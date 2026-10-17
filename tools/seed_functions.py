@@ -1,0 +1,75 @@
+"""Derive Thumb function start addresses from a GBA ROM for seeding Ghidra.
+
+Sources: every `bl` target inside the code region, plus odd (Thumb) pointers into the code region
+that sit in literal pools (code/rodata, the IWRAM image) or inside pointer tables elsewhere in ROM.
+
+usage: seed_functions.py ROM OUT.txt [--code-end 0x28000] [--extra 0x21d74,0x158]
+"""
+import argparse
+import collections
+import struct
+
+ROM_BASE = 0x08000000
+DATA_IMAGE = (0x7FD6BC, 0x7FE53B)  # .data copied to IWRAM at boot (LoG2 USA)
+
+
+def is_ptr(w):
+    return (0x08000000 <= w < 0x08800000) or (0x02000000 <= w < 0x02040000) or (0x03000000 <= w < 0x03008000)
+
+
+def bl_targets(data, code_end):
+    out = set()
+    for i in range(0, code_end, 2):
+        h1 = data[i] | data[i + 1] << 8
+        if (h1 & 0xF800) != 0xF000:
+            continue
+        h2 = data[i + 2] | data[i + 3] << 8
+        if (h2 & 0xF800) != 0xF800:
+            continue
+        off = ((h1 & 0x7FF) << 12) | ((h2 & 0x7FF) << 1)
+        if off & 0x400000:
+            off -= 0x800000
+        t = i + 4 + off
+        if 0 <= t < code_end and t % 2 == 0:
+            out.add(t)
+    return out
+
+
+def pointer_targets(data, code_end, rodata_end):
+    words = struct.unpack("<%dI" % (len(data) // 4), data[: len(data) // 4 * 4])
+    out = set()
+    sources = collections.Counter()
+    for j, w in enumerate(words):
+        if not (ROM_BASE + 1 <= w < ROM_BASE + code_end and w & 1):
+            continue
+        off = j * 4
+        in_pool = off < rodata_end or DATA_IMAGE[0] <= off < DATA_IMAGE[1]
+        in_table = (j > 0 and is_ptr(words[j - 1])) or (j + 1 < len(words) and is_ptr(words[j + 1]))
+        if in_pool or in_table:
+            out.add(w - ROM_BASE - 1)
+            sources[off // 0x40000] += 1
+    return out, sources
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("rom")
+    ap.add_argument("out")
+    ap.add_argument("--code-end", type=lambda s: int(s, 0), default=0x28000)
+    ap.add_argument("--rodata-end", type=lambda s: int(s, 0), default=0x40000)
+    ap.add_argument("--extra", default="0x21d74,0x158", help="comma-separated extra starts (ROM offsets)")
+    a = ap.parse_args()
+
+    data = open(a.rom, "rb").read()
+    bl = bl_targets(data, a.code_end)
+    ptrs, sources = pointer_targets(data, a.code_end, a.rodata_end)
+    seeds = bl | ptrs | {int(x, 0) for x in a.extra.split(",") if x}
+    with open(a.out, "w") as f:
+        for s in sorted(seeds):
+            f.write(f"{ROM_BASE + s:08x}\n")
+    print(f"bl targets {len(bl)}, pointer targets {len(ptrs)}, total seeds {len(seeds)} -> {a.out}")
+    print("pointer sources by 256KB:", " ".join(f"{k * 0x40000:06x}:{v}" for k, v in sorted(sources.items())))
+
+
+if __name__ == "__main__":
+    main()

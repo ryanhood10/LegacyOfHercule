@@ -20,6 +20,18 @@ Then check them:
 python tools/romcheck.py roms/log2.gba roms/buu.gba
 ```
 
+## Ghidra
+
+Builds a headless Ghidra project in `build/ghidra/` with the GBA memory map, functions seeded from
+`bl` targets and pointer tables (Ghidra's own code finder is useless on this ROM), and a function
+list in `build/log2.functions.csv`:
+
+```
+tools\ghidra_import.ps1 roms\log2.gba
+```
+
+Open `build\ghidra\log2.gpr` in the Ghidra GUI afterwards. Findings go in `docs/rom-map.md`.
+
 ## Layout
 
 ```
