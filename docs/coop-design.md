@@ -190,6 +190,20 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
 - Savestates survive rebuilds: `coop_init_once` rebuilds the RAM vtable copies when the stored
   `code_id` (address of `coop_init_once`) differs from the running build.
 
+## Cutscene map changes and the prologue (2026-10-17)
+
+- Bug found in Ryan's playthrough: after the prologue's first cutscene only one player and one HUD
+  remained and the Flight Circle would not respond. Cause: the cutscene replaced the player entity
+  *inside* `EntityList_Update`'s loop, and the co-op replacement restored the `g_PlayerObject` it had
+  captured before the loop, leaving the game pointing at freed memory. The loop now re-reads both
+  player pointers for every entity and only restores `g_PlayerObject` if the callee left it alone.
+- The prologue party is Trunks alone, which made player 2 share his slot (and HP). Rule: the players
+  never share a character, so `pick_p2_slot` returns -1 and player 2 only joins once a second party
+  member exists (`ensure_p2` re-checks every idle frame, so it appears as soon as someone joins).
+- Flight Circles: stand on the circle and press A; the scripted flight then loads the next map, which
+  destroys player 2 and respawns it on player 1 at the landing spot. A takeoff animation for player 2
+  (each player lifting off from where they stand) is not done yet.
+
 ## Test tooling additions
 
 - `tools/mgba/ents.lua`: `ents()` lists both players and every enemy (vtable `0x080252A4`) with

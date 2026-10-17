@@ -25,20 +25,23 @@ void entity_list_update_hook(EntityList *list) {
         call_slot(ev, 2);
     }
 
-    Entity *p1 = g_PlayerObject;
-    Entity *p2 = coop.p2;
     for (int i = list->count - 1; i >= 0; i--) {
+        // Re-read both players every entity: a cutscene or map change inside an update replaces
+        // the player entity (and destroys player 2), and the old pointers must not be restored.
+        Entity *p1 = g_PlayerObject;
+        Entity *p2 = coop.p2;
         Entity *e = list->items[i];
         if (p1 && p2 && e != p1 && e != p2) {
             Entity *near = nearest_player(e, p1, p2);
             g_PlayerObject = near;
             coop.acting = near;
             call_slot(e, 2);
-            g_PlayerObject = p1;
+            if (g_PlayerObject == near) g_PlayerObject = p1;
         } else {
             coop.acting = (p2 && e == p2) ? p2 : p1;
             call_slot(e, 2);
         }
+        if (i > list->count) i = list->count;   // the list shrank under us
     }
-    coop.acting = p1;
+    coop.acting = g_PlayerObject;
 }

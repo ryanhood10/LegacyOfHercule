@@ -23,3 +23,10 @@ function ents(all)
   end
 end
 console:log("ents loaded")
+
+-- words(addr, n): log n 32-bit words starting at addr
+function words(addr, n)
+  local t = {}
+  for i = 0, (n or 8) - 1 do t[#t + 1] = string.format("%x=%08x", addr + i * 4, emu:read32(addr + i * 4)) end
+  console:log(table.concat(t, " "))
+end

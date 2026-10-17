@@ -243,12 +243,13 @@ static int slot_ok(int s, int avail) {
     return (f & 1) && (!avail || (f & 2));
 }
 
+// -1 while the party has no second member: the players never share a character, so player 2
+// joins once someone besides player 1's character is in the party.
 static int pick_p2_slot(void) {
     if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;   // keep the chosen character across maps
-    int active = g_Party->active_slot;
     for (int i = 0; i < 6; i++)
         if (slot_ok(i, 0)) return i;
-    return active;
+    return -1;
 }
 
 static void install_behaviour(Entity *e, int slot) {
@@ -295,7 +296,9 @@ void p2_cycle(void) {
 
 static void ensure_p2(Entity *p1) {
     if (coop.p2 || !p2_present()) return;
-    coop.p2_slot = (u8)pick_p2_slot();
+    int slot = pick_p2_slot();
+    if (slot < 0) return;
+    coop.p2_slot = (u8)slot;
     s16 xy[2] = { (s16)(p1->x >> 8), (s16)(p1->y >> 8) };
     Entity *p2 = PlayerEntity_Create(0, CharacterEntry_GetSpriteRecord(&g_Party->chars[coop.p2_slot]), xy);
     g_PlayerObject = p1;  // the constructor claimed the player slot
