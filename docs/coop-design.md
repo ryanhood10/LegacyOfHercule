@@ -164,9 +164,10 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   slot only (`peek()` shows both slots' EXP and the `awards` counters).
 - Note: one award to the active slot is counted on every debug-menu Map Test entry, before the
   menu resets the party's EXP to level 40; it is the original game's behaviour, not a co-op path.
-- Open: both players' `+0x180` behaviour pointer is the same IWRAM cell (`0x030021E0`), so
-  `install_behaviour` for player 2 re-initialises the cell player 1 also uses. Nothing visibly
-  wrong yet; check whether per-character melee/ability behaviour differs between rows.
+- Both players' `+0x180` behaviour pointer is the same IWRAM cell (`0x030021E0`): the 22 display
+  rows map onto five cells by behaviour *type* (rows 0-3 = the base forms share one), so
+  `install_behaviour` for player 2 re-initialises a type singleton of the same type, which is
+  benign. Rows of another type (4, 5, 7, 10, 11, 14, 16, 17, 20) use their own cells.
 
 ## Test tooling additions
 

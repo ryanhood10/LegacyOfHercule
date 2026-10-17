@@ -48,11 +48,19 @@ Output: `build/log2-coop.gba`. Run it in mGBA. For a boot smoke test over the GD
 ## Playing two-player on one PC
 
 1. Open `build\log2-coop.gba` in mGBA (the Qt `mGBA.exe`, not `mgba-sdl`).
-2. Tools > Scripting, type `dofile("F:/MeltyCreations/log2/tools/mgba/p2_input.lua")` and Run.
+2. Tools > Scripting, type `dofile("F:/MeltyCreations/log2/tools/mgba/coop.lua")` and Run. That
+   loads the player-2 bridge plus the console helpers `peek()`, `ents()` and `p2_force` (mGBA 0.10.5
+   has no command-line script option, so this step is manual).
 3. Run `python tools\p2_keys.py` in a terminal. Player 1 uses mGBA's normal keys; player 2 uses
    IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. Two gamepads: bind one in mGBA,
    adapt `KEYMAP` in `p2_keys.py` for the other. A second player on another PC runs
    `p2_keys.py --host <your ip>` (forward TCP 7777) and watches a screen share.
+
+Player 2 appears as soon as its pad sends anything, bound to the first other party member, with its
+own HUD panel on the right, its own damage and EXP (kills go to whoever made them). With no second
+pad the game plays exactly as before. Testing tip: `make DEBUG_MENU=1`, idle ~75 s on the title for
+the debug menu's Map Test, and keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t
+build\log2-coop.ss1 build\log2-coop.gba` starts straight from it.
 
 ## Layout
 
