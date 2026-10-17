@@ -1,0 +1,21 @@
+# ROMs and anything derived from them never go in the repo
+roms/
+*.gba
+*.sav
+*.sgm
+*.ss?
+build/
+
+# Ghidra projects (keep them local; share notes via docs/ instead)
+*.gpr
+*.rep/
+*.lock
+*.lock~
+
+# Python
+__pycache__/
+*.pyc
+
+# Editors
+.vscode/
+.idea/
