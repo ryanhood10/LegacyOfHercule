@@ -1,6 +1,7 @@
 // Replacement for Input_Poll (0x0801EEFC; its first 8 bytes are patched to jump here).
 // Same behaviour for player 1, plus player 2's InputSystem filled from the selected source.
 #include "coop.h"
+#include "wide.h"
 
 #define CONTROLLER_WINDOW 600   // polls (~10 s) during which holding L+R turns this GBA into the P2 pad
 
@@ -94,6 +95,7 @@ void input_poll_hook(InputSystem *in) {
     poll_into(&coop.input2, p2);
 
     coop_active_check();
+    wide_update();
 #if P2_MODE != P2_MODE_SWAP
     if (coop.p2 && (coop.input2.pressed & KEY_SELECT) && p1_controllable()) p2_cycle();
 #endif

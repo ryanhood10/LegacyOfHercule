@@ -1,6 +1,7 @@
 // Second HUD panel for player 2, drawn right after player 1's by hooking the HUD object's vtable
 // (draw / update / destroy). The panel composition is a port of the original draw routine.
 #include "coop.h"
+#include "wide.h"
 
 static void dma_copy32(const void *src, void *dst, int words) {
     REG_DMA3SAD = (u32)src;
@@ -12,11 +13,13 @@ static void dma_copy32(const void *src, void *dst, int words) {
 static void emit_sprites(const Hud *h, u32 **oam, int x_offset) {
     u32 *o = *oam;
     u32 y = h->y & 0xFF;
-    o[0] = (0x80086000u + ((u32)x_offset << 16)) | y;
+    // attr1 x is 9 bits; the wide-view fork reads bit 9 of x from attr1 bit 9 (word bit 25)
+    u32 xo = (((u32)x_offset & 0x1FF) << 16) | ((((u32)x_offset >> 9) & 1) << 25);
+    o[0] = (0x80086000u + xo) | y;
     o[1] = (o[1] & 0xFFFFFC00u) | (h->tile & 0x3FF);
-    o[2] = (0x40282000u + ((u32)x_offset << 16)) | y;
+    o[2] = (0x40282000u + xo) | y;
     o[3] = (o[3] & 0xFFFFFC00u) | ((h->tile + 0x10) & 0x3FF);
-    o[4] = (0x80386000u + ((u32)x_offset << 16)) | y;
+    o[4] = (0x80386000u + xo) | y;
     o[5] = (o[5] & 0xFFFFFC00u) | ((h->tile + 0x18) & 0x3FF);
     *oam = o + 6;
 }
@@ -85,7 +88,7 @@ void hud_draw_hook(Hud *h, u32 **oam) {
     if (!coop.p2) return;
     hud2_ensure_tiles();
     coop.hud2.y = h->y;
-    emit_sprites(&coop.hud2, oam, HUD2_X_OFFSET);
+    emit_sprites(&coop.hud2, oam, wide_w() - 96);   // 144 at 240 wide (HUD2_X_OFFSET)
     compose_panel(&coop.hud2, &g_Party->chars[coop.p2_slot]);
 }
 

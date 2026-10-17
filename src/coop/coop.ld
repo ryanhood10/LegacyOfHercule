@@ -4,7 +4,7 @@ ENTRY(idle_update_hook)
 EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud_destroy_hook g_p2_remote g_p1_remote
        dash_update_hook ctrl_8277_hook ctrl_85ad_hook entity_list_update_hook camera_follow_hook
        exp_award_hook enemy_spawn_hook damage_calc_hook ai_speed8_create_hook ai_speed4_create_hook
-       bossbar_create_hook coop2)
+       bossbar_create_hook coop2 sprite_emit_hook)
 
 MEMORY
 {

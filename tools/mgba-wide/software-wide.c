@@ -147,7 +147,8 @@ static size_t _decompress(const uint8_t* src, size_t srcSize, int litBits, uint8
 		uint32_t o = _bits(&b, 7);
 		if (o) {
 			lastOff = o;
-			COPY(lastOff, _bits(&b, 2) + 2);
+			uint32_t len = _bits(&b, 2) + 2;   /* evaluated once: COPY re-evaluates its length */
+			COPY(lastOff, len);
 			continue;
 		}
 		uint32_t k = _bits(&b, 2);
@@ -202,8 +203,12 @@ static const uint16_t* _chunk(struct GBAVideoSoftwareRenderer* renderer, uint32_
 
 /* ---- per-frame descriptor ------------------------------------------------------------------ */
 void GBAVideoSoftwareRendererWideBeginFrame(struct GBAVideoSoftwareRenderer* renderer) {
+	int oldW = renderer->wideW, oldH = renderer->wideH;
 	renderer->wideW = GBA_VIDEO_HORIZONTAL_PIXELS;
 	renderer->wideH = GBA_VIDEO_VERTICAL_PIXELS;
+	if (oldW != renderer->wideW || oldH != renderer->wideH) {
+		memset(renderer->scanlineDirty, 0xFF, sizeof(renderer->scanlineDirty));
+	}
 	struct GBA* gba = renderer->d.gba;
 	if (!gba || !gba->memory.wram) {
 		return;
@@ -216,6 +221,10 @@ void GBAVideoSoftwareRendererWideBeginFrame(struct GBAVideoSoftwareRenderer* ren
 	int h = _rd16(wram, WIDE_DESC_OFFSET + 6);
 	if (w < GBA_VIDEO_HORIZONTAL_PIXELS || w > WIDE_MAX_W || h < GBA_VIDEO_VERTICAL_PIXELS || h > WIDE_MAX_H) {
 		return;
+	}
+	if (oldW != (w & ~3) || oldH != h) {
+		/* the scanline cache only redraws lines whose registers changed; a new size needs them all */
+		memset(renderer->scanlineDirty, 0xFF, sizeof(renderer->scanlineDirty));
 	}
 	renderer->wideW = w & ~3;
 	renderer->wideH = h;

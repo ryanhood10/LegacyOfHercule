@@ -114,6 +114,32 @@ packages on top and is optional.
   `tools/win_shot.ps1 out.png -Title "mGBA (Ubuntu)"` screenshots it). `tools/mgba/wide_test.lua`
   forces a descriptor (`WIDE_W`/`WIDE_H` env) so the renderer can be exercised before the ROM side.
 
+## Status: working (2026-10-17 evening)
+
+Verified in the WSL fork from the wolf-map savestate: with `make WIDE=1` the view starts at 240 x 160,
+widens as the players separate (seen at 344 x 228 and 452 x 300 with both HUD panels at the wide
+corners and sprites placed correctly), and shrinks back when they rejoin. Player 2's keys reach the
+fork through `MGBA_P2=1` (TCP pad reader in `tools/mgba-wide/p2pad.c`, port `MGBA_P2_PORT`,
+default 7777) with the unchanged `tools/p2_keys.py --port <n>` sender. Fixes that mattered: the C
+decompressor's copy macro re-evaluated its length argument; mGBA's window columns were 8-bit
+(`endX`, `GBAVideoWindowRegion`) and wrapped at 256; every scanline must be marked dirty when the
+view size changes; the view only shrinks after a second without player control, so a knockback
+does not zoom in.
+
+ROM side (`WIDE=1` build only, stock build untouched): `src/coop/wide.c/.h` (descriptor at
+`0x0203FEC0`, state at `0x0203FEC8`, target width = separation + 144 px, height follows 2:3, eased
+1/8 per frame, 240..720), `camera.c` (midpoint minus half the wide size, map clamp for the wide
+size, cull rect widened after `World_SetView`), `player.c` leash, `hud.c` (player 2's panel at
+`w - 96`, OAM x bit 9), `input.c` calls `wide_update()`, `patch_rom.py --wide` redirects the draw
+slot of the 13 sprite classes to `sprite_emit_hook` (OAM attr1 bits 9/10 from the entity's full
+screen coordinates). `make WIDE=1 WIDE_TEST=480` forces a size for renderer tests;
+`make WIDE=1 P2_MODE=1` (mirror mode) separates the players with one key.
+
+Known limits: Lua scripts never fire frame callbacks in the SDL fork (loading works, callbacks do
+not), so `netplay.lua` and the console helpers are Windows-mGBA only for now; dialogue boxes, the
+pause menu and BG0 text stay at native size in the top-left of a wide frame; OBJ count is still 128;
+the stock Windows mGBA ignores the descriptor and shows the normal 240 x 160 of a `WIDE=1` ROM.
+
 ## Plan
 
 1. Toolchain install (needs Ryan's OK), stock SDL build, run `build/log2-coop.gba`.

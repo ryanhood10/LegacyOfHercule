@@ -31,6 +31,8 @@ def edit(rel, pairs, must=True):
 
 # ---- renderer base: give renderers the GBA pointer (ROM, EWRAM, IWRAM access) -----------------
 edit("include/mgba/internal/gba/video.h", [
+    # window columns must hold the wide width (up to 720), not 8 bits
+    ("struct GBAVideoWindowRegion {\n\tuint8_t end;\n\tuint8_t start;\n};", "struct GBAVideoWindowRegion {\n\tuint16_t end;\n\tuint16_t start;\n};"),
     ("struct GBAVideoRenderer {\n", "struct GBA;\nstruct GBAVideoRenderer {\n"),
     ("\tunion GBAOAM* oam;\n", "\tunion GBAOAM* oam;\n\tstruct GBA* gba;   /* wide view: ROM/RAM access */\n"),
 ])
@@ -59,6 +61,7 @@ extern int mWideFrameH;
     ("\tuint32_t row[GBA_VIDEO_HORIZONTAL_PIXELS];\n\tuint32_t spriteLayer[GBA_VIDEO_HORIZONTAL_PIXELS];\n",
      "\tuint32_t row[WIDE_MAX_W];\n\tuint32_t spriteLayer[WIDE_MAX_W];\n"),
     ("\tuint32_t scanlineDirty[5];\n", "\tuint32_t scanlineDirty[(WIDE_MAX_H + 31) / 32];\n"),
+    ("\tuint8_t endX;\n\tstruct WindowControl control;\n", "\tuint16_t endX;   /* wide view: up to 720 */\n\tstruct WindowControl control;\n"),
     ("\t} cache[GBA_VIDEO_VERTICAL_PIXELS];\n", "\t} cache[WIDE_MAX_H];\n"),
     ("\tuint8_t lastHighlightAmount;\n};\n", """\tuint8_t lastHighlightAmount;
 
@@ -333,7 +336,9 @@ edit("src/platform/sdl/sw-sdl2.c", [
     ("\tunsigned width, height;\n\trenderer->core->desiredVideoDimensions(renderer->core, &width, &height);\n\trenderer->window = SDL_CreateWindow(",
      "\tunsigned width, height;\n\trenderer->core->desiredVideoDimensions(renderer->core, &width, &height);\n\twidth = WIDE_MAX_W;\n\theight = WIDE_MAX_H;\n\trenderer->window = SDL_CreateWindow("),
     ("\t\t\tSDL_RenderCopy(renderer->sdlRenderer, renderer->sdlTex, 0, 0);\n",
-     "\t\t\tSDL_Rect src = { 0, 0, mWideFrameW, mWideFrameH };\n\t\t\tSDL_RenderCopy(renderer->sdlRenderer, renderer->sdlTex, &src, 0);\n"),
+     "\t\t\tSDL_Rect src = { 0, 0, mWideFrameW, mWideFrameH };\n\t\t\tmP2PadPoll(renderer->core);\n\t\t\tSDL_RenderCopy(renderer->sdlRenderer, renderer->sdlTex, &src, 0);\n"),
+    ("static bool mSDLSWInit(struct mSDLRenderer* renderer);",
+     "void mP2PadPoll(struct mCore* core);\n\nstatic bool mSDLSWInit(struct mSDLRenderer* renderer);"),
 ])
 
 # ---- SDL frontend: MGBA_SCRIPT=<lua file> ------------------------------------------------------
@@ -351,16 +356,47 @@ edit("src/platform/sdl/main.c", [
 		mScriptContextAttachStdlib(&scriptContext);
 		mScriptContextAttachSocket(&scriptContext);
 		mScriptContextRegisterEngines(&scriptContext);
-		if (mLogGetContext()) {
-			mScriptContextAttachLogger(&scriptContext, mLogGetContext());
-		}
-		mScriptContextAttachCore(&scriptContext, renderer->core);
-		if (!mScriptContextLoadFile(&scriptContext, scriptPath)) {
-			printf("Could not load script %s\\n", scriptPath);
-		}
+		mScriptContextAttachLogger(&scriptContext, &_logger.d);
 	}
 """),
+    # load the script once the core thread runs and has attached the context (as the Qt frontend does)
+    ("""	bool didFail = !mCoreThreadStart(&thread);
+
+	if (!didFail) {
+""", """	bool didFail = !mCoreThreadStart(&thread);
+
+	if (!didFail) {
+#ifdef ENABLE_SCRIPTING
+		if (scriptPath) {
+			mCoreThreadInterrupt(&thread);
+			if (!mScriptContextLoadFile(&scriptContext, scriptPath)) {
+				printf("Could not load script %s\\n", scriptPath);
+			} else {
+				printf("wide: loaded script %s\\n", scriptPath);
+			}
+			mCoreThreadContinue(&thread);
+		}
+#endif
+"""),
     ("#ifdef ENABLE_SCRIPTING\n\tmScriptBridgeDestroy(bridge);\n",
-     "#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDetachCore(&scriptContext);\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n\tmScriptBridgeDestroy(bridge);\n"),
+     "#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n\tmScriptBridgeDestroy(bridge);\n"),
+    # the core thread attaches the context itself (and fires start/frame callbacks) when it has one
+    ("\tthread.logger.logger = &_logger.d;\n",
+     "\tthread.logger.logger = &_logger.d;\n#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tthread.scriptContext = &scriptContext;\n\t}\n#endif\n"),
+])
+# ---- player-2 pad over TCP in the SDL frontend (no Lua needed) ----------------------------------
+shutil.copyfile(os.path.join(here, "p2pad.c"), os.path.join(root, "src/platform/sdl/p2pad.c"))
+print("copied p2pad.c")
+edit("src/platform/sdl/CMakeLists.txt", [
+    ("set(MAIN_SRC ${CMAKE_SOURCE_DIR}/src/platform/sdl/main.c)",
+     "set(MAIN_SRC ${CMAKE_SOURCE_DIR}/src/platform/sdl/main.c ${CMAKE_SOURCE_DIR}/src/platform/sdl/p2pad.c)"),
+])
+edit("src/platform/sdl/main.c", [
+    ("static struct mStandardLogger _logger;\n",
+     "static struct mStandardLogger _logger;\nvoid mP2PadInit(void);\nvoid mP2PadDeinit(void);\n"),
+    ("\tbool didFail = !mCoreThreadStart(&thread);\n",
+     "\tmP2PadInit();\n\tbool didFail = !mCoreThreadStart(&thread);\n"),
+    ("#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n",
+     "\tmP2PadDeinit();\n#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n"),
 ])
 print("done")

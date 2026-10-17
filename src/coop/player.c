@@ -1,6 +1,7 @@
 // Player control states (idle / walk / diagonal) ported from the ROM with one change: input and the
 // party slot come from the entity instead of globals, so a second player entity can run them.
 #include "coop.h"
+#include "wide.h"
 
 // Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
 // the game never zeroes them, hence the magic. Order fixed: remote word at +0, state at +4.
@@ -47,8 +48,9 @@ void leash_p2(Entity *e) {
     s32 x = e->x >> 8, y = e->y >> 8;
     // the whole visible area minus the sprite's own half-width (the GBA shows 240 x 160 and
     // nothing beyond it; a wider view is an emulator feature, see docs)
-    s32 nx = x < left + 4 ? left + 4 : (x > left + 236 ? left + 236 : x);
-    s32 ny = y < top + 20 ? top + 20 : (y > top + 158 ? top + 158 : y);
+    s32 right = left + wide_w() - 4, bottom = top + wide_h() - 2;
+    s32 nx = x < left + 4 ? left + 4 : (x > right ? right : x);
+    s32 ny = y < top + 20 ? top + 20 : (y > bottom ? bottom : y);
     if (nx != x) e->x = nx << 8;
     if (ny != y) e->y = ny << 8;
 }

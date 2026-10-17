@@ -101,6 +101,21 @@ console. Make savestates with the current build: player 2's vtable copies in EWR
 addresses, so a state from an older build crashes (`Jumped to invalid address`) as soon as
 player 2 acts.
 
+## Wide view on big screens (WSL fork)
+
+`make WIDE=1` builds `build\log2-wide.gba`, which widens the view up to 720 x 480 as the two
+players separate and shrinks it back when they rejoin. It needs the mGBA fork in `tools/mgba-wide`,
+which Windows Smart App Control blocks when built natively, so it is built and run in WSL Ubuntu:
+
+```
+wsl -d Ubuntu -u root -- bash /mnt/f/MeltyCreations/log2/tools/mgba-wide/build-wsl.sh
+wsl -d Ubuntu -u root -- bash -c "cd /root/mgba-build/sdl && MGBA_P2=1 MGBA_P2_PORT=7778 ./mgba -2 /mnt/f/MeltyCreations/log2/build/log2-wide.gba"
+python tools\p2_keys.py --port 7778
+```
+
+The window appears on the Windows desktop (WSLg). See `docs/widescreen.md` for the design and
+limits (the Lua helpers and netplay script do not run in the fork yet).
+
 ## Layout
 
 ```

@@ -24,6 +24,11 @@ VTABLE_HOOKS = [
     (0x0802408C, 4, "hud_draw_hook"),
 ]
 
+# --wide: draw slot (4) of every class whose draw is the base sprite emitter 0x08007773, redirected
+# to sprite_emit_hook (adds OAM x bit 9 / y bit 8 for the wide-view mGBA fork)
+SPRITE_VTABLES = [0x0802489C, 0x08024E84, 0x080252A4, 0x08025564, 0x080255CC, 0x08025604, 0x0802564C,
+                  0x08025770, 0x080257A0, 0x080257D0, 0x0802593C, 0x08025C30, 0x08025F28]
+
 # (function address, symbol): the entry becomes  ldr r3,[pc,#n]; bx r3; (nop;) .word symbol|1
 # 8 bytes when addr % 4 == 0; 10 bytes (with a nop before the word) when addr % 4 == 2.
 ENTRY_JUMPS = [
@@ -61,6 +66,7 @@ def load_symbols(path):
 def main():
     orig, blob, symfile, out = sys.argv[1:5]
     debug_menu = "--debug-menu" in sys.argv[5:]
+    wide = "--wide" in sys.argv[5:]
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
         off, old, new = DEBUG_MENU_PATCH
@@ -83,7 +89,10 @@ def main():
         struct.pack_into("<I", rom, off, new)
         print(f"word   {ROM_BASE + off:08x} {old:08x} -> {new:08x}")
 
-    for vtable, slot, name in VTABLE_HOOKS:
+    hooks = list(VTABLE_HOOKS)
+    if wide:
+        hooks += [(vt, 4, "sprite_emit_hook") for vt in SPRITE_VTABLES]
+    for vtable, slot, name in hooks:
         target = syms[name] | 1
         rel = (target - vtable) & 0xFFFFFFFF
         off = vtable - ROM_BASE + slot * 4
