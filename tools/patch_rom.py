@@ -24,11 +24,12 @@ VTABLE_HOOKS = [
     (0x0802408C, 4, "hud_draw_hook"),
 ]
 
-# (function address, symbol): first 8 bytes become  ldr r3,[pc]; bx r3; .word symbol|1
-# The address must be such that (addr + 4) & ~3 == addr + 4, i.e. addr % 4 == 0.
+# (function address, symbol): the entry becomes  ldr r3,[pc,#n]; bx r3; (nop;) .word symbol|1
+# 8 bytes when addr % 4 == 0; 10 bytes (with a nop before the word) when addr % 4 == 2.
 ENTRY_JUMPS = [
     (0x0801EEFC, "input_poll_hook"),         # Input_Poll
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
+    (0x0800E4D2, "exp_award_hook"),          # enemy death -> EXP event
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
@@ -85,11 +86,15 @@ def main():
         print(f"vtable {vtable:08x}[{slot}] {old:08x} -> {rel:08x} ({name} @ {target:08x})")
 
     for addr, name in ENTRY_JUMPS:
-        if addr % 4:
-            sys.exit(f"entry jump at {addr:#x} must be 4-byte aligned")
         target = syms[name] | 1
         off = addr - ROM_BASE
-        struct.pack_into("<HHI", rom, off, 0x4B00, 0x4718, target)   # ldr r3,[pc,#0]; bx r3; .word
+        if addr % 4 == 0:
+            struct.pack_into("<HHI", rom, off, 0x4B00, 0x4718, target)   # ldr r3,[pc,#0]; bx r3; .word
+        elif addr % 4 == 2:
+            # pc reads as (addr+4)&~3 = addr+2, so [pc,#4] is the word at addr+6
+            struct.pack_into("<HHHI", rom, off, 0x4B01, 0x4718, 0x46C0, target)   # ldr r3,[pc,#4]; bx r3; nop; .word
+        else:
+            sys.exit(f"entry jump at {addr:#x} must be 2-byte aligned")
         print(f"entry  {addr:08x} -> {name} @ {target:08x}")
 
     open(out, "wb").write(rom)

@@ -1,16 +1,8 @@
 // Replacement for EntityList_Update (0x080069A4; entry patched with a long jump). Same work as the
 // original, plus: while a non-player entity updates, g_PlayerObject points at whichever player is
-// nearest to it, so enemy AI, attacks and hit tests target player 2 when they should.
+// nearest to it, so enemy AI, attacks and hit tests target player 2 when they should. coop.acting
+// records the player responsible for the current update (for EXP crediting, see exp.c).
 #include "coop.h"
-
-typedef struct EntityList {
-    u32 *vtable;          // +0x000
-    s32 count;            // +0x004
-    Entity *items[0x182]; // +0x008 .. +0x610
-    s32 event_count;      // +0x610
-    u32 *events[];        // +0x614  objects: { relative vtable, s32 ticks }
-} EntityList;
-_Static_assert(__builtin_offsetof(EntityList, event_count) == 0x610, "EntityList layout");
 
 static inline void call_slot(void *obj, int slot) {
     ((void (*)(void *))vslot(obj, slot))(obj);
@@ -23,6 +15,7 @@ static Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2) {
 }
 
 void entity_list_update_hook(EntityList *list) {
+    coop.acting = g_PlayerObject;
     for (int i = list->event_count - 1; i >= 0; i--) {
         u32 *ev = list->events[i];
         if (--((s32 *)ev)[1] != 0) continue;
@@ -37,11 +30,15 @@ void entity_list_update_hook(EntityList *list) {
     for (int i = list->count - 1; i >= 0; i--) {
         Entity *e = list->items[i];
         if (p1 && p2 && e != p1 && e != p2) {
-            g_PlayerObject = nearest_player(e, p1, p2);
+            Entity *near = nearest_player(e, p1, p2);
+            g_PlayerObject = near;
+            coop.acting = near;
             call_slot(e, 2);
             g_PlayerObject = p1;
         } else {
+            coop.acting = (p2 && e == p2) ? p2 : p1;
             call_slot(e, 2);
         }
     }
+    coop.acting = p1;
 }

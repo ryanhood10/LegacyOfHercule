@@ -32,5 +32,10 @@ function peek()
   console:log(string.format("coop@%s remote=%04x input2=%04x age=%d slot2=%d active=%d spawns=%d destroys=%d", hex(COOP),
     emu:read16(0x0203FF00), emu:read16(COOP + 0x7A), emu:read16(COOP + 0xB6), emu:read8(COOP + 0x80), emu:read8(0x03000E90),
     emu:read16(COOP + 0xB8), emu:read16(COOP + 0xBA)))
+  local function exp(slot) return emu:read32(0x03000E90 + 0xC + slot * 0x1C + 0x10) end
+  local function hp(slot) return emu:read16(0x03000E90 + 0xC + slot * 0x1C) end
+  local a, b = emu:read8(0x03000E90), emu:read8(COOP + 0x80)
+  console:log(string.format("exp: active=%d p2slot=%d hp=%d/%d acting=%s awards p1=%d p2=%d", exp(a), exp(b), hp(a), hp(b),
+    hex(emu:read32(COOP + 0xBC)), emu:read16(COOP + 0xD8), emu:read16(COOP + 0xDA)))
 end
 console:log("peek loaded")

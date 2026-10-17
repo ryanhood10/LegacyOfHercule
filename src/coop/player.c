@@ -219,6 +219,7 @@ void coop_init_once(void) {
     coop.p2_vtable[0] = (u32)p2_destroy - base;
     coop.p2_vtable[15] = (u32)p2_change_hp - base;
     coop.p2_vtable[16] = (u32)p2_take_damage - base;
+    exp_init();
 }
 
 static int pick_p2_slot(void) {

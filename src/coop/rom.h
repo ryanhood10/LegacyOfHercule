@@ -54,6 +54,15 @@ typedef struct PartyState {
     CharacterEntry chars[6];      // +0x0C
 } PartyState;
 
+typedef struct EntityList {
+    u32 *vtable;          // +0x000
+    s32 count;            // +0x004
+    Entity *items[0x182]; // +0x008 .. +0x610
+    s32 event_count;      // +0x610
+    u32 *events[];        // +0x614  objects: { relative vtable, s32 ticks, ... }; slot 3 fires, slot 2 destroys
+} EntityList;
+_Static_assert(__builtin_offsetof(EntityList, event_count) == 0x610, "EntityList layout");
+
 typedef struct AbilityDef {
     void *ready_icon, *cooling_icon;
     int (*is_ready)(CharacterEntry *);
@@ -94,6 +103,7 @@ typedef struct AbilityDef {
 #define g_LastDirFrame   (*(u32 *)0x03001F60)   // frame of the last d-pad press (double-tap)
 #define g_Ctx            ((const u32 *)0x083B50E8) // [4] collision map, +0x9C facing table, +0xC0 vectors
 #define g_SceneTable     ((void **)0x083ED1B8)      // [1] entity list used by the map loader
+#define g_EntityList     ((EntityList *)0x03001120)  // == g_SceneTable[1]
 #define g_AudioMixer     ((u8 *)0x030026BC)
 #define g_Camera         ((void *)0x030020DC)
 #define CAMERA_CELL      (*(const s32 **)0x081DA974)   // ROM cell -> camera object; +0x1C/+0x20 = view origin (world px)
@@ -167,6 +177,8 @@ ROM_FN(void, Sfx_Play, (void *channel, const void *sfx, int vol, int pan), 0x080
 ROM_FN(void, Player_Attack, (Entity *e), 0x08007DE9);
 ROM_FN(void, Player_StepAxis, (Entity *e, const s32 *xy, int axis), 0x08007D25);
 ROM_FN(void, IdleState_Update, (void *state, Entity *e), 0x08007F35);
+ROM_FN(void *, Arena_Alloc, (int bytes), 0x0801F08D);
+ROM_FN(void, Party_AddExp, (PartyState *party, int slot, int amount), 0x08003D59);   // handles level-ups
 
 // vtable slot calls: function = table + table[slot]
 static inline void *vslot(const void *obj, int slot) {

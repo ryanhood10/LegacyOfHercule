@@ -27,7 +27,11 @@ typedef struct CoopState {
     u16 sio_last;      // last raw word received from the controller GBA
     u16 source_age;    // frames since a player-2 input source last reported (bridge or cable)
     u16 spawns, destroys;   // debug counters for player 2's lifetime
+    Entity *acting;         // player responsible for the entity update in progress (exp.c)
+    u32 exp_vtable[6];      // copy of the EXP event vtable with the fire slot replaced
+    u16 exp_awards[2];      // debug counters: EXP events credited to [0] player 1, [1] player 2
 } CoopState;
+_Static_assert(__builtin_offsetof(CoopState, exp_awards) == 0xD8, "CoopState layout (peek.lua)");
 
 #define P2_SOURCE_TIMEOUT 180   // frames without a source before player 2 is considered absent
 
@@ -40,4 +44,5 @@ extern CoopState coop;             // pinned at 0x0203FF04 (section .coop)
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 
 void coop_init_once(void);
+void exp_init(void);         // build the EXP event vtable copy (called from coop_init_once)
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)

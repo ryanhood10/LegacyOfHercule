@@ -122,7 +122,8 @@ player 2 respawning every frame, garbage input). `tools/patch_rom.py` shrinks th
 (idle `0x08025A84`, walk `0x080256C4`, ...), `+0x1C` a secondary state (default `0x03001F3C`).
 
 Live inspection without pausing: `dofile("…/tools/mgba/peek.lua")` in the Scripting console, then
-`peek()` prints both players' positions/states and the co-op counters (addresses from `coop.sym`).
+`peek()` prints both players' positions/states, both slots' EXP/HP and the co-op counters (addresses
+from `coop.sym`). See also `ents.lua` and `force.lua` below.
 
 ## Session logic
 
@@ -144,6 +145,39 @@ Live inspection without pausing: `dofile("…/tools/mgba/peek.lua")` in the Scri
   gate (`p1_controllable`) covers scripted movement states where updates keep running.
 - The screen-edge leash means a parked player 2 stops player 1 at the view edge (by design);
   with one person testing, drive both pads (`UP+I`) to walk together.
+
+## EXP crediting (2026-10-17)
+
+- Enemy death calls `0x0800E4D2(enemy)`: base EXP = word 0 of the enemy's behaviour object
+  (wolves 13, snakes 45), scaled to the *active* slot's level (clamped to `[span>>7, span>>1]` of the
+  current level's EXP span, level 50 gets nothing), then queued as a 12-byte event
+  `{vtable 0x080245B0, ticks 1, amount}` on the entity list (`0x03001120`, count +0x610). The event's
+  slot 3 fires `Party_AddExp(g_Party, active_slot, amount)` (`0x08003D58`, handles level-ups: stat
+  gains, popup, sound), slot 2 destroys it.
+- `src/coop/exp.c` replaces the entry (10-byte long jump, the function starts at a 2-byte-aligned
+  address) and credits the player who was acting when the enemy died: `coop.acting` is maintained by
+  the entity-list replacement (the player being updated, or the nearest player while a non-player
+  entity updates). The event grows to 16 bytes with the credited slot, using a private vtable copy
+  whose fire slot calls `Party_AddExp` with that slot; the level clamp uses the credited slot too.
+- Verified in zone 2 area 7 with a level-40 party: player 2 (Gohan, slot 0) killing a wolf added
+  4747 EXP to slot 0 and nothing to the active slot; player 1 killing one added 4747 to the active
+  slot only (`peek()` shows both slots' EXP and the `awards` counters).
+- Note: one award to the active slot is counted on every debug-menu Map Test entry, before the
+  menu resets the party's EXP to level 40; it is the original game's behaviour, not a co-op path.
+- Open: both players' `+0x180` behaviour pointer is the same IWRAM cell (`0x030021E0`), so
+  `install_behaviour` for player 2 re-initialises the cell player 1 also uses. Nothing visibly
+  wrong yet; check whether per-character melee/ability behaviour differs between rows.
+
+## Test tooling additions
+
+- `tools/mgba/ents.lua`: `ents()` lists both players and every enemy (vtable `0x080252A4`) with
+  position, base EXP and control state, plus the camera view origin; `ents(true)` lists everything.
+- `tools/mgba/force.lua`: `p2_force = 0x8000 | keys` drives player 2's pad from the console (bit 15
+  valid, bits 0-9 GBA keys), `p2_force = nil` returns control to the TCP bridge. Useful with mGBA
+  savestates (Shift+F1 / F1) to retry a fight without the 75 s debug-menu idle.
+- Typing into the Scripting console while another helper focuses the game window sends keystrokes
+  into the game (one such slip opened the pause menu and quit to the title); keep console typing and
+  game-window key presses sequential.
 
 ## Plan for the two-Goku proof (Phase 2 start)
 
