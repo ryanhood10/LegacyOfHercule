@@ -12,8 +12,8 @@ typedef struct Entity {
     u8 _p0[0x0C];
     u8 facing;            // +0x010  0 down, 1 up, 2 left, 3 right
     u8 _p1[7];
-    void *anim_state;     // +0x018  animation state object (anim table 0x083B5268)
-    void *ctrl_state;     // +0x01C  control state object (idle / walk / ...)
+    void *ctrl_state;     // +0x018  control state object (idle / walk / dash ...; anim table 0x083B5268)
+    void *aux_state;      // +0x01C  secondary state (default 0x03001F3C, vtable 0x08024188; hurt/death overrides)
     u8 _p2[0x28];
     void *sprite_record;  // +0x048
     u8 _p3[0x10C];
@@ -83,7 +83,7 @@ typedef struct AbilityDef {
 #define SIOCNT_MULTI_115200 0x2003   // multiplayer mode, 115200 baud
 #define SIOCNT_START        0x0080
 #define SIO_MARK            0x4000   // set on every controller word; 0xFFFF (no cable) fails the test
-#define SIO_VALID(v)        (((v) & 0xC000) == SIO_MARK)
+#define SIO_VALID(v)        (((v) & 0xFC00) == SIO_MARK)   // marker set, bits 10-13 and 15 clear
 
 #define g_PlayerObject   (*(Entity **)0x03001FA8)
 #define g_InputSystem    ((InputSystem *)0x0300229C)
@@ -126,6 +126,8 @@ typedef struct Hud {
 } Hud;
 _Static_assert(sizeof(Hud) == 0x28, "Hud size");
 
+#define IDLE_VTABLE       0x08025A84u   // player control states
+#define WALK_VTABLE       0x080256C4u
 #define HUD_VTABLE        0x0802408Cu
 #define HUD_PANEL_TILES   ((const void *)0x086D7B54)   // 768 bytes, 256-colour
 #define HUD_HP_TABLE      ((const s32 *)0x083B5358)    // 0x30 x {a,b,c,pad}: pixel offsets

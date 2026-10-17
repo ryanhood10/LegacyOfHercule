@@ -2,7 +2,10 @@
 // party slot come from the entity instead of globals, so a second player entity can run them.
 #include "coop.h"
 
-CoopState coop;  // top of EWRAM (linker script); not zeroed by the game, hence the magic
+// Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
+// the game never zeroes them, hence the magic. Order fixed: remote word at +0, state at +4.
+volatile u16 g_p2_remote __attribute__((section(".coop.0"), used));
+CoopState coop __attribute__((section(".coop.1"), used));
 
 typedef struct { s32 dx, dy; } Vec;
 #define CTX_VECTORS   ((const Vec *)((const u8 *)g_Ctx + 0xC0))
@@ -10,7 +13,24 @@ typedef struct { s32 dx, dy; } Vec;
 #define COLLISION_MAP ((const void *)g_Ctx[4])
 
 static int is_p2(const Entity *e) { return e == coop.p2; }
-static InputSystem *input_for(const Entity *e) { return is_p2(e) ? &coop.input2 : g_InputSystem; }
+
+static const u32 PLAYER_CTRL_VTABLES[] = { IDLE_VTABLE, WALK_VTABLE, 0x080258DCu, 0x08025E20u, 0x080251F4u, 0x08025D70u };
+
+int p1_controllable(void) {
+    Entity *p1 = g_PlayerObject;
+    if (!p1 || !p1->ctrl_state) return 0;
+    u32 vt = *(u32 *)p1->ctrl_state;
+    for (unsigned i = 0; i < sizeof PLAYER_CTRL_VTABLES / sizeof PLAYER_CTRL_VTABLES[0]; i++)
+        if (vt == PLAYER_CTRL_VTABLES[i]) return 1;
+    return 0;
+}
+
+static InputSystem no_input;   // what player 2 sees during cutscenes
+
+static InputSystem *input_for(const Entity *e) {
+    if (!is_p2(e)) return g_InputSystem;
+    return p1_controllable() ? &coop.input2 : &no_input;
+}
 static int slot_for(const Entity *e) { return is_p2(e) ? coop.p2_slot : g_Party->active_slot; }
 static u16 *last_dir_for(const Entity *e) { return is_p2(e) ? &coop.p2_last_dir : &g_LastDir; }
 static u32 *last_dir_frame_for(const Entity *e) { return is_p2(e) ? &coop.p2_last_dir_frame : &g_LastDirFrame; }
@@ -140,6 +160,7 @@ void diag_update(void *st, Entity *e) {
 static void p2_destroy(Entity *e, int free_it, u32 a, u32 b) {
     e->vtable = coop.p2_vtable;   // mirrors the original, which resets its own vtable here
     coop.p2 = 0;
+    coop.destroys++;
     Entity_BaseDestroy(e, 0, a, b);
     if (free_it) Arena_Free(e);
 }
@@ -185,6 +206,8 @@ void coop_init_once(void) {
     coop.hud2.tile = 0;
     coop.polls = 0;
     coop.sio_last = 0;
+    coop.source_age = P2_SOURCE_TIMEOUT;
+    coop.spawns = coop.destroys = 0;
     // Both roles sit in multiplayer serial mode from the first frame so a linked emulator pair
     // (lockstep) never sees a mode mismatch; the original game does not use the serial port.
     REG_RCNT = 0;
@@ -214,9 +237,9 @@ static void install_behaviour(Entity *e, int slot) {
 }
 
 static void ensure_p2(Entity *p1) {
-    if (coop.p2) return;
+    if (coop.p2 || !p2_present()) return;
     coop.p2_slot = (u8)pick_p2_slot();
-    s16 xy[2] = { (s16)((p1->x >> 8) + 24), (s16)(p1->y >> 8) };
+    s16 xy[2] = { (s16)(p1->x >> 8), (s16)(p1->y >> 8) };
     Entity *p2 = PlayerEntity_Create(0, CharacterEntry_GetSpriteRecord(&g_Party->chars[coop.p2_slot]), xy);
     g_PlayerObject = p1;  // the constructor claimed the player slot
     if (!p2) return;
@@ -224,6 +247,7 @@ static void ensure_p2(Entity *p1) {
     if (coop.p2_slot != g_Party->active_slot) install_behaviour(p2, coop.p2_slot);
     EntityList_Add(g_SceneTable[1], p2);
     coop.p2 = p2;
+    coop.spawns++;
 }
 
 // Entry hook kept on the idle slot so P2 is (re)created whenever P1 stands on a map.

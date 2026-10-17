@@ -112,6 +112,28 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
 - A zoomed-out view is not possible on GBA hardware (tiled backgrounds cannot be scaled); it would
   be an emulator-side renderer feature for Phase 3, alongside widescreen.
 
+## Memory placement (important)
+
+The co-op state lives at the top of EWRAM in a pinned section (`g_p2_remote` `0x0203FF00`, `coop`
+`0x0203FF04`, see `coop.ld`). The game's heap (`Arena_Init`, `0x0801EFA4`) is `0xFDFE` words from
+`0x02000800`, i.e. it reaches `0x0203FFF8` and overwrote that block on entity-heavy maps (symptoms:
+player 2 respawning every frame, garbage input). `tools/patch_rom.py` shrinks the size word at ROM
+`0x1F20C` to `0xFD7E`, reserving the top 512 bytes. Entity state fields: `+0x18` is the control state
+(idle `0x08025A84`, walk `0x080256C4`, ...), `+0x1C` a secondary state (default `0x03001F3C`).
+
+Live inspection without pausing: `dofile("…/tools/mgba/peek.lua")` in the Scripting console, then
+`peek()` prints both players' positions/states and the co-op counters (addresses from `coop.sym`).
+
+## Session logic
+
+- Player 2 is only spawned while a player-2 input source is present: a valid bridge word
+  (`g_p2_remote` bit 15) or a valid link-cable word within the last 3 s (`coop.source_age`). With no
+  second pad the game is unchanged single-player. In the mirror/swap test modes a source is implied.
+- Player 2 spawns on player 1's position (not offset), so map-edge spawns stay walkable.
+- While player 1 is not in a player-driven control state (cutscenes, scripted walks, menus), player
+  2 sees no input (`p1_controllable()` checks the control-state vtable), so it cannot wander during
+  dialogue.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).

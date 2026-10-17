@@ -25,11 +25,19 @@ typedef struct CoopState {
     u8 sio_ready;      // serial registers initialised
     u8 _pad;
     u16 sio_last;      // last raw word received from the controller GBA
+    u16 source_age;    // frames since a player-2 input source last reported (bridge or cable)
+    u16 spawns, destroys;   // debug counters for player 2's lifetime
 } CoopState;
+
+#define P2_SOURCE_TIMEOUT 180   // frames without a source before player 2 is considered absent
+
+int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
+int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)
 
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232
 
-extern CoopState coop;
+extern CoopState coop;             // pinned at 0x0203FF04 (section .coop)
+extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 
 void coop_init_once(void);
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)

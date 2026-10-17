@@ -10,7 +10,8 @@ static void call_as_player(Entity *e, void *state, CtrlFn fn) {
     InputSystem saved = *g_InputSystem;
     u16 saved_dir = g_LastDir;
     u32 saved_frame = g_LastDirFrame;
-    *g_InputSystem = coop.input2;
+    static InputSystem no_input;
+    *g_InputSystem = p1_controllable() ? coop.input2 : no_input;
     g_LastDir = coop.p2_last_dir;
     g_LastDirFrame = coop.p2_last_dir_frame;
     fn(state, e);

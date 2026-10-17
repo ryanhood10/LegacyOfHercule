@@ -18,14 +18,21 @@ static void poll_into(InputSystem *in, u16 now) {
     }
 }
 
-// An emulator-side script (tools/mgba/p2_input.lua) writes player 2's buttons here: bit 15 = valid,
-// bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
-volatile u16 g_p2_remote;
+// g_p2_remote (coop.h): an emulator-side script (tools/mgba/p2_input.lua) writes player 2's buttons
+// there: bit 15 = valid, bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
+
+int p2_present(void) {
+#if P2_MODE == P2_MODE_SIO
+    return coop.source_age < P2_SOURCE_TIMEOUT;
+#else
+    return 1;
+#endif
+}
 
 #if P2_MODE == P2_MODE_SIO
 static u16 sio_poll(void) {
     u16 remote = g_p2_remote;
-    if (remote & 0x8000) return remote & 0x3FF;
+    if (remote & 0x8000) { coop.source_age = 0; return remote & 0x3FF; }
     if (!coop.sio_ready) {
         REG_RCNT = 0;
         REG_SIOCNT = SIOCNT_MULTI_115200;
@@ -35,7 +42,9 @@ static u16 sio_poll(void) {
     u16 got = REG_SIOMULTI1;          // result of the transfer started last frame
     if (!(REG_SIOCNT & SIOCNT_START)) REG_SIOCNT = SIOCNT_MULTI_115200 | SIOCNT_START;
     coop.sio_last = got;
-    return SIO_VALID(got) ? (u16)(~got & 0x3FF) : 0;
+    if (SIO_VALID(got)) { coop.source_age = 0; return (u16)(~got & 0x3FF); }
+    if (coop.source_age < 0xFFFF) coop.source_age++;
+    return 0;
 }
 #endif
 

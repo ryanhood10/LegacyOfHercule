@@ -31,6 +31,12 @@ ENTRY_JUMPS = [
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
 ]
 
+# (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
+# from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 512 bytes.
+WORD_PATCHES = [
+    (0x01F20C, 0x0000FDFE, 0x0000FD7E),
+]
+
 # Optional: title screen idles into the leftover debug menu (Map Test loads any map with a level-40
 # party). From the Arefu/Legacy engine notes: file offset 0x574, BL GameIntroVideo_Create -> BL DebugMenu_Create.
 DEBUG_MENU_PATCH = (0x574, bytes.fromhex("1EF0E2FB"), bytes.fromhex("05F09CF8"))
@@ -62,6 +68,13 @@ def main():
         sys.exit(f"original ROM is larger than {CODE_AT:#x}")
     rom += b"\xff" * (ROM_SIZE - len(rom))
     rom[CODE_AT:CODE_AT + len(code)] = code
+
+    for off, old, new in WORD_PATCHES:
+        cur = struct.unpack_from("<I", rom, off)[0]
+        if cur != old:
+            sys.exit(f"word patch at {off:#x}: expected {old:08x}, found {cur:08x}")
+        struct.pack_into("<I", rom, off, new)
+        print(f"word   {ROM_BASE + off:08x} {old:08x} -> {new:08x}")
 
     for vtable, slot, name in VTABLE_HOOKS:
         target = syms[name] | 1
