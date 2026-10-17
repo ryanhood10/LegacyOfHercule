@@ -94,6 +94,26 @@ the SDL frontend with scripting enabled (`-DBUILD_QT=OFF -DBUILD_SDL=ON -DENABLE
 will be added so `coop.lua` loads from the command line. The Qt frontend needs Qt 5/6 development
 packages on top and is optional.
 
+## The fork (tools/mgba-wide, 2026-10-17)
+
+- `apply.py <mgba src>` patches an mGBA 0.10 tree: the renderer base gets a `gba` pointer (ROM/RAM
+  access); the software renderer gets a runtime frame size (`wideW/wideH`, max 720 x 480) read at
+  scanline 0 from the EWRAM descriptor at `0x0203FEC0` (`u32 "WIDE", u16 w, u16 h`; anything else
+  means the stock 240 x 160), row buffers and scanline caches sized for the maximum, rows 160..H-1
+  drawn in `finishFrame` with the last line's register state, `_drawMode0()` routing each text
+  background with a chunked map to `software-wide.c` (chunk cache of 64 x 2 KB, C port of the
+  decompressor, per-pixel tile fetch and the same compositing helpers as mode 0) and the rest (BG0's
+  dialogue text, blank layers) to the stock VRAM drawer; non-affine sprites read x bit 9 / y bit 8
+  from OAM attr1 bits 9/10 and are culled against the wide size; the SDL presenter keeps a
+  720 x 480 texture and copies the current `mWideFrameW x mWideFrameH` to the window (that scaling is
+  the "zoom"); `MGBA_SCRIPT=file.lua` loads a Lua script in the SDL frontend (it has no console).
+- Build and run (WSL, see the Smart App Control note): `wsl -d Ubuntu -u root -- bash
+  /mnt/f/MeltyCreations/log2/tools/mgba-wide/build-wsl.sh`, then
+  `MGBA_SCRIPT=/mnt/f/MeltyCreations/log2/tools/mgba/coop.lua /root/mgba-build/sdl/mgba -3
+  /mnt/f/MeltyCreations/log2/build/log2-coop.gba` (WSLg shows the window on the Windows desktop;
+  `tools/win_shot.ps1 out.png -Title "mGBA (Ubuntu)"` screenshots it). `tools/mgba/wide_test.lua`
+  forces a descriptor (`WIDE_W`/`WIDE_H` env) so the renderer can be exercised before the ROM side.
+
 ## Plan
 
 1. Toolchain install (needs Ryan's OK), stock SDL build, run `build/log2-coop.gba`.
