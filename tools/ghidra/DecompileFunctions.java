@@ -10,6 +10,10 @@ import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionIterator;
+import ghidra.program.model.address.Address;
+import ghidra.program.model.lang.Register;
+import ghidra.program.model.lang.RegisterValue;
+import java.math.BigInteger;
 
 public class DecompileFunctions extends GhidraScript {
     @Override
@@ -25,8 +29,19 @@ public class DecompileFunctions extends GhidraScript {
             while (it.hasNext()) fns.add(it.next());
         } else {
             for (int i = 1; i < args.length; i++) {
-                Function f = getFunctionAt(toAddr(Long.parseLong(args[i], 16)));
-                if (f == null) println("no function at " + args[i]); else fns.add(f);
+                Address a = toAddr(Long.parseLong(args[i], 16) & ~1L);
+                Function f = getFunctionAt(a);
+                if (f == null) {
+                    // not seeded: create a Thumb function there (vtable targets are only reachable through RAM)
+                    if (getInstructionAt(a) == null) {
+                        Register tmode = currentProgram.getRegister("TMode");
+                        currentProgram.getProgramContext().setRegisterValue(a, a, new RegisterValue(tmode, BigInteger.ONE));
+                        disassemble(a);
+                    }
+                    f = createFunction(a, null);
+                    println((f == null ? "could not create function at " : "created function at ") + args[i]);
+                }
+                if (f != null) fns.add(f);
             }
         }
 

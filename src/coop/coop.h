@@ -14,7 +14,7 @@
 typedef struct CoopState {
     u32 magic;
     Entity *p2;
-    u32 p2_vtable[24];
+    u32 p2_vtable_unused[24];   // superseded by g_p2_vtable (48 slots); kept so offsets stay put
     InputSystem input2;
     u8 p2_slot;        // party slot bound to player 2
     u8 control;        // SWAP mode: 0 = controller drives P1, 1 = drives P2
@@ -46,6 +46,8 @@ int p1_controllable(void);   // player 1 is in a player-driven control state (no
 
 extern CoopState coop;             // pinned at 0x0203FF04 (section .coop)
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
+#define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4
+extern u32 g_p2_vtable[PLAYER_VTABLE_SLOTS];   // player 2's private player vtable (section .coop.vt)
 extern volatile u16 g_p1_remote;   // pinned at 0x0203FF02: netplay replaces KEYINPUT for player 1 (same format)
 
 void coop_init_once(void);

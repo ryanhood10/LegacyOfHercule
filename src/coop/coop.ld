@@ -9,6 +9,7 @@ MEMORY
 {
     rom   (rx)  : ORIGIN = 0x08800000, LENGTH = 0x00100000
     ewram (rw)  : ORIGIN = 0x0203FF00, LENGTH = 0x00000100
+    vtram (rw)  : ORIGIN = 0x0203FE00, LENGTH = 0x00000100   /* below the pinned block, above the heap */
 }
 
 SECTIONS
@@ -25,6 +26,10 @@ SECTIONS
         . = ALIGN(4);
         KEEP(*(.coop.1))
     } > ewram
+
+    .coopvt (NOLOAD) : {
+        KEEP(*(.coop.vt))
+    } > vtram
 
     .bss (NOLOAD) : {
         *(.bss*)

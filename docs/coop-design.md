@@ -239,12 +239,29 @@ Steps: (1) map the enemy behaviour object and the spawn native, (2) co-op scale 
 damage and speed plus twin spawns for regular enemies, (3) boss twins with partner models, (4) the
 second boss bar, (5) tune so a level-1 Hercule beside Gohan is survivable.
 
+## Two-player dash crash and the view limit (2026-10-17)
+
+- Ryan hit "jumped to invalid address D061087A" when both players double-tap dashed at once. The
+  player vtable at `0x08025604` has 48 slots (up to the walk vtable at `0x080256C4`); player 2's
+  private copy held 24, so a dash/flight-state call past slot 23 read `coop` fields as code
+  addresses. The copy is now `g_p2_vtable[48]` in its own pinned block at `0x0203FE00` (section
+  `.coop.vt`, below the state block, above the heap); `coop_init_once` repoints a live player 2
+  from an older savestate at it. Verified: simultaneous dashes left and right (into a map change).
+- Separation: the leash now allows the whole 240 x 160 view minus a sprite half-width
+  (`x in [left+4, left+236]`, `y in [top+20, top+158]`). More is not possible in the ROM: the GBA
+  draws exactly 240 x 160 and the emulator only scales that image, so a player beyond it is simply
+  invisible. Ryan wants 2-3x the width for big screens; that needs an emulator that renders a wider
+  window of the map (a modified mGBA renderer plus ROM-side camera/leash/HUD changes), tracked as
+  the Phase 3 "widescreen" item. An in-ROM split screen (per-scanline BG scroll via HDMA) is the
+  hardware-only alternative but doubles every sprite and clips badly at the seam.
+
 ## Test tooling additions
 
 - `tools/mgba/ents.lua`: `ents()` lists both players and every enemy (vtable `0x080252A4`) with
   position, base EXP and control state, plus the camera view origin; `ents(true)` lists everything.
 - `tools/mgba/force.lua`: `p2_force = 0x8000 | keys` drives player 2's pad from the console (bit 15
-  valid, bits 0-9 GBA keys), `p2_force = nil` returns control to the TCP bridge. Useful with mGBA
+  valid, bits 0-9 GBA keys), `p2_force = nil` returns control to the TCP bridge; `p2_play{{word,frames},...}`
+  scripts a frame-exact sequence and `p2_dash(keys)` performs a double-tap dash. Useful with mGBA
   savestates (Shift+F1 / F1) to retry a fight without the 75 s debug-menu idle.
 - Typing into the Scripting console while another helper focuses the game window sends keystrokes
   into the game (one such slip opened the pause menu and quit to the title); keep console typing and

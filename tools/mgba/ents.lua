@@ -2,12 +2,23 @@
 -- Prints the camera view origin, both players and every enemy (vtable 0x080252A4) in g_EntityList
 -- (0x03001120): index, vtable, position, behaviour word 0 (base EXP for enemies), control state.
 local function hex(v) return string.format("%08x", v) end
+local function symbol(name, fallback)
+  local f = io.open("coop.sym", "r") or io.open("F:/MeltyCreations/log2/build/coop.sym", "r")
+  if not f then return fallback end
+  for line in f:lines() do
+    local addr = line:match("^(%x+) %a " .. name .. "$")
+    if addr then f:close(); return tonumber(addr, 16) end
+  end
+  f:close()
+  return fallback
+end
+local COOP = symbol("coop", 0x0203FF04)
 
 function ents(all)
   local list = 0x03001120
   local count = emu:read32(list + 4)
   local p1 = emu:read32(0x03001FA8)
-  local p2 = emu:read32(0x0203FF08)
+  local p2 = emu:read32(COOP + 4)
   console:log(string.format("entities=%d events=%d view=(%d,%d) p1=%s p2=%s", count, emu:read32(list + 0x610),
     emu:read32(0x030010AC), emu:read32(0x030010B0), hex(p1), hex(p2)))
   for i = 0, count - 1 do

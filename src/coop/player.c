@@ -7,6 +7,7 @@
 volatile u16 g_p2_remote __attribute__((section(".coop.0"), used));
 volatile u16 g_p1_remote __attribute__((section(".coop.0p1"), used)); // +2: netplay override for player 1
 CoopState coop __attribute__((section(".coop.1"), used));
+u32 g_p2_vtable[PLAYER_VTABLE_SLOTS] __attribute__((section(".coop.vt"), used));
 
 typedef struct { s32 dx, dy; } Vec;
 #define CTX_VECTORS   ((const Vec *)((const u8 *)g_Ctx + 0xC0))
@@ -44,8 +45,10 @@ void leash_p2(Entity *e) {
     if (!cam) return;
     s32 left = cam[7], top = cam[8];           // +0x1C, +0x20
     s32 x = e->x >> 8, y = e->y >> 8;
-    s32 nx = x < left + 8 ? left + 8 : (x > left + 224 ? left + 224 : x);
-    s32 ny = y < top + 24 ? top + 24 : (y > top + 156 ? top + 156 : y);
+    // the whole visible area minus the sprite's own half-width (the GBA shows 240 x 160 and
+    // nothing beyond it; a wider view is an emulator feature, see docs)
+    s32 nx = x < left + 4 ? left + 4 : (x > left + 236 ? left + 236 : x);
+    s32 ny = y < top + 20 ? top + 20 : (y > top + 158 ? top + 158 : y);
     if (nx != x) e->x = nx << 8;
     if (ny != y) e->y = ny << 8;
 }
@@ -159,7 +162,7 @@ void diag_update(void *st, Entity *e) {
 
 // ---- player 2 lifetime -----------------------------------------------------------------------
 static void p2_destroy(Entity *e, int free_it, u32 a, u32 b) {
-    e->vtable = coop.p2_vtable;   // mirrors the original, which resets its own vtable here
+    e->vtable = g_p2_vtable;   // mirrors the original, which resets its own vtable here
     coop.p2 = 0;
     coop.destroys++;
     Entity_BaseDestroy(e, 0, a, b);
@@ -195,12 +198,15 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
 }
 
 static void build_vtables(void) {
-    u32 base = (u32)coop.p2_vtable;
-    for (int i = 0; i < 24; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
-    coop.p2_vtable[0] = (u32)p2_destroy - base;
-    coop.p2_vtable[15] = (u32)p2_change_hp - base;
-    coop.p2_vtable[16] = (u32)p2_take_damage - base;
+    // All 48 slots: the dash/flight states call slots past 24, and a short copy sent them into
+    // whatever followed the table (the "jumped to invalid address" crash on a two-player dash).
+    u32 base = (u32)g_p2_vtable;
+    for (int i = 0; i < PLAYER_VTABLE_SLOTS; i++) g_p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
+    g_p2_vtable[0] = (u32)p2_destroy - base;
+    g_p2_vtable[15] = (u32)p2_change_hp - base;
+    g_p2_vtable[16] = (u32)p2_take_damage - base;
     exp_init();
+    if (coop.p2) coop.p2->vtable = g_p2_vtable;   // a live player 2 from an older build's savestate
     coop.code_id = (u32)coop_init_once;
 }
 
@@ -312,7 +318,7 @@ static void ensure_p2(Entity *p1) {
     Entity *p2 = PlayerEntity_Create(0, CharacterEntry_GetSpriteRecord(&g_Party->chars[coop.p2_slot]), xy);
     g_PlayerObject = p1;  // the constructor claimed the player slot
     if (!p2) return;
-    p2->vtable = coop.p2_vtable;
+    p2->vtable = g_p2_vtable;
     if (coop.p2_slot != g_Party->active_slot) install_behaviour(p2, coop.p2_slot);
     EntityList_Add(g_SceneTable[1], p2);
     coop.p2 = p2;
