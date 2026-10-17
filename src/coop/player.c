@@ -140,6 +140,14 @@ void coop_init_once(void) {
     coop.input2.history_armed = 0;
     coop.input2.current = coop.input2.pressed = coop.input2.released = 0;
     coop.hud2.tile = 0;
+    coop.polls = 0;
+    coop.sio_last = 0;
+    // Both roles sit in multiplayer serial mode from the first frame so a linked emulator pair
+    // (lockstep) never sees a mode mismatch; the original game does not use the serial port.
+    REG_RCNT = 0;
+    REG_SIOCNT = SIOCNT_MULTI_115200;
+    REG_SIOMLT_SEND = SIO_MARK;
+    coop.sio_ready = 1;
     u32 base = (u32)coop.p2_vtable;
     for (int i = 0; i < 16; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
     coop.p2_vtable[0] = (u32)p2_destroy - base;

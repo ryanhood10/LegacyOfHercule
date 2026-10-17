@@ -6,7 +6,7 @@
 #define P2_MODE_MIRROR 1   // P1's input with left/right swapped (test mode, no second controller)
 #define P2_MODE_SWAP   2   // Select toggles which player the single controller drives
 #ifndef P2_MODE
-#define P2_MODE P2_MODE_MIRROR
+#define P2_MODE P2_MODE_SIO
 #endif
 
 #define COOP_MAGIC 0xC00B0002u
@@ -21,6 +21,10 @@ typedef struct CoopState {
     u16 p2_last_dir;   // per-player copies of g_LastDir / g_LastDirFrame
     u32 p2_last_dir_frame;
     Hud hud2;          // player 2's panel state (vtable unused); tile == 0 means not allocated
+    u16 polls;         // input polls since boot (controller-mode detection window)
+    u8 sio_ready;      // serial registers initialised
+    u8 _pad;
+    u16 sio_last;      // last raw word received from the controller GBA
 } CoopState;
 
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232

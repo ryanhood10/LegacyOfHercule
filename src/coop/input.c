@@ -2,6 +2,10 @@
 // Same behaviour for player 1, plus player 2's InputSystem filled from the selected source.
 #include "coop.h"
 
+#define CONTROLLER_WINDOW 600   // polls (~10 s) during which holding L+R turns this GBA into the P2 pad
+
+void controller_main(void);  // never returns
+
 static void poll_into(InputSystem *in, u16 now) {
     u16 changed = in->current ^ now;
     u16 pressed = now & changed;
@@ -13,6 +17,27 @@ static void poll_into(InputSystem *in, u16 now) {
         if (in->history_head >= 8) in->history_head = 0;
     }
 }
+
+// An emulator-side script (tools/mgba/p2_input.lua) writes player 2's buttons here: bit 15 = valid,
+// bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
+volatile u16 g_p2_remote;
+
+#if P2_MODE == P2_MODE_SIO
+static u16 sio_poll(void) {
+    u16 remote = g_p2_remote;
+    if (remote & 0x8000) return remote & 0x3FF;
+    if (!coop.sio_ready) {
+        REG_RCNT = 0;
+        REG_SIOCNT = SIOCNT_MULTI_115200;
+        REG_SIOMLT_SEND = SIO_MARK;   // the host sends a marker too, so a controller can see us
+        coop.sio_ready = 1;
+    }
+    u16 got = REG_SIOMULTI1;          // result of the transfer started last frame
+    if (!(REG_SIOCNT & SIOCNT_START)) REG_SIOCNT = SIOCNT_MULTI_115200 | SIOCNT_START;
+    coop.sio_last = got;
+    return SIO_VALID(got) ? (u16)(~got & 0x3FF) : 0;
+}
+#endif
 
 static u16 p2_source(u16 p1_now, u16 *p1_out) {
 #if P2_MODE == P2_MODE_MIRROR
@@ -29,13 +54,23 @@ static u16 p2_source(u16 p1_now, u16 *p1_out) {
     return quiet;
 #else
     (void)p1_now; (void)p1_out;
-    return (u16)~(REG_SIODATA32 & 0x3FF);
+    return sio_poll();
 #endif
 }
 
 void input_poll_hook(InputSystem *in) {
     coop_init_once();
-    u16 now = (u16)~REG_KEYINPUT;
+    u16 raw = REG_KEYINPUT;
+    // Every instance publishes its own buttons on the link; a host ignores what it receives from
+    // itself, a second game instance thereby doubles as player 2's pad without controller mode.
+    REG_SIOMLT_SEND = (u16)((raw & 0x3FF) | SIO_MARK);
+#ifndef NO_CONTROLLER_MODE
+    if (coop.polls < CONTROLLER_WINDOW) {
+        coop.polls++;
+        if ((~raw & (KEY_L | KEY_R)) == (KEY_L | KEY_R)) controller_main();
+    }
+#endif
+    u16 now = (u16)~raw;
     u16 p1 = now;
     u16 p2 = p2_source(now, &p1);
 

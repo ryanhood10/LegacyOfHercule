@@ -72,7 +72,18 @@ typedef struct AbilityDef {
 #define KEY_DPAD 0xF0
 
 #define REG_KEYINPUT     (*(volatile u16 *)0x04000130)
-#define REG_SIODATA32    (*(volatile u32 *)0x04000120)
+#define REG_SIOMULTI0    (*(volatile u16 *)0x04000120)   // data received from GBA 0 (master)
+#define REG_SIOMULTI1    (*(volatile u16 *)0x04000122)   // ... from GBA 1
+#define REG_SIOCNT       (*(volatile u16 *)0x04000128)
+#define REG_SIOMLT_SEND  (*(volatile u16 *)0x0400012A)
+#define REG_RCNT         (*(volatile u16 *)0x04000134)
+#define REG_DISPCNT      (*(volatile u16 *)0x04000000)
+#define REG_VCOUNT       (*(volatile u16 *)0x04000006)
+#define REG_IME          (*(volatile u16 *)0x04000208)
+#define SIOCNT_MULTI_115200 0x2003   // multiplayer mode, 115200 baud
+#define SIOCNT_START        0x0080
+#define SIO_MARK            0x4000   // set on every controller word; 0xFFFF (no cable) fails the test
+#define SIO_VALID(v)        (((v) & 0xC000) == SIO_MARK)
 
 #define g_PlayerObject   (*(Entity **)0x03001FA8)
 #define g_InputSystem    ((InputSystem *)0x0300229C)
@@ -127,6 +138,7 @@ _Static_assert(sizeof(Hud) == 0x28, "Hud size");
 #define REG_DMA3CNT_L     (*(volatile u16 *)0x040000DC)
 #define REG_DMA3CNT_H     (*(volatile u16 *)0x040000DE)
 #define KEY_L 0x200
+#define KEY_R 0x100
 
 #define ROM_FN(ret, name, args, addr) static ret (*const name) args = (ret (*) args)(addr)
 

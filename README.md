@@ -45,6 +45,15 @@ make
 Output: `build/log2-coop.gba`. Run it in mGBA. For a boot smoke test over the GDB stub:
 `mgba-sdl -g build\log2-coop.gba`, then `arm-none-eabi-gdb -batch -x tools\gdb\check_boot.gdb`.
 
+## Playing two-player on one PC
+
+1. Open `build\log2-coop.gba` in mGBA (the Qt `mGBA.exe`, not `mgba-sdl`).
+2. Tools > Scripting, type `dofile("F:/MeltyCreations/log2/tools/mgba/p2_input.lua")` and Run.
+3. Run `python tools\p2_keys.py` in a terminal. Player 1 uses mGBA's normal keys; player 2 uses
+   IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. Two gamepads: bind one in mGBA,
+   adapt `KEYMAP` in `p2_keys.py` for the other. A second player on another PC runs
+   `p2_keys.py --host <your ip>` (forward TCP 7777) and watches a screen share.
+
 ## Layout
 
 ```

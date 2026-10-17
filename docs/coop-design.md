@@ -59,6 +59,25 @@ keyboard cannot reach the ROM; same-system play uses mGBA's second multiplayer w
 with a second gamepad, or `P2_MODE_SWAP`. Extra keyboard keys and online play both need the
 emulator-side input patch planned for Phase 3.
 
+## Player 2 input transports (2026-10-17)
+
+Player 2's buttons reach the game through `g_p2_remote` (EWRAM word, bit 15 = valid, bits 0-9 =
+GBA keys active-high; address in `build/coop.sym`) with the link cable as fallback:
+
+1. **Same PC, one keyboard (works).** mGBA (Qt) > Tools > Scripting, run
+   `dofile("F:/MeltyCreations/log2/tools/mgba/p2_input.lua")`; then `python tools/p2_keys.py`.
+   The sender reads the keyboard globally (IJKL move, O = A, U = B, [ ] = L R, N/M = Select/Start)
+   and streams changes over TCP 7777; the script writes them into `g_p2_remote` every frame.
+   Verified: P2 walks while P1 stands still, in a single window.
+2. **Remote (same path).** The brother runs `p2_keys.py --host <host ip>` and watches the game
+   over a screen share; the host forwards port 7777. Proper lockstep netplay stays Phase 3.
+3. **Link cable (real hardware; stalls under mGBA).** Every boot puts the serial port in multiplayer
+   mode; the host starts a 16-bit transfer per frame and reads `SIOMULTI1`; holding L+R in the first
+   10 s turns a second cartridge into a pad (`src/coop/controller.c`, mode-3 button display, marker
+   `0x4000`). Under mGBA 0.10.5's lockstep the master's `SIOCNT` sticks at `0x208B` (busy) and the
+   slave never goes busy, whether the slave is the controller loop or a plain game instance; the
+   stuck phase matches `_masterUpdate` never being re-run after STARTING. Untested on hardware.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).
