@@ -15,6 +15,10 @@ VTABLE_HOOKS = [
     (0x08025A84, 2, "idle_update_hook"),   # idle control state
     (0x080256C4, 2, "walk_update"),        # walk control state
     (0x080258DC, 2, "diag_update"),        # diagonal / free movement control state
+    (0x08025E20, 2, "dash_update_hook"),   # dash / transformation charge control state
+    (0x080251F4, 2, "ctrl_8277_hook"),     # control state reading the d-pad
+    (0x08025D70, 5, "ctrl_85ad_hook"),     # control state reading A
+    (0x08025A6C, 0, "camera_follow_hook"), # camera-follow object update
     (0x0802408C, 0, "hud_destroy_hook"),   # HUD object
     (0x0802408C, 2, "hud_update_hook"),
     (0x0802408C, 4, "hud_draw_hook"),
@@ -23,8 +27,13 @@ VTABLE_HOOKS = [
 # (function address, symbol): first 8 bytes become  ldr r3,[pc]; bx r3; .word symbol|1
 # The address must be such that (addr + 4) & ~3 == addr + 4, i.e. addr % 4 == 0.
 ENTRY_JUMPS = [
-    (0x0801EEFC, "input_poll_hook"),       # Input_Poll
+    (0x0801EEFC, "input_poll_hook"),         # Input_Poll
+    (0x080069A4, "entity_list_update_hook"), # EntityList_Update
 ]
+
+# Optional: title screen idles into the leftover debug menu (Map Test loads any map with a level-40
+# party). From the Arefu/Legacy engine notes: file offset 0x574, BL GameIntroVideo_Create -> BL DebugMenu_Create.
+DEBUG_MENU_PATCH = (0x574, bytes.fromhex("1EF0E2FB"), bytes.fromhex("05F09CF8"))
 
 
 def load_symbols(path):
@@ -38,7 +47,14 @@ def load_symbols(path):
 
 def main():
     orig, blob, symfile, out = sys.argv[1:5]
+    debug_menu = "--debug-menu" in sys.argv[5:]
     rom = bytearray(open(orig, "rb").read())
+    if debug_menu:
+        off, old, new = DEBUG_MENU_PATCH
+        if rom[off:off + 4] != old:
+            sys.exit(f"debug-menu patch: unexpected bytes {rom[off:off + 4].hex()} at {off:#x}")
+        rom[off:off + 4] = new
+        print("debug menu enabled (idle 30 s on the title screen)")
     code = open(blob, "rb").read()
     syms = load_symbols(symfile)
 

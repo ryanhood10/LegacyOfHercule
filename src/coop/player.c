@@ -17,6 +17,18 @@ static u32 *last_dir_frame_for(const Entity *e) { return is_p2(e) ? &coop.p2_las
 
 static void play_cant_sfx(void) { Sfx_Play(g_AudioMixer + 0x5C4, SFX_TABLE + 0xE4, 0x40, 0); }
 
+void leash_p2(Entity *e) {
+    if (!coop.p2 || (e != coop.p2 && e != g_PlayerObject)) return;   // both players, only in co-op
+    const s32 *cam = CAMERA_CELL;
+    if (!cam) return;
+    s32 left = cam[7], top = cam[8];           // +0x1C, +0x20
+    s32 x = e->x >> 8, y = e->y >> 8;
+    s32 nx = x < left + 8 ? left + 8 : (x > left + 224 ? left + 224 : x);
+    s32 ny = y < top + 24 ? top + 24 : (y > top + 156 ? top + 156 : y);
+    if (nx != x) e->x = nx << 8;
+    if (ny != y) e->y = ny << 8;
+}
+
 static void use_ability(Entity *e) {
     CharacterEntry *c = &g_Party->chars[slot_for(e)];
     const AbilityDef *a = &ABILITY_TABLE[c->ability_list[c->ability_index]];
@@ -55,6 +67,7 @@ void idle_update(IdleState *st, Entity *e) {
         *last = dir;
         *last_frame = frame;
     }
+    leash_p2(e);
     handle_buttons(e, in);
 }
 
@@ -89,6 +102,7 @@ void walk_update(void *st, Entity *e) {
     } else {
         Entity_SetAnimation(e, ANIM_IDLE);
     }
+    leash_p2(e);
     handle_buttons(e, in);
 }
 
@@ -118,15 +132,44 @@ void diag_update(void *st, Entity *e) {
         }
         e->facing = CTX_FACING[e->facing + k * 4];
     }
+    leash_p2(e);
     handle_buttons(e, in);
 }
 
 // ---- player 2 lifetime -----------------------------------------------------------------------
 static void p2_destroy(Entity *e, int free_it, u32 a, u32 b) {
-    e->vtable = coop.p2_vtable;
+    e->vtable = coop.p2_vtable;   // mirrors the original, which resets its own vtable here
     coop.p2 = 0;
     Entity_BaseDestroy(e, 0, a, b);
     if (free_it) Arena_Free(e);
+}
+
+// ---- player 2 damage routing (private vtable slots 15 / 16) ---------------------------------
+static void p2_change_hp(Entity *e, int delta) {
+    (void)e;
+    CharacterEntry *c = &g_Party->chars[coop.p2_slot];
+    int hp = c->hp + delta;
+    if (hp > c->max_hp) hp = c->max_hp;
+    if (hp < 0) hp = 0;
+    c->hp = (u16)hp;
+}
+
+ROM_FN(void, Player_Knockback, (Entity *e, void *hit), 0x0800F833);
+
+// Returns 0 (survived) so OnHit plays the hurt animation; at 0 HP player 2 revives beside player 1.
+static int p2_take_damage(Entity *e, const u8 *hit) {
+    int dmg = *(const s32 *)(hit + 8);
+    if (dmg == 0) return 0;
+    Player_Knockback(e, (void *)hit);
+    CharacterEntry *c = &g_Party->chars[coop.p2_slot];
+    if (c->hp > dmg) {
+        c->hp = (u16)(c->hp - dmg);
+    } else {
+        c->hp = (u16)(c->max_hp / 2 ? c->max_hp / 2 : 1);
+        Entity *p1 = g_PlayerObject;
+        if (p1 && p1 != e) { e->x = p1->x + (16 << 8); e->y = p1->y; }
+    }
+    return 0;
 }
 
 void coop_init_once(void) {
@@ -149,8 +192,10 @@ void coop_init_once(void) {
     REG_SIOMLT_SEND = SIO_MARK;
     coop.sio_ready = 1;
     u32 base = (u32)coop.p2_vtable;
-    for (int i = 0; i < 16; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
+    for (int i = 0; i < 24; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
     coop.p2_vtable[0] = (u32)p2_destroy - base;
+    coop.p2_vtable[15] = (u32)p2_change_hp - base;
+    coop.p2_vtable[16] = (u32)p2_take_damage - base;
 }
 
 static int pick_p2_slot(void) {

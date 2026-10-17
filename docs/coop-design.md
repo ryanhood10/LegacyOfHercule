@@ -78,6 +78,40 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
    slave never goes busy, whether the slave is the controller loop or a plain game instance; the
    stuck phase matches `_masterUpdate` never being re-run after STARTING. Untested on hardware.
 
+## Enemies, damage and the remaining control states (2026-10-17)
+
+- `EntityList_Update` `0x080069A4` (expires the event queue, then calls vtable slot 2 on every
+  entity) is replaced by `src/coop/entities.c`; while a non-player entity updates, `g_PlayerObject`
+  points at the player nearest to it, so chase, attack and hit tests target player 2 when they
+  should. Verified in zone 2 area 7 (wolves): a wolf left player 1 alone and went for player 2.
+- Damage: player vtable slot 14 `OnHit` -> slot 16 `TakeDamage` (active slot!) and slot 15
+  `ChangeHP`. Player 2's private vtable copy overrides 15/16 to use its own slot; at 0 HP player 2
+  revives at half HP beside player 1 instead of dying (a wolf hit took slot 0 from 975 to 917 while
+  the active slot 1 was untouched).
+- Dash/charge (`0x08025E20`), `0x080251F4` and `0x08025D70` control states run the *original* code
+  for player 2 through `src/coop/wrap.c`, which swaps player 2's `InputSystem` contents into the
+  global block (and the last-direction globals) around the call.
+- `make DEBUG_MENU=1` applies the documented title-screen patch: ~75 s idle opens the debug menu;
+  Map Test loads any map with a full level-40 party (so player 2 gets a real second character).
+  Rows: Music, Sample, Map Test; Zone/Area/Variation adjust with the d-pad under Map Test.
+- The TCP bridge now repeats the pad word 20x/s and the Lua side drains the socket every frame
+  (`hasdata`); the callback-only version dropped presses.
+
+## Shared-screen camera (2026-10-17)
+
+- The camera-follow object (vtable `0x08025A6C`, update slot 0, original `0x0800D9F8`) aims the
+  view at its target entity's bounding-box centre minus (120, 84) with per-frame smoothing of 3/64
+  (x) and 9/128 (y), then `Camera_Apply` `0x080062E8` clamps to the map and sets the world object's
+  view origin (`0x03001090` +0x1C/+0x20; position kept as px << 10 at +4/+8). `src/coop/camera.c`
+  replaces that slot: when player 2 exists the target point is the midpoint of both players'
+  box centres, same smoothing, same setter.
+- Both players are leashed to the visible area (`leash_p2`, applied in the ported control states
+  and after the wrapped originals), so the screen edge is the separation limit: a player walking
+  away stops at the edge until the other follows. Scripted movement is unaffected since the leash
+  only runs in player-controlled states. Verified in zone 2 area 7.
+- A zoomed-out view is not possible on GBA hardware (tiled backgrounds cannot be scaled); it would
+  be an emulator-side renderer feature for Phase 3, alongside widescreen.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).

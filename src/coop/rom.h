@@ -96,6 +96,7 @@ typedef struct AbilityDef {
 #define g_SceneTable     ((void **)0x083ED1B8)      // [1] entity list used by the map loader
 #define g_AudioMixer     ((u8 *)0x030026BC)
 #define g_Camera         ((void *)0x030020DC)
+#define CAMERA_CELL      (*(const s32 **)0x081DA974)   // ROM cell -> camera object; +0x1C/+0x20 = view origin (world px)
 #define SFX_TABLE        ((const u8 *)0x080E15B0)
 #define DISPLAY_DATA     ((const u8 *)0x081D967C)   // 22 rows x 0x14; +1 spriteId, +0x10 ppVTable
 #define ABILITY_TABLE    ((const AbilityDef *)0x081D9900)

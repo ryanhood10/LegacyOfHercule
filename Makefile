@@ -9,6 +9,9 @@ OUT     := $(BUILD)/log2-coop.gba
 
 # P2_MODE: 0 = link cable (default), 1 = mirror P1 (test), 2 = Select swaps the single controller
 P2_MODE ?= 0
+# DEBUG_MENU=1 patches the title screen to open the game's leftover debug menu (Map Test) after 30 s idle
+DEBUG_MENU ?= 0
+PATCH_FLAGS := $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,)
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
            -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
@@ -32,7 +35,7 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 	$(NM) $< > $@
 
 $(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py
-	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@
+	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)
 
 clean:
 	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(OUT)

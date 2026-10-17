@@ -1,6 +1,7 @@
 /* New code goes into the second 8 MiB of a padded 16 MiB ROM; globals into the top of EWRAM. */
 ENTRY(idle_update_hook)
-EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud_destroy_hook g_p2_remote)
+EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud_destroy_hook g_p2_remote
+       dash_update_hook ctrl_8277_hook ctrl_85ad_hook entity_list_update_hook camera_follow_hook)
 
 MEMORY
 {

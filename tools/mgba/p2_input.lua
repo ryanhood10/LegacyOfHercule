@@ -24,13 +24,21 @@ local connected = false
 local server = socket.bind("0.0.0.0", PORT)
 local client = nil
 
-local function onData()
-  local data = client:receive(64)
-  if data and #data >= 2 then
-    local b1, b2 = data:byte(#data - 1, #data)   -- newest word wins
-    latest = b1 + b2 * 256
+local function drain()
+  -- read everything queued; the newest complete word wins
+  local guard = 0
+  while client and client:hasdata() and guard < 64 do
+    local data = client:receive(256)
+    if not data or #data == 0 then break end
+    if #data >= 2 then
+      local b1, b2 = data:byte(#data - 1, #data)
+      latest = b1 + b2 * 256
+    end
+    guard = guard + 1
   end
 end
+
+local function onData() drain() end
 
 local function onError()
   client = nil
@@ -56,7 +64,7 @@ console:log(string.format("p2_input: listening on %d, writing to %08X", PORT, RE
 
 callbacks:add("frame", function()
   server:poll()
-  if client then client:poll() end
+  if client then client:poll(); drain() end
   if emu then
     if connected then emu:write16(REMOTE_ADDR, (latest & 0x3FF) | VALID)
     else emu:write16(REMOTE_ADDR, 0) end

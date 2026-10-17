@@ -48,10 +48,11 @@ def main():
             with socket.create_connection((a.host, a.port), timeout=5) as s:
                 s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 print(f"connected to {a.host}:{a.port}; IJKL move, O=A, U=B, [ ]=L R, N=Select, M=Start")
-                last = None
+                last, ticks = None, 0
                 while True:
                     word = read_word()
-                    if word != last:
+                    ticks += 1
+                    if word != last or ticks % 6 == 0:   # on change, and a 20 Hz heartbeat
                         s.sendall(struct.pack("<H", word))
                         last = word
                     time.sleep(1 / 120)

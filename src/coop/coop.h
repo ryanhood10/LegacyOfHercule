@@ -14,7 +14,7 @@
 typedef struct CoopState {
     u32 magic;
     Entity *p2;
-    u32 p2_vtable[16];
+    u32 p2_vtable[24];
     InputSystem input2;
     u8 p2_slot;        // party slot bound to player 2
     u8 control;        // SWAP mode: 0 = controller drives P1, 1 = drives P2
@@ -32,3 +32,4 @@ typedef struct CoopState {
 extern CoopState coop;
 
 void coop_init_once(void);
+void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
