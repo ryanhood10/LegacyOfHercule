@@ -237,16 +237,21 @@ void coop_init_once(void) {
 
 // A slot player 2 may use: in the party, not player 1's. `avail` also requires the game's
 // "available" flag (bit 1), the one the save-pad switch screen greys characters out by.
+// Hercule (slot 5) is player 2's default: the game fills his entry at new game (level 1, 50 HP)
+// but never flags him in the party until late, so he is allowed whenever his entry is filled.
+#define HERCULE_SLOT 5
 static int slot_ok(int s, int avail) {
     if (s < 0 || s >= 6 || s == g_Party->active_slot) return 0;
+    if (s == HERCULE_SLOT) return g_Party->chars[s].max_hp != 0;
     u32 f = g_Party->chars[s].flags;
     return (f & 1) && (!avail || (f & 2));
 }
 
-// -1 while the party has no second member: the players never share a character, so player 2
-// joins once someone besides player 1's character is in the party.
+// Player 2's character: whatever it chose before (kept across maps), else Hercule, else the first
+// other party member; -1 if none exists, since the players never share a character.
 static int pick_p2_slot(void) {
-    if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;   // keep the chosen character across maps
+    if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;
+    if (slot_ok(HERCULE_SLOT, 0)) return HERCULE_SLOT;
     for (int i = 0; i < 6; i++)
         if (slot_ok(i, 0)) return i;
     return -1;
@@ -299,7 +304,11 @@ static void ensure_p2(Entity *p1) {
     int slot = pick_p2_slot();
     if (slot < 0) return;
     coop.p2_slot = (u8)slot;
-    s16 xy[2] = { (s16)(p1->x >> 8), (s16)(p1->y >> 8) };
+    // 12 px to player 1's left when that spot is walkable, else exactly on player 1 (overlapping
+    // beats appearing outside the map at an edge spawn)
+    s32 px[2] = { (p1->x >> 8) - 12, p1->y >> 8 };
+    if (px[0] < 8 || !Collision_Check(COLLISION_MAP, px, (u8 *)p1 + 0x154)) px[0] = p1->x >> 8;   // +0x154 = box w,h
+    s16 xy[2] = { (s16)px[0], (s16)px[1] };
     Entity *p2 = PlayerEntity_Create(0, CharacterEntry_GetSpriteRecord(&g_Party->chars[coop.p2_slot]), xy);
     g_PlayerObject = p1;  // the constructor claimed the player slot
     if (!p2) return;

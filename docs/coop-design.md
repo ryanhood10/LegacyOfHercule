@@ -204,6 +204,41 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   destroys player 2 and respawns it on player 1 at the landing spot. A takeoff animation for player 2
   (each player lifting off from where they stand) is not done yet.
 
+## Player 2 = Hercule (2026-10-17)
+
+- Ryan's call: player 2 defaults to Hercule (party slot 5, display row 21, sprite 72). The game
+  fills his entry at new game (level 1, 50 HP, 20 EP, no flight, one ability) but only flags him
+  into the party late in the story, so `slot_ok` accepts slot 5 whenever its `max_hp` is set. Player
+  2 can still cycle to other available members with Select and comes back to Hercule by cycling.
+- Verified from the prologue Flight Circle savestate: Hercule appears with his own panel, flies with
+  Trunks and respawns on him at the landing spot. Player 2 spawns 12 px left of player 1 when that
+  spot is walkable, else exactly on player 1 (overlap beats leaving the map).
+
+## Plan: co-op difficulty, twin bosses (not started)
+
+Ryan's direction: with two players, enemies should be stronger, smarter, faster, more numerous,
+and every boss fight gets a second boss of a different model at the original's strength (Frieza +
+Cooler, Cell + Cell, Cooler + King Cold on Namek, Buu + Buu, robots duplicated), with two boss HP
+bars and the two models placed side by side rather than overlapping.
+
+Engine facts to build on:
+- Enemies are class `0x080252A4` entities; their behaviour object (`+0x180`) starts with base EXP,
+  the rest (HP, damage, speed, abilities) still has to be mapped. Movement speed is `+0x188/+0x18C`.
+- Enemies already target the nearest player (entities.c). Twin spawns should alternate targets
+  (one per player) instead of both chasing the same person.
+- Enemy and boss placement comes from the map scripts (bytecode VM natives; the reference notes
+  in the Arefu clone list the opcodes). The spawn native is the hook: in co-op, spawn a twin 16-24 px
+  beside the original with a scale factor applied to HP/damage, and for bosses with the alternate
+  sprite/behaviour of the partner character.
+- The boss HP bar is drawn by the HUD object (vtable `0x0802408C`); the second bar follows the same
+  pattern as the player-2 panel (own tile block, drawn under the first), bound to the twin entity.
+- King Cold has fight sprites but no enemy class in the ROM; the twin for Namek Cooler needs a new
+  behaviour object built from Cooler's with King Cold's sprite record.
+
+Steps: (1) map the enemy behaviour object and the spawn native, (2) co-op scale factors for HP,
+damage and speed plus twin spawns for regular enemies, (3) boss twins with partner models, (4) the
+second boss bar, (5) tune so a level-1 Hercule beside Gohan is survivable.
+
 ## Test tooling additions
 
 - `tools/mgba/ents.lua`: `ents()` lists both players and every enemy (vtable `0x080252A4`) with
