@@ -19,9 +19,13 @@ public static class WinEnum {
   public static string Title(IntPtr h) { var sb = new StringBuilder(256); GetWindowText(h, sb, 256); return sb.ToString(); }
 }
 "@
-function Get-MgbaWindow([int]$Index = 0, [string]$Title = '') {
+function Get-WindowPid([IntPtr]$h) { $p = [uint32]0; [void][WinEnum]::GetWindowThreadProcessId($h, [ref]$p); return $p }
+# -Title picks a secondary window (e.g. 'Scripting*'); add -ProcessId (from Get-WindowPid of a main window) to
+# choose the one belonging to a particular mGBA instance.
+function Get-MgbaWindow([int]$Index = 0, [string]$Title = '', [uint32]$ProcessId = 0) {
     $pids = New-Object 'System.Collections.Generic.HashSet[uint32]'
-    Get-Process mgba-sdl, mGBA -ErrorAction SilentlyContinue | ForEach-Object { [void]$pids.Add([uint32]$_.Id) }
+    if ($ProcessId) { [void]$pids.Add($ProcessId) }
+    else { Get-Process mgba-sdl, mGBA -ErrorAction SilentlyContinue | ForEach-Object { [void]$pids.Add([uint32]$_.Id) } }
     $all = [WinEnum]::ForPids($pids)
     if ($Title) { $wins = $all | Where-Object { [WinEnum]::Title($_) -like $Title }; $Index = 0 }
     else { $wins = $all | Where-Object { [WinEnum]::Title($_) -like 'mGBA*' } }

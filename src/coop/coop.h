@@ -42,6 +42,7 @@ int p1_controllable(void);   // player 1 is in a player-driven control state (no
 
 extern CoopState coop;             // pinned at 0x0203FF04 (section .coop)
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
+extern volatile u16 g_p1_remote;   // pinned at 0x0203FF02: netplay replaces KEYINPUT for player 1 (same format)
 
 void coop_init_once(void);
 void exp_init(void);         // build the EXP event vtable copy (called from coop_init_once)

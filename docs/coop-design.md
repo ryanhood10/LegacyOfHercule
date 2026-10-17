@@ -180,6 +180,78 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   into the game (one such slip opened the pause menu and quit to the title); keep console typing and
   game-window key presses sequential.
 
+## Lockstep netplay (2026-10-17)
+
+`tools/mgba/netplay.lua` + `tools/netplay_relay.py`: both players run the ROM in their own mGBA
+(0.10.5 Qt, Lua scripting, no emulator rebuild) and exchange one pad word per frame; a frame runs
+only once both pads for it are known, so the emulations stay identical. Verified on one PC with two
+instances through the loopback relay: 11 400 lockstep frames (3+ minutes) of two-player movement,
+attacks and the map-intro dialogue with 190 matching hash checks and 0 desyncs; single-shot
+screenshots of both windows show the same scene while player 2 walks.
+
+Design:
+
+- **Both pads come from EWRAM.** `input_poll_hook` now also reads `g_p1_remote` (`0x0203FF02`, same
+  format as `g_p2_remote`: bit 15 valid, bits 0-9 keys) and, when valid, uses it instead of
+  `KEYINPUT` for everything downstream (player 1, the link-cable mirror word, controller-mode
+  detection). The script writes both words at the frame boundary for the coming frame, so the
+  physical buttons of either machine never reach the game directly.
+- **Why not `emu:setKeys` for player 1?** mGBA's Qt frontend re-applies the keyboard state every
+  frame in `CoreController::updateKeys` as `activeKeys |= core->getKeys() & ~m_removedKeys`
+  (0.10.5), i.e. keys set by a script stick until the user *releases* that key, and the thread's
+  own `videoFrameEnded` callback (which does that) runs before the script's `frame` callback. So
+  after a `setKeys` override, `getKeys()` can no longer tell a physically held key from the
+  override: the guest could not read its own pad. Feeding the ROM from memory keeps `getKeys()`
+  pure on both sides (host = player 1, guest = player 2), at the cost of trusting that the game reads
+  `KEYINPUT` only through `Input_Poll` (it does; everything else uses `g_InputSystem`).
+- **Frame timing.** Lockstep frame F: at the end of frame F-1 each side sends its pad sampled now,
+  tagged for frame F-1+delay, then blocks in the `frame` callback until the peer's word for F has
+  arrived (`socket:select` on the raw socket, 20 ms slices, 10 s timeout), writes
+  `g_p1_remote`/`g_p2_remote` and lets the frame run. The frame callback fires at the start of
+  VBlank, before the game's own VBlank handler polls input, so both sides see the words at the same
+  emulated point. Frames 1..delay-1 use empty pads on both sides.
+- **Handshake / start state.** HELLO carries protocol, role, ROM CRC32 (`emu:checksum`) and delay;
+  the host then `saveStateBuffer`s (save data + RTC, no screenshot: 405 568 bytes) and sends it, the
+  guest `loadStateBuffer`s inside its frame callback and answers READY; both treat that boundary as
+  frame 0. Loading a state from inside the callback is fine because the state was also taken from
+  inside the same callback on the host (`_startHblank` schedules the next video event before
+  `GBAFrameEnded`, so the continuation is identical). Fresh boot = the host resets before connecting;
+  a map start = the host loads a savestate first. Same mechanism re-runs on a desync (`RESYNC`).
+- **Desync check.** Every 60 frames an FNV-1a hash of both players' entity pointer, position
+  (`+0x158/+0x15C`), control state and facing, the whole `CoopState` and `g_FrameCounter`; every
+  300 frames the whole IWRAM too (`emu:readRange`). Hashes are exchanged (`H frame hash`) and
+  compared when both are known; "in sync" is logged every 600 frames, mismatches immediately.
+- **Transport.** mGBA's Lua sockets are non-blocking (`receive` returns `temporary failure`
+  / WSAEWOULDBLOCK on Windows, mapped to `AGAIN`); a 400 KB `send` therefore needs the retry loop.
+  Line protocol (`I frame word`, `H frame hash`, `HELLO`, `STATE n` + bytes, `READY`, `RESYNC`,
+  `BYE`). The relay sets `TCP_NODELAY` and uses blocking threads per direction (a non-blocking
+  `sendall` dies with WinError 10035 when the receiver is slower than the sender).
+- **Stalls.** With both instances on one PC the host waited on the guest in about half the frames
+  (the faster side always waits; `netplay_status()` shows how much), 60 fps on both. Delay 2 gives
+  one frame of network slack; use 3-4 over the internet.
+
+Lessons:
+
+- A savestate made with an older ROM build crashes (`Jumped to invalid address 09000A42`) once
+  player 2 acts: the private vtable copies in EWRAM hold the old blob's function addresses. Both
+  instances crashed on the same frame, which at least confirmed the lockstep. Re-make states after
+  `make`.
+- An off-by-one that treated the input for the frame currently awaited as "late" stalled both
+  sides until the 10 s timeout; inputs for `frame` itself are the ones we wait for.
+- Debug menu controls (for making states): the cursor rows are Music, Sample, Map Test; on Map
+  Test, Down cycles the edited field (Zone > Area > Variation, green; a further Down wraps the
+  cursor to Music), Right/Left change it (changing Zone resets Area to 1), A starts the map, B
+  leaves the menu back to the title (and the 75 s idle starts over).
+- Test helpers: `tools/mgba_script.ps1 '<lua>' -Window N` opens Tools > Scripting by mouse (the
+  menu bar ignores Alt mnemonics) and types the line into instance N's console;
+  `tools/mgba_shot.ps1 out.png -Title 'Scripting*' -Of N` shoots that console;
+  `Get-MgbaWindow -Title ... -ProcessId` / `Get-WindowPid` in `mgba_window.ps1` pick windows per
+  instance. Capture both game windows with one `CopyFromScreen` to compare the same instant.
+
+Open: a `ROM mismatch` check uses the CRC of the loaded ROM (so both need the same `make` flags,
+e.g. `DEBUG_MENU=1`); mGBA's BIOS choice is not checked (HLE on both is the default); the guest's
+save file is replaced by the host's snapshot.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).

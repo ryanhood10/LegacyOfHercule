@@ -1,5 +1,6 @@
 # Screenshot an mGBA window to a PNG.  Usage: tools\mgba_shot.ps1 out.png [-Window N]
-param([Parameter(Mandatory = $true)][string]$Out, [int]$Window = 0, [string]$Title = "")
+# -Title 'Scripting*' shoots a secondary window instead; add -Of N to pick the one of mGBA instance N.
+param([Parameter(Mandatory = $true)][string]$Out, [int]$Window = 0, [string]$Title = "", [int]$Of = -1)
 . "$PSScriptRoot\mgba_window.ps1"
 Add-Type -AssemblyName System.Drawing
 Add-Type @"
@@ -14,7 +15,8 @@ public static class W {
 }
 "@
 [W]::SetProcessDPIAware() | Out-Null
-$h = Get-MgbaWindow -Index $Window -Title $Title
+if ($Title -and $Of -ge 0) { $h = Get-MgbaWindow -Title $Title -ProcessId (Get-WindowPid (Get-MgbaWindow -Index $Of)) }
+else { $h = Get-MgbaWindow -Index $Window -Title $Title }
 [W]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Milliseconds 250
 $rc = New-Object RECT; [W]::GetClientRect($h, [ref]$rc) | Out-Null
 $pt = New-Object POINT; [W]::ClientToScreen($h, [ref]$pt) | Out-Null

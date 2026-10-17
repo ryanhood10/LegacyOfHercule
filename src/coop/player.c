@@ -5,6 +5,7 @@
 // Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
 // the game never zeroes them, hence the magic. Order fixed: remote word at +0, state at +4.
 volatile u16 g_p2_remote __attribute__((section(".coop.0"), used));
+volatile u16 g_p1_remote __attribute__((section(".coop.0p1"), used)); // +2: netplay override for player 1
 CoopState coop __attribute__((section(".coop.1"), used));
 
 typedef struct { s32 dx, dy; } Vec;

@@ -70,6 +70,10 @@ static u16 p2_source(u16 p1_now, u16 *p1_out) {
 void input_poll_hook(InputSystem *in) {
     coop_init_once();
     u16 raw = REG_KEYINPUT;
+    // Lockstep netplay (tools/mgba/netplay.lua) feeds both pads from EWRAM so the two emulations see
+    // identical input; the physical buttons of this machine then never reach the game directly.
+    u16 p1_remote = g_p1_remote;
+    if (p1_remote & 0x8000) raw = (u16)(~p1_remote & 0x3FF);
     // Every instance publishes its own buttons on the link; a host ignores what it receives from
     // itself, a second game instance thereby doubles as player 2's pad without controller mode.
     REG_SIOMLT_SEND = (u16)((raw & 0x3FF) | SIO_MARK);
