@@ -134,6 +134,17 @@ Live inspection without pausing: `dofile("…/tools/mgba/peek.lua")` in the Scri
   2 sees no input (`p1_controllable()` checks the control-state vtable), so it cannot wander during
   dialogue.
 
+## Soak results (2026-10-17)
+
+- Pause menu (Start) opens and closes with player 2 present; the status screen shows the active slot.
+- Map transition (zone 2 area 7 -> east neighbour, both players walking off the edge): player 2 is
+  destroyed with the old map (`destroys=1`) and recreated on player 1 at the new spawn
+  (`spawns=2`); the new map's intro dialogue ran normally.
+- Dialogue boxes suspend entity updates, so neither player moves during them; the control-state
+  gate (`p1_controllable`) covers scripted movement states where updates keep running.
+- The screen-edge leash means a parked player 2 stops player 1 at the view edge (by design);
+  with one person testing, drive both pads (`UP+I`) to walk together.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).
