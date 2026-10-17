@@ -16,6 +16,7 @@ Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2) {
 
 void entity_list_update_hook(EntityList *list) {
     coop.acting = g_PlayerObject;
+    coop_debug_tick();
     for (int i = list->event_count - 1; i >= 0; i--) {
         u32 *ev = list->events[i];
         if (--((s32 *)ev)[1] != 0) continue;

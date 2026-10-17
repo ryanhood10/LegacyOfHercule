@@ -68,7 +68,15 @@ typedef struct CoopExtra {
     s32 last_secondary;
     Entity *last_defender;
     Entity *last_attacker;
+    u32 cmd, cmd_arg;       // test commands from the console (enemies.lua): COOP_CMD_*
+    ActorRecord actor_rec;  // scratch record for COOP_CMD_ACTOR
+    u32 actor_count;        // COOP_CMD_ACTOR places successive actors on a 6 x 2 grid around player 1
+    u32 partner_override;   // console: nonzero = every boss twin uses this sprite id (model experiments)
 } CoopExtra;
+#define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
+#define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
+#define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
+void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 extern CoopExtra coop2;
 
 // Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin)
@@ -83,6 +91,7 @@ extern CoopExtra coop2;
 #define COOP_OFF_TWINS  2
 #define COOP_OFF_SPEED  4
 #define COOP_OFF_HP     8
+#define COOP_OFF_PARTNER 16  // boss twins keep the original's model
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame

@@ -28,7 +28,41 @@ function dmg()
     emu:read16(DBG + 6), emu:read16(DBG + 14), emu:read16(DBG + 16), emu:read16(DBG + 8), emu:read32(DBG + 20), emu:read32(DBG + 24),
     emu:read32(DBG + 28), emu:read32(DBG + 32)))
 end
--- coopoff(bits): tuning switches, bit 1 = damage multiplier, 2 = twins, 4 = speed, 8 = HP scaling (0 = all on)
+-- spawnrec(i): spawn mapScripts[i] of the current map the way the TriggerMapEvent opcode does (boss records
+-- with condition word 1 only ever spawn that way); bar(e): draw the boss bar(s) for entity e (0 = pair 0)
+local CMD = DBG + 36
+function spawnrec(i) emu:write32(CMD + 4, i); emu:write32(CMD, 1); console:log("spawn script " .. i) end
+function bar(e) emu:write32(CMD + 4, e or 0); emu:write32(CMD, 2); console:log("boss bar requested") end
+-- actor(sprite): stand a script actor of that sprite id beside player 1 (to see what a sprite id looks like)
+function actor(sprite) emu:write32(CMD + 4, sprite); emu:write32(CMD, 3); console:log("actor sprite " .. sprite) end
+-- lowhp(n): set every registered original and twin to n HP (pair-rule tests)
+function lowhp(n)
+  for i = 0, 23 do
+    for _, off in ipairs({0, 4}) do
+      local e = emu:read32(TWINS + i * 8 + off)
+      if e ~= 0 then emu:write32(e + 0x188, n or 1) end
+    end
+  end
+  console:log("registered enemies set to " .. (n or 1) .. " HP")
+end
+-- tele(dx): move every registered original and twin beside player 1 (dx px right, default 24)
+function tele(dx)
+  local p = emu:read32(0x03001FA8)
+  if p == 0 then return end
+  for i = 0, 23 do
+    for _, off in ipairs({0, 4}) do
+      local e = emu:read32(TWINS + i * 8 + off)
+      if e ~= 0 then
+        emu:write32(e + 0x158, emu:read32(p + 0x158) + ((dx or 24) << 8))
+        emu:write32(e + 0x15C, emu:read32(p + 0x15C))
+      end
+    end
+  end
+  console:log("registered enemies moved beside player 1")
+end
+-- partner(sprite): make every boss twin use this sprite id (0 = the built-in partner table)
+function partner(sprite) emu:write32(CMD + 8 + 28 + 4, sprite or 0); console:log("partner override " .. (sprite or 0)) end
+-- coopoff(bits): tuning switches, bit 1 = damage multiplier, 2 = twins, 4 = speed, 8 = HP scaling, 16 = partner models (0 = all on)
 function coopoff(bits) emu:write16(DBG + 8, bits or 0); console:log("coop2.off = " .. (bits or 0)) end
 
 local function scan_modules(seen)

@@ -214,7 +214,7 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   Trunks and respawns on him at the landing spot. Player 2 spawns 12 px left of player 1 when that
   spot is walkable, else exactly on player 1 (overlap beats leaving the map).
 
-## Plan: co-op difficulty, twin bosses (stages 1-2 done, see the next section)
+## Plan: co-op difficulty, twin bosses (stages 1-4 done, see the next section; stage 5 tuning open)
 
 Ryan's direction: with two players, enemies should be stronger, smarter, faster, more numerous,
 and every boss fight gets a second boss of a different model at the original's strength (Frieza +
@@ -344,20 +344,63 @@ entity pointer, `0x10` slides it out.
 - Hercule (level-40 debug party) and Piccolo both survive about a minute idle among 16 scaled
   enemies; tuning for a level-1 Hercule is still open (stage 5).
 
-### Boss roster (records with 0 EXP and >= 1000 HP; identities to confirm in mGBA)
+### Boss roster (identified in mGBA by standing each sprite id next to the player: `actor(n)`)
 
-| map | stat | sprite | HP | notes |
+Boss records are spawned by scripts: their condition word is `1`, which the loader's evaluator
+(`0x08003F07`: type = high half, 0 = never) rejects, and the fight's bytecode spawns them with the
+TriggerMapEvent opcode (84, `0x0800AAAF` -> `Map_SpawnScript` `0x0800C73B`: `mapScripts[index]`
+without the condition). The same opcode path goes through the co-op spawn hook, so scripted bosses
+get twins too. First forms with condition 0 (Cell at the Cell Games) spawn at map load.
+
+| map (debug-menu zone/area) | stat | sprite | HP | who |
 |---|---|---|---|---|
-| Z11 A4, A5, A6 | 3 | 9 | 3550 | prologue cutscene actors in Z1A2 use sprites 9 and 11: Frieza / King Cold candidates |
-| Z8 A49 | 4 | 11 | 2910 | the other prologue model |
-| Z7 A15 / Z7 A19 | 5 / 6 | 12 / 14 | 2970 / 2810 | |
-| Z8 A13, A27, A40 | 7 | 14 | 1900 | same model three times (robot candidates) |
-| Z2 A50 | 44 | 50 | 6400 | |
-| Z6 A61 | 29 | 34 | 10200 | highest HP in the game (hidden Namek boss: Cooler candidate) |
-| Z10 A20 | 60 | 28 | 5210 | |
-| Z12 A4 | 76 | 29 | 4890 | |
-| Z12 A6 | 78, 79 | 30 | 5160, 5500 | Cell forms (sprite 30 = Cell per the reference notes) |
-| Z14 A2 / A3 | 21-25 | 30 | 6500-8230 | Cell; stat 26 sprite 31 x3 = Cell Jr |
+| Z6 A61 "New Namek" (6/28) | 29 | 34 | 10200 | Cooler |
+| Z11 A4-A6 Master Roshi's island (11/4..6) | 3 | 9 | 3550 | Android 17 |
+| Z8 A49 (8/49) | 4 | 11 | 2910 | Android 18 |
+| Z7 A15 / A19 (7/15, 7/19) | 5 / 6 | 12 / 14 | 2970 / 2810 | Garlic Jr / a Spice boy |
+| Z8 A13, A27, A40 | 7 | 14 | 1900 | the Spice boys |
+| Z2 A50 East District 439 (2/40) | 44 | 50 | 6400 | the red robot |
+| Z10 A20 / Z12 A4 | 60 / 76 | 28 / 29 | 5210 / 4890 | Imperfect / Semi-Perfect Cell |
+| Z12 A6, Z14 A2, Z14 A3 | 78-79, 21-25 | 30 | 5160-8230 | Perfect Cell forms; stat 26 sprite 31 x3 = Cell Jr |
+| Z6 A70 (6/31) | 106, 64, 98 | 156, 76, 121 | 800, 1800, 2110 | tournament gauntlet (EXP, condition 1): Yamcha?, Krillin, Tien |
+
+Other sprites: 74 King Cold (cutscene only), 49 Frieza (cutscene only, no enemy record anywhere),
+41 Dr. Gero, 72 Hercule, 75 Korin, 76 Krillin, 102 Oolong, 121 Tien, 7 Saibaman, 38-40 and 44-47
+and 124 robots (regular enemies), 123 / 98 / 128 the big beasts. **There is no Frieza boss fight in
+Legacy of Goku II**: Frieza and King Cold only appear in the opening cutscene, so "Frieza + Cooler"
+cannot be built; the hidden Cooler fight on New Namek is the Frieza-family boss. Majin Buu is not in
+this game either (Buu's Fury).
+
+The debug menu's Area counter is the index within the zone's map-entry block, not the area byte:
+`menu area = entry index - first entry of that zone + 1` (zone first entries: 1:0 2:7 3:49 4:63
+5:141 6:145 7:177 8:203 9:261 10:268 11:293 12:299 13:313 14:323).
+
+### Boss pairs (stage 3) and the second bar (stage 4)
+
+- Boss = `max_hp >= 1000` and (no EXP or condition word 1). The twin keeps the original's stats and
+  AI; `partner_sprite()` gives it another model: Android 17 <-> 18 (verified: 17 on Z11A6 with an
+  18-model twin fights normally). Cooler's AI set 21 crashes ("Jumped to invalid address") with any
+  other sprite record (King Cold 74, Android 17 9 tried; Cell's AI with Cooler's model is fine), so
+  Cooler's twin is a second Cooler until that module (`0x0801C05B` sequences bound to the record) is
+  understood. `partner(n)` from the console overrides the table for experiments.
+- Pair rule (private vtable slot 14): the first boss of a pair to reach 0 HP dies quietly (list
+  broadcast `0xF` so its bar empties, regular-enemy death routine: dust, SFX, removal, no action);
+  if it was the original, the twin inherits the record action and becomes the original. The last one
+  dies the normal boss way, which runs the fight's script. A partner-model twin switches back to the
+  original model first so the script's sprite lookups find it. Twins' record copies point their
+  action at a no-op pair, so a twin's death never fires the defeat dialogue. Verified on the Cell
+  Games arena (14/3): both Cells at 5 HP, player 1 killed one (removed, registry shows the survivor
+  as the original), then the other (stays at 0 HP, the arena cutscene started).
+- Boss bars: in co-op both bars use a vtable copy whose draw is a port of the ROM's (two 32x8
+  sprites, 60 px fill from the entity's HP and stat max) with the bar's own x / target y (bytes
+  +0x19 / +0x1A of the object): x = 88 (the gap between the two player panels), the original's at
+  y = 8, the twin's at y = 20. Single-player keeps the ROM object at x = 160. When the script finds
+  the twin (the list search runs from the end) the first bar is still bound to the original.
+  Verified with `bar(0)` on the Cell pair and on a Cooler pair (6/28, `spawnrec(1)`).
+- Console test commands (`coop2.cmd`, run by the entity-list hook, so not during dialogue boxes):
+  `spawnrec(i)` = TriggerMapEvent i, `bar(e)`, `actor(sprite)` (grid of 12 around player 1),
+  `lowhp(n)`, `tele(dx)`, `partner(n)`, `coopoff(bits)` (1 damage, 2 twins, 4 speed, 8 HP, 16 partner
+  models).
 
 ## Two-player dash crash and the view limit (2026-10-17)
 

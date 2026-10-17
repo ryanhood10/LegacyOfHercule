@@ -62,6 +62,9 @@ typedef struct EnemyRecord {
     s32 behaviour_count;  // +0x18  behaviour list (waypoints, waits) ticked by 0x0800D156
     const void *behaviours[];   // +0x1C
 } EnemyRecord;
+// Co-op record copies (enemies.c) are allocated with one extra word after the behaviour pointers
+// holding the record's original sprite id (partner-model twins change sprite_id).
+static inline s32 *record_orig_sprite(EnemyRecord *r) { return (s32 *)&r->behaviours[r->behaviour_count]; }
 
 // Hit descriptor filled by the damage calculation 0x0800F910(defender, hit).
 typedef struct Hit {
@@ -89,11 +92,15 @@ typedef struct BossBar {
     u8 range;             // +0x16  fill pixels spanned by 100 %
     s8 step;              // +0x17  y velocity (1 slide in, -1 slide out)
     s8 y;                 // +0x18
-    u8 _p1[3];
+    u8 x;                 // +0x19  (co-op bars only) left edge; the ROM draw uses 160
+    s8 y_target;          // +0x1A  (co-op bars only) where the slide-in stops; the ROM update uses 8
+    u8 _p1;
 } BossBar;
 _Static_assert(sizeof(BossBar) == 0x1C, "BossBar size");
 #define BOSSBAR_VTABLE      0x08025748u
 #define BOSSBAR_BASE_VTABLE 0x08023A1Cu
+#define BOSSBAR_FILL_TABLE  ((const s32 *)0x086D60F4)   // 60 x {4 byte offsets} into the 0x200-byte tile block
+#define BOSSBAR_EMPTY_TILES ((const void *)0x086D64B4) // 0x200 bytes: the empty bar
 #define ENEMY_VTABLE        0x080252A4u
 #define AI_SPEED8_VTABLE    0x08023BE0u   // 8-direction chase module {vtable, speed 8.8} (ctor 0x0801B333)
 #define AI_SPEED4_VTABLE    0x08023D88u   // axis-aligned approach module (ctor 0x0801B15F)
@@ -254,6 +261,18 @@ ROM_FN(void, Enemy_Destroy, (Entity *e, int free_it, u32 a, u32 b), 0x0800E33B);
 ROM_FN(int, Rand_Range, (int n), 0x0802141D);        // n * rand16 >> 16
 ROM_FN(int, Rand_Chance, (u32 p), 0x0802142F);       // rand16 < p
 ROM_FN(void, EntityList_Remove, (void *list, void *obj, int flag), 0x080068CB);
+ROM_FN(void *, Character_GetSpriteRecord, (int sprite_id), 0x08009325);      // 0 player, 1-6 party, >= 7 NPC sprites
+ROM_FN(int, Enemy_OnHit, (Entity *e, const u8 *hit), 0x0800E485);           // enemy vtable slot 14
+ROM_FN(void, Enemy_RegularDeath, (const u32 *cls, Entity *e), 0x0801A74D);  // EXP, popup + action, list removal, dust, SFX
+ROM_FN(u32, EntityList_Broadcast, (void *list, int msg, void *arg), 0x08006DA7);   // every entity's slot 9
+#define ENEMY_CLASS_REGULAR ((const u32 *)0x086D2B6C)
+#define g_MapState (*(void **)0x083B5C88)   // -> map state (+4 = MapEntry *)
+typedef struct ActorRecord {   // MapScript_CreateCharacter record (handler 0x0800D6DF)
+    void *handler; u32 flags; s16 x, y; s32 sprite_id; s32 behaviour_count; const void *behaviours[1];
+} ActorRecord;
+ROM_FN(Entity *, MapScript_CreateCharacter, (const ActorRecord *rec), 0x0800D6DF);
+ROM_FN(void, Map_SpawnScript, (void *map, int index), 0x0800C73B);   // TriggerMapEvent opcode 84: mapScripts[index] without its condition
+#define ENEMY_ACTION_NONE   0x08010699u
 
 // vtable slot calls: function = table + table[slot]
 static inline void *vslot(const void *obj, int slot) {

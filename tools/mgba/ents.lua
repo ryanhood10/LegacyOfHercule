@@ -31,9 +31,11 @@ function ents(all)
   local count = emu:read32(list + 4)
   local p1 = emu:read32(0x03001FA8)
   local p2 = emu:read32(COOP + 4)
-  console:log(string.format("entities=%d events=%d view=(%d,%d) p1=%s p2=%s twins=%d scaled=%d bars=%d", count,
+  local entry = emu:read32(0x03002084)   -- map state +4: the MapEntry in use (+4 = script count)
+  console:log(string.format("entities=%d events=%d view=(%d,%d) p1=%s p2=%s twins=%d scaled=%d bars=%d map Z%dA%d entry=%s scripts=%d", count,
     emu:read32(list + 0x610), emu:read32(0x030010AC), emu:read32(0x030010B0), hex(p1), hex(p2),
-    emu:read16(TWINS + 24 * 8), emu:read16(TWINS + 24 * 8 + 2), emu:read16(TWINS + 24 * 8 + 4)))
+    emu:read16(TWINS + 24 * 8), emu:read16(TWINS + 24 * 8 + 2), emu:read16(TWINS + 24 * 8 + 4),
+    emu:read8(0x03002080), emu:read8(0x03002081), hex(entry), entry ~= 0 and emu:read8(entry + 4) or 0))
   for i = 0, count - 1 do
     local e = emu:read32(list + 8 + i * 4)
     local vt = emu:read32(e)

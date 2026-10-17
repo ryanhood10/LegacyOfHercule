@@ -10,22 +10,43 @@
 
 CoopExtra coop2 __attribute__((section(".coop2"), used));
 
+BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi);
+
 void *memcpy(void *dst, const void *src, unsigned n);   // util.c
 #define COLLISION_MAP ((const void *)g_Ctx[4])
 
 int is_coop_enemy(const Entity *e) { return e && e->vtable == coop2.enemy_vtable; }
+
+// A co-op enemy's record copy lives behind its stat copy in the entity block (create_coop_enemy).
+static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
+static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable); }
 
-// Bosses: no EXP but real HP (scripted targets such as rocks have no EXP and tiny HP; they are left alone).
-static int is_boss(const EnemyStat *st) { return st->exp == 0 && st->max_hp >= 1000; }
-static int twinnable(const EnemyStat *st) { return st->exp > 0 || is_boss(st); }
-
-// Partner model for boss twins: stat index -> sprite id (0 = same model). Filled in as the fights are
-// identified in mGBA; see docs/coop-design.md "Boss roster".
-static int partner_sprite(int stat_index) {
-    (void)stat_index;
-    return 0;
+// Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
+// word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
+// are left alone.
+static int is_boss_rec(const EnemyRecord *rec, const EnemyStat *st) {
+    return st->max_hp >= 1000 && (st->exp == 0 || rec->flags == 1);
 }
+static int is_boss(const Entity *e) { return is_boss_rec(record_of_const(e), (const EnemyStat *)e->behaviour); }
+static int twinnable(const EnemyRecord *rec, const EnemyStat *st) { return st->exp > 0 || is_boss_rec(rec, st); }
+
+// Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
+// "Boss roster" for how the fights were identified.
+static int partner_sprite(int stat_index) {
+    if (coop2.partner_override) return (int)coop2.partner_override;
+    switch (stat_index) {
+    // Cooler (stat 29): King Cold's sprite (74) with Cooler's AI set crashes at spawn (so does any
+    // other record; Cell's AI takes Cooler's model fine) -> same model until module 0x0801C05B is understood
+    case 3:  return 11;   // Android 17 (Z11) -> Android 18
+    case 4:  return 9;    // Android 18 (Z8A49) -> Android 17
+    default: return 0;    // Cell forms, Cell Jr, Garlic Jr and the Spice boys, the robot: same model
+    }
+}
+
+// The twin's record copy points its action object here, so a twin's death never fires the
+// original's defeat dialogue / script (the pair rules below hand the action to the survivor).
+static const u32 no_action[2] = { ENEMY_ACTION_NONE, 0 };
 
 // ---- twin registry ------------------------------------------------------------------------------
 static TwinPair *pair_of(const Entity *e) {
@@ -72,24 +93,71 @@ static void coop_enemy_destroy(Entity *e, int free_it, u32 a, u32 b) {
     Enemy_Destroy(e, free_it, a, b);
 }
 
-static void twin_bar_update(BossBar *bar);
+// ---- boss pairs ---------------------------------------------------------------------------------
+
+static void set_sprite(Entity *e, int sprite_id) {
+    e->sprite_record = Character_GetSpriteRecord(sprite_id);
+    ((void (*)(Entity *, int))vslot(e, 10))(e, 0);   // idle control state: frames come from the new record
+}
+
+// Remove a boss from the fight without its script: regular-enemy death (no EXP for bosses, popup,
+// list removal, dust, SFX) after telling every entity (the bars) that it died.
+static void quiet_death(Entity *e) {
+    e->hp = 0;
+    EntityList_Broadcast(g_SceneTable[1], 0xF, e);
+    Enemy_RegularDeath(ENEMY_CLASS_REGULAR, e);
+}
+
+// Enemy vtable slot 14 (OnHit: HP -= hit[+8], death at 0) for co-op enemies. Boss pairs: the
+// first of the two to fall is removed quietly and hands the original's role (record action, the
+// script's model) to the survivor, whose death then runs the fight's script as in single-player.
+static int coop_enemy_onhit(Entity *e, const u8 *hit) {
+    s32 dmg = *(const s32 *)(hit + 8);
+    TwinPair *pr = pair_of(e);
+    if (pr && is_boss(e) && e->hp > 0 && dmg >= e->hp) {
+        Entity *partner = pr->orig == e ? pr->twin : pr->orig;
+        if (partner) {
+            if (pr->orig == e) {
+                // the original falls first: the twin becomes the original (action, script model)
+                record_of(partner)->action = e->action;
+                partner->action = e->action;
+                pr->orig = partner;
+                pr->twin = 0;
+            } else {
+                pr->twin = 0;
+            }
+            quiet_death(e);
+            return 1;
+        }
+        // last of the pair: a partner-model twin dies as the original model so the script sees it
+        if (record_of(e)->sprite_id != *record_orig_sprite(record_of(e))) set_sprite(e, *record_orig_sprite(record_of(e)));
+    }
+    return Enemy_OnHit(e, hit);
+}
+
+static void coop_bar_update(BossBar *bar);
+static int coop_bar_draw(BossBar *bar, u32 **oam);
 
 void enemies_init(void) {
     u32 base = (u32)coop2.enemy_vtable;
     const u32 *orig = (const u32 *)ENEMY_VTABLE;
     for (int i = 0; i < 48; i++) coop2.enemy_vtable[i] = (ENEMY_VTABLE + orig[i]) - base;
     coop2.enemy_vtable[0] = (u32)coop_enemy_destroy - base;
+    coop2.enemy_vtable[14] = (u32)coop_enemy_onhit - base;
 
     base = (u32)coop2.bar_vtable;
     orig = (const u32 *)BOSSBAR_VTABLE;
     for (int i = 0; i < 24; i++) coop2.bar_vtable[i] = (BOSSBAR_VTABLE + orig[i]) - base;
-    coop2.bar_vtable[2] = (u32)twin_bar_update - base;
+    coop2.bar_vtable[2] = (u32)coop_bar_update - base;
+    coop2.bar_vtable[4] = (u32)coop_bar_draw - base;
 
     if (coop2.magic != COOP2_MAGIC) {
         coop2.magic = COOP2_MAGIC;
         for (int i = 0; i < TWIN_MAX; i++) coop2.twins[i].orig = coop2.twins[i].twin = 0;
         coop2.spawned = coop2.scaled = coop2.bars = 0;
         coop2.off = 0;
+        coop2.actor_count = 0;
+        coop2.partner_override = 0;
     }
 }
 
@@ -99,9 +167,10 @@ void enemies_init(void) {
 // shifted spawn point (the constructor registers the collision box at the record's position, so the
 // twin must be created where it stands) and, for boss twins, the partner sprite.
 static u32 record_size(const EnemyRecord *rec) { return 0x1C + 4 * (u32)rec->behaviour_count; }
+static u32 record_copy_size(const EnemyRecord *rec) { return record_size(rec) + 4; }   // + original sprite id
 
-static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, int scale, int dx, int sprite) {
-    u32 rsize = (record_size(rec) + 3) & ~3u;
+static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, int scale, int dx, int sprite, int twin) {
+    u32 rsize = record_copy_size(rec);
     u8 *block = Arena_Alloc(ENEMY_SIZE + sizeof(EnemyStat) + rsize);
     if (!block) return 0;
     EnemyStat *stat = (EnemyStat *)(block + ENEMY_SIZE);
@@ -113,7 +182,9 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
     }
     memcpy(r, rec, record_size(rec));
     r->x = (s16)(rec->x + dx);
+    *record_orig_sprite(r) = rec->sprite_id;
     if (sprite) r->sprite_id = sprite;
+    if (twin) r->action = (void *)no_action;   // twins never fire the record's action
     Entity *e = Enemy_Create(block, r, stat);
     if (!e) { Arena_Free(block); return 0; }
     e->vtable = coop2.enemy_vtable;
@@ -123,10 +194,10 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     const EnemyStat *st = &ENEMY_STATS[rec->stat_index];
-    if (!p2_present() || !twinnable(st)) return Enemy_Create(0, rec, st);
+    if (!p2_present() || !twinnable(rec, st)) return Enemy_Create(0, rec, st);
 
-    int boss = is_boss(st);
-    Entity *orig = create_coop_enemy(rec, st, !boss, 0, 0);
+    int boss = is_boss_rec(rec, st);
+    Entity *orig = create_coop_enemy(rec, st, !boss, 0, 0, 0);
     if (!orig) return 0;
 
     // Twin TWIN_OFFSET px to the right when that spot is walkable, else to the left, else on top.
@@ -137,13 +208,45 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         dx = (rec->x >= TWIN_OFFSET + 8 && Collision_Check(COLLISION_MAP, px, (u8 *)orig + 0x154)) ? -TWIN_OFFSET : 0;
     }
     Entity *twin = (coop2.off & COOP_OFF_TWINS) ? 0
-                 : create_coop_enemy(rec, st, !boss, dx, boss ? partner_sprite(rec->stat_index) : 0);
+                 : create_coop_enemy(rec, st, !boss, dx, (boss && !(coop2.off & COOP_OFF_PARTNER)) ? partner_sprite(rec->stat_index) : 0, 1);
     if (twin) {
         EntityList_Add(g_SceneTable[1], twin);   // the loader adds the returned original itself
         register_pair(orig, twin);
         coop2.spawned++;
     }
     return orig;
+}
+
+// ---- test commands ------------------------------------------------------------------------------
+// enemies.lua writes coop2.cmd / cmd_arg; the entity-list hook runs them at the start of a frame.
+void coop_debug_tick(void) {
+    u32 cmd = coop2.cmd;
+    if (!cmd) return;
+    coop2.cmd = 0;
+    if (cmd == COOP_CMD_SPAWN_SCRIPT) {
+        Map_SpawnScript(g_MapState, (int)coop2.cmd_arg);
+    } else if (cmd == COOP_CMD_ACTOR) {
+        static const u32 face_wait[2] = { 0x0800CB0Fu, 0x7D00 };   // NpcBehavior_FaceAndWait: face down, 9 min
+        ActorRecord *r = &coop2.actor_rec;
+        Entity *p1 = g_PlayerObject;
+        if (!p1) return;
+        r->handler = (void *)0x0800D6DFu;
+        r->flags = 0;
+        u32 k = coop2.actor_count++;
+        r->x = (s16)((p1->x >> 8) - 80 + 40 * (int)(k % 6));
+        r->y = (s16)((p1->y >> 8) - 40 + 64 * (int)((k / 6) % 2));
+        r->sprite_id = (s32)coop2.cmd_arg;
+        r->behaviour_count = 1;
+        r->behaviours[0] = face_wait;
+        Entity *a = MapScript_CreateCharacter(r);
+        if (a) EntityList_Add(g_SceneTable[1], a);
+    } else if (cmd == COOP_CMD_BOSS_BAR) {
+        Entity *e = (Entity *)coop2.cmd_arg;
+        if (!e) e = coop2.twins[0].orig ? coop2.twins[0].orig : coop2.twins[0].twin;
+        if (!e) return;
+        BossBar *bar = bossbar_create_hook(0, e, 0, 100);
+        if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
+    }
 }
 
 // ---- walk speed ---------------------------------------------------------------------------------
@@ -202,10 +305,49 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
 }
 
 // ---- boss bars ----------------------------------------------------------------------------------
+// The ROM bar sits at x = 160, under player 2's panel (152..232). Co-op bars use a vtable copy whose
+// draw and update read the bar's own x / target y: both bars go in the 64 px gap between the panels
+// (x = 88), the original at y = 8 and the twin's under it at y = 20.
+#define BAR_X_COOP 88
+#define BAR_Y_TOP 8
 #define BAR_Y_TWIN 20
 #define BAR_LIST (*(void **)0x086D60F0)   // -> g_EntityList (the bar's own ObjVram/list cell)
 
-static BossBar *bar_create(void *mem, Entity *e, int lo, int hi, u32 *vtable) {
+static void dma_copy32(const void *src, void *dst, int words) {
+    REG_DMA3SAD = (u32)src;
+    REG_DMA3DAD = (u32)dst;
+    REG_DMA3CNT_L = (u16)words;
+    REG_DMA3CNT_H = 0x8400;
+}
+
+// Port of the ROM draw (vtable slot 4, 0x0801055D) with the bar's own x: two 32x8 256-colour sprites,
+// fill = lo + hp * range / max_hp pixels of 60, tiles rebuilt from the empty bar when the fill changes.
+static int coop_bar_draw(BossBar *bar, u32 **oam) {
+    u32 *o = *oam;
+    u32 y = (u8)bar->y;
+    u32 x = bar->x;
+    o[0] = (((0x4000u | x) << 16) | 0x6000u) | y;
+    o[1] = (o[1] & 0xFFFFF000u) | (bar->tile & 0x3FF);
+    o[2] = (((0x4000u | (x + 32)) << 16) | 0x6000u) | y;
+    o[3] = (o[3] & 0xFFFFF000u) | ((bar->tile + 8) & 0x3FF);
+    *oam = o + 4;
+    u32 fill = bar->lo;
+    Entity *e = bar->entity;
+    if (e) fill += (u32)(e->hp * bar->range) / (u32)((const EnemyStat *)e->behaviour)->max_hp;
+    if (bar->px != fill) {
+        bar->px = (u8)fill;
+        u8 buf[0x200];
+        dma_copy32(BOSSBAR_EMPTY_TILES, buf, 0x80);
+        for (u32 i = fill; i < 60; i++) {
+            const s32 *t = BOSSBAR_FILL_TABLE + i * 4;
+            buf[t[0]] = 1; buf[t[1]] = 1; buf[t[2]] = 1; buf[t[3]] = 1;
+        }
+        dma_copy32(buf, (void *)(OBJ_VRAM + bar->tile * 0x20), 0x80);
+    }
+    return 0;
+}
+
+static BossBar *bar_create(void *mem, Entity *e, int lo, int hi, u32 *vtable, int x, int y_target) {
     BossBar *bar = mem ? mem : Arena_Alloc(sizeof *bar);
     if (!bar) return 0;
     bar->vtable = (u32 *)BOSSBAR_BASE_VTABLE;
@@ -220,22 +362,26 @@ static BossBar *bar_create(void *mem, Entity *e, int lo, int hi, u32 *vtable) {
     bar->step = 1;
     bar->lo = (u8)(lo * 60 / 100);
     bar->range = (u8)(hi * 60 / 100 - bar->lo);
+    bar->x = (u8)x;
+    bar->y_target = (s8)y_target;
     return bar;
 }
 
-// Original slide: y += step until 8 (or removed below -8). The twin's bar settles 12 px lower.
-static void twin_bar_update(BossBar *bar) {
+// Original slide: y += step until 8 (or removed below -8); co-op bars stop at their own target.
+static void coop_bar_update(BossBar *bar) {
     int y = bar->y + bar->step;
     bar->y = (s8)y;
     if (y < -8) EntityList_Remove(BAR_LIST, bar, -8);
-    else if (y > BAR_Y_TWIN) { bar->y = BAR_Y_TWIN; bar->step = 0; }
+    else if (y > bar->y_target) { bar->y = bar->y_target; bar->step = 0; }
 }
 
 BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
-    BossBar *bar = bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE);
-    TwinPair *pr = coop.p2 ? pair_of(e) : 0;
-    if (bar && pr && pr->twin && pr->twin != e) {
-        BossBar *second = bar_create(0, pr->twin, lo, hi, coop2.bar_vtable);
+    if (!coop.p2) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);   // single-player: the ROM object
+    TwinPair *pr = pair_of(e);
+    if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin
+    BossBar *bar = bar_create(mem, e, lo, hi, coop2.bar_vtable, BAR_X_COOP, BAR_Y_TOP);
+    if (bar && pr && pr->orig && pr->twin) {
+        BossBar *second = bar_create(0, pr->twin, lo, hi, coop2.bar_vtable, BAR_X_COOP, BAR_Y_TWIN);
         if (second) { EntityList_Add(g_SceneTable[1], (Entity *)second); coop2.bars++; }
     }
     return bar;
