@@ -28,6 +28,16 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
 - **Creation:** `PlayerEntity_Create(mem, a, b)` `0x080086D4` sets the vtable, `g_PlayerObject`,
   and installs the display row's behaviour class (`+0x180`).
 
+## Status
+
+**Shadow milestone reached (2026-10-17).** `make` produces `build/log2-coop.gba` (16 MiB, code at
+`0x08800000`). The only ROM edit is the idle state's update slot, redirected to `idle_update_hook`
+(`src/coop/coop.c`), which lazily creates a second player entity next to the first the moment the
+player is idle on a map. The second entity shares the input block, so it mirrors player 1: verified
+in mGBA on the prologue map (two Trunks, both walking with the D-pad, each with its own collision).
+The second entity gets a private copy of the player vtable whose destroy clears `coop.p2` instead
+of `g_PlayerObject`, so map changes rebuild it cleanly.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).

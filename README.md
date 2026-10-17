@@ -32,6 +32,19 @@ tools\ghidra_import.ps1 roms\log2.gba
 
 Open `build\ghidra\log2.gpr` in the Ghidra GUI afterwards. Findings go in `docs/rom-map.md`.
 
+## Building the co-op ROM
+
+`src/coop/` is compiled with `arm-none-eabi-gcc` (Thumb, arm7tdmi) into a blob linked at
+`0x08800000`, and `tools/patch_rom.py` pads the original to 16 MiB, drops the blob in, and rewrites
+the vtable slots that redirect into it:
+
+```
+make
+```
+
+Output: `build/log2-coop.gba`. Run it in mGBA. For a boot smoke test over the GDB stub:
+`mgba-sdl -g build\log2-coop.gba`, then `arm-none-eabi-gdb -batch -x tools\gdb\check_boot.gdb`.
+
 ## Layout
 
 ```
