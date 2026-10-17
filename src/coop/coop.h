@@ -45,6 +45,49 @@ int p1_controllable(void);   // player 1 is in a player-driven control state (no
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232
 
 extern CoopState coop;             // pinned at 0x0203FF04 (section .coop)
+
+// Co-op difficulty state (enemies.c), pinned at 0x0203FB00 (section .coop2, below the player-2 vtable block).
+#define COOP2_MAGIC 0xC00B0D1Fu
+#define TWIN_MAX 24
+typedef struct TwinPair { Entity *orig, *twin; } TwinPair;
+typedef struct CoopExtra {
+    u32 magic;
+    u32 enemy_vtable[48];   // copy of the enemy class vtable (all slots, see g_p2_vtable): destroy unregisters the pair
+    u32 bar_vtable[24];     // copy of the boss-bar vtable for the twin's bar (settles lower)
+    TwinPair twins[TWIN_MAX];
+    u16 spawned;            // debug: twins created since boot
+    u16 scaled;             // debug: enemies given scaled stats
+    u16 bars;               // debug: twin boss bars created
+    u16 dmg_calls;          // debug: damage calculations (any defender)
+    u16 off;                // tuning switches (set from the console): COOP_OFF_* bits
+    u16 _pad;
+    u16 dmg_calls_unused;   // (keeps the debug words below word-aligned)
+    u16 dmg_player;         // debug: ... with a player as the defender
+    u16 dmg_scaled;         // debug: ... that got the co-op multiplier
+    s32 last_dmg;           // debug: last calculation's dmg / secondary / defender / attacker
+    s32 last_secondary;
+    Entity *last_defender;
+    Entity *last_attacker;
+} CoopExtra;
+extern CoopExtra coop2;
+
+// Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin)
+#define COOP_HP_NUM 3        // HP x 1.5
+#define COOP_HP_DEN 2
+#define COOP_DMG_NUM 5       // damage dealt to players x 1.25
+#define COOP_DMG_DEN 4
+#define COOP_SPEED_NUM 6     // walk speed x 1.2
+#define COOP_SPEED_DEN 5
+#define TWIN_OFFSET 24       // px beside the original
+#define COOP_OFF_DAMAGE 1    // coop2.off bits: disable the damage multiplier / twins / speed / HP scaling
+#define COOP_OFF_TWINS  2
+#define COOP_OFF_SPEED  4
+#define COOP_OFF_HP     8
+
+void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
+Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
+int is_coop_enemy(const Entity *e);
+Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2);   // entities.c
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 #define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4
 extern u32 g_p2_vtable[PLAYER_VTABLE_SLOTS];   // player 2's private player vtable (section .coop.vt)

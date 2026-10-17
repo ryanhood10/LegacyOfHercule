@@ -8,7 +8,7 @@ static inline void call_slot(void *obj, int slot) {
     ((void (*)(void *))vslot(obj, slot))(obj);
 }
 
-static Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2) {
+Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2) {
     s32 dx1 = (e->x - p1->x) >> 8, dy1 = (e->y - p1->y) >> 8;
     s32 dx2 = (e->x - p2->x) >> 8, dy2 = (e->y - p2->y) >> 8;
     return (dx2 * dx2 + dy2 * dy2 < dx1 * dx1 + dy1 * dy1) ? p2 : p1;
@@ -32,7 +32,7 @@ void entity_list_update_hook(EntityList *list) {
         Entity *p2 = coop.p2;
         Entity *e = list->items[i];
         if (p1 && p2 && e != p1 && e != p2) {
-            Entity *near = nearest_player(e, p1, p2);
+            Entity *near = coop_target(e, p1, p2);
             g_PlayerObject = near;
             coop.acting = near;
             call_slot(e, 2);

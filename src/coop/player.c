@@ -206,6 +206,7 @@ static void build_vtables(void) {
     g_p2_vtable[15] = (u32)p2_change_hp - base;
     g_p2_vtable[16] = (u32)p2_take_damage - base;
     exp_init();
+    enemies_init();
     if (coop.p2) coop.p2->vtable = g_p2_vtable;   // a live player 2 from an older build's savestate
     coop.code_id = (u32)coop_init_once;
 }

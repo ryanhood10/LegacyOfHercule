@@ -30,12 +30,18 @@ ENTRY_JUMPS = [
     (0x0801EEFC, "input_poll_hook"),         # Input_Poll
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
     (0x0800E4D2, "exp_award_hook"),          # enemy death -> EXP event
+    (0x0800E77E, "enemy_spawn_hook"),        # MapScript_CreateEnemy (map loader record handler)
+    (0x0800F910, "damage_calc_hook"),        # damage calculation (defender, hit)
+    (0x0801B332, "ai_speed8_create_hook"),   # 8-direction chase AI module constructor (speed param)
+    (0x0801B15E, "ai_speed4_create_hook"),   # axis-aligned approach AI module constructor
+    (0x080104C0, "bossbar_create_hook"),     # BossHealthBar_Create (DrawBossHealthBar opcodes)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
-# from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 512 bytes.
+# from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 1.25 KiB
+# (0x0203FB00 co-op difficulty state, 0x0203FE00 player-2 vtable, 0x0203FF00 pad words + CoopState).
 WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000FD7E),
+    (0x01F20C, 0x0000FDFE, 0x0000FCC0),
 ]
 
 # Optional: title screen idles into the leftover debug menu (Map Test loads any map with a level-40

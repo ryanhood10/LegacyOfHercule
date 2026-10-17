@@ -4,6 +4,7 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+typedef signed char s8;
 typedef signed short s16;
 typedef signed int s32;
 
@@ -19,14 +20,83 @@ typedef struct Entity {
     u8 _p3[0x10C];
     s32 x;                // +0x158  8.8 fixed
     s32 y;                // +0x15C
-    u8 _p4[0x20];
-    void *behaviour;      // +0x180  display-row behaviour class
-    u8 _p5[4];
-    s32 side_speed;       // +0x188  used when a second direction is held
-    s32 speed;            // +0x18C
+    u8 stat_melee;        // +0x160  combat bytes (enemies: copied from EnemyStat +0xC..+0x10 by 0x0800F7CC)
+    u8 stat_ranged;       // +0x161  attacker stat for ranged hits
+    u8 defence;           // +0x162  damage taken scales by (128 - defence) / 128
+    u8 res_melee;         // +0x163  hit->secondary = dmg * res / 128 (melee)
+    u8 res_ranged;        // +0x164  same for ranged hits
+    u8 _p4[0x1B];
+    void *behaviour;      // +0x180  player: display-row behaviour class; enemy: EnemyStat *
+    void *action;         // +0x184  enemy: record's action object {func, payload}, fired on death
+    union {
+        s32 side_speed;   // +0x188  player: used when a second direction is held
+        s32 hp;           // +0x188  enemy: current HP (max = stat->max_hp)
+    };
+    s32 speed;            // +0x18C  player speed; enemy: +0x18C/+0x18D flag bytes
     u8 _p6[0x10];
 } Entity;
 _Static_assert(sizeof(Entity) == 0x1A0, "Entity size");
+_Static_assert(__builtin_offsetof(Entity, hp) == 0x188, "Entity hp offset");
+#define ENEMY_SIZE 0x1F0   // enemy entities are larger: +0x190 behaviour-list state, +0x19C AI state
+
+// Enemy stat database (0x086D56AC, 24 bytes per entry; MapScript enemy record +8 indexes it).
+typedef struct EnemyStat {
+    s32 exp;              // +0x00  base EXP (0 for bosses and scripted targets)
+    s32 max_hp;           // +0x04
+    s32 ai_set;           // +0x08  index into the AI set table 0x086D5194 (8-byte {class, param})
+    u8 melee, ranged, defence, res_melee;   // +0x0C..+0x0F -> entity +0x160..+0x163
+    s32 res_ranged;       // +0x10  -> entity +0x164 (byte)
+    const u32 *cls;       // +0x14  class object: word 2 = death handler (EXP award, popup, removal)
+} EnemyStat;
+_Static_assert(sizeof(EnemyStat) == 0x18, "EnemyStat size");
+#define ENEMY_STATS ((const EnemyStat *)0x086D56AC)
+
+// MapEntry.mapScripts[] record handled by 0x0800E77F (MapScript_CreateEnemy). Size 0x1C + 4*count.
+typedef struct EnemyRecord {
+    void *handler;        // +0x00  0x0800E77F
+    u32 flags;            // +0x04  spawn condition (already evaluated by the map loader)
+    s32 stat_index;       // +0x08
+    s16 x, y;             // +0x0C  pixels
+    s32 sprite_id;        // +0x10  Character_GetSpriteId space (>= 7)
+    void *action;         // +0x14  {func, payload}: 0x0801069B bytecode, 0x080106B3 dialog, 0x08010699 none
+    s32 behaviour_count;  // +0x18  behaviour list (waypoints, waits) ticked by 0x0800D156
+    const void *behaviours[];   // +0x1C
+} EnemyRecord;
+
+// Hit descriptor filled by the damage calculation 0x0800F910(defender, hit).
+typedef struct Hit {
+    s32 kind;             // +0x00  0 = melee popup style (player side)
+    s32 mult;             // +0x04  10.10 fixed multiplier (0x400 = 1.0)
+    const u8 *attack;     // +0x08  attack descriptor: byte 0 = 0 melee / else ranged, word +4 = base power
+    Entity *attacker;     // +0x0C
+    s32 crit;             // +0x10  set by the calculation (melee only)
+    s32 dmg;              // +0x14  result
+    s32 secondary;        // +0x18  dmg * defender resistance / 128
+} Hit;
+
+// Boss health bar object (0x1C bytes, vtable 0x08025748), created by BossHealthBar_Create 0x080104C1
+// from the DrawBossHealthBar opcodes; two 32x8 sprites at x = 160, y slides from -8 to 8.
+typedef struct BossBar {
+    u32 *vtable;          // +0x00
+    s32 f4;               // +0x04
+    u8 kind;              // +0x08  4
+    u8 _p0[3];
+    u16 tile;             // +0x0C  OBJ VRAM tile base (0x200 bytes)
+    u16 size;             // +0x0E  0x200
+    Entity *entity;       // +0x10  bound enemy (cleared by list message 0xF when it dies)
+    u8 px;                // +0x14  cached fill width (0xFF = redraw)
+    u8 lo;                // +0x15  fill pixels at 0 % (lo% * 60 / 100)
+    u8 range;             // +0x16  fill pixels spanned by 100 %
+    s8 step;              // +0x17  y velocity (1 slide in, -1 slide out)
+    s8 y;                 // +0x18
+    u8 _p1[3];
+} BossBar;
+_Static_assert(sizeof(BossBar) == 0x1C, "BossBar size");
+#define BOSSBAR_VTABLE      0x08025748u
+#define BOSSBAR_BASE_VTABLE 0x08023A1Cu
+#define ENEMY_VTABLE        0x080252A4u
+#define AI_SPEED8_VTABLE    0x08023BE0u   // 8-direction chase module {vtable, speed 8.8} (ctor 0x0801B333)
+#define AI_SPEED4_VTABLE    0x08023D88u   // axis-aligned approach module (ctor 0x0801B15F)
 
 typedef struct InputSystem {
     u8 history_head;      // +0x00
@@ -179,6 +249,11 @@ ROM_FN(void, Player_StepAxis, (Entity *e, const s32 *xy, int axis), 0x08007D25);
 ROM_FN(void, IdleState_Update, (void *state, Entity *e), 0x08007F35);
 ROM_FN(void *, Arena_Alloc, (int bytes), 0x0801F08D);
 ROM_FN(void, Party_AddExp, (PartyState *party, int slot, int amount), 0x08003D59);   // handles level-ups
+ROM_FN(Entity *, Enemy_Create, (void *mem, const EnemyRecord *rec, const EnemyStat *stat), 0x0800E281);
+ROM_FN(void, Enemy_Destroy, (Entity *e, int free_it, u32 a, u32 b), 0x0800E33B);   // enemy vtable slot 0
+ROM_FN(int, Rand_Range, (int n), 0x0802141D);        // n * rand16 >> 16
+ROM_FN(int, Rand_Chance, (u32 p), 0x0802142F);       // rand16 < p
+ROM_FN(void, EntityList_Remove, (void *list, void *obj, int flag), 0x080068CB);
 
 // vtable slot calls: function = table + table[slot]
 static inline void *vslot(const void *obj, int slot) {

@@ -214,7 +214,7 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   Trunks and respawns on him at the landing spot. Player 2 spawns 12 px left of player 1 when that
   spot is walkable, else exactly on player 1 (overlap beats leaving the map).
 
-## Plan: co-op difficulty, twin bosses (not started)
+## Plan: co-op difficulty, twin bosses (stages 1-2 done, see the next section)
 
 Ryan's direction: with two players, enemies should be stronger, smarter, faster, more numerous,
 and every boss fight gets a second boss of a different model at the original's strength (Frieza +
@@ -238,6 +238,126 @@ Engine facts to build on:
 Steps: (1) map the enemy behaviour object and the spawn native, (2) co-op scale factors for HP,
 damage and speed plus twin spawns for regular enemies, (3) boss twins with partner models, (4) the
 second boss bar, (5) tune so a level-1 Hercule beside Gohan is survivable.
+
+## Co-op difficulty: enemy object map, twins and scaling (2026-10-17)
+
+### Enemy entity (class vtable `0x080252A4`, 0x1F0 bytes)
+
+Created by the map loader through the enemy record handler `0x0800E77E` = `Enemy_Create(0, record,
+&stats[record->stat_index])` (`0x0800E281`); the loader adds the returned entity to the list itself.
+
+| offset | field |
+|---|---|
+| `+0x160..+0x164` | combat bytes copied from the stat entry by the base init `0x0800F7CC`: melee stat, ranged stat, defence, melee resistance, ranged resistance |
+| `+0x180` | `EnemyStat *` (word 0 = base EXP, used by the EXP award) |
+| `+0x184` | record's action object `{func, payload}` (`0x0801069B` bytecode, `0x080106B3` dialogue, `0x08010699` none) |
+| `+0x188` | current HP (max = stat `+4`) |
+| `+0x190` | behaviour-list state `{current, index, record+0x18}` (waypoints / waits, ticked by `0x0800D156`) |
+| `+0x19C` | AI state `{entity, count, (module, class) x5 ...}` ticked by `0x0801AB09` from update slot 2 |
+
+Vtable slots (function = table + word): 0 destroy `0x0800E33B` (unregisters the collision box, frees
+the AI and behaviour list), 2 update `0x0800E5A5`, 9 collision / message `0x0800E5B9` (type 0 =
+hit by a player attack: box test, damage calc, AI notify; `0x14` = scouter registration by stat
+index), 10 / 11 control-state set / test, 12 / 13 collision box register / unregister, 14 OnHit
+`0x0800E485` (knockback + popup `0x0800F833`, `HP -= hit->dmg`; at 0 it broadcasts list message
+`0xF` and calls the stat class' death handler), 15 heal `0x0800E561` (clamped to the stat max).
+Like the player vtable it is 48 words long; the co-op copy takes all of them.
+
+**Stat database** `0x086D56AC`, 24 bytes per entry (`EnemyStat` in rom.h): `+0` base EXP, `+4` max
+HP, `+8` AI set, `+0xC` melee / ranged / defence / melee-resistance bytes, `+0x10` ranged
+resistance, `+0x14` class object (word 2 = death handler). Wolves (zone 2 area 7) are stat 53:
+13 EXP, 35 HP, AI set 8, melee 7, defence 3. Bosses have 0 EXP and >= 1000 HP; scripted targets
+(rocks, tutorial dummies) have 0 EXP and tiny HP.
+
+**Map entry** (`0x08409368`, 327 x 0x38): `+0` zone, `+1` area, `+4` script count (byte), `+0x14`
+`mapScripts` pointer array (handlers `0x0800E77F` enemy, `0x0800B711` NPC, `0x0800D6DF` actor), `+5`
+/ `+0x18` items, `+6` / `+0x1C` objects, `+7` / `+0x20` triggers (8 bytes), `+0x30` on-load script.
+Enemy record: `+4` condition flags (evaluated by the loader), `+8` stat index, `+0xC` x,y, `+0x10`
+sprite id, `+0x14` action object, `+0x18` behaviour count, `+0x1C` behaviour pointers. 666 records on
+167 maps; every boss is one of them (with a condition), nothing spawns enemies from bytecode.
+
+**Damage** `0x0800F910(defender, hit)` (`Hit` in rom.h: `+4` multiplier 10.10, `+8` attack
+descriptor (byte 0: 0 melee / else ranged, word `+4` base power), `+0xC` attacker, out `+0x10` crit,
+`+0x14` damage, `+0x18` secondary): melee uses the attacker's `+0x160` byte with a crit chance of
+`stat*0xA4/65536`, ranged the `+0x161` byte; the curve `stat*(stat*26-701)+115618`, `(128 - defence)/128`
+and a `(256 + rand(26))/256` jitter give the damage. Both players' hits on enemies and enemy hits on
+players go through it (player collision slot 9 `0x08008945` cases 0 / 1 call it with the hit at
+`desc+0x14`). Two RNG draws (`0x0802142F` chance, `0x0802141D` range) in a fixed order.
+
+**AI** sets: table `0x086D5194`, 154 x `{class, param}`; module classes are `{create, update, finish,
+param, ...}` trees: SELECT by distance² to `g_PlayerObject` (`0x0801AEF3`, `0x0801D749` with
+hysteresis), GOTO set (`0x0801AB65`), SEQUENCE (`0x0801B887`), PARALLEL (`0x0801B63F`), CHANCE
+(`0x0801BA47`), wait (`0x0801BBAD`), and the leaf movers whose objects are `{vtable, speed 8.8}`:
+8-direction chase `0x0801B333` (vtable `0x08023BE0`; wolves 0xB3 = 0.7 px/frame) and axis-aligned
+approach `0x0801B15F` (`0x08023D88`). Wolves: set 8 = patrol until a player is within 72 px, set 9 =
+chase. Every module reads the target from `g_PlayerObject`, which is why the per-entity swap in
+entities.c retargets them.
+
+**Death**: the stat class' handler (regular enemies `0x0801A74D`) awards EXP (`0x0800E4D2`, our
+hook), queues a 0x14-byte popup event (vtable `0x080238FC`, fire slot `0x080109AD` runs the record's
+action object: defeat dialogues and scripts fire here), removes the entity, spawns dust and plays
+the death SFX. The boss class `0x086FF3C4` (`0x0801A82D`) only awards EXP and queues the event; the
+boss entity stays for the script.
+
+**Boss bar**: `DrawBossHealthBar(charIdx)` (opcode 85, `0x0800AB1B`; 90 takes a percent range) finds
+the entity by sprite id (`0x08009371` -> list find type 5) and adds `BossHealthBar_Create(0, e, lo,
+hi)` (`0x080104C1`, `BossBar` in rom.h, vtable `0x08025748`): two 32x8 sprites at x = 160 sliding
+from y = -8 to 8, fill = `lo + hp * range / stat->max_hp` px of 60, redrawn from a 60-entry offset
+table at `0x086D60F4` into its own 0x200-byte tile block. Message `0xF` (entity died) clears its
+entity pointer, `0x10` slides it out.
+
+### What co-op changes (src/coop/enemies.c)
+
+- `.coop2` block at `0x0203FB00` (heap size word now `0xFCC0`, reserving the top 1.25 KiB): enemy and
+  boss-bar vtable copies, a 24-pair twin registry and counters (`ents()` prints them).
+- Spawn hook on `0x0800E77E`: with a player-2 source present every enemy with EXP (and every boss)
+  is created from a private stat copy and record copy carried in its own arena block (`0x1F0` +
+  stat + record, freed with the entity), plus a twin 24 px to the right (left if blocked, else on
+  top) from a record copy with the shifted spawn point, so the collision box the constructor
+  registers is right. Regular enemies and their twins get `max_hp x 1.5`; bosses keep their stats.
+  Twins are added to the entity list by the hook and registered as a pair. Twins give full EXP.
+- Chase-module constructors (`0x0801B332`, `0x0801B15E`) are replaced: a co-op enemy's module gets
+  `speed x 1.2`. NPC actors and single-player modules are unchanged.
+- Damage calc (`0x0800F910`) is ported; an enemy hit on either player is `x 1.25` when player 2 exists.
+- Targeting: entities.c asks `coop_target()`: originals see the nearest player, a twin whose original
+  is alive sees the *other* player, so a pair splits up instead of both chasing the nearest.
+- The private enemy vtable only overrides destroy (clears the registry entry); everything else runs
+  the original code.
+- Boss bar hook on `0x080104C1`: when the entity has a registered twin, a second bar bound to the
+  twin is added with a vtable copy whose update settles it at y = 20 (under the first).
+- Nothing changes without a player-2 source: the hooks call the originals' logic with the ROM data.
+
+### Verified (zone 2 area 7 from the debug menu, player 2 forced present)
+
+- 8 enemies (5 wolves, 3 snakes) spawn as 8 pairs: `ents()` shows every `CE` with a `TW` 24 px
+  away, wolves 52/52 HP (35 x 1.5) and snakes 97/97 (65 x 1.5); `twins=8 scaled=16`.
+- Chase modules: `spdwatch()` logs the wolves' chase at speed 214 (0.84 px/frame) in co-op and 179
+  (0.70) in the single-player pass of the same map (snakes 256 -> 307).
+- Damage: with `hits()` logging every party-slot HP change, wolf bites do 7 with the multiplier and
+  6 with `coopoff(1)` on the same characters (`dmg()` shows the hook's counters and last result;
+  Rand draws are unchanged, lockstep-safe).
+- Targeting: `twins()` shows chasing pairs split (original nearest player 1, twin going for player 2,
+  or the reverse) while patrolling pairs stay together.
+- Single-player pass (pad word cleared, 3 s source timeout, then the same Map Test): plain
+  `0x080252A4` enemies, 35 / 65 HP, no twins, `scaled=0`; and the registry is empty after the map
+  unloads (destroy hook).
+- Hercule (level-40 debug party) and Piccolo both survive about a minute idle among 16 scaled
+  enemies; tuning for a level-1 Hercule is still open (stage 5).
+
+### Boss roster (records with 0 EXP and >= 1000 HP; identities to confirm in mGBA)
+
+| map | stat | sprite | HP | notes |
+|---|---|---|---|---|
+| Z11 A4, A5, A6 | 3 | 9 | 3550 | prologue cutscene actors in Z1A2 use sprites 9 and 11: Frieza / King Cold candidates |
+| Z8 A49 | 4 | 11 | 2910 | the other prologue model |
+| Z7 A15 / Z7 A19 | 5 / 6 | 12 / 14 | 2970 / 2810 | |
+| Z8 A13, A27, A40 | 7 | 14 | 1900 | same model three times (robot candidates) |
+| Z2 A50 | 44 | 50 | 6400 | |
+| Z6 A61 | 29 | 34 | 10200 | highest HP in the game (hidden Namek boss: Cooler candidate) |
+| Z10 A20 | 60 | 28 | 5210 | |
+| Z12 A4 | 76 | 29 | 4890 | |
+| Z12 A6 | 78, 79 | 30 | 5160, 5500 | Cell forms (sprite 30 = Cell per the reference notes) |
+| Z14 A2 / A3 | 21-25 | 30 | 6500-8230 | Cell; stat 26 sprite 31 x3 = Cell Jr |
 
 ## Two-player dash crash and the view limit (2026-10-17)
 
@@ -263,6 +383,20 @@ second boss bar, (5) tune so a level-1 Hercule beside Gohan is survivable.
   valid, bits 0-9 GBA keys), `p2_force = nil` returns control to the TCP bridge; `p2_play{{word,frames},...}`
   scripts a frame-exact sequence and `p2_dash(keys)` performs a double-tap dash. Useful with mGBA
   savestates (Shift+F1 / F1) to retry a fight without the 75 s debug-menu idle.
+- `tools/mgba/enemies.lua` (loaded by coop.lua): `spd()` scans EWRAM for live chase modules and
+  prints their speeds, `track(e, n)` logs an entity's displacement over n frames, `hits()` logs every
+  party-slot HP change (damage per hit). `ents()` tags co-op enemies `CE` and twins `TW` and prints
+  HP / max.
+- `tools/mgba/cmd_server.lua` + `tools/mgba_cmd.py`: a TCP line server (7779) inside mGBA that runs
+  Lua from the command line without touching the keyboard or the window focus. `seq("DOWN:4 WAIT:20
+  A:4")` drives player 1's pad in frames through `g_p1_remote`, `p2seq` player 2's, `state(n)` /
+  `save(n)` load and save slots, `shot(path)` screenshots, `flush()` returns what frame callbacks
+  logged since the last command, `--wait` blocks until the pad queues drain. Load it once from the
+  Scripting console; from then on nothing needs SendKeys, so another session's helper typing into
+  mGBA no longer collides (two sessions driving one window by keystrokes garbled both).
+- Debug-menu navigation that works from a fresh menu: Down, Down (Map Test row, Zone editable),
+  Right = zone+1, Down (Area), Right x n, A. Keep a savestate of the menu itself (slot 3) so a Map
+  Test costs seconds instead of the 75 s idle; `tools/mgba_input.ps1` knows F1-F9 for the slots.
 - Typing into the Scripting console while another helper focuses the game window sends keystrokes
   into the game (one such slip opened the pause menu and quit to the title); keep console typing and
   game-window key presses sequential.
