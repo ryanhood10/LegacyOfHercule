@@ -35,7 +35,10 @@ function peek()
   local function exp(slot) return emu:read32(0x03000E90 + 0xC + slot * 0x1C + 0x10) end
   local function hp(slot) return emu:read16(0x03000E90 + 0xC + slot * 0x1C) end
   local a, b = emu:read8(0x03000E90), emu:read8(COOP + 0x80)
-  console:log(string.format("exp: active=%d p2slot=%d hp=%d/%d acting=%s awards p1=%d p2=%d", exp(a), exp(b), hp(a), hp(b),
-    hex(emu:read32(COOP + 0xBC)), emu:read16(COOP + 0xD8), emu:read16(COOP + 0xDA)))
+  console:log(string.format("exp: active=%d p2slot=%d hp=%d/%d acting=%s awards p1=%d p2=%d rebinds=%d", exp(a), exp(b), hp(a), hp(b),
+    hex(emu:read32(COOP + 0xBC)), emu:read16(COOP + 0xD8), emu:read16(COOP + 0xDA), emu:read16(COOP + 0xDE)))
+  if p1 ~= 0 and p2 ~= 0 then
+    console:log(string.format("sprites: p1=%s p2=%s", hex(emu:read32(p1 + 0x48)), hex(emu:read32(p2 + 0x48))))
+  end
 end
 console:log("peek loaded")

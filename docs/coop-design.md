@@ -169,6 +169,27 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   `install_behaviour` for player 2 re-initialises a type singleton of the same type, which is
   benign. Rows of another type (4, 5, 7, 10, 11, 14, 16, 17, 20) use their own cells.
 
+## Character switching (2026-10-17)
+
+- The game switches characters only at a save pad (A on the pad opens the Switch Characters
+  screen, `0x08010BCE`; its input handler `0x08011172` writes the chosen slot to
+  `g_Party->active_slot`, swaps player 1's sprite record (`+0x48`) in place, re-installs the
+  behaviour (`0x080086A2`) and resets every non-active slot's display row to its base form
+  (`0x08003ED4`). No map reload, so player 2's entity survives the switch. The pause menu's Status
+  page only browses characters (Left/Right).
+- Rule: the two players never share a party slot. `coop_active_check()` (every input poll) sees
+  the active slot change; if player 1 took player 2's character, player 2 is rebound to player 1's
+  previous slot (a trade), else to the first other party member. `p2_bind()` mirrors the game's
+  switch: new sprite record, behaviour, idle animation reset; HUD, damage and EXP follow the slot.
+- Player 2 switches on its own with **Select** (next party member that is in the party, flagged
+  available (flags bit 1, the save-pad screen's greying rule) and not player 1's), anywhere while
+  player 1 is controllable. The chosen slot survives map changes (`pick_p2_slot` keeps it).
+- Verified from a savestate: Select moved player 2 Gohan -> Vegeta (own HUD updated); an emulated
+  save-pad switch (active slot := player 2's, player 1 sprite := player 2's) rebound player 2 to
+  Piccolo. A switch at a real save pad is still to be played through.
+- Savestates survive rebuilds: `coop_init_once` rebuilds the RAM vtable copies when the stored
+  `code_id` (address of `coop_init_once`) differs from the running build.
+
 ## Test tooling additions
 
 - `tools/mgba/ents.lua`: `ents()` lists both players and every enemy (vtable `0x080252A4`) with

@@ -92,4 +92,9 @@ void input_poll_hook(InputSystem *in) {
     if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) SoftReset();
 
     poll_into(&coop.input2, p2);
+
+    coop_active_check();
+#if P2_MODE != P2_MODE_SWAP
+    if (coop.p2 && (coop.input2.pressed & KEY_SELECT) && p1_controllable()) p2_cycle();
+#endif
 }

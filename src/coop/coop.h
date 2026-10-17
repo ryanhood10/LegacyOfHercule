@@ -30,6 +30,10 @@ typedef struct CoopState {
     Entity *acting;         // player responsible for the entity update in progress (exp.c)
     u32 exp_vtable[6];      // copy of the EXP event vtable with the fire slot replaced
     u16 exp_awards[2];      // debug counters: EXP events credited to [0] player 1, [1] player 2
+    u8 last_active;         // active slot seen last frame (detects save-pad character switches)
+    u8 _pad2;
+    u16 rebinds;            // debug counter: player 2 character changes
+    u32 code_id;            // address of coop_init_once in the build that filled the vtables
 } CoopState;
 _Static_assert(__builtin_offsetof(CoopState, exp_awards) == 0xD8, "CoopState layout (peek.lua)");
 
@@ -47,3 +51,5 @@ extern volatile u16 g_p1_remote;   // pinned at 0x0203FF02: netplay replaces KEY
 void coop_init_once(void);
 void exp_init(void);         // build the EXP event vtable copy (called from coop_init_once)
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
+void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
+void p2_cycle(void);            // player 2 picks the next available character (Select)

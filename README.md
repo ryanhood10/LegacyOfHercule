@@ -58,7 +58,9 @@ Output: `build/log2-coop.gba`. Run it in mGBA. For a boot smoke test over the GD
    section for real netplay.)
 
 Player 2 appears as soon as its pad sends anything, bound to the first other party member, with its
-own HUD panel on the right, its own damage and EXP (kills go to whoever made them). With no second
+own HUD panel on the right, its own damage and EXP (kills go to whoever made them). Player 2 presses
+Select to switch to the next available party member; the two players never share a character (if
+player 1 picks player 2's character at a save pad, player 2 takes player 1's old one). With no second
 pad the game plays exactly as before. Testing tip: `make DEBUG_MENU=1`, idle ~75 s on the title for
 the debug menu's Map Test, and keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t
 build\log2-coop.ss1 build\log2-coop.gba` starts straight from it.

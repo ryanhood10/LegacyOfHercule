@@ -194,8 +194,22 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
     return 0;
 }
 
+static void build_vtables(void) {
+    u32 base = (u32)coop.p2_vtable;
+    for (int i = 0; i < 24; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
+    coop.p2_vtable[0] = (u32)p2_destroy - base;
+    coop.p2_vtable[15] = (u32)p2_change_hp - base;
+    coop.p2_vtable[16] = (u32)p2_take_damage - base;
+    exp_init();
+    coop.code_id = (u32)coop_init_once;
+}
+
 void coop_init_once(void) {
-    if (coop.magic == COOP_MAGIC) return;
+    if (coop.magic == COOP_MAGIC) {
+        // A savestate from another build: the RAM vtables hold that build's code addresses.
+        if (coop.code_id != (u32)coop_init_once) build_vtables();
+        return;
+    }
     coop.magic = COOP_MAGIC;
     coop.p2 = 0;
     coop.control = 0;
@@ -209,24 +223,31 @@ void coop_init_once(void) {
     coop.sio_last = 0;
     coop.source_age = P2_SOURCE_TIMEOUT;
     coop.spawns = coop.destroys = 0;
+    coop.p2_slot = 0xFF;          // nothing chosen yet: first other party member
+    coop.last_active = g_Party->active_slot;
+    coop.rebinds = 0;
     // Both roles sit in multiplayer serial mode from the first frame so a linked emulator pair
     // (lockstep) never sees a mode mismatch; the original game does not use the serial port.
     REG_RCNT = 0;
     REG_SIOCNT = SIOCNT_MULTI_115200;
     REG_SIOMLT_SEND = SIO_MARK;
     coop.sio_ready = 1;
-    u32 base = (u32)coop.p2_vtable;
-    for (int i = 0; i < 24; i++) coop.p2_vtable[i] = (0x08025604u + PLAYER_VTABLE[i]) - base;
-    coop.p2_vtable[0] = (u32)p2_destroy - base;
-    coop.p2_vtable[15] = (u32)p2_change_hp - base;
-    coop.p2_vtable[16] = (u32)p2_take_damage - base;
-    exp_init();
+    build_vtables();
+}
+
+// A slot player 2 may use: in the party, not player 1's. `avail` also requires the game's
+// "available" flag (bit 1), the one the save-pad switch screen greys characters out by.
+static int slot_ok(int s, int avail) {
+    if (s < 0 || s >= 6 || s == g_Party->active_slot) return 0;
+    u32 f = g_Party->chars[s].flags;
+    return (f & 1) && (!avail || (f & 2));
 }
 
 static int pick_p2_slot(void) {
+    if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;   // keep the chosen character across maps
     int active = g_Party->active_slot;
     for (int i = 0; i < 6; i++)
-        if (i != active && (g_Party->chars[i].flags & 1)) return i;
+        if (slot_ok(i, 0)) return i;
     return active;
 }
 
@@ -236,6 +257,40 @@ static void install_behaviour(Entity *e, int slot) {
     const u32 *vt = (const u32 *)*cell;
     e->behaviour = cell;
     ((void (*)(void *, Entity *))((u32)vt + vt[0]))(cell, e);
+}
+
+// Give the live player-2 entity another party slot: what the save-pad switch does to player 1
+// (new sprite record, behaviour re-installed), plus an idle reset so the new sprite's frames apply.
+static void p2_bind(Entity *p2, int slot) {
+    coop.p2_slot = (u8)slot;
+    p2->sprite_record = CharacterEntry_GetSpriteRecord(&g_Party->chars[slot]);
+    install_behaviour(p2, slot);
+    Entity_SetAnimation(p2, ANIM_IDLE);
+    coop.rebinds++;
+}
+
+// Called every input poll. When player 1 switches onto player 2's character, player 2 takes
+// player 1's previous one (a trade), or failing that the first other party member.
+void coop_active_check(void) {
+    int active = g_Party->active_slot;
+    if (active == coop.last_active) return;
+    int old = coop.last_active;
+    coop.last_active = (u8)active;
+    if (!coop.p2 || active != coop.p2_slot) return;
+    int ns = slot_ok(old, 0) ? old : -1;
+    for (int i = 0; ns < 0 && i < 6; i++)
+        if (slot_ok(i, 0)) ns = i;
+    if (ns >= 0) p2_bind(coop.p2, ns);
+}
+
+// Player 2's own switch: next available party member after the current one, never player 1's.
+void p2_cycle(void) {
+    if (!coop.p2) return;
+    for (int k = 1; k < 6; k++) {
+        int s = (coop.p2_slot + k) % 6;
+        if (slot_ok(s, 1)) { p2_bind(coop.p2, s); return; }
+    }
+    play_cant_sfx();
 }
 
 static void ensure_p2(Entity *p1) {
