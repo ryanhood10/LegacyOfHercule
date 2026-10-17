@@ -10,7 +10,7 @@ public static class K {
 }
 "@
 $vk = @{ UP = 0x26; DOWN = 0x28; LEFT = 0x25; RIGHT = 0x27; X = 0x58; Z = 0x5A; A = 0x41; S = 0x53; ENTER = 0x0D; BACKSPACE = 0x08 }
-$p = Get-Process mgba-sdl -ErrorAction Stop | Select-Object -First 1
+$p = Get-Process mgba-sdl, mGBA -ErrorAction SilentlyContinue | Where-Object MainWindowHandle -ne 0 | Select-Object -First 1
 [K]::SetForegroundWindow($p.MainWindowHandle) | Out-Null
 Start-Sleep -Milliseconds 300
 foreach ($step in $Script.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)) {

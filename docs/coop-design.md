@@ -38,6 +38,27 @@ in mGBA on the prologue map (two Trunks, both walking with the D-pad, each with 
 The second entity gets a private copy of the player vtable whose destroy clears `coop.p2` instead
 of `g_PlayerObject`, so map changes rebuild it cleanly.
 
+**Independent input reached (2026-10-17).** `Input_Poll`'s entry is patched with a long jump to
+`input_poll_hook` (`src/coop/input.c`), which polls player 1 exactly as before and fills a second
+`InputSystem` for player 2 from a selectable source (`P2_MODE`: link-cable serial, mirror, or
+Select-swaps-control). The idle, walk and diagonal control states are ported to C
+(`src/coop/player.c`) and take input and the party slot per entity; both players run the ports.
+Verified in mGBA in mirror mode: holding Right sends P1 right and P2 left. Player 2 binds to the
+first other in-party slot (own HP/EP/abilities/sprite/behaviour); with a one-member party it falls
+back to sharing the active slot. Not yet: dash state for P2, HUD for P2, enemies targeting P2.
+
+**Dual HUD reached (2026-10-17).** The HUD object (vtable `0x0802408C`, created by `HUD_Create`
+`0x08008B14`) has its draw / update / destroy slots redirected to `src/coop/hud.c`, which calls the
+originals and then draws a second panel 144 px to the right from player 2's party slot: own
+`ObjVram_Alloc` tile block, same panel art, HP = `hp*48/max`, EP = `ep*49/max`, XP bar, meter and
+ready/cooling ability icon (a port of `0x08008BEF`), L on player 2's pad cycles its ability. Tiles
+are freed when the HUD object is destroyed. Verified in mGBA.
+
+**Input transport note.** A GBA cartridge sees exactly 10 buttons, so a second key set on one
+keyboard cannot reach the ROM; same-system play uses mGBA's second multiplayer window (link cable)
+with a second gamepad, or `P2_MODE_SWAP`. Extra keyboard keys and online play both need the
+emulator-side input patch planned for Phase 3.
+
 ## Plan for the two-Goku proof (Phase 2 start)
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).

@@ -12,7 +12,7 @@ public static class W {
 }
 "@
 [W]::SetProcessDPIAware() | Out-Null
-$p = Get-Process mgba-sdl -ErrorAction Stop | Select-Object -First 1
+$p = Get-Process mgba-sdl, mGBA -ErrorAction SilentlyContinue | Where-Object MainWindowHandle -ne 0 | Select-Object -First 1
 $h = $p.MainWindowHandle
 $rc = New-Object RECT; [W]::GetClientRect($h, [ref]$rc) | Out-Null
 $pt = New-Object POINT; [W]::ClientToScreen($h, [ref]$pt) | Out-Null
