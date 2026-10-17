@@ -54,9 +54,40 @@ which is the largest unknown; frame cost at 720 x 480 is 9x the pixels (the soft
 fast; fine on this laptop); HBlank/raster effects, if any map uses them, would be lost in the extra
 rows; mGBA savestates and the Lua bridge keep working since the core is unchanged.
 
-## Build requirements (not yet installed)
+## Map streaming, decoded (2026-10-17)
 
-No compiler, CMake or SDL development files exist on this laptop (only git). The lean route is
+- Each background layer object (`+4` BG index, `+8` map header pointer, `+0xC..+0x18` four chunk
+  pointers, `+0x1C..+0x1F` four cached chunk ids, `+0x20/+0x24` current chunk x/y, `+0x28` four
+  2 KB chunk caches) is updated per frame by `0x080055A4` (BG0/1-style layers) or `0x0800561A`:
+  scroll = layer_scale * world_pos + world_px + layer_offset, in 1/1024 px; the top-left margin is
+  (-8, -48) px; chunk coordinates are scroll >> 8.
+- `0x0800532E(layer, chunkXY)` keeps a 2 x 2 window of **256 x 256 px chunks** decompressed: the map
+  header has width/height in chunks at `+0x14/+0x15` and a chunk pointer table at `+0x18`
+  (`0xFF` = empty chunk, `DAT_08005588` = blank map); chunk data is unpacked with `0x0801F394`
+  (header word 0: 0 = plain copy of `word1` bytes from `+8`, 1/2 = the JCALG1 decompressor the boot
+  code copies to IWRAM `0x03000000`). A chunk is 32 x 32 standard GBA text-BG entries (2 KB).
+- `0x080054A4(layer, px)` DMAs the 32 x 32-tile VRAM map (`0x0600E000 + bg * 0x800`) from the four
+  chunk caches every frame, offset by `(px & 0xFF) >> 3`, so VRAM only ever holds a 256 x 256 window.
+- Consequence for the wide view: a renderer that knows this format can draw any width straight from
+  the ROM's chunk table (decompressing chunks itself with a C port of the JCALG1 decoder) using the
+  tile graphics and palettes already in VRAM. The ROM only has to publish, at a fixed EWRAM
+  address, the view size, and per BG the map header pointer and the full (unwrapped) scroll value;
+  the camera/leash/cull/OAM-bit work stays as planned. No large EWRAM buffers are needed.
+
+## Blocker: Windows Smart App Control (2026-10-17)
+
+MSYS2 installed fine (GCC 16, CMake 4.4, Ninja, SDL2, Lua), but `ld.exe` is blocked by Smart App
+Control ("An Application Control policy has blocked this file"; `VerifiedAndReputablePolicyState=1`,
+code-integrity enforcement 2). It allowed `gcc.exe`/`cmake.exe` only because those exact unsigned
+binaries have cloud reputation; a freshly built `mgba-sdl.exe` would have none and be blocked too.
+Options: turn Smart App Control off (Windows Security > App & browser control; it cannot be turned
+back on without reinstalling Windows), or build and run the custom mGBA inside WSL (Linux binaries
+are not subject to it; WSLg shows the window; the Lua bridge works over localhost), or shelve the
+wide view. Decision is Ryan's.
+
+## Build requirements
+
+MSYS2 is now installed at C:\msys64 with the packages below. The lean route is
 MSYS2 (`mingw-w64-ucrt-x86_64-{gcc,cmake,ninja,SDL2,lua,zlib,libpng,libzip,sqlite3}`), building
 the SDL frontend with scripting enabled (`-DBUILD_QT=OFF -DBUILD_SDL=ON -DENABLE_SCRIPTING=ON
 -DUSE_FFMPEG=OFF`), 2-3 GB on disk. The SDL frontend has no Scripting window; a `--script` option
