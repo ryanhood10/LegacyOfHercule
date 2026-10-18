@@ -322,7 +322,8 @@ void story_test_finish(void) {
         Entity *e = l->items[i];
         if (!is_enemy(e) || e->hp <= 0) continue;
         int boss = is_coop_enemy(e) ? is_boss(e) : ((const EnemyStat *)e->behaviour)->max_hp >= 1000;
-        if (!is_a16(e) && !boss) continue;
+        const u32 *act = (const u32 *)e->action;     // or any enemy whose death runs a story action
+        if (!is_a16(e) && !boss && !(act && act[0] != ENEMY_ACTION_NONE)) continue;
         u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
         memset(m, 0, sizeof m);
         *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1

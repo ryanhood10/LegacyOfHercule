@@ -105,6 +105,7 @@
   "include": [
     "data/hercule-text.json",
     "data/story/a16_island.json",
-    "data/story/ch1_opening.json"
+    "data/story/ch1_opening.json",
+    "data/story/ch2_west_city.json"
   ]
 }

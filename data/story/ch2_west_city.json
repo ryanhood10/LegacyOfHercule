@@ -1,0 +1,33 @@
+{
+  "_": "Chapter 2, West City (docs/story.md section 0 item 2): Hercule joins with Piccolo (the mansion deal), Triceratops Jungle with Piccolo and Hercule only, Hercule's credit for the dinosaur peace. Scripts in ch2_west_city.lscript; see docs/scripts.md.",
+  "sources": ["data/story/ch2_west_city.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 4, "area": 3},
+      "_": "West City: Piccolo's talk (record 2) becomes the deal; Hercule (slot 5) joins beside Piccolo",
+      "records": {"2": {"talk": "seq:ch2_piccolo_deal"}}
+    },
+    {
+      "map": {"zone": 4, "area": 51},
+      "_": "past the 'Only Piccolo' barrier, until King Triceratops is beaten: player 2 can only be Hercule",
+      "edits": [
+        {"at": "onload", "replace": [
+          ["StackTestStoryFlag 276", "StackTestStoryFlagNot 60\nJumpIfFalse SL1\nSetStoryFlag 361\nClearCharacterFlag_Bit1 0\nClearCharacterFlag_Bit1 6\nSL1:\nStackTestStoryFlag 276"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 4, "area": 50},
+      "_": "the jungle's entrance: leaving the jungle gives Gohan and Krillin back",
+      "edits": [
+        {"at": "onload", "replace": [
+          ["StackTestStoryFlag 275", "StackTestStoryFlag 361\nJumpIfFalse SU1\nSetCharacterFlag_Bit1 0\nSetCharacterFlag_Bit1 6\nClearStoryFlag 361\nSU1:\nStackTestStoryFlag 275"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 4, "area": 58},
+      "records": {"0": {"action": "seq:ch2_triceratops_end"}}
+    }
+  ]
+}
