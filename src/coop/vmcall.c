@@ -14,6 +14,7 @@
 //   4 HerculeAwaken ()                  Super Hercule into Hercule's abilities (ssj.c; Buu phase)
 //   5 P2Present () -> 0 / 1             is player 2 there (its entity, or its pad: the twins spawn by the pad)
 //   6 P2Bind (slot)                     player 2 plays this party slot now (or at its respawn after a warp)
+//   7 PadSwap ()                        the two pads trade players (coop2.pad_swap, as a duel won by player 2)
 #include "coop.h"
 
 void hercule_awaken(void);                 // ssj.c
@@ -81,6 +82,7 @@ void vm_coop_call(s32 *st) {
     case 6:   // without an entity (a warp despawned it until player 1 is free again) the respawn picks the slot
         if (a >= 0 && a < PARTY_SLOTS) { if (coop.p2) p2_bind_slot(a); else coop.p2_slot = (u8)a; }
         break;
+    case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     default: (void)b; break;
     }
 }
