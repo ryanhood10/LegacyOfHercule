@@ -130,7 +130,8 @@ static const u32 *down_group(const Entity *e) {
 }
 
 // Enemy vtable slot 2 for co-op enemies: a downed boss plays its knock-down and freezes on the last
-// frame (or after DOWN_SETTLE frames without one): no states, no AI.
+// frame (or after DOWN_SETTLE frames without one): no states, no AI. Defeat scripts still reach it by its
+// sprite: Android 19's swaps its vtable for the explosion, Dr. Gero's despawns it.
 static void coop_enemy_update(Entity *e) {
     if (is_downed(e)) {
         s32 *t = down_timer(record_of(e));
@@ -181,8 +182,13 @@ static int coop_enemy_onhit(Entity *e, const u8 *hit) {
             else go_down(e, hit);
             return 1;
         }
-        // last of the pair: a partner-model twin dies as the original model so the script sees it
-        if (record_of(e)->sprite_id != *record_orig_sprite(record_of(e))) set_sprite(e, *record_orig_sprite(record_of(e)));
+        // last of the pair. With the quiet removal (COOP_OFF_BOTHDOWN) the original is gone, so a
+        // partner-model twin dies as the original model for the script's sprite lookups. Under the
+        // both-down rule the downed original is still on the map and the script finds it by its sprite;
+        // the survivor keeps its own model (switching it made Dr. Gero's defeat script fly off and despawn
+        // the wrong Gero, and Android 13 vanished), so a script can address each of the pair.
+        if ((coop2.off & COOP_OFF_BOTHDOWN) && record_of(e)->sprite_id != *record_orig_sprite(record_of(e)))
+            set_sprite(e, *record_orig_sprite(record_of(e)));
     }
     return Enemy_OnHit(e, hit);
 }

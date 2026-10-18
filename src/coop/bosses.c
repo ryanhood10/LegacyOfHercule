@@ -3,14 +3,16 @@
 #include "bosses.h"
 
 const ExtraStat extra_stats[] = {
-    // 110 Android 13, base form (not yet "Super"): Android 19's AI set (29) and boss class, a little
-    // tougher than 19 (2970 HP, 21/14/11). 19's co-op partner on the zone 7 battlefield.
-    { 5, -1, 3200, -1, 24, 20, 16, 0 },
+    // 110 Android 13, base form (not yet "Super"): Android 19's AI set (29) and boss class. More HP than
+    // 19 (2970, 21/14/11) but about his damage: the twin goes for the other player, so 13 usually fights
+    // player 2 (Hercule beside Vegeta). 19's co-op partner on the zone 7 battlefield.
+    { 5, -1, 3200, -1, 22, 16, 14, 0 },
     // 111 Cooler's Namekian servant: Cooler's melee boss AI set (21) and class, well below Cooler
     // (10200 HP, 75/85/79) so the pair is one fight's worth for two players.
     { 29, -1, 6000, -1, 68, 60, 64, 0 },
-    // 112 Android 13 beside Dr. Gero at the lab door: Gero's level (1900 HP, 25/21/17), a bit more HP.
-    { 5, -1, 2400, -1, 26, 22, 17, 0 },
+    // 112 Android 13 beside Dr. Gero at the lab door: more HP than Gero (1900, 25/21/17), a little
+    // less damage (he backs Gero up; 13 survives the scene and leaves).
+    { 5, -1, 2400, -1, 24, 20, 16, 0 },
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 

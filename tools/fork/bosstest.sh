@@ -12,8 +12,8 @@
 # Offsets: coop2 0x0203FB00 (twins +0x124, off +0x1EC, cmd +0x208, arg +0x20C, partner +0x22C, downed
 # +0x250); a co-op enemy block = entity (0x1F0) + stat copy (0x18, max HP at +4) + record copy
 # (stat index +8, sprite +0x10).
-. /root/slot.sh
-G=/root/gdbsrv.sh
+. "$(dirname "$0")/slot.sh"
+G="$(dirname "$0")/gdbsrv.sh"
 C=0x0203FB00
 sel() { [ "$1" = twin ] && echo 0x128 || echo 0x124; }
 peek() {
