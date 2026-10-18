@@ -1,0 +1,155 @@
+{
+  "_": "Roshi's gym (docs/story.md section 0 item 8): two duos (Yamcha & Tien, Krillin & Hercule, BOSS_PAIR rules in bosses.c), 'come back with a different team' when a player is Hercule or Krillin, the animal-ninja finale (records 8-18, flags 363-375, three rounds). Scripts in ch8_gym.lscript.",
+  "sources": [
+    "data/story/ch8_gym.lscript"
+  ],
+  "maps": [
+    {
+      "map": {
+        "zone": 6,
+        "area": 70
+      },
+      "_": "the sparring room: trigger 1 duo 1, trigger 2 duo 2, trigger 3 the animals; record 0 Yamcha / new Tien actor, record 1 Krillin / new Hercule actor (who stands depends on the players), record 2 (Tien alone) no longer spawned",
+      "triggers": {
+        "1": {
+          "payload": "seq:ch8_gym_duo1"
+        },
+        "2": {
+          "payload": "seq:ch8_gym_duo2"
+        },
+        "3": {
+          "payload": "seq:ch8_gym_animals"
+        }
+      },
+      "records": {
+        "1": {
+          "condition": "script:ch8_gym_krillin_cond"
+        },
+        "2": "disable",
+        "3": {
+          "action": "seq:ch8_gym_duo1_end"
+        },
+        "4": {
+          "action": "seq:ch8_gym_duo2_end"
+        }
+      },
+      "add_records": [
+        {
+          "kind": "actor",
+          "sprite": 121,
+          "x": 152,
+          "y": 136,
+          "facing": 0,
+          "condition": "noflag:212"
+        },
+        {
+          "kind": "actor",
+          "sprite": 72,
+          "x": 104,
+          "y": 136,
+          "facing": 0,
+          "condition": "script:ch8_gym_hercule_cond"
+        },
+        {
+          "like": 3,
+          "stat": 1,
+          "sprite": 7,
+          "x": 64,
+          "y": 80,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_alligator"
+        },
+        {
+          "like": 3,
+          "stat": 107,
+          "sprite": 64,
+          "x": 112,
+          "y": 72,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_hawk"
+        },
+        {
+          "like": 3,
+          "stat": 67,
+          "sprite": 79,
+          "x": 160,
+          "y": 72,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_ladybug"
+        },
+        {
+          "like": 3,
+          "stat": 80,
+          "sprite": 105,
+          "x": 208,
+          "y": 80,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_pterodactyl"
+        },
+        {
+          "like": 3,
+          "stat": 92,
+          "sprite": 108,
+          "x": 64,
+          "y": 128,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_sabertooth"
+        },
+        {
+          "like": 3,
+          "stat": 90,
+          "sprite": 113,
+          "x": 208,
+          "y": 128,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_scorpion"
+        },
+        {
+          "like": 3,
+          "stat": 14,
+          "sprite": 116,
+          "x": 88,
+          "y": 176,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_snake"
+        },
+        {
+          "like": 3,
+          "stat": 99,
+          "sprite": 122,
+          "x": 136,
+          "y": 184,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_trex"
+        },
+        {
+          "like": 3,
+          "stat": 54,
+          "sprite": 125,
+          "x": 184,
+          "y": 176,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_triceratops"
+        },
+        {
+          "like": 3,
+          "stat": 75,
+          "sprite": 96,
+          "x": 96,
+          "y": 120,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_ninja1"
+        },
+        {
+          "like": 3,
+          "stat": 75,
+          "sprite": 96,
+          "x": 176,
+          "y": 120,
+          "condition": "never",
+          "action": "seq:ch8_gym_down_ninja2"
+        }
+      ]
+    }
+  ]
+}

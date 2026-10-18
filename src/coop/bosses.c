@@ -39,6 +39,11 @@ static const BossRule rules[] = {
     { COOLER_SPIRIT_STAT, 0, BOSS_PAIR, 0, 0 },     // the twin's own stat: boss pair rules for it too
     // Cooler (New Namek bonus) + his Namekian servant
     { 29, 0, 0, NAMEK_SPRITE, NAMEK_STAT },
+    // Roshi's gym in the ten-day wait: the sparring matches are duos, Yamcha + Tien and Krillin + Hercule
+    // (Hercule's sprite with Krillin's numbers); always pairs, so the duos stand in single-player too
+    { 106, 0, BOSS_PAIR, 121, 98 },
+    { 98,  0, BOSS_PAIR, 0, 0 },
+    { 64,  0, BOSS_PAIR, 72, 0 },
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },
     { 79, 50, BOSS_NO_TWIN, 0, 0 },

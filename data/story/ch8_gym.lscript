@@ -1,0 +1,895 @@
+; Roshi's gym in the ten-day wait (docs/story.md section 0 item 8, "Roshi's gym, redesigned"), applied by
+; ch8_gym.json. The sparring room (zone 6 area 70) runs three matches by story flags 212-214: two duos and
+; the animal-ninja finale. Yamcha (stat 106) fights beside Tien (sprite 121, stat 98) and Krillin (stat
+; 64) beside Hercule (sprite 72, Krillin's numbers): BOSS_PAIR rules in bosses.c, so both duos stand in
+; single-player too. If either player is Hercule or Krillin (CoopCall 8 = player 2's slot), the second
+; duo cannot fight: only the other of the pair stands in the room and says so. The finale releases one
+; of every wild animal and two ninjas (new enemy records 8-18, copies of Yamcha's record; 6 and 7 are the Tien and Hercule actors); each defeat
+; sets one of the story flags 363-373, in three rounds (374, 375: round started); the last one pays.
+; Speakers: 0 narration, 67 Hercule, 73 Krillin, 80 Master Roshi, 95 Tien, 114 Yamcha.
+
+; ---- match 1: Yamcha and Tien --------------------------------------------------------------------
+
+sequence ch8_gym_duo1
+  stock @083d2ce4                        ; sound
+  stock @083d2cf0                        ; Yamcha: "This is going to be good, %s!"
+  text 95 "TIEN: Master Roshi wants us to fight as a team today.  Two against two!"
+  script
+        DespawnEntity 121
+        DespawnCharacterAndRecordPosition 156, 3
+        DrawBossHealthBar 156
+end
+
+sequence ch8_gym_duo1_end
+  stockseq @083d2de4 0 1                 ; Yamcha: "Whoa... You sure showed me!"
+  text 95 "TIEN: Good teamwork.  Thanks for the fight."
+  stockseq @083d2de4 2 4                 ; the +3 Power Capsule, back to the atrium, flag 212
+end
+
+; ---- match 2: Krillin and Hercule ------------------------------------------------------------------
+
+; who of the pair stands in the room: Krillin unless a player is Krillin, Hercule unless a player is Hercule
+script ch8_gym_krillin_cond
+        StackTestStoryFlag 212
+        StackTestStoryFlagNot 213
+        And
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        And
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+end
+
+script ch8_gym_hercule_cond
+        StackTestStoryFlag 212
+        StackTestStoryFlagNot 213
+        And
+        PushActiveCharIndex
+        PushByte 5
+        CmpNe
+        And
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpNe
+        And
+end
+
+sequence ch8_gym_duo2
+  script                                 ; a player is Krillin -> 1 (and Hercule too -> 3), Hercule -> 5, else 7
+        PlayAudio 50
+        PushActiveCharIndex
+        PushByte 6
+        CmpEq
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpEq
+        Add
+        JumpIfFalse L2
+        PushActiveCharIndex
+        PushByte 5
+        CmpEq
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpEq
+        Add
+        JumpIfFalse L1
+        PushByte 3
+        END
+      L1:
+        PushByte 1
+        END
+      L2:
+        PushActiveCharIndex
+        PushByte 5
+        CmpEq
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpEq
+        Add
+        JumpIfFalse L3
+        PushByte 5
+        END
+      L3:
+        PushByte 7
+        END
+  text 67 "HERCULE: Sorry, Master Roshi says I can only fight duos with Krillin on my team right now.\x0bCome back with a different team!"
+  stop
+  text 0 "@^Hercule and Krillin are the next sparring team.\x0bCome back with a different team!"
+  stop
+  text 73 "KRILLIN: Sorry, Master Roshi says I can only fight duos with Hercule on my team right now.\x0bCome back with a different team!"
+  stop
+  stock @083d2e04                        ; Krillin: "Go easy on me, okay?"
+  text 67 "HERCULE: Ha ha ha!  Prepare to face the World Champion...  and his little buddy!"
+  script
+        DespawnEntity 72
+        DespawnCharacterAndRecordPosition 76, 4
+        DrawBossHealthBar 76
+end
+
+sequence ch8_gym_duo2_end
+  stockseq @083d2eec 0 1                 ; Krillin: "Owwww... That hurt."
+  text 67 "HERCULE: Ow ow ow...  I let you win, of course!  It's called good sportsmanship!"
+  stockseq @083d2eec 2 4                 ; the +3 Strength Capsule, back to the atrium, flag 213
+end
+
+; ---- match 3: the animal ninjas ---------------------------------------------------------------------
+
+sequence ch8_gym_animals
+  script
+        PlayAudio 50
+        ClearStoryFlag 363
+        ClearStoryFlag 364
+        ClearStoryFlag 365
+        ClearStoryFlag 366
+        ClearStoryFlag 367
+        ClearStoryFlag 368
+        ClearStoryFlag 369
+        ClearStoryFlag 370
+        ClearStoryFlag 371
+        ClearStoryFlag 372
+        ClearStoryFlag 373
+        ClearStoryFlag 374
+        ClearStoryFlag 375
+  text 80 "MASTER ROSHI: Ho ho!  You make a fine team!  For your last lesson, I've hired some special animal ninjas.\x0bA different kind of training!  Ready...  begin!"
+  script                                 ; the first round (the next ones start from the defeats below)
+        PlayMusic 35
+        TriggerMapEvent 8
+        TriggerMapEvent 9
+        TriggerMapEvent 10
+        TriggerMapEvent 17
+end
+
+; each animal's defeat sets its flag; a round's last defeat releases the next round (flags 374, 375:
+; started), and when every flag is set Roshi pays the capsule (the stock Tien prize). Three rounds keep
+; the room within the sprite memory (eleven kinds at once, doubled in co-op, ran out of OBJ tiles).
+
+sequence ch8_gym_down_alligator
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 363
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_hawk
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 364
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_ladybug
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 365
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_pterodactyl
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 366
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_sabertooth
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 367
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_scorpion
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 368
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_snake
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 369
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_trex
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 370
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_triceratops
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 371
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_ninja1
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 372
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
+
+sequence ch8_gym_down_ninja2
+  script                                 ; all down -> 2, else stop (1)
+        SetStoryFlag 373
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlagNot 374
+        And
+        JumpIfFalse L1
+        SetStoryFlag 374
+        TriggerMapEvent 11
+        TriggerMapEvent 12
+        TriggerMapEvent 13
+        TriggerMapEvent 18
+      L1:
+        StackTestStoryFlag 366
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 373
+        And
+        StackTestStoryFlagNot 375
+        And
+        JumpIfFalse L2
+        SetStoryFlag 375
+        TriggerMapEvent 14
+        TriggerMapEvent 15
+        TriggerMapEvent 16
+      L2:
+        StackTestStoryFlag 363
+        StackTestStoryFlag 364
+        And
+        StackTestStoryFlag 365
+        And
+        StackTestStoryFlag 366
+        And
+        StackTestStoryFlag 367
+        And
+        StackTestStoryFlag 368
+        And
+        StackTestStoryFlag 369
+        And
+        StackTestStoryFlag 370
+        And
+        StackTestStoryFlag 371
+        And
+        StackTestStoryFlag 372
+        And
+        StackTestStoryFlag 373
+        And
+        JumpIfFalse L3
+        PushByte 2
+        END
+      L3:
+        PushByte 1
+        END
+  stop
+  text 80 "MASTER ROSHI: Splendid!  Not a single animal left standing.\x0bHere, you've earned this."
+  stock @083d2fac                        ; the +3 Endurance Capsule
+  stock @083d2fb4
+  stock @083d2fe0                        ; back to the atrium, flag 214
+end
