@@ -47,7 +47,7 @@ similar body and recoloured).
 | 66-71 | 3 | Vegeta forms as NPC/enemy-grade sets | partly; 137-140 look like the playable Vegeta/Goku sets (9-10) |
 | 72 | 9 | Hercule | yes (stock) |
 | 73, 103, 104 | 1 / 10 / 9 | Piccolo (NPC, playable with cape, variant) | yes (103) |
-| 76 | 7 | **Krillin** (bald, orange gi, attack and hurt poses) | yes, needs abilities + a row |
+| 76 | 13 (7 used) | **Krillin** NPC set: idle, walk, run, knock-down, shout, ki pose, punch combo, lying (12) | playable as **sprite 161** (below) |
 | 121 | 7 | **Tien** (bald, green pants, attack and hurt poses) | yes, needs abilities + a row |
 | 75 | 1 | Master Roshi | no (idle only) |
 | 94 | 2 | Android 18 (blonde) | no (NPC poses) |
@@ -239,6 +239,55 @@ pointer (+0x18) changes. There is no missile in the ROM; what exists and is reus
 right clockwise, 2 flame frames each), `a16_fist[8]` (the rocket fist drawn by hand pointing left,
 rotated to right / down / left / up, 2 flame frames each) and `a16_boom[4]` (the dust explosion
 with its colours mapped by brightness onto white / yellow / orange / dark orange / red).
+
+## Krillin (sprite 161, `tools/krillinsprites.py`, 2026-10-18)
+
+Krillin's stock record (76) has groups 0-6 and 12 only (byte 2 says 13 groups; 7-11 are empty). A
+player row needs the attack combo groups 7 and 8, hurt 11, the flying lean 13, the fidget 14, the
+special melee 16 (the debug party unlocks the charged A attack for every slot but Hercule's), the
+halo 17, the Kamehameha pose 18 and the tumble 20. **Goku's playable record (60) wears the same turtle
+gi in the same palette indices (orange 32-35/39, blue 79/80/195/215) and the same frame boxes**
+(16x32 idle, shoulders on row 15 in both), so `tools/krillinsprites.py` builds **sprite id 161**
+(`krillin_record`, Makefile `KRILLIN_SPRITE`) at build time into `build/gen/krillin_sprites_data.c`
+(preview `build/<dir>/krillin_preview.png`):
+
+| group | source |
+|---|---|
+| 0-6, 12 | sprite 76's own descriptor arrays, by ROM address (76 stays untouched for the cutscenes) |
+| 7, 8, 11, 13, 14, 16, 17, 18 | sprite 60 frames re-headed: Goku's hair (largest black component in the top 45 %) and face are cleared and Krillin's head, cut from his idle frame of the same facing (top row to the row before three gi pixels), is pasted with its chin on Goku's chin row (Goku's idle neck row per facing) and its face centre on Goku's (71 frames, all swapped) |
+| 20 (tumble) | sprite 76's group 3 (knock-down): Goku's tumble frames are rotated bodies with no head on top |
+| 9, 10, 15, 19 | empty, as in Hercule's set (no transformation, no Spirit Bomb) |
+
+The header is Goku's (collision boxes) with the group count 21. Frames are LZ-compressed with
+`buu2log2.compress`. Seen in the fork as player 1 and player 2: walking, the A combo, hurt, ki
+pose, the level-up message (`build/kr/shots/`).
+
+### Portraits (all from the ROM; `Portrait_Table` 0x083EC9D4, `Character_GetPortraitResource` 0x0800BDCC)
+
+`Portrait_Table` holds ids 8..114, each a compressed 64x64 *linear* 8bpp image. Ids 8-25 are the
+status-screen portraits drawn into a BG canvas with the **menu BG palette (raw at 0x081D4F50)**; the
+others (dialogue, switch screen) use the OBJ palette. A display row's +2 picks the dialogue portrait,
++3 the status portrait. Party ids 2-7 = slots 0-5 (`(id - 2) * 0x1C + party`), so slots 6+ only ever
+use explicit ids. **Krillin has a dialogue portrait: id 73** (95 is Tien, 67 Hercule); no status
+portrait exists, so the generator remaps 73 to the BG palette by nearest colour and appends it as
+**id 119** in `portrait_module`, a copy of the portrait module table 0x083EC9D0 (word 0 = the party,
+word id + 1 = `Portrait_Table[id]`, word 116 = the entity list; 120 words copied verbatim) that
+`patch_rom.py` points the one literal (file 0xBE10) at.
+
+### Projectiles and icons (same generator)
+
+| symbol | what |
+|---|---|
+| `kr_kiblast[16]` | the player ki blast's 4 facings x 4 frames (`0x0840E47C`, raw 16x16, same attrs) recoloured by brightness onto a white / cyan / blue ramp; `kiblast_spawn_hook` swaps them in for Krillin |
+| `kr_disc[4]` | the Destructo Disc: a 32x32 raw frame (attr `0x80002000`), an ellipse rx 13 / ry 5 with a saw-toothed orange rim, gold ring, yellow body, a white-hot centre line and spokes that rotate per frame |
+| `kr_disc_icon_0/1` | HUD ability icons (32x16, 8bpp tiles, 0x200 bytes): the Ki Blast pair with the picture area (rows 2-8, columns 13-28) redrawn as a small disc, the cooling one in the stock greys |
+| `kr_status_icon_disc / _ki` | the status screen's 18x8 technique icons (linear, menu BG palette, compressed like `0x086FF6D0`) |
+
+The player ki blast (`FUN_0800E8B0`, 0x54-byte object, vtable `0x08024CBC`): frame base +0x50 =
+`0x0840E47C + facing * 0x30`, +0x18 the current frame, velocity from `0x0840E554` (0x300 8.8 per
+frame), hit message type = owner +0x16C, attack `0x086DB2E4` `{1, 3, 0x400}`, impact frame
+`0x0840E53C`; it is spawned by `FUN_0800EAD8(xy, owner)` from the ki blast control state (animation
+34, `0x03002194`, vtable `0x08025D48`; holding B repeats it at 2 EP each).
 
 ## Android 13 (id 165) and Cooler's Namekian servant (id 166) (`tools/bossmodels.py`, 2026-10-18)
 

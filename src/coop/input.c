@@ -144,6 +144,7 @@ void input_poll_hook(InputSystem *in) {
     u16 now = (u16)~raw;
     u16 p1 = now;
     u16 p2 = p2_source(now, &p1);
+    if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
 #ifdef A16_TEST
     if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
         if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, coop2.a16, -1, &g_Party->chars[g_Party->active_slot]);
@@ -155,6 +156,20 @@ void input_poll_hook(InputSystem *in) {
     }
 #endif
 
+#ifdef KR_TEST
+    // test builds: player 2's pad pressing L + R + Select + Start together toggles "this pad drives player 1"
+    // (tools/fork/p2hold.py on the fork's pad port), so menus with their own input loops and player 1's
+    // abilities can be driven without gdb or window keys (docs/testing.md "Krillin")
+    {
+        static u8 route __attribute__((section(".party.kr"))), combo __attribute__((section(".party.kr")));
+        u16 r = (g_p2_remote & 0x8000) ? (g_p2_remote & 0x3FF) : 0;
+        int c = (r & 0x30C) == 0x30C;
+        if (c && !combo) route ^= 1;
+        combo = (u8)c;
+        if (c) { p1 = 0; p2 = 0; }            // the combo itself reaches nobody
+        else if (route) { p1 = r; p2 = 0; }
+    }
+#endif
     poll_into(in, p1);
     if (in->pressed) g_LastInputFrame = g_FrameCounter;
     if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) SoftReset();
@@ -162,7 +177,10 @@ void input_poll_hook(InputSystem *in) {
     poll_into(&coop.input2, p2);
 
     coop_active_check();
+    p2_sync_combat();
+    duel_tick();
     wide_update();
+    krillin_frame(in);   // krillin.c: old Hercule's weak combat bytes, KR_TEST triggers
 #ifdef SSJ_TEST
     if (coop.p2 && (coop.input2.pressed & KEY_START)) {   // test builds: player 2's Start transforms
         extern int ssj_ready(CharacterEntry *); extern void ssj_use(CharacterEntry *, Entity *);

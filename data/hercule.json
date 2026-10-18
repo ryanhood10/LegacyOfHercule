@@ -11,24 +11,27 @@
       "abilities": [
         14,
         15,
-        18,
+        16,
         17
       ],
       "ability_index": 0
     },
     "6": {
-      "hp": 80,
-      "ep": 20,
-      "str": 3.0,
-      "pow": 4.0,
-      "end": 3.0,
+      "hp": 60,
+      "ep": 40,
+      "str": 1.5,
+      "pow": 2.5,
+      "end": 1.5,
       "display_row": 23,
-      "flags": "0x40",
+      "flags": "0x58",
       "abilities": [
+        21,
+        19,
+        20,
         2
       ],
       "ability_index": 0,
-      "_": "Krillin placeholder (slot 6): Gohan-like level-1 stats, Ki Blast, display row 23 = Hercule row with Krillin NPC sprite (tools/spriteclone.py). Real art, abilities and growth are a later pass; slot 7 stays empty."
+      "_": "Krillin (slot 6, row 23, sprite 161): weaker than the Z fighters like Hercule, ki-leaning. Flags 0x40 as the stock rows plus bits 3/4 (his two status-screen technique pages). Abilities: Destructo Disc, Afterimage Rush, Shockwave Punch, Ki Blast (stock 2, recoloured blue for him). docs/hercule.md 'Krillin'."
     }
   },
   "growth": {
@@ -48,16 +51,16 @@
     },
     "6": {
       "str": [
-        300,
-        500
+        280,
+        480
       ],
       "pow": [
-        300,
-        500
+        330,
+        530
       ],
       "end": [
-        256,
-        456
+        300,
+        500
       ]
     }
   },
@@ -91,6 +94,27 @@
       "icons": 6,
       "is_ready": "fn:ssj_ready",
       "on_use": "fn:ssj_use"
+    },
+    {
+      "name": "AfterimageRush",
+      "icons": 7,
+      "is_ready": "fn:krillin_rush_ready",
+      "on_use": "fn:krillin_rush_use"
+    },
+    {
+      "name": "ShockwavePunch",
+      "icons": 6,
+      "is_ready": "fn:krillin_shock_ready",
+      "on_use": "fn:krillin_shock_use"
+    },
+    {
+      "name": "DestructoDisc",
+      "icons": [
+        "sym:kr_disc_icon_0",
+        "sym:kr_disc_icon_1"
+      ],
+      "is_ready": "fn:krillin_disc_ready",
+      "on_use": "fn:krillin_disc_use"
     }
   ],
   "patches": [

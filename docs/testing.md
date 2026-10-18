@@ -46,8 +46,9 @@ tools\win_keys.ps1 "N:200 WAIT:1200 M:200 WAIT:500" -Title "mGBA (Ubuntu)"   # k
 tools\win_shot.ps1 build\x.png -Title "mGBA (Ubuntu)"
 ```
 
-Always `pkill -9 -x mgba` before launching: a stale instance keeps ports 7778/2345 and the new one
-silently runs without pad or debugger. The log says `p2pad: sender connected` when the pad is live.
+Before launching, stop the stale instance of *your* slot (`runfork.ps1 -Slot n` does): a stale instance
+keeps its ports and the new one silently runs without pad or debugger. Never `pkill -x mgba` while other
+sessions run forks. The log says `p2pad: sender connected` when the pad is live.
 Select cycling for player 2 registers only every few presses; verify the slot instead of counting.
 
 ## Several fork instances at once (slots)
@@ -64,6 +65,26 @@ Select cycling for player 2 registers only every few presses; verify the slot in
 
 Finding entities with gdb: the scene list is `g_EntityList` 0x03001120, `count` at +4 and the item
 pointers inline from +8; co-op enemies have vtable 0x0203FB04 (`coop2.enemy_vtable`).
+
+**Audio sync stall:** with several forks running, a fork launched with sound can stall (a boot stuck on
+the copyright screen for minutes, keys ignored). `runfork.ps1 ... -Mute` passes `-C mute=1 -C
+audioSync=0` and runs at full speed. Interrupting the gdb stub while the CPU idles in the BIOS (title,
+copyright, menus) can drop the connection ("Disconnected from target"); pause only in game and drive
+menus with `win_keys.ps1` (presses of 350 ms with 700 ms gaps register; faster ones drop).
+
+## New maps (zone 15, `docs/maps.md`)
+
+```
+make BUILD=build/maps WIDE=1 DEBUG_MENU=1                       # MAPS=1 by default: builds data/maps/*.json
+tools\fork\runfork.ps1 /mnt/f/.../build/maps/log2-wide.gba -Slot 4 -Mute
+python tools/fork/p2hold.py --port 7782 --cmd build/maps/p2cmd.txt   # player 2 present; write "0x40:2" etc. to the file
+wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=4 /root/warp.sh 15 1 216 200"   # arctic (2: 312 280 Time Chamber, 3: 276 354 arena, 4: 240 340 crater)
+```
+
+The debug Map Test lists zone 15 too (zone field: Right x14 from 1). A savestate taken at the debug
+menu (Shift+F1) loads on any rebuild with the same code, so map-data changes do not need a new boot.
+Offline check of a built ROM: `python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table
+<table address printed by patch_rom.py> --count 330`.
 
 ## Fork helpers (`tools/fork/`, used for the party-slots work)
 
@@ -177,6 +198,38 @@ drops the connection at a fatal "Jumped to invalid address" (no post-mortem; tra
 `dump binary memory` returned zeros past 0x06014000 (read VRAM in small `x/` probes instead),
 breakpoints on hot functions slow the game to a crawl (arm them from another breakpoint), and every
 frame-stop makes emulated time lag real time, so wait longer before reading the log.
+
+## Krillin / old Hercule tests (fork slot 2, `KR_TEST=1`, 2026-10-18)
+
+```
+make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
+tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Quiet
+python tools\fork\p2hold.py --port 7780 --cmd F:/.../build/kn/p2cmd.txt          # background
+tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"           # toggle the pad to player 1, A
+```
+
+- **Several forks at once**: with audio sync on, an instance can barely advance (its pad socket's
+  Recv-Q grows, keys "don't register"); `-Quiet` (= `-C mute=1 -C audioSync=0`) fixes it. Other
+  sessions' scripts (`runa16.ps1`, older `runfork.ps1` copies) run `pkill -9 -x mgba` /
+  `pkill -x gdb-multiarch`, which kills every instance or its gdb client; a dead gdb client leaves the
+  stub halted (relaunch).
+- **No window keys needed**: in `KR_TEST` builds player 2's pad pressing L+R+Select+Start toggles the
+  fork pad between player 2 and player 1 (the combo itself reaches nobody), so menus with their own
+  input loops (pause / status, save pad dialog, switch screen, level-up text) are driven through the
+  TCP pad. Player 1's L+R opens the Dragon Radar (Start, B, B closes it). Test triggers on player 2's
+  pad holding L+R: **Up** = slot 5 toggles old Hercule (rows 21 / 24), **Right** = Krillin becomes
+  player 1, **Left** = Krillin's EXP one short of his next level, **Down** = 1 EXP to Krillin through
+  the kill path's EXP event (a level-up on demand); row and player switches are refused inside
+  dialogue loops. Party HP is refilled below a third, so idling tests survive.
+- Debug-menu savestate: made once at the title-idle debug menu (Map Test row, zone 2 area 7
+  selected); it loads under later builds (menu code is stock). Zone 2 area 6 = open field with
+  snakes (an intro dialogue first: 6 x A), area 7 = wolves under trees, area 1 = town with the save
+  pad at (540, 256).
+- Helpers (`FORK_SLOT=n`): `kr_peek.sh` (party entries, active slot, player 2's slot), `kr_ents.gdb`
+  (entity list with vtables, positions, sprite records), `kr_tele2.sh X Y` (both players; the
+  shared-screen leash pulls one back otherwise), `kr_setidx.sh SLOT INDEX` (selected ability); state
+  counters at `kr_state` (`coop.sym`). Screens: `tools\win_burst.ps1` (N frames from one process, start
+  it ~1.7 s before the action; check each frame's title bar, another session's window may be on top).
 
 ## Reading screenshots
 

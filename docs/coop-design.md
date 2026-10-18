@@ -676,3 +676,66 @@ model and ran the stock defeat dialogue ("This is ridiculous. Piccolo was suppos
 us!"). With the test rule (`make CFLAGS_EXTRA=-DBOSS_RULE_TEST`: 17 alone, end 50 %) 17 spawned
 alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `build/bdtest.sh`,
 `bdfind.sh`, `bdpeek.sh` (not committed; the pattern is in `docs/testing.md`).
+
+## Player 2's combat stats, duplicate NPCs, test warp (2026-10-18)
+
+- **Player 2's combat bytes**: the behaviour classes write entity +0x160/+0x161/+0x162 (melee,
+  ranged, defence = str/pow/end >> 8) from the *active* party slot (`0x08016FD8`), so player 2 used
+  player 1's character's stats. The class init also adds the form's bonus (the Super Saiyan classes,
+  e.g. `0x0801718C`: +15/+10/+15) and sets the speeds, so `install_behaviour()` (player.c) now runs it
+  with the active slot temporarily set to player 2's slot, and `p2_sync_combat()` re-runs it whenever
+  player 2's str/pow/end, row or slot change (level-up, capsule, transformation). Verified in the
+  fork: Hercule as player 2 got 46/45/63 (his own) on load, and raising his strength by 2 in the party
+  entry gave 48 within a frame, while player 1 kept Piccolo's 46/49/39.
+- **Camera shake**: `camera_shake_safe()` (player.c) extends a running shake instead of calling
+  `Camera_Shake` again (which links the camera into its own controller chain: an endless loop); the
+  player's wall bump uses it. android16.c has its own copy.
+- **Duplicate-actor rule** (`src/coop/actors.c`, run at the start of every entity-list update): a
+  town NPC (vtable `0x080255CC`, map records with handler `0x0800B711`) that shows the character
+  player 1 or player 2 controls is removed with `EntityList_Remove`, whose vtable slot 1 is the
+  deleting destructor (teardown + free). Same person = the NPC's sprite record is the sprite of a
+  display row reachable from the player's current row through the transformation links, or an
+  NPC-only alias (`aliases[]`: sprite 76 -> Krillin, slot 6). Cutscene actors (handler `0x0800D6DF`,
+  bytecode spawns) are not touched: scripts address them by sprite. `COOP_OFF_DUPES` (64) disables
+  it; `coop2.dupes_removed` counts. Verified: zone 3 area 6 with Piccolo as player 1 lost Piccolo's
+  NPC and kept Krillin's, Vegeta's, Tien's and the others.
+- **World map** (Ryan's rule: one player flies): already the case. Player 2 is despawned by the
+  warp and only respawns from player 1's on-foot idle state, which never runs while flying, so the
+  world map has no player-2 entity and only player 1's pad drives it; both land together and player 2
+  reappears beside player 1. Verified by warping to zone 6 area 99 (player 2 pointer 0, one flyer).
+- **Test warp**: `coop2.cmd = 5` (`COOP_CMD_WARP`) with `cmd_arg = zone | area << 8` and
+  `cmd_arg2` (CoopExtra +0x254) `= x | y << 16` calls the WarpToMapNoEntities opcode handler
+  (`0x08009A89`, stack `{5, zone, area, 1, x, y}`) from the entity-list hook. Offsets: `coop2` is
+  at `0x0203FB00`, `cmd` +0x208, `cmd_arg` +0x20C.
+
+## Player-vs-player duel (2026-10-18, src/coop/duel.c)
+
+For the story's two duels (Vegeta vs his shadow clone in space, Vegeta vs Trunks in the Time Chamber).
+
+- **Hits**: player attacks broadcast hit messages of type 1, which players ignore (the player
+  message handler `0x08008945`, vtable `0x08025604` slot 9, takes types 0 and 2). `player_msg_hook`
+  (hooked on slot 9 for both players; player 2's vtable copy inherits it) handles a type-1 hit whose
+  attacker is the opponent (or a projectile owned by the opponent, +0x1C) as type 0 for that player
+  only: box test, damage calculation with the attacker's own combat bytes, knock-back, OnHit (slot 14,
+  `0x08008807`, which calls take-damage slot 16).
+- **Final blow**: player 1's take-damage (slot 16, `0x08008785`: HP -= dmg from the *active* slot's
+  entry, death animation 0x21 and the game-over event at 0) is hooked (`p1_take_damage_hook`): in a
+  duel the blow is trimmed to leave 1 HP and the duel ends. Player 2's own take-damage asks
+  `duel_p2_final_blow` first. No game over, no revive.
+- **End**: `coop2.duel_winner` = 1 or 2, the pads swap when player 2 won and `DUEL_SWAP_ON_P2_WIN`
+  is set (`coop2.pad_swap`, applied in `input_poll_hook` while a player-2 source exists), and the
+  duel's end script (a mapScripts index, TriggerMapEvent style) runs.
+- **Clone**: `duel_start(-1, flags, end_script)` copies player 1's party entry into the last party
+  slot (`DUEL_SLOT` = `PARTY_SLOTS - 1`, so slot 7 is reserved for duels) and binds player 2 to it;
+  `DUEL_SHADOW` draws player 2 through a 256-entry colour remap toward darker violet palette colours
+  (entity +0x24, decoded per frame by the sprite emitter `0x08007772`; the hit flash borrows the same
+  field and clears it, so `duel_tick` puts the tint back). `duel_clear()` drops the clone slot and the
+  tint once the story's end scene is over.
+- **Flags**: `DUEL_CLONE` 1, `DUEL_SHADOW` 2, `DUEL_SWAP_ON_P2_WIN` 4, `DUEL_FULL_EP` 8 (EP held full:
+  no Super Saiyan drain during the fight). Debug: `coop2.cmd = 6` (`COOP_CMD_DUEL`), `cmd_arg =
+  (p2_slot + 1, 0 = clone) | flags << 8 | (end_script + 1) << 16`.
+
+Verified in the fork (island save, Piccolo + Hercule): a clone duel turned player 2 into a shadow
+Piccolo; each player's punches hurt the other (554 -> 485 and 554 -> 414); player 1's final blow left
+the clone at 1 HP with `winner = 1`; in a rematch player 2's final blow left player 1 at 1 HP, no game
+over, `winner = 2`, pads swapped (player 1's pad then walked player 2's entity).

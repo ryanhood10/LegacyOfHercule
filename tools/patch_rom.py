@@ -2,6 +2,7 @@
 vtable slots that redirect into it, and patch function entries with long jumps.
 
 usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--party-slots N] [--debug-menu] [--wide] [--data-patch FILE.json ...]
+                    [--maps maps.patch.json]
 
 --data-patch FILE.json applies generic data records to the output ROM (after the code and hooks).
 The file is a JSON list; each record is an object with a file offset and one of:
@@ -11,6 +12,12 @@ The file is a JSON list; each record is an object with a file offset and one of:
     {"offset": "0x8024",   "word":  "fn:hercule_taunt"}   u32 = symbol address | 1 (Thumb function pointer)
 An optional "expect": "5b" (hex) aborts the build if the bytes there differ, and "note" is printed.
 Records are applied in order; tools/romdata.py and tools/script_dump.py generate these files.
+
+--maps FILE.json (tools/mapbuild.py build) adds new maps, as the LAST step (after --data-patch, so map
+record edits made at the original table offsets are kept): its "records" (chunks, tiles, collision,
+variations, ...) are written into free ROM (must be unused 0xFF padding), then the MapEntry table is
+relocated to "table_offset": the 327 stock rows as patched so far, followed by the new "rows"; the four
+code literals that hold the table address (and &table[3]) and Map_GetCount's constant are repointed.
 """
 import json
 import os
@@ -36,6 +43,16 @@ VTABLE_HOOKS = [
     (0x0802408C, 0, "hud_destroy_hook"),   # HUD object
     (0x0802408C, 2, "hud_update_hook"),
     (0x0802408C, 4, "hud_draw_hook"),
+    (0x08025604, 9, "player_msg_hook"),     # player message handler: duel hits (duel.c)
+    (0x08025604, 16, "p1_take_damage_hook"),# player 1 take-damage: a duel's final blow leaves 1 HP
+    # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
+    # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
+    (0x08023B3C, 13, "status_title_hook"),
+    (0x08023B3C, 23, "status_pages_hook"),
+    (0x08023B3C, 24, "status_draw_hook"),
+    (0x080248CC, 13, "status_title_hook"),
+    (0x080248CC, 23, "status_pages_hook"),
+    (0x080248CC, 24, "status_draw_hook"),
 ]
 
 # --wide: draw slot (4) of every class whose draw is the base sprite emitter 0x08007773, redirected
@@ -54,6 +71,9 @@ ENTRY_JUMPS = [
     (0x0801B332, "ai_speed8_create_hook"),   # 8-direction chase AI module constructor (speed param)
     (0x0801B15E, "ai_speed4_create_hook"),   # axis-aligned approach AI module constructor
     (0x080104C0, "bossbar_create_hook"),     # BossHealthBar_Create (DrawBossHealthBar opcodes)
+    (0x080094B0, "vm_push_name_hook"),       # VM: push the active character's name (dialogue %s)
+    (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
+    (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
@@ -83,12 +103,21 @@ LITERAL_RELOCATIONS = [
     (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,
                                      0xB050, 0xC804, 0x10F18, 0x112BC, 0x13574, 0x14FF4, 0x26458, 0x26474]),
     (0x083B4E90, "sprite_index", 0x1C, [0x959C]),
+    # UI string table (names, menu labels, technique names): 260 stock entries + per-slot blocks
+    # (tools/krillinsprites.py, src/coop/krillin.h UI_*); all 20 literals hold the table's address
+    (0x080E2840, "ui_strings", 0, [0x4F8, 0x9B0, 0x1268, 0x1B38, 0x1D88, 0x2524, 0x28A8, 0x3230, 0x3794, 0x3B10,
+                                   0x460C, 0x49BC, 0x4C98, 0x95AC, 0xCAE4, 0x10F44, 0x1172C, 0x17A34, 0x1960C, 0x1A688]),
+    # portrait module table (word id + 1 = Portrait_Table[id]): Krillin's status portrait appended (id 119)
+    (0x083EC9D0, "portrait_module", 0, [0xBE10]),
+    # status screen technique pages (0x08003520 / 0x08003684): module table with per-slot icon pairs and
+    # string-block bases for PARTY_SLOTS characters (src/coop/krillin.c status_module)
+    (0x081D94D0, "status_module", 0, [0x377C]),
     (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 24
-# (row 22 = Super Saiyan Hercule, row 23 = Krillin placeholder; tools/spriteclone.py)
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 25
+# (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule; tools/spriteclone.py)
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x18),
+    (0x42D6, 0x16, 0x19),
 ]
 
 
@@ -107,6 +136,7 @@ BYTE_PATCHES = [
 #    repointed (growth rows stay at literal + 0xA8).
 PARTY_ENTRY_JUMPS = [
     (0x08003C24, "party_init_hook"),        # Party_Init(party): defaults + zeroed flag banks
+    (0x08003D58, "party_add_exp_hook"),     # Party_AddExp: its module words sat below the moved literal 0x3EA0
     (0x08003E42, "flag_test_hook"),         # Flag_Test(party, id)
     (0x08003E5E, "flag_set_hook"),          # Flag_Set(party, id)
     (0x08003E74, "flag_clear_hook"),        # Flag_Clear(party, id)
@@ -265,11 +295,65 @@ def apply_data_patch(rom, path, syms):
         print(f"data   {ROM_BASE + off:08x} {len(data):5} bytes  {rec.get('note', '')}")
 
 
+MAP_TABLE = 0x409368                       # g_MapEntries (file offset)
+MAP_COUNT, MAP_ROW = 327, 0x38
+MAP_TABLE_LITERALS = [0x5ADC, 0x5D5C, 0xEBD8]   # Draw_DebugTestMenu, Debug_LoadMapFromSelection, Map_FindEntry
+MAP_ENTRY3_LITERAL = 0x195C                 # &g_MapEntries[3] (new-game map)
+MAP_COUNT_CODE = 0xE0AC                     # Map_GetCount: movs r0,#0xFF; adds r0,#0x48 (327)
+
+
+def apply_maps(rom, path):
+    """New maps from tools/mapbuild.py: data records, then the relocated, extended MapEntry table."""
+    m = json.load(open(path))
+    for rec in m["records"]:
+        off = int(rec["offset"], 0)
+        data = bytes.fromhex(rec["bytes"])
+        if off + len(data) > len(rom):
+            sys.exit(f"maps: record at {off:#x} runs past the ROM")
+        if any(b != 0xFF for b in rom[off:off + len(data)]):
+            sys.exit(f"maps: record at {off:#x} ({rec.get('note', '')}) overlaps used ROM; move MAP_FREE")
+        rom[off:off + len(data)] = data
+    rows = [bytes.fromhex(r) for r in m["rows"]]
+    if not rows:
+        return
+    stock = bytes(rom[MAP_TABLE:MAP_TABLE + MAP_COUNT * MAP_ROW])
+    have = {(stock[i * MAP_ROW], stock[i * MAP_ROW + 1]) for i in range(MAP_COUNT)}
+    for r in rows:
+        if (r[0], r[1]) in have:
+            sys.exit(f"maps: zone {r[0]} area {r[1]} already exists")
+        have.add((r[0], r[1]))
+    count = MAP_COUNT + len(rows)
+    if count > 255 + 255:
+        sys.exit(f"maps: {count} entries do not fit Map_GetCount's movs/adds")
+    table = int(m["table_offset"], 0)
+    new = stock + b"".join(rows)
+    if any(b != 0xFF for b in rom[table:table + len(new)]):
+        sys.exit(f"maps: table space at {table:#x} is not free")
+    rom[table:table + len(new)] = new
+    for off in MAP_TABLE_LITERALS:
+        cur = struct.unpack_from("<I", rom, off)[0]
+        if cur != ROM_BASE + MAP_TABLE:
+            sys.exit(f"maps: literal at {off:#x} is {cur:08x}, expected the map table")
+        struct.pack_into("<I", rom, off, ROM_BASE + table)
+    cur = struct.unpack_from("<I", rom, MAP_ENTRY3_LITERAL)[0]
+    if cur != ROM_BASE + MAP_TABLE + 3 * MAP_ROW:
+        sys.exit(f"maps: literal at {MAP_ENTRY3_LITERAL:#x} is {cur:08x}, expected &table[3]")
+    struct.pack_into("<I", rom, MAP_ENTRY3_LITERAL, ROM_BASE + table + 3 * MAP_ROW)
+    if rom[MAP_COUNT_CODE:MAP_COUNT_CODE + 4] != bytes([0xFF, 0x20, MAP_COUNT - 255, 0x30]):
+        sys.exit(f"maps: Map_GetCount at {MAP_COUNT_CODE:#x} is {rom[MAP_COUNT_CODE:MAP_COUNT_CODE + 4].hex()}")
+    rom[MAP_COUNT_CODE + 2] = count - 255
+    for info in m["maps"]:
+        print(f"map    zone {info['zone']} area {info['area']} {info['name']} ({info['size'][0]}x{info['size'][1]} px)")
+    print(f"maps   table {ROM_BASE + table:08x}: {count} entries, {len(m['records'])} records "
+          f"{m['free_start']}..{m['free_end']}")
+
+
 def main():
     orig, blob, symfile, out = sys.argv[1:5]
     debug_menu = "--debug-menu" in sys.argv[5:]
     wide = "--wide" in sys.argv[5:]
     data_patches = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--data-patch"]
+    maps = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--maps"]
     party_slots = int(next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--party-slots"), 6))
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
@@ -335,6 +419,8 @@ def main():
     for path in data_patches:
         apply_data_patch(rom, path, syms)
     apply_party_count_patches(rom, party_slots)
+    for path in maps:
+        apply_maps(rom, path)
 
     open(out, "wb").write(rom)
     print(f"wrote {out}: {len(rom)} bytes, code {len(code)} bytes at {ROM_BASE + CODE_AT:#x}")

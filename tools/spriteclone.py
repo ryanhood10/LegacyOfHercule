@@ -4,10 +4,13 @@ committed: the output lives in build/gen.
 
 usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ssj_preview.png]
                       [--extra 158=buu_record_158,159=buu_record_159] [--row-sprite 157]
+                      [--krillin-sprite 161] [--old-hercule-sprite 158]
   --extra       more records (symbols defined in another generated file, e.g. tools/buu2log2.py's
                 build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids
   --row-sprite  the sprite id the Super Saiyan Hercule display row (22) uses (default 157; a test
                 build can point it at a converted Buu record to see it in game)
+  --krillin-sprite      sprite of Krillin's row 23 (default 161, tools/krillinsprites.py; 76 = his NPC set)
+  --old-hercule-sprite  sprite of old Hercule's row 24 (default 158, the Buu's Fury Hercule; 72 without it)
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -25,8 +28,13 @@ NEW_SPRITE = 157         # first free id after the stock 3..156
 SRC_ROW = 21             # Hercule's display row
 NEW_ROW = 22
 ROW_COUNT = 22
-KRILLIN_SPRITE = 76      # Krillin's NPC sprite record (docs/sprites.md)
+KRILLIN_SPRITE = 161     # Krillin's playable record (tools/krillinsprites.py; 76 is his NPC set)
 KRILLIN_ROW = 23
+KRILLIN_PORTRAIT = 73    # Portrait_Table: his dialogue portrait (switch screen / dialogue, OBJ palette)
+KRILLIN_STATUS_PORTRAIT = 119   # status-screen portrait, appended by tools/krillinsprites.py (portrait_module)
+OLD_HERCULE_SPRITE = 158 # Hercule in his Buu-saga gi (tools/buu2log2.py)
+OLD_HERCULE_ROW = 24
+GOHAN_ROW = 0            # a standard ground/flight row (behaviour class 0x030021E0) to copy for Krillin
 DISPLAY_DATA = 0x081D967C
 HAIR_GOLD, HAIR_SHADE, HAIR_LIGHT, HAIR_BRIGHT = 120, 20, 46, 8   # SSJ Goku's hair indices
 BLACK = 1
@@ -135,6 +143,8 @@ def main():
             k, v = kv.split("=")
             extra[int(k)] = v
     row_sprite = int(sys.argv[sys.argv.index("--row-sprite") + 1]) if "--row-sprite" in sys.argv else NEW_SPRITE
+    krillin_sprite = int(sys.argv[sys.argv.index("--krillin-sprite") + 1]) if "--krillin-sprite" in sys.argv else KRILLIN_SPRITE
+    old_sprite = int(sys.argv[sys.argv.index("--old-hercule-sprite") + 1]) if "--old-hercule-sprite" in sys.argv else OLD_HERCULE_SPRITE
     sp = S.Sprites(rom)
     rec = sp.record(SRC_SPRITE)
     groups = sp.groups(rec)
@@ -231,16 +241,27 @@ def main():
     new[5] = SRC_ROW       # detransformedDataIndex -> Hercule
     rows[SRC_ROW * 20 + 4] = NEW_ROW   # Hercule's own row now links to the new form
     rows += new
-    # row 23 = Krillin placeholder (party slot 6, docs/party-8-slots.md): Hercule's row with Krillin's
-    # NPC sprite (76), no transformation links; his own behaviour class and art are a later pass
-    krillin = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
-    krillin[0] &= ~1
-    krillin[1] = KRILLIN_SPRITE
+    # row 23 = Krillin (party slot 6, docs/party-8-slots.md): Gohan's row (standard behaviour class, flight
+    # timing) with Krillin's playable sprite, his dialogue portrait (+2) and his status portrait (+3), no
+    # transformation links
+    krillin = bytearray(rows[GOHAN_ROW * 20:GOHAN_ROW * 20 + 20])
+    krillin[0] = 0         # a base form, like Hercule's row 21
+    krillin[1] = krillin_sprite
+    krillin[2] = KRILLIN_PORTRAIT
+    krillin[3] = KRILLIN_STATUS_PORTRAIT
     krillin[4] = KRILLIN_ROW
     krillin[5] = KRILLIN_ROW
     rows += krillin
+    # row 24 = old Hercule (future prologue, docs/hercule.md): Hercule's row with the Buu-saga sprite; the
+    # story switches slot 5 to it with SetCharacterTransformation(5, sprite) and back with (5, 72)
+    old = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
+    old[0] = 0             # a base form (the story switches it by script)
+    old[1] = old_sprite
+    old[4] = OLD_HERCULE_ROW
+    old[5] = OLD_HERCULE_ROW
+    rows += old
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
-    lines.append(f"const u32 display_row_count = {ROW_COUNT + 2};")
+    lines.append(f"const u32 display_row_count = {ROW_COUNT + 3};")
     os.makedirs(os.path.dirname(out_c), exist_ok=True)
     open(out_c, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     total = sum(len(b) for (_, _), b in [((p, fi), fr[5]) for p, frs in arrays.items() for fi, fr in enumerate(frs) if fr[5]])

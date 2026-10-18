@@ -82,7 +82,19 @@ typedef struct CoopExtra {
     u32 a16_spawn_frame;    // debug: g_FrameCounter when he spawned / when his HP reached 0
     u32 a16_dead_frame;
     u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
-    u16 _pad3;
+    u16 dupes_removed;      // debug: town NPCs removed because a player controls that character (actors.c)
+    u32 cmd_arg2;           // second argument of a test command (COOP_CMD_WARP: x | y << 16)
+    u32 p2_class_key;       // stats/row/slot player 2's class init last ran with (player.c)
+    u8 duel_active;         // duel.c: player-vs-player hits on, final blow ends the duel
+    u8 duel_winner;         // 1 or 2 after a duel (0 before)
+    u8 duel_flags;          // DUEL_* below
+    u8 duel_saved_slot;     // player 2's slot before a clone duel
+    s16 duel_end_script;    // mapScripts index run when the duel ends (-1 none)
+    u16 duel_hits;          // debug: player-vs-player hits landed
+    u8 *duel_tint;          // the clone's shadow remap table (Arena)
+    u8 pad_swap;            // 1 = player 1's pad drives player 2's entity and the other way round
+    u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
+    u8 _pad5[2];
     u32 boss_rec[8];        // scratch record for COOP_CMD_SPAWN_RECORD (0x1C bytes, no behaviours)
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
@@ -90,7 +102,20 @@ _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x020
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
 #define COOP_CMD_A16          4   // spawn the Android 16 boss 64 px right of player 1, with a boss bar (android16.c)
-#define COOP_CMD_SPAWN_RECORD 5   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
+#define COOP_CMD_DUEL         6   // arg = (p2_slot + 1, 0 = clone) | flags << 8 | (end_script + 1) << 16: duel_start
+#define COOP_CMD_WARP         5   // arg = zone | area << 8, arg2 = x | y << 16 (pixels): the WarpToMap opcode (39)
+void camera_shake_safe(int frames, int strength);   // player.c: Camera_Shake that never re-links a shaking camera
+void p2_sync_combat(void);                          // player.c: player 2 entity combat bytes from its own slot
+#define DUEL_CLONE          1   // player 2 plays a copy of player 1's character (last party slot)
+#define DUEL_SHADOW         2   // draw player 2 through a darkening colour remap
+#define DUEL_SWAP_ON_P2_WIN 4   // when player 2 wins, the pads swap from then on
+#define DUEL_FULL_EP        8   // both players' EP stays full (no Super Saiyan drain)
+void duel_start(int p2_slot, int flags, int end_script);   // duel.c
+void duel_clear(void);
+void duel_tick(void);
+int duel_p2_final_blow(Entity *e, int dmg);
+void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
+#define COOP_CMD_SPAWN_RECORD 7   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 extern CoopExtra coop2;
 
@@ -107,6 +132,7 @@ extern CoopExtra coop2;
 #define COOP_OFF_SPEED  4
 #define COOP_OFF_HP     8
 #define COOP_OFF_PARTNER 16  // boss twins keep the original's model
+#define COOP_OFF_DUPES 64     // keep town NPCs that show a player's character
 #define COOP_OFF_BOTHDOWN 32 // the first boss of a pair to fall is removed (pre-2026-10-18 behaviour) instead of staying down
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
@@ -123,3 +149,5 @@ void exp_init(void);         // build the EXP event vtable copy (called from coo
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
 void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
 void p2_cycle(void);            // player 2 picks the next available character (Select)
+void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
+void old_hercule_set(int on);   // krillin.c: slot 5 -> old Hercule's row (1) or Hercule's (0)

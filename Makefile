@@ -20,20 +20,31 @@ PARTY_SLOTS ?= 8
 # HERCULE=1 (default) applies the Legacy of Hercule data edits (data/hercule.json via tools/romdata.py)
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
-PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,) $(if $(filter 1,$(WIDE)),--wide,) $(if $(DATA_PATCH),--data-patch $(DATA_PATCH),)
+# MAPS=1 (default): new maps built from data/maps/*.json by tools/mapbuild.py (zone 15: arctic, Time
+# Chamber, Broly's arena; docs/maps.md), placed from MAP_FREE and appended to the relocated map table
+MAPS ?= 1
+MAP_SPECS ?= $(sort $(wildcard data/maps/*.json))
+MAP_FREE ?= 0xD00000
+MAPS_PATCH := $(if $(and $(filter 1,$(MAPS)),$(MAP_SPECS)),$(BUILD)/maps.patch.json,)
+PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,) $(if $(filter 1,$(WIDE)),--wide,) $(if $(DATA_PATCH),--data-patch $(DATA_PATCH),) $(if $(MAPS_PATCH),--maps $(MAPS_PATCH),)
 # A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM);
 # A16_TEST=1: player 1's L + R + Down spawns the Android 16 boss beside player 1 (src/coop/android16.c)
 A16_SPRITE ?= 160
+# KRILLIN_SPRITE: sprite id of Krillin's playable record (tools/krillinsprites.py, built from the ROM: his
+# NPC set 76 plus Goku's fight groups re-headed); OLD_HERCULE_SPRITE: old Hercule's row 24 (158 = the Buu's
+# Fury Hercule, 72 without roms/buu.gba). KR_TEST=1: player 1's L+R+Up toggles old Hercule on slot 5,
+# L+R+Left sets Krillin's EXP one short of his next level (src/coop/krillin.c)
+KRILLIN_SPRITE ?= 161
 # A13_SPRITE / NAMEK_SPRITE: Android 13 (base form) and Cooler's Namekian servant (tools/bossmodels.py,
 # built from the ROM); src/coop/bosses.c gives them to the co-op twins of 19, Dr. Gero and Cooler
 A13_SPRITE ?= 165
 NAMEK_SPRITE ?= 166
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,)  $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/boss_models_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o
 SSJ_TEST ?= 0
 
 # BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
@@ -47,19 +58,21 @@ BUU_ROM ?= roms/buu.gba
 BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
-EXTRA_SPRITES := $(A16_SPRITE)=a16_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record
+EXTRA_SPRITES := $(A16_SPRITE)=a16_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
 endif
 CLONE_FLAGS := --extra $(subst $(space),$(comma),$(strip $(EXTRA_SPRITES)))
 CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
+OLD_HERCULE_SPRITE ?= $(if $(filter 1,$(BUU)),158,72)
+CLONE_FLAGS += --krillin-sprite $(KRILLIN_SPRITE) --old-hercule-sprite $(OLD_HERCULE_SPRITE)
 
 all: $(OUT)
 
-$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/bosses.h
+$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h
 	@mkdir -p $(BUILD)/obj
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
 $(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags
@@ -82,6 +95,15 @@ $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
 # Android 16's fighting sprite and the rocket / explosion projectile frames (never committed)
 $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
 	$(PYTHON) tools/a16sprites.py $(ROM) $@ --preview $(BUILD)/a16_preview.png
+
+# Krillin's playable sprite, status portrait, ki blast / Destructo Disc frames and icons, the relocated UI
+# string table and portrait module table (never committed)
+$(BUILD)/gen/krillin_sprites_data.c: tools/krillinsprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
+	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png
+
+$(BUILD)/obj/krillin_sprites_data.o: $(BUILD)/gen/krillin_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 $(BUILD)/obj/a16_sprites_data.o: $(BUILD)/gen/a16_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
@@ -111,10 +133,14 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 $(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json) tools/romdata.py
 	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
-$(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH)
+$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	@mkdir -p $(BUILD)
+	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps --buu-rom $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
+
+$(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH) $(MAPS_PATCH)
 	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)
 
 clean:
-	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(OUT)
+	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(BUILD)/maps.patch.json $(OUT)
 
 .PHONY: all clean FORCE

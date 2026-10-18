@@ -41,7 +41,7 @@ spawn)
 rec)
   $G pause; sleep 0.6
   $G cmd "set *(unsigned*)($C+0x20C) = $2"
-  $G cmd "set *(unsigned*)($C+0x208) = 5"
+  $G cmd "set *(unsigned*)($C+0x208) = 7"
   sleep 0.3; $G cmd continue; sleep 3
   peek rec ;;
 peek) peek "${2:-now}" ;;

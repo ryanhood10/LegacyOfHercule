@@ -220,6 +220,10 @@ void enemies_init(void) {
         coop2.a16 = 0;
         coop2.a16_force = 0;
         coop2.downed = 0;
+        coop2.dupes_removed = 0;
+        coop2.duel_active = 0;
+        coop2.duel_tint = 0;
+        coop2.pad_swap = 0;
     }
 }
 
@@ -337,6 +341,14 @@ void coop_debug_tick(void) {
         if (a) EntityList_Add(g_SceneTable[1], a);
     } else if (cmd == COOP_CMD_A16) {
         a16_test_spawn();
+    } else if (cmd == COOP_CMD_DUEL) {
+        u32 a = coop2.cmd_arg;
+        duel_start((int)(a & 0xFF) - 1, (int)((a >> 8) & 0xFF), (int)((a >> 16) & 0xFFFF) - 1);
+    } else if (cmd == COOP_CMD_WARP) {
+        // the bytecode WarpToMapNoEntities handler (opcode 39) pops y, x, variation, area, zone
+        s32 stack[6] = { 5, (s32)(coop2.cmd_arg & 0xFF), (s32)((coop2.cmd_arg >> 8) & 0xFF), 1,
+                         (s32)(coop2.cmd_arg2 & 0xFFFF), (s32)(coop2.cmd_arg2 >> 16) };
+        ((void (*)(s32 *))0x08009A89u)(stack);
     } else if (cmd == COOP_CMD_BOSS_BAR) {
         Entity *e = (Entity *)coop2.cmd_arg;
         if (!e) e = coop2.twins[0].orig ? coop2.twins[0].orig : coop2.twins[0].twin;
