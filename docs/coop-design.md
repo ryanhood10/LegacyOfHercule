@@ -681,9 +681,12 @@ alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `
 
 - **Player 2's combat bytes**: the behaviour classes write entity +0x160/+0x161/+0x162 (melee,
   ranged, defence = str/pow/end >> 8) from the *active* party slot (`0x08016FD8`), so player 2 used
-  player 1's character's stats. `p2_sync_combat()` (player.c) rewrites them from player 2's own slot
-  every input poll. Verified in the fork: corrupted bytes came back as Hercule's (46/45/63) within a
-  frame while player 1 kept Piccolo's.
+  player 1's character's stats. The class init also adds the form's bonus (the Super Saiyan classes,
+  e.g. `0x0801718C`: +15/+10/+15) and sets the speeds, so `install_behaviour()` (player.c) now runs it
+  with the active slot temporarily set to player 2's slot, and `p2_sync_combat()` re-runs it whenever
+  player 2's str/pow/end, row or slot change (level-up, capsule, transformation). Verified in the
+  fork: Hercule as player 2 got 46/45/63 (his own) on load, and raising his strength by 2 in the party
+  entry gave 48 within a frame, while player 1 kept Piccolo's 46/49/39.
 - **Camera shake**: `camera_shake_safe()` (player.c) extends a running shake instead of calling
   `Camera_Shake` again (which links the camera into its own controller chain: an endless loop); the
   player's wall bump uses it. android16.c has its own copy.
@@ -696,6 +699,10 @@ alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `
   bytecode spawns) are not touched: scripts address them by sprite. `COOP_OFF_DUPES` (64) disables
   it; `coop2.dupes_removed` counts. Verified: zone 3 area 6 with Piccolo as player 1 lost Piccolo's
   NPC and kept Krillin's, Vegeta's, Tien's and the others.
+- **World map** (Ryan's rule: one player flies): already the case. Player 2 is despawned by the
+  warp and only respawns from player 1's on-foot idle state, which never runs while flying, so the
+  world map has no player-2 entity and only player 1's pad drives it; both land together and player 2
+  reappears beside player 1. Verified by warping to zone 6 area 99 (player 2 pointer 0, one flyer).
 - **Test warp**: `coop2.cmd = 5` (`COOP_CMD_WARP`) with `cmd_arg = zone | area << 8` and
   `cmd_arg2` (CoopExtra +0x254) `= x | y << 16` calls the WarpToMapNoEntities opcode handler
   (`0x08009A89`, stack `{5, zone, area, 1, x, y}`) from the entity-list hook. Offsets: `coop2` is

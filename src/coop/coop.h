@@ -84,6 +84,7 @@ typedef struct CoopExtra {
     u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
     u16 dupes_removed;      // debug: town NPCs removed because a player controls that character (actors.c)
     u32 cmd_arg2;           // second argument of a test command (COOP_CMD_WARP: x | y << 16)
+    u32 p2_class_key;       // stats/row/slot player 2's class init last ran with (player.c)
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
