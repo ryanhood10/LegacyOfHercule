@@ -286,6 +286,14 @@ session decoded sprites only), so lifting it is a new spike; the cheap stand-in 
 Trunks are inside, the story-consistent playables are Piccolo (player 1 by script) with Hercule,
 Krillin or Gohan (Gohan's selectable bit is cleared by the stock script; we can leave it set).
 
+Kame House from the pad (verified): landing on the island does not start the scene; the 17 arrival
+scene fires when you walk into the yard in front of the house, and the island has a save pad in
+the yard (the same trigger signature as Gohan's house: condition `0x08010AC7`, function
+`0x0800D839`), so a player can switch to Krillin at the pad before walking into the scene. At the
+end of the scene the script flies you straight to the fight island (zone 11 area 4): no stop, no
+small enemies (zone 11 has none), and the fight island has no pad. The boss continues across areas
+4, 5 and 6 by script warps.
+
 Open for Kame House: player 2 beside Piccolo against 17 (Hercule, who flew in with him), and 18
 joining as 17's twin instead of "sitting this one out", or 16 stepping in.
 
