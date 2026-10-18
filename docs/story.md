@@ -516,7 +516,22 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   beside Gero, watching in the lab) stay.
 - **Kept as planned:** Roshi's 2v2 gym and its finale; Cooler with his Namekian servant, reachable
   in the wait (the gate is the stock "Only Piccolo" barrier; there is no level gate).
-- **Under discussion:** a Broly encounter in the wait, and what triggers it.
+- **Broly side chapter (Ryan, 2026-10-18), in the wait:**
+  - *Trigger:* right after Cell's TV announcement in the Briefs' residence (zone 6 area 16, where
+    Bulma already hands over the Scouter Note), Bulma adds: tell Vegeta a ship is arriving for him in
+    the backyard, and it looks like a Saiyan ship.
+  - *Backyard:* the Capsule Corp lawn (zone 6 area 21, the training yard east of the grounds). With
+    Vegeta as a player, a spaceship stands there (an existing model copied in); Paragus steps out and
+    says he has found a New Planet Vegeta for him to rule as king. Vegeta goes aboard; Trunks follows
+    with Krillin, Gohan and Piccolo. The ship leaves.
+  - *Arrival:* cut to the Broly arena (zone 15 area 3), expanded with a landing zone where the ship
+    model stands, and a save pad there where the players can switch to anyone.
+  - *The fight:* walking into the next area, everyone appears on screen for the stock-style dialogue
+    (not dynamic), then only player 1 and player 2 fight Broly and Paragus. Broly is the real boss and
+    much stronger; Paragus is weak and easy. If Paragus dies first, Broly's health refills once and he
+    becomes stronger and faster (rage at his father's death).
+  - *End:* after both fall, a huge explosion, a short scene back at Capsule Corp with everyone talking
+    it over, fade to black, and player 1 and player 2 are at Capsule Corp with the game back to normal.
 
 ## 5. What the plan is missing (engine limits found while checking)
 
