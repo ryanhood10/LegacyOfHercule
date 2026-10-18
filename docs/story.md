@@ -167,6 +167,18 @@ wakes 17 and 18, 17 takes and destroys the controller ("You're not going to put 
 old man") and Gero dies at their hands; 13 watches, then leaves promising his master he will fulfil
 his destiny. Hercule's line at the door: offers to "negotiate".
 
+**The road (Ryan): Piccolo and Vegeta fight 17 and 18.** Stock, from the pad: entering the road
+area hides Piccolo, spawns 17, 18 and 16 and plays the car talk; a winnable boss fight against 18
+(enemy stat 4, sprite 11, 8000 EXP); then the script takes the win away (she gets up, blasts
+Piccolo flat, "Nice try... who's next?"); Krillin pleads, 18 kisses him, the three fly off, a full
+heal, Vegeta storms off, Piccolo leaves alone for the Lookout. In the series it is Vegeta who fights
+18 on this road and loses, with Piccolo beaten too, so making it Piccolo + Vegeta against 17 + 18
+is closer to the source than the stock scene: for the fight the script makes Vegeta the only
+player-2 choice (whoever lost the duel gets Vegeta back here), 17 joins as 18's twin (needs an
+enemy record; 17's fighting sprite is to be confirmed from the atlas, 9 or 15), both-down rule,
+and the blast knocks both players flat before the stock dialogue resumes. Hercule stands with
+Krillin for the plea; the kiss stays Krillin's unless Ryan wants it on Hercule.
+
 ## 5. What the plan is missing (engine limits found while checking)
 
 1. **Six party slots.** `PartyState` holds exactly 6 characters (Gohan, Vegeta, Goku, Piccolo,
