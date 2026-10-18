@@ -1,7 +1,7 @@
 """Build the co-op ROM: pad the original to 16 MiB, drop the compiled code at 0x800000, rewrite the
 vtable slots that redirect into it, and patch function entries with long jumps.
 
-usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--debug-menu] [--wide] [--data-patch FILE.json ...]
+usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--party-slots N] [--debug-menu] [--wide] [--data-patch FILE.json ...]
 
 --data-patch FILE.json applies generic data records to the output ROM (after the code and hooks).
 The file is a JSON list; each record is an object with a file offset and one of:
@@ -55,6 +55,19 @@ ENTRY_JUMPS = [
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
 # from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 1.25 KiB
 # (0x0203FB00 co-op difficulty state, 0x0203FE00 player-2 vtable, 0x0203FF00 pad words + CoopState).
+# The cap now ends at 0x0203F000, where coop.ld's partyram region (relocated party block + save-menu slot
+# store) starts: (0x0203F000 - 0x02000800) / 4 = 0xFA00 words.
+WORD_PATCHES = [
+    (0x01F20C, 0x0000FDFE, 0x0000FA00),
+]
+
+# The 27 pointer words that hold the party block's address (g_PartyState, 0x03000E90): the static
+# initialiser's literal (file 0x22EE8) and the per-module pointer tables in data. Found by scanning the
+# ROM for the value (docs/party-8-slots.md); all become g_party_block so the block can grow.
+PARTY_PTR_WORDS = [0x22EE8, 0x1D4F20, 0x1D94D0, 0x1D9534, 0x1D9C10, 0x1D9CA8, 0x1DA8D8, 0x3B50FC, 0x3B526C,
+                   0x3B5354, 0x3B5C98, 0x3B5F6C, 0x3EC838, 0x3EC9D0, 0x3ED1A4, 0x3ED1C0, 0x40DAF8, 0x6ADE1C,
+                   0x6D60EC, 0x6D7628, 0x6D7640, 0x6DB288, 0x6E3620, 0x6F7E54, 0x6F8078, 0x6F88CC, 0x6FD86C]
+
 # (old literal value, symbol, add, [file offsets]): every listed pool word must hold the old value and
 # becomes symbol+add. Used to move ROM tables that have no spare room into the co-op code area:
 # Character_DisplayData (22 rows -> 23, the 18 literals from the reference notes) and
@@ -63,15 +76,13 @@ LITERAL_RELOCATIONS = [
     (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,
                                      0xB050, 0xC804, 0x10F18, 0x112BC, 0x13574, 0x14FF4, 0x26458, 0x26474]),
     (0x083B4E90, "sprite_index", 0x1C, [0x959C]),
+    (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
 # (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 23
 BYTE_PATCHES = [
     (0x42D6, 0x16, 0x17),
 ]
 
-WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000FCC0),
-]
 
 # Optional: title screen idles into the leftover debug menu (Map Test loads any map with a level-40
 # party). From the Arefu/Legacy engine notes: file offset 0x574, BL GameIntroVideo_Create -> BL DebugMenu_Create.
@@ -117,6 +128,7 @@ def main():
     debug_menu = "--debug-menu" in sys.argv[5:]
     wide = "--wide" in sys.argv[5:]
     data_patches = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--data-patch"]
+    party_slots = int(next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--party-slots"), 6))
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
         off, old, new = DEBUG_MENU_PATCH

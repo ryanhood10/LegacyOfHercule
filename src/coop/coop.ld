@@ -5,6 +5,7 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        dash_update_hook ctrl_8277_hook ctrl_85ad_hook entity_list_update_hook camera_follow_hook
        exp_award_hook enemy_spawn_hook damage_calc_hook ai_speed8_create_hook ai_speed4_create_hook
        bossbar_create_hook coop2 sprite_emit_hook
+       g_party_block
        hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use sprite_index display_rows display_row_count ssj_record)
 
 MEMORY
@@ -13,6 +14,8 @@ MEMORY
     ewram (rw)  : ORIGIN = 0x0203FF00, LENGTH = 0x00000100
     vtram (rw)  : ORIGIN = 0x0203FE00, LENGTH = 0x00000100   /* below the pinned block, above the heap */
     ewram2 (rw) : ORIGIN = 0x0203FB00, LENGTH = 0x00000300   /* co-op difficulty state (enemies.c) */
+    partyram (rw) : ORIGIN = 0x0203F000, LENGTH = 0x00000B00 /* relocated party block + save-menu slot store (party.c);
+                                                                 the heap cap in tools/patch_rom.py ends here */
 }
 
 SECTIONS
@@ -37,6 +40,10 @@ SECTIONS
     .coop2 (NOLOAD) : {
         KEEP(*(.coop2))
     } > ewram2
+
+    .party (NOLOAD) : {
+        KEEP(*(.party))
+    } > partyram
 
     .bss (NOLOAD) : {
         *(.bss*)
