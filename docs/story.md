@@ -215,6 +215,31 @@ Ryan's decisions for this stretch:
   as written. Piccolo and the boosted Hercule then go to Gingertown together for Imperfect Cell.
 - Android 13 is loose after the road: bonus content.
 
+## 4e. Gingertown and after (decisions and verified flow, 2026-10-18)
+
+- **Gingertown (Ryan): Imperfect Cell fights with a Multi-Form duplicate.** Cell has Tien's cells,
+  so the split is Tien's technique and Piccolo says so; Cell plus Cell through the twin mechanism,
+  both-down rule: a body that falls is reabsorbed, and when both are beaten Cell pulls himself
+  together and escapes as the stock scene already has him do. Piccolo and the Kami-boosted Hercule
+  are the players; Krillin and Trunks arrive at the end as scripted. Cell Juniors stay for the
+  Cell Games; Android 13 stays loose (his art is not in either ROM: drawn, or his role moves to an
+  existing body, Ryan to decide).
+- **After the fight** the script makes Trunks player 1 again (zone 10 areas 21-33: ordinary
+  enemies, "Only Trunks" barriers), then the world map to **Kame House** (zone 11): Piccolo asks
+  after Goku, Goku wakes ("Kamiccolo!") and leaves to train; 17, 18 and 16 land ("Can Goku come out
+  and play?"), Piccolo takes 17 to the next island, "you and me": **Piccolo vs Android 17** as a
+  multi-map boss (enemy stat 3, sprite 9, the island breaking apart, 18 sitting it out), then 16
+  detects two powers and **Cell arrives** ("Thanks for bringing 17 and 18 here"). The script warps
+  to the Lookout.
+- **Lookout / Time Chamber** (zone 9): Dende and the Dragon Balls hub with Gohan as player 1; the
+  Hyperbolic Time Chamber scene makes Piccolo then Vegeta player 1.
+- **Zone 12**: Vegeta vs (Semi-Perfect) Cell (boss, sprite 29; afterwards Trunks is player 1), Cell
+  vs Trunks ("all you've done is pump up your muscles", Perfect Cell sprite 30, two boss records),
+  robot and animal areas between; then zones 13-14, the Cell Games.
+
+Open for Kame House: player 2 beside Piccolo against 17 (Hercule, who flew in with him), and 18
+joining as 17's twin instead of "sitting this one out", or 16 stepping in.
+
 ## 5. What the plan is missing (engine limits found while checking)
 
 1. **Six party slots.** `PartyState` holds exactly 6 characters (Gohan, Vegeta, Goku, Piccolo,
