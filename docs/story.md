@@ -265,6 +265,14 @@ Ryan's decisions for this stretch:
   vs Trunks ("all you've done is pump up your muscles", Perfect Cell sprite 30, two boss records),
   robot and animal areas between; then zones 13-14, the Cell Games.
 
+Time Chamber (Ryan is considering an extra gameplay scene there): LoG2 has only the door on the
+Lookout map ("You cannot enter the Hyperbolic Time Chamber"); no interior exists in this ROM.
+Buu's Fury has the chamber as a playable location, but its map format is not decoded (the Buu
+session decoded sprites only), so lifting it is a new spike; the cheap stand-in is LoG2's own
+"space" arena (zone 6 area 50, Vegeta's Super Saiyan scene) with a white palette. While Vegeta and
+Trunks are inside, the story-consistent playables are Piccolo (player 1 by script) with Hercule,
+Krillin or Gohan (Gohan's selectable bit is cleared by the stock script; we can leave it set).
+
 Open for Kame House: player 2 beside Piccolo against 17 (Hercule, who flew in with him), and 18
 joining as 17's twin instead of "sitting this one out", or 16 stepping in.
 
