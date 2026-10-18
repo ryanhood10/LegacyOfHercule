@@ -318,6 +318,30 @@ projectiles (heat-seeking rockets that lock on and detonate after three seconds,
 big explosives across the field, none of which hurt 16) and a new boss AI for them. 17 and 18
 watch; after the fight Cell arrives as scripted and the warp to the Lookout follows.
 
+## 4f. Boss endings and the road to the Cell Games (Ryan, 2026-10-18)
+
+- **Android 16 is not killed.** The island fight is hard but ends when 16 is down to about half
+  health; Cell arrives and the stock warp follows. 16 is kept for later and fought again. The stock
+  game already brings him back: after the Perfect Cell fight he asks Trunks "I need help. Please
+  take me to someone who knows how to repair me... Once my circuits are repaired, I can fight
+  alongside you", Trunks takes him to Capsule Corporation, and Bulma reads his memory there.
+- **Semi-Perfect Cell vs Vegeta and Trunks:** Cell splits into two (Multi-Form duplicate), the same
+  mechanics as Gingertown. The stock twist stays: Cell talks Vegeta into letting him absorb 18.
+- **Perfect Cell vs Trunks:** Cell fights alone; the fight ends at about half of his health, when he
+  laughs it off ("All you've done is pump up your muscles"); Trunks' transformation beats stay as
+  scripted (the script also resets both Saiyans to their base sprites afterwards).
+- **After that, from the pad (verified):** Cell announces the tournament ("a tournament will begin in
+  ten days... I'm giving you a second chance"); Trunks: "I should return to Capsule Corporation and
+  tell the others"; 16 asks for repairs; Vegeta's "Foolish boy" and Cell's "I have fought you
+  before... in the future" close the scene; warp to the world map. Then Capsule Corporation: the
+  receptionist sends you to Master Roshi in the atrium; Bulma and Dr. Briefs over 16's memory
+  ("loaded with Goku's data... designed for the sole purpose of destroying Goku"); Cell's TV
+  announcement at the Briefs' residence ("The Cell Games will be held nine days from today near the
+  Northern Wastelands"); the Scouter Note; the Dragon Ball hunt for Dende; "Enter the Cell Games".
+
+Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its
+defeat action at that threshold instead of at zero HP and becomes untargetable).
+
 ## 5. What the plan is missing (engine limits found while checking)
 
 1. **Six party slots.** `PartyState` holds exactly 6 characters (Gohan, Vegeta, Goku, Piccolo,
