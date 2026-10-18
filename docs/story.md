@@ -62,7 +62,14 @@ boss that dies first only falls until its twin is down ("both-down"); some bosse
 and are reused; a map actor whose sprite is player 2's current sprite is not spawned; duel losers
 swap pads with the winner's role as above, no level handicap; Hercule and Krillin stay weaker.
 
-**Mechanics the story needs (none written yet):** player-vs-player duel mode + pad swap; both-down
+**Built so far (2026-10-18, on main):** script assembler and map patcher (`docs/scripts.md`,
+`data/story/*.json`), chapter 1 (old Hercule prologue, Krillin's visit, forest spirits, landing
+sites), chapter 2 (mansion deal, Hercule joins in West City, Triceratops Jungle lock), the Android 16
+island fight; engine pieces: duel mode, both-down / half-health boss rules, duplicate-NPC removal,
+Krillin and old Hercule playable, zone-15 maps (arctic, Time Chamber, Broly arena). Still to write:
+chapters 3-8 below (the duels need the script-to-C bridge in `docs/scripts.md`).
+
+**Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
 and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
 bytecode assembler for new scenes (the dumper exists, `tools/script_dump.py`); new enemy-stat rows
 (Android 13, Multi-Form Cell, Cooler's Namekian = recoloured Piccolo, 2v2 gym duos, animal wave);
