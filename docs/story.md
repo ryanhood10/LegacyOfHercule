@@ -231,8 +231,17 @@ Ryan's decisions for this stretch:
   larval form ("This has to be Cell in his larval form... I better destroy it before we have
   another Cell on our hands"), Dr. Gero's master computer, blasting it, the self-destruct escape
   ("WARNING! SECURITY BREACH! DESTRUCT SEQUENCE ACTIVATED!"). Story-wise player 2 here is
-  **Krillin** (he is the one with Trunks; his NPC copy is removed by the duplicate-actor rule),
-  while Hercule flies on with Piccolo. Then the world map to **Kame House** (zone 11): Piccolo asks
+  **Krillin** (Ryan: the locked pair for this chapter is Trunks + Krillin; his NPC copy is removed
+  by the duplicate-actor rule), while Hercule flies on with Piccolo.
+- **After the lab, in quest order** (the ROM's quest table, each quest opened by the previous one's
+  completion flag): "Check on Goku's progress at Master Roshi's island" (Trunks and Krillin fly
+  there: Goku wakes, "Kamiccolo", Goku leaves to train; Piccolo is a scene actor here) -> "Meet
+  Goku at Kami's Lookout" (the Time Chamber intro: "only two of us can train", Vegeta and Trunks go
+  in first; the script makes **Piccolo** player 1) -> "Intercept the Androids on Master Roshi's
+  Island" (Piccolo's fight below) -> "Meet Trunks and Vegeta outside the Hyperbolic Time Chamber"
+  (Vegeta becomes player 1) -> "Prevent Cell from absorbing Android 18" (Vegeta vs Cell, then
+  Trunks vs Perfect Cell) -> "Meet Master Roshi at Capsule Corporation" -> Cell's announcement at
+  the Briefs' -> the Dragon Balls for Dende -> "Enter the Cell Games". Then **Kame House** (zone 11): Piccolo asks
   after Goku, Goku wakes ("Kamiccolo!") and leaves to train; 17, 18 and 16 land ("Can Goku come out
   and play?"), Piccolo takes 17 to the next island, "you and me": **Piccolo vs Android 17** as a
   multi-map boss (enemy stat 3, sprite 9, the island breaking apart, 18 sitting it out), then 16
