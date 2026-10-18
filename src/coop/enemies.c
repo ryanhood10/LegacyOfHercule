@@ -7,6 +7,7 @@
 // calculation 0x0800F910, the two chase-module constructors (0x0801B332, 0x0801B15E) that carry the
 // walk speed, and BossHealthBar_Create 0x080104C0.
 #include "coop.h"
+#include "android16.h"
 
 CoopExtra coop2 __attribute__((section(".coop2"), used));
 
@@ -20,7 +21,7 @@ int is_coop_enemy(const Entity *e) { return e && e->vtable == coop2.enemy_vtable
 // A co-op enemy's record copy lives behind its stat copy in the entity block (create_coop_enemy).
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
-static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable); }
+static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e)); }
 
 // Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
@@ -158,6 +159,8 @@ void enemies_init(void) {
         coop2.off = 0;
         coop2.actor_count = 0;
         coop2.partner_override = 0;
+        coop2.a16 = 0;
+        coop2.a16_force = 0;
     }
 }
 
@@ -193,6 +196,7 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
 
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
+    if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
     const EnemyStat *st = &ENEMY_STATS[rec->stat_index];
     if (!p2_present() || !twinnable(rec, st)) return Enemy_Create(0, rec, st);
 
@@ -240,6 +244,8 @@ void coop_debug_tick(void) {
         r->behaviours[0] = face_wait;
         Entity *a = MapScript_CreateCharacter(r);
         if (a) EntityList_Add(g_SceneTable[1], a);
+    } else if (cmd == COOP_CMD_A16) {
+        a16_test_spawn();
     } else if (cmd == COOP_CMD_BOSS_BAR) {
         Entity *e = (Entity *)coop2.cmd_arg;
         if (!e) e = coop2.twins[0].orig ? coop2.twins[0].orig : coop2.twins[0].twin;

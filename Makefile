@@ -21,8 +21,11 @@ PARTY_SLOTS ?= 8
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
 PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,) $(if $(filter 1,$(WIDE)),--wide,) $(if $(DATA_PATCH),--data-patch $(DATA_PATCH),)
+# A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM);
+# A16_TEST=1: player 1's L + R + Down spawns the Android 16 boss beside player 1 (src/coop/android16.c)
+A16_SPRITE ?= 160
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
@@ -40,8 +43,6 @@ BUU_ROM ?= roms/buu.gba
 BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
-# A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM)
-A16_SPRITE ?= 160
 EXTRA_SPRITES := $(A16_SPRITE)=a16_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
@@ -52,7 +53,7 @@ CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
 
 all: $(OUT)
 
-$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h
+$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -c $< -o $@
 
