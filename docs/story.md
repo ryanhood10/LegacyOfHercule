@@ -69,7 +69,51 @@ actor record; **byte** = one script opcode/flag; **code** = new C; **art** = new
 | Landing site | Krillin must not stand there as an NPC because player 2 is Krillin | delete the Krillin actor record in map 52 and give his line ("Who is this guy?") to Tien or to a player-2 bubble; same in map 54 ("two energies"). actor, text |
 | Goku's arrival, Trunks leaves | as stock, plus old Hercule leaves with Trunks | one actor beside Trunks in map 54 and two lines. actor, text |
 | West City | Gohan and Krillin fly there (world-map sign; both players fly, verified); Piccolo playable; **Hercule joins here** after the mansion deal (he wants the flying "magic trick", Piccolo needs a roof) | the stock scene already has Hercule Day, the Mayor and the key theft, so Hercule is on site; add the Piccolo/Hercule dialogue and a `SetCharacterInParty(Hercule)` next to the Piccolo unlock. text, byte. Goku is in West City too in the stock script (he waits outside City Hall); keep or trim his lines. |
+| Triceratops Jungle | Piccolo's solo stretch (King Triceratops); player 2 = Hercule only, level 1 beside Piccolo (clear Krillin's selectable bit at the jungle entrance, restore it at home); Hercule claims credit for the dinosaur peace treaty | byte, text |
 | Then | normal game with Gohan + Krillin/Hercule as player 2 | every later map where Krillin stands as an NPC (18 maps: Kame House, Amenbo Island, the Cell chapters) needs the NPC removed or his line reassigned when player 2 is Krillin. text/actor, mechanical |
+
+## 4b. Vegeta's chapter: the clone duel (Ryan, 2026-10-17)
+
+Stock flow (verified in the scripts): Amenbo Island, Yamcha found hurt, "Meanwhile..." the script
+adds Vegeta and Piccolo to the party, makes Vegeta the only selectable character and loads the space
+map (zone 6 area 50): the "I'm finally a Super Saiyan" scene plus the Super Saiyan tutorial, no
+enemies. Warp to zone 6 area 22 (landing, one line, no enemies), then the world map into zone 7:
+areas 1-15 of Gero's robot grunts, opening with the Goku / Android 20 scene (Goku coughing, 19
+volunteering). Area 15: Vegeta vs Android 19 is a real boss fight (enemy stat 5, sprite 12), then
+Android 20 flees, Vegeta leaves ("You're not needed anymore") and control passes to Piccolo
+(`SetActiveCharacterNoReset 1`). Only-Vegeta barriers elsewhere are bonus areas.
+
+Ryan's version:
+
+1. **Space cutscene, rewritten.** Vegeta trains against his "shadow", a clone of himself. The clone
+   lands a couple of punches; Vegeta's blast sends it into the rocks (explosion). Vegeta taunts it as
+   an inferior copy. The clone goes Super Saiyan first: only one of them leaves alive, it is done
+   living in his shadow; it knocks Vegeta into an explosion. Vegeta's monologue (his race enslaved,
+   the true prince surpassed by a low-class Saiyan from Earth, and now a clone meant for poultry
+   training reaches the legend; it is in his DNA, it is his legend, he takes what is his) and he
+   transforms.
+2. **The duel.** Player 1 controls Vegeta, player 2 the clone, both Super Saiyan, to the death.
+3. **Result.** The winner plays Vegeta. One line, "VEGETA: I've won. I'm a Super Saiyan", fade to the
+   landing map. Whoever won is the only player in control through the landing and into zone 7.
+4. **Hercule arrives.** In zone 7 area 1, after the stock Goku / Android 20 / 19 scene, Hercule walks
+   up: "Thank God he's arrived, we need you in the fight." Vegeta: who the hell are you? He is
+   Hercule, Piccolo told him to wait here and watch for Vegeta. From here the loser of the duel is
+   Hercule (the only selectable player-2 character), useless beside Vegeta through the robot zone
+   and the Android 19 fight. The punishment for losing is about five minutes without a pad.
+
+What it costs (no code yet):
+
+| piece | mechanism | cost |
+|---|---|---|
+| the two cutscenes | dialogue records plus a scripted actor (Vegeta's sprite with a palette tint through the entity colour remap at +0x24, so the clone reads as a shadow), the opcodes already in the ROM for positions, flight, facing, fades, music and waits | text, actor, a small script assembler we do not have yet (the dumper exists; the encoder is the same format) |
+| the clone as a character | one party slot "Vegeta's shadow" with Vegeta's row and abilities (needs the N-slot party, in progress), removed from the party after the duel | data, byte |
+| player-versus-player hits | new in `src/coop`: player attacks and blasts test against the other player's entity, damage through the existing player-2 damage routing, hurt/knockback states, death ends the duel and fires the "I've won" script (`Map_SpawnScript`) | code, one to two days |
+| the winner keeps Vegeta | swap the two pad sources in `input.c` when player 2 wins (one flag) | code, small |
+| loser sits out | no selectable slot for player 2 means no player-2 entity (already how `pick_p2_slot` works) until the Hercule script sets his selectable bit | byte |
+| Hercule meets Vegeta | actor + dialogue appended to zone 7 area 1's on-load scene, `SetCharacterFlag_Bit1(5)` | text, actor, byte |
+
+Open: whether both players keep the Super Saiyan drain rules during the duel (the stock form is a
+timed boost), and a draw rule if both die on the same frame (give it to player 1).
 
 ## 5. What the plan is missing (engine limits found while checking)
 
@@ -103,6 +147,9 @@ actor record; **byte** = one script opcode/flag; **code** = new C; **art** = new
   LoG2, the fusion scene as a script edit, two new sprites.
 
 ## 7. Still open
+
+- Save-pad switching with only two characters already works as a trade (player 1 taking
+  player 2's character hands player 2 the old one), noted for the UI.
 
 - Party slots: decided, grow to 8 (Ryan, 2026-10-17); plan and site inventory in `docs/party-8-slots.md`.
 - Super Saiyan look: gold afro (what we have) or a different "Super Human" look?
