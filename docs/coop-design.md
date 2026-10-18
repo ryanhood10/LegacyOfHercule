@@ -535,3 +535,10 @@ Known hook points: `EntityList_Add(list, entity)` `0x080068B8`; `PlayerEntity_Cr
 
 Open items: which player-vtable slot calls `state->update` each frame (find dynamically with
 `tools/gdb/watch_input.gdb` once a savestate exists) and the camera object.
+
+## World map rule (Ryan, 2026-10-17)
+
+Only the player who stepped on the flight sign controls the world map (zone 6 area 99); the other
+player is a passenger and has no entity there. Both players land together at the destination. To
+implement when the story scripts land: suppress player 2's spawn while the world map is loaded and
+give the pad that initiated the flight player 1's input for its duration.
