@@ -55,6 +55,20 @@ ENTRY_JUMPS = [
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
 # from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 1.25 KiB
 # (0x0203FB00 co-op difficulty state, 0x0203FE00 player-2 vtable, 0x0203FF00 pad words + CoopState).
+# (old literal value, symbol, add, [file offsets]): every listed pool word must hold the old value and
+# becomes symbol+add. Used to move ROM tables that have no spare room into the co-op code area:
+# Character_DisplayData (22 rows -> 23, the 18 literals from the reference notes) and
+# g_CharacterSpriteIndex (the one literal loads table+7 words).
+LITERAL_RELOCATIONS = [
+    (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,
+                                     0xB050, 0xC804, 0x10F18, 0x112BC, 0x13574, 0x14FF4, 0x26458, 0x26474]),
+    (0x083B4E90, "sprite_index", 0x1C, [0x959C]),
+]
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 23
+BYTE_PATCHES = [
+    (0x42D6, 0x16, 0x17),
+]
+
 WORD_PATCHES = [
     (0x01F20C, 0x0000FDFE, 0x0000FCC0),
 ]
@@ -124,6 +138,20 @@ def main():
             sys.exit(f"word patch at {off:#x}: expected {old:08x}, found {cur:08x}")
         struct.pack_into("<I", rom, off, new)
         print(f"word   {ROM_BASE + off:08x} {old:08x} -> {new:08x}")
+
+    for old, name, add, offs in LITERAL_RELOCATIONS:
+        new = (syms[name] + add) & 0xFFFFFFFF
+        for off in offs:
+            cur = struct.unpack_from("<I", rom, off)[0]
+            if cur != old:
+                sys.exit(f"relocation at {off:#x}: expected {old:08x}, found {cur:08x}")
+            struct.pack_into("<I", rom, off, new)
+        print(f"reloc  {old:08x} -> {new:08x} ({name}+{add:#x}) at {len(offs)} literals")
+    for off, old, new in BYTE_PATCHES:
+        if rom[off] != old:
+            sys.exit(f"byte patch at {off:#x}: expected {old:02x}, found {rom[off]:02x}")
+        rom[off] = new
+        print(f"byte   {ROM_BASE + off:08x} {old:02x} -> {new:02x}")
 
     hooks = list(VTABLE_HOOKS)
     if wide:

@@ -284,6 +284,11 @@ static void p2_bind(Entity *p2, int slot) {
     coop.rebinds++;
 }
 
+// Player 2's slot changed display row (a transformation): re-read sprite and behaviour, stay idle.
+void p2_refresh_sprite(void) {
+    if (coop.p2) p2_bind(coop.p2, coop.p2_slot);
+}
+
 // Called every input poll. When player 1 switches onto player 2's character, player 2 takes
 // player 1's previous one (a trade), or failing that the first other party member.
 void coop_active_check(void) {

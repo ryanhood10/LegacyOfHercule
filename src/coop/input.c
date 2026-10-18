@@ -96,6 +96,13 @@ void input_poll_hook(InputSystem *in) {
 
     coop_active_check();
     wide_update();
+#ifdef SSJ_TEST
+    if (coop.p2 && (coop.input2.pressed & KEY_START)) {   // test builds: player 2's Start transforms
+        extern int ssj_ready(CharacterEntry *); extern void ssj_use(CharacterEntry *, Entity *);
+        CharacterEntry *c = &g_Party->chars[coop.p2_slot];
+        if (ssj_ready(c)) ssj_use(c, coop.p2);
+    }
+#endif
 #if P2_MODE != P2_MODE_SWAP
     if (coop.p2 && (coop.input2.pressed & KEY_SELECT) && p1_controllable()) p2_cycle();
 #endif

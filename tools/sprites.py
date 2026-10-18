@@ -84,34 +84,34 @@ class Sprites:
         return r if self.is_ptr(r) else 0
 
     def groups(self, rec):
+        """All pose groups of a record: header byte 2 is the group count (up to 23 in the stock
+        game); a group may be empty ({0,0,0,0}) and the game addresses groups by fixed index (idle
+        fidget lives at group 14, for example), so empty ones must be kept in place."""
+        n = self.rom[rec - ROM_BASE + 2]
         out = []
         a = rec + 0x4C
-        for _ in range(MAX_GROUPS):
+        for _ in range(n):
             ptrs = [self.u32(a + 4 * d) for d in range(4)]
-            # a direction slot may be empty (0); the record ends at the first word that is neither
-            if not any(self.is_ptr(p) for p in ptrs) or not all(p == 0 or self.is_ptr(p) for p in ptrs):
+            if not all(p == 0 or self.is_ptr(p) for p in ptrs):
                 break
             out.append(ptrs)
             a += 16
         return out
 
     def frame_counts(self, groups):
-        """Descriptor arrays are back to back; an array's length is the gap to the next one (max 16)."""
+        """Each group's four descriptor arrays sit back to back and its frame blobs follow them, so
+        an array's length is the gap to the next array OR the next blob (whichever comes first)."""
         arrs = sorted({p for g in groups for p in g if p})
-        blobs = []
-        for g in groups:
-            for p in g:
-                if not p:
-                    continue
-                b = self.u32(p + 8)
-                if self.is_ptr(b):
-                    blobs.append(b)
-        end = min(blobs) if blobs else arrs[-1] + 12
+        bounds = set(arrs)
+        for a in arrs:
+            b = self.u32(a + 8)
+            if self.is_ptr(b):
+                bounds.add(b)
+        bounds = sorted(bounds)
         counts = {}
-        for i, a in enumerate(arrs):
-            nxt = arrs[i + 1] if i + 1 < len(arrs) else end
-            n = max(1, min(16, (nxt - a) // 12))
-            counts[a] = n
+        for a in arrs:
+            nxt = next((b for b in bounds if b > a), a + 12)
+            counts[a] = max(1, min(16, (nxt - a) // 12))
         return counts
 
     def descriptor(self, arr, fi):
