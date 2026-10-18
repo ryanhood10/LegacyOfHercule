@@ -1,0 +1,216 @@
+; The two duels (docs/story.md section 0 items 3 and 6, sections 4b and 4e), applied by ch3_duels.json.
+; Both run through the script -> C bridge: CoopCall 1 (DuelStart: slot, flags, end sequence), CoopCall 2
+; (DuelClear), CoopCall 3 (DuelWinner, pushes 1 / 2). Flags: 1 clone, 2 shadow, 4 swap pads when player 2
+; wins, 8 full energy (Super Saiyan without drain). Without a player 2 a duel is skipped (player 1 wins).
+; Sprites: 137 / 140 Vegeta base / Super Saiyan, 128 / 134 Trunks base / Super Saiyan, 72 Hercule.
+; Speakers: 0 narration, 1 the active character's box, 67 Hercule, 99 Trunks, 106 Vegeta.
+
+; ---- space (zone 6 area 50): Vegeta and his clone ----------------------------------------------------
+
+sequence ch3_space
+  script
+        SetPlayerVisible 0
+        SetEntityPositionInstant 0, 248, 560
+        SetEntityFacing 0, 3
+        SpawnCharacterEntity 137, 304, 560
+        SetEntityFacing 137, 2
+        SetCharacterLevel 2, 18
+        PlayMusic 39
+        SetPlayerVisible 1
+        WaitFrames 60
+        PlayAudio 50
+  text 0 "@^In the deep reaches of space, Vegeta trains against a clone of himself..."
+  script
+        WalkToPosition 137, 268, 560
+        SetEntityAnimation 137, 5
+        PlayDamageEffect 0
+        PlaySFX 0, 31
+        SetEntityAnimation 0, 2
+        WaitFrames 20
+        SetEntityAnimation 137, 5
+        PlayDamageEffect 0
+        PlaySFX 0, 31
+        SetEntityAnimation 0, 2
+        WaitFrames 30
+  text 1 "#VEGETA: Tch...  A lucky shot."
+  script
+        SetEntityAnimation 0, 34
+        NPCFireKiBlastAtEntity 0, 137, 100
+        WaitFrames 20
+        PlayDamageEffect 137
+        SetEntityAnimation 137, 2
+        PlaySFX 137, 20
+        FlyToPosition 137, 352, 536
+        ScreenShake 0, 20, 40
+        WhiteFlash 10
+        WaitFrames 40
+  text 1 "#Pathetic.  You're nothing but a cheap copy, made to keep the real prince sharp.\x0bKnow your place, shadow!"
+  script
+        WalkToPosition 137, 312, 560
+        SetEntityFacing 137, 2
+        WaitFrames 40
+        WhiteFlash 20
+        DespawnEntity 137
+        SpawnCharacterEntity 140, 312, 560
+        SetEntityFacing 140, 2
+        WaitFrames 40
+  text 106 "CLONE: A copy?  Look again, prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
+  script
+        FlyToPosition 140, 272, 560
+        SetEntityAnimation 140, 5
+        PlayDamageEffect 0
+        SetEntityAnimation 0, 2
+        FlyToPosition 0, 208, 576
+        WhiteFlash 30
+        ScreenShake 0, 30, 60
+        PlaySFX 0, 20
+        WaitFrames 60
+        SetEntityFacing 0, 3
+        SetEntityAnimation 0, 6
+        WaitFrames 60
+  text 1 "#VEGETA: Frieza enslaved my race...\x0bThe true prince of all Saiyans was surpassed by a low-class warrior raised on Earth...\x0b...and now a clone, made for paltry training, reaches the legend before me?!"
+  text 1 "#No!  It is in my blood.  This is MY legend...\x0b...and I will take what is mine!"
+  script
+        SetCharacterFlag_Bit5 2
+        SetCharacterFlag_Dynamic 2, 1
+        SetEntityAnimation 0, 35
+        SetCharacterTransformation 2, 140
+        WhiteFlash 20
+  stock @083d1fe8                        ; Vegeta: I'm finally a Super Saiyan!
+  stock @083d1fac                        ; You are now playing as Vegeta.
+  text 1 "#Only one of us leaves alive, shadow?  So be it!"
+  script
+        DespawnEntity 140
+        PlayMusic 35
+        CoopCall 1, -1, 15, seq:ch3_space_end
+        SetPlayerVisible 1
+end
+
+; the duel is over: the winner is Vegeta (player 1's entity; the pads swapped if player 2 won)
+sequence ch3_space_end
+  script
+        WaitFrames 40
+        PlayMusic 39
+        PlayAudio 50
+  text 1 "#VEGETA: I've won.  I'm a Super Saiyan."
+  stock @083d20a8                        ; the Super Saiyan form tutorial
+  stock @083d21bc                        ; "I have to get back to Earth..."
+  script
+        CoopCall 2, 0, 0, 0
+        SetCharacterTransformation 2, 137
+        SetStoryFlag 77
+        FadeOut 60
+        WaitFrames 60
+        WarpToMapWithEntities 6, 22, 1, 240, 288
+        WalkToPosition 0, 240, 312
+end
+
+; zone 6 area 22: Vegeta lands; Hercule was told by Piccolo to wait for him (the duel's loser plays him)
+sequence ch3_landing
+  stock @083d196c                        ; sound
+  stock @083d1974                        ; Vegeta: those Androids must be here by now
+  script
+        SpawnCharacterEntity 72, 344, 352
+        WalkToPosition 72, 272, 320
+        SetEntityFacing 72, 2
+        SetEntityFacing 0, 3
+        PlayAudio 50
+  text 67 "HERCULE: Thank God you've arrived!  We need you in the fight!"
+  text 1 "#VEGETA: And who the hell are you?"
+  text 67 "HERCULE: The name's Hercule!  World Martial Arts Champion!\x0bPiccolo told me to wait here and keep an eye out for you."
+  text 1 "#VEGETA: Hmph.  Stay out of my way."
+  script
+        DespawnEntity 72
+        SetCharacterFlag_Bit1 5
+        CoopCall 6, 5, 0, 0                ; player 2's entity (kept across the warp) plays Hercule now
+        SetStoryFlag 75
+        PlayAudio 62
+        ReloadMap
+  stock @083d19f2                        ; Journal Updated!
+end
+
+; ---- the Lookout (zone 9 area 3) and the Hyperbolic Time Chamber (zone 15 area 2): Vegeta vs Trunks ----
+
+sequence ch6_lookout
+  stockseq @083dde0c 0 17                ; Goku: only two can train; Vegeta first; Mr. Popo's rules
+  script                                 ; Vegeta and Trunks walk into the chamber (stock 083ddd22's walk)
+        BeginCommandBatch
+        WalkToPosition 137, 96, 144
+        SetEntityFacing 60, 1
+        WalkToPosition 137, 96, 56
+        CommitCommandBatch
+        PushActiveCharIndex
+        PushByte 3
+        CmpEq
+        JumpIfFalse L1
+        WalkToPosition 0, 96, 120
+        WalkToPosition 0, 96, 56
+        Jump L2
+      L1:
+        WalkToPosition 128, 112, 160
+        WalkToPosition 128, 96, 120
+        WalkToPosition 128, 96, 56
+      L2:
+        FadeOut 120
+        WaitFrames 30
+        SetStoryFlag 144
+        SetCharacterFlag_Bit1 2
+        SetCharacterFlag_Bit1 3
+        SetActiveCharacter 2
+        SetCharacterTransformation 2, 140
+        SetCharacterTransformation 3, 134
+        WarpToMapWithEntities 15, 2, 1, 280, 320
+        SpawnCharacterEntity 134, 344, 320
+        SetEntityFacing 0, 3
+        SetEntityFacing 134, 2
+        FadeFromWhite 60
+        PlayAudio 50
+  text 99 "TRUNKS: Well, father, let's get settled in.  We have a whole year in here."
+  text 106 "VEGETA: Settled in?  Don't be ridiculous.\x0bWe spar.  Right now, boy!"
+  text 99 "TRUNKS: Right now?  ...Fine.  Don't expect me to go easy on you."
+  script
+        DespawnEntity 134
+        PlayMusic 35
+        CoopCall 1, 3, 12, seq:ch6_chamber_end
+        SetPlayerVisible 1
+end
+
+; the winner's pad plays Piccolo next, the loser's Hercule (the pads swapped if Trunks won)
+sequence ch6_chamber_end
+  script                                 ; next entry: 1 if Vegeta won, 2 if Trunks did
+        WaitFrames 40
+        PlayAudio 50
+        CoopCall 3, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PushByte 1
+        END
+      L1:
+        PushByte 2
+        END
+  text 106 "VEGETA: Hmph.  That is how a prince fights.\x0bNow get up.  We have a year of training ahead of us." -> 3
+  text 99 "TRUNKS: I won, father...\x0bNow let's train.  Cell won't wait for us." -> 3
+  script
+        CoopCall 2, 0, 0, 0
+        SetCharacterTransformation 2, 137
+        SetCharacterTransformation 3, 128
+        FadeOut 120
+        WaitFrames 60
+        ClearCharacterFlag_Bit1 0
+        ClearCharacterFlag_Bit1 2
+        ClearCharacterFlag_Bit1 3
+        ClearCharacterFlag_Bit1 6
+        SetCharacterFlag_Bit1 5
+        SetActiveCharacter 1
+        WarpToMapWithEntities 9, 3, 1, 128, 168
+        CoopCall 6, 5, 0, 0                ; player 2 (kept across the warp) plays Hercule
+        FadeFromWhite 60
+        PlayAudio 50
+  stock @083ddc64                        ; Goku: Piccolo, get back to Roshi's Island
+  text 3 "!PICCOLO: Right.  I'm on my way."
+  script
+        SetPlayerVisible 1
+        PlayAudio 62
+  stock @083dddf4                        ; Journal Updated!
+end

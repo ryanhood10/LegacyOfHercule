@@ -95,6 +95,13 @@ typedef struct CoopExtra {
     u8 pad_swap;            // 1 = player 1's pad drives player 2's entity and the other way round
     u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
     u8 _pad5[2];
+    // script -> C bridge (vmcall.c, game action 130 "CoopCall")
+    const void *call_end_seq;   // dialogue sequence run when the bridged duel ends (0 none)
+    u32 call_action[2];         // {EnemyAction_RunDialog, sequence}: what the end event fires
+    s8 call_slot;               // pending duel: player 2's slot (-1 = clone of player 1)
+    u8 call_flags;              // pending duel: DUEL_* flags
+    u8 call_state;              // 0 idle, 1 waiting for player 2, 2 duel running
+    u8 _pad6;
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x2C0, "CoopExtra must fit 0x0203FB00..0x0203FDC0 (StoryTest above it)");
 
@@ -127,6 +134,7 @@ void p2_sync_combat(void);                          // player.c: player 2 entity
 void duel_start(int p2_slot, int flags, int end_script);   // duel.c
 void duel_clear(void);
 void duel_tick(void);
+void coop_call_tick(void);                           // vmcall.c, every input poll
 int duel_p2_final_blow(Entity *e, int dmg);
 void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook

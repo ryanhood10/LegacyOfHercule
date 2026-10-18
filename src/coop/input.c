@@ -157,6 +157,7 @@ void input_poll_hook(InputSystem *in) {
     coop_active_check();
     p2_sync_combat();
     duel_tick();
+    coop_call_tick();
     wide_update();
     krillin_frame(in);   // krillin.c: old Hercule's weak combat bytes, KR_TEST triggers
 #ifdef SSJ_TEST

@@ -123,6 +123,12 @@
       "expect": "5b",
       "bytes": "4f",
       "note": "Keep Goku after the Cell Games: ClearCharacterInParty(4) -> SetCharacterInParty(4)"
+    },
+    {
+      "offset": "0x3B5F30",
+      "expect": "d5af0008",
+      "word": "fn:vm_coop_call",
+      "note": "game action 130 (unused sub_0800AFD4) -> CoopCall, the script-to-C bridge (src/coop/vmcall.c, docs/scripts.md)"
     }
   ],
   "story_free": "0xB00000",
@@ -130,6 +136,7 @@
     "data/hercule-text.json",
     "data/story/a16_island.json",
     "data/story/ch1_opening.json",
-    "data/story/ch2_west_city.json"
+    "data/story/ch2_west_city.json",
+    "data/story/ch3_duels.json"
   ]
 }
