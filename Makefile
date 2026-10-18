@@ -16,7 +16,7 @@ P2_MODE ?= 0
 DEBUG_MENU ?= 0
 # PARTY_SLOTS: party entries (stock 6). The block is relocated to EWRAM whatever the value; > 6 also
 # grows the save layout and patches every ROM site that assumed six (tools/patch_rom.py --party-slots)
-PARTY_SLOTS ?= 6
+PARTY_SLOTS ?= 8
 # HERCULE=1 (default) applies the Legacy of Hercule data edits (data/hercule.json via tools/romdata.py)
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
@@ -53,7 +53,7 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 	$(NM) $< > $@
 
 $(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json) tools/romdata.py
-	$(PYTHON) tools/romdata.py build $< $@ $(ROM)
+	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
 $(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH)
 	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)

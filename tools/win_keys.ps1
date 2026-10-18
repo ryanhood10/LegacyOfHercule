@@ -11,6 +11,8 @@ public static class WK {
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
   [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr h, StringBuilder s, int n);
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+  [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
+  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
   [DllImport("user32.dll")] public static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr extra);
   [DllImport("user32.dll")] public static extern uint MapVirtualKey(uint code, uint mapType);
   public static IntPtr Find(string needle) {
@@ -25,6 +27,7 @@ $vk = @{ UP = 0x26; DOWN = 0x28; LEFT = 0x25; RIGHT = 0x27; X = 0x58; Z = 0x5A; 
          I = 0x49; J = 0x4A; K = 0x4B; L = 0x4C; U = 0x55; M = 0x4D; ENTER = 0x0D; BACKSPACE = 0x08; ESC = 0x1B; F1 = 0x70; F2 = 0x71 }
 $h = [WK]::Find($Title)
 if ($h -eq [IntPtr]::Zero) { throw "no window with title containing '$Title'" }
+if ([WK]::IsIconic($h)) { [WK]::ShowWindow($h, 9) | Out-Null; Start-Sleep -Milliseconds 400 }   # restore a minimised window
 [WK]::SetForegroundWindow($h) | Out-Null
 Start-Sleep -Milliseconds 300
 function Press([int]$code, [bool]$down) {

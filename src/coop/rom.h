@@ -130,8 +130,9 @@ _Static_assert(sizeof(CharacterEntry) == 0x1C, "CharacterEntry size");
 // address, and sizes it for PARTY_SLOTS entries; everything after the entries keeps its stock layout,
 // shifted by (PARTY_SLOTS - 6) * 0x1C (tools/patch_rom.py --party-slots patches the ROM's offsets).
 #ifndef PARTY_SLOTS
-#define PARTY_SLOTS 6
+#define PARTY_SLOTS 8
 #endif
+_Static_assert(PARTY_SLOTS >= 6 && PARTY_SLOTS <= 16, "PARTY_SLOTS range");
 #define PARTY_SLOTS_STOCK 6
 #define PARTY_TAIL_SHIFT ((PARTY_SLOTS - PARTY_SLOTS_STOCK) * 0x1C)
 typedef struct PartyState {
@@ -259,6 +260,9 @@ _Static_assert(sizeof(Hud) == 0x28, "Hud size");
 #define REG_DMA3CNT_H     (*(volatile u16 *)0x040000DE)
 #define KEY_L 0x200
 #define KEY_R 0x100
+
+void *memcpy(void *dst, const void *src, unsigned n);   // util.c (freestanding)
+void *memset(void *dst, int c, unsigned n);
 
 #define ROM_FN(ret, name, args, addr) static ret (*const name) args = (ret (*) args)(addr)
 
