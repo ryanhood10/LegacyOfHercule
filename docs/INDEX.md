@@ -17,7 +17,8 @@ file and tool, and says where to look for a given question. Keep it current.
 | `docs/sprites.md` | sprite record format, atlas, playable candidates, SSJ Hercule clone | sprites, new characters |
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
-| `docs/story.md` | the ROM's story chapters and the rewrite options under discussion | story work |
+| `docs/story.md` | the ROM's story as scripted, Ryan's opening, beat costs, what is still open | story work |
+| `docs/party-8-slots.md` | plan and site inventory for growing the party from 6 to 8 slots | before touching the party |
 | `docs/roms.md` | reference ROM hashes | checking a dump |
 | `README.md` | user-facing: setup, playing two-player, netplay, wide view | onboarding a player |
 
@@ -65,7 +66,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `widerender.py` | offline reference render of the wide view from a savestate |
 | `savestate.py` | dump memory regions/words from an mGBA savestate |
 | `romcheck.py` | ROM header/hash check |
-| `seed_functions.py`, `ghidra_import.ps1`, `ghidra/*.java` | headless Ghidra project, function seeding, `DecompileFunctions.java <outdir> <addr...>`, `FindRefs.java` |
+| `seed_functions.py`, `ghidra_import.ps1`, `ghidra/*.java` | headless Ghidra project, function seeding, `DecompileFunctions.java <outdir> <addr...|all>` (whole-ROM corpus in `build/decomp_all/` for grepping), `FindRefs.java <addr...>` |
 | `mgba_run.ps1`, `mgba_input.ps1`, `mgba_shot.ps1`, `mgba_script.ps1`, `mgba_window.ps1` | drive the Windows mGBA (Qt) by window: restart on a ROM copy, keys, screenshots, Scripting console |
 | `mgba_cmd.py` + `mgba/cmd_server.lua` | focus-free TCP command server inside Windows mGBA (`seq`, `state`, `shot`) |
 | `mgba/coop.lua`, `peek.lua`, `ents.lua`, `force.lua`, `enemies.lua`, `p2_input.lua`, `wide_test.lua` | Lua helpers for Windows mGBA (console inspectors, player-2 pad bridge) |

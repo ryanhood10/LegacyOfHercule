@@ -12,6 +12,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Frieza + Cooler "spirit of the forest" fight replaces the dream, Hercule joins in West City via a
   mansion deal with Piccolo. Checked against the dumped scripts (`build/scripts/`); the one engine
   blocker is the six-slot party (`docs/story.md` section 5). No code yet, by Ryan's request.
+- **Eight party slots decided** (Ryan): `docs/party-8-slots.md` inventories every six-slot
+  assumption in the ROM (27 pointer words, ~15 tail offsets, 8 count constants, the default table,
+  the save path, two screens) from a whole-ROM decompile (`build/decomp_all/`) and plans the work
+  in five testable steps, about three days. Not started.
 - **Super Saiyan Hercule works in game** (d7093cd): sprite 157 / display row 22 generated from
   Hercule's record by `tools/spriteclone.py`, display rows and sprite index relocated into the blob
   (`patch_rom.py` LITERAL_RELOCATIONS, row-limit byte), `src/coop/ssj.c` ability pair wired into

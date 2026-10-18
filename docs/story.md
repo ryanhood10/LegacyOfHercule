@@ -104,6 +104,6 @@ actor record; **byte** = one script opcode/flag; **code** = new C; **art** = new
 
 ## 7. Still open
 
-- Party slots: grow to 8 (clean) or let Krillin borrow Trunks' slot (hack)?
+- Party slots: decided, grow to 8 (Ryan, 2026-10-17); plan and site inventory in `docs/party-8-slots.md`.
 - Super Saiyan look: gold afro (what we have) or a different "Super Human" look?
 - Name of the Goku + Hercule fusion in our text ("Gokule" is the fan name).
