@@ -711,6 +711,11 @@ HP, 74/70/68 (Cooler 10200, 75/85/79); at 68/60/64 he barely scratched Hercule. 
 walks up and punches, so these fights are a lower bound; the real level at the 19 fight is lower than
 30 for Hercule, which is the next thing to check when the story's levels are known.
 
+**Single-player (story-scripts, 2026-10-18):** stat 5 (19) and 7 (Gero) are `BOSS_PAIR` rules now, with
+rules for 13's stats 110 / 112, so 13 fights beside them without a player 2 too: the chapter scripts
+(13's lines, 13 flying off by sprite 165) need him on the map. Tested headless against one player;
+the defeat runs as in co-op.
+
 **Found and fixed on the way:** player 2 froze whenever player 1 was in the hurt state
 (`0x08025B98`): `p1_controllable()` whitelists player 1's control states to tell cutscenes from play,
 and the hurt state was missing, so a boss pair pummelling player 1 also froze player 2. It is in the
