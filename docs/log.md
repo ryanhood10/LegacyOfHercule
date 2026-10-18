@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-17
 
+- **Story decision (Ryan): "Canon plus Hercule"**: the DBZ story stays, Hercule is in every scene as
+  player 2, the twist is saved for the end (surprise Super Saiyan Hercule beats Buu; Goku fuses with
+  Hercule, not Vegeta, against Buu; Vegito stays for Janemba). Beat sheet in `docs/story.md`.
 - **Super Saiyan Hercule works in game** (d7093cd): sprite 157 / display row 22 generated from
   Hercule's record by `tools/spriteclone.py`, display rows and sprite index relocated into the blob
   (`patch_rom.py` LITERAL_RELOCATIONS, row-limit byte), `src/coop/ssj.c` ability pair wired into
@@ -34,4 +37,4 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - Super Saiyan Hercule: icon for the ability, aura/flash on transform, EP drain and revert rules,
   Hercule-specific SSJ moveset; the game's own transformed-state handling only runs for the active
   player (opcode 73 refreshes player 1's entity only; `p2_refresh_sprite` covers player 2).
-- Story decisions (see `docs/story.md` section 4).
+- Story: prologue framing, SSJ look, player 1 per chapter, fusion name (`docs/story.md` section 5).

@@ -23,40 +23,44 @@ quest table. Chapter names are ours.
 
 Buu's Fury (separate ROM) continues seven years later through Majin Buu.
 
-## 2. Three ways to make it Hercule's story
+## 2. Decision (Ryan, 2026-10-17): "Canon plus Hercule"
 
-**Light (text and data only, days):** keep every scene; change *framing*. The intro card and the
-first town make it clear Hercule is our hero; his autograph quest becomes a running gag that pays off;
-his Cell Games "victory" is rewritten so the player (as Hercule, co-op with the Z fighter) actually
-contributes, e.g. he distracts Cell at the key moment or saves Android 16's head; Goku stays alive
-(Keep-Goku byte). Every Gohan chapter stays; Hercule is player 2's character throughout, so the
-brother *is* the hero's shadow the whole game.
+The DBZ story stays beat for beat; Hercule is player 2 and is written into every scene as the man
+who was also there. The twist is kept for the end: a surprise Super Saiyan Hercule beats Majin Buu,
+and against Buu the fusion is Goku + Hercule instead of Goku + Vegeta. Vegito stays for Janemba
+(Ryan's call; the film has Gogeta against Janemba, and whether Buu's Fury has a Janemba fight at all
+is to be checked in that ROM). Hercule gains; nobody else loses their moment.
 
-**Medium (new scenes with existing actors, weeks):** add Hercule-only chapters between the big
-beats: the "Satan Gym" training arc with Krillin/Tien as sparring partners (playable guests), a
-fight-promoter subplot in the city (Mayor and townsfolk already have lines), a comic Scouter episode
-where his power level reads 5. The Super Saiyan form arrives as a story item after a Cell Games
-moment (he's "touched by the Super Saiyan aura"), gated by a flag, not a level.
+## 3. Beat sheet (LoG2 ROM) with the mechanism each beat uses
 
-**Bold (new maps and bosses, months):** an alternate route through the Cell Games where Hercule's
-party faces Cell Jr.s on their own map, a twin-boss Cooler + King Cold finale (co-op difficulty
-already supports twins), and a bridge chapter leading into Buu's Fury.
+Cost tags: **text** = dialogue swap through `tools/script_dump.py` + `data/hercule-text.json`;
+**actor** = place/replace a sprite in a map script; **byte** = one script flag such as Keep Goku;
+**code** = new C in `src/coop`; **art** = new frames.
 
-## 3. Fun little things that are cheap
+| chapter | Hercule's part | cost |
+|---|---|---|
+| Prologue (Trunks vs Frieza, King Cold) | Hercule is in the crowd at the landing site as player 2, "covering the story for the press"; his first line is that he had it handled. Open question: he replaces Trunks for player 1, or the game opens on him watching the news. | actor, text |
+| Gohan at home / West City | The autograph errand becomes the running gag: the autograph is Hercule's, and he signs it himself in person. Krillin's "You let me win" line gets a Hercule reply. | text |
+| Androids (Gero's lab, 19/20, 16/17/18) | Hercule "disarms" the lab door (the access cards are his idea); Android 18 ignores him, setting up Buu's Fury. Twin-boss excuse: Gero's spare unit. | text, actor |
+| Vegeta chapter | Hercule follows Vegeta around as his "manager", Vegeta's lines sharpen. | text |
+| Cell (Ginger Town, absorptions) | Townsfolk cheer Hercule, who claims each win; the Scouter minigame reads him at 5. | text |
+| Cell Games | His public "victory" becomes partly true: he throws Android 16's head to Gohan (the beat the series already gives him), written so the player does it. Cell Jr. twins. | text, actor |
+| After Cell | Goku stays (Keep-Goku byte). Hercule is unlocked as in the stock game and leads the credits scene. The transformation is gated by a story flag, not a level: the aura is a "gift" he does not understand yet. | byte, code |
+| Side content | Animal mini-quest (sprite 136 row), Satan Dollars counter text, enemy taunts about the champion, manager phone calls through the Capsule Corp phone gag. | text, code |
 
-- Animal mini-quest: a transformed-form row with an animal sprite (136 looks like a squirrel) and no
-  abilities; a forest run where everything chases you; both players shrink.
-- Hercule-sized rewards: autographs as currency, a "Satan Dollars" counter in the journal text.
-- Dialogue swaps so Krillin, Yamcha, Tien, Chiaotzu comment on Hercule's rise (they already have
-  lines in several maps).
-- Enemy taunts about his "world champion" status before boss fights.
-- Capsule Corp phone calls (the Mathbook gag) reused for Hercule's manager.
-- A Cell Games scoreboard: the Scouter reading Hercule's power as a joke, later as 9000+.
+## 4. Buu's Fury (phase 2, separate ROM)
 
-## 4. Questions for Ryan
+- Hercule and Buu's friendship is already in the stock story; the surprise is that the aura from the
+  Cell Games is real. When Goku needs a fusion partner against Buu, Hercule is the one who is there
+  (as he is in the series, where Goku considers it): the fused form is a new row and sprite in the
+  Buu ROM, built with the same cloner once that ROM has its decompile pass. Vegito stays for Janemba.
+- The final blow on Buu is Super Saiyan Hercule's, with the Spirit Bomb beat kept as his crowd call.
+- Needs: Buu's Fury decompile pass (party, display rows, saves), save conversion from LoG2, the
+  fusion scene as a script edit, two new sprites (SSJ Hercule in the Buu ROM, the fused form).
 
-- Light, medium or bold as the target for the first playable release?
-- Does Hercule replace Trunks in the prologue, or does the game open with Hercule watching the news?
-- Super Saiyan gold afro (what we have now) or a different "Super Human" look?
-- Which Z fighters must stay playable as player 1 in each chapter (we can't remove Gohan's chapters
-  without losing most of the game)?
+## 5. Still open
+
+- Prologue: Hercule replaces Trunks as player 1, or the game opens with Hercule watching the news?
+- Super Saiyan look: gold afro (what we have) or a different "Super Human" look?
+- Which Z fighters stay as player 1 per chapter (the Gohan chapters are most of the game).
+- Name of the Goku + Hercule fusion in our text ("Gokule" is the fan name).

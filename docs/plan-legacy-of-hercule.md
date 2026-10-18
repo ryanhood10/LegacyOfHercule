@@ -4,7 +4,7 @@ Ryan's direction (2026-10-17): keep Legacy of Goku II's story backbone (it is go
 but retell it with Hercule as the true hero who grows through the Android and Cell sagas, keep every
 beloved character in a role, add playable characters, new scenes, enemies, levels, movesets and silly
 side quests (animal transformations), and carry it into Buu's Fury where Hercule, not Goku, finishes
-Majin Buu. Co-op and the wide view stay the foundation.
+Majin Buu. Story frame decided 2026-10-17: "Canon plus Hercule" (see `docs/story.md` section 2). Co-op and the wide view stay the foundation.
 
 ## 1. What the engine lets us do (grounded in the decompile and the reference notes)
 
