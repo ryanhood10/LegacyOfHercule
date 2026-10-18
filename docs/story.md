@@ -530,6 +530,11 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
     (not dynamic), then only player 1 and player 2 fight Broly and Paragus. Broly is the real boss and
     much stronger; Paragus is weak and easy. If Paragus dies first, Broly's health refills once and he
     becomes stronger and faster (rage at his father's death).
+  - *Models (Ryan):* Broly appears only as the Legendary Super Saiyan (sprite 159, from Buu's Fury),
+    already waiting in the arena; no base-form Broly. Paragus = Vegeta's model in Saiyan armor
+    (his playable set, sprites 137-140) made old: grey hair and a grey goatee, as a generated
+    recolour/edit of every frame (like tools/a16sprites.py), plus a matching edit of Vegeta's
+    dialogue portrait.
   - *End:* after both fall, a huge explosion, a short scene back at Capsule Corp with everyone talking
     it over, fade to black, and player 1 and player 2 are at Capsule Corp with the game back to normal.
 
