@@ -218,3 +218,24 @@ pixels) is pasted with its chin on 17's chin row and its face centre on 17's. 16
 own stock frames are already broader than 17's at the game's 16x32 / 32x32 sizes, and the four
 groups taken from 17 keep 17's silhouette below the head (a wider torso would need hand-drawn
 frames). Frames are LZ-compressed with `buu2log2.compress`.
+
+### Rocket, fist, bomb and explosion frames (same generator)
+
+The ROM's projectile class (`0x08013BC0` base, 0x58-byte objects, vtable slots 3 cull / 4 OAM /
+5 DMA) draws **raw** 8-bit tiles: a descriptor `{s8 xo, s8 yo, u8 w, u8 h, u32 attr0|attr1<<16,
+tiles}` whose `xo, yo` is the anchor (8, 8 for 16x16), uploaded by DMA when the object's frame
+pointer (+0x18) changes. There is no missile in the ROM; what exists and is reused:
+
+| ROM frames | what |
+|---|---|
+| `0x086FFBFC` x3 (16x16) | a black bomb with a burning fuse, thrown by `FUN_0801CCC8` (an arcing bomb whose landing broadcasts a type-2 hit and explodes through `FUN_0801CD32`) - **reused as 16's area explosive** |
+| `0x086AF614` x4 (16x16, 32x32 x3) | the dust-cloud explosion (`FUN_0800FA1C`) - **recoloured to fire** for the rocket explosions |
+| `0x0840E47C` x16, `0x0840E53C` | the NPC ki blast (4 facings x 4) and its impact |
+| `0x086E1590` x4 | white impact ring |
+| `0x086FF8DC` 4 velocity pairs | the debris particles `FUN_0800EC08` spawns around an explosion |
+
+`tools/a16sprites.py` adds, as raw tiles in `build/gen/a16_sprites_data.c`: `a16_missile[16]`
+(a small grey missile with a red nose, fins and exhaust, drawn procedurally at 8 angles from 0 =
+right clockwise, 2 flame frames each), `a16_fist[8]` (the rocket fist drawn by hand pointing left,
+rotated to right / down / left / up, 2 flame frames each) and `a16_boom[4]` (the dust explosion
+with its colours mapped by brightness onto white / yellow / orange / dark orange / red).

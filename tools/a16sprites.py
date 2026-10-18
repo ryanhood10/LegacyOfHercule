@@ -1,5 +1,6 @@
-"""Android 16 as a boss: his fighting sprite record (id 160 by default), emitted as C source
-compiled into the co-op ROM. Nothing from the ROM is committed: everything below is derived from roms/log2.gba at build time into build/gen.
+"""Android 16 as a boss: his fighting sprite record (id 160 by default) and the rocket / explosion
+projectile frames, emitted as C source compiled into the co-op ROM. Nothing from the ROM is
+committed: everything below is derived from roms/log2.gba at build time into build/gen.
 
 usage: a16sprites.py roms/log2.gba build/gen/a16_sprites_data.c [--preview build/a16_preview.png]
 
@@ -16,12 +17,19 @@ Sources (docs/sprites.md "Android 16 boss"):
     at the elbow) while the fist flies as a projectile.
   * The record keeps 17's group layout (13 groups + the new one), because the boss AI set 21 that
     17 and 18 use addresses groups by index.
+Projectiles (raw 8-bit tiles, the format of the ROM's projectile class 0x08013BC0): a small missile
+in 8 directions x 2 flame frames (drawn procedurally), the rocket fist in 4 directions, and a fire
+explosion recoloured from the ROM's dust-cloud explosion (0x086AF614, 4 frames). The bomb dropped
+across the field is the ROM's own (0x086FFBFC, 3 frames), referenced by address from C.
 """
+import math
 import os
+import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sprites as S  # noqa: E402
+import mapchunks as m  # noqa: E402
 from buu2log2 import compress  # noqa: E402
 
 A16_SPRITE = 8           # Android 16's stock record (idle, walk, hit-stun, punch, knock-down)
@@ -29,6 +37,7 @@ A17_SPRITE = 9           # Android 17's fight record (the island boss)
 GROUPS_FROM_16 = (0, 1, 2, 6, 12)
 GROUPS_FROM_17 = (3, 5, 7, 8)
 ROCKET_GROUP = 13
+DUST_EXPLOSION = 0x086AF614      # 4 raw descriptors {xo, yo, w, h, attr, tiles} (FUN_0800FA1C's)
 HFLIP = 0x10000000               # attr1 bit 12 in the descriptor's attr word
 
 BLACK = 1
@@ -149,6 +158,91 @@ def recolour17(px):
     return [[RECOLOUR.get(v, v) for v in row] for row in px]
 
 
+# ---- projectile art ---------------------------------------------------------------------------------
+FIST_LEFT = [   # the rocket fist pointing left: knuckles, green forearm, exhaust (16x16)
+    "................",
+    "................",
+    "................",
+    "..####..........",
+    ".#hhff#.####....",
+    "#hffef##kiik#...",
+    "#feeff#knnik#yo.",
+    "#ffeef#koonk#Woy",
+    "#feeff#knnik#yo.",
+    "#hffef##kiik#...",
+    ".#ffee#.####....",
+    "..####..........",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+FIST_COLOURS = {"#": 1, "h": 114, "f": 115, "e": 117, "k": 41, "i": 42, "n": 54, "o": 46, "y": 32, "W": 2}
+FLAME_ALT = {"y": 5, "o": 32, "W": 46}   # second flame frame
+
+
+def parse_art(rows, colours, alt=None):
+    px = blank(16, 16)
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                c = colours[ch]
+                if alt and ch in alt:
+                    c = alt[ch]
+                px[y][x] = c
+    return px
+
+
+def rot_cw(px):
+    """Rotate a square frame 90 degrees clockwise."""
+    n = len(px)
+    return [[px[n - 1 - x][y] for x in range(n)] for y in range(n)]
+
+
+def missile(angle, flame):
+    """Small grey missile pointing along `angle` (radians, 0 = right, y down): body 11 px long and 3
+    wide, red nose, two fins, a flickering exhaust; outlined in black."""
+    ux, uy = math.cos(angle), math.sin(angle)
+    px = blank(16, 16)
+    body = {}
+    for y in range(16):
+        for x in range(16):
+            rx, ry = x + 0.5 - 8, y + 0.5 - 8
+            t = rx * ux + ry * uy          # along the nose direction
+            s = -rx * uy + ry * ux         # across
+            c = 0
+            if -4.5 <= t <= 4.5 and abs(s) <= 1.35 - max(0.0, t - 3.0) * 0.6:
+                c = 5 if t > 3.0 else (10 if s < -0.4 else (13 if s < 0.5 else 15))
+            elif -4.5 <= t <= -2.0 and abs(s) <= 2.6:
+                c = 15                      # fins
+            elif -7.5 <= t < -4.5 and abs(s) <= (1.2 if flame else 0.9):
+                c = (46 if t > -5.8 else 32) if flame else (2 if t > -5.8 else 46)
+            if c:
+                body[(y, x)] = c
+    for (y, x), c in body.items():
+        px[y][x] = c
+    for y in range(16):
+        for x in range(16):
+            if px[y][x] or (y, x) in body:
+                continue
+            if any((y + dy, x + dx) in body and body[(y + dy, x + dx)] not in (46, 32, 2)
+                   for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1))):
+                px[y][x] = BLACK
+    return px
+
+
+FIRE = [2, 46, 32, 33, 5, 35]     # white, yellow, orange, dark orange, red, brown-red
+
+
+def fire_recolour(px, pal):
+    """Dust-cloud explosion -> fire: map each colour by brightness onto the fire ramp."""
+    used = sorted({v for row in px for v in row if v}, key=lambda i: -sum(pal[i]))
+    ramp = {}
+    for k, i in enumerate(used):
+        ramp[i] = FIRE[min(len(FIRE) - 1, k * len(FIRE) // max(1, len(used)))]
+    return [[ramp.get(v, 0) for v in row] for row in px]
+
+
 # ---- main -------------------------------------------------------------------------------------------
 def main():
     rom = open(sys.argv[1], "rb").read()
@@ -211,7 +305,34 @@ def main():
         else:
             groups.append(None if not any(g17[gi]) else ("rom", g17[gi]))
 
+    # projectile frames
     proj = {}
+    missiles = []
+    for k in range(8):                      # 0 = right, then clockwise in 45-degree steps (y down)
+        for fl in (0, 1):
+            missiles.append(missile(k * math.pi / 4, fl))
+    proj["a16_missile"] = [(8, 8, 16, 16, 0x40002000, px) for px in missiles]
+    fist = []
+    base = [parse_art(FIST_LEFT, FIST_COLOURS), parse_art(FIST_LEFT, FIST_COLOURS, FLAME_ALT)]
+    # order: right, down, left, up (matching the missile's 0 / 90 / 180 / 270 degrees) x 2 flames
+    for turns in (2, 3, 0, 1):
+        for b in base:
+            px = b
+            for _ in range(turns):
+                px = rot_cw(px)
+            fist.append(px)
+    proj["a16_fist"] = [(8, 8, 16, 16, 0x40002000, px) for px in fist]
+    boom = []
+    for i in range(4):
+        d = DUST_EXPLOSION + 12 * i
+        xo, yo, w, h = struct.unpack_from("<bbBB", rom, d - S.ROM_BASE)
+        attr, raw = u32(d + 4), u32(d + 8)
+        data = rom[raw - S.ROM_BASE:raw - S.ROM_BASE + w * h]
+        tw = w // 8
+        px = [[data[((y // 8) * tw + x // 8) * 64 + (y % 8) * 8 + x % 8] for x in range(w)] for y in range(h)]
+        boom.append((xo, yo, w, h, attr, fire_recolour(px, sp.pal)))
+    proj["a16_boom"] = boom
+
     write_c(out_c, header, groups, proj)
     if preview_path:
         write_preview(preview_path, sp, groups, proj)
