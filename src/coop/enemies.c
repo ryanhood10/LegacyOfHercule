@@ -38,9 +38,9 @@ static int twinnable(const EnemyRecord *rec, const EnemyStat *st) { return st->e
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
-// The table lives in bosses.c (boss rules). Cooler (stat 29): King Cold's sprite (74) with Cooler's AI
-// set crashes at spawn (so does any other record; Cell's AI takes Cooler's model fine), so Cooler keeps
-// the same model until module 0x0801C05B is understood.
+// The table lives in bosses.c (boss rules). A partner model must have every pose group the boss's AI
+// set plays: King Cold's sprite 74 (5 groups) under Cooler's set 21 crashes at the first charge or
+// attack (groups 5-8 read past the record), so Cooler's partner is the Namekian servant (sprite 166).
 static int partner_sprite(int stat_index) {
     if (coop2.partner_override) return (int)coop2.partner_override;
     const BossRule *r = boss_rule(stat_index);

@@ -38,7 +38,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `exp.c` | EXP credited to the killing player |
 | `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` |
 | `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
-| `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides) and per-boss rules (end_pct, partner model/stat, no twin); the both-down rule lives in `enemies.c` |
+| `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler's Namekian) and per-boss rules (end_pct, partner model/stat, no twin); the both-down rule lives in `enemies.c` |
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
@@ -81,6 +81,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group) and the projectile frames -> `build/gen/a16_sprites_data.c` |
+| `bossmodels.py` | Android 13 (id 165: 16's body + 17's fight frames, re-dressed per body part: cap, white hair, vest, jeans) and Cooler's Namekian servant (id 166: Piccolo's capeless set 104 recoloured) -> `build/gen/boss_models_data.c`, previews |
 | `krillinsprites.py` | Krillin's playable sprite (id 161: sprite 76 + Goku's fight groups re-headed), status portrait (73 in the menu BG palette), blue ki blast, Destructo Disc frames, HUD and status icons, the UI string table with per-slot blocks, the portrait module table -> `build/gen/krillin_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
@@ -99,7 +100,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `win_keys.ps1`, `win_shot.ps1`, `win_burst.ps1` | keys and screenshots for any window by title (used for the WSL fork window); `win_burst` takes N frames from one process |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |
-| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`); Krillin tests: `padq.sh` (queue steps for `p2hold.py --cmd`), `kr_peek.sh`, `kr_ents.gdb`, `kr_tele2.sh`, `kr_setidx.sh`; `runfork.ps1 -Quiet` (no audio sync, for several forks at once) |
+| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`); Krillin tests: `padq.sh` (queue steps for `p2hold.py --cmd`), `kr_peek.sh`, `kr_ents.gdb`, `kr_tele2.sh`, `kr_setidx.sh`; `runfork.ps1 -Quiet` (no audio sync, for several forks at once); boss pairs: `bootisland.sh` (boot -> island test map, level-30 pair), `bossfight.sh` (spawn any boss record + autopilot, HP log), `bosstest.sh`, `q.sh` (one tagged gdb query); slots >= 1 install into `/root/fork-sN` |
 
 ## Where to look for...
 

@@ -4,6 +4,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-18
 
+- **Boss models** (branch `boss-models`, worktree `F:\MeltyCreations\log2-bm`): Android 13 base form
+  (sprite 165) and Cooler's Namekian servant (166) from `tools/bossmodels.py`; stats 110 (13 beside
+  19), 111 (Namekian), 112 (13 beside Gero); rules give them to the co-op twins of 19, Gero and Cooler.
+  Tested in the fork with both players (spawn, autopilot fights, both-down in both orders, defeat
+  scripts). Fixed: player 2 froze while player 1 was in the hurt state; under both-down the survivor
+  keeps its model (Gero's script had despawned the wrong Gero). King Cold's sprite crashes as Cooler's
+  twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
+  names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
+  13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
 - **Production resumed (Ryan, after the model switch): "get as much progress with the game as you
   can", story planning paused where it stopped** (`docs/story.md` section 0, "Next to decide").
 - **Merged**: `android16-boss` (sprite 160, rockets, AI, stat 109; island scripts still name 17).

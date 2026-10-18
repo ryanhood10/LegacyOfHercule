@@ -653,21 +653,29 @@ Story bosses are configured in `src/coop/bosses.c` (declarations and field meani
 
 - **Extra stats** (`extra_stats[]`, index `EXTRA_STAT_BASE` 110 + i): a stock stat to start from
   plus overrides (AI set, HP, EXP, melee/ranged/defence). The spawn resolves it into the enemy's
-  private stat copy, so no ROM table is copied into the build. 110 = Android 13 (base form, 19's AI
-  and class). 109 stays Android 16 (own spawn path in `android16.c`).
+  private stat copy, so no ROM table is copied into the build. 110 = Android 13 beside 19 (19's AI
+  set 29 and class), 111 = Cooler's Namekian servant (Cooler's set 21 and class), 112 = Android 13
+  beside Dr. Gero. 109 stays Android 16 (own spawn path in `android16.c`). Ids 113-119 are free.
 - **Boss rules** (`rules[]`, by stat index, single-player and co-op alike): `end_pct` (the entity
   gets only the HP above `end_pct` and its bar is drawn over `[end_pct, 100]`, so the fight ends
   "at half health" with the bar half full), `partner_sprite` / `partner_stat` (the co-op twin's model
   and stat; 0 = same model, a Multi-Form duplicate), `BOSS_NO_TWIN`. Current rules: 17 <-> 18 models,
-  19 + Android 13 and Dr. Gero + Android 13 (sprite `A13_SPRITE`, 0 until the art lands), Perfect
-  Cell (78, 79) alone to half health. Imperfect and Semi-Perfect Cell use the default duplicate.
+  19 + Android 13 (sprite `A13_SPRITE` 165, stat 110), Dr. Gero + Android 13 (165, stat 112), Cooler +
+  the Namekian servant (`NAMEK_SPRITE` 166, stat 111), Perfect Cell (78, 79) alone to half health.
+  Imperfect and Semi-Perfect Cell use the default duplicate. A partner model needs every pose group the
+  boss's AI set plays (`docs/sprites.md` "Making a new enemy model").
 - **Both-down rule** (all boss pairs): the first boss of a pair to fall takes the blow as a
   non-lethal hit (knock-back, damage popup), then HP 0, no action, list message 0xF (its bar lets
   go), plays pose group 3 (the knock-down: standing, falling, lying on 17, Gero and the Cell forms;
   19 has none) and freezes on the lying frame; its AI stops (vtable slot 2 wrapper) and further hits
   are ignored. The ROM's boss death is never called for it because that removes the entity. The
-  survivor carries the original's record action; its death runs the fight's script as before.
-  `coop2.off |= COOP_OFF_BOTHDOWN` (32) restores the old quiet removal.
+  survivor carries the original's record action; its death runs the fight's script as before. The
+  survivor keeps its own model: the downed original is still on the map, so the defeat script finds it
+  by its sprite (19's explodes it, Gero's flies it off and despawns it, Cooler's explodes it) and the
+  partner (13, the Namekian) stays standing at HP 0 for the story script to address by its own sprite.
+  (Until 2026-10-18 the survivor switched to the original's model before dying; with two entities of
+  that sprite on the map Gero's script flew off and despawned the downed Gero and Android 13 vanished.)
+  `coop2.off |= COOP_OFF_BOTHDOWN` (32) restores the old quiet removal, and with it the model switch.
 
 Verified in the fork (island zone 11 area 6, `a16_base.ss1`, Map_SpawnScript 0 = the Android 17 boss
 record): 17 + 18-model twin spawned; 17 knocked out first lay down and stayed (HP 0, frozen, no
@@ -676,6 +684,36 @@ model and ran the stock defeat dialogue ("This is ridiculous. Piccolo was suppos
 us!"). With the test rule (`make CFLAGS_EXTRA=-DBOSS_RULE_TEST`: 17 alone, end 50 %) 17 spawned
 alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `build/bdtest.sh`,
 `bdfind.sh`, `bdpeek.sh` (not committed; the pattern is in `docs/testing.md`).
+
+### Android 13, the Namekian servant and the boss-pair tests (2026-10-18, branch `boss-models`)
+
+Models: `docs/sprites.md` "Android 13 (id 165) and Cooler's Namekian servant (id 166)". Tested in the
+fork (slot 3) on the island path (debug Map Test 11/6) with `COOP_CMD_SPAWN_RECORD` (7: any map's
+boss record beside player 1, plus its bars; `tools/fork/bossfight.sh`, `docs/testing.md` "Boss pairs"):
+Piccolo (player 1) and Hercule (player 2) at the level-30 stats of the Android 16 tests, the
+`A16_TEST` autopilot (now fights any registered pair: player 1 the original, player 2 the twin).
+
+| pair (record) | result |
+|---|---|
+| 19 + 13 (`0x083FD3BC`, map 7/15 script 2) | spawns with two bars; 13 (cap, vest, jeans) fights player 2. Autopilot: won at 50 s with both players up (19 fell first at ~20 s, 13 at 50 s); earlier tunings: won at 40 s once, lost twice at 155 s with 19 at 904 HP (13 already down) |
+| both-down, 13 first | 13 lies in his group-3 pose with an empty bar; 19's death runs the stock dialogue ("Silly robot. You really thought you had a chance against me?") |
+| both-down, 19 first | 19's defeat script (white flash, damage effect, velocity on sprite 12) explodes the downed 19; 13 stands at HP 0; the dialogue follows |
+| Gero + 13 (`0x083FF970`, map 8/13 script 1) | autopilot: both down at 40 s (Gero first at ~20 s) with Piccolo at 0 HP; Gero's script (FlyToPosition 14, DespawnEntity 14, collision, ReloadMap) removes the downed Gero, 13 stays |
+| Cooler + Namekian (`0x083FB574`, map 6/28 script 1) | spawns, fights, no crash; both orders of both-down work (Namekian lies down; Cooler's script explodes the downed Cooler and pans the camera). Level 30 is far below this fight (Cooler took ~150 HP/s off Piccolo with god-mode HP; the stock bonus fight is endgame) |
+| Cooler + King Cold's model (`partner(74)`) | crash "Jumped to invalid address C002E564" at the first charge/attack: record 74 has 5 groups and set 21 plays groups 5-8 |
+| Cooler + Android 17's model (`partner(9)`) | fights 40 s, no crash (the old note that any other model crashes was wrong) |
+
+Tuning (bosses.c): 13 beside 19 = 3200 HP, 22/16/14 (19: 2970, 21/14/11): more HP than 19, his
+damage, because the twin goes for the other player and 13 usually ends up on player 2 (Hercule beside
+Vegeta in the story). 13 beside Gero = 2400 HP, 24/20/16 (Gero 1900, 25/21/17). The Namekian = 6000
+HP, 74/70/68 (Cooler 10200, 75/85/79); at 68/60/64 he barely scratched Hercule. The autopilot only
+walks up and punches, so these fights are a lower bound; the real level at the 19 fight is lower than
+30 for Hercule, which is the next thing to check when the story's levels are known.
+
+**Found and fixed on the way:** player 2 froze whenever player 1 was in the hurt state
+(`0x08025B98`): `p1_controllable()` whitelists player 1's control states to tell cutscenes from play,
+and the hurt state was missing, so a boss pair pummelling player 1 also froze player 2. It is in the
+list now (player.c).
 
 ## Player 2's combat stats, duplicate NPCs, test warp (2026-10-18)
 

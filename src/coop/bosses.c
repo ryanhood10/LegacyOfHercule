@@ -7,9 +7,10 @@ const ExtraStat extra_stats[] = {
     // 19 (2970, 21/14/11) but about his damage: the twin goes for the other player, so 13 usually fights
     // player 2 (Hercule beside Vegeta). 19's co-op partner on the zone 7 battlefield.
     { 5, -1, 3200, -1, 22, 16, 14, 0 },
-    // 111 Cooler's Namekian servant: Cooler's melee boss AI set (21) and class, well below Cooler
-    // (10200 HP, 75/85/79) so the pair is one fight's worth for two players.
-    { 29, -1, 6000, -1, 68, 60, 64, 0 },
+    // 111 Cooler's Namekian servant: Cooler's melee boss AI set (21) and class; about Cooler's damage
+    // but 6000 HP of his 10200 (75/85/79), so the pair is one fight's worth for two players. (At 68/60/64
+    // he barely scratched a level-30 Hercule in the fork while Cooler shredded Piccolo.)
+    { 29, -1, 6000, -1, 74, 70, 68, 0 },
     // 112 Android 13 beside Dr. Gero at the lab door: more HP than Gero (1900, 25/21/17), a little
     // less damage (he backs Gero up; 13 survives the scene and leaves).
     { 5, -1, 2400, -1, 24, 20, 16, 0 },
