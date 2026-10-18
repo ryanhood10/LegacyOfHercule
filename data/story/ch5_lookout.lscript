@@ -1,0 +1,145 @@
+; Chapter 5 (docs/story.md section 0 item 5, sections 4d and 4e), applied by ch5_lookout.json: the first
+; Lookout visit (Hercule stays when Kami defers), Trunks' chapter with Gohan as player 2, Kami's boost
+; for Hercule before the fusion, Gingertown with Piccolo and Hercule against Imperfect Cell and his
+; Multi-Form duplicate (bosses.c: stat 60's default twin, co-op only).
+; Speakers: 0 narration, 1 the active character (Piccolo), 3 / 90 Piccolo, 38 Cell, 67 Hercule, 69 Kami.
+
+; ---- zone 9 area 6: Kami defers; Piccolo leaves Hercule at the Lookout -------------------------------
+
+sequence ch5_lookout_first
+  stockseq @083df720 0 16                ; Kami and Piccolo: "I'll be waiting."
+  text 67 "HERCULE: So, uh...  we're waiting?  Up here?\x0bGreat!  Nice view.  Nice and far away from those Androids!"
+  text 1 "@PICCOLO: You stay here, Hercule.  And don't touch anything."
+  script                                 ; stock entry 17, with Hercule (5) and Krillin (6) locked too and
+        SetStoryFlag 129                 ; player 2 on Gohan after the warp to Gohan's house
+        FadeOut 90
+        WarpToMapNoEntities 2, 20, 1, 160, 264
+        PlayMusic 14
+        SetCharacterInPartyFlag 3
+        SetCharacterInPartyFlag 1
+        SetCharacterInPartyFlag 2
+        SetCharacterFlag_Bit5 3
+        SetCharacterTransformation 3, 128
+        SetCharacterTransformation 0, 53
+        SetCharacterLevel 3, 27
+        SetActiveCharacter 3
+        ClearCharacterFlag_Bit1 1
+        ClearCharacterFlag_Bit1 5
+        ClearCharacterFlag_Bit1 6
+        SetCharacterFlag_Bit1 0
+        SetCharacterFlag_Bit1 3
+        SetCharacterFlag_Bit5 3
+        SetCharacterFlag_Dynamic 3, 0
+        SetCharacterFlag_Dynamic 3, 1
+        CoopCall 6, 0, 0, 0
+        SetEntityFacing 128, 2
+        SpawnCharacterEntity 156, 136, 216
+        SpawnCharacterEntity 53, 176, 272
+        SetEntityFacing 53, 2
+        FadeFromWhite 90
+  stockseq @083df720 18 39               ; Krillin, Bulma's photo, Gohan: "I'm coming with you, Trunks!"
+end
+
+; ---- zone 10 area 16 -> the Lookout: Kami draws out Hercule's potential, then the fusion ---------------
+
+sequence ch5_fusion
+  stockseq @083e0dbc 0 35                ; the cicada skin, the news from Gingertown, "So you finally came to your senses?"
+  script
+        SpawnCharacterEntity 72, 232, 152
+        WalkToPosition 72, 216, 136
+        SetEntityFacing 72, 2
+        SetEntityFacing 73, 3
+  text 69 "KAMI: But first...  Hercule.  Come here."
+  text 67 "HERCULE: M-me?  Uh, sure thing, Mr. Kami, sir!"
+  text 69 "KAMI: You took Piccolo into your home and stood beside him, though you had every reason to fear him.\x0bFew have ever shown him such kindness."
+  text 69 "Every living being carries a hidden potential.\x0bAllow me to draw out a little of yours, as the Grand Elder of Namek once did for Gohan and Krillin."
+  script
+        WhiteFlash 20
+        PlayAudio 27
+        StackGetCharLevel 5, 5
+        PushByte 3
+        Add
+        SetCharacterLevel
+        SetCharHP 5, 5000
+        SetCharEP 5, 5000
+        WaitFrames 30
+  fmt 0 "@^Hercule has achieved Level %d!"
+        StackGetCharLevel 5
+  text 67 "HERCULE: Whoa...  I feel like I could lift a truck!\x0bHa ha ha!  Not that I couldn't before, of course!"
+  text 90 "PICCOLO: Hmph.  Don't let it go to your head."
+  script
+        SetEntityFacing 73, 0
+  stockseq @083e0dbc 36 47               ; "Our union will make you more powerful", Popo's goodbye, the Namek
+  script                                 ; stock entry 48: Piccolo and Hercule fly to Gingertown together
+        FadeToWhite 120
+        SetCharacterFlag_Dynamic 1, 2
+        SetCharacterFlag_Bit1 1
+        SetCharacterFlag_Bit5 1
+        SetCharHP 1, 5000
+        SetCharEP 1, 5000
+        SetCharacterFlag_Bit1 5
+        ClearCharacterFlag_Bit1 0
+        ClearCharacterFlag_Bit1 3
+        ClearStoryFlag 133
+        SetStoryFlag 132
+        SetPlayerVisible 1
+        WarpToMapNoEntities 6, 99, 1, 896, 1480
+        CoopCall 6, 5, 0, 0
+        WhiteFadeOut 120
+        PlayAudio 62
+  stock @083e0da6                        ; Journal Updated
+end
+
+; ---- zone 10 area 17 -> 20: Gingertown. In co-op Cell splits (Tien's Multi-Form) ---------------------
+
+sequence ch5_gingertown
+  stockseq @083e11e4 0 15                ; "Hisssss!", "call me The Namek", the blast, "Don't count on it."
+  script                                 ; co-op: the duplicate (next 17), else the fight (20)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 17
+        END
+      L1:
+        PushByte 20
+        END
+  text 38 "@???: Two of you?  Then two of me!"
+  text 1 "@PICCOLO: He split himself in two...  That's Tien's Multi-Form technique!"
+  text 67 "HERCULE: T-two bugs?!  Nobody said anything about two bugs!"
+  stock @083e11d0                        ; the fight
+end
+
+; Cell beaten. In co-op the body that fell first is taken back in (one Cell stays for the stock scene)
+sequence ch5_gingertown_end
+  script                                 ; co-op: the reabsorption (next 1), else the stock scene (3)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 1
+        END
+      L1:
+        PushByte 3
+        END
+  script
+        WhiteFlash 10
+        DespawnEntity 28
+        SetEntityAnimation 28, 0         ; the one left may be the body that fell first (lying)
+        WaitFrames 30
+  text 1 "#PICCOLO: It took its other half back into itself..."
+  stockseq @083e24a0 0 56                ; the Kamehameha, the arm trick, Cell's story, Krillin and Trunks, Vegeta
+  script                                 ; stock entry 57, with Gohan and Trunks selectable again
+        FadeOut 90
+        PlayMusic 5
+        DespawnEntity 128
+        SetEntityPositionInstant 0, 280, 296
+        SetCharacterFlag_Bit1 0
+        SetCharacterFlag_Bit1 3
+        SetActiveCharacter 3
+        DespawnEntity 137
+        DespawnEntity 76
+        DespawnEntity 121
+        SetActiveEntity 0
+        FadeFromWhite 90
+        SetPlayerVisible 1
+        PlayAudio 62
+        SetStoryFlag 136
+  stock @083e2486                        ; Journal Updated!
+end

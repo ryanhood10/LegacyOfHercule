@@ -12,8 +12,8 @@
 //   2 DuelClear ()                      after the end scene: player 2's slot and colours back (duel_clear)
 //   3 DuelWinner () -> 1 / 2            winner of the last duel (0 before any)
 //   4 HerculeAwaken ()                  Super Hercule into Hercule's abilities (ssj.c; Buu phase)
-//   5 P2Present () -> 0 / 1             is there a player 2 entity
-//   6 P2Bind (slot)                     player 2 plays this party slot now
+//   5 P2Present () -> 0 / 1             is player 2 there (its entity, or its pad: the twins spawn by the pad)
+//   6 P2Bind (slot)                     player 2 plays this party slot now (or at its respawn after a warp)
 #include "coop.h"
 
 void hercule_awaken(void);                 // ssj.c
@@ -77,8 +77,10 @@ void vm_coop_call(s32 *st) {
     case 2: duel_clear(); coop2.call_state = 0; break;
     case 3: vm_push(st, coop2.duel_winner); break;
     case 4: hercule_awaken(); break;
-    case 5: vm_push(st, coop.p2 != 0); break;
-    case 6: if (coop.p2 && a >= 0 && a < PARTY_SLOTS) p2_bind_slot(a); break;
+    case 5: vm_push(st, coop.p2 != 0 || p2_present()); break;   // the pad: a warp despawns the entity until player 1 is free
+    case 6:   // without an entity (a warp despawned it until player 1 is free again) the respawn picks the slot
+        if (a >= 0 && a < PARTY_SLOTS) { if (coop.p2) p2_bind_slot(a); else coop.p2_slot = (u8)a; }
+        break;
     default: (void)b; break;
     }
 }

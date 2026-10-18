@@ -17,7 +17,9 @@ sites, the West City deal, Triceratops Jungle), the duels of items 3 and 6 (spac
 Hercule at the landing; Time Chamber duel, winner Piccolo / loser Hercule), zone 7 of item 3
 (Android 13 in the cutaway and beside 19, both-down, 13 flees with the "true plan" line; the skip's
 boosts for Hercule and Krillin), Piccolo's chapter of item 4 (13 beside Gero in his three stages,
-Hercule's "negotiate" at the lab door, 13 in the lab, the road with Vegeta as player 2) and the Android
+Hercule's "negotiate" at the lab door, 13 in the lab, the road with Vegeta as player 2), item 5 (Hercule
+stays at the Lookout, Gohan as player 2 in Trunks' chapter, Kami's boost for Hercule, Gingertown with
+Cell's Multi-Form duplicate) and the Android
 16 island
 fight from item 6 (Kame House deal, 16 over the two stock stages, half health, Cell). Tested headless
 (`docs/testing.md`).
