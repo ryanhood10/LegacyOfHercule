@@ -28,9 +28,12 @@ static const BossRule rules[] = {
     { 3,  0, 0, 11, 0 },
 #endif
     { 4,  0, 0, 9,  0 },
-    // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door)
-    { 5,  0, 0, A13_SPRITE, A13_STAT },
-    { 7,  0, 0, A13_SPRITE, A13_GERO_STAT },
+    // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door): always a pair, so the
+    // story scripts (13's lines, 13 flying off) find 13 in single-player too
+    { 5,  0, BOSS_PAIR, A13_SPRITE, A13_STAT },
+    { A13_STAT, 0, BOSS_PAIR, 0, 0 },
+    { 7,  0, BOSS_PAIR, A13_SPRITE, A13_GERO_STAT },
+    { A13_GERO_STAT, 0, BOSS_PAIR, 0, 0 },
     // The forest spirit (zone 2 area 8, the stock dream's clearing): Frieza and Cooler, always a pair
     { 41, 0, BOSS_PAIR, COOLER_SPRITE, COOLER_SPIRIT_STAT },
     { COOLER_SPIRIT_STAT, 0, BOSS_PAIR, 0, 0 },     // the twin's own stat: boss pair rules for it too

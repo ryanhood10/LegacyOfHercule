@@ -14,7 +14,9 @@ map ZONE AREA`, all maps in `build/scripts/` after a full dump) and the quest ta
 **Implemented (story-scripts, 2026-10-18; `docs/scripts.md` section 5, `data/story/`):** items 1 and
 2 below as written (old Hercule in the prologue, Krillin's visit, the forest spirit, the landing
 sites, the West City deal, Triceratops Jungle), the duels of items 3 and 6 (space clone duel and
-Hercule at the landing; Time Chamber duel, winner Piccolo / loser Hercule) and the Android 16 island
+Hercule at the landing; Time Chamber duel, winner Piccolo / loser Hercule), zone 7 of item 3
+(Android 13 in the cutaway and beside 19, both-down, 13 flees with the "true plan" line; the skip's
+boosts for Hercule and Krillin) and the Android 16 island
 fight from item 6 (Kame House deal, 16 over the two stock stages, half health, Cell). Tested headless
 (`docs/testing.md`).
 

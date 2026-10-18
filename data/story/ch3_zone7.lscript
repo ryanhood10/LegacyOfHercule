@@ -1,0 +1,59 @@
+; Zone 7 and the three-year skip (docs/story.md section 0 item 3, section 4b items 5 and 6), applied by
+; ch3_zone7.json. Android 13 (base form, sprite 165, boss stat 110 beside 19; bosses.c) stands with 19
+; and 20 in the cutaway scene, fights beside 19 (both-down: the first to fall stays down), and after
+; the fight 19 explodes as stock while 13 flies off swearing revenge. 13 has no portrait: speaker 0.
+; Sprites: 12 Android 19, 13 Android 20, 165 Android 13, 61 Goku (Super Saiyan).
+
+; ---- zone 7 area 1 (map 177): the cutaway to the battlefield (map 191 loaded with its actors) ----------
+
+sequence ch3_z7_cutaway
+  script                                 ; stock entry 0, plus 13 standing beside 19
+        SetMapRestoreFlag
+        SetPlayerVisible 0
+        LoadMapWithEntities 7, 15, 1, 352, 288
+        SpawnCharacterEntity 165, 528, 384
+        SetEntityFacing 165, 2
+        SetEntityFacing 60, 3
+        SetEntityFacing 12, 2
+        PlayMusic 25
+        WaitFrames 60
+        PlayAudio 50
+  stockseq @083d37bc 1 14                ; 20: "We will fight here", the tracking device, Super Saiyan, 19, 20
+  text 0 "@^ANDROID 13: Outta date already, huh?\x0bDon't sweat it, 20.  Whatever he turns into, he's still on Dr. Gero's list."
+  stockseq @083d37bc 15 16               ; 20: "19 will demonstrate this by himself!"
+  text 0 "@^ANDROID 13: Suit yourself.  I'll be watchin', 19.\x0bHoller if you need a hand."
+  stockseq @083d37bc 17 19               ; Goku: "I wouldn't bank on it", flag 76, back to area 1
+end
+
+; ---- zone 7 area 15 (map 191): Vegeta arrives; 19 and 13 fight him and Hercule ----------------------
+
+sequence ch3_z7_battle
+  script
+        SpawnCharacterEntity 165, 528, 384
+        SetEntityFacing 165, 2
+  stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
+  text 0 "@^ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
+  stockseq @083d40c8 39 40               ; 20 flies up to watch; Vegeta: "does a machine experience fear?"
+  script                                 ; stock entry 41, plus 13's actor leaving for his boss twin
+        SetPlayerVisible 1
+        DespawnEntity 165
+        DespawnCharacterAndRecordPosition 12, 2
+        DrawBossHealthBar 12
+        SetActiveEntity 0
+end
+
+; both are down (the record's defeat action runs once, when the last of the pair falls): 19 explodes,
+; 13 (still on the map, by his own sprite) gets up and flies off
+sequence ch3_z7_defeat
+  stock @083d4174                        ; 19 explodes, EXP, the music
+  text 0 "@^ANDROID 13: Tch...  19's nothin' but scrap metal now.\x0bYou got lucky, Saiyan.  Real lucky."
+  text 1 "#VEGETA: Another tin can?  Stay down and I'll make it quick."
+  text 0 "@^ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
+  text 0 "@^And don't go thinkin' you've got Dr. Gero figured out.\x0bHeh...  Not even we know what the old man's true plan is."
+  script
+        PlayAudio 26
+        FlyToPosition 165, 640, 96
+        DespawnEntity 165
+        WaitFrames 30
+  stockseq @083d4834 1 14                ; Vegeta's "Silly robot", 20 flees, Vegeta follows, Piccolo takes over
+end
