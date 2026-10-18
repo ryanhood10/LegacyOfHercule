@@ -115,6 +115,18 @@ What it costs (no code yet):
 Open: whether both players keep the Super Saiyan drain rules during the duel (the stock form is a
 timed boost), and a draw rule if both die on the same frame (give it to player 1).
 
+## 4c. Piccolo's chapter (Ryan, 2026-10-17): Hercule stays player 2
+
+Stock flow (zone 8): after the Android 19 fight, Piccolo is player 1. Robot grunts throughout,
+Dr. Gero at his lab door ("I won't let you get into my lab", two maps), Gero activates 17 and 18, the
+Androids scene (`SetActiveCharacter 1` keeps Piccolo), Cell's lab under the computer (Krillin's
+lines: "that thing is made up of cells from the greatest fighters", the self-destruct), Yajirobe's
+Senzu drop, then the Lookout (zone 9 area 1) hands player 1 to Gohan. Krillin stands as an NPC in
+zone 8 areas 47, 48 and 65 and talks through the lab scenes, so while Hercule is player 2 Krillin's
+selectable bit stays clear (set it again when the party next meets at the Lookout). Hercule gets a
+line per scene: scared of the lab door, hiding behind Piccolo when 17 and 18 wake, "I knew it" at
+Cell's tank. Cost: text and a few bytes.
+
 ## 5. What the plan is missing (engine limits found while checking)
 
 1. **Six party slots.** `PartyState` holds exactly 6 characters (Gohan, Vegeta, Goku, Piccolo,
