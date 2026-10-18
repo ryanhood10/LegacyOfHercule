@@ -241,7 +241,9 @@ Ryan's decisions for this stretch:
   the Lookout (zone 9 area 3): Goku's "only two of us can train", Vegeta and Trunks enter the
   chamber, Mr. Popo's rules, then Goku: "Piccolo, you should get back to Roshi's Island... when the
   Androids don't find me..." and the script makes **Piccolo player 1** (the script clears Trunks' and Gohan's
-  selectable bits; Vegeta's is untouched), so player 2 is Hercule, with Vegeta as the odd leftover. World map back to
+  selectable bits; Vegeta's was already cleared on the road when he stormed off), so in the stock
+  game Piccolo is the only playable character here, and for us player 2 is Hercule (Krillin too if
+  we leave him selectable). World map back to
   Roshi's island: 17, 18 and 16 are waiting, the island fight (areas 4, 5, 6), Cell's arrival, and
   the warp back to the Lookout where Vegeta comes out ("Vegeta has achieved Level %d", Tien: "Cell
   has swallowed up Android 17", Bulma's armour) and becomes player 1.
