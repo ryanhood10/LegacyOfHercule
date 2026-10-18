@@ -13,6 +13,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 4, Piccolo's chapter (story-scripts)**: `data/story/ch4_piccolo`: 13 backs Gero up in all three
+  stages and flies off after each; Hercule's "negotiate" at the lab door; 13 watches 17 and 18 turn
+  on Gero in the lab and walks out promising to fulfil his destiny; the road: Vegeta arrives and is
+  player 2 for 18 + 17 in co-op, Hercule again for the stock ending. Engine fix (`enemies.c`): a
+  co-op boss bar whose boss went down first now slides out once no boss stands (the twin's empty bar
+  stayed on screen after every pair fight). Tested headless: Gero's stage 1, both generators in both
+  orders, the lab, the road in co-op (through to the world map, flag 127, Piccolo / Hercule) and
+  single-player.
 - **CoopCall moved to game action 59 (story-scripts)**: action 130 (`sub_0800AFD4`) was not unused: nine
   stock on-load scripts (zones 2, 7, 8, 10, 12, 13) call it to add a scene object, and the repoint
   had them pop an empty stack. 59 is `Deprecated_CharacterSpecialAttack` (an assert, no stock caller;

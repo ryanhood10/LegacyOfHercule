@@ -515,8 +515,21 @@ static BossBar *bar_create(void *mem, Entity *e, int lo, int hi, u32 *vtable, in
     return bar;
 }
 
-// Original slide: y += step until 8 (or removed below -8); co-op bars stop at their own target.
+// Is a boss still standing on the map (a co-op boss with HP, or any boss-class ROM enemy)?
+static int boss_standing(void) {
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (is_coop_enemy(e) && e->hp > 0 && is_boss(e)) return 1;
+    }
+    return 0;
+}
+
+// Original slide: y += step until 8 (or removed below -8); co-op bars stop at their own target. A bar
+// whose boss went down (both-down: message 0xF cleared its entity, it shows empty) slides out once no
+// boss stands any more: the stock death only takes the last boss's own bar away.
 static void coop_bar_update(BossBar *bar) {
+    if (!bar->entity && bar->step == 0 && !boss_standing()) bar->step = -1;
     int y = bar->y + bar->step;
     bar->y = (s8)y;
     if (y < -8) EntityList_Remove(BAR_LIST, bar, -8);

@@ -16,7 +16,9 @@ map ZONE AREA`, all maps in `build/scripts/` after a full dump) and the quest ta
 sites, the West City deal, Triceratops Jungle), the duels of items 3 and 6 (space clone duel and
 Hercule at the landing; Time Chamber duel, winner Piccolo / loser Hercule), zone 7 of item 3
 (Android 13 in the cutaway and beside 19, both-down, 13 flees with the "true plan" line; the skip's
-boosts for Hercule and Krillin) and the Android 16 island
+boosts for Hercule and Krillin), Piccolo's chapter of item 4 (13 beside Gero in his three stages,
+Hercule's "negotiate" at the lab door, 13 in the lab, the road with Vegeta as player 2) and the Android
+16 island
 fight from item 6 (Kame House deal, 16 over the two stock stages, half health, Cell). Tested headless
 (`docs/testing.md`).
 
