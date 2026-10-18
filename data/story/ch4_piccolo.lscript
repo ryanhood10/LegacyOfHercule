@@ -1,0 +1,189 @@
+; Piccolo's chapter (docs/story.md section 0 item 4, section 4c), applied by ch4_piccolo.json. Player 1
+; Piccolo, player 2 Hercule (bound since the landing; the save pad keeps the others). Android 13 (sprite
+; 165, speaker 0: no portrait) backs Dr. Gero up in all three of Gero's stages (bosses.c: stat 7 pairs
+; with 13, stat 112, both-down) and flies off after each; in the lab he watches 17 and 18 turn on Gero
+; and leaves. The road: in co-op Vegeta arrives and is player 2 for the fight against 18 and her twin 17
+; (bosses.c: stat 4's partner model is 17's, sprite 9), then player 2 is Hercule again.
+; Speakers: 0 narration, 3 Piccolo, 4 Vegeta, 28 Android 17, 29 Android 18, 32 Dr. Gero, 67 Hercule.
+
+; ---- zone 8 area 13: Gero's first stage ("You're trying to find my secret lab") ---------------------
+
+sequence ch4_gero_first
+  script                                 ; stock entry 0, plus 13 beside Gero
+        SpawnCharacterEntity 165, 224, 240
+        PlayAudio 50
+        SetStoryFlag 90
+        WalkToPosition 14, 192, 240
+  stock @083d5ddc                        ; Gero: you'll never get inside!
+  text 0 "@^ANDROID 13: Told ya I'd be back.\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
+  script                                 ; stock entry 2: Gero (and 13, his boss twin) fight
+        DespawnEntity 165
+        DespawnCharacterAndRecordPosition 14, 1
+        DrawBossHealthBarRange 14, 75, 100
+        ClearCollisionRect 72, 0, 208, 24
+        ClearCollisionRect 240, 568, 376, 592
+end
+
+; ---- zone 8 areas 27 and 40: the two generators at the lab door (Gero's second and third stages) -----
+; Stock: entry 0 skips to the second-visit lines when the other generator's flag is set. The index it
+; returns is absolute, so the sequences are restated with it moved.
+
+sequence ch4_gero_door_a27
+  script
+        PlayAudio 50
+        SetStoryFlag 89
+        StackTestStoryFlag 88
+        JumpIfFalse L1
+        PushByte 9
+      L1:
+        END
+  stock @083d6274                        ; Gero: I won't let you get into my lab!
+  text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
+  text 3 "!PICCOLO: Hercule.  Get behind me."
+  script
+        SpawnCharacterEntity 165, 360, 176
+        SetEntityFacing 165, 2
+        WaitFrames 20
+  text 0 "@^ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  script
+        DespawnEntity 165
+  stock @083d62dc                        ; the fight, stage 50-75
+  stop
+  stock @083d6304                        ; Gero: the last generator
+  script
+        SpawnCharacterEntity 165, 360, 176
+        SetEntityFacing 165, 2
+        WaitFrames 30
+        DespawnEntity 165
+  stock @083d6360                        ; the fight, stage 25-50
+end
+
+sequence ch4_gero_door_a40
+  script
+        PlayAudio 50
+        SetStoryFlag 88
+        StackTestStoryFlag 89
+        JumpIfFalse L1
+        PushByte 9
+      L1:
+        END
+  stock @083d76e0                        ; Gero: I won't let you get into my lab!
+  text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
+  text 3 "!PICCOLO: Hercule.  Get behind me."
+  script
+        SpawnCharacterEntity 165, 232, 264
+        SetEntityFacing 165, 2
+        WaitFrames 20
+  text 0 "@^ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  script
+        DespawnEntity 165
+  stock @083d7748                        ; the fight, stage 50-75
+  stop
+  stock @083d7770                        ; Gero: the last generator
+  script
+        SpawnCharacterEntity 165, 232, 264
+        SetEntityFacing 165, 2
+        WaitFrames 30
+        DespawnEntity 165
+  stock @083d77cc                        ; the fight, stage 25-50
+end
+
+; ---- zone 8 area 46: the cutaway into the lab (map 8/60): Gero wakes 17 and 18; 13 watches ----------
+
+sequence ch4_lab
+  script                                 ; stock entry 0, plus 13 in the corner
+        SetPlayerVisible 0
+        PanCameraToPosition 72, 392, 3
+        WaitFrames 60
+        SetMapRestoreFlag
+        PlayMusic 7
+        LoadMapWithEntities 8, 60, 1, 184, 168
+        SpawnCharacterEntity 165, 304, 184
+        SetEntityFacing 165, 2
+        PlayAudio 50
+  stockseq @083d9f5c 1 27                ; Gero, 17, 18, the controller, "not going to put us to sleep again"
+  script
+        WaitFrames 30
+        SetEntityFacing 165, 1
+        WaitFrames 20
+  text 0 "@^ANDROID 13: (Heh...  You built 'em too well, Doc.)"
+  text 0 "@^(Don't you worry.  Whatever they do to you, I'll fulfil my destiny.\x0bGoku is mine.)"
+  script
+        WalkToPosition 165, 336, 296
+        DespawnEntity 165
+  stock @083d9f44                        ; back to area 46, flag 124
+end
+
+; ---- zone 8 area 49: the road. 17, 18 and 16; in co-op Vegeta arrives and fights beside Piccolo ------
+
+sequence ch4_road
+  stockseq @083d8b60 0 22                ; the car talk, 16 refuses, 18: "I'll handle this."
+  script                                 ; co-op: Vegeta's arrival (next 24), else the fight (29)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 24
+        END
+      L1:
+        PushByte 29
+        END
+  text 67 "HERCULE: Uh...  Hey, look at the time!  I'd love to stay, but I promised I'd guard the...  the road!"
+  text 4 "!VEGETA: Out of my way, clown.\x0bThe machines are mine.  Namek, try to keep up."
+  script                                 ; player 2 plays Vegeta for the fight; Hercule steps back
+        FadeOut 30
+        WaitFrames 20
+        ClearCharacterFlag_Bit1 0
+        ClearCharacterFlag_Bit1 5
+        SetCharacterFlag_Bit1 2
+        CoopCall 6, 2, 0, 0
+        FadeFromWhite 30
+  text 28 "ANDROID 17: Vegeta, isn't it?  Then I'll take you.\x0b18, the green one's yours."
+  text 29 "ANDROID 18: Fine by me."
+  stock @083d8b38                        ; the fight: 18 (and 17, her twin)
+end
+
+; 18 (or the pair) beaten: she gets up and blasts Piccolo; player 2 is Hercule again for the stock ending
+sequence ch4_road_end
+  stockseq @083d98ac 0 1                 ; 18 falls, gets up, the blast, "Nice try!  Who's next?"
+  script                                 ; stock entry 2, with player 2 back to Hercule during the fade
+        PlayMusic 37
+        FadeOut 120
+        ClearCharacterFlag_Bit1 2
+        SetCharacterFlag_Bit1 0
+        SetCharacterFlag_Bit1 5
+        CoopCall 6, 5, 0, 0
+        PanCameraToPosition 152, 296, 10
+        WaitFrames 60
+        SetEntityPositionInstant 0, 0, 0
+        SetEntityAnimation 0, 0
+        PushActiveCharIndex
+        PushByte 2
+        CmpEq
+        PushActiveCharIsTransformed
+        And
+        JumpIfFalse L1
+        SetEntityAnimation 0, 36
+      L1:
+        SetEntityPositionInstant 11, 224, 344
+        SetEntityFacing 11, 0
+        SpawnCharacterEntity 8, 344, 368
+        SetEntityFacing 8, 3
+        SpawnCharacterEntity 9, 256, 288
+        SpawnCharacterEntity 76, 88, 432
+        FindCharacterEntity 0
+        FindCharacterEntity 1
+        FindCharacterEntity 2
+        FindCharacterEntity 3
+        FindCharacterEntity 4
+        SetEntityFacing 76, 3
+        FadeFromWhite 90
+        WalkToPosition 9, 256, 336
+        WaitFrames 60
+        WalkToPosition 9, 208, 368
+        WaitFrames 40
+        PanCameraToPosition 32, 312, 3
+        WaitFrames 60
+        SetEntityAnimation 76, 4
+  stockseq @083d98ac 3 11                ; 17: "We want Goku", the birds, Krillin's plea
+  text 67 "#HERCULE: Y-yeah!  What the little guy said!\x0bLeave Goku alone, or...  or you'll have to deal with me!"
+  stockseq @083d98ac 12 48               ; 17's game, the kiss, Vegeta storms off, Piccolo leaves alone
+end

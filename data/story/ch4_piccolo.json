@@ -1,0 +1,49 @@
+{
+  "_": "Piccolo's chapter (docs/story.md section 0 item 4): Android 13 backs Dr. Gero up in his three stages and flies off after each, Hercule offers to negotiate at the lab door, 13 watches 17 and 18 turn on Gero in the lab and leaves, the road fight with Vegeta as player 2 in co-op against 18 and 17, the stock ending with Hercule beside Krillin. Scripts in ch4_piccolo.lscript.",
+  "sources": ["data/story/ch4_piccolo.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 8, "area": 13},
+      "_": "Gero's first stage (75-100): 13 beside him; his defeat script flies Gero off, 13 follows",
+      "triggers": {"0": {"payload": "seq:ch4_gero_first"}},
+      "edits": [
+        {"at": "record:1/defeat", "replace": [
+          ["FindPlayerEntity", "FlyToPosition 165, 224, 0\nDespawnEntity 165\nFindPlayerEntity"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 27},
+      "_": "a generator at the lab door (Gero 50-75 or 25-50)",
+      "triggers": {"0": {"payload": "seq:ch4_gero_door_a27"}},
+      "edits": [
+        {"at": "record:3/defeat/entry:4", "replace": [
+          ["FindPlayerEntity", "FlyToPosition 165, 496, 0\nDespawnEntity 165\nFindPlayerEntity"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 40},
+      "_": "the other generator at the lab door",
+      "triggers": {"0": {"payload": "seq:ch4_gero_door_a40"}},
+      "edits": [
+        {"at": "record:1/defeat/entry:4", "replace": [
+          ["FindPlayerEntity", "FlyToPosition 165, 80, 104\nDespawnEntity 165\nFindPlayerEntity"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 46},
+      "_": "the lab cutaway (loads map 8/60): 13 watches and leaves",
+      "triggers": {"0": {"payload": "seq:ch4_lab"}}
+    },
+    {
+      "map": {"zone": 8, "area": 49},
+      "_": "the road: Vegeta as player 2 for the fight in co-op, Hercule again for the ending",
+      "triggers": {"0": {"payload": "seq:ch4_road"}},
+      "records": {
+        "0": {"action": "seq:ch4_road_end"}
+      }
+    }
+  ]
+}

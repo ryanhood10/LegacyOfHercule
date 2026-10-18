@@ -716,6 +716,11 @@ rules for 13's stats 110 / 112, so 13 fights beside them without a player 2 too:
 (13's lines, 13 flying off by sprite 165) need him on the map. Tested headless against one player;
 the defeat runs as in co-op.
 
+**Leftover bar (fixed 2026-10-18, story-scripts):** under both-down the first boss's bar keeps showing
+empty (message 0xF clears its entity), but the stock death only removes the last boss's own bar, so
+the empty one stayed on screen after every pair fight (19 + 13, Gero + 13). `coop_bar_update` now
+slides a bar without an entity out once no co-op boss with HP is left on the map.
+
 **Found and fixed on the way:** player 2 froze whenever player 1 was in the hurt state
 (`0x08025B98`): `p1_controllable()` whitelists player 1's control states to tell cutscenes from play,
 and the hurt state was missing, so a boss pair pummelling player 1 also froze player 2. It is in the
