@@ -1,0 +1,21 @@
+{
+  "_": "Broly side-arc arena (docs/story.md 4f): a rocky wasteland crater. Northern Wastelands zone 3 area 6: its walled basin (cliff walls north and west, a pebble rim south and east; the basin's own collision) as the arena floor, the pod crater on the plain above it as scenery, the plain filled in around them. Only the basin is walkable.",
+  "name": "broly_arena",
+  "zone": 15, "area": 3,
+  "base": [3, 6],
+  "tileset": "fresh",
+  "layout": [640, 544],
+  "ops": [
+    {"op": "fill", "bg": 3, "rect": [0, 0, 80, 68], "src": {"map": [3, 6], "bg": 3, "rect": [2, 2, 4, 4]}},
+    {"op": "stamp", "at": [44, 0], "src": {"map": [3, 6], "rect": [48, 8, 32, 26]}, "collision": false},
+    {"op": "stamp", "at": [7, 24], "src": {"map": [3, 6], "rect": [10, 36, 66, 42]}},
+    {"op": "border", "width": 1, "mask": "both"}
+  ],
+  "triggers": [
+    {"type": "flight", "rect": [264, 440, 312, 480], "world": [1670, 1192]}
+  ],
+  "spawn": [276, 354],
+  "name_id": 223,
+  "music": 30,
+  "flags": 1
+}

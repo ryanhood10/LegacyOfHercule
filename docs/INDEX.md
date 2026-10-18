@@ -14,6 +14,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `docs/rom-map.md` | ROM regions, IWRAM image, toolchain, seeded function list, open questions | looking for an address |
 | `docs/coop-design.md` | co-op findings and status: movement, camera, EXP, switching, enemies, twins, netplay | co-op behaviour |
 | `docs/widescreen.md` | dynamic wide view design, map streaming, the mGBA fork | wide view / fork |
+| `docs/maps.md` | map format (MapEntry, variation, layers, tiles, palette, collision, triggers, exits, gates), the map tools, adding maps, the zone-15 maps, Buu's Fury maps | maps, warps, new areas |
 | `docs/sprites.md` | sprite record format, atlas, playable candidates, SSJ Hercule clone | sprites, new characters |
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
@@ -50,7 +51,8 @@ file and tool, and says where to look for a given question. Keep it current.
 | `util.c` | freestanding memcpy/memset helpers |
 | `coop.ld` | linker script: `.coop` sections, pinned EWRAM regions, `EXTERN` list of hook symbols |
 
-Generated at build time (never committed): `build/gen/sprites_data.c` (SSJ Hercule record, relocated
+Generated at build time (never committed): `build/maps.patch.json` (the new maps, from
+`tools/mapbuild.py` and `data/maps/*.json`; previews in `$(BUILD)/maps/`), `build/gen/sprites_data.c` (SSJ Hercule record, relocated
 `sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/gen/a16_sprites_data.c`
 (Android 16's sprite 160 and the missile / fist / explosion frames, from `tools/a16sprites.py`), `build/gen/buu_sprites_data.c`
 (sprite ids 158+ converted from Buu's Fury by `tools/buu2log2.py`, when `roms/buu.gba` is present),
@@ -58,6 +60,8 @@ Generated at build time (never committed): `build/gen/sprites_data.c` (SSJ Hercu
 
 ## Data (`data/`)
 
+`maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`; format in
+`docs/maps.md`), built by `tools/mapbuild.py` and placed by `patch_rom.py --maps` (`MAPS=1`).
 `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
 Keep-Goku byte, included text records); `hercule-text.json` holds dialogue records written by
 `tools/script_dump.py`. Applied by `tools/romdata.py build` then `patch_rom.py --data-patch`.
@@ -66,7 +70,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 
 | tool | what it does |
 |---|---|
-| `patch_rom.py` | builds the ROM: pad to 16 MiB, place the blob, vtable slot hooks, entry jumps, word/byte patches, literal relocations, `--party-slots N` (count patches, shadow tables, N-entry default table), `--wide`, `--debug-menu`, `--data-patch` |
+| `patch_rom.py` | builds the ROM: pad to 16 MiB, place the blob, vtable slot hooks, entry jumps, word/byte patches, literal relocations, `--party-slots N` (count patches, shadow tables, N-entry default table), `--wide`, `--debug-menu`, `--data-patch`, `--maps` (new maps; relocates the MapEntry table last) |
 | `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json`; `build --party-slots N` targets the relocated N-entry table |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
@@ -75,6 +79,9 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group) and the projectile frames -> `build/gen/a16_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
+| `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates (also reads Buu's Fury variations) |
+| `mapexport.py` | render any map from the ROM: per-layer PNGs, composite, walk / projectile overlays, summary; `--list`, `--all`, `--tileset`, `--table/--count` for a built ROM |
+| `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps, generated tiles, recolour into new banks, effect overlays, collision ops, triggers, exits, gates -> `--maps` records + MapEntry rows |
 | `widerender.py` | offline reference render of the wide view from a savestate |
 | `savestate.py` | dump memory regions/words from an mGBA savestate |
 | `romcheck.py` | ROM header/hash check |
@@ -105,4 +112,5 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |
 | the Android 16 boss, hit messages, projectiles, enemy control states | `src/coop/android16.c`, `docs/coop-design.md` "Android 16 boss", `docs/sprites.md` "Android 16 boss sprite" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |
+| a map's layout, collision, exits, tiles; adding or re-dressing a map | `docs/maps.md`, `tools/mapexport.py`, `tools/mapbuild.py`, `data/maps/` |
 | what Ryan decided / asked for | `docs/log.md`, `docs/plan-legacy-of-hercule.md` section 4, `docs/story.md` |

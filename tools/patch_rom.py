@@ -2,6 +2,7 @@
 vtable slots that redirect into it, and patch function entries with long jumps.
 
 usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--party-slots N] [--debug-menu] [--wide] [--data-patch FILE.json ...]
+                    [--maps maps.patch.json]
 
 --data-patch FILE.json applies generic data records to the output ROM (after the code and hooks).
 The file is a JSON list; each record is an object with a file offset and one of:
@@ -11,6 +12,12 @@ The file is a JSON list; each record is an object with a file offset and one of:
     {"offset": "0x8024",   "word":  "fn:hercule_taunt"}   u32 = symbol address | 1 (Thumb function pointer)
 An optional "expect": "5b" (hex) aborts the build if the bytes there differ, and "note" is printed.
 Records are applied in order; tools/romdata.py and tools/script_dump.py generate these files.
+
+--maps FILE.json (tools/mapbuild.py build) adds new maps, as the LAST step (after --data-patch, so map
+record edits made at the original table offsets are kept): its "records" (chunks, tiles, collision,
+variations, ...) are written into free ROM (must be unused 0xFF padding), then the MapEntry table is
+relocated to "table_offset": the 327 stock rows as patched so far, followed by the new "rows"; the four
+code literals that hold the table address (and &table[3]) and Map_GetCount's constant are repointed.
 """
 import json
 import os
@@ -267,11 +274,65 @@ def apply_data_patch(rom, path, syms):
         print(f"data   {ROM_BASE + off:08x} {len(data):5} bytes  {rec.get('note', '')}")
 
 
+MAP_TABLE = 0x409368                       # g_MapEntries (file offset)
+MAP_COUNT, MAP_ROW = 327, 0x38
+MAP_TABLE_LITERALS = [0x5ADC, 0x5D5C, 0xEBD8]   # Draw_DebugTestMenu, Debug_LoadMapFromSelection, Map_FindEntry
+MAP_ENTRY3_LITERAL = 0x195C                 # &g_MapEntries[3] (new-game map)
+MAP_COUNT_CODE = 0xE0AC                     # Map_GetCount: movs r0,#0xFF; adds r0,#0x48 (327)
+
+
+def apply_maps(rom, path):
+    """New maps from tools/mapbuild.py: data records, then the relocated, extended MapEntry table."""
+    m = json.load(open(path))
+    for rec in m["records"]:
+        off = int(rec["offset"], 0)
+        data = bytes.fromhex(rec["bytes"])
+        if off + len(data) > len(rom):
+            sys.exit(f"maps: record at {off:#x} runs past the ROM")
+        if any(b != 0xFF for b in rom[off:off + len(data)]):
+            sys.exit(f"maps: record at {off:#x} ({rec.get('note', '')}) overlaps used ROM; move MAP_FREE")
+        rom[off:off + len(data)] = data
+    rows = [bytes.fromhex(r) for r in m["rows"]]
+    if not rows:
+        return
+    stock = bytes(rom[MAP_TABLE:MAP_TABLE + MAP_COUNT * MAP_ROW])
+    have = {(stock[i * MAP_ROW], stock[i * MAP_ROW + 1]) for i in range(MAP_COUNT)}
+    for r in rows:
+        if (r[0], r[1]) in have:
+            sys.exit(f"maps: zone {r[0]} area {r[1]} already exists")
+        have.add((r[0], r[1]))
+    count = MAP_COUNT + len(rows)
+    if count > 255 + 255:
+        sys.exit(f"maps: {count} entries do not fit Map_GetCount's movs/adds")
+    table = int(m["table_offset"], 0)
+    new = stock + b"".join(rows)
+    if any(b != 0xFF for b in rom[table:table + len(new)]):
+        sys.exit(f"maps: table space at {table:#x} is not free")
+    rom[table:table + len(new)] = new
+    for off in MAP_TABLE_LITERALS:
+        cur = struct.unpack_from("<I", rom, off)[0]
+        if cur != ROM_BASE + MAP_TABLE:
+            sys.exit(f"maps: literal at {off:#x} is {cur:08x}, expected the map table")
+        struct.pack_into("<I", rom, off, ROM_BASE + table)
+    cur = struct.unpack_from("<I", rom, MAP_ENTRY3_LITERAL)[0]
+    if cur != ROM_BASE + MAP_TABLE + 3 * MAP_ROW:
+        sys.exit(f"maps: literal at {MAP_ENTRY3_LITERAL:#x} is {cur:08x}, expected &table[3]")
+    struct.pack_into("<I", rom, MAP_ENTRY3_LITERAL, ROM_BASE + table + 3 * MAP_ROW)
+    if rom[MAP_COUNT_CODE:MAP_COUNT_CODE + 4] != bytes([0xFF, 0x20, MAP_COUNT - 255, 0x30]):
+        sys.exit(f"maps: Map_GetCount at {MAP_COUNT_CODE:#x} is {rom[MAP_COUNT_CODE:MAP_COUNT_CODE + 4].hex()}")
+    rom[MAP_COUNT_CODE + 2] = count - 255
+    for info in m["maps"]:
+        print(f"map    zone {info['zone']} area {info['area']} {info['name']} ({info['size'][0]}x{info['size'][1]} px)")
+    print(f"maps   table {ROM_BASE + table:08x}: {count} entries, {len(m['records'])} records "
+          f"{m['free_start']}..{m['free_end']}")
+
+
 def main():
     orig, blob, symfile, out = sys.argv[1:5]
     debug_menu = "--debug-menu" in sys.argv[5:]
     wide = "--wide" in sys.argv[5:]
     data_patches = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--data-patch"]
+    maps = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--maps"]
     party_slots = int(next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--party-slots"), 6))
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
@@ -337,6 +398,8 @@ def main():
     for path in data_patches:
         apply_data_patch(rom, path, syms)
     apply_party_count_patches(rom, party_slots)
+    for path in maps:
+        apply_maps(rom, path)
 
     open(out, "wb").write(rom)
     print(f"wrote {out}: {len(rom)} bytes, code {len(code)} bytes at {ROM_BASE + CODE_AT:#x}")
