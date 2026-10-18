@@ -42,6 +42,32 @@ Always `pkill -9 -x mgba` before launching: a stale instance keeps ports 7778/23
 silently runs without pad or debugger. The log says `p2pad: sender connected` when the pad is live.
 Select cycling for player 2 registers only every few presses; verify the slot instead of counting.
 
+## Fork helpers (`tools/fork/`, used for the party-slots work)
+
+The stub accepts one client per emulator run: a second `target remote` never completes, and a client
+that quits while attached leaves the stub writing to a dead socket (SIGPIPE kills mGBA unless the
+launcher ignores it). So keep one gdb attached for the whole run:
+
+```
+toolsorkunfork.ps1 /mnt/f/MeltyCreations/log2/build/party8/log2-coop.gba 14   # kill old, launch with -g + trap '' PIPE, attach, continue, wait
+wsl -d Ubuntu -u root -- bash -c "/root/peek.sh"            # pause, dump party / player / EEPROM slots (peek.gdb), continue
+wsl -d Ubuntu -u root -- bash -c "/root/keys.sh 8 0.25"      # hold Start 0.25 s through g_p1_remote (0x0203FF02): A=1 B=2 Sel=4 Start=8 R/L/U/D=0x10/20/40/80 R=0x100 L=0x200
+wsl -d Ubuntu -u root -- bash -c "/root/tele.sh 544 215"     # teleport player 1 (pixels)
+```
+
+Copy the `.sh`/`.gdb` files to `/root` first (`runfork.ps1` expects them there; strip CR). `keys.sh`
+pauses, writes the pad word, continues, sleeps, releases: the title, the debug menu, the Select Game
+menu and in-game movement take it; the save pad's Save/Switch dialog, the switch screen and the pause
+menu do not (they read the pad during a modal loop), so drive those with `win_keys.ps1` (arrows,
+X=A, Z=B, A=L, S=R, Enter=Start, Backspace=Select; 250-300 ms holds register, shorter ones drop).
+`win_keys.ps1` / `win_shot.ps1` restore a minimised window. `reset.sh` jumps the CPU to the ROM
+entry: EWRAM survives, so the co-op state's stale player-2 pointer crashes the next map; prefer a
+relaunch (the `.sav` keeps the EEPROM). mGBA starts the EEPROM as a 512-byte device and zero-extends
+it on the first wider access, so bytes beyond 0x200 read as zero until written. A `DEBUG_MENU=1` ROM
+turns a new game into the debug menu (the patch replaces the intro video). A stale
+`tools/p2_keys.py` from another session reconnects to the fork's port 7778 and injects player-2
+buttons; kill it before testing.
+
 ## GDB stub (fork, `-g`, port 2345) — the fastest way to a crash cause
 
 `gdb-multiarch` is installed in WSL. Launch the fork with `-g`, then run a batch script:

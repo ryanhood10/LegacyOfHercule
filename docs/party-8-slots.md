@@ -1,92 +1,136 @@
-# Growing the party from 6 to 8 slots (plan, 2026-10-17)
+# PARTY_SLOTS: a party of N entries (built 2026-10-17, default 8)
 
 Ryan's decision: Krillin (and later others) are real party members with their own stats and saves,
-so the party grows. This page is the inventory of everything in the ROM that assumes six, found by
-decompiling every function (`build/decomp_all/`, `DecompileFunctions.java ... all`) and grepping,
-and the plan to change it. No code written yet.
+so the party grows. This page records what the build does, every ROM site that assumed six (found
+by decompiling every function, `build/decomp_all/`, and grepping), how each is patched, what was
+verified in mGBA and what is still placeholder. `make PARTY_SLOTS=N` (default 8, code written for
+6..16; see "Limits") builds it; `tools/patch_rom.py --party-slots N` applies the patches and asserts
+every patched byte's stock value.
 
-## What the party block is
+## The party block
 
-`g_PartyState` at `0x03000E90`, 0x164 bytes, BSS (not in the IWRAM image); the next global starts
-at `0x03000FF4`, so it cannot grow in place. Layout (from `Party_Init` `0x08003C24`, the flag
-accessors and the save code):
+Stock: `g_PartyState` at `0x03000E90`, 0x164 bytes of IWRAM BSS followed by other globals, so it
+cannot grow in place. The build pins `g_party_block` (`src/coop/party.c`, section `.party`) at
+`0x0203F000` and repoints the 27 ROM words that hold the stock address (`PARTY_PTR_WORDS` in
+`patch_rom.py`; the static initialiser's literal at file 0x22EE8 plus the per-module pointer tables).
+The arena cap drops to 0xF9FE words: the arena hands out `0x02000808 + 4 * cap`, so the stock 0xFDFE
+ended exactly at 0x02040000 and the earlier 0xFCC0 let the first allocation (the 8 KiB EEPROM mirror,
+`0x08021454`) run 8 bytes past 0x0203FB00 into `coop2`. Layout (`PartyState` in `src/coop/rom.h`;
+offsets for N = 6, everything after the entries moves by `(N - 6) * 0x1C`):
 
 ```
-+0x00  u8   active slot
-+0x01  u8   flags (bit0 "saved", bit2 ...)
-+0x02  u8[3] zone, area, variation of the save position
-+0x04  u32  ?
-+0x08  s32  meter (HUD, 24.8)
-+0x0C  CharacterEntry[6] x 0x1C   (name/hp/ep/stats/exp/flags/abilities; +0x20 flags: bit0 in party, bit1 selectable, bit5.. unlocked moves)
-+0xB4  u8[100] event-flag bank 1  (Flag_Test/Set/Clear 0x08003E42/5E/74, 0x08003F06; Party_Init descriptor 0x19 x 4)
-+0x11A u8[]   "seen" bit bank    (0x0800B00C, 0x08018A38, 0x08019204: journal / bestiary bits)
-+0x12B        bank 2 descriptor base in Party_Init (0x19 x 4)
-+0x160 s16 x, +0x162 s16 y  save position (SaveGame 0x08004030); +0x163 also used as a byte flag
-                                (0x0800831C/8330/833E set it to 0 / 0x80 around character changes)
++0x00  u8   active slot              +0x01 u8 flags: bit0 saved once, bit1 meter shown, bit2 debug party
++0x02  u8   zone, area, variation    (save position's map, SaveGame)
++0x08  s32  meter (24.8)
++0x0C  CharacterEntry[N] x 0x1C      hp/ep/row/stats/exp/flags/abilities
++0xB4  u8[0x66] event flags          Flag_Test/Set/Clear 0x08003E42/5E/74, condition word 0x08003F06
++0x11A u8[0x10] seen bits            journal / bestiary (0x0800B00C, 0x08018A38, 0x08019204)
++0x12B u8[0x32] item counters        0x08004348, 0x080095E4, 0x080096CA, 0x080096E8, 0x0800F3F0
++0x160 s16 x, +0x162 s16 y           save position (pixels)
 ```
 
-The game never holds the party address in code literals except once (static init, file 0x22EE8);
-everything else reads it from 26 pointer tables in data (per-module globals blocks such as
-`0x083B50DC+0x20`, the script module's blocks, `0x081D94D0`). Only two data words point *inside*
-the block and both are unrelated graphics bytes, so the block can move freely.
+`Party_Init` fills the entries from the default table and zeroes 50 bytes at +0xB4 and at +0x12A.
+The region `partyram` (`coop.ld`, 0x0203F000..0x0203FB00) also holds the save menu's slot store and
+the switch screen's view party; `coop2` keeps 0x0203FB00. (The three sites `0x0800831C/8330/833E`
+listed by the earlier inventory touch an Entity's resistance bytes, not the party.)
 
-## Every site that assumes six (grouped by the patch it needs)
+## Every site that assumed six, and its patch
 
-**A. Pointer words (27)**: file 0x22EE8, 0x1D4F20, 0x1D94D0, 0x1D9534, 0x1D9C10, 0x1D9CA8,
-0x1DA8D8, 0x3B50FC, 0x3B526C, 0x3B5354, 0x3B5C98, 0x3B5F6C, 0x3EC838, 0x3EC9D0, 0x3ED1A4,
-0x3ED1C0, 0x40DAF8, 0x6ADE1C, 0x6D60EC, 0x6D7628, 0x6D7640, 0x6DB288, 0x6E3620, 0x6F7E54,
-0x6F8078, 0x6F88CC, 0x6FD86C. All become the new block (LITERAL_RELOCATIONS already does this
-kind of edit).
+**Pointer words (27)** -> `LITERAL_RELOCATIONS` to `g_party_block`.
 
-**B. Tail offsets (+0x38 each)**: Party_Init 0x08003C24 (+0xB4, +0x12B descriptors); flag bank 1
-accessors 0x08003E42, 0x08003E5E, 0x08003E74, 0x08003F06 (+0xB4); bank 2 users 0x0800B00C,
-0x08018A38, 0x08019204 (+0x11A); save position / end byte 0x08004030 (+0x160/+0x162),
-0x0800831C, 0x08008330, 0x0800833E (+0x163). Thumb immediates: 0xB4->0xEC, 0x11A->0x152,
-0x12B->0x163 fit `add #imm8`; the 0x160-0x163 sites need per-site inspection (likely
-`mov+lsl` or a pool literal). About 15 instructions.
+**Tail offsets, re-implemented in C** (entry jumps, `PARTY_ENTRY_JUMPS`; all generic in
+`PARTY_SLOTS`): `Party_Init` 0x08003C24, `Flag_Test/Set/Clear` 0x08003E42/5E/74, the script condition
+word 0x08003F06 (`src/coop/party.c`); VM counter opcodes 0x080095E4/96CA/96E8, item use 0x0800F3F0,
+bestiary "seen" opcode 0x0800B00C. (0x08003E8A is an unreferenced flag toggle.)
 
-**C. Slot-count constants (`< 6`)**: 0x08003480 (switch-screen list builder; object 0x170 ->
-0x178), 0x08003E00, 0x08003E28, 0x08003ED4 (detransform others), 0x08005C0A (debug party; its
-`slot != 5` Hercule special case too), VM character-id checks `id - 2 < 6` in 0x0800B1E2 and
-0x0800B296 (scripts name characters as slot + 2, so Krillin = 8, Hercule stays 7). About 8 bytes.
+**Tail offsets in large constructors -> shadow tables** (`PARTY_SHADOWS`): 0x08004348 (status item
+list, counters), 0x08018A38 (journal page, seen bit), 0x08019204 (bestiary list, seen bits) load the
+party through a private pool word -> pointer table -> party word. The pool word is repointed to a
+0x200-byte copy of the table at file 0xA01000+ whose party word is `g_party_block + shift`, so their
+unchanged `adds #0xFF; adds #0x11; ldrb [r, #10]` instructions land on the moved banks for any N.
+The same trick gives the switch screen its view party (below).
 
-**D. Default party and growth rows**: the default table `0x081D9548` (6 x 0x1C, literal file
-0x3EA0) is followed by the growth rows at table+0xA8 (`0x08003CA0` adds 0xA8). Relocate the table
-to our data (8 entries + 8 x 3 growth pairs) and change 0xA8 -> 0xE0. `data/hercule.json` already
-rewrites these rows through `tools/romdata.py`, so the 8-entry table can be emitted the same way.
+**Count constants** (`PARTY_COUNT_PATCHES`, imm8): 0x08003E00 / 0x08003E1E / 0x08003ED4 loops,
+the status list builder 0x08003480 (loop and object size 0x170 + 4 per slot, also allocated by
+0x08004CAC), the VM character-id range `(id - 2) <= 5` in 0x0800B1E2 (scripts name characters as
+slot + 2: Krillin = 8), the debug party loop 0x08005C0A (fills only the *defined* slots: entries
+with a max HP after the data patch). The switch screen's own `< 6` (0x08010C90) stays: its view
+never holds more than six.
 
-**E. Save path (0x164 / 0x168 everywhere)**: SaveGame 0x08004030, LoadSlot 0x08003F9C, WriteSlot
-0x08003FEC (each copies the block into a 0x164-byte stack buffer, checksums it and reads/writes
-SRAM at `0x10 + slot * 0x168` through 0x08021526 / 0x080214C4), and the save-menu module
-0x08001960, 0x080019D4, 0x080019F6, 0x08001A0C, 0x08001A26, 0x08001A8A, 0x08001AE2, 0x08001B0E,
-0x0800180C (slot buffer with stride 0x164, copy / erase / validity / load). Patching stack frames
-and strides by hand is fragile, so: **re-implement the three party-module save functions and the
-menu's SRAM reader, slot copy and slot erase in C** (entry jumps, like `exp.c`), with a new SRAM
-layout: header 0x10, slots of 0x19C + 4 checksum at stride 0x1A0 (SRAM is 32 KiB; the stock game
-uses 0x448 bytes). Old saves are not loadable; the menu shows them as empty.
+**Default party and growth rows**: rebuilt with N entries at file 0xA00000 (`romdata.PARTY_TABLE_AT`:
+stock rows 0-5, zero rows above, growth rows after the entries) and the literal at 0x3EA0 repointed
+to `table + N * 0x1C - 0xA8` so the level-up code 0x08003CA0 still reads growth at literal + 0xA8.
+`tools/romdata.py build --party-slots N` writes `data/hercule.json`'s party/growth records into that
+table (the Makefile passes it); `romdata.py party build/<dir>/log2-coop.gba` prints the built one.
 
-**F. Screens**: the save-pad switch screen (0x08010BCE / 0x08011172, list from 0x08003480) and the
-status screen (0x0800379C, slot list at object+0x158) lay out portraits for up to six; check what
-they do with eight (spacing or paging) once the data side works.
+**Save path** (`src/coop/party_save.c`, entry jumps): `SaveGame` 0x08004030, `LoadSlot` 0x08003F9C,
+`WriteSlot` 0x08003FEC and the save menu's 0x08001960 (read slots), 0x080019D4/19F6 (saved),
+0x08001A0C (location name), 0x08001A26 (portrait count), 0x08001A44/1A66 (member in party /
+selectable), 0x08001A8A (active position), 0x08001AB8 (member sprite), 0x08001AE2 (start as member),
+0x08001B0E (erase), 0x0800180C (start game, returns 0 like the original or the menu falls through to
+the intro video). EEPROM layout: header 0x10 unchanged, slots of `SAVE_STRIDE = (sizeof PartyState +
+4 + 7) & ~7` bytes (0x1A0 for N = 8) at `0x10 + slot * stride`, block then u32 checksum
+(`0x0802153E`), written through the ROM's own mirror + EEPROM routines (`0x080214C4`, 8-byte
+blocks). Three slots use 0x4F0 of the 8 KiB (0x790 for N = 16). Old six-slot saves fail the checksum
+and read as empty. The menu's screen object keeps its stock size: the three 0x164-byte buffers inside
+it are unused, the slots live in a private store (`SaveStore` in `.party`), and its six-wide portrait
+rows show a window of at most six members around the slot's active character (start-as-member picks
+among those). The menu has no slot-copy feature (start / erase only).
 
-**G. Our own code and data**: `CharacterEntry chars[6]` in `src/coop/rom.h`, slot loops in
-`player.c` (`slot_ok`, `p2_cycle % 6`, `pick_p2_slot`), `hud.c`, `exp.c`, `tools/mgba/peek.lua`
-offsets, `data/hercule.json` party rows (add Krillin and old Hercule), `docs/engine.md`.
+**Switch Characters screen** (`src/coop/switch.c`): the stock screen object (0xD8 bytes) holds six
+portrait pairs and reads the party through its module table (0x086D763C word 1). That word is
+shadowed to `switch_view`, a compacted party holding the window of up to six members currently shown,
+so the stock open routine 0x08010BCE lays the portraits out exactly as before. Replaced: the
+constructor 0x08010B08 (allocates 0xD8 + the member list / window, builds the view), prev/next
+0x08010B60/0x08010B9A (queries over the whole party), select 0x0801110C, arrow-button state
+0x080110BC and the input handler 0x08011172, which rebuilds the portraits (delete + create, same
+layout rule) when the selection leaves the window and draws arrow tiles (two 8x8 tiles rendered into
+VRAM 0x06004600, placed on the frame's edge columns of the tilemap at 0x0600E800, rows 9-10; the right
+one is the horizontal flip) while more characters exist on that side. Confirm writes the real party's
+active slot and refreshes player 1 as the original did.
 
-## Where the block goes
+**Status screen** (0x0800379C): its list object is sized for N (above) and shows one character per
+page, so nothing crowds; paging through the list is stock code (Left/Right and Select did not page it
+in the fork test, so the paging key is unconfirmed).
 
-EWRAM, just below the co-op difficulty state: lower the arena cap (the existing `WORD_PATCHES`
-Arena_Init heap size) by 0x200 and pin `PartyState8` (0x19C bytes) at `0x0203F900`. IWRAM would
-be faster but its free space is not mapped; the party is not hot.
+**Co-op code**: `PartyState chars[PARTY_SLOTS]`, `player.c` slot loops and `p2_cycle`, `ssj.c`,
+`tools/mgba/peek.lua` / `enemies.lua` read the block through the `g_party_block` symbol.
 
-## Order of work (each step testable in mGBA from a savestate)
+## Krillin (slot 6) and slot 7
 
-1. Relocate as-is (A + the block at 0x0203F900, still 6 entries): the game must play and save
-   exactly as before. Proves the pointer inventory is complete.
-2. Grow: B, C, D with 8 entries; new game, level-ups, flags, switching, journal all as before.
-3. Save path E in C; save, load, copy, erase slots; `tools/savestate.py` to inspect SRAM.
-4. Screens F for eight portraits.
-5. G, then Krillin's row/abilities (`docs/sprites.md`) and old Hercule's row.
+`data/hercule.json` gives slot 6 Gohan-like level-1 stats, Ki Blast, flags 0x40 and display row 23
+(`tools/spriteclone.py`: Hercule's row with Krillin's NPC sprite 76, no transformation links; the
+row-limit byte 0x42D6 is now 24). Slot 7 is empty (all zero, never flagged in party). Placeholder
+limits seen in the fork: the status screen names slot 6 from the per-slot name / ability-name tables,
+which have six entries (it shows "GOHAN" and Piccolo's ability names), and his portrait is Hercule's.
+Krillin's own pass (art, abilities, names, growth) is a separate plan (`docs/sprites.md`).
 
-Estimate: steps 1-3 about two days of work with testing, 4-5 another day plus Krillin's own art and
-abilities (separate plan).
+## Limits
+
+- `PARTY_SLOTS` 6..16 (static assert). The count patches are imm8; the object-size patches reach
+  N = 16; the shadow tables and C code have no limit. `partyram` holds the party, the save store
+  (3 slots + 8 bytes each) and the view: 0x87C bytes for N = 8, 0xCC4 for N = 16 (region 0xB00, so
+  N = 16 needs the region and heap cap lowered by 0x200; `coop.ld` errors when it overflows).
+- The save menu shows at most six members per slot; the switch screen shows six at a time.
+- The debug party (Map Test) fills slots 0..defined-1 with level-40 characters, so Krillin appears
+  there with Hercule's look.
+
+## Verified (WSL fork, `build/party8`, PARTY_SLOTS=8, docs/testing.md "fork helpers")
+
+Boot: 8-entry defaults in the block, the stock block stays zero. Map Test party of seven, zone 2
+area 1: the save pad tutorial flag lands in the moved bank (+0xEC), Save writes slot 0 (checksum,
+zone/area/position), the Select Game menu shows the slot's six-portrait window and "East District
+439", loading restores all eight entries and lands on the pad; a new game runs through the hooks.
+Switch Characters: six portraits, right indicator, Right scrolls to Piccolo..Krillin with the left
+indicator, A makes Krillin player 1 (active slot 6), the pause menu shows his stats. Erase: the menu's R
+mode, Delete Game? Yes, and the slot reads as a new game (active 3, flags 0). Not exercised: the
+journal with seen bits set, a save from the real story (the fork's EEPROM starts as a
+512-byte device and zero-extends; slots beyond it read as empty until written).
+
+## Follow-ups
+
+- Krillin's names, portrait, abilities and growth (per-slot tables in the status screen module).
+- Save-menu portrait row wider than six (the menu object's 3 x 6 entity arrays).
+- The status screen's paging key, and an indicator there if it is wanted.
+- The 6 x 0x1C bytes still reserved for the party inside the save-menu object and the scroll's
+  rebuilt portraits (deleted through the entity list, so no leak was seen) are the only loose ends.

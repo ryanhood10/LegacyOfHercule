@@ -1,7 +1,7 @@
 """Build the co-op ROM: pad the original to 16 MiB, drop the compiled code at 0x800000, rewrite the
 vtable slots that redirect into it, and patch function entries with long jumps.
 
-usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--debug-menu] [--wide] [--data-patch FILE.json ...]
+usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--party-slots N] [--debug-menu] [--wide] [--data-patch FILE.json ...]
 
 --data-patch FILE.json applies generic data records to the output ROM (after the code and hooks).
 The file is a JSON list; each record is an object with a file offset and one of:
@@ -13,8 +13,12 @@ An optional "expect": "5b" (hex) aborts the build if the bytes there differ, and
 Records are applied in order; tools/romdata.py and tools/script_dump.py generate these files.
 """
 import json
+import os
 import struct
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import romdata   # noqa: E402  (party table layout shared with tools/romdata.py)
 
 ROM_BASE = 0x08000000
 CODE_AT = 0x00800000
@@ -55,6 +59,22 @@ ENTRY_JUMPS = [
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
 # from 0x02000800 to 0x0203FFF8, over the co-op state at the top of EWRAM; keep the top 1.25 KiB
 # (0x0203FB00 co-op difficulty state, 0x0203FE00 player-2 vtable, 0x0203FF00 pad words + CoopState).
+# The arena hands out [0x02000808, 0x02000808 + 4 * cap): the stock 0xFDFE ends exactly at 0x02040000,
+# and the first allocation (the 8 KiB EEPROM mirror, 0x08021454) sits at the very top. The cap now ends
+# at 0x0203F000, where coop.ld's partyram region (relocated party block + save-menu slot store) starts:
+# (0x0203F000 - 0x02000808) / 4 = 0xF9FE words. (The earlier 0xFCC0 let the mirror's last 8 bytes
+# overlap coop2's magic word at 0x0203FB00; nothing wrote them, so it never showed.)
+WORD_PATCHES = [
+    (0x01F20C, 0x0000FDFE, 0x0000F9FE),
+]
+
+# The 27 pointer words that hold the party block's address (g_PartyState, 0x03000E90): the static
+# initialiser's literal (file 0x22EE8) and the per-module pointer tables in data. Found by scanning the
+# ROM for the value (docs/party-8-slots.md); all become g_party_block so the block can grow.
+PARTY_PTR_WORDS = [0x22EE8, 0x1D4F20, 0x1D94D0, 0x1D9534, 0x1D9C10, 0x1D9CA8, 0x1DA8D8, 0x3B50FC, 0x3B526C,
+                   0x3B5354, 0x3B5C98, 0x3B5F6C, 0x3EC838, 0x3EC9D0, 0x3ED1A4, 0x3ED1C0, 0x40DAF8, 0x6ADE1C,
+                   0x6D60EC, 0x6D7628, 0x6D7640, 0x6DB288, 0x6E3620, 0x6F7E54, 0x6F8078, 0x6F88CC, 0x6FD86C]
+
 # (old literal value, symbol, add, [file offsets]): every listed pool word must hold the old value and
 # becomes symbol+add. Used to move ROM tables that have no spare room into the co-op code area:
 # Character_DisplayData (22 rows -> 23, the 18 literals from the reference notes) and
@@ -63,15 +83,148 @@ LITERAL_RELOCATIONS = [
     (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,
                                      0xB050, 0xC804, 0x10F18, 0x112BC, 0x13574, 0x14FF4, 0x26458, 0x26474]),
     (0x083B4E90, "sprite_index", 0x1C, [0x959C]),
+    (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 23
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 24
+# (row 22 = Super Saiyan Hercule, row 23 = Krillin placeholder; tools/spriteclone.py)
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x17),
+    (0x42D6, 0x16, 0x18),
 ]
 
-WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000FCC0),
+
+# ---- PARTY_SLOTS (--party-slots N): every ROM site that assumed six party entries -----------------
+# The party block lives in EWRAM (PARTY_PTR_WORDS above) and holds N entries; everything after the
+# entries moves by (N - 6) * 0x1C. Sites by the kind of patch they need (docs/party-8-slots.md):
+#  - C re-implementations with entry jumps (PARTY_ENTRY_JUMPS, src/coop/party.c): Party_Init, the flag
+#    accessors and VM flag / counter / item opcodes that add the tail offsets, and the save path.
+#  - Thumb imm8 patches (PARTY_COUNT_PATCHES): loop limits "< 6", the VM character-id range, the
+#    status-list object size.
+#  - Shadow pointer tables (PARTY_SHADOWS): three large constructors reach the flag banks through a
+#    private pool word -> per-module pointer table -> party word; the pool word is repointed to a copy
+#    of that table whose party word is g_party_block + shift, so their unchanged "+ 0x11A"/"+ 0x12B"
+#    instructions land on the moved banks. (pool word file offset, table address, party word offset.)
+#  - The default party / growth table: rebuilt with N entries at romdata.PARTY_TABLE_AT, literal 0x3EA0
+#    repointed (growth rows stay at literal + 0xA8).
+PARTY_ENTRY_JUMPS = [
+    (0x08003C24, "party_init_hook"),        # Party_Init(party): defaults + zeroed flag banks
+    (0x08003E42, "flag_test_hook"),         # Flag_Test(party, id)
+    (0x08003E5E, "flag_set_hook"),          # Flag_Set(party, id)
+    (0x08003E74, "flag_clear_hook"),        # Flag_Clear(party, id)
+    (0x08003F06, "flag_cond_hook"),         # script condition word: flag id | mode << 16, or bytecode pointer
+    (0x080095E4, "vm_counter_get_hook"),    # VM opcode: push counters[pop] + live pickups
+    (0x080096CA, "vm_counter_dec_hook"),    # VM opcode: counters[pop]--
+    (0x080096E8, "vm_counter_sub_hook"),    # VM opcode: counters[idx] -= value
+    (0x0800F3F0, "item_use_hook"),          # item use check / counter increment
+    (0x0800B00C, "vm_seen_hook"),           # VM opcode: mark a sprite's bestiary entry seen
+    # save path (src/coop/party_save.c): new EEPROM layout, slot store outside the menu object
+    (0x08004030, "save_game_hook"),         # SaveGame(party, xy): the save pad
+    (0x08003F9C, "load_slot_hook"),         # LoadSlot(dst, slot)
+    (0x08003FEC, "write_slot_hook"),        # WriteSlot(src, slot)
+    (0x08001960, "save_menu_load_hook"),    # save menu: read the three slots
+    (0x080019D4, "save_menu_any_hook"),     # any slot saved
+    (0x080019F6, "save_menu_saved_hook"),   # slot saved
+    (0x08001A0C, "save_menu_location_hook"),   # slot's location name
+    (0x08001A26, "save_menu_count_hook"),   # portraits to draw
+    (0x08001A44, "save_menu_member_in_party_hook"),
+    (0x08001A66, "save_menu_member_selectable_hook"),
+    (0x08001A8A, "save_menu_active_pos_hook"),
+    (0x08001AB8, "save_menu_member_sprite_hook"),
+    (0x08001AE2, "save_menu_set_active_hook"),
+    (0x08001B0E, "save_menu_erase_hook"),
+    (0x0800180C, "save_menu_start_hook"),   # start / load the chosen slot
+    # switch screen (src/coop/switch.c): bigger object, window of six portraits, scrolling
+    (0x08010B08, "switch_create_hook"),
+    (0x08010B60, "switch_next_hook"),
+    (0x08010B9A, "switch_prev_hook"),
+    (0x0801110C, "switch_select_hook"),
+    (0x080110BC, "switch_arrows_hook"),
+    (0x08011172, "switch_update_hook"),
 ]
+# (file offset, stock byte, new byte as a function of n and the number of defined slots d)
+PARTY_COUNT_PATCHES = [
+    (0x3E18, 0x06, lambda n, d: n),                 # Party_CountInParty 0x08003E00: CMP R1,#6
+    (0x3E3A, 0x06, lambda n, d: n),                 # Party_CountFlag 0x08003E1E: CMP R1,#6
+    (0x3EFE, 0x06, lambda n, d: n),                 # Party_DetransformOthers 0x08003ED4: CMP R1,#6
+    (0x3502, 0x06, lambda n, d: n),                 # status list builder 0x08003480: CMP R0,#6
+    (0x3488, 0x71, lambda n, d: 0x71 + (n - 6) * 4),   # ... its object size 0x170 (ADDS R0,#0x71 after #0xFF)
+    (0x4E36, 0x71, lambda n, d: 0x71 + (n - 6) * 4),   # status screen 0x08004CAC allocates the same object
+    (0xB250, 0x05, lambda n, d: n - 1),             # VM character ids: (id - 2) <= 5 in 0x0800B1E2 (CMP R2,#5)
+    (0x5CA6, 0x06, lambda n, d: d),                 # debug party 0x08005C0A fills slots 0..d-1 (CMP R5,#6)
+]
+# (pool word file offset, table address, party word offset, target): target None = the party block
+# shifted by the tail; a symbol name = that object instead (the switch screen's view party).
+PARTY_SHADOWS = [
+    (0x45F4, 0x081D9C08, 0x8, None),    # 0x08004348 status item list: counters (+0x12B)
+    (0x18E3C, 0x086F88C0, 0xC, None),   # 0x08018A38 journal page: seen bit (+0x11A)
+    (0x195F4, 0x086FD864, 0x8, None),   # 0x08019204 bestiary list: seen bits (+0x11A)
+    (0x10F10, 0x086D763C, 0x4, "switch_view"),   # switch screen 0x08010B08..0x08010BCE (src/coop/switch.c)
+    (0x112AC, 0x086D763C, 0x4, "switch_view"),   # ... its update / destroy functions
+]
+PARTY_SHADOW_AT = romdata.PARTY_TABLE_AT + 0x1000   # shadow tables, 0x200 bytes each
+PARTY_SHADOW_SIZE = 0x200
+
+
+def build_party_table(rom, n):
+    """Stock rows 0-5 (and zero rows above) as an N-entry table at PARTY_TABLE_AT; repoint the literal."""
+    ent_off, grow_off, literal = romdata.party_table_layout(n)
+    size = romdata.ENTRY.size
+    rom[ent_off:ent_off + n * size] = bytes(n * size)
+    rom[grow_off:grow_off + n * 12] = bytes(n * 12)
+    rom[ent_off:ent_off + 6 * size] = rom[romdata.PARTY_OFF:romdata.PARTY_OFF + 6 * size]
+    rom[grow_off:grow_off + 6 * 12] = rom[romdata.GROWTH_OFF:romdata.GROWTH_OFF + 6 * 12]
+    cur = struct.unpack_from("<I", rom, romdata.PARTY_REF)[0]
+    if cur != ROM_BASE + romdata.PARTY_OFF:
+        sys.exit(f"party table literal at {romdata.PARTY_REF:#x}: expected {ROM_BASE + romdata.PARTY_OFF:08x}, found {cur:08x}")
+    struct.pack_into("<I", rom, romdata.PARTY_REF, literal)
+    print(f"party  {n}-entry default table at {ROM_BASE + ent_off:08x}, growth rows at {ROM_BASE + grow_off:08x}, literal {literal:08x}")
+
+
+def defined_party_slots(rom, n):
+    """Entries with a max HP (after the data patch): the debug party fills only those."""
+    ent_off = romdata.party_table_layout(n)[0]
+    d = 0
+    for i in range(n):
+        if struct.unpack_from("<H", rom, ent_off + i * romdata.ENTRY.size + 2)[0]:
+            d = i + 1
+    return d
+
+
+def apply_party_patches(rom, syms, n):
+    """The shadow pointer tables (the entry jumps are applied with ENTRY_JUMPS, the count bytes after
+    the data patch by apply_party_count_patches)."""
+    shift = (n - 6) * 0x1C
+    base = syms["g_party_block"]
+    shadows = {}   # (table, word, target) -> file offset of the copy
+    for pool, table, word, target in PARTY_SHADOWS:
+        cur = struct.unpack_from("<I", rom, pool)[0]
+        if cur != table:
+            sys.exit(f"shadow pool word at {pool:#x}: expected {table:08x}, found {cur:08x}")
+        key = (table, word, target)
+        if key not in shadows:
+            at = PARTY_SHADOW_AT + len(shadows) * PARTY_SHADOW_SIZE
+            rom[at:at + PARTY_SHADOW_SIZE] = rom[table - ROM_BASE:table - ROM_BASE + PARTY_SHADOW_SIZE]
+            old_party = struct.unpack_from("<I", rom, at + word)[0]
+            if old_party != base:   # the table's party word was relocated above
+                sys.exit(f"shadow table {table:08x}+{word:#x}: expected the party block {base:08x}, found {old_party:08x}")
+            new = base + shift if target is None else syms[target]
+            struct.pack_into("<I", rom, at + word, new)
+            shadows[key] = at
+            print(f"shadow table {table:08x} -> {ROM_BASE + at:08x} (word +{word:#x} = {new:08x}, {target or 'party + shift'})")
+        struct.pack_into("<I", rom, pool, ROM_BASE + shadows[key])
+        print(f"shadow pool word {ROM_BASE + pool:08x} -> {ROM_BASE + shadows[key]:08x}")
+
+
+def apply_party_count_patches(rom, n):
+    d = defined_party_slots(rom, n)
+    for off, old, fn in PARTY_COUNT_PATCHES:
+        new = fn(n, d)
+        if rom[off] != old:
+            sys.exit(f"party count patch at {off:#x}: expected {old:02x}, found {rom[off]:02x}")
+        if not 0 <= new <= 0xFF:
+            sys.exit(f"party count patch at {off:#x}: {new:#x} does not fit an imm8")
+        rom[off] = new
+    print(f"party  {n} slots, {d} defined; {len(PARTY_COUNT_PATCHES)} count bytes patched")
+
 
 # Optional: title screen idles into the leftover debug menu (Map Test loads any map with a level-40
 # party). From the Arefu/Legacy engine notes: file offset 0x574, BL GameIntroVideo_Create -> BL DebugMenu_Create.
@@ -117,6 +270,7 @@ def main():
     debug_menu = "--debug-menu" in sys.argv[5:]
     wide = "--wide" in sys.argv[5:]
     data_patches = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--data-patch"]
+    party_slots = int(next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--party-slots"), 6))
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
         off, old, new = DEBUG_MENU_PATCH
@@ -164,7 +318,7 @@ def main():
         struct.pack_into("<I", rom, off, rel)
         print(f"vtable {vtable:08x}[{slot}] {old:08x} -> {rel:08x} ({name} @ {target:08x})")
 
-    for addr, name in ENTRY_JUMPS:
+    for addr, name in ENTRY_JUMPS + PARTY_ENTRY_JUMPS:
         target = syms[name] | 1
         off = addr - ROM_BASE
         if addr % 4 == 0:
@@ -176,8 +330,11 @@ def main():
             sys.exit(f"entry jump at {addr:#x} must be 2-byte aligned")
         print(f"entry  {addr:08x} -> {name} @ {target:08x}")
 
+    build_party_table(rom, party_slots)
+    apply_party_patches(rom, syms, party_slots)
     for path in data_patches:
         apply_data_patch(rom, path, syms)
+    apply_party_count_patches(rom, party_slots)
 
     open(out, "wb").write(rom)
     print(f"wrote {out}: {len(rom)} bytes, code {len(code)} bytes at {ROM_BASE + CODE_AT:#x}")

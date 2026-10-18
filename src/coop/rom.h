@@ -125,11 +125,36 @@ typedef struct CharacterEntry {
 } CharacterEntry;
 _Static_assert(sizeof(CharacterEntry) == 0x1C, "CharacterEntry size");
 
+// The party block (stock: g_PartyState at 0x03000E90, 0x164 bytes with six entries). The build relocates
+// it into EWRAM (g_party_block, section .party) by repointing the 27 pointer words that hold its
+// address, and sizes it for PARTY_SLOTS entries; everything after the entries keeps its stock layout,
+// shifted by (PARTY_SLOTS - 6) * 0x1C (tools/patch_rom.py --party-slots patches the ROM's offsets).
+#ifndef PARTY_SLOTS
+#define PARTY_SLOTS 8
+#endif
+_Static_assert(PARTY_SLOTS >= 6 && PARTY_SLOTS <= 16, "PARTY_SLOTS range");
+#define PARTY_SLOTS_STOCK 6
+#define PARTY_TAIL_SHIFT ((PARTY_SLOTS - PARTY_SLOTS_STOCK) * 0x1C)
 typedef struct PartyState {
     u8 active_slot;               // +0x00
-    u8 _p0[0x0B];
-    CharacterEntry chars[6];      // +0x0C
+    u8 flags;                     // +0x01  bit0 saved once, bit1 meter shown (0x080040AA), bit2 debug party
+    u8 zone, area, variation;     // +0x02  save position (map), written by SaveGame
+    u8 _p0[3];
+    s32 meter;                    // +0x08  HUD meter (24.8)
+    CharacterEntry chars[PARTY_SLOTS];   // +0x0C
+    u8 event_flags[0x66];         // +0xB4  bit bank 1 (Flag_Test/Set/Clear 0x08003E42/5E/74, 0x08003F06); Party_Init zeroes 50 bytes
+    u8 seen_bits[0x10];           // +0x11A bit bank 2: journal / bestiary "seen" bits (0x0800B00C, 0x08018A38, 0x08019204)
+    u8 _p1;                       // +0x12A
+    u8 counters[0x32];            // +0x12B 50 item / quest counters (0x08004348, 0x080095E4, 0x080096CA, 0x080096E8, 0x0800F3EE)
+    u8 _p2[3];                    // +0x15D
+    s16 save_x, save_y;           // +0x160 save position (pixels), SaveGame 0x08004030
 } PartyState;
+_Static_assert(__builtin_offsetof(PartyState, event_flags) == 0xB4 + PARTY_TAIL_SHIFT, "PartyState tail");
+_Static_assert(__builtin_offsetof(PartyState, counters) == 0x12B + PARTY_TAIL_SHIFT, "PartyState counters");
+_Static_assert(__builtin_offsetof(PartyState, save_x) == 0x160 + PARTY_TAIL_SHIFT, "PartyState save position");
+_Static_assert(sizeof(PartyState) == 0x164 + PARTY_TAIL_SHIFT, "PartyState size");
+#define PARTY_BYTES sizeof(PartyState)
+extern PartyState g_party_block;      // party.c, pinned in the .party EWRAM region (coop.ld)
 
 typedef struct EntityList {
     u32 *vtable;          // +0x000
@@ -175,7 +200,7 @@ typedef struct AbilityDef {
 #define g_InputSystem    ((InputSystem *)0x0300229C)
 #define g_FrameCounter   (*(u32 *)0x03000E20)
 #define g_LastInputFrame (*(u32 *)0x03002298)
-#define g_Party          ((PartyState *)0x03000E90)
+#define g_Party          (&g_party_block)       // stock 0x03000E90; relocated (see PartyState)
 #define g_LastDir        (*(u16 *)0x03001F40)   // direction that started the current walk
 #define g_LastDirFrame   (*(u32 *)0x03001F60)   // frame of the last d-pad press (double-tap)
 #define g_Ctx            ((const u32 *)0x083B50E8) // [4] collision map, +0x9C facing table, +0xC0 vectors
@@ -235,6 +260,9 @@ _Static_assert(sizeof(Hud) == 0x28, "Hud size");
 #define REG_DMA3CNT_H     (*(volatile u16 *)0x040000DE)
 #define KEY_L 0x200
 #define KEY_R 0x100
+
+void *memcpy(void *dst, const void *src, unsigned n);   // util.c (freestanding)
+void *memset(void *dst, int c, unsigned n);
 
 #define ROM_FN(ret, name, args, addr) static ret (*const name) args = (ret (*) args)(addr)
 

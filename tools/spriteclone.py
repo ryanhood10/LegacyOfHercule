@@ -20,6 +20,8 @@ NEW_SPRITE = 157         # first free id after the stock 3..156
 SRC_ROW = 21             # Hercule's display row
 NEW_ROW = 22
 ROW_COUNT = 22
+KRILLIN_SPRITE = 76      # Krillin's NPC sprite record (docs/sprites.md)
+KRILLIN_ROW = 23
 DISPLAY_DATA = 0x081D967C
 HAIR_GOLD, HAIR_SHADE, HAIR_LIGHT, HAIR_BRIGHT = 120, 20, 46, 8   # SSJ Goku's hair indices
 BLACK = 1
@@ -214,8 +216,16 @@ def main():
     new[5] = SRC_ROW       # detransformedDataIndex -> Hercule
     rows[SRC_ROW * 20 + 4] = NEW_ROW   # Hercule's own row now links to the new form
     rows += new
+    # row 23 = Krillin placeholder (party slot 6, docs/party-8-slots.md): Hercule's row with Krillin's
+    # NPC sprite (76), no transformation links; his own behaviour class and art are a later pass
+    krillin = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
+    krillin[0] &= ~1
+    krillin[1] = KRILLIN_SPRITE
+    krillin[4] = KRILLIN_ROW
+    krillin[5] = KRILLIN_ROW
+    rows += krillin
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
-    lines.append(f"const u32 display_row_count = {ROW_COUNT + 1};")
+    lines.append(f"const u32 display_row_count = {ROW_COUNT + 2};")
     os.makedirs(os.path.dirname(out_c), exist_ok=True)
     open(out_c, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     total = sum(len(b) for (_, _), b in [((p, fi), fr[5]) for p, frs in arrays.items() for fi, fr in enumerate(frs) if fr[5]])
