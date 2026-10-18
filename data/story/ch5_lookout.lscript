@@ -125,14 +125,18 @@ sequence ch5_gingertown_end
         WaitFrames 30
   text 1 "#PICCOLO: It took its other half back into itself..."
   stockseq @083e24a0 0 56                ; the Kamehameha, the arm trick, Cell's story, Krillin and Trunks, Vegeta
-  script                                 ; stock entry 57, with Gohan and Trunks selectable again
-        FadeOut 90
+  script                                 ; stock entry 57: Trunks and Krillin are the pair for the lab
+        FadeOut 90                       ; basement (ch6_basement); Hercule flies on with Piccolo
         PlayMusic 5
         DespawnEntity 128
         SetEntityPositionInstant 0, 280, 296
-        SetCharacterFlag_Bit1 0
         SetCharacterFlag_Bit1 3
+        SetCharacterFlag_Bit1 6
+        ClearCharacterFlag_Bit1 0
+        ClearCharacterFlag_Bit1 1
+        ClearCharacterFlag_Bit1 5
         SetActiveCharacter 3
+        CoopCall 6, 6, 0, 0
         DespawnEntity 137
         DespawnEntity 76
         DespawnEntity 121

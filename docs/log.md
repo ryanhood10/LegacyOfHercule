@@ -13,6 +13,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 6 before the chamber (story-scripts)**: `data/story/ch6_basement`: Gingertown's end locks
+  Trunks + Krillin (player 2 Krillin); the lab basement scenes skip Krillin's NPC when player 2 is
+  there (single-player keeps the stock walk); the lab exit no longer makes Piccolo selectable (a scene
+  actor at Kame House); Krillin stays home when Goku leaves; the chamber's end makes Piccolo, Hercule
+  and Krillin selectable for the island. Tested headless in co-op: basement entry, larva, computer,
+  lab exit, Kame House to the beach (flag 143, no player 2), Gingertown's end (player 2 Krillin).
 - **Chapter 5 (story-scripts)**: `data/story/ch5_lookout`: Hercule stays at the Lookout when Kami defers,
   Gohan is player 2 in Trunks' chapter, Kami draws out Hercule's potential before the fusion (+3
   levels and a refill; the amount is ours, Ryan's note said "level + EXP"), Piccolo and Hercule go to
