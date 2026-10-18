@@ -13,6 +13,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 7 (story-scripts)**: `data/story/ch7_cell`: Vegeta + Trunks out of the chamber, Semi-Perfect Cell's
+  Multi-Form duplicate in co-op and its reabsorption, Krillin flies in after Perfect Cell's kick and
+  takes the pad that played Vegeta (new `CoopCall 7`, PadSwap: the pads trade players, so the Trunks
+  player is player 1 from here), Krillin's one-hit KO before Cell's tournament speech, then Trunks +
+  Krillin with Vegeta, Piccolo and Hercule selectable. Tested headless in co-op from the Semi-Perfect
+  scene to the journal (flag 151) and the single-player Semi-Perfect path. Test note: a Map Test
+  Trunks is base form 128, which has no transformation pose 35, so the stock "transform unless
+  transformed" step hangs; the real flow has him at 129 from the chamber exit.
 - **Chapter 6 before the chamber (story-scripts)**: `data/story/ch6_basement`: Gingertown's end locks
   Trunks + Krillin (player 2 Krillin); the lab basement scenes skip Krillin's NPC when player 2 is
   there (single-player keeps the stock walk); the lab exit no longer makes Piccolo selectable (a scene

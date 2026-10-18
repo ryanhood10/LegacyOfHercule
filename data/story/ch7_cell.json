@@ -1,0 +1,31 @@
+{
+  "_": "Chapter 7 (docs/story.md section 0 item 7): Vegeta and Trunks out of the chamber, Semi-Perfect Cell's Multi-Form duplicate in co-op, Krillin taking the pad that played Vegeta after the kick (PadSwap), Krillin's one-hit KO before Perfect Cell's tournament speech, Trunks + Krillin by default afterwards. Scripts in ch7_cell.lscript.",
+  "sources": ["data/story/ch7_cell.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 9, "area": 3},
+      "_": "out of the Time Chamber: Vegeta player 1, Trunks the only player-2 choice for zone 12",
+      "edits": [
+        {"at": "trigger:2/entry:32", "replace": [
+          ["ClearCharacterFlag_Bit1 0", "ClearCharacterFlag_Bit1 0\nClearCharacterFlag_Bit1 1\nClearCharacterFlag_Bit1 5\nClearCharacterFlag_Bit1 6"],
+          ["WarpToMapWithEntities 9, 1, 1, 760, 360", "WarpToMapWithEntities 9, 1, 1, 760, 360\nCoopCall 6, 3, 0, 0"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 12, "area": 4},
+      "_": "Semi-Perfect Cell (and his duplicate in co-op), Cell absorbs 18, Perfect Cell knocks Vegeta out",
+      "triggers": {"0": {"payload": "seq:ch7_semi_perfect"}},
+      "records": {
+        "1": {"action": "seq:ch7_semi_perfect_end"}
+      }
+    },
+    {
+      "map": {"zone": 12, "area": 6},
+      "_": "Perfect Cell's second stage beaten: Krillin's one-hit KO in co-op, the tournament, Trunks + Krillin after",
+      "records": {
+        "1": {"action": "seq:ch7_perfect_end"}
+      }
+    }
+  ]
+}
