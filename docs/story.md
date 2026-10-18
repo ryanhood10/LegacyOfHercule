@@ -3,6 +3,70 @@
 Source: the game's own caption cards and dialogue (dumped per map by `tools/script_dump.py` into
 `build/scripts/`, map order follows play order closely), plus the quest table. Chapter names are ours.
 
+## 0. Status and how to resume (2026-10-18)
+
+**Mode:** story first. Ryan and Claude are walking the game chapter by chapter from the player's
+side, deciding co-op casting and new beats; every decision is recorded here the same turn. No
+production code for the story has been written (the engine work that is merged: eight party slots,
+Super Saiyan Hercule, Buu's Fury sprite conversion). Sections 3-4f below are the decisions in play
+order; this section is the summary. Facts come from the dumped scripts (`python tools/script_dump.py
+map ZONE AREA`, all maps in `build/scripts/` after a full dump) and the quest table.
+
+**Decided so far, in play order** (player 1 / player 2):
+
+1. Future prologue: Trunks / old Hercule (sprite 158, comic relief, rides the time machine; no hint
+   of what he becomes). Present day: Krillin visits Gohan instead of phoning; Gohan / Krillin; the
+   forest "spirit" fight against Frieza + Cooler replaces the dream; Krillin's NPC removed from the
+   landing site; Goku's arrival as stock.
+2. West City: Hercule joins after the mansion deal with Piccolo (he is in the party from here on).
+   Triceratops Jungle: Piccolo / Hercule only, Hercule level 1.
+3. Amenbo Island, then the space scene rewritten as Vegeta vs his clone, then the **first duel**
+   (P1 Vegeta vs P2 clone, both Super Saiyan, no drain, to the death, draw to P1): the winner's
+   pad plays Vegeta, the loser's pad plays Hercule, who meets Vegeta at the landing map. Zone 7
+   robots, then Android 19 + base-form Android 13 (both-down rule: 19 explodes, 13 flees swearing
+   revenge and hinting at Gero's "true plan"). Three-year skip gives Krillin and Hercule the same
+   +1 level and refill as the others.
+4. Piccolo's chapter: Hercule default P2, pad free. Gero's lab door: Gero + 13 (13 leaves after 17
+   and 18 kill Gero inside). The road: Piccolo + Vegeta vs 17 + 18 (Vegeta forced as P2 for the
+   fight), stock ending (blast flattens both, Krillin's plea, the kiss, Vegeta storms off).
+5. Lookout 1: Kami defers; Hercule stays at the Lookout. Gohan's house: Trunks / Gohan locked for
+   Trunks' chapter (capsule, Cell's skin). Fusion scene: Kami boosts Hercule's "potential" (level +
+   EXP) first, then fuses with Piccolo. Gingertown: Piccolo / Hercule vs Imperfect Cell + his
+   Multi-Form duplicate (Tien's technique), Cell escapes.
+6. Lab basement: Trunks / Krillin locked (plans, Cell larva, master computer, self-destruct).
+   Kame House: Goku wakes (Piccolo is a scene actor), "meet me at the Lookout". Lookout: Vegeta
+   and Trunks enter the chamber: **second duel** (Vegeta vs Trunks, same rules); winner's pad
+   plays Piccolo, loser's pad plays Hercule. Island: **Android 16 boss** (rewritten dialogue: 16
+   furious Goku is absent, Piccolo's trick), new frames + rockets + AI, ends at half health; Cell
+   arrives. Krillin stays at Kame House (selectable there via the yard pad).
+7. Vegeta out of the chamber: Vegeta / Trunks vs Semi-Perfect Cell + duplicate; Cell absorbs 18;
+   Perfect Cell vs Ascended Trunks / Krillin (Vegeta's pad switches to Krillin after Vegeta's KO;
+   Krillin's one-hit KO opens the ending) to half health, Cell laughs, announces the Games; 16 asks
+   for repairs. After: Trunks / Krillin default, Vegeta stays selectable (his barriers), Piccolo on.
+8. The ten-day wait: Capsule Corp hub; Roshi's gym as 2v2 duos (Yamcha & Tien, Hercule & Krillin,
+   "come back with a different team" line) and the animal-ninja finale; Dragon Balls and side
+   quests; Cooler's two-part bonus kept (Piccolo gate) with a Namekian servant beside him; optional
+   Android 13 arctic encounter behind a Vegeta barrier (partner undecided; story flag for the
+   post-Cell variant); a Broly side arc wanted (maps and scripts; sprite 159 ready).
+
+**Next to decide:** Android 13's arctic partner; then the Cell Games (Hercule's stock "victory", Cell
+Juniors, Gohan's win, Keep Goku), the ending, and the Buu's Fury phase (Super Saiyan Hercule beats
+Buu, Goku + Hercule fusion, Vegito for Janemba; no Hercule reveal before then).
+
+**Standing rules:** no Hercule-hero reveal until much later; one player controls the world map; a
+boss that dies first only falls until its twin is down ("both-down"); some bosses end at half health
+and are reused; a map actor whose sprite is player 2's current sprite is not spawned; duel losers
+swap pads with the winner's role as above, no level handicap; Hercule and Krillin stay weaker.
+
+**Mechanics the story needs (none written yet):** player-vs-player duel mode + pad swap; both-down
+and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
+bytecode assembler for new scenes (the dumper exists, `tools/script_dump.py`); new enemy-stat rows
+(Android 13, Multi-Form Cell, Cooler's Namekian = recoloured Piccolo, 2v2 gym duos, animal wave);
+Android 16 fight set + rocket projectiles + AI; Android 13 art (not in either ROM); Krillin's real
+row, portrait and abilities (Destructo Disc); old Hercule's row on sprite 158; Kami's boost script;
+per-chapter selectable-flag edits; map tooling (chunk encoder, collision, map-table entries) for the
+arctic, Broly's arena and a chamber interior, or a Buu's Fury map decode.
+
 ## 1. What is actually in the game (Android and Cell sagas)
 
 1. **Prologue, Future Trunks.** The future first: Future Gohan trains Trunks (melee tutorial), the

@@ -2,6 +2,22 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-18
+
+- **Story planning walked from the player's side through the Cell Games wait** (Ryan + Claude,
+  all in `docs/story.md`, section 0 is the summary): the two duels, Android 13 and 16 as new
+  bosses, Multi-Form Cell, 2v2 gym, Cooler's Namekian, the half-health and both-down rules, casting
+  per chapter. Next: Android 13's partner, then the Cell Games. No story code written.
+- **No-reveal rule**: Hercule is not revealed as the hero until much later; the prologue caption
+  rewrites were removed (`data/hercule-text.json` is empty).
+- **Merged to main**: `party-slots` (eight slots, scrolling switch screen, new save layout; plain
+  `make` is now the 8-slot game, old saves read as empty, Krillin is a placeholder row) and the
+  Buu's Fury sprite decode/converter (ids 158 Buu-saga Hercule, 159 LSSJ Broly; Android 13 is not
+  in that ROM). Both built together after a doc-conflict merge (2f4ca5d).
+- **Side sessions**: party-slots, buu-sprites and hercule-hero are done and idle; an Android 16
+  boss session (art, rockets, AI, own worktree) was started from a card and then stopped; its
+  branch, if any, is not merged. Ryan is closing sessions and switching models next.
+
 ## 2026-10-17
 
 - **Story decision (Ryan): "Canon plus Hercule"**: the DBZ story stays, Hercule is in every scene as
@@ -64,4 +80,4 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - Super Saiyan Hercule: icon for the ability, aura/flash on transform, EP drain and revert rules,
   Hercule-specific SSJ moveset; the game's own transformed-state handling only runs for the active
   player (opcode 73 refreshes player 1's entity only; `p2_refresh_sprite` covers player 2).
-- Story: prologue framing, SSJ look, player 1 per chapter, fusion name (`docs/story.md` section 5).
+- Story: continue from `docs/story.md` section 0 ("Next to decide").

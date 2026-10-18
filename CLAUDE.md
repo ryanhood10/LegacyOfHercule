@@ -12,7 +12,10 @@ Story: `docs/story.md`. Testing recipes: `docs/testing.md`. Progress log: `docs/
 ## Rules (Ryan's, standing)
 
 - Commit autonomously and keep working; never stop to ask whether to commit. End commit messages
-  with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+  with the `Co-Authored-By:` line your session's attribution reminder gives (it names the model).
+- Push `main` to `origin` (github.com/ryanhood10/LegacyOfHercule) after committing. Side sessions
+  commit on their own branches and never push main; the main session merges them (if the checkout
+  is dirty with another session's edits, merge in a temporary worktree and push from there).
 - Never commit ROM or asset data: `roms/` and `build/` are ignored; generated sprite/data files
   (`build/gen/*`, `build/*.patch.json`) stay in `build/`. Dialogue *edits* in `data/` are ours.
 - The Arefu/Legacy reference clone (`F:\MeltyCreations\tools\downloads\arefu-legacy`, no licence)
@@ -27,6 +30,16 @@ Story: `docs/story.md`. Testing recipes: `docs/testing.md`. Progress log: `docs/
   way to a fact. Record each new fact in the relevant `docs/*.md`.
 - Keep these docs current: when a build flag, tool, address or test recipe changes, update
   `docs/INDEX.md` / the owning doc in the same commit.
+
+## Current phase (2026-10-18): story first
+
+Ryan is designing the story and co-op casting chapter by chapter in chat; `docs/story.md` section 0
+is the summary, the standing rules and the list of mechanics the story will need. Do not start
+production story code until Ryan says the plan is done; engine pieces he explicitly started run in
+side sessions on their own branches. Nothing may reveal Hercule as the hero before the Buu phase.
+Facts about the game come from the script dump (`tools/script_dump.py`, full dump in
+`build/scripts/`), the quest table (reference notes) and Ghidra; check them before answering a
+story question. `docs/log.md` says what landed last.
 
 ## Build (Windows, Git Bash)
 
