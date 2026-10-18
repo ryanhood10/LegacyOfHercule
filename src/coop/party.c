@@ -37,6 +37,45 @@ void party_init_hook(PartyState *p) {
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
 }
 
+// Party_AddExp 0x08003D58 (the EXP event's fire, exp.c): the stock code reaches its module words (SFX
+// mixer, entity list, map state, the VM's "no actor" pair) at negative offsets from the default-table
+// literal 0x08003EA0 (literal - 0x1C .. - 0x8 = the module table 0x081D952C in the stock ROM). The
+// relocated table moved that literal, so a level-up read party data as pointers and its message-0x15
+// broadcast jumped to garbage ("Jumped to invalid address" when the level-up dialogue closed). Same
+// steps, module words read from the stock table.
+#define LEVELUP_MODULE  ((void *const *)0x081D952C)   // [1] mixer, [2] party (relocated), [3] entity list, [4] map state
+#define LEVELUP_NO_ACTOR ((const void *)0x081D9540)   // the stock literal - 8 (two -1 words)
+#define LEVELUP_SEQ     (*(const void *const *)0x08003EC0)   // "%s has achieved Level %d!" + Attribute Bonus
+#define LEVELUP_SFX     (*(const void *const *)0x08003EC4)
+#define LEVELUP_SFX_CH  (*(const u32 *)0x08003EC8)            // 0x5C4
+#define LEVELUP_SCREEN_VT (*(const u32 *)0x08003ECC)         // modal screen running the dialogue context
+ROM_FN(void, Party_LevelUp, (PartyState *p, int slot, int from, int to), 0x08003CA1);   // growth draws
+ROM_FN(void, VmDialog_Init, (void *ctx, const void *seq, void *state, const void *actor, int flags), 0x0800B4AF);
+ROM_FN(void, VmDialog_Free, (void *ctx, int free_it), 0x0800B4FD);
+ROM_FN(void, Map_RefreshItems, (void *map_state), 0x0800C35F);
+ROM_FN(void, PlayerEntity_RefreshSprite, (Entity *e), 0x080086A3);
+
+void party_add_exp_hook(PartyState *p, int slot, int amount) {
+    CharacterEntry *c = &p->chars[slot];
+    if (c->hp == 0) return;
+    int from = Character_GetLevel(c);
+    c->exp += (u32)amount;
+    int to = Character_GetLevel(c);
+    if (from == to) return;
+    Party_LevelUp(p, slot, from, to);
+    u32 ctx[8];        // the stock frame gives the dialogue context 28 bytes
+    u16 state = 0;
+    VmDialog_Init(ctx, LEVELUP_SEQ, &state, LEVELUP_NO_ACTOR, 0);
+    Sfx_Play((u8 *)LEVELUP_MODULE[1] + LEVELUP_SFX_CH, LEVELUP_SFX, 0x40, 0);
+    u32 *screen = Arena_Alloc(8);
+    if (screen) { screen[0] = LEVELUP_SCREEN_VT; screen[1] = (u32)ctx; }
+    ((int (*)(void *))0x0801F2F5)(screen);   // Modal_Run with the screen pushed in r0
+    if (g_PlayerObject) PlayerEntity_RefreshSprite(g_PlayerObject);
+    EntityList_Broadcast(LEVELUP_MODULE[3], 0x15, 0);
+    Map_RefreshItems(LEVELUP_MODULE[4]);
+    VmDialog_Free(ctx, 0);
+}
+
 // Flag bank 1 (+0xB4): 0x08003E42 / 0x08003E5E / 0x08003E74, called by the script VM with the party pointer.
 int flag_test_hook(PartyState *p, u32 id) {
     return (p->event_flags[id >> 3] >> (id & 7)) & 1;

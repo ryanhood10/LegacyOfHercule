@@ -42,7 +42,8 @@ file and tool, and says where to look for a given question. Keep it current.
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
-| `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, flag accessors, VM counter / item / bestiary opcodes |
+| `krillin.c/.h` | Krillin (slot 6, row 23, sprite 161) and old Hercule (row 24): status-screen title / pages / technique pages for PARTY_SLOTS, dialogue name opcodes, blue ki blast, Afterimage Rush / Shockwave Punch / Destructo Disc (abilities 19-21), old Hercule's weak combat bytes and `old_hercule_set`, `KR_TEST` triggers; ids in the header |
+| `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, `Party_AddExp` (level-ups), flag accessors, VM counter / item / bestiary opcodes |
 | `party_save.c` | save path for N entries: `SaveGame`, `LoadSlot`, `WriteSlot`, the save menu's slot store and queries, start game; EEPROM slots of `SAVE_STRIDE` |
 | `switch.c` | Switch Characters screen: view party of six, scrolling window, edge indicators |
 | `ssj.c` | Super Saiyan Hercule ability pair (`ssj_ready` / `ssj_use`): row 22, sprite 157, EP cost 50 |
@@ -56,6 +57,8 @@ Generated at build time (never committed): `build/maps.patch.json` (the new maps
 `sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/gen/a16_sprites_data.c`
 (Android 16's sprite 160 and the missile / fist / explosion frames, from `tools/a16sprites.py`), `build/gen/buu_sprites_data.c`
 (sprite ids 158+ converted from Buu's Fury by `tools/buu2log2.py`, when `roms/buu.gba` is present),
+`build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
+icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/krillinsprites.py`),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
 ## Data (`data/`)
@@ -78,6 +81,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group) and the projectile frames -> `build/gen/a16_sprites_data.c` |
+| `krillinsprites.py` | Krillin's playable sprite (id 161: sprite 76 + Goku's fight groups re-headed), status portrait (73 in the menu BG palette), blue ki blast, Destructo Disc frames, HUD and status icons, the UI string table with per-slot blocks, the portrait module table -> `build/gen/krillin_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
 | `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates (also reads Buu's Fury variations) |
@@ -92,10 +96,10 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `mgba/coop.lua`, `peek.lua`, `ents.lua`, `force.lua`, `enemies.lua`, `p2_input.lua`, `wide_test.lua` | Lua helpers for Windows mGBA (console inspectors, player-2 pad bridge) |
 | `mgba/netplay.lua`, `netplay_relay.py` | frame-lockstep netplay (Windows mGBA) |
 | `p2_keys.py` | player-2 keyboard sender (IJKL / O U / [ ] / N M) over TCP (7777 Lua bridge, 7778 fork) |
-| `win_keys.ps1`, `win_shot.ps1` | keys and screenshots for any window by title (used for the WSL fork window) |
+| `win_keys.ps1`, `win_shot.ps1`, `win_burst.ps1` | keys and screenshots for any window by title (used for the WSL fork window); `win_burst` takes N frames from one process |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |
-| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`) |
+| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`); Krillin tests: `padq.sh` (queue steps for `p2hold.py --cmd`), `kr_peek.sh`, `kr_ents.gdb`, `kr_tele2.sh`, `kr_setidx.sh`; `runfork.ps1 -Quiet` (no audio sync, for several forks at once) |
 
 ## Where to look for...
 
@@ -108,6 +112,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | sprite record layout, frame encoding | `docs/sprites.md`, `tools/sprites.py` |
 | Buu's Fury sprites, converting them, which ids exist | `docs/sprites.md` "Buu's Fury", `tools/buu_sprites.py`, `tools/buu2log2.py` |
 | display rows, transformations | `docs/sprites.md` SSJ section, `src/coop/ssj.c`, `tools/spriteclone.py` |
+| Krillin, old Hercule, per-slot names / portraits / status pages | `docs/hercule.md` 5b / 5c, `src/coop/krillin.c`, `docs/party-8-slots.md` "Krillin", `docs/sprites.md` "Krillin" |
 | ability table, stats, growth | `docs/hercule.md`, `tools/romdata.py`, `data/hercule.json` |
 | dialogue text and scripts | `tools/script_dump.py`, `docs/hercule.md` section 5 |
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |

@@ -147,3 +147,5 @@ void exp_init(void);         // build the EXP event vtable copy (called from coo
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
 void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
 void p2_cycle(void);            // player 2 picks the next available character (Select)
+void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
+void old_hercule_set(int on);   // krillin.c: slot 5 -> old Hercule's row (1) or Hercule's (0)

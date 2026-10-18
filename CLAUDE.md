@@ -55,7 +55,8 @@ Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `PARTY_SLOTS
 `WIDE_TEST=<w>` forces a view width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger; `BUU=0` leaves out
 the sprites converted from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test
 build). `A16_SPRITE` (160) is Android 16's boss sprite; `A16_TEST=1` = player 1's L+R+Down spawns the
-Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.md`). `make` does not run from PowerShell
+Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.md`). `KRILLIN_SPRITE` (161) is Krillin's
+playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's pad (`docs/testing.md` "Krillin"). `make` does not run from PowerShell
 (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
 
 ## Test (see docs/testing.md for the full recipes)
@@ -77,8 +78,8 @@ Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.
 
 Party: stock `0x03000E90`, relocated to `g_party_block` `0x0203F000` with `PARTY_SLOTS` (8) x 0x1C
 entries at +0xC (entry +8 = display row; `docs/party-8-slots.md`); Character_DisplayData 22 rows x 20
-(relocated into the blob as `display_rows`, row 22 = SSJ Hercule, row 23 = Krillin placeholder);
-sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule, 158+ from Buu's Fury, 160 = Android 16 boss;
+(relocated into the blob as `display_rows`, row 22 = SSJ Hercule, row 23 = Krillin, row 24 = old Hercule);
+sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule, 158+ from Buu's Fury, 160 = Android 16 boss, 161 = Krillin;
 Buu ROM: index `0x086B6BDC`, OBJ palette `0x0805652C`, see `docs/sprites.md`); entity list
 `0x03001120`; world/camera object `0x03001090`; input `0x0300229C`; co-op state `0x0203FF04`;
 player-2 vtable `0x0203FE00`; wide descriptor `0x0203FEC0`; ability table literal `0x08008024`.
