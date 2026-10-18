@@ -24,6 +24,8 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "gates": [{"x":, "y":, "barrier": 0, "color": 3, "level": 50, "char": 2}],  replace/add level gates
   "triggers": [{"type": "flight", "rect": [x1,y1,x2,y2], "world": [x, y]}, {"type": "script", ...}],
   "exits": [{"type": "edge"|"door", "rect": [...], "dir": "down|up|left|right", "to": [z, a, v], "at": [x, y]}],
+  "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [x1,y1,x2,y2], "decoration": 0, "dialogue_trigger": 0},
+                                     a working level barrier on a kept decoration + gate (item, on-load, dialogue condition)
   "onload": {"barrier_flag": 280, "rect": [x1,y1,x2,y2]} | null,
   "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
   "requires": "buu"                  only built when that ROM is given (--buu-rom)
@@ -54,6 +56,7 @@ COUNT_AT = 0xE0AC                           # Map_GetCount: movs r0,#0xFF; adds 
 ACT_EXIT = 0x0800D8AF            # activation object of exits
 ACT_PRESS = 0x0800D839           # activation object of the flight / save-pad / script spots
 ACT_DIALOG_FACING = 0x0800D87F   # activation object of barrier dialogue triggers
+ITEM_SCRIPT_HANDLER = 0x0800F9A3 # map item handler: run the record's script (+0xC) when touched
 
 
 class SpecError(Exception):
@@ -585,9 +588,9 @@ def script_warp(zone, area, var, x, y, music=None, with_entities=True):
     return s + b"\x11"
 
 
-def script_barrier_onload(flag, rect):
-    """if flag: FindEntityByType 0; SetCollisionRect rect; RemoveRectFromMask2 rect (stock barrier pattern)."""
-    body = bytes([0x00, 0x00, 0x02, 0x1E]) + push_multi(rect) + b"\x02\x47" + push_multi(rect) + b"\x02\x75"
+def script_barrier_onload(flag, rect, deco=0):
+    """if flag: Step 30 (hide decoration deco); SetCollisionRect rect; RemoveRectFromMask2 rect (stock barrier pattern)."""
+    body = bytes([0x00, deco, 0x02, 0x1E]) + push_multi(rect) + b"\x02\x47" + push_multi(rect) + b"\x02\x75"
     head = bytes([0x01]) + varint_bytes(flag) + b"\x02\x13" + bytes([0x13, len(body)])
     return head + body + b"\x11"
 
@@ -738,6 +741,22 @@ def emit(b, pk):
                 struct.pack_into("<H", gg, 2, ch["y"])
     gate_ptr = pk.put(b"".join(b.gates)) if b.gates else 0
     # triggers
+    # barrier (the stock pattern of zone 8 area 28): an item on the decoration that runs the open script when
+    # its condition holds at load (the right character at the level), the on-load script that keeps it open
+    # once the flag is set, and the "only X may pass" dialogue trigger's condition
+    bar = spec.get("barrier")
+    items = []
+    if bar:
+        c, lv, deco, flag, rect = bar["char"], bar["level"], bar.get("decoration", 0), bar["flag"], bar["rect"]
+        cond = pk.put(bytes([0x02, 0x0B, 0x00, c, 0x0B, 0x00, c, 0x02, 0x16, 0x00, lv, 0x0E, 0x04, 0x11]), "barrier condition")
+        opener = pk.put(bytes([0x00, bar.get("sound", 47), 0x02, 0x2E]) + push_multi(rect) + bytes([0x02, 0x47]) + push_multi(rect)
+                        + bytes([0x02, 0x75, 0x01]) + varint_bytes(flag) + bytes([0x02, 0x1B, 0x11]), "barrier open script")
+        items.append(pk.put(struct.pack("<IBBBBII", cond, deco, 1, 3, 0, ITEM_SCRIPT_HANDLER, opener), "barrier item"))
+        talk = pk.put(bytes([0x02, 0x0B, 0x00, c, 0x0C, 0x01]) + varint_bytes(flag) + bytes([0x02, 0x14, 0x04, 0x11]), "barrier dialogue condition")
+        k = bar.get("dialogue_trigger")
+        if k is not None:
+            b.triggers[k][0] = talk
+    item_arr = pk.put(b"".join(struct.pack("<I", p) for p in items)) if items else 0
     trig = []
     for cond, data, _ in b.triggers:
         trig.append((cond, pk.put(data)))
@@ -774,6 +793,8 @@ def emit(b, pk):
     ol = spec.get("onload")
     if ol:
         onload = pk.put(script_barrier_onload(ol["barrier_flag"], ol["rect"]), f"{spec['name']} on-load")
+    elif bar:
+        onload = pk.put(script_barrier_onload(bar["flag"], bar["rect"], bar.get("decoration", 0)), f"{spec['name']} on-load")
     # variation
     var = bytearray(bvar.raw() if bvar else bytes(L.VARIATION_SIZE))
     if not bvar:
@@ -801,10 +822,10 @@ def emit(b, pk):
     # MapEntry
     be = b.base.entry if b.base else None
     row = bytearray(L.MAP_ENTRY_SIZE)
-    row[0:8] = bytes([spec["zone"], spec["area"], 1, len(trig), 0, 0, 0, len(b.gates)])
+    row[0:8] = bytes([spec["zone"], spec["area"], 1, len(trig), 0, len(items), 0, len(b.gates)])
     struct.pack_into("<I", row, 0x08, spec.get("flags", be.flags if be else 1))
     struct.pack_into("<I", row, 0x0C, spec.get("name_id", be.name if be else 0xDD))
-    struct.pack_into("<IIIII", row, 0x10, trig_arr, 0, 0, 0, gate_ptr)
+    struct.pack_into("<IIIII", row, 0x10, trig_arr, 0, item_arr, 0, gate_ptr)
     struct.pack_into("<I", row, 0x24, spec.get("music", be.music if be else 2))
     struct.pack_into("<IIII", row, 0x28, 0, var_arr, onload, 0)
     info = dict(name=spec["name"], zone=spec["zone"], area=spec["area"], size=[b.W * 8, b.H * 8], spawn=[sx, sy],

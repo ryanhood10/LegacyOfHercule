@@ -174,10 +174,21 @@ pair of triggers per landing site: a script trigger warping to the town and a 0x
 **Level gates** (+0x20, 8 bytes): u16 x, u16 y (where the number is drawn), u8 barrier (the
 decoration it labels, found by message 6), u8 colour, u8 level, u8 character (party slot; 255 = any).
 Colour and character pairs in the stock maps: 6 Gohan (0), 4 Piccolo (1), 3 Vegeta (2), 7 Trunks (3),
-39 Goku (4), 5 Hercule (5), 2 anyone (255). A barrier = decoration + gate + a dialogue trigger
-("Only Vegeta is allowed to pass through this barrier.") + an on-load script that opens the
-collision once the barrier's story flag is set (zone 8 area 28: flag 280, `SetCollisionRect` +
-`RemoveRectFromMask2` over the decoration's rect).
+39 Goku (4), 5 Hercule (5), 2 anyone (255).
+
+**A working barrier** (zone 8 area 28, the "Only Vegeta" cave) is five pieces: the decoration (the
+force field, id 0, its rect blocked in the walk collision); the gate (the number); an **item**
+(MapEntry +0x18, count +5) `{u32 condition, u8 decoration id, u8 1, u8 3, u8 0, handler 0x0800F9A3,
+script}` whose condition (a script: active character == 2 and level of character 2 >= 50) is tested
+**when the map loads**, and whose script runs when that player presses A at the decoration (play
+sound 47, `SetCollisionRect` + `RemoveRectFromMask2` over the rect, `SetStoryFlag 280`, and the
+decoration disappears); a dialogue trigger "Only Vegeta is allowed to pass through this barrier."
+whose condition is "active character != 2 and flag 280 clear"; and an on-load script that, once
+flag 280 is set, hides decoration 0 and opens the rect again. So the right character must be the
+active one when entering the map. `mapbuild`'s `barrier` block generates the item, the conditions
+and the on-load script for any character, level and flag. Items in general: `FUN_0800F034` attaches
+the record to the decoration found by id (message 6); decorations answer message 4 (show / hide,
+argument id << 1 | visible) and 6 (find by id).
 
 ## 8. Tools
 
@@ -241,13 +252,18 @@ Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `St
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an
 exit record `{dir, 15, AREA, 1, x, y}`; the debug Map Test lists zone 15 too. The arctic's cave door
 (rect (336, 0)-(353, 57) after the stretch) has no exit yet: Android 13's interior or encounter
-attaches there. The barrier's on-load uses the stock flag 280 (see "Open").
+attaches there. The arctic's barrier is a working copy of the stock one with its own story flag
+**380** (the highest stock flag is 306; flags 0-399 are cleared at a new game): Vegeta (party slot
+2) at level 50 or more, active when entering the map, presses A at it to open it for good.
 
 **Verified in the WSL fork** (slot 4, `make BUILD=build/maps3 WIDE=1 DEBUG_MENU=1`, 2026-10-18):
 the debug Map Test lists zone 15 and loads area 1; the co-op test warp (the WarpToMap opcode handler)
 reaches areas 1 to 4; in each, both players walk and stop at the collision (the arctic's ice cliff,
 outcrops and the Vegeta barrier, which shows its blue 50; the Time Chamber's building, canopy and
-border; the arena's basin walls, rim and boulders; the imported crater's walls); the wide view shows each map; the Time Chamber's
+border; the arena's basin walls, rim and boulders; the imported crater's walls); the wide view
+shows each map; with a level-1 test copy of the arctic, Vegeta active and pressing A at the barrier
+opens it (it vanishes, flag 380 set, he walks into the cave) and it stays open after re-entering;
+the Time Chamber's
 door under the canopy leads to Kami's Lookout; the arctic's flight spot (press A) flies to the world
 map. Screenshots: `build/maps/shots/` (`zone15_sheet.png`), not committed (ROM graphics).
 
@@ -273,9 +289,7 @@ animated tiles (frame 0 only), exits and scripts. Finding the map table (through
 
 ## Open
 
-- The barrier object (decoration 0 + gate) handles Vegeta's level check itself and probably sets the
-  flag (280 for the stock cave; no script sets it): the arctic's on-load reuses 280, so passing the
-  stock barrier in zone 8 also opens the arctic's. Give the arctic its own flag once the barrier's
-  flag source is decoded (decoration record or gate object `FUN_08010304`).
+- Story flags taken by the maps: 380 (the arctic barrier). Keep new map flags in 380-399 and tell the
+  story session.
 - The activation objects (0x0300209x) are named by use, not decoded.
 - Decoration records beyond the barrier pattern, item and chest record layouts: not needed yet.

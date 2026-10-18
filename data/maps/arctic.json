@@ -1,5 +1,5 @@
 {
-  "_": "Arctic (docs/story.md 4f): Android 13's area behind a Vegeta barrier. Northern Mountains zone 8 area 28 (cliff wall, cave mouth, the stock 'Only Vegeta is allowed to pass' barrier: decoration 0, gate colour 3 / party slot 2) widened and deepened into a snowfield, recoloured to snow and ice, with Snowy Highlands' snowfall overlay (zone 13 BG0). Base coordinates (c, r) map to (c + 16 if c >= 12, r + 12 if r >= 12).",
+  "_": "Arctic (docs/story.md 4f): Android 13's area behind a Vegeta barrier. Northern Mountains zone 8 area 28 (cliff wall, cave mouth, the stock 'Only Vegeta is allowed to pass' barrier: decoration 0, gate colour 3 / party slot 2, made a working barrier with its own story flag 380 by the 'barrier' block) widened and deepened into a snowfield, recoloured to snow and ice, with Snowy Highlands' snowfall overlay (zone 13 BG0). Base coordinates (c, r) map to (c + 16 if c >= 12, r + 12 if r >= 12).",
   "name": "arctic",
   "zone": 15, "area": 1,
   "base": [8, 28],
@@ -26,7 +26,7 @@
     ]
   },
   "effect": {"from": [13, 1]},
-  "onload": {"barrier_flag": 280, "rect": [336, 40, 368, 72]},
+  "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [336, 40, 368, 72], "decoration": 0, "dialogue_trigger": 0},
   "triggers": [
     {"type": "flight", "rect": [104, 280, 152, 320], "world": [1632, 1592]}
   ],
