@@ -542,3 +542,107 @@ Only the player who stepped on the flight sign controls the world map (zone 6 ar
 player is a passenger and has no entity there. Both players land together at the destination. To
 implement when the story scripts land: suppress player 2's spawn while the world map is loaded and
 give the pad that initiated the flight player 1's input for its duration.
+
+## Android 16 boss (2026-10-18, branch `android16-boss`)
+
+Ryan's decision (`docs/story.md` 4e): 16 is the island boss Piccolo and player 2 fight next to Kame
+House. What exists: sprite **160** (`tools/a16sprites.py`, `docs/sprites.md` "Android 16 boss
+sprite"), enemy stat **109**, the AI in `src/coop/android16.c` with knobs in `src/coop/android16.h`,
+and a test placement. The island scripts are unchanged (the parent session owns them).
+
+### How to place him (for the story work)
+
+- An enemy record (`EnemyRecord`, handler `0x0800E77F`) with **stat 109** and **sprite 160** spawns
+  him through `enemy_spawn_hook` (map load, or TriggerMapEvent opcode 84 with condition word 1 for a
+  scripted boss). Stat 109 is past the stock table (0..108); the hook resolves it to `a16_stat`.
+  He never gets a co-op twin (one boss; 17 and 18 watch).
+- The stock island fight refers to the boss by sprite: map 296's trigger runs
+  `DespawnCharacterAndRecordPosition [9, 1]` and `DrawBossHealthBarRange [9, 75, 100]`, and its
+  defeat script moves char 9. A 16 fight needs those arguments to say 160, the record changed (map 296
+  script 1 at `0x08406494`: `+8` stat 3 -> 109, `+0x10` sprite 9 -> 160), and the actor standing in
+  for him before the fight (`actor sprite 8`) swapped with 17's (`actor sprite 9`).
+- Android 16 in the stock game is **sprite 8** (the island actor), not 15 (that is Dr. Gero).
+- Defeated (HP 0) he stays on the map in his knock-down frame and fires nothing; the boss death class
+  (`0x086FF3C4`) runs the record's action, as for 17.
+
+### Attacks (special-attack scheduler between ticks of the stock boss AI set 21)
+
+| attack | what happens | knobs |
+|---|---|---|
+| stock melee | AI set 21 (17's): approach, punches, kicks | `A16_MELEE` stat |
+| heat-seeking rocket | charge pose (group 5) 30 frames, one missile locked on the **nearer player**, steering after them, explodes on contact or when the **three-second fuse** ends; below a third of his HP one rocket per player | `A16_HOMING_*` |
+| rocket barrage | charge 24, a fan of 5 (7 enraged) fast missiles, weak homing, 80-frame fuse | `A16_BARRAGE_*` |
+| area explosives | arms up 30, 5 (7 enraged) of the ROM's bombs dropped from 96 px: the first four around the players, the rest anywhere in view; 72-frame fuse after landing; big fire explosion (3 sprites, debris, shake) | `A16_BOMB_*` |
+| rocket punch | group 13: wind-up 18 frames, the forearm flies straight along his facing, explodes on contact or after 60 frames; the arm returns 36 frames later | `A16_PUNCH_*` |
+
+Choice by HP: above 2/3 homing 40 / barrage 20 / punch 40; between 1/3 and 2/3 25 each; below 1/3
+homing 25, barrage 25, bombs 35, punch 15, and cooldowns times `A16_RAGE_PCT`%. A special starts only
+from idle or walk, with a player within `A16_RANGE` px, after a cooldown of 150-240 frames.
+**Poise**: a hit that stuns him opens `A16_POISE` (90) frames in which hits only do damage, and a
+special cannot be interrupted, so two players cannot stun-lock him.
+
+### Engine facts found for this (decompiled, verified in the fork)
+
+- **Hit messages** (list broadcast `0x08006DA7`, message 0): `{u8 type; s32 x1, y1, x2, y2; u8 facing
+  (+0x14); s32 mult 10.10 (+0x18); attack descriptor (+0x1C); attacker (+0x20); out crit, dmg,
+  applied (+0x24..+0x2F); source (+0x30)}`. Players accept types 0 and 2 (`0x08008945`), enemies 1
+  and 2 (`0x0800E5B9`); the ROM's bomb uses 2 (it hurts everyone), 16's blasts use 0. The receiver
+  runs the damage calc on `msg+0x14` and OnHit on `msg+0x24`, which reads the applied damage at
+  `+8` (`msg+0x2C`). Attack descriptors are `{u8 kind (1 = ranged), u8 reaction, pad, s32 base}`;
+  `0x086DB2DC` is 17's melee.
+- **Projectile class** (base init `0x08013BC1(obj, vram_bytes, owner)`, 0x58 bytes): +0x18 frame
+  descriptor (raw tiles, DMA'd by slot 5 when it differs from +0x10), +0x20/+0x24 position 8.8,
+  `0x08013BF5` updates the box and sort key, +0x1C owner (cleared by message 0xF), slot 2 update.
+  The NPC ki blast (`FUN_08011BC4`, vtable `0x080259C4`) is a script effect that only reacts to
+  message 0x11 from its target; the arcing bomb (`FUN_0801CCC8`, landing `0x0801CDFD`, explosion
+  `0x0801CD33`: 4 debris `0x0800EC09`, dust explosion `0x0800FA1D`, SFX `0x14 + rand 2`) is the only
+  damaging enemy projectile found.
+- **Enemy control states**: `0x0840DB00` lists IWRAM state objects by index (0 idle, 1 walk, 2/3 hurt,
+  6/7/8/10 = play group 6/7/8/10 once); entity +0x4C = group pointer (record + 0x4C + 0x10 * group),
+  +0x14 frame, +0x12 timer; `0x0800763D` switches state (exit, set +0x18, enter). The engine calls
+  state vtable slots above 3 (a 4-slot private state crashed with "Jumped to invalid address" after
+  the radar screen), so copy the idle state's vtable `0x08024BA0` and replace slots 0-3.
+- Enemy update = `0x0800772B` (aux + control state), then the AI tick `0x0801AB09(e + 0x19C)`.
+- **Camera_Shake(cam, frames, strength 0-100)** links the camera object into the controller chain
+  headed at `0x03000FF4`; calling it again while it shakes links it to itself (an endless loop).
+  16 starts a shake only when the head is not the camera and otherwise extends the timer. The
+  player bump in `player.c` calls it unguarded (follow-up).
+- OBJ VRAM free space = `0x08006D71(g_EntityList)` (largest free block); 16 skips a projectile's art
+  when it would leave less than 0x100 bytes (the damage still happens).
+- The scouter registration (message 0x14) searches the bestiary by stat pointer, so a stat outside
+  the table simply has no scouter entry.
+- **Player 2's combat bytes** (entity +0x160..+0x162: melee, ranged, defence) are player 1's
+  character's, not their own (Hercule as player 2 at level 40 had 61/65/51 = Piccolo's). Not fixed
+  here (follow-up); the tests below wrote the right bytes by hand.
+
+### Tuning and test results (fork, island area 6, Piccolo + Hercule at level-30 stats)
+
+Level-30 stats were scaled from the debug party's level-40 values along each character's growth:
+Piccolo 554 HP, str/pow/end 46.7/49.8/39.6; Hercule 245 HP, 47.0/45.5/63.0 (party entries and
+entity bytes; savestate `build/a16/a16_base.ss1`, recipe in `docs/testing.md`). Each player hit takes
+about 71 off 16 (a crit about 150). The test autopilot (`A16_TEST`, `coop2.a16_bot`) walks both
+players to his sides and punches, steps out of bomb and rocket blasts and his swings, and backs off
+below 35% HP; it uses no abilities and no items, so it is a lower bound on two people.
+
+| 16's numbers (HP / melee / ranged) | result |
+|---|---|
+| 5200 / 34 / 40, no poise | stun-locked to 1321 HP in 30 s, then the rage bombs killed both |
+| 5200 / 34 / 40, poise | both dead in 19 s (melee about 57 / 41 per hit on Piccolo / Hercule) |
+| 7000 / 22 / 30 | Piccolo dead in 30 s |
+| 5000 / 12 / 28, bombs x1.25, 9 rage bombs | 80 s, stalled at 1801 HP, both died |
+| 4500 / 12 / 28, bombs x1.0, 7 rage bombs | lost twice, at 862 and 693 HP |
+| **4000 / 12 / 28 (current)** | **won 3 of 5**: KOs at 28 s (Piccolo 143, Hercule 182 left), 31 s (232 / 138) and 35 s (38 / 159); lost twice, at 953 and 1179 HP |
+
+Per hit now (co-op x1.25 included), Piccolo / Hercule: melee 17-22 / 12-13, homing rocket 35 / 31,
+barrage 25 / 22, punch and bombs about 40 / 33. People who dodge and use abilities and items should
+win more often; level 25 is harder (not measured). Raise `A16_HP` for a longer fight. Single-player
+gets `A16_SOLO_HP_PCT` (70%) of his HP (not tested).
+
+### Open
+
+- Screenshots of a missile in flight: the in-fight captures show 16 between both players, the boss
+  bar, hit flashes and explosions, but no frame caught a missile mid-flight; the paused-frame
+  capture (`tools/fork/a16shots.sh`) made the fork exit twice (cause not found).
+- The island scripts still name 17 (sprite 9, stat 3); the dialogue and scripts are the parent's.
+- AI set 21 drives his melee, so he keeps 17's moves (dash, kicks) rather than moves of his own.
+- The player-2 combat-byte bug above; a Camera_Shake guard for `player.c`.

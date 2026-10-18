@@ -72,10 +72,20 @@ typedef struct CoopExtra {
     ActorRecord actor_rec;  // scratch record for COOP_CMD_ACTOR
     u32 actor_count;        // COOP_CMD_ACTOR places successive actors on a 6 x 2 grid around player 1
     u32 partner_override;   // console: nonzero = every boss twin uses this sprite id (model experiments)
+    Entity *p1_frame;       // player 1 at the start of this frame's entity update (g_PlayerObject is swapped per entity)
+    Entity *a16;            // the live Android 16 boss (android16.c), 0 when none
+    u16 a16_fired, a16_booms;   // debug: projectiles launched, explosion sprites spawned
+    u16 a16_hits, a16_skipped;  // debug: blasts that hit a player, projectiles skipped (OBJ VRAM / heap)
+    u32 a16_force;          // console/GDB: nonzero = every special is this attack (1 homing, 2 barrage, 3 bombs, 4 punch)
+    u16 a16_bot;            // A16_TEST builds: nonzero = both players are driven by the test autopilot (input.c)
+    u16 a16_specials;       // debug: specials started
+    u32 a16_spawn_frame;    // debug: g_FrameCounter when he spawned / when his HP reached 0
+    u32 a16_dead_frame;
 } CoopExtra;
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
+#define COOP_CMD_A16          4   // spawn the Android 16 boss 64 px right of player 1, with a boss bar (android16.c)
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 extern CoopExtra coop2;
 

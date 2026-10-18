@@ -35,7 +35,8 @@ file and tool, and says where to look for a given question. Keep it current.
 | `wide.c/.h` | wide-view descriptor and dynamic size, `sprite_emit_hook` (OAM x/y high bits) |
 | `hud.c` | player 2's HUD panel |
 | `exp.c` | EXP credited to the killing player |
-| `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar |
+| `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` |
+| `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
 | `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, flag accessors, VM counter / item / bestiary opcodes |
 | `party_save.c` | save path for N entries: `SaveGame`, `LoadSlot`, `WriteSlot`, the save menu's slot store and queries, start game; EEPROM slots of `SAVE_STRIDE` |
@@ -47,7 +48,8 @@ file and tool, and says where to look for a given question. Keep it current.
 | `coop.ld` | linker script: `.coop` sections, pinned EWRAM regions, `EXTERN` list of hook symbols |
 
 Generated at build time (never committed): `build/gen/sprites_data.c` (SSJ Hercule record, relocated
-`sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/gen/buu_sprites_data.c`
+`sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/gen/a16_sprites_data.c`
+(Android 16's sprite 160 and the missile / fist / explosion frames, from `tools/a16sprites.py`), `build/gen/buu_sprites_data.c`
 (sprite ids 158+ converted from Buu's Fury by `tools/buu2log2.py`, when `roms/buu.gba` is present),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
@@ -67,6 +69,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
+| `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group) and the projectile frames -> `build/gen/a16_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
 | `widerender.py` | offline reference render of the wide view from a savestate |
@@ -81,7 +84,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `win_keys.ps1`, `win_shot.ps1` | keys and screenshots for any window by title (used for the WSL fork window) |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |
-| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh` |
+| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`) |
 
 ## Where to look for...
 
@@ -97,5 +100,6 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | ability table, stats, growth | `docs/hercule.md`, `tools/romdata.py`, `data/hercule.json` |
 | dialogue text and scripts | `tools/script_dump.py`, `docs/hercule.md` section 5 |
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |
+| the Android 16 boss, hit messages, projectiles, enemy control states | `src/coop/android16.c`, `docs/coop-design.md` "Android 16 boss", `docs/sprites.md` "Android 16 boss sprite" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |
 | what Ryan decided / asked for | `docs/log.md`, `docs/plan-legacy-of-hercule.md` section 4, `docs/story.md` |

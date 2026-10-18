@@ -2,6 +2,7 @@
 // Same behaviour for player 1, plus player 2's InputSystem filled from the selected source.
 #include "coop.h"
 #include "wide.h"
+#include "android16.h"
 
 #define CONTROLLER_WINDOW 600   // polls (~10 s) during which holding L+R turns this GBA into the P2 pad
 
@@ -68,6 +69,36 @@ static u16 p2_source(u16 p1_now, u16 *p1_out) {
 #endif
 }
 
+#ifdef A16_TEST
+// Test autopilot for the Android 16 fight (coop2.a16_bot): walk to a spot beside him (player 1 on his
+// left, player 2 on his right), turn to him and punch with A; no dodging and no abilities, so a win
+// by the autopilot is a lower bound on what two people can do.
+static u16 bot_pad(const Entity *pl, const Entity *boss, int side, const CharacterEntry *c) {
+    int low = c->hp * 100 < c->max_hp * 35;      // hurt: keep out of his reach and only dodge
+    s32 tx = (boss->x >> 8) + side * (low ? 70 : 20), ty = boss->y >> 8;
+    s32 ex = tx - (pl->x >> 8), ey = ty - (pl->y >> 8);
+    u32 t = g_FrameCounter;
+    u16 pad = 0;
+    s32 rx, ry;
+    if (a16_threat(pl, &rx, &ry)) {             // step out of a blast first, as a person would
+        if (rx > 0) pad |= KEY_RIGHT; else pad |= KEY_LEFT;
+        if (ry > 4) pad |= KEY_DOWN; else if (ry < -4) pad |= KEY_UP;
+        return pad;
+    }
+    if (ex > 3 || ex < -3 || ey > 3 || ey < -3) {
+        if (ex > 3) pad |= KEY_RIGHT;
+        if (ex < -3) pad |= KEY_LEFT;
+        if (ey > 3) pad |= KEY_DOWN;
+        if (ey < -3) pad |= KEY_UP;
+        return pad;
+    }
+    if (low) return 0;
+    if ((t % 20) == 0) return side < 0 ? KEY_RIGHT : KEY_LEFT;   // face him
+    if ((t % 10) < 2) return KEY_A;
+    return 0;
+}
+#endif
+
 void input_poll_hook(InputSystem *in) {
     coop_init_once();
     u16 raw = REG_KEYINPUT;
@@ -87,6 +118,12 @@ void input_poll_hook(InputSystem *in) {
     u16 now = (u16)~raw;
     u16 p1 = now;
     u16 p2 = p2_source(now, &p1);
+#ifdef A16_TEST
+    if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
+        if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, coop2.a16, -1, &g_Party->chars[g_Party->active_slot]);
+        if (coop.p2) p2 = bot_pad(coop.p2, coop2.a16, 1, &g_Party->chars[coop.p2_slot]);
+    }
+#endif
 
     poll_into(in, p1);
     if (in->pressed) g_LastInputFrame = g_FrameCounter;
@@ -102,6 +139,11 @@ void input_poll_hook(InputSystem *in) {
         CharacterEntry *c = &g_Party->chars[coop.p2_slot];
         if (ssj_ready(c)) ssj_use(c, coop.p2);
     }
+#endif
+#ifdef A16_TEST
+    // test builds: player 1 holds L and R and presses Down -> Android 16 boss beside player 1 (android16.c)
+    if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && (in->pressed & KEY_DOWN) && p1_controllable())
+        coop2.cmd = COOP_CMD_A16;
 #endif
 #if P2_MODE != P2_MODE_SWAP
     if (coop.p2 && (coop.input2.pressed & KEY_SELECT) && p1_controllable()) p2_cycle();

@@ -76,6 +76,47 @@ turns a new game into the debug menu (the patch replaces the intro video). A sta
 `tools/p2_keys.py` from another session reconnects to the fork's port 7778 and injects player-2
 buttons; kill it before testing.
 
+## Android 16 boss fight (fork, scripted; `docs/coop-design.md` "Android 16 boss")
+
+Build and helpers (from the `android16-boss` worktree, `F:\MeltyCreations\log2-a16`):
+
+```
+make BUILD=build/a16 WIDE=1 DEBUG_MENU=1 A16_TEST=1        # Git Bash, toolchain PATH as above
+wsl -d Ubuntu -u root -- bash -c "tr -d '\r' < /mnt/f/MeltyCreations/log2-a16/tools/fork/a16install.sh | bash"   # copies a16*.sh/.gdb to /root
+python tools/fork/p2hold.py --cmd build/a16/p2cmd.txt      # keep running (background): player 2 present, scripted pad
+```
+
+Savestate `build/a16/a16_base.ss1` (made with this build; re-make after a rebuild if player 2
+misbehaves): island zone 11 area 6 (debug Map Test 11/6, no triggers, 17/18/16 actors stand
+around), Piccolo player 1 (slot 1), Hercule player 2 (slot 5), both at level-30 stats: party
+entries 0x0203F028 (Piccolo: hp 554, str 11955, pow 12750, end 10140, exp 382750) and 0x0203F098
+(Hercule: hp 245, str 12030, pow 11650, end 16130), and the entity combat bytes written by hand
+(player 1 entity +0x160 = 46 49 39, player 2 = 47 45 63; player 2's are otherwise player 1's, a bug).
+To re-make it: boot the ROM, leave the title idle ~100 s for the debug menu, Map Test zone 11
+area 6 (Down picks the field, Right increments; hold keys 0.3 s), A; start `p2hold.py`, nudge
+player 1 so player 2 spawns (Hercule), poke the values above with gdb, then Shift+F1 in the window
+(`tools\win_keys.ps1 "SHIFT+F1:300" -Title "mGBA (Ubuntu)"`) -> `build/a16/log2-wide.ss1`.
+
+Run a fight (Git Bash; `MSYS_NO_PATHCONV=1` stops Git Bash rewriting `/mnt/...` and `/root/...`):
+
+```
+MSYS_NO_PATHCONV=1 powershell -NoProfile -File tools/fork/runa16.ps1 -State /mnt/f/MeltyCreations/log2-a16/build/a16/a16_base.ss1
+MSYS_NO_PATHCONV=1 wsl -d Ubuntu -u root -- bash -c "/root/a16fight.sh 0 1 300 10"   # FORCE BOT SECS STEP
+MSYS_NO_PATHCONV=1 wsl -d Ubuntu -u root -- bash -c "/root/a16peek.sh"               # one readout
+```
+
+`a16fight.sh` spawns 16 (writes COOP_CMD_A16 = 4 to coop2.cmd at 0x0203FD08), sets the forced
+special (0x0203FD40: 1 homing, 2 barrage, 3 bombs, 4 punch, 0 random) and the autopilot
+(0x0203FD44), logs every hit a player takes and every hit 16 takes (`a16hits.gdb`, to
+`/root/a16hits.log`), and stops at a KO. In game without gdb: player 1 holds L + R and presses Down
+(`A16_TEST` builds). Readout fields: coop2 0x0203FB00 + 0x234 a16 entity, +0x238 fired/explosion
+sprites, +0x23C blasts that hit/skipped art, +0x244 bot/specials, +0x248/+0x24C spawn/KO frame.
+
+Notes: the fork's p2pad writes 0 to the player-2 pad word while no sender is connected, so a gdb
+write of 0x8000 does not keep player 2 present (use `p2hold.py`). P1's Select opens the Dragon Radar.
+`tools/fork/a16shots.sh` (pause, screenshot, continue) made the fork exit twice; plain
+`win_shot.ps1` captures while running work.
+
 ## GDB stub (fork, `-g`, port 2345) — the fastest way to a crash cause
 
 `gdb-multiarch` is installed in WSL. Launch the fork with `-g`, then run a batch script:

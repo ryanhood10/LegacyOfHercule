@@ -24,7 +24,7 @@ public static class WK {
 }
 "@
 $vk = @{ UP = 0x26; DOWN = 0x28; LEFT = 0x25; RIGHT = 0x27; X = 0x58; Z = 0x5A; A = 0x41; S = 0x53; N = 0x4E; O = 0x4F;
-         I = 0x49; J = 0x4A; K = 0x4B; L = 0x4C; U = 0x55; M = 0x4D; ENTER = 0x0D; BACKSPACE = 0x08; ESC = 0x1B; F1 = 0x70; F2 = 0x71 }
+         I = 0x49; J = 0x4A; K = 0x4B; L = 0x4C; U = 0x55; M = 0x4D; ENTER = 0x0D; BACKSPACE = 0x08; ESC = 0x1B; F1 = 0x70; F2 = 0x71; F3 = 0x72; F4 = 0x73; SHIFT = 0x10 }
 $h = [WK]::Find($Title)
 if ($h -eq [IntPtr]::Zero) { throw "no window with title containing '$Title'" }
 if ([WK]::IsIconic($h)) { [WK]::ShowWindow($h, 9) | Out-Null; Start-Sleep -Milliseconds 400 }   # restore a minimised window
