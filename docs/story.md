@@ -310,8 +310,13 @@ is the no-art alternative.
 caption rewrites from the first text swap ("Earth's true hope is a man with no ki at all" and
 "Sixteen years before Hercule's rise") are removed; `data/hercule-text.json` is empty again.
 
-Open for Kame House: player 2 beside Piccolo against 17 (Hercule, who flew in with him), and 18
-joining as 17's twin instead of "sitting this one out", or 16 stepping in.
+**Decided (Ryan, 2026-10-18): Android 16 is the island boss.** The Kame House dialogue changes:
+16 is furious that Goku is not there; Piccolo tricks him ("beat me on the next island and I'll tell
+you where Goku is"); the fight on the island is Piccolo and player 2 (Hercule or Krillin) against
+16 with new fighting frames (attacks, rocket punch with the forearm detached, hurt), rocket
+projectiles (heat-seeking rockets that lock on and detonate after three seconds, rocket barrages,
+big explosives across the field, none of which hurt 16) and a new boss AI for them. 17 and 18
+watch; after the fight Cell arrives as scripted and the warp to the Lookout follows.
 
 ## 5. What the plan is missing (engine limits found while checking)
 
