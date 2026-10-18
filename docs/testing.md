@@ -65,6 +65,26 @@ Select cycling for player 2 registers only every few presses; verify the slot in
 Finding entities with gdb: the scene list is `g_EntityList` 0x03001120, `count` at +4 and the item
 pointers inline from +8; co-op enemies have vtable 0x0203FB04 (`coop2.enemy_vtable`).
 
+**Audio sync stall:** with several forks running, a fork launched with sound can stall (a boot stuck on
+the copyright screen for minutes, keys ignored). `runfork.ps1 ... -Mute` passes `-C mute=1 -C
+audioSync=0` and runs at full speed. Interrupting the gdb stub while the CPU idles in the BIOS (title,
+copyright, menus) can drop the connection ("Disconnected from target"); pause only in game and drive
+menus with `win_keys.ps1` (presses of 350 ms with 700 ms gaps register; faster ones drop).
+
+## New maps (zone 15, `docs/maps.md`)
+
+```
+make BUILD=build/maps WIDE=1 DEBUG_MENU=1                       # MAPS=1 by default: builds data/maps/*.json
+tools\fork\runfork.ps1 /mnt/f/.../build/maps/log2-wide.gba -Slot 4 -Mute
+python tools/fork/p2hold.py --port 7782 --cmd build/maps/p2cmd.txt   # player 2 present; write "0x40:2" etc. to the file
+wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=4 /root/warp.sh 15 1 216 200"   # arctic (2: 312 280 Time Chamber, 3: 276 354 arena, 4: 240 340 crater)
+```
+
+The debug Map Test lists zone 15 too (zone field: Right x14 from 1). A savestate taken at the debug
+menu (Shift+F1) loads on any rebuild with the same code, so map-data changes do not need a new boot.
+Offline check of a built ROM: `python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table
+<table address printed by patch_rom.py> --count 330`.
+
 ## Fork helpers (`tools/fork/`, used for the party-slots work)
 
 The stub accepts one client per emulator run: a second `target remote` never completes, and a client

@@ -1,0 +1,37 @@
+{
+  "_": "Arctic (docs/story.md 4f): Android 13's area behind a Vegeta barrier. Northern Mountains zone 8 area 28 (cliff wall, cave mouth, the stock 'Only Vegeta is allowed to pass' barrier: decoration 0, gate colour 3 / party slot 2, made a working barrier with its own story flag 380 by the 'barrier' block) widened and deepened into a snowfield, recoloured to snow and ice, with Snowy Highlands' snowfall overlay (zone 13 BG0). Base coordinates (c, r) map to (c + 16 if c >= 12, r + 12 if r >= 12).",
+  "name": "arctic",
+  "zone": 15, "area": 1,
+  "base": [8, 28],
+  "tileset": "base",
+  "layout": "base",
+  "keep": ["decorations", "gates", "triggers"],
+  "ops": [
+    {"op": "insert_cols", "at": 12, "src": [4, 12], "times": 2},
+    {"op": "insert_rows", "at": 12, "src": [12, 16], "times": 3},
+    {"op": "fill", "bg": 3, "rect": [0, 12, 54, 34], "src": {"map": [8, 28], "bg": 3, "rect": [1, 13, 4, 4]}},
+    {"op": "clear", "bg": 1, "rect": [0, 12, 54, 34]},
+    {"op": "clear", "bg": 2, "rect": [0, 12, 54, 34]},
+    {"op": "walk", "rect": [0, 12, 54, 34], "mask": "both"},
+    {"op": "stamp", "at": [24, 21], "src": {"map": [8, 28], "rect": [15, 11, 12, 12]}, "layers": [3]},
+    {"op": "stamp", "at": [0, 31], "src": {"map": [8, 28], "rect": [0, 19, 12, 15]}},
+    {"op": "stamp", "at": [38, 34], "src": {"map": [8, 28], "rect": [22, 22, 16, 12]}},
+    {"op": "border", "width": 1, "mask": "both"}
+  ],
+  "recolor": {
+    "rules": [
+      {"_": "grass, foliage, yellow-greens -> snow", "hue": [45, 170], "sat": [0.12, 1], "ramp": [[150, 175, 215], [215, 230, 250], [255, 255, 255]], "gamma": 0.6},
+      {"_": "dirt, rock, cliffs (reds, browns, oranges) -> blue-grey ice rock", "hue": [300, 45], "sat": [0.08, 1], "ramp": [[20, 30, 70], [70, 100, 160], [150, 185, 230], [225, 240, 255]], "gamma": 0.9},
+      {"_": "everything else (greys, blues) -> cold ramp", "ramp": [[10, 15, 40], [110, 140, 200], [240, 248, 255]]}
+    ]
+  },
+  "effect": {"from": [13, 1]},
+  "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [336, 40, 368, 72], "decoration": 0, "dialogue_trigger": 0},
+  "triggers": [
+    {"type": "flight", "rect": [104, 280, 152, 320], "world": [1632, 1592]}
+  ],
+  "spawn": [216, 200],
+  "name_id": 233,
+  "music": 5,
+  "flags": 1
+}
