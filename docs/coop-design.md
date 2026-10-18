@@ -676,3 +676,27 @@ model and ran the stock defeat dialogue ("This is ridiculous. Piccolo was suppos
 us!"). With the test rule (`make CFLAGS_EXTRA=-DBOSS_RULE_TEST`: 17 alone, end 50 %) 17 spawned
 alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `build/bdtest.sh`,
 `bdfind.sh`, `bdpeek.sh` (not committed; the pattern is in `docs/testing.md`).
+
+## Player 2's combat stats, duplicate NPCs, test warp (2026-10-18)
+
+- **Player 2's combat bytes**: the behaviour classes write entity +0x160/+0x161/+0x162 (melee,
+  ranged, defence = str/pow/end >> 8) from the *active* party slot (`0x08016FD8`), so player 2 used
+  player 1's character's stats. `p2_sync_combat()` (player.c) rewrites them from player 2's own slot
+  every input poll. Verified in the fork: corrupted bytes came back as Hercule's (46/45/63) within a
+  frame while player 1 kept Piccolo's.
+- **Camera shake**: `camera_shake_safe()` (player.c) extends a running shake instead of calling
+  `Camera_Shake` again (which links the camera into its own controller chain: an endless loop); the
+  player's wall bump uses it. android16.c has its own copy.
+- **Duplicate-actor rule** (`src/coop/actors.c`, run at the start of every entity-list update): a
+  town NPC (vtable `0x080255CC`, map records with handler `0x0800B711`) that shows the character
+  player 1 or player 2 controls is removed with `EntityList_Remove`, whose vtable slot 1 is the
+  deleting destructor (teardown + free). Same person = the NPC's sprite record is the sprite of a
+  display row reachable from the player's current row through the transformation links, or an
+  NPC-only alias (`aliases[]`: sprite 76 -> Krillin, slot 6). Cutscene actors (handler `0x0800D6DF`,
+  bytecode spawns) are not touched: scripts address them by sprite. `COOP_OFF_DUPES` (64) disables
+  it; `coop2.dupes_removed` counts. Verified: zone 3 area 6 with Piccolo as player 1 lost Piccolo's
+  NPC and kept Krillin's, Vegeta's, Tien's and the others.
+- **Test warp**: `coop2.cmd = 5` (`COOP_CMD_WARP`) with `cmd_arg = zone | area << 8` and
+  `cmd_arg2` (CoopExtra +0x254) `= x | y << 16` calls the WarpToMapNoEntities opcode handler
+  (`0x08009A89`, stack `{5, zone, area, 1, x, y}`) from the entity-list hook. Offsets: `coop2` is
+  at `0x0203FB00`, `cmd` +0x208, `cmd_arg` +0x20C.

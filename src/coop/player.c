@@ -97,6 +97,30 @@ void idle_update(IdleState *st, Entity *e) {
     handle_buttons(e, in);
 }
 
+// Camera_Shake links the camera into the controller chain headed at 0x03000FF4; calling it again while
+// it shakes links it to itself (an endless loop). Extend the running shake instead.
+#define SHAKE_HEAD (*(void **)0x03000FF4)
+void camera_shake_safe(int frames, int strength) {
+    if (SHAKE_HEAD == g_Camera) {
+        s32 *left = (s32 *)((u8 *)g_Camera + 0xC);
+        if (*left < frames) *left = frames;
+        return;
+    }
+    Camera_Shake(g_Camera, frames, strength);
+}
+
+// The behaviour classes write the combat bytes (entity +0x160 melee, +0x161 ranged, +0x162 defence)
+// from the ACTIVE party slot (0x08016FD8), so player 2's entity got player 1's character's stats.
+// Rewrite them from player 2's own slot every frame (input poll).
+void p2_sync_combat(void) {
+    Entity *p2 = coop.p2;
+    if (!p2) return;
+    const CharacterEntry *c = &g_Party->chars[coop.p2_slot];
+    p2->stat_melee = (u8)(c->str >> 8);
+    p2->stat_ranged = (u8)(c->pow >> 8);
+    p2->defence = (u8)(c->end >> 8);
+}
+
 // ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F) ------------------------------------
 void walk_update(void *st, Entity *e) {
     (void)st;
@@ -108,7 +132,7 @@ void walk_update(void *st, Entity *e) {
         s32 ny = e->y + v->dy * e->speed;
         s32 px[2] = { nx >> 8, ny >> 8 };
         if (!Collision_Check(COLLISION_MAP, px, 0)) {
-            Camera_Shake(g_Camera, 8, 100);
+            camera_shake_safe(8, 100);
             Entity_SetAnimation(e, ANIM_BUMP);
             play_cant_sfx();
         } else {

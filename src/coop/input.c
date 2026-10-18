@@ -132,6 +132,7 @@ void input_poll_hook(InputSystem *in) {
     poll_into(&coop.input2, p2);
 
     coop_active_check();
+    p2_sync_combat();
     wide_update();
 #ifdef SSJ_TEST
     if (coop.p2 && (coop.input2.pressed & KEY_START)) {   // test builds: player 2's Start transforms

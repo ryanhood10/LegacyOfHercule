@@ -82,13 +82,18 @@ typedef struct CoopExtra {
     u32 a16_spawn_frame;    // debug: g_FrameCounter when he spawned / when his HP reached 0
     u32 a16_dead_frame;
     u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
-    u16 _pad3;
+    u16 dupes_removed;      // debug: town NPCs removed because a player controls that character (actors.c)
+    u32 cmd_arg2;           // second argument of a test command (COOP_CMD_WARP: x | y << 16)
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
 #define COOP_CMD_A16          4   // spawn the Android 16 boss 64 px right of player 1, with a boss bar (android16.c)
+#define COOP_CMD_WARP         5   // arg = zone | area << 8, arg2 = x | y << 16 (pixels): the WarpToMap opcode (39)
+void camera_shake_safe(int frames, int strength);   // player.c: Camera_Shake that never re-links a shaking camera
+void p2_sync_combat(void);                          // player.c: player 2 entity combat bytes from its own slot
+void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 extern CoopExtra coop2;
 
@@ -105,6 +110,7 @@ extern CoopExtra coop2;
 #define COOP_OFF_SPEED  4
 #define COOP_OFF_HP     8
 #define COOP_OFF_PARTNER 16  // boss twins keep the original's model
+#define COOP_OFF_DUPES 64     // keep town NPCs that show a player's character
 #define COOP_OFF_BOTHDOWN 32 // the first boss of a pair to fall is removed (pre-2026-10-18 behaviour) instead of staying down
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
