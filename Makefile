@@ -26,7 +26,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o
 SSJ_TEST ?= 0
 
 # BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
@@ -40,10 +40,14 @@ BUU_ROM ?= roms/buu.gba
 BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
+# A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM)
+A16_SPRITE ?= 160
+EXTRA_SPRITES := $(A16_SPRITE)=a16_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
-CLONE_FLAGS := --extra $(subst $(space),$(comma),$(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s)))))
+EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
 endif
+CLONE_FLAGS := --extra $(subst $(space),$(comma),$(strip $(EXTRA_SPRITES)))
 CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
 
 all: $(OUT)
@@ -67,6 +71,14 @@ $(BUILD)/gen/buu_sprites_data.c: tools/buu2log2.py tools/buu_sprites.py tools/sp
 	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ $(BUU_SPRITES) --preview-dir $(BUILD) --report $(BUILD)/gen/buu_sprites_report.md
 
 $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# Android 16's fighting sprite and the rocket / explosion projectile frames (never committed)
+$(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
+	$(PYTHON) tools/a16sprites.py $(ROM) $@ --preview $(BUILD)/a16_preview.png
+
+$(BUILD)/obj/a16_sprites_data.o: $(BUILD)/gen/a16_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

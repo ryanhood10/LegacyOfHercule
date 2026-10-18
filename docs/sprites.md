@@ -51,7 +51,10 @@ similar body and recoloured).
 | 121 | 7 | **Tien** (bald, green pants, attack and hurt poses) | yes, needs abilities + a row |
 | 75 | 1 | Master Roshi | no (idle only) |
 | 94 | 2 | Android 18 (blonde) | no (NPC poses) |
-| 15, 16-19 | 1-3 | Androids 17 / 16 | enemy-grade (attack, hurt) |
+| 8 | 7 | **Android 16** (orange mohawk, green armour): idle, walk, hit-stun (2-4), one punch (6), knock-down (12) | the island scenes' actor; the boss uses id 160 (below) |
+| 9, 10, 11 | 13 / 2 / 13 | Android 17 fight set (the island boss), 17 NPC, Android 18 fight set | enemy-grade, full |
+| 15 | 3 | Dr. Gero (white hair under a glass dome): idle, walk, knock-down | NPC (not Android 16: an earlier note said so) |
+| 16-19 | 1-9 | a man in a suit, the tiger bandits | NPC / enemy-grade |
 | 29, 30, 28 | 4 | Imperfect Cell, Perfect Cell, Cell Jr. | enemy-grade |
 | 34, 48, 49, 50, 74 | 2-3 | Frieza final form, Mecha Frieza (small), King Cold (large cape) | enemy-grade; a playable Mecha Frieza needs run/charge poses drawn |
 | 37-39, 44-47 | 3 | large and small robots | enemy-grade |
@@ -188,3 +191,30 @@ types, 199 Oolong, 207/216 tournament announcer and Spopovich, 242 pale giant, 2
 was inspected: no cap, no silver-haired muscle man, no blue-skinned Super 13; the nearest shapes
 are Broly 28 (big, full moveset) and Van Zant 29/262 (big, NPC set). The story's base-form Android
 13 has to be drawn (a recolour of a big human set such as 28, or of LoG2's Android 16/17 bodies).
+
+## Android 16 boss sprite (id 160, `tools/a16sprites.py`, 2026-10-18)
+
+Android 16 is **sprite 8** in the stock game (the island scenes place him as `actor sprite 8` on
+maps 296-298); sprite 15 is Dr. Gero. Sprite 8 has 7 groups: idle 0, walk 1, hit-stun 2-4, one
+punch 6 and the knock-down 12, so a fighting 16 needs only the knock-back, the charge pose and two
+more attacks. `tools/a16sprites.py` builds **sprite id 160** (`a16_record`, `A16_SPRITE` in the
+Makefile) from the ROM at build time into `build/gen/a16_sprites_data.c` (preview
+`build/<dir>/a16_preview.png`):
+
+| group | source | frames per facing |
+|---|---|---|
+| 0 idle, 1 walk, 2 hit-stun, 6 punch, 12 knock-down | sprite 8's own descriptor arrays, referenced by ROM address (nothing copied; sprite 8 is unchanged for the cutscenes) | 2, 4, 4, 4, 4/4/4/1 |
+| 3 knock-back, 5 charge, 7 and 8 attacks | sprite 9 (Android 17) frames, recoloured and re-headed (below) | 4, 3, 4, 4 |
+| 13 rocket punch (new) | sprite 8's punch: wind-up, then the punch with the fist and half the forearm cut away and a grey socket at the elbow (the swing arc removed) | 3 |
+| 4, 9-11 | empty, as in sprite 9 | - |
+
+The record copies sprite 9's header (collision boxes) with the group count raised to 14, so the
+boss AI set 21 (17, 18 and Cooler use it; it addresses groups by index) finds every group where
+17's record has it. The 17 frames: 17's grey vest and orange scarf become 16's green armour
+(indices 42/41/46/54), the blue trousers olive, the green shoes grey boots and the skin 16's skin
+ramp; 17's long black hair (the largest black component in the top of the frame) and face are
+cleared and 16's head (his idle frame of the same facing, cut above the first row with armour
+pixels) is pasted with its chin on 17's chin row and its face centre on 17's. 16's build: his
+own stock frames are already broader than 17's at the game's 16x32 / 32x32 sizes, and the four
+groups taken from 17 keep 17's silhouette below the head (a wider torso would need hand-drawn
+frames). Frames are LZ-compressed with `buu2log2.compress`.
