@@ -131,6 +131,65 @@ then **removed again** (commit e78e78e): Ryan's rule is that nothing reveals Her
 much later, so `data/hercule-text.json` is empty and the stock opening plays. Dialogue edits from here
 follow `docs/story.md`; the tool and the write path stay.
 
+## 5b. Krillin (party slot 6, display row 23, sprite 161; `src/coop/krillin.c`, 2026-10-18)
+
+Krillin is a real party member: his own row, sprite (`docs/sprites.md` "Krillin"), portraits, names,
+stats, growth and four abilities. Ids are in `src/coop/krillin.h`.
+
+**Stats** (`data/hercule.json` slot 6; Ryan's rule: weaker than the Z fighters, like Hercule): 60 HP,
+40 EP, str 1.5 / pow 2.5 / end 1.5, growth str 280..480, pow 330..530, end 300..500 per level (Gohan
+318..518 / 302..502 / 256..456), flags 0x58 (0x40 like every stock row, plus bits 3 and 4 = his two
+status-screen technique pages). At the debug party's level 40 he lands near str 60 / pow 70 / end 60
+with about 60 % of Gohan's HP. A live level-up 40 -> 41 in the fork gave HP +7 %, EP +4, str +479,
+pow +513, end +303 (inside the ranges) and showed "Krillin has achieved Level 41!".
+
+**Abilities** (list `[21, 19, 20, 2]`):
+
+| idx | name (HUD icon) | what | EP |
+|---|---|---|---|
+| 21 | Destructo Disc (new disc icons) | animation 5 (the ki pose) and a disc of the ROM's projectile class flying along his facing at 4 px / frame for up to 90 frames or until it leaves the view; every frame it sends a type-1 hit message (attack `{1, 3, 0x800}`, twice the ki blast's base) with a 24x14 box to each enemy it has not hit yet (up to 12): it **pierces** and never hits the same enemy twice; walls do not stop it; players ignore it. Cooldown 150 frames per slot; while thrown, `coop.acting` = the thrower so kill EXP goes to him | 12 |
+| 19 | Afterimage Rush (Energy Punch icon) | dashes up to 40 px along his facing (4 px steps, stops at walls), then the A attack plus a melee hit `{0, 3, 0x600}` in front of him | 4 |
+| 20 | Shockwave Punch (Hercule punch icon) | animation 5 and a melee burst `{0, 4, 0x500}` 36 px around him, small camera shake | 6 |
+| 2 | Ki Blast (stock) | the stock ability; `kiblast_spawn_hook` (entry jump on `0x0800EAD8`) gives every ki blast whose owner plays row 23 the blue frames | 2 |
+
+Verified in the fork (zone 2 areas 6 and 7, as player 1 and as player 2): every ability fired
+(`kr_state` counters `discs, disc_hits, kiblasts, rushes` at 0x0203F86C in `build/kn`); one disc cut
+through two snakes standing on Hercule and flew on (Hercule untouched), others killed snakes and the
+EXP landed on slot 6; screenshots in `build/kr/shots/`.
+
+**Status screen** (pause menu; `docs/party-8-slots.md`): the title is `ui_strings[UI_NAME + slot]`
+(vtable slot 13 of both status objects, `0x08023B3C` and the pause menu's `0x080248CC`); page count
+(slot 23): 4 for slots 0-4, 1 for Hercule, 3 for Krillin (stats, Destructo Disc, Ki Blast); page
+dispatch (slot 24) maps Krillin's pages onto the stock energy-technique page `0x08003520`, which
+reads `status_module` (a copy of the module table `0x081D94D0` with per-slot icon pairs and the
+string-block bases; literal file 0x377C repointed). Shows KRILLIN, his portrait (status id 119) and
+both technique pages with their icons and texts.
+
+**Names**: `ui_strings` is the UI string table (0x080E2840, 260 entries: menu labels, names at
+0x30/0x36 + slot, technique names 0x9D.. / 0xA7.. / 0xB1.. + slot, item and place names) copied by
+`tools/krillinsprites.py` with six 16-entry per-slot blocks appended (energy 1 / 2 names and
+descriptions, mixed-case and capital names; stock rows copied for the stock slots); `patch_rom.py`
+repoints all 20 literals. The dialogue opcodes that push the active character's name (`0x080094B0`,
+`0x080094CC`, "%s has achieved Level %d!" and every "%s:" line) are re-implemented to read the
+blocks. The switch screen shows sprites only (no names); the save menu shows portraits.
+
+## 5c. Old Hercule (slot 5 on display row 24, sprite 158)
+
+For the future prologue (`docs/story.md` section 0): Hercule as comic relief in his Buu-saga look.
+Row 24 is Hercule's row 21 with the Buu's Fury Hercule sprite (158; `OLD_HERCULE_SPRITE`, 72 when
+`BUU=0`), no transformation links. The story switches with the game's own opcode:
+
+- **on**: `SetCharacterTransformation(5, 158)` (opcode 73: the first display row with sprite 158 is
+  row 24 in the default build; a test build with `SSJ_SPRITE=158` would match row 22 first);
+- **off**: `SetCharacterTransformation(5, 72)` (row 21, the first row with sprite 72).
+
+Abilities stay slot 5's (Rolling Hercule Punch, Dynamite Kick, Super Hercule, Taunt), tuned weak:
+while slot 5 shows row 24, `krillin_frame` (every input poll) divides his entity's combat bytes
+(+0x160 melee, +0x161 ranged) by `OLD_HERCULE_WEAKNESS` (3) for whichever player plays him, and
+`ssj_ready` refuses Super Hercule on row 24. C code can call `old_hercule_set(1 / 0)`. Verified in the
+fork as player 2: row 21 -> 24, entity sprite record -> `buu_record_158`, combat bytes 85/73 -> 28/24,
+Super Hercule refused (row and EP unchanged), and back to row 21 with the stock record.
+
 ## 6. Verification log
 
 | stage | result |
@@ -140,6 +199,8 @@ follow `docs/story.md`; the tool and the write path stay.
 | 3 moveset | four abilities fire as player 2, EP costs right, no crash (section 3) |
 | 4 Keep Goku | byte applied; Cell finale played in mGBA, Goku's slot keeps bit 0 (section 4) |
 | 5 dialogue | prologue dump verified; both write paths shown by a new game in mGBA, then reverted per the no-reveal rule (section 5) |
+| 5b Krillin | status page, technique pages, switch screen, all four abilities as player 1 and 2, disc piercing and kills, level-up (fork, section 5b) |
+| 5c old Hercule | row 24 on and off as player 2, weak combat bytes, Super Hercule refused (section 5c) |
 
 Test states on the run copy: `build/log2-run.ss1` (Z2A7, player 2 = Hercule, this build),
 `log2-run.ss3` (debug menu). Driving recipe: `tools/mgba_run.ps1 -NoStates`, then

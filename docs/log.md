@@ -4,6 +4,18 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-18
 
+- **Krillin is a real party member; old Hercule row** (branch `krillin-party`, worktree
+  `F:\MeltyCreations\log2-krillin`, not merged): slot 6 on display row 23 with sprite 161 (sprite 76
+  plus Goku's fight groups re-headed, `tools/krillinsprites.py`), dialogue portrait 73 and a status
+  portrait (id 119, 73 in the menu BG palette), his name on the status / pause screens and in "%s"
+  dialogue (relocated UI string table with per-slot blocks), status technique pages, stats / growth
+  weaker than the Z fighters, abilities 21 Destructo Disc (piercing, cooldown, 12 EP), 19 Afterimage
+  Rush, 20 Shockwave Punch and the stock Ki Blast recoloured blue. Old Hercule = slot 5 on row 24
+  (sprite 158) via opcode 73 `(5, 158)`, back with `(5, 72)`, combat bytes / 3, no Super Hercule.
+  All tested in fork slot 2 (`docs/hercule.md` 5b / 5c, screenshots `build/kr/shots/`).
+- **Level-up crash fixed** (same branch): every level-up in a PARTY_SLOTS build crashed when its
+  dialogue closed (`Party_AddExp` read module words below the moved literal 0x3EA0;
+  `docs/party-8-slots.md` "Level-ups"). `party_add_exp_hook` re-implements it.
 - **Story planning walked from the player's side through the Cell Games wait** (Ryan + Claude,
   all in `docs/story.md`, section 0 is the summary): the two duels, Android 13 and 16 as new
   bosses, Multi-Form Cell, 2v2 gym, Cooler's Namekian, the half-health and both-down rules, casting
