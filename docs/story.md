@@ -359,6 +359,29 @@ watch; after the fight Cell arrives as scripted and the warp to the Lookout foll
   opponents (enemy stat 64, sprite 76); when player 2 is Krillin that match swaps its opponent
   (Hercule is the obvious stand-in) or is skipped by the duplicate-actor rule.
 
+**Roshi's gym, redesigned (Ryan, 2026-10-18).** Stock facts: the sparring room (zone 6 area 70)
+has one spot where a single opponent stands; you talk to the opponent to start, each win sets a
+story flag and the next one appears (Yamcha, then Krillin, then Tien); Roshi is not in the room
+(his line elsewhere explains everyone moved to Capsule Corp during the Cell crisis). Ryan's
+version: the matches are **2 v 2**: the two players against Yamcha & Tien, then against Hercule &
+Krillin (each win still pays a +3 capsule). If one player is currently Hercule or Krillin, only
+the other of the pair stands in the room and talking to him gives "Sorry, Master Roshi says I can
+only fight duos with Krillin on my team right now" (or "...with Hercule..."), so the players come
+back with different characters. When both duos are beaten, the **final fight**: Roshi says he
+hired some special animal ninjas for a different kind of training and releases one of every wild
+animal into the room (alligator, hawk, ladybug, pterodactyl, sabertooth tiger, scorpion, snake,
+T-rex, triceratops) plus two ninjas; clear the room for the last capsule. Cost: the twin-spawn
+code already pairs enemies; a wave spawn of mixed enemy records and the room dialogue are new
+script and a little code; every animal above is a stock enemy type (ids to be confirmed in the
+atlas), the "ninjas" map to the Warlord's bandit sprites.
+
+**Side-quest window (what the series did in those ten days):** the Broly film is set in exactly
+this gap (Paragus lures Vegeta to "New Planet Vegeta" while the Z fighters wait for the Cell
+Games), and Legendary Super Saiyan Broly's full fighting sprite is already converted from Buu's
+Fury (LoG2 id 159), so a Broly side arc here needs maps and script but no new art. Cooler's stock
+bonus area (zone 4 area 50 / zone 6 area 61) is gated by West City-era story flags, not the
+ending; check in play when it opens.
+
 Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its
 defeat action at that threshold instead of at zero HP and becomes untargetable).
 
