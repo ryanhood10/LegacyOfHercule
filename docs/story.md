@@ -224,8 +224,15 @@ Ryan's decisions for this stretch:
   are the players; Krillin and Trunks arrive at the end as scripted. Cell Juniors stay for the
   Cell Games; Android 13 stays loose (his art is not in either ROM: drawn, or his role moves to an
   existing body, Ryan to decide).
-- **After the fight** the script makes Trunks player 1 again (zone 10 areas 21-33: ordinary
-  enemies, "Only Trunks" barriers), then the world map to **Kame House** (zone 11): Piccolo asks
+- **After the fight** Piccolo sends Trunks and Krillin back to Dr. Gero's lab ("I'll explain
+  everything to you, and then we have to go back to Dr. Gero's lab." / Krillin: "I'm on it!") and
+  Trunks is player 1: ordinary areas (zone 10, "Only Trunks" barriers) to the **lab basement**
+  (zone 8 areas 61-65) with Krillin beside him as a talking NPC: the Android design plans, Cell's
+  larval form ("This has to be Cell in his larval form... I better destroy it before we have
+  another Cell on our hands"), Dr. Gero's master computer, blasting it, the self-destruct escape
+  ("WARNING! SECURITY BREACH! DESTRUCT SEQUENCE ACTIVATED!"). Story-wise player 2 here is
+  **Krillin** (he is the one with Trunks; his NPC copy is removed by the duplicate-actor rule),
+  while Hercule flies on with Piccolo. Then the world map to **Kame House** (zone 11): Piccolo asks
   after Goku, Goku wakes ("Kamiccolo!") and leaves to train; 17, 18 and 16 land ("Can Goku come out
   and play?"), Piccolo takes 17 to the next island, "you and me": **Piccolo vs Android 17** as a
   multi-map boss (enemy stat 3, sprite 9, the island breaking apart, 18 sitting it out), then 16
