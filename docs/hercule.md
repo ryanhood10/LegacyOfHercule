@@ -77,6 +77,12 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 | 15 | Dynamite Kick (Ki Blast icon) | 34, Ki Blast: one quick projectile | 3 | stock onUse `0x080131E1`, 1 EP extra |
 | 16 | Megaton Punch (Big Bang icon) | 46, Big Bang: the big slow projectile | 12 | stock onUse `0x08013179`, 2 EP extra |
 | 17 | Hercule Taunt (Transformation icon) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
+| 18 | Super Hercule (Hercule icon for now) | switches the slot to display row 22 (the recoloured clone of sprite 72, built by the parent session's `tools/spriteclone.py`) | 50 | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` |
+
+Hercule's four-slot list is **14, 15, 18, 17** (punch, kick, Super Hercule, taunt), so the
+transformation sits in the third slot like every other character's. Megaton Punch (16) stays in the
+table for scripts or a later per-character list. Verified as player 2 from `log2-run.ss1`: row 21 ->
+22, EP 100 -> 50, the entity's sprite record moved to the cloned sprite (`build/hc10_ssj.png`).
 
 The isReady gate copies the stock one (`[[0x086DB284] + 0xC] != 0`, the game's "abilities allowed"
 flag) plus the EP check. The stock 14 entries are untouched; the table is a relocated copy with the
@@ -84,8 +90,8 @@ four new rows and the two code literals repointed. Verified as player 2 from `lo
 50 -> 46 / 47 / 38 / 58 and the control states 0x08024810 (punch), 0x08025D48 (ki blast),
 0x080258B4 (big bang), 0x080258C8 (bump) each returned to idle (`build/hc5_*.png`).
 
-Later: proper icons (a 0x200-byte 4bpp tile pair each) once the sprite pipeline can draw them, and a
-"Super Human" transformation entry pointing at the new display row from `docs/sprites.md`.
+Later: proper icons (a 0x200-byte 4bpp tile pair each, a golden one for 18) once the sprite pipeline
+can draw them.
 
 ## 4. Keep Goku after Cell
 

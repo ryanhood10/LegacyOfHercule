@@ -11,7 +11,7 @@
       "abilities": [
         14,
         15,
-        16,
+        18,
         17
       ],
       "ability_index": 0
@@ -57,6 +57,12 @@
       "icons": 11,
       "is_ready": "fn:hercule_taunt_ready",
       "on_use": "fn:hercule_taunt_use"
+    },
+    {
+      "name": "SuperHercule",
+      "icons": 6,
+      "is_ready": "fn:ssj_ready",
+      "on_use": "fn:ssj_use"
     }
   ],
   "patches": [
