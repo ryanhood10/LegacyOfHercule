@@ -337,6 +337,22 @@ void coop_debug_tick(void) {
         if (!e) return;
         BossBar *bar = bossbar_create_hook(0, e, 0, 100);
         if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
+    } else if (cmd == COOP_CMD_SPAWN_RECORD) {
+        // a boss record from any map, beside player 1 on this one (test the boss pairs without their maps'
+        // cutscenes); the record's action is kept, so a defeat fires its dialogue / script
+        const EnemyRecord *src = (const EnemyRecord *)coop2.cmd_arg;
+        EnemyRecord *r = (EnemyRecord *)coop2.boss_rec;
+        Entity *p1 = g_PlayerObject;
+        if (!p1 || (u32)src < 0x08000000u) return;
+        memcpy(r, src, 0x1C);
+        r->behaviour_count = 0;
+        r->x = (s16)((p1->x >> 8) + 48);
+        r->y = (s16)(p1->y >> 8);
+        Entity *e = enemy_spawn_hook(r);
+        if (!e) return;
+        EntityList_Add(g_SceneTable[1], e);
+        BossBar *bar = bossbar_create_hook(0, e, 0, 100);
+        if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
     }
 }
 

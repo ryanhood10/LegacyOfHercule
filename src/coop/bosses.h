@@ -37,11 +37,17 @@ typedef struct BossRule {
     s16 partner_stat;
 } BossRule;
 
-// Sprite ids of the new boss models (0 until the art exists = the original's model).
+// Sprite ids of the new boss models (tools/bossmodels.py; the Makefile passes A13_SPRITE=165 and
+// NAMEK_SPRITE=166; 0 = no art, the twin keeps the original's model).
 #ifndef A13_SPRITE
 #define A13_SPRITE 0
 #endif
-#define A13_STAT 110        // Android 13, base form
+#ifndef NAMEK_SPRITE
+#define NAMEK_SPRITE 0
+#endif
+#define A13_STAT 110        // Android 13, base form, beside Android 19
+#define NAMEK_STAT 111      // Cooler's Namekian servant
+#define A13_GERO_STAT 112   // Android 13 beside Dr. Gero at the lab door
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;

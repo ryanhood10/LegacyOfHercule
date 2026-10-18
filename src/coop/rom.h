@@ -102,6 +102,7 @@ _Static_assert(sizeof(BossBar) == 0x1C, "BossBar size");
 #define BOSSBAR_FILL_TABLE  ((const s32 *)0x086D60F4)   // 60 x {4 byte offsets} into the 0x200-byte tile block
 #define BOSSBAR_EMPTY_TILES ((const void *)0x086D64B4) // 0x200 bytes: the empty bar
 #define ENEMY_VTABLE        0x080252A4u
+#define ENEMY_STATES        ((void *const *)0x0840DB00)   // enemy control states by index (0 idle, 1 walk, 6/7/8/10 attack groups)
 #define AI_SPEED8_VTABLE    0x08023BE0u   // 8-direction chase module {vtable, speed 8.8} (ctor 0x0801B333)
 #define AI_SPEED4_VTABLE    0x08023D88u   // axis-aligned approach module (ctor 0x0801B15F)
 

@@ -3,9 +3,14 @@
 #include "bosses.h"
 
 const ExtraStat extra_stats[] = {
-    // 110 Android 13, base form (not yet "Super"): Android 19's AI set and boss class, a little
-    // tougher than 19. Partner of 19 on the zone 7 battlefield and of Dr. Gero at the lab door.
+    // 110 Android 13, base form (not yet "Super"): Android 19's AI set (29) and boss class, a little
+    // tougher than 19 (2970 HP, 21/14/11). 19's co-op partner on the zone 7 battlefield.
     { 5, -1, 3200, -1, 24, 20, 16, 0 },
+    // 111 Cooler's Namekian servant: Cooler's melee boss AI set (21) and class, well below Cooler
+    // (10200 HP, 75/85/79) so the pair is one fight's worth for two players.
+    { 29, -1, 6000, -1, 68, 60, 64, 0 },
+    // 112 Android 13 beside Dr. Gero at the lab door: Gero's level (1900 HP, 25/21/17), a bit more HP.
+    { 5, -1, 2400, -1, 26, 22, 17, 0 },
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 
@@ -19,7 +24,9 @@ static const BossRule rules[] = {
     { 4,  0, 0, 9,  0 },
     // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door)
     { 5,  0, 0, A13_SPRITE, A13_STAT },
-    { 7,  0, 0, A13_SPRITE, A13_STAT },
+    { 7,  0, 0, A13_SPRITE, A13_GERO_STAT },
+    // Cooler (New Namek bonus) + his Namekian servant
+    { 29, 0, 0, NAMEK_SPRITE, NAMEK_STAT },
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },
     { 79, 50, BOSS_NO_TWIN, 0, 0 },

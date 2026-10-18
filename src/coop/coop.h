@@ -83,12 +83,14 @@ typedef struct CoopExtra {
     u32 a16_dead_frame;
     u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
     u16 _pad3;
+    u32 boss_rec[8];        // scratch record for COOP_CMD_SPAWN_RECORD (0x1C bytes, no behaviours)
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
 #define COOP_CMD_A16          4   // spawn the Android 16 boss 64 px right of player 1, with a boss bar (android16.c)
+#define COOP_CMD_SPAWN_RECORD 5   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 extern CoopExtra coop2;
 
