@@ -30,12 +30,14 @@ ROM_FN(void, ProjBase_UpdateBox, (void *obj), 0x08013BF5);
 ROM_FN(int, Proj_InView, (void *obj), 0x08013C23);                     // ahead of it along its facing, still in view
 ROM_FN(void, Player_LaunchPoint, (s32 *xy, const Entity *e), 0x08007A27);   // where the ki blast leaves the hand (px)
 ROM_FN(void, VM_SetCharacterTransformation, (s32 *stack), 0x0800A8ED);
+ROM_FN(void, PlayerEntity_RefreshSprite, (Entity *e), 0x080086A3);
 #define KIBLAST_LIST   (*(void **)0x0840E54C)   // the ki blast module's entity list word (0x0800EAD8)
 #define PROJ_VTABLE    0x080259C4u              // the NPC ki blast's vtable (android16.c): copied, slots replaced
 #define PROJ_MESSAGE   0x08013D69u              // base projectile message handler (9, 10, 15)
 #define SHAKE_HEAD     (*(void **)0x03000FF4)
 #define SFX_LAUNCH     0x0D                     // the ki blast's launch (0x0D + rand 2)
 #define SFX_KI_HIT     0x22                     // the ki blast's impact (0x22 + rand 3)
+#define HURT_VTABLE    0x08025B98u              // player control state while hit (no input)
 
 void p2_refresh_sprite(void);   // player.c
 
@@ -62,6 +64,7 @@ typedef struct KrState {
     u32 disc_thrown[PARTY_SLOTS];   // g_FrameCounter of each slot's last throw
     u16 discs, disc_hits;           // debug counters (peek with gdb: kr_state)
     u16 kiblasts, rushes;
+    u16 triggers, _pad;            // KR_TEST: frames with L + R held
 } KrState;
 #define KR_MAGIC 0x4B52494Cu
 KrState kr_state __attribute__((section(".party.kr")));   // after g_party_block (coop.ld)
@@ -241,6 +244,8 @@ static void disc_update(Disc *p) {
     m.type = p->type;
     m.facing = p->facing;
     EntityList *list = g_EntityList;
+    Entity *was = coop.acting;
+    coop.acting = p->owner;            // EXP for a kill goes to the thrower (exp.c), not the nearer player
     for (int i = list->count - 1; i >= 0 && p->nhit < DISC_MAX_HITS; i--) {
         Entity *t = list->items[i];
         if (!t || t == p->owner || !is_coop_enemy(t)) continue;
@@ -254,6 +259,7 @@ static void disc_update(Disc *p) {
             sfx(SFX_KI_HIT + Rand_Range(3));
         }
     }
+    coop.acting = was;
 }
 
 static Disc *disc_new(Entity *owner, s32 x, s32 y) {
@@ -320,11 +326,38 @@ void krillin_frame(const InputSystem *in) {
     weaken(g_PlayerObject, g_Party->active_slot);
     if (coop.p2) weaken(coop.p2, coop.p2_slot);
 #ifdef KR_TEST
-    // test builds: player 1 holds L + R and presses Up -> slot 5 toggles old Hercule; Left -> Krillin's EXP
-    // just short of his next level (the next kill levels him up)
-    if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && p1_controllable()) {
-        if (in->pressed & KEY_UP) old_hercule_set(row_of_slot(HERCULE_SLOT) != OLD_HERCULE_ROW);
-        if (in->pressed & KEY_LEFT) {
+    // test builds: nobody dies while a test idles (HP refilled below a third), so the fork can be driven slowly
+    for (int i = 0; i < PARTY_SLOTS; i++) {
+        CharacterEntry *k = &g_Party->chars[i];
+        if (k->max_hp && k->hp < k->max_hp / 3) k->hp = k->max_hp;
+    }
+    // player 2's pad (the fork's TCP pad, docs/testing.md) holds L + R and presses Up -> slot 5 toggles old
+    // Hercule; Right -> Krillin becomes player 1; Left -> Krillin's EXP one short of his next level (the next
+    // kill levels him up); Down -> 1 EXP for Krillin through the kill path's EXP event. Player 1's L + R would
+    // open the Dragon Radar.
+    const InputSystem *t = &coop.input2;
+    (void)in;
+    if ((t->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R)) {
+        Entity *p1 = g_PlayerObject ? g_PlayerObject : coop2.p1_frame;
+        state()->triggers++;
+        // row and player switches only outside cutscenes and modal dialogue loops (the input hook runs in
+        // those too; switching a row inside the level-up dialogue crashed the game when it closed)
+        int free = p1_controllable() || (p1 && p1->ctrl_state && *(u32 *)p1->ctrl_state == HURT_VTABLE);
+        if ((t->pressed & KEY_UP) && free) old_hercule_set(row_of_slot(HERCULE_SLOT) != OLD_HERCULE_ROW);
+        if ((t->pressed & KEY_RIGHT) && free && p1 && g_Party->active_slot != KRILLIN_SLOT) {
+            g_Party->active_slot = KRILLIN_SLOT;   // as the save pad's switch does (switch.c confirm)
+            p1->sprite_record = Character_GetSpriteRecord(DISPLAY_DATA[KRILLIN_ROW * 0x14 + 1]);
+            PlayerEntity_RefreshSprite(p1);
+            Entity_SetAnimation(p1, ANIM_IDLE);
+        }
+        if ((t->pressed & KEY_DOWN) && free) {   // award 1 EXP to Krillin through the kill path's event (exp.c)
+            u32 *ev = Arena_Alloc(16);
+            if (ev) {
+                ev[0] = (u32)coop.exp_vtable; ev[1] = 1; ev[2] = 1; ev[3] = KRILLIN_SLOT;
+                g_EntityList->events[g_EntityList->event_count++] = ev;
+            }
+        }
+        if (t->pressed & KEY_LEFT) {
             CharacterEntry *k = &g_Party->chars[KRILLIN_SLOT];
             int lv = Character_GetLevel(k);
             if (lv < 50) k->exp = (u32)Character_LevelExp(lv + 1) - 1;

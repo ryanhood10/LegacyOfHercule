@@ -135,7 +135,8 @@ void input_poll_hook(InputSystem *in) {
         int c = (r & 0x30C) == 0x30C;
         if (c && !combo) route ^= 1;
         combo = (u8)c;
-        if (route) { p1 = c ? 0 : r; p2 = 0; }
+        if (c) { p1 = 0; p2 = 0; }            // the combo itself reaches nobody
+        else if (route) { p1 = r; p2 = 0; }
     }
 #endif
     poll_into(in, p1);

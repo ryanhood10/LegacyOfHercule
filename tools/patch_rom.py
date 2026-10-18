@@ -127,6 +127,7 @@ BYTE_PATCHES = [
 #    repointed (growth rows stay at literal + 0xA8).
 PARTY_ENTRY_JUMPS = [
     (0x08003C24, "party_init_hook"),        # Party_Init(party): defaults + zeroed flag banks
+    (0x08003D58, "party_add_exp_hook"),     # Party_AddExp: its module words sat below the moved literal 0x3EA0
     (0x08003E42, "flag_test_hook"),         # Flag_Test(party, id)
     (0x08003E5E, "flag_set_hook"),          # Flag_Set(party, id)
     (0x08003E74, "flag_clear_hook"),        # Flag_Clear(party, id)
