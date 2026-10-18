@@ -84,9 +84,14 @@ characters in three lines.
 
 ### 2.2b CoopCall, the script -> C bridge (`src/coop/vmcall.c`)
 
-Game action 130 (`sub_0800AFD4`, called by no stock script) is repointed by a `data/hercule.json`
+Game action 59 (`Deprecated_CharacterSpecialAttack`, an assert that no stock script calls) is repointed by a `data/hercule.json`
 patch to `vm_coop_call`. `CoopCall fn, a, b, c` always pops four values; the queries push one result
 (use them only where the value is consumed: a value left at a dialogue script's END is a next index).
+The bridge first sat on action 130 (`sub_0800AFD4`), wrongly taken for unused: nine stock on-load
+scripts (maps in zones 2, 7, 8, 10, 12, 13, e.g. Gero's area 8/13) call it to add an object made by
+`0x0801C4B0` to the scene, and with the repoint they popped an empty stack. Unused actions (no stock
+script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68, 105-108, 118, 120, 128,
+131-133, 138; 59, 61 and 66 are the engine's own "deprecated" asserts.
 
 | fn | call | does |
 |---|---|---|

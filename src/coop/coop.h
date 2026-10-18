@@ -96,7 +96,7 @@ typedef struct CoopExtra {
     u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
     u8 _pad5[2];
     u32 boss_rec[8];        // scratch record for COOP_CMD_SPAWN_RECORD (0x1C bytes, no behaviours)
-    // script -> C bridge (vmcall.c, game action 130 "CoopCall")
+    // script -> C bridge (vmcall.c, game action 59 "CoopCall")
     const void *call_end_seq;   // dialogue sequence run when the bridged duel ends (0 none)
     u32 call_action[2];         // {EnemyAction_RunDialog, sequence}: what the end event fires
     s8 call_slot;               // pending duel: player 2's slot (-1 = clone of player 1)
