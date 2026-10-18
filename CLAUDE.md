@@ -38,7 +38,8 @@ make BUILD=build/ssj SSJ_TEST=1 DEBUG_MENU=1 WIDE=1 DATA_PATCH=   # private dir,
 ```
 
 Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `WIDE_TEST=<w>` forces a view
-width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger. `make` does not run from PowerShell
+width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger; `BUU=0` leaves out the sprites converted
+from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test build). `make` does not run from PowerShell
 (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
 
 ## Test (see docs/testing.md for the full recipes)
@@ -58,6 +59,7 @@ width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger. `make` does not run
 
 Party `0x03000E90` (active slot byte, 6 x 0x1C entries at +0xC; entry +8 = display row);
 Character_DisplayData 22 rows x 20 (relocated into the blob as `display_rows`, row 22 = SSJ Hercule);
-sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule); entity list
+sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule, 158+ from Buu's Fury;
+Buu ROM: index `0x086B6BDC`, OBJ palette `0x0805652C`, see `docs/sprites.md`); entity list
 `0x03001120`; world/camera object `0x03001090`; input `0x0300229C`; co-op state `0x0203FF04`;
 player-2 vtable `0x0203FE00`; wide descriptor `0x0203FEC0`; ability table literal `0x08008024`.

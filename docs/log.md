@@ -37,6 +37,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
   2's default, post-cutscene stale-pointer fix, two-player dash crash fix.** `docs/coop-design.md`.
 - **Netplay** (212d8e7): frame-lockstep over TCP with a relay; one-PC test only so far.
 
+- **Buu's Fury sprite decode + converter**: index `0x086B6BDC` (297 records), palette `0x0805652C`,
+  record/animation/descriptor layout, per-record colour remap tables, multi-part frames
+  (`docs/sprites.md` "Buu's Fury"). `tools/buu_sprites.py` atlas + sheets + report;
+  `tools/buu2log2.py` converts records to LoG2 format with the palette remapped and an LZ encoder for
+  the game's decompressor; `make` links them as sprite ids 158 (Buu-saga Hercule, record 128) and
+  159 (LSSJ Broly, record 28) when `roms/buu.gba` is present. Hercule verified in game as player 2.
+  **Android 13 is not in Buu's Fury** (all 297 records checked); the story needs it drawn.
+
 ## Open items
 
 - Human test of the save-pad switch with player 2 present; a real two-PC netplay run.

@@ -10,7 +10,7 @@
 --   state(n) / save(n)          load / save savestate slot n
 --   shot("path.png")            screenshot
 --   flush()                     return the lines frame callbacks logged since the last command
-local PORT = 7779
+local PORT = cmd_server_port or 7779   -- set cmd_server_port before dofile() for a second instance
 local P1_WORD, P2_WORD = 0x0203FF02, 0x0203FF00
 local KEYS = { A = 1, B = 2, SELECT = 4, START = 8, RIGHT = 0x10, LEFT = 0x20, UP = 0x40, DOWN = 0x80, R = 0x100, L = 0x200 }
 

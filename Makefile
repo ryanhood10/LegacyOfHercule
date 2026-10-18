@@ -26,6 +26,23 @@ SRCS := $(wildcard src/coop/*.c)
 OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o
 SSJ_TEST ?= 0
 
+# BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
+# appended to the relocated sprite index. BUU_SPRITES lists "<log2 id>=<buu record>" pairs
+# (158 = Hercule in his Buu-saga gi, 159 = Legendary Super Saiyan Broly; see docs/sprites.md).
+# SSJ_SPRITE: the sprite the Super Saiyan Hercule row uses (test builds point it at 158/159).
+comma := ,
+empty :=
+space := $(empty) $(empty)
+BUU_ROM ?= roms/buu.gba
+BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
+BUU_SPRITES ?= 158=128 159=28
+SSJ_SPRITE ?= 157
+ifeq ($(BUU),1)
+OBJS += $(BUILD)/obj/buu_sprites_data.o
+CLONE_FLAGS := --extra $(subst $(space),$(comma),$(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s)))))
+endif
+CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
+
 all: $(OUT)
 
 $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h
@@ -33,8 +50,22 @@ $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
-$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py $(ROM)
-	$(PYTHON) tools/spriteclone.py $(ROM) $@
+$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags
+	$(PYTHON) tools/spriteclone.py $(ROM) $@ $(CLONE_FLAGS)
+
+# re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
+$(BUILD)/.spriteflags: FORCE
+	@mkdir -p $(BUILD)
+	@echo "$(CLONE_FLAGS) $(BUU_SPRITES)" | cmp -s - $@ || echo "$(CLONE_FLAGS) $(BUU_SPRITES)" > $@
+FORCE:
+
+# Buu's Fury records converted to LoG2 format (never committed); preview PNGs and a colour report beside them
+$(BUILD)/gen/buu_sprites_data.c: tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUU_ROM) $(BUILD)/.spriteflags
+	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ $(BUU_SPRITES) --preview-dir $(BUILD) --report $(BUILD)/gen/buu_sprites_report.md
+
+$(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 $(BUILD)/obj/sprites_data.o: $(BUILD)/gen/sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
@@ -58,4 +89,4 @@ $(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH)
 clean:
 	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(OUT)
 
-.PHONY: all clean
+.PHONY: all clean FORCE

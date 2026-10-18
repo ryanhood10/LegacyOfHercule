@@ -44,8 +44,9 @@ file and tool, and says where to look for a given question. Keep it current.
 | `coop.ld` | linker script: `.coop` sections, pinned EWRAM regions, `EXTERN` list of hook symbols |
 
 Generated at build time (never committed): `build/gen/sprites_data.c` (SSJ Hercule record, relocated
-`sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/hercule.patch.json` (from
-`tools/romdata.py build data/hercule.json`).
+`sprite_index` and `display_rows`, from `tools/spriteclone.py`), `build/gen/buu_sprites_data.c`
+(sprite ids 158+ converted from Buu's Fury by `tools/buu2log2.py`, when `roms/buu.gba` is present),
+`build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
 ## Data (`data/`)
 
@@ -61,14 +62,16 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json` |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
-| `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file |
+| `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
+| `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
+| `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
 | `widerender.py` | offline reference render of the wide view from a savestate |
 | `savestate.py` | dump memory regions/words from an mGBA savestate |
 | `romcheck.py` | ROM header/hash check |
 | `seed_functions.py`, `ghidra_import.ps1`, `ghidra/*.java` | headless Ghidra project, function seeding, `DecompileFunctions.java <outdir> <addr...|all>` (whole-ROM corpus in `build/decomp_all/` for grepping), `FindRefs.java <addr...>` |
 | `mgba_run.ps1`, `mgba_input.ps1`, `mgba_shot.ps1`, `mgba_script.ps1`, `mgba_window.ps1` | drive the Windows mGBA (Qt) by window: restart on a ROM copy, keys, screenshots, Scripting console |
-| `mgba_cmd.py` + `mgba/cmd_server.lua` | focus-free TCP command server inside Windows mGBA (`seq`, `state`, `shot`) |
+| `mgba_cmd.py` + `mgba/cmd_server.lua` | focus-free TCP command server inside Windows mGBA (`seq`, `state`, `shot`); `--port=N` / `cmd_server_port` for a second instance |
 | `mgba/coop.lua`, `peek.lua`, `ents.lua`, `force.lua`, `enemies.lua`, `p2_input.lua`, `wide_test.lua` | Lua helpers for Windows mGBA (console inspectors, player-2 pad bridge) |
 | `mgba/netplay.lua`, `netplay_relay.py` | frame-lockstep netplay (Windows mGBA) |
 | `p2_keys.py` | player-2 keyboard sender (IJKL / O U / [ ] / N M) over TCP (7777 Lua bridge, 7778 fork) |
@@ -84,6 +87,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | how player 2 is spawned / bound / switched | `src/coop/player.c`, `docs/coop-design.md` "Character switching" |
 | why a build crashed with "Jumped to invalid address" | `docs/testing.md` GDB recipe; savestate from an older build? (vtable copies) |
 | sprite record layout, frame encoding | `docs/sprites.md`, `tools/sprites.py` |
+| Buu's Fury sprites, converting them, which ids exist | `docs/sprites.md` "Buu's Fury", `tools/buu_sprites.py`, `tools/buu2log2.py` |
 | display rows, transformations | `docs/sprites.md` SSJ section, `src/coop/ssj.c`, `tools/spriteclone.py` |
 | ability table, stats, growth | `docs/hercule.md`, `tools/romdata.py`, `data/hercule.json` |
 | dialogue text and scripts | `tools/script_dump.py`, `docs/hercule.md` section 5 |

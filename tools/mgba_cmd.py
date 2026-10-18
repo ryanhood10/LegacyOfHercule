@@ -2,6 +2,8 @@
 
 usage: python tools/mgba_cmd.py 'ents()' ['seq("DOWN:5 WAIT:30")' ...]
        python tools/mgba_cmd.py --wait            (block until the pad queues are empty)
+       python tools/mgba_cmd.py --port=7781 ...   (a second mGBA instance whose server was loaded
+                                                   with cmd_server_port = 7781)
 Each argument is one line; a line's output arrives after the frame in which it ran.
 """
 import socket
@@ -26,7 +28,12 @@ def main():
     args = sys.argv[1:]
     if not args:
         sys.exit(__doc__)
-    sock = socket.create_connection(("127.0.0.1", 7779), timeout=5)
+    port = 7779
+    for a in list(args):
+        if a.startswith("--port="):
+            port = int(a[7:])
+            args.remove(a)
+    sock = socket.create_connection(("127.0.0.1", port), timeout=5)
     for line in args:
         if line == "--wait":
             while True:

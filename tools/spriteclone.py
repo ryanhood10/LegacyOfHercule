@@ -3,6 +3,11 @@ index and display-row tables, as C source compiled into the co-op ROM. Nothing f
 committed: the output lives in build/gen.
 
 usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ssj_preview.png]
+                      [--extra 158=buu_record_158,159=buu_record_159] [--row-sprite 157]
+  --extra       more records (symbols defined in another generated file, e.g. tools/buu2log2.py's
+                build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids
+  --row-sprite  the sprite id the Super Saiyan Hercule display row (22) uses (default 157; a test
+                build can point it at a converted Buu record to see it in game)
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -122,6 +127,12 @@ def main():
     rom = open(sys.argv[1], "rb").read()
     out_c = sys.argv[2]
     preview = sys.argv[sys.argv.index("--preview") + 1] if "--preview" in sys.argv else None
+    extra = {}
+    if "--extra" in sys.argv:
+        for kv in sys.argv[sys.argv.index("--extra") + 1].split(","):
+            k, v = kv.split("=")
+            extra[int(k)] = v
+    row_sprite = int(sys.argv[sys.argv.index("--row-sprite") + 1]) if "--row-sprite" in sys.argv else NEW_SPRITE
     sp = S.Sprites(rom)
     rec = sp.record(SRC_SPRITE)
     groups = sp.groups(rec)
@@ -201,15 +212,19 @@ def main():
     hdr = ", ".join(f"0x{b:02x}" for b in header)
     grp = ", ".join("{" + ", ".join(names[p] if p else "0" for p in g) + "}" for g in groups)
     lines.append(f"const SpriteRecord ssj_record = {{{{{hdr}}}, {{{grp}}}, 0}};")
-    # sprite index: stock words 0..156 then the new record
+    # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
     idx_words = [struct.unpack_from("<I", rom, S.INDEX - S.ROM_BASE + i * 4)[0] for i in range(NEW_SPRITE)]
-    lines.append("const void *const sprite_index[%d] __attribute__((aligned(4))) = {%s, &ssj_record};" % (
-        NEW_SPRITE + 1, ", ".join(f"(const void *)0x{v:08x}u" for v in idx_words)))
+    entries = [f"(const void *)0x{v:08x}u" for v in idx_words] + ["&ssj_record"]
+    for sid in range(NEW_SPRITE + 1, max(extra, default=NEW_SPRITE) + 1):
+        entries.append(f"&{extra[sid]}" if sid in extra else "0")
+    for sym in extra.values():
+        lines.append(f"extern const char {sym}[];")
+    lines.append("const void *const sprite_index[%d] __attribute__((aligned(4))) = {%s};" % (len(entries), ", ".join(entries)))
     # display rows: stock 22 rows then row 22 = Hercule's row with sprite 157, transformed flag, links
     rows = bytearray(rom[DISPLAY_DATA - S.ROM_BASE:DISPLAY_DATA - S.ROM_BASE + ROW_COUNT * 20])
     new = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
     new[0] |= 1            # transformed form
-    new[1] = NEW_SPRITE
+    new[1] = row_sprite
     new[4] = NEW_ROW       # transformedDataIndex (itself)
     new[5] = SRC_ROW       # detransformedDataIndex -> Hercule
     rows[SRC_ROW * 20 + 4] = NEW_ROW   # Hercule's own row now links to the new form

@@ -23,6 +23,14 @@ python tools\p2_keys.py               # player 2: IJKL move, O=A, U=B, [ ]=L R, 
 python tools\mgba_cmd.py "seq('DOWN:4 WAIT:20 A:4')"   # focus-free pad/state/screenshot commands
 ```
 
+A second instance beside another session's: start `mGBA.exe <your copy>` yourself (never
+`mgba_run.ps1`, which kills every mGBA), load `cmd_server.lua` with `cmd_server_port = 7781` set first
+(and a frame callback writing `p2_force` to `0x0203FF00` instead of `coop.lua`, whose bridge binds
+7777), then `mgba_cmd.py --port=7781`. Lua typed through PowerShell loses double quotes: use single
+quotes. `mgba_script.ps1` clicks Tools > Scripting by client coordinates, so the window must be in
+front and unobstructed (pin it topmost first); it also fails if `mgba_window.ps1` was dot-sourced
+earlier in the same process. The savestate you load may have the Dragon Radar open: `seq('START:4')`.
+
 Console helpers (Tools > Scripting, `dofile(".../tools/mgba/coop.lua")`): `peek()` co-op state,
 `ents()` entity list, `p2_force = 0x8001` pad override, `spd()`, `lowhp()`, `actor(n)`. Write Lua
 with single quotes only when it goes through PowerShell. Another session may own this window: do not
