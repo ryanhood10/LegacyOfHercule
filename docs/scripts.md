@@ -1,0 +1,233 @@
+# Story scripts: formats, tools, and the chapters built with them
+
+How the game's map scripts, dialogue and map records work (decompiled from the ROM, checked by
+assembling every stock script back to identical bytes), the text form we edit them in, the map
+patcher that applies story specs, and the chapters implemented so far. Related: `docs/maps.md` (map
+format, new maps), `docs/story.md` (what the story is), `docs/testing.md` (how chapters are tested).
+
+## 1. Tools
+
+| tool | what it does |
+|---|---|
+| `tools/script_asm.py` | the lscript text form: `dump map ZONE AREA` / `dump script ADDR` / `dump seq ADDR` write it, `asm FILE --free OFF` assembles a file into free ROM, `roundtrip` checks every stock script and sequence |
+| `tools/mapedit.py` | applies story specs (`data/story/*.json`): triggers, records, map scripts, line edits; `show SPEC...` prints the records it would write |
+| `tools/romdata.py` | a file in `data/hercule.json`'s `include` list that holds an object (not a list) is a story spec: it goes through `mapedit` (all specs share one editor, in include order) into `"story_free"` (0xB00000..0xC00000) |
+| `tools/script_dump.py` | the older read-only dumper (byte offsets beside each instruction) |
+| `tools/headless/st_headless.c` | headless test runner on the fork's libmgba (section 7, `docs/testing.md`) |
+
+Round trip (`python tools/script_asm.py roundtrip`): 563 scripts and 367 dialogue sequences (2317
+entries: 989 script, 741 text, 537 compressed text, 27 format, 20 compressed format, 3 jump) reached
+from the map table (name, music, variation, on-load, on-leave scripts, trigger conditions and
+payloads, record conditions, NPC dialogue, enemy defeat actions, item scripts, chest dialogue) and
+the quest table: dump, parse, assemble, compare: **0 failures**.
+
+## 2. Formats
+
+### 2.1 Bytecode (`BytecodeVM_ExecuteScript` 0x080092E4)
+
+Main dispatch (0x083B5C00): 0x00 PushByte u8, 0x01 PushVarint, 0x02 Step u8 (game action table
+0x083B5D28, 145 entries; names in `script_dump.py STEP_NAMES`, from the reference notes), 0x03 TypeOp
+u8, 0x04-0x10 And Not Negate Add Sub Mul Div CmpEq CmpNe CmpGt CmpGe CmpLt CmpLe, **0x11 END**,
+0x12 Jump, 0x13 JumpIfFalse, 0x14 Pop, 0x15-0x1A StepTypePost_* u8 u8, 0x1B PushToAltStack (loop
+counter), 0x1C LoopOrJump, 0x1D PushMulti u8 count + varints.
+
+- **Jumps** (decompiled 0x080090FE, 0x0800910A, 0x0800926C): the operand is an **unsigned** byte.
+  Jump and JumpIfFalse go **forward** to (address after the operand) + byte; LoopOrJump decrements
+  the counter pushed by PushToAltStack and, unless it reached 0, goes **back** to (address after the
+  operand) - byte. A script can continue past an END when a jump targets beyond it.
+- **Varints**: 7-bit groups MSB first, bit 7 = more; then u even -> u/2, u odd -> -(u/2). Every stock
+  varint is minimal (the assembler can rely on it; the disassembler would print `.bytes` otherwise).
+- **Arguments**: actions pop their arguments; the stock scripts push them with PushByte (one value
+  0-255), PushVarint (one other value) or PushMulti (several), then Step. The lscript macro form
+  writes exactly that.
+- A script entry (mode 0) or a condition script leaves its result on the stack.
+
+Useful action facts found on the way (decompiled):
+
+| action | fact |
+|---|---|
+| 104 DespawnCharacterAndRecordPosition (char, record) | removes the entity showing sprite `char` and spawns map record `record` (any handler, its condition ignored) at its position and facing: how a stand-in actor becomes the boss |
+| 84 TriggerMapEvent (record) | spawns map record `record` ignoring its condition (records with condition 1 exist only for this) |
+| 73 SetCharacterTransformation (slot, sprite) | the second argument is a **sprite id**: the display row showing that sprite becomes the slot's row (assertion "unable to find sprite index in character display data" when none does) |
+| 79 / 91 SetCharacterInPartyFlag / ClearCharacterInPartyFlag (slot) | party entry flags bit 0 |
+| 80 / 81 SetCharacterFlag_Bit1 / ClearCharacterFlag_Bit1 (slot) | bit 1 = available (switchable); stock chapters lock characters with it |
+| 90 DrawBossHealthBarRange (char, lo, hi) | `BossHealthBar_Create(0, entity, lo, hi)`: the bar draws the entity's HP over [lo, hi] % |
+| 38 / 39 WarpToMapWithEntities / NoEntities (zone, area, variation, x, y) | NoEntities loads the map without its records (the island's area 5 has no 16 after the stage-1 warp) |
+
+### 2.2 Dialogue sequences and entries
+
+A sequence is an array of entry pointers ended by a word whose top 16 bits are 0 (usually 0; a few
+are small numbers, kept by `end=`). An entry starts `u16 next, u8 mode`; `next` is the index run
+after it (0..count, count = the end). Entries are 2-aligned; modes 2-5 need 4.
+
+| mode | layout after the 3-byte header |
+|---|---|
+| 0 script | bytecode to END (no text box, runs at once) |
+| 1 text | u8 speaker, NUL-terminated text |
+| 2 compressed text | u8 speaker, JCALG1 stream (word-aligned; `tools/mapchunks.py decompress`) |
+| 3 format | u8 speaker, u32 pointer to the format string (`%s`, `%d`), the argument script inline at +8 |
+| 4 compressed format | u8 speaker, **u32 pointer to the argument script**, the compressed format text inline at +8 (decompiled 0x0800B396; the reference notes had +4 and +8 the other way round) |
+| 5 jump | u8 pad, u32 target |
+
+Speaker = portrait and name box (0 narration, 1 the active character's box, 3 / 90 Piccolo, 26 16,
+28 17, 29 18, 38 Cell, 44 Cooler, 49 Frieza, 57 Future Gohan, 63 / 66 Goku, 67 Hercule, 73 Krillin,
+80 Roshi, 81 Mayor, 95 Tien, 98 Trunks). The first character picks the box position: `!` top, `#`,
+`@` and `@^` (captions) as the stock lines use them. `\x0b` is a page break; a page holds about 60
+characters in three lines.
+
+### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
+
+MapEntry (0x38 bytes, table 0x08409368; `docs/maps.md` has every field): +3 trigger count, +0x10
+triggers, +4 record count, +0x14 records, +0xC name, +0x24 music, +0x28 variation script, +0x30
+on-load script, +0x34 on-leave script (run when the next map loads).
+
+**Condition word** (records +4, triggers' first word, items, chests; `FUN_08003F06`, re-implemented
+in party.c): 0 always; 1..0xFFFF never (1 = "spawned by a script"); 0x1nnnn flag n set; 0x2nnnn flag
+n clear; 0x3nnnn flag n set and consumed; else a condition script.
+
+**Triggers**: `{u32 condition, data*}`; data = `{create fn, activation getter, s16 x1, y1, x2, y2,
+payload}`, created at map load when the condition holds (so flags must be set before the map loads).
+
+| create / activation | kind |
+|---|---|
+| 0x0800D7E1 / 0x0800D765 | dialogue, on entering the rect |
+| 0x0800C2C3 / 0x0800D765 or 0x0801087B / 0x0801087F | script, on entering the rect |
+| 0x0800C2C3 / 0x0800D839 | script, **A pressed inside the rect** (the island's area-5 exit) |
+| 0x08010AC7 / 0x0800D839 | save pad (16 bytes, no payload) |
+| 0x0800C233, 0x0800D9C3 | exits (door / walk-off); the map's always-on exits are the variation's (`docs/maps.md`) |
+
+**Records** (handler first): town NPC 0x0800B711 `{handler, condition, x, y, dialogue*, sprite,
+count, behaviours[]}` (talkable); actor 0x0800D6DF `{handler, condition, x, y, sprite, count, ptr}`
+with its behaviour inline at +0x18; enemy 0x0800E77F `{handler, condition, stat, x, y, sprite,
+action*, count, behaviours[]}`, action = `{0x0801069B, script}` / `{0x080106B3, sequence}` /
+`{0x08010699, -}`, fired by the death class. Behaviour `{0x0800CB0F, facing << 16 | ticks}` = face and
+wait. Scripts find entities by **sprite id** and spawn records by **index**, so records are never
+deleted (mapedit disables them) and new ones are appended.
+
+### 2.4 Party flags and player 2
+
+Party entry +0x14 flags: bit 0 in the party, bit 1 available. Player 2 (`src/coop/player.c`) is any
+party member with both bits other than player 1's character, keeping its previous choice, else
+Hercule, else the first; it is chosen when player 2's entity spawns (map load). So the story picks
+player 2 with the flag opcodes (old Hercule in the prologue, Krillin from his visit, the jungle
+lock), and a stock chapter lock applies to player 2 too.
+
+### 2.5 Story flags
+
+Stock scripts use flags up to 306. Party_Init clears flags 0-399 at a new game; flags 400+ are
+never cleared, so new flags stay below 400. **360-379: story-scripts** (360 Krillin has visited,
+361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`).
+
+## 3. lscript, the text form
+
+```
+; comment to the end of the line (outside strings)
+script NAME [@08xxxxxx]                    a bytecode script; @ADDR = where the stock copy lives
+    WalkToPosition 0, 96, 176              macro: push the arguments, then Step WalkToPosition
+    PushByte 60 / PushVarint -3 / PushMulti 1, 2, 3 / Step NAME|N / TypeOp N
+    And .. CmpLe, Pop, PushToAltStack, StepTypePost_* NAME, T, END, .bytes HEX
+  loop:                                    labels; Jump / JumpIfFalse LABEL (forward), LoopOrJump LABEL (back)
+    JumpIfFalse loop
+end                                        END is appended when the last instruction is not END
+
+sequence NAME [@08xxxxxx] [end=N]
+  [0] script [-> NEXT] [@ADDR]             entry lines: optional [index] (checked), KIND, ARGS,
+      SetPlayerVisible 0                     -> NEXT (default index + 1), @ADDR; instructions follow
+  text 63 "GOKU: Oh, hi!"                    text SPEAKER "..."              mode 1
+  textz 1 @083b9410 "..."                    textz SPEAKER @A "..."          mode 2 (stock)
+  fmt 113 fmt=@083b5fc0 "Hi, %s!"            fmt SPEAKER [fmt=@A] "..."      mode 3, argument script below
+  fmtz 1 @A args=@A "..."                    fmtz SPEAKER @A args=@A "..."   mode 4, argument script below
+  jump 0x83bb5f4                             jump TARGET [pad=N]             mode 5
+  stock @083b9d16                            the ROM's entry at that address, with this sequence's next index
+  stockseq @083e6078 1 [71]                  entries FROM..TO of a stock sequence, next indexes shifted
+end
+```
+
+Strings take `\xNN` (`\x0b` page break), `\"`, `\\`. The assembler never compresses: a `textz` /
+`fmtz` whose text still equals the stock entry at its `@ADDR` keeps the stock bytes, an edited one
+becomes mode 1 / mode 3. Anything whose assembled bytes equal the stock bytes at its `@ADDR` is not
+written again. **Committed lscript files restate no stock text**: unchanged lines are `stock` /
+`stockseq` references; only our new lines and the scripts we edit are spelled out.
+
+## 4. Story specs (`tools/mapedit.py`)
+
+```json
+{
+  "sources": ["data/story/x.lscript"],
+  "maps": [{
+    "map": {"zone": 11, "area": 4},                  or {"index": 296}, "which" for duplicates
+    "onload": "script:NAME",                         also name, music, variation, onleave
+    "triggers": {"0": {"payload": "seq:NAME", "rect": [x1, y1, x2, y2], "condition": "flag:12"}},
+    "add_triggers": [{"like": 0, "rect": [...], "payload": "...", "condition": "..."}],
+    "records": {"1": {"stat": 109, "sprite": 160, "action": "seq:NAME"}, "4": "disable"},
+    "add_records": [{"kind": "actor", "sprite": 158, "x": 240, "y": 456, "facing": 0, "condition": "noflag:26"},
+                    {"like": 4, "sprite": 72, "talk": "seq:NAME"}],
+    "pre_edits": [...],
+    "edits": [{"at": "trigger:0/entry:48", "replace": [["SetEntityFollow 76, 128", ""]]}]
+  }]
+}
+```
+
+- References: `seq:NAME`, `script:NAME` (assembled once, on first use), `@08xxxxxx`, `none`.
+  Conditions: `always`, `never`, `flag:N`, `noflag:N`, `once:N`, `script:NAME`, a number.
+- Record fields: `condition`, `x`, `y`, `sprite`; enemies `stat`, `action` (a sequence = defeat
+  dialogue, a script = defeat script, `none`); NPCs `talk`. New records: `kind` actor / npc / enemy
+  (one face-and-wait behaviour) or `like` (a copy of record N, or `{"map": ..., "record": N}`).
+  Growing a list copies the pointer array to free ROM and updates the count.
+- Edit paths: `trigger:N`, `record:N/defeat`, `record:N/talk`, `onload` (and the other map
+  scripts), plus `/entry:K`. `replace` pairs match whole lines as `dump` prints them
+  (whitespace-normalised); `""` deletes the line, a replacement with newlines inserts several.
+  An edited script goes to free ROM and its pointer is repointed; an edited entry is re-placed and its
+  sequence slot repointed in place (sequences are shared). `pre_edits` run before the replacements,
+  and sources are parsed against the ROM as edited so far, so a `stockseq` over a stock sequence
+  picks up `pre_edits` made to its entries (`ch1_opening.json`, zone 3 area 6).
+- Edits land at the stock table's offsets; `patch_rom.py --maps` relocates the table afterwards and
+  carries them over.
+
+## 5. Chapters implemented
+
+| spec | maps | what |
+|---|---|---|
+| `a16_island` | 293, 296-298 (zone 11 areas 1, 4-6) | Kame House: 16 furious that Goku is absent, Piccolo's deal ("beat me on that island and I'll tell you where Goku is"); 16 (stat 109, sprite 160) replaces 17 in the two stock stages (bar 75-100 in area 4, 50-75 in area 6), stops at half health standing (`android16.c`), replaced by his stand-in actor (new record 6), Cell's stock scene follows (`stockseq`) |
+| `ch1_opening` | 0, 1, 3 (zone 1), 14, 19 (zone 2), 52, 54 (zone 3) | old Hercule (slot 5, row 24 / sprite 158) is player 2 in the future prologue with three comic lines and leaves the party at "Present day"; Krillin walks in instead of phoning (the stock call lines in person) and joins (slot 6); the forest spirit fight (the dream's clearing, Frieza + Cooler as a `BOSS_PAIR`), the warp to the armor cave and the voice's explanation; Krillin's actor and NPC gone from both landing-site scenes; old Hercule beside Trunks, two lines, leaves with him |
+| `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
+
+Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the
+`BOSS_PAIR` rule flag and Cooler's spirit stat 111 (`bosses.c`), player 2 by party flags
+(`player.c`), the `StoryTest` preset and `COOP_CMD_STORY_WIN` for tests, and two engine fixes: the
+`BossHealthBar_Create` entry jump now goes through r12 (the r3 trampoline had clobbered the bar's
+upper percent), and a `Camera_Shake` hook never links the camera into its own shake chain.
+
+## 6. Writing a chapter
+
+1. `python tools/script_asm.py dump map Z A > build/story/zZaA.lscript` for every map involved.
+2. Write `data/story/NAME.lscript`: new lines as `text`, unchanged ones as `stock` / `stockseq`,
+   edited scripts in full. Write `data/story/NAME.json` and add it to `data/hercule.json`'s include.
+3. `python tools/mapedit.py show data/story/NAME.json` (errors name the line), then `make`.
+4. Test headless (section 7): Map Test the map with the chapter's flags, mash through, screenshot.
+
+## 7. Testing chapters
+
+`docs/testing.md` "Story chapters, headless" has the recipe. Short form: build a `DEBUG_MENU=1` ROM,
+make a debug-menu savestate once per build (`tools/headless/mkmenu.txt`), then scripts like
+
+```
+p2 0                      # player 2 present (any build except STORY_TEST)
+preset +4                 # story flags Party_Init applies at the Map Test
+maptest 19                # map entry index (script_dump.py maps)
+mash 9 110                # A nine times, 110 frames apart
+poke32 0x0203FD08 7       # COOP_CMD_STORY_WIN: every boss fight on the map is won
+mashmap 11 5 30           # A until the map changes
+shot NAME                 # screenshot
+```
+
+run by `python tools/headless/st_test.py SCRIPT ROM STATE`, which tiles the screenshots.
+
+## 8. Limits and open points
+
+- Old Hercule's lines use Hercule's portrait (67); a portrait of his own is art.
+- The Map Test party has everyone in it, so a Map Test does not show who player 2 would be in a new
+  game; the party flags were checked by peeking the party block.
+- Gohan's later chapters still show Krillin as an NPC where the stock game has him (18 maps); the
+  duplicate-NPC rule (`actors.c`) hides town NPCs, cutscene actors need per-scene edits like zone 3's.
+- Mode 5 (jump) entries round-trip but their runtime meaning is not traced.

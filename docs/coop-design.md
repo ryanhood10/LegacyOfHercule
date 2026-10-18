@@ -654,14 +654,15 @@ Story bosses are configured in `src/coop/bosses.c` (declarations and field meani
 - **Extra stats** (`extra_stats[]`, index `EXTRA_STAT_BASE` 110 + i): a stock stat to start from
   plus overrides (AI set, HP, EXP, melee/ranged/defence). The spawn resolves it into the enemy's
   private stat copy, so no ROM table is copied into the build. 110 = Android 13 beside 19 (19's AI
-  set 29 and class), 111 = Cooler's Namekian servant (Cooler's set 21 and class), 112 = Android 13
-  beside Dr. Gero. 109 stays Android 16 (own spawn path in `android16.c`). Ids 113-119 are free.
+  set 29 and class), 111 = the forest spirit's Cooler, 112 = Android 13 beside Dr. Gero, 113 = Cooler's
+  Namekian servant (Cooler's set 21 and class). 109 stays Android 16 (own spawn path in
+  `android16.c`). Ids 114-119 are free.
 - **Boss rules** (`rules[]`, by stat index, single-player and co-op alike): `end_pct` (the entity
   gets only the HP above `end_pct` and its bar is drawn over `[end_pct, 100]`, so the fight ends
   "at half health" with the bar half full), `partner_sprite` / `partner_stat` (the co-op twin's model
   and stat; 0 = same model, a Multi-Form duplicate), `BOSS_NO_TWIN`. Current rules: 17 <-> 18 models,
   19 + Android 13 (sprite `A13_SPRITE` 165, stat 110), Dr. Gero + Android 13 (165, stat 112), Cooler +
-  the Namekian servant (`NAMEK_SPRITE` 166, stat 111), Perfect Cell (78, 79) alone to half health.
+  the Namekian servant (`NAMEK_SPRITE` 166, stat 113), the forest spirit's Frieza + Cooler (41 + 111), Perfect Cell (78, 79) alone to half health.
   Imperfect and Semi-Perfect Cell use the default duplicate. A partner model needs every pose group the
   boss's AI set plays (`docs/sprites.md` "Making a new enemy model").
 - **Both-down rule** (all boss pairs): the first boss of a pair to fall takes the blow as a
@@ -777,3 +778,26 @@ Verified in the fork (island save, Piccolo + Hercule): a clone duel turned playe
 Piccolo; each player's punches hurt the other (554 -> 485 and 554 -> 414); player 1's final blow left
 the clone at 1 HP with `winner = 1`; in a rematch player 2's final blow left player 1 at 1 HP, no game
 over, `winner = 2`, pads swapped (player 1's pad then walked player 2's entity).
+
+## Story-scripts engine pieces (2026-10-18, branch `story-scripts`, `docs/scripts.md`)
+
+- **Boss bar argument fix**: the entry jump into `bossbar_create_hook` was `ldr r3,[pc]; bx r3`, which
+  replaced `BossHealthBar_Create`'s fourth argument (r3 = the upper percent of
+  `DrawBossHealthBarRange`) with the hook's address. `patch_rom.py` now jumps through r12 for the
+  entries in `R3_ARG_JUMPS` (push {r0}; ldr r0,[pc]; mov r12,r0; pop {r0}; bx r12).
+- **Camera_Shake hook** (0x0800DD80, `camera.c`): a shake requested while the camera already heads the
+  shake chain (0x03000FF4) extends the running one instead of linking the camera to itself; this was
+  a crash when a player was hit during one of 16's explosion shakes (ROM callers included, beside
+  `player.c`'s `camera_shake_safe`).
+- **Android 16 ends at half health** (`A16_END_PCT` 50, `android16.c`): `A16_HP` is what the players take
+  off over the whole fight; a bar range drawn for him slices his nominal health (stage [75, 100] and
+  [50, 75] on the island, 2000 HP each with two players, 1400 alone); at the bottom of a stage the defeat
+  action fires and he stays standing (idle state, AI off, hits ignored); the rage phases follow the whole
+  fight.
+- **`BOSS_PAIR`** (`bosses.h`): a pair even in single-player, under the boss rules whatever its HP and
+  EXP: the forest spirit's Frieza (stat 41) + Cooler (sprite 34, stat 111 = Cooler's AI with Frieza's
+  tutorial numbers).
+- **Player 2 by party flags** (`player.c`): player 2 is a party member with bits 0 and 1 (Hercule is no
+  longer allowed outside the party), so the story's flag opcodes pick and lock player 2.
+- **Chapter tests**: `StoryTest` preset (0x0203FDC0, applied by Party_Init), `COOP_CMD_STORY_WIN` (7),
+  `STORY_TEST=1` builds; `tools/headless/st_headless.c`.

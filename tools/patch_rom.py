@@ -61,7 +61,10 @@ SPRITE_VTABLES = [0x0802489C, 0x08024E84, 0x080252A4, 0x08025564, 0x080255CC, 0x
                   0x08025770, 0x080257A0, 0x080257D0, 0x0802593C, 0x08025C30, 0x08025F28]
 
 # (function address, symbol): the entry becomes  ldr r3,[pc,#n]; bx r3; (nop;) .word symbol|1
+# (functions in R3_ARG_JUMPS take a 4th argument in r3 and jump through r12 instead, see main)
 # 8 bytes when addr % 4 == 0; 10 bytes (with a nop before the word) when addr % 4 == 2.
+R3_ARG_JUMPS = {0x080104C0}   # BossHealthBar_Create(mem, entity, lo, hi): hi arrives in r3
+
 ENTRY_JUMPS = [
     (0x0801EEFC, "input_poll_hook"),         # Input_Poll
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
@@ -71,6 +74,7 @@ ENTRY_JUMPS = [
     (0x0801B332, "ai_speed8_create_hook"),   # 8-direction chase AI module constructor (speed param)
     (0x0801B15E, "ai_speed4_create_hook"),   # axis-aligned approach AI module constructor
     (0x080104C0, "bossbar_create_hook"),     # BossHealthBar_Create (DrawBossHealthBar opcodes)
+    (0x0800DD80, "camera_shake_hook"),       # Camera_Shake: never link the camera into its own chain
     (0x080094B0, "vm_push_name_hook"),       # VM: push the active character's name (dialogue %s)
     (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
     (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
@@ -405,6 +409,15 @@ def main():
     for addr, name in ENTRY_JUMPS + PARTY_ENTRY_JUMPS:
         target = syms[name] | 1
         off = addr - ROM_BASE
+        if addr in R3_ARG_JUMPS:
+            # the 4th argument lives in r3: jump through r12 instead (push {r0}; ldr r0,[pc]; mov r12,r0;
+            # pop {r0}; bx r12; .word), 16 bytes at a word-aligned entry, 14 at a halfword-aligned one
+            if addr % 4 == 0:
+                struct.pack_into("<HHHHHHI", rom, off, 0xB401, 0x4802, 0x4684, 0xBC01, 0x4760, 0x46C0, target)
+            else:
+                struct.pack_into("<HHHHHI", rom, off, 0xB401, 0x4801, 0x4684, 0xBC01, 0x4760, target)
+            print(f"entry  {addr:08x} -> {name} @ {target:08x} (via r12)")
+            continue
         if addr % 4 == 0:
             struct.pack_into("<HHI", rom, off, 0x4B00, 0x4718, target)   # ldr r3,[pc,#0]; bx r3; .word
         elif addr % 4 == 2:

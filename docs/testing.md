@@ -235,13 +235,13 @@ frame-stop makes emulated time lag real time, so wait longer before reading the 
 
 ```
 make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
-tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Quiet
+tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute
 python tools\fork\p2hold.py --port 7780 --cmd F:/.../build/kn/p2cmd.txt          # background
 tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"           # toggle the pad to player 1, A
 ```
 
 - **Several forks at once**: with audio sync on, an instance can barely advance (its pad socket's
-  Recv-Q grows, keys "don't register"); `-Quiet` (= `-C mute=1 -C audioSync=0`) fixes it. Other
+  Recv-Q grows, keys "don't register"); `-Mute` (= `-C mute=1 -C audioSync=0`) fixes it. Other
   sessions' scripts (`runa16.ps1`, older `runfork.ps1` copies) run `pkill -9 -x mgba` /
   `pkill -x gdb-multiarch`, which kills every instance or its gdb client; a dead gdb client leaves the
   stub halted (relaunch).
@@ -262,6 +262,40 @@ tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"        
   shared-screen leash pulls one back otherwise), `kr_setidx.sh SLOT INDEX` (selected ability); state
   counters at `kr_state` (`coop.sym`). Screens: `tools\win_burst.ps1` (N frames from one process, start
   it ~1.7 s before the action; check each frame's title bar, another session's window may be on top).
+
+## Story chapters, headless (`tools/headless/`, 2026-10-18)
+
+The fork's window and GDB link were too flaky for long scripted scenes (the stub dropped connections
+after pauses, WSLg showed stale frames under other sessions' windows), so chapters are tested in a
+headless runner built on the fork's own `libmgba`: no window, no debugger, deterministic frames,
+about seven times faster than real time.
+
+```
+wsl -d Ubuntu -u root -- bash -c "cd /mnt/f/MeltyCreations/log2-story && gcc -O2 -o /root/st_headless tools/headless/st_headless.c -I/root/mgba-build/include -I/mnt/f/MeltyCreations/tools/downloads/mgba/include -L/root/mgba-build -lmgba -Wl,-rpath,/root/mgba-build"
+make BUILD=build/sth DEBUG_MENU=1                       # co-op tests (player 2 present with "p2 0")
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/sth/log2-coop.gba    # once per build: build/hl/menu.ss
+python tools/headless/st_test.py build/hl/x.txt build/sth/log2-coop.gba build/hl/menu.ss --cols 4
+```
+
+`tools/headless/mkmenu.txt` boots, skips the intro (`key 8 6` twice), idles 5500 frames into the
+debug menu and saves `build/hl/menu.ss` (bare `shot` / `save` / `load` names land in `build/hl/`). Commands (full list in the C file's header): `frames`, `key MASK N`, `keys MASK`,
+`p2 MASK|off`, `mash N [F]`, `mashent NAME VTABLE MAX`, `mashmap ZONE AREA MAX`, `waitmap`,
+`waitnz ADDR MAX`, `maptest ENTRY` (with the debug menu open: points Map Test at a map entry index
+and presses A), `preset +N -N` (story flags Party_Init applies at that Map Test), `flags`, `peek`,
+`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `map`, `shot NAME`, `save` / `load`. The runner
+prints the registers of the first "Jumped to invalid address" (`CRASH regs`, `r14` = the caller).
+`st_test.py` resolves bare shot names next to the script and tiles them into one PNG.
+
+Useful words: `coop2.cmd` 0x0203FD08 (7 = `COOP_CMD_STORY_WIN`: every boss fight and story enemy on
+the map is won through its own OnHit; 5 = warp, `cmd_arg` 0x0203FD0C = zone | area << 8,
+`cmd_arg2` 0x0203FD54 = x | y << 16), `coop2.a16` 0x0203FD34, `coop2.a16_bot` 0x0203FD44,
+`coop.p2_slot` 0x0203FF84, party block 0x0203F000 (active slot byte 0, entries at +0xC + 0x1C * slot,
+flags at entry +0x14), story flags 0x0203F0EC + n / 8. A Map Test party has everyone in it and
+player 1 is Piccolo (`poke8 0x0203F000 0` then a warp makes Gohan player 1). `STORY_TEST=1` builds
+(the fork's TCP pad drives player 1, `tools/fork/st_pad.py`; story-flag preset in ROM at 0xC00000,
+`tools/fork/st_preset.py`; player 1's L + R + Up wins the fights) are for interactive fork sessions;
+`tools/fork/st_run.ps1` launches the fork without the debugger and `st_place.ps1` moves a window out
+from under another session's.
 
 ## Reading screenshots
 

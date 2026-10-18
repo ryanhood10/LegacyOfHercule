@@ -31,7 +31,9 @@ Spec file (all sections optional; numbers may be JSON ints or "0x.." strings):
             two code literals that point at it are repointed.
   "strings": [{"offset": "0x3B81B0", "text": "..."}],   in-place text replacement, must fit the old string
   "patches": [{"offset": "0x3EC738", "expect": "5b", "bytes": "4f", "note": "..."}],  raw records, passed through
-  "include": ["data/hercule-text.json"]   more record files (e.g. written by tools/script_dump.py), appended
+  "include": ["data/hercule-text.json"]   more record files (e.g. written by tools/script_dump.py), appended;
+            a file holding an object instead of a list is a story spec, applied by tools/mapedit.py
+            (map table edits, lscript sources assembled into "story_free", default 0xB00000)
 }
 
 Facts (file offsets; from the decompile and the Arefu/Legacy notes, verified on the ROM):
@@ -45,8 +47,11 @@ Facts (file offsets; from the decompile and the Arefu/Legacy notes, verified on 
   0x1D9900 g_AbilityTable, 14 x {readyIcon, coolingIcon, isReady, onUse}; literals at 0x8024 and 0x8E8C.
 """
 import json
+import os
 import struct
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # tools/mapedit.py for story specs
 
 ROM_BASE = 0x08000000
 PARTY_OFF = 0x1D9548
@@ -328,8 +333,16 @@ def build(rom, spec, party_slots=None):
 
     for p in spec.get("patches", []):
         recs.append(dict(p))
+    editor = None
     for path in spec.get("include", []):
-        recs += json.load(open(path))
+        data = json.load(open(path))
+        if isinstance(data, dict):        # a story spec (data/story/*.json): map edits by tools/mapedit.py
+            import mapedit
+            got, editor = mapedit.build(rom, [path], num(spec.get("story_free", mapedit.STORY_FREE)),
+                                        num(spec.get("story_limit", mapedit.STORY_LIMIT)), editor)
+            recs += got
+        else:
+            recs += data
     return recs
 
 

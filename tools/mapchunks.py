@@ -58,9 +58,10 @@ class BitReader:
                 return v
 
 
-def decompress(src, pos, lit_bits):
+def decompress(src, pos, lit_bits, want_end=False):
     """Port of the ARM routine at 0x03000000. src[pos:] is the bitstream (header + 8),
-    lit_bits is r3 at entry (the header's word 0). Returns the output bytes."""
+    lit_bits is r3 at entry (the header's word 0). Returns the output bytes, or (bytes, end offset
+    of the last 32-bit word read) with want_end (the stream's size in the ROM, for copying it)."""
     out = bytearray()
     r = BitReader(src, pos)
     off_bits = 8      # r5
@@ -123,7 +124,7 @@ def decompress(src, pos, lit_bits):
             continue
         k = r.bits(2)
         if k == 0:
-            return bytes(out)                         # end of stream
+            return (bytes(out), r.pos) if want_end else bytes(out)   # end of stream
         off_bits = r.bits(k + 3)
 
 

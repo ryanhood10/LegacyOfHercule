@@ -1,0 +1,136 @@
+; Android 16 is the island boss (docs/story.md 4e/4f, docs/coop-design.md "Android 16 boss").
+; Kame House (zone 11 area 1, map 293): 16 is furious that Goku is not there and Piccolo tricks him into
+; a fight on the next island. The island (areas 4-6, maps 296-298): 16 (enemy stat 109, sprite 160)
+; instead of 17 (stat 3, sprite 9); the stock fight runs over two stages (bar 75-100 in area 4, 50-75 in
+; area 6) and 16 stops at half health (src/coop/android16.c A16_END_PCT), stays standing, and Cell
+; arrives as scripted. Sprites: 8 = 16's stock actor, 9 = 17, 11 = 18, 160 = 16's fighting model,
+; 28 = Cell. Speakers: 3 Piccolo, 26 Android 16, 28 Android 17, 29 Android 18.
+; Stock entries are referenced (stock @ADDR / stockseq), never restated; applied by a16_island.json.
+
+; map 293 trigger 3 (condition: flag 144 set, 145 clear): the androids land at Kame House
+sequence a16_kame_house
+  [0] stock @083e285c                   ; arrival sound
+  [1] stock @083e2864                   ; 17: can Goku come out and play?
+  [2] stock @083e2896                   ; 17, 18 and 16 fly in
+  [3] stock @083e2920                   ; 16: I cannot detect him
+  [4] stock @083e295e                   ; 17: not here?
+  [5] stock @083e296c                   ; Piccolo walks up
+  [6] text 3 "!PICCOLO: That's right.  Goku's not here."
+  [7] text 26 "ANDROID 16: Not here...?\x0bI was built for one purpose: to destroy Goku.\x0bWhere is he?  Tell me where Goku is!"
+  [8] text 28 "Whoa, take it easy, 16.  I've never seen you like this."
+  [9] text 3 "!You want Goku?  Then let's make a deal.\x0bBeat me on that island over there...\x0b...and I'll tell you where he is."
+  [10] stock @083e2ac6                  ; camera pans to the island
+  [11] stock @083e2ae4                  ; Piccolo: you and me
+  [12] stock @083e2af4                  ; camera back
+  [13] text 26 "ANDROID 16: Agreed.\x0bWhen you lose, you will tell me where to find Goku."
+  [14] text 28 "Ha!  This I've got to see.  Come on, 18."
+  [15] text 3 "!(Heh.  He doesn't need to know I have no intention of telling him.)"
+  [16] stock @083e2b38                  ; all three fly to the island, flag 145, reload
+end
+
+; map 296 trigger 0: on the island, before the fight
+sequence a16_island_intro
+  [0] stock @083e469c                   ; face, camera, music
+  [1] stock @083e46b8                   ; 18 sits this one out
+  [2] stock @083e46f4                   ; wait
+  [3] text 26 "!ANDROID 16: Piccolo.  When I defeat you, you will tell me where Goku is."
+  [4] text 3 "!PICCOLO: A deal's a deal.  But you have to beat me first!"
+  [5] text 26 "!Then I will not hold back."
+  [6] script
+        DespawnCharacterAndRecordPosition 8, 1      ; 16's actor -> the boss record (stat 109, sprite 160)
+        DrawBossHealthBarRange 160, 75, 100         ; first stage: 100 % -> 75 %
+        SetPlayerVisible 1
+        SetActiveEntity 0
+end
+
+; map 296 record 1 defeat (16 at 75 %): the island breaks apart, everyone moves to area 5
+sequence a16_island_break
+  [0] stock @083e4818                   ; rumble
+  [1] text 29 "ANDROID 18: This island is breaking apart!\x0b16, is he really pushing you around?"
+  [2] stock @083e4884                   ; rumble
+  [3] stock @083e4890                   ; 17: he can't keep this up
+  [4] stock @083e4904                   ; Piccolo: you're not perfect
+  [5] script                            ; stock 083e494c with 16 = 160 (the boss) and 17 = 9 (watching)
+        PlayAudioBlocking 50, 90
+        PlayAudio 43
+        FadeToWhite 120
+        PlayAudio 20
+        WaitFrames 30
+        PlayAudio 21
+        WarpToMapNoEntities 11, 5, 1, 336, 88
+        PanCameraToPosition 152, 56, 10
+        SetEntityFacing 160, 1
+        SetEntityFacing 9, 1
+        SetEntityFacing 11, 3
+        WhiteFadeOut 120
+        StopAudio 43
+        WaitFrames 120
+        PlayAudio 26
+        FlyToPosition 160, 400, 240
+        DespawnEntity 160
+        BeginCommandBatch
+        PlaySFX 9, 26
+        FlyToPosition 9, 376, 264
+        DespawnEntity 9
+        FlyToPosition 11, 408, 232
+        DespawnEntity 11
+        CommitCommandBatch
+        WaitFrames 60
+        PlayAudio 47
+        FindCharacterEntity 0
+        SetStoryFlag 146
+        WaitFrames 60
+        SetActiveEntity 0
+        SetPlayerVisible 1
+end
+
+; map 298 record 0 defeat (16 at 50 %, the end of his fight): he stays standing, Cell arrives
+sequence a16_island_half
+  [0] script
+        PlayAudio 60
+        SetPlayerVisible 0
+        FindPlayerEntity
+        WaitFrames 60
+        DespawnCharacterAndRecordPosition 160, 6    ; the boss -> 16's standing actor (sprite 8, record 6)
+        PlayAudio 50
+  [1] text 26 "ANDROID 16: Enough.  You are stronger than my data predicted.\x0bNow keep your promise, Piccolo.  Where is Goku?"
+  [2] stock @083e4a28                   ; 17: this is ridiculous
+  [3] stock @083e4aa4                   ; 16: I am detecting two powers
+  [4] stock @083e4b08                   ; wait
+  [5] stock @083e4b16                   ; 17: what is that supposed to mean?
+  [6] text 3 "!PICCOLO: (Our deal will have to wait...  That power is coming this way!)"
+  [7] script                            ; stock 083e4b6c (Cell lands) without 17's knock-down pose
+        PlayAudio 60
+        FindPlayerEntity
+        AddEXP 15000
+        SetPlayerVisible 0
+        FadeOut 180
+        TriggerMapEvent 3
+        SetEntityPositionInstant 9, 336, 200
+        SetEntityFacing 0, 2
+        SetEntityPositionInstant 0, 272, 216
+        SetEntityFacing 0, 3
+        PanCameraToPosition 208, 112, 10
+        FadeFromWhite 180
+        WaitFrames 60
+        PlayAudio 26
+        FlyToPosition 11, 384, 192
+        SetEntityFacing 11, 2
+        PlayAudio 26
+        FlyToPosition 8, 312, 168
+        SetEntityAnimation 9, 0
+        SetEntityFacing 8, 2
+        WaitFrames 60
+        BeginCommandBatch
+        WalkToPosition 11, 368, 208
+        PlayMusic 28
+        SetEntityFacing 11, 0
+        SetEntityFacing 9, 0
+        CommitCommandBatch
+        SetEntityFacing 8, 0
+        SetEntityFacing 0, 0
+        WalkToPosition 28, 368, 256
+        WaitFrames 60
+        PlayAudio 50
+  stockseq @083e6078 1                  ; the stock Cell scene from his first line to the warp
+end

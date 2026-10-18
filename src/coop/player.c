@@ -281,23 +281,25 @@ void coop_init_once(void) {
 
 // A slot player 2 may use: in the party, not player 1's. `avail` also requires the game's
 // "available" flag (bit 1), the one the save-pad switch screen greys characters out by.
-// Hercule (slot 5) is player 2's default: the game fills his entry at new game (level 1, 50 HP)
-// but never flags him in the party until late, so he is allowed whenever his entry is filled.
+// The story scripts choose player 2 through the party flags (docs/story.md 0): old Hercule joins for
+// the future prologue, Krillin when he visits Gohan, Hercule for good in West City (data/story/).
+// Hercule (slot 5) stays the first choice whenever he is in the party.
 #define HERCULE_SLOT 5
 static int slot_ok(int s, int avail) {
     if (s < 0 || s >= PARTY_SLOTS || s == g_Party->active_slot) return 0;
-    if (s == HERCULE_SLOT) return g_Party->chars[s].max_hp != 0;
     u32 f = g_Party->chars[s].flags;
     return (f & 1) && (!avail || (f & 2));
 }
 
 // Player 2's character: whatever it chose before (kept across maps), else Hercule, else the first
-// other party member; -1 if none exists, since the players never share a character.
+// other party member; -1 if none exists, since the players never share a character. Only available
+// members count (bit 1, what the stock scripts clear to lock a chapter to some characters), so the
+// story's locks apply to player 2 at the next map load.
 static int pick_p2_slot(void) {
-    if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;
-    if (slot_ok(HERCULE_SLOT, 0)) return HERCULE_SLOT;
+    if (slot_ok(coop.p2_slot, 1)) return coop.p2_slot;
+    if (slot_ok(HERCULE_SLOT, 1)) return HERCULE_SLOT;
     for (int i = 0; i < PARTY_SLOTS; i++)
-        if (slot_ok(i, 0)) return i;
+        if (slot_ok(i, 1)) return i;
     return -1;
 }
 

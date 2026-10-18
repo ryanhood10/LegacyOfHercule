@@ -6,13 +6,25 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - **Boss models** (branch `boss-models`, worktree `F:\MeltyCreations\log2-bm`): Android 13 base form
   (sprite 165) and Cooler's Namekian servant (166) from `tools/bossmodels.py`; stats 110 (13 beside
-  19), 111 (Namekian), 112 (13 beside Gero); rules give them to the co-op twins of 19, Gero and Cooler.
+  19), 112 (13 beside Gero), 113 (Namekian; 111 is main's forest-spirit Cooler); rules give them to the co-op twins of 19, Gero and Cooler.
   Tested in the fork with both players (spawn, autopilot fights, both-down in both orders, defeat
   scripts). Fixed: player 2 froze while player 1 was in the hurt state; under both-down the survivor
   keeps its model (Gero's script had despawned the wrong Gero). King Cold's sprite crashes as Cooler's
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Story scripts (branch `story-scripts`, worktree `F:\MeltyCreations\log2-story`)**:
+  `tools/script_asm.py` (lscript text form of scripts and dialogue, assembler, round trip over every
+  stock script: 563 scripts, 367 sequences, 2317 entries, 0 failures) and `tools/mapedit.py` (story
+  specs `data/story/*.json`: triggers, records, map scripts, line edits, grown arrays), formats in
+  `docs/scripts.md`. Chapters: the Android 16 island fight (Kame House deal, 16 over both stages, ends at
+  half health standing, Cell arrives), chapter 1 (old Hercule as player 2 in the prologue, Krillin's
+  visit, the forest spirit Frieza + Cooler, no Krillin NPC at the landing site, old Hercule leaves with
+  Trunks) and chapter 2 (the West City mansion deal, Triceratops Jungle with Piccolo and Hercule).
+  Fixes: boss-bar upper percent (r3 clobbered by the entry jump), Camera_Shake self-link crash.
+  Testing moved to a headless libmgba runner (`tools/headless/`) after the fork's GDB link and window
+  proved unreliable for long scenes.
+
 - **Production resumed (Ryan, after the model switch): "get as much progress with the game as you
   can", story planning paused where it stopped** (`docs/story.md` section 0, "Next to decide").
 - **Merged**: `android16-boss` (sprite 160, rockets, AI, stat 109; island scripts still name 17).

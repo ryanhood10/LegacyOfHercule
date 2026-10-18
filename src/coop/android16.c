@@ -87,7 +87,8 @@ typedef struct A16 {
     s16 timer, cooldown;
     s16 shots, fired;
     s16 poise;            // frames of stun immunity left (A16_POISE)
-    s16 _pad;
+    u8 lo, hi;            // this stage's slice of his nominal health, percent (A16_END_PCT..100 by default)
+    u8 down, sliced;      // down: the stage ended (HP 0), standing; sliced: a bar range set the HP
     Entity *target;
     Proj *live[A16_LIVE];
 } A16;
@@ -420,18 +421,26 @@ static void begin(A16 *a, int attack) {
     set_frames(a, attack == ATK_PUNCH ? 13 : 5, 0);
 }
 
+// Health left over the whole fight, percent: 100 at the start, 0 when he is down to A16_END_PCT %
+// (the stage slices map onto it, so the rage phases follow the fight, not one stage).
+static int fight_pct(const A16 *a) {
+    const Entity *e = a->e;
+    s32 max = ((const EnemyStat *)e->behaviour)->max_hp;
+    s32 level = a->lo * 100 + (max > 0 ? e->hp * (a->hi - a->lo) * 100 / max : 0);   // nominal % x 100
+    return (level - A16_END_PCT * 100) / (100 - A16_END_PCT);
+}
+
 static void finish(A16 *a) {
     Entity *e = a->e;
     a->attack = ATK_NONE;
-    int pct = e->hp * 100 / ((const EnemyStat *)e->behaviour)->max_hp;
+    int pct = fight_pct(a);
     a->cooldown = (s16)(A16_COOLDOWN_MIN + Rand_Range(A16_COOLDOWN_MAX - A16_COOLDOWN_MIN));
     if (pct < 34) a->cooldown = (s16)(a->cooldown * A16_RAGE_PCT / 100);
     if (e->ctrl_state == &a->ctrl) Entity_SetAnimation(e, 0);
 }
 
 static int choose(A16 *a) {
-    Entity *e = a->e;
-    int pct = e->hp * 100 / ((const EnemyStat *)e->behaviour)->max_hp;
+    int pct = fight_pct(a);
     // weights: homing, barrage, bombs, punch
     int w[4];
     if (pct > 66)      { w[0] = 40; w[1] = 20; w[2] = 0;  w[3] = 40; }
@@ -445,8 +454,7 @@ static int choose(A16 *a) {
 
 static void step_attack(A16 *a) {
     Entity *e = a->e;
-    int pct = e->hp * 100 / ((const EnemyStat *)e->behaviour)->max_hp;
-    int rage = pct < 34;
+    int rage = fight_pct(a) < 34;
     a->timer++;
     switch (a->attack) {
     case ATK_HOMING:   // charge 30 frames, fire (one per player when raging), hold 20
@@ -520,12 +528,15 @@ static void step_attack(A16 *a) {
 static void a16_update(Entity *e) {
     A16 *a = state_of(e);
     coop2.a16 = e;
-    if (e->hp <= 0) {              // defeated: the script owns him now; show the knock-down and stop
-        if (!coop2.a16_dead_frame) coop2.a16_dead_frame = g_FrameCounter;
-        if (e->ctrl_state != &a->ctrl) Entity_SetCtrlState(e, &a->ctrl);
-        set_frames(a, 12, 0);
-        a->attack = ATK_NONE;
-        Entity_BaseUpdate(e);
+    if (e->hp <= 0) {              // the stage is over: he stays standing and the script owns him
+        if (!a->down) {
+            a->down = 1;
+            a->attack = ATK_NONE;
+            if (!coop2.a16_dead_frame) coop2.a16_dead_frame = g_FrameCounter;
+            Entity_SetCtrlState(e, ENEMY_STATES[0]);
+            Entity_SetAnimation(e, 0);
+        }
+        Entity_BaseUpdate(e);      // script commands (fly, face, animation) still move him
         return;
     }
     Entity_BaseUpdate(e);
@@ -553,6 +564,7 @@ void damage_calc_hook(Entity *defender, Hit *hit);   // enemies.c
 #define ENEMY_MESSAGE 0x0800E5B9u
 static int a16_message(Entity *e, int msg, u8 *m) {
     A16 *a = state_of(e);
+    if (msg == 0 && (m[0] == 1 || m[0] == 2) && e->hp <= 0) return 0;   // the stage is over: no more hits
     if (msg == 0 && (m[0] == 1 || m[0] == 2) && e->hp > 0) {
         if (a->poise > 0 || a->attack) {
             if (!E32(e, 0x168)) return 0;              // not hittable right now (as the stock test)
@@ -619,7 +631,9 @@ Entity *a16_spawn(const EnemyRecord *rec) {
     A16 *a = (A16 *)((u8 *)r + rs);
     memset(a, 0, sizeof *a);
     *stat = a16_stat;
-    if (!p2_present()) stat->max_hp = A16_HP * A16_SOLO_HP_PCT / 100;
+    if (!p2_present()) stat->max_hp = A16_HP * A16_SOLO_HP_PCT / 100;   // the [END, 100] slice
+    a->lo = A16_END_PCT;
+    a->hi = 100;
     memcpy(r, rec, 0x1C + 4 * (u32)rec->behaviour_count);
     Entity *e = Enemy_Create(block, r, stat);
     if (!e) { Arena_Free(block); return 0; }
@@ -644,6 +658,25 @@ Entity *a16_spawn(const EnemyRecord *rec) {
     coop2.a16_dead_frame = 0;
     coop2.a16 = e;
     return e;
+}
+
+// A boss bar with a percent range is being drawn for him (DrawBossHealthBarRange 160, lo, hi right after
+// the spawn): before the first hit, give this stage the slice [max(lo, A16_END_PCT), hi] of his
+// nominal health. Returns the bar's lo.
+int a16_bar_range(Entity *e, int lo, int hi) {
+    A16 *a = state_of(e);
+    if (lo < A16_END_PCT) lo = A16_END_PCT;
+    if (hi <= lo || a->down) return lo;
+    EnemyStat *stat = (EnemyStat *)e->behaviour;
+    if (!a->sliced && e->hp == stat->max_hp) {
+        s32 whole = stat->max_hp * 100 / (100 - A16_END_PCT);    // nominal health (single-player scaled)
+        stat->max_hp = whole * (hi - lo) / 100;
+        e->hp = stat->max_hp;
+        a->lo = (u8)lo;
+        a->hi = (u8)hi;
+        a->sliced = 1;
+    }
+    return a->lo;
 }
 
 // Test placement (COOP_CMD_A16, A16_TEST builds: player 1 holds L + R and presses Down): an enemy record

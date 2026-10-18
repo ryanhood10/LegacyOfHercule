@@ -1,0 +1,47 @@
+{
+  "_": "Android 16 island fight (docs/story.md 4e/4f): Kame House dialogue, 16 replaces 17 as the island boss over the two stock stages, ends at half health, Cell arrives. Scripts in a16_island.lscript; see docs/scripts.md.",
+  "sources": ["data/story/a16_island.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 11, "area": 1},
+      "_": "Kame House: the androids' arrival scene",
+      "triggers": {"3": {"payload": "seq:a16_kame_house"}}
+    },
+    {
+      "map": {"zone": 11, "area": 4},
+      "_": "first stage: 16 stands where 17 stood, 17 watches from 16's spot",
+      "triggers": {"0": {"payload": "seq:a16_island_intro"}},
+      "records": {
+        "0": {"sprite": 8},
+        "1": {"stat": 109, "sprite": 160, "action": "seq:a16_island_break"},
+        "3": {"sprite": 9}
+      }
+    },
+    {
+      "map": {"zone": 11, "area": 5},
+      "_": "between the stages (the stock warp loads this area without its records; A at the rock's edge flies on to area 6, where actor 8 = 16 becomes the boss record)",
+      "records": {
+        "0": {"stat": 109, "sprite": 160},
+        "2": {"sprite": 9}
+      },
+      "edits": [
+        {"at": "trigger:0", "replace": [
+          ["DespawnCharacterAndRecordPosition 9, 0", "DespawnCharacterAndRecordPosition 8, 0"],
+          ["DrawBossHealthBarRange 9, 50, 75", "DrawBossHealthBarRange 160, 50, 75"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 11, "area": 6},
+      "_": "second stage (75 -> 50 %), then Cell. Record 5 is the actor standing at the fight spot when the area loads (area 5's warp script turns it into record 0): 16 now; record 4 (17's third stage) is no longer spawned; record 6 = 16's standing actor that replaces the boss after the fight",
+      "records": {
+        "0": {"stat": 109, "sprite": 160, "action": "seq:a16_island_half"},
+        "2": {"sprite": 9},
+        "5": {"sprite": 8}
+      },
+      "add_records": [
+        {"kind": "actor", "sprite": 8, "x": 288, "y": 232, "facing": 0, "condition": "never"}
+      ]
+    }
+  ]
+}

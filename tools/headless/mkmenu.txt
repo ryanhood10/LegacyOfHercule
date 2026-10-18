@@ -1,0 +1,10 @@
+# Debug-menu savestate for a DEBUG_MENU=1 ROM (build/hl/menu.ss): boot, skip the intro, idle on the
+# title until the debug menu opens, save. python tools/headless/st_test.py tools/headless/mkmenu.txt ROM
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 5500
+find menu 0x08023ee8
+save menu.ss
+shot menu
