@@ -80,8 +80,8 @@ playable, Android 13 / 16 / Namekian models, zone-15 maps). Tested per chapter w
 runner (`tools/headless/`); the space duel was also played in the fork with a real final blow.
 Numbers chosen by Claude that Ryan may want to change: Kami's boost (+3 levels and a refill),
 the arctic 13 (stat 114, half health), the gym duos (also fought in single-player).
-Still open for Ryan: Android 13's arctic partner; then plan the Cell Games, the ending and the Buu
-phase (section "Next to decide" above).
+Still open for Ryan: the rest of the ten-day wait (section 4g: Broly?), then the Cell Games, the
+ending and the Buu phase. Android 13 returns after Cell (4g).
 
 **Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
 and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
@@ -507,6 +507,16 @@ ending; check in play when it opens.
 
 Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its
 defeat action at that threshold instead of at zero HP and becomes untargetable).
+
+## 4g. The ten-day wait, revised (Ryan, 2026-10-18)
+
+- **Android 13 is held back until after Cell.** He absorbs 17 and 18 to become Super 13, so his
+  return comes after the Dragon Ball wish brings everyone (17 and 18 included) back to life. The
+  arctic encounter built in chapter 8 comes out of the wait; his earlier appearances (beside 19,
+  beside Gero, watching in the lab) stay.
+- **Kept as planned:** Roshi's 2v2 gym and its finale; Cooler with his Namekian servant, reachable
+  in the wait (the gate is the stock "Only Piccolo" barrier; there is no level gate).
+- **Under discussion:** a Broly encounter in the wait, and what triggers it.
 
 ## 5. What the plan is missing (engine limits found while checking)
 
