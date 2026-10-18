@@ -138,6 +138,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## Open items
 
+- Boss tuning: re-tune Android 13 (stats 110 / 112) once the story fixes the levels for the 19 and
+  Gero fights (13 mostly fights player 2, Hercule); re-run the Namekian's final 74/70/68 numbers in
+  the fork; King Cold needs a fight set (pose groups 2 and 5-8) before he can partner anyone.
+- Old Hercule needs his own dialogue portrait (he uses Hercule's).
 - Party: Krillin's own names / portrait / abilities (the status screen's per-slot tables have six
   entries), the save menu's six-wide portrait rows, the status screen's paging key; the journal with
   seen bits set was not exercised in the fork.
