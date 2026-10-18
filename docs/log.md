@@ -7,6 +7,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - **Story decision (Ryan): "Canon plus Hercule"**: the DBZ story stays, Hercule is in every scene as
   player 2, the twist is saved for the end (surprise Super Saiyan Hercule beats Buu; Goku fuses with
   Hercule, not Vegeta, against Buu; Vegito stays for Janemba). Beat sheet in `docs/story.md`.
+- **Opening redesigned by Ryan (late evening)**: future prologue keeps Trunks with old Hercule as
+  comic-relief player 2; present day opens with Krillin visiting Gohan (player 2 = Krillin), a
+  Frieza + Cooler "spirit of the forest" fight replaces the dream, Hercule joins in West City via a
+  mansion deal with Piccolo. Checked against the dumped scripts (`build/scripts/`); the one engine
+  blocker is the six-slot party (`docs/story.md` section 5). No code yet, by Ryan's request.
 - **Super Saiyan Hercule works in game** (d7093cd): sprite 157 / display row 22 generated from
   Hercule's record by `tools/spriteclone.py`, display rows and sprite index relocated into the blob
   (`patch_rom.py` LITERAL_RELOCATIONS, row-limit byte), `src/coop/ssj.c` ability pair wired into
