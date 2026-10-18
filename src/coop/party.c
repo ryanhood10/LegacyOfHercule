@@ -28,6 +28,9 @@ ROM_FN(int, Modal_Run, (void), 0x0801F2F5);                                     
 
 // Party_Init 0x08003C24: new-game defaults. The stock code DMAs 6 x 0x1C from the default table and
 // clears 50 bytes at +0xB4 and at +0x12A; the rest of the block is left as it was.
+void flag_set_hook(PartyState *p, u32 id);
+void flag_clear_hook(PartyState *p, u32 id);
+
 void party_init_hook(PartyState *p) {
     p->flags = 0;
     p->meter = 0;
@@ -35,6 +38,14 @@ void party_init_hook(PartyState *p) {
     memcpy(p->chars, PARTY_DEFAULTS, PARTY_SLOTS * sizeof(CharacterEntry));
     memset(p->event_flags, 0, PARTY_FLAG_BANK_ZEROED);
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
+    const StoryTest *t = STORY_TEST_RAM;      // chapter-test preset (coop.h)
+#ifdef STORY_TEST
+    if (STORY_PRESET->magic == STORY_TEST_MAGIC) t = STORY_PRESET;
+#endif
+    if (t->magic == STORY_TEST_MAGIC) {
+        for (int i = 0; i < 16 && t->set[i] != 0xFFFF; i++) flag_set_hook(p, t->set[i]);
+        for (int i = 0; i < 8 && t->clear[i] != 0xFFFF; i++) flag_clear_hook(p, t->clear[i]);
+    }
 }
 
 // Flag bank 1 (+0xB4): 0x08003E42 / 0x08003E5E / 0x08003E74, called by the script VM with the party pointer.

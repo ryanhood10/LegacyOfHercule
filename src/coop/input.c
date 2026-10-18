@@ -34,6 +34,9 @@ int p2_present(void) {
 #if P2_MODE == P2_MODE_SIO
 static u16 sio_poll(void) {
     u16 remote = g_p2_remote;
+#ifdef STORY_TEST
+    if (remote & 0x8000) return 0;    // the fork's TCP pad is driving player 1 (input_poll_hook)
+#endif
     if (remote & 0x8000) { coop.source_age = 0; return remote & 0x3FF; }
     if (!coop.sio_ready) {
         REG_RCNT = 0;
@@ -106,6 +109,11 @@ void input_poll_hook(InputSystem *in) {
     // identical input; the physical buttons of this machine then never reach the game directly.
     u16 p1_remote = g_p1_remote;
     if (p1_remote & 0x8000) raw = (u16)(~p1_remote & 0x3FF);
+#ifdef STORY_TEST
+    // chapter tests (tools/fork/st_pad.py): the fork's TCP pad (written to g_p2_remote with bit 15)
+    // drives player 1, so tests need no debugger; player 2 stays absent in these builds
+    if (g_p2_remote & 0x8000) raw = (u16)(~g_p2_remote & 0x3FF);
+#endif
     // Every instance publishes its own buttons on the link; a host ignores what it receives from
     // itself, a second game instance thereby doubles as player 2's pad without controller mode.
     REG_SIOMLT_SEND = (u16)((raw & 0x3FF) | SIO_MARK);
@@ -144,6 +152,17 @@ void input_poll_hook(InputSystem *in) {
     // test builds: player 1 holds L and R and presses Down -> Android 16 boss beside player 1 (android16.c)
     if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && (in->pressed & KEY_DOWN) && p1_controllable())
         coop2.cmd = COOP_CMD_A16;
+#endif
+    // chapter tests (COOP_CMD_STORY_WIN from a debugger or the headless runner): run here, outside the
+    // entity-list update, where a boss death (its events, its removal) is safe
+    if (coop2.cmd == COOP_CMD_STORY_WIN) { coop2.cmd = 0; story_test_finish(); }
+#ifdef STORY_TEST
+    // chapter tests: player 1 holds L and R and presses Up -> every boss fight on the map is won
+    if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && (in->pressed & KEY_UP)) story_test_finish();
+#ifdef A16_TEST
+    // ... and Left -> the Android 16 fight autopilot on / off
+    if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && (in->pressed & KEY_LEFT)) coop2.a16_bot ^= 1;
+#endif
 #endif
 #if P2_MODE != P2_MODE_SWAP
     if (coop.p2 && (coop.input2.pressed & KEY_SELECT) && p1_controllable()) p2_cycle();

@@ -306,6 +306,25 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     return orig;
 }
 
+// Chapter tests (COOP_CMD_STORY_WIN, or player 1 L + R + Up in STORY_TEST builds): every boss on the map (story bosses, Android 16) takes a
+// blow worth its remaining HP from player 1 through its own OnHit (vtable slot 14), so pair rules,
+// end_pct stages and the defeat action all run as if the players had won the fight.
+void story_test_finish(void) {
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (!is_enemy(e) || e->hp <= 0) continue;
+        const EnemyStat *st = (const EnemyStat *)e->behaviour;
+        if (!is_a16(e) && !(st->exp == 0 && st->max_hp >= 1000)) continue;
+        u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
+        memset(m, 0, sizeof m);
+        *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1
+        *(Entity **)(m + 0x30) = g_PlayerObject;
+        *(s32 *)(m + 0x2C) = e->hp;                 // the applied damage OnHit subtracts
+        ((int (*)(Entity *, const u8 *))((u32)e->vtable + e->vtable[14]))(e, m + 0x24);
+    }
+}
+
 // ---- test commands ------------------------------------------------------------------------------
 // enemies.lua writes coop2.cmd / cmd_arg; the entity-list hook runs them at the start of a frame.
 void coop_debug_tick(void) {
@@ -474,7 +493,7 @@ static int bar_lo(const Entity *e, int lo) {
 }
 
 BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
-    if (e) lo = bar_lo(e, lo);
+    if (e) lo = is_a16(e) ? a16_bar_range(e, lo, hi) : bar_lo(e, lo);
     if (!coop.p2) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);   // single-player: the ROM object
     TwinPair *pr = pair_of(e);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin

@@ -84,12 +84,28 @@ typedef struct CoopExtra {
     u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
     u16 _pad3;
 } CoopExtra;
-_Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
+_Static_assert(sizeof(CoopExtra) <= 0x2C0, "CoopExtra must fit 0x0203FB00..0x0203FDC0 (StoryTest above it)");
+
+// Story test preset: Party_Init (party.c) applies it after resetting the party, so a debug Map Test
+// starts a chapter with its story flags. STORY_TEST builds read it from ROM (STORY_PRESET, file offset
+// 0xC00000, written by tools/fork/st_preset.py); a debugger may also write it to EWRAM (STORY_TEST_RAM, used
+// when the ROM copy has no magic). Inert unless magic == STORY_TEST_MAGIC; the game never writes either.
+typedef struct StoryTest {
+    u32 magic;
+    u16 set[16];            // story flags to set (0xFFFF ends the list)
+    u16 clear[8];           // story flags to clear (0xFFFF ends the list)
+} StoryTest;
+#define STORY_TEST_RAM ((StoryTest *)0x0203FDC0)
+#define STORY_PRESET ((const StoryTest *)0x08C00000)
+#define STORY_TEST_MAGIC 0x53545259u   // "STRY"
+_Static_assert(sizeof(StoryTest) <= 0x40, "StoryTest must fit 0x0203FDC0..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
 #define COOP_CMD_A16          4   // spawn the Android 16 boss 64 px right of player 1, with a boss bar (android16.c)
+#define COOP_CMD_STORY_WIN    5   // chapter tests: win every boss fight on the map (story_test_finish, enemies.c)
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
+void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
 extern CoopExtra coop2;
 
 // Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin)

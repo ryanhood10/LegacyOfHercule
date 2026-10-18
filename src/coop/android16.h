@@ -8,8 +8,14 @@
 #define A16_SPRITE        160     // tools/a16sprites.py record (Makefile A16_SPRITE)
 #endif
 
-// Stat row (designed for two players at level 25-30; single-player gets A16_SOLO_HP_PCT of it)
+// Stat row (designed for two players at level 25-30; single-player gets A16_SOLO_HP_PCT of it).
+// A16_HP is the HP the players take off him over the whole island fight; the fight ends when he is
+// down to A16_END_PCT % of his nominal health (A16_HP * 100 / (100 - A16_END_PCT)): the defeat action
+// fires and he stays standing (docs/story.md 4f: he survives for later). A boss bar drawn for him with
+// a percent range (DrawBossHealthBarRange 160, lo, hi) gives that stage the slice [max(lo, END), hi]
+// of the nominal health, so the island's two stages (75-100 in area 4, 50-75 in area 6) end at half.
 #define A16_HP            4000
+#define A16_END_PCT       50
 #define A16_SOLO_HP_PCT   70
 #define A16_MELEE         12      // stock 17: 32 melee, 39 ranged, 34 defence (tuned down: see docs)
 #define A16_RANGED        28
@@ -62,3 +68,4 @@ Entity *a16_spawn(const EnemyRecord *rec);   // enemy_spawn_hook for stat A16_ST
 int is_a16(const Entity *e);
 void a16_test_spawn(void);                    // COOP_CMD_A16: next to player 1, with a boss bar
 int a16_threat(const Entity *pl, s32 *ex, s32 *ey);   // test autopilot: a blast about to hit pl? escape vector
+int a16_bar_range(Entity *e, int lo, int hi);    // bossbar_create_hook: slice his HP to [lo, hi], returns the bar's lo

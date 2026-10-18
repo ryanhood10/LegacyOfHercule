@@ -45,3 +45,21 @@ void camera_follow_hook(u8 *follow) {
     world[5] = world[3] + w;   // +0x14/+0x18: cull rect right/bottom (SetView baked 240/160)
     world[6] = world[4] + h;
 }
+
+// Camera_Shake (0x0800DD80, entry jump): links the camera object into the controller chain headed at
+// 0x03000FF4 for `frames` frames. Calling it again while the camera is still the head linked the camera
+// to itself, and the shake update then followed a dead link ("Jumped to invalid address": a player hit
+// during one of Android 16's explosion shakes did it). A shake already running is extended instead.
+#define SHAKE_CHAIN_HEAD (*(u8 **)0x03000FF4)
+void camera_shake_hook(u8 *cam, s32 frames, u32 strength) {
+    if (SHAKE_CHAIN_HEAD == cam) {
+        if (*(s32 *)(cam + 0xC) < frames) *(s32 *)(cam + 0xC) = frames;
+        return;
+    }
+    *(s32 *)(cam + 0xC) = frames;
+    cam[4] = (u8)strength;
+    *(u8 **)(cam + 8) = SHAKE_CHAIN_HEAD;
+    cam[5] = (u8)((100 - (s32)(strength & 0xFF)) / 16 + 1);   // shake period, as the ROM computes it
+    cam[6] = 1;
+    SHAKE_CHAIN_HEAD = cam;
+}
