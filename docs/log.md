@@ -4,6 +4,35 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-18
 
+- **Production resumed (Ryan, after the model switch): "get as much progress with the game as you
+  can", story planning paused where it stopped** (`docs/story.md` section 0, "Next to decide").
+- **Merged**: `android16-boss` (sprite 160, rockets, AI, stat 109; island scripts still name 17).
+- **Engine (main)**: boss rules and extra stats (`bosses.c`: Android 13 = stat 110, end-at-percent,
+  partner model/stat, no-twin, Perfect Cell alone to half health) and the both-down rule (first boss
+  down lies in its knock-down pose until the pair is beaten); player 2's combat stats and speeds from
+  its own slot with form bonuses; safe camera shake; duplicate town NPCs removed (`actors.c`);
+  world-map rule confirmed (player 2 has no entity there); player-vs-player duel (`duel.c`: opponent
+  hits, final blow to 1 HP, winner, pad swap, shadow clone in party slot 7); Hercule starts without
+  Super Hercule (`hercule_awaken()` grants it later); debug warp/duel commands; several fork
+  instances in parallel (slots 0-4). All verified in the fork (`docs/coop-design.md`).
+- **Side sessions started** (own worktrees and fork slots): story-scripts (slot 1: script assembler,
+  map patcher, island 16 fight, opening chapters), krillin-playable (slot 2: Krillin's row,
+  portrait, names, Destructo Disc; old Hercule row), boss-models (slot 3: Android 13 sprite 165,
+  Cooler's Namekian 166), map-tools (slot 4: map format, new arctic / Time Chamber / Broly maps).
+- **New maps (branch `new-maps`, worktree `F:\MeltyCreations\log2-maps`)**: the map format is decoded
+  end to end (`docs/maps.md`: MapEntry, variation, tiled and effect layers, the one global BG
+  palette, tileset slot table + shared tile banks, animated tiles, walk / projectile collision
+  bitmaps, triggers, exits, flight spots, level gates and barriers), with `tools/maplib.py`,
+  `tools/mapexport.py` (render any map) and `tools/mapbuild.py` (build maps from
+  `data/maps/*.json`). `patch_rom.py --maps` places them after the data patches and relocates the
+  MapEntry table (331 entries). Zone 15: area 1 arctic (Northern Mountains re-dressed in snow and ice,
+  falling snow, the stock Vegeta barrier at a cave), area 2 Hyperbolic Time Chamber (white void,
+  living quarters), area 3 Broly's arena (wasteland basin and pod crater), area 4 a crater imported
+  from Buu's Fury (built when `roms/buu.gba` is there). All four tested in the WSL fork with both
+  players (collision, wide view, door exit, flight spot). Found on the way: zone 13 is a stock "Snowy
+  Highlands" zone; Buu's Fury uses the same map format (401 maps render; its map table is not found,
+  so Broly's own map is not identified). Fork tip: `runfork.ps1 -Mute` (audio sync stalls a fork).
+
 - **Story planning walked from the player's side through the Cell Games wait** (Ryan + Claude,
   all in `docs/story.md`, section 0 is the summary): the two duels, Android 13 and 16 as new
   bosses, Multi-Form Cell, 2v2 gym, Cooler's Namekian, the half-health and both-down rules, casting

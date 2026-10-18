@@ -344,9 +344,10 @@ needs a map (see the next paragraph); the duel code is the same PvP work as the 
 
 Time Chamber interior: LoG2 has only the door on the
 Lookout map ("You cannot enter the Hyperbolic Time Chamber"); no interior exists in this ROM.
-Buu's Fury has the chamber as a playable location, but its map format is not decoded (the Buu
-session decoded sprites only), so lifting it is a new spike; the cheap stand-in is LoG2's own
-"space" arena (zone 6 area 50, Vegeta's Super Saiyan scene) with a white palette. While Vegeta and
+**Built (2026-10-18, `docs/maps.md`):** zone 15 area 2, a white void with the living quarters (the
+Lookout's palace facade) at the top edge and a door back to the Lookout. Buu's Fury's map format
+turned out to be LoG2's; its round living-quarters rooms (records 0x082546A0 / 0x08254DA0) can be
+imported the same way if wanted. While Vegeta and
 Trunks are inside, the story-consistent playables are Piccolo (player 1 by script) with Hercule,
 Krillin or Gohan (Gohan's selectable bit is cleared by the stock script; we can leave it set).
 
@@ -468,12 +469,15 @@ ending; check in play when it opens.
   one of Gero's large robots (sprites 37-39) under 13's command, or a spare Android 19 unit
   recoloured; Androids 14 and 15 (his film sidekicks, whom Super 13 absorbs) would be the best
   story but need drawing. Optional: a story flag records whether it happened, and the post-Cell
-  Super 13 encounter has two openings (met before / first meeting). Facts: no map in LoG2 mentions
-  snow or an arctic; the Northern Mountains around Gero's lab are the coldest-looking stock area.
-  A brand-new map needs tooling we do not have (chunk encoder, collision, map-table entry); a
-  re-dressed existing map with new triggers and scripts is the cheap route.
-- **Broly (maps and scripts wanted):** Buu's Fury's map format is not decoded (sprites only), so
-  reusing its Broly arena is a spike; the cheap route is an existing LoG2 arena re-scripted. Broly's
+  Super 13 encounter has two openings (met before / first meeting). Facts: zone 13 is a stock
+  "Snowy Highlands" zone (10 snow maps with falling snow), which the dialogue never names. **Built
+  (2026-10-18, `docs/maps.md`):** zone 15 area 1, an arctic snowfield (Northern Mountains zone 8
+  area 28 re-dressed in snow and ice, falling snow) with a cave behind a working "Only Vegeta"
+  barrier (level 50, story flag 380); the cave door has no exit yet, for 13's encounter.
+- **Broly (maps and scripts wanted):** maps built (2026-10-18, `docs/maps.md`): zone 15 area 3, a
+  wasteland basin with a pod crater (LoG2 tiles), and area 4, a walled crater imported from Buu's
+  Fury (same map format; built when `roms/buu.gba` is present). Buu's Broly battle map itself is not
+  identified (its map table is not found). Broly's
   fight sprite is ready (id 159).
 
 Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its

@@ -97,6 +97,32 @@ void idle_update(IdleState *st, Entity *e) {
     handle_buttons(e, in);
 }
 
+// Camera_Shake links the camera into the controller chain headed at 0x03000FF4; calling it again while
+// it shakes links it to itself (an endless loop). Extend the running shake instead.
+#define SHAKE_HEAD (*(void **)0x03000FF4)
+static void install_behaviour(Entity *e, int slot);
+
+void camera_shake_safe(int frames, int strength) {
+    if (SHAKE_HEAD == g_Camera) {
+        s32 *left = (s32 *)((u8 *)g_Camera + 0xC);
+        if (*left < frames) *left = frames;
+        return;
+    }
+    Camera_Shake(g_Camera, frames, strength);
+}
+
+// Player 2's combat bytes and speeds come from its class init run as its own slot (install_behaviour).
+// When its stats or form change (level-up, capsule, transformation) the init runs again; player 1's
+// refresh paths only ever touch the active player's entity.
+void p2_sync_combat(void) {
+    Entity *p2 = coop.p2;
+    if (!p2) return;
+    int slot = coop.p2_slot;
+    const CharacterEntry *c = &g_Party->chars[slot];
+    u32 key = (u32)c->str ^ ((u32)c->pow << 8) ^ ((u32)c->end << 16) ^ ((u32)c->display_row << 24) ^ (u32)slot;
+    if (key != coop2.p2_class_key) install_behaviour(p2, slot);
+}
+
 // ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F) ------------------------------------
 void walk_update(void *st, Entity *e) {
     (void)st;
@@ -108,7 +134,7 @@ void walk_update(void *st, Entity *e) {
         s32 ny = e->y + v->dy * e->speed;
         s32 px[2] = { nx >> 8, ny >> 8 };
         if (!Collision_Check(COLLISION_MAP, px, 0)) {
-            Camera_Shake(g_Camera, 8, 100);
+            camera_shake_safe(8, 100);
             Entity_SetAnimation(e, ANIM_BUMP);
             play_cant_sfx();
         } else {
@@ -188,6 +214,7 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
     Player_Knockback(e, (void *)hit);
+    if (duel_p2_final_blow(e, dmg)) return 0;   // a duel's final blow: 1 HP, the duel ends
     CharacterEntry *c = &g_Party->chars[coop.p2_slot];
     if (c->hp > dmg) {
         c->hp = (u16)(c->hp - dmg);
@@ -266,12 +293,20 @@ static int pick_p2_slot(void) {
     return -1;
 }
 
+// The class init (slot 0) writes the entity's combat bytes (+0x160..+0x164, with the form's bonus:
+// the Super Saiyan classes add e.g. +15/+10/+15) and speeds (+0x188/+0x18C) from the ACTIVE party
+// slot (0x08016FD8, 0x0801718C), so it runs with the active slot set to `slot` for the duration.
 static void install_behaviour(Entity *e, int slot) {
     const u8 *row = DISPLAY_DATA + g_Party->chars[slot].display_row * 0x14;
     u32 *cell = *(u32 **)(row + 0x10);     // IWRAM cell holding the behaviour vtable pointer
     const u32 *vt = (const u32 *)*cell;
     e->behaviour = cell;
+    u8 active = g_Party->active_slot;
+    g_Party->active_slot = (u8)slot;
     ((void (*)(void *, Entity *))((u32)vt + vt[0]))(cell, e);
+    g_Party->active_slot = active;
+    const CharacterEntry *c = &g_Party->chars[slot];
+    coop2.p2_class_key = (u32)c->str ^ ((u32)c->pow << 8) ^ ((u32)c->end << 16) ^ ((u32)c->display_row << 24) ^ (u32)slot;
 }
 
 // Give the live player-2 entity another party slot: what the save-pad switch does to player 1
@@ -282,6 +317,13 @@ static void p2_bind(Entity *p2, int slot) {
     install_behaviour(p2, slot);
     Entity_SetAnimation(p2, ANIM_IDLE);
     coop.rebinds++;
+}
+
+// duel.c: bind player 2 to any slot (the duel's clone slot is not a selectable party member).
+int p2_bind_slot(int slot) {
+    if (!coop.p2 || slot < 0 || slot >= PARTY_SLOTS) return 0;
+    p2_bind(coop.p2, slot);
+    return 1;
 }
 
 // Player 2's slot changed display row (a transformation): re-read sprite and behaviour, stay idle.

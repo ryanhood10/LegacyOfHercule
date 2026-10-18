@@ -20,7 +20,13 @@ PARTY_SLOTS ?= 8
 # HERCULE=1 (default) applies the Legacy of Hercule data edits (data/hercule.json via tools/romdata.py)
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
-PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,) $(if $(filter 1,$(WIDE)),--wide,) $(if $(DATA_PATCH),--data-patch $(DATA_PATCH),)
+# MAPS=1 (default): new maps built from data/maps/*.json by tools/mapbuild.py (zone 15: arctic, Time
+# Chamber, Broly's arena; docs/maps.md), placed from MAP_FREE and appended to the relocated map table
+MAPS ?= 1
+MAP_SPECS ?= $(sort $(wildcard data/maps/*.json))
+MAP_FREE ?= 0xD00000
+MAPS_PATCH := $(if $(and $(filter 1,$(MAPS)),$(MAP_SPECS)),$(BUILD)/maps.patch.json,)
+PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--debug-menu,) $(if $(filter 1,$(WIDE)),--wide,) $(if $(DATA_PATCH),--data-patch $(DATA_PATCH),) $(if $(MAPS_PATCH),--maps $(MAPS_PATCH),)
 # A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM);
 # A16_TEST=1: player 1's L + R + Down spawns the Android 16 boss beside player 1 (src/coop/android16.c)
 A16_SPRITE ?= 160
@@ -102,10 +108,14 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 $(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json data/story/*.json data/story/*.lscript) tools/romdata.py tools/mapedit.py tools/script_asm.py
 	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
-$(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH)
+$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	@mkdir -p $(BUILD)
+	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps --buu-rom $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
+
+$(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH) $(MAPS_PATCH)
 	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)
 
 clean:
-	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(OUT)
+	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(BUILD)/maps.patch.json $(OUT)
 
 .PHONY: all clean FORCE
