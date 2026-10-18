@@ -36,6 +36,14 @@ VTABLE_HOOKS = [
     (0x0802408C, 0, "hud_destroy_hook"),   # HUD object
     (0x0802408C, 2, "hud_update_hook"),
     (0x0802408C, 4, "hud_draw_hook"),
+    # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
+    # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
+    (0x08023B3C, 13, "status_title_hook"),
+    (0x08023B3C, 23, "status_pages_hook"),
+    (0x08023B3C, 24, "status_draw_hook"),
+    (0x080248CC, 13, "status_title_hook"),
+    (0x080248CC, 23, "status_pages_hook"),
+    (0x080248CC, 24, "status_draw_hook"),
 ]
 
 # --wide: draw slot (4) of every class whose draw is the base sprite emitter 0x08007773, redirected
@@ -54,6 +62,9 @@ ENTRY_JUMPS = [
     (0x0801B332, "ai_speed8_create_hook"),   # 8-direction chase AI module constructor (speed param)
     (0x0801B15E, "ai_speed4_create_hook"),   # axis-aligned approach AI module constructor
     (0x080104C0, "bossbar_create_hook"),     # BossHealthBar_Create (DrawBossHealthBar opcodes)
+    (0x080094B0, "vm_push_name_hook"),       # VM: push the active character's name (dialogue %s)
+    (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
+    (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
@@ -83,12 +94,21 @@ LITERAL_RELOCATIONS = [
     (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,
                                      0xB050, 0xC804, 0x10F18, 0x112BC, 0x13574, 0x14FF4, 0x26458, 0x26474]),
     (0x083B4E90, "sprite_index", 0x1C, [0x959C]),
+    # UI string table (names, menu labels, technique names): 260 stock entries + per-slot blocks
+    # (tools/krillinsprites.py, src/coop/krillin.h UI_*); all 20 literals hold the table's address
+    (0x080E2840, "ui_strings", 0, [0x4F8, 0x9B0, 0x1268, 0x1B38, 0x1D88, 0x2524, 0x28A8, 0x3230, 0x3794, 0x3B10,
+                                   0x460C, 0x49BC, 0x4C98, 0x95AC, 0xCAE4, 0x10F44, 0x1172C, 0x17A34, 0x1960C, 0x1A688]),
+    # portrait module table (word id + 1 = Portrait_Table[id]): Krillin's status portrait appended (id 119)
+    (0x083EC9D0, "portrait_module", 0, [0xBE10]),
+    # status screen technique pages (0x08003520 / 0x08003684): module table with per-slot icon pairs and
+    # string-block bases for PARTY_SLOTS characters (src/coop/krillin.c status_module)
+    (0x081D94D0, "status_module", 0, [0x377C]),
     (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 24
-# (row 22 = Super Saiyan Hercule, row 23 = Krillin placeholder; tools/spriteclone.py)
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 25
+# (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule; tools/spriteclone.py)
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x18),
+    (0x42D6, 0x16, 0x19),
 ]
 
 

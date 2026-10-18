@@ -2,6 +2,7 @@
 // slot to the new display row (generated at build time: sprite 157, row 22) through the game's own
 // transformation handler, and refreshes player 2's entity when the slot is player 2's.
 #include "coop.h"
+#include "krillin.h"
 
 #define SSJ_SPRITE 157
 #define SSJ_ROW 22
@@ -18,7 +19,7 @@ static int slot_of(const CharacterEntry *c) {
 }
 
 int ssj_ready(CharacterEntry *c) {
-    return c->ep >= SSJ_EP_COST && c->display_row != SSJ_ROW;
+    return c->ep >= SSJ_EP_COST && c->display_row != SSJ_ROW && c->display_row != OLD_HERCULE_ROW;   // old Hercule cannot
 }
 
 void ssj_use(CharacterEntry *c, Entity *e) {
