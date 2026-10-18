@@ -5,6 +5,9 @@ adding shared-screen co-op (link cable as second controller) and later merging *
 
 This repo contains code and notes only. No ROM data or game assets are committed.
 
+Working on it with Claude? `CLAUDE.md` is the one-page quick-start and `docs/INDEX.md` maps every
+document, source file and tool; `docs/log.md` says what landed last and what is open.
+
 ## ROMs
 
 Drop dumps of your own cartridges here (git-ignored):

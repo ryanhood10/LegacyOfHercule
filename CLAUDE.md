@@ -1,0 +1,63 @@
+# Claude quick-start for this repo (read first, keep current)
+
+**What this is.** A shiftable "decomp" of *Dragon Ball Z: The Legacy of Goku II* (GBA, USA `ALFE`)
+turned into a two-player co-op mod, growing into **The Legacy of Hercule** (Hercule as the hero,
+Super Saiyan Hercule, co-op difficulty, twin bosses, story edits). Ryan plays it with his brother.
+Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and notes only.
+
+**Map of everything:** `docs/INDEX.md` (wiki home). Engine facts: `docs/engine.md`, `docs/rom-map.md`.
+Co-op design and verified findings: `docs/coop-design.md`. Game plan: `docs/plan-legacy-of-hercule.md`.
+Story: `docs/story.md`. Testing recipes: `docs/testing.md`. Progress log: `docs/log.md`.
+
+## Rules (Ryan's, standing)
+
+- Commit autonomously and keep working; never stop to ask whether to commit. End commit messages
+  with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+- Never commit ROM or asset data: `roms/` and `build/` are ignored; generated sprite/data files
+  (`build/gen/*`, `build/*.patch.json`) stay in `build/`. Dialogue *edits* in `data/` are ours.
+- The Arefu/Legacy reference clone (`F:\MeltyCreations\tools\downloads\arefu-legacy`, no licence)
+  is for facts and names only; never copy code or data from it.
+- Never change Windows security settings (Smart App Control is on; it blocks unsigned new binaries
+  such as `ld.exe` and any mGBA we build on Windows, which is why the fork lives in WSL).
+- Two Claude sessions often share this working tree. Never SendKeys to another session's mGBA
+  window; this session only drives the WSL fork window titled `mGBA (Ubuntu)`. Build into a
+  private directory (`make BUILD=build/<name> ...`) so object files and `coop.sym` are not swapped
+  under each other. Commit only your own files (`git add <paths>`, never `-A`).
+- Decompile from the ROM (Ghidra headless) before guessing at engine behaviour; it is the fastest
+  way to a fact. Record each new fact in the relevant `docs/*.md`.
+- Keep these docs current: when a build flag, tool, address or test recipe changes, update
+  `docs/INDEX.md` / the owning doc in the same commit.
+
+## Build (Windows, Git Bash)
+
+```
+export PATH="/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti-rel1/bin:/c/Program Files (x86)/GnuWin32/bin:$PATH"
+make                       # build/log2-coop.gba (HERCULE=1 data patch on by default)
+make WIDE=1 DEBUG_MENU=1   # build/log2-wide.gba for the WSL fork, debug menu on the title screen
+make BUILD=build/ssj SSJ_TEST=1 DEBUG_MENU=1 WIDE=1 DATA_PATCH=   # private dir, P2 Start = transform
+```
+
+Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `WIDE_TEST=<w>` forces a view
+width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger. `make` does not run from PowerShell
+(GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
+
+## Test (see docs/testing.md for the full recipes)
+
+- Stock ROM in Windows mGBA: `tools\mgba_run.ps1` (runs a copy; mGBA locks the file), Lua helpers
+  via `tools/mgba/coop.lua`, pad sender `python tools\p2_keys.py`, TCP command server for
+  focus-free tests (`tools/mgba_cmd.py`).
+- Wide ROM in the WSL fork: `wsl -d Ubuntu -u root -- bash -c "cd /root/mgba-build/sdl && MGBA_P2=1 MGBA_P2_PORT=7778 ./mgba -2 -t <state> <rom>"`,
+  sender `python tools\p2_keys.py --port 7778`, keys `tools\win_keys.ps1 "M:200 WAIT:500" -Title "mGBA (Ubuntu)"`,
+  screenshot `tools\win_shot.ps1 out.png -Title "mGBA (Ubuntu)"`. Add `-g` and attach
+  `gdb-multiarch -batch -x <script>` for breakpoints, traces and memory dumps (works; see testing.md).
+- Savestates: `build/log2-coop.ss1` = zone 2 area 7 wolf map, level-40 party, Piccolo P1 (slot 1),
+  Gohan P2 (slot 0); `ss2` = prologue Flight Circle. Re-make states after every `make` of the same
+  ROM name (player 2's vtable copies hold code addresses).
+
+## Key addresses (details in docs/engine.md and src/coop/rom.h)
+
+Party `0x03000E90` (active slot byte, 6 x 0x1C entries at +0xC; entry +8 = display row);
+Character_DisplayData 22 rows x 20 (relocated into the blob as `display_rows`, row 22 = SSJ Hercule);
+sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule); entity list
+`0x03001120`; world/camera object `0x03001090`; input `0x0300229C`; co-op state `0x0203FF04`;
+player-2 vtable `0x0203FE00`; wide descriptor `0x0203FEC0`; ability table literal `0x08008024`.
