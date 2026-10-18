@@ -119,11 +119,12 @@ Ryan's version:
    swearing revenge and saying they do not know Dr. Gero's true plan. That "both down" rule is a
    small addition to the twin-boss code in `enemies.c` (downed state, no death action until the
    pair is dead).
-6. **Three-year skip boosts.** The skip script at Gohan's home sets levels and HP by script
-   (`SetCharacterLevel` / `SetCharHP`, map 7), as do Piccolo's unlock (slot 1 to level 10), Vegeta's
-   space scene (slot 2 to 18), the Time Chamber and the ending (Hercule to 40). Krillin and Hercule
-   get their own scripted bumps at the skip, kept below the Z fighters (numbers with the growth
-   design in `docs/hercule.md`).
+6. **Three-year skip boosts.** Verified in the skip script (map 7): Gohan and Piccolo each get
+   one level (`StackGetCharLevel + 1 -> SetCharacterLevel`) and a full HP/EP refill (500 caps to
+   max), nothing more. Other scripted sets: Piccolo's unlock puts him at level 10, Vegeta's space
+   scene at 18, Trunks at 27 when unlocked, the Time Chamber and the ending (Hercule to 40).
+   Krillin and Hercule get the same +1 and refill at the skip (Ryan: boosted too, but kept weaker;
+   their curves are in `docs/hercule.md`).
 
 What it costs (no code yet):
 
