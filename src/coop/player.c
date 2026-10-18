@@ -214,6 +214,7 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
     Player_Knockback(e, (void *)hit);
+    if (duel_p2_final_blow(e, dmg)) return 0;   // a duel's final blow: 1 HP, the duel ends
     CharacterEntry *c = &g_Party->chars[coop.p2_slot];
     if (c->hp > dmg) {
         c->hp = (u16)(c->hp - dmg);
@@ -316,6 +317,13 @@ static void p2_bind(Entity *p2, int slot) {
     install_behaviour(p2, slot);
     Entity_SetAnimation(p2, ANIM_IDLE);
     coop.rebinds++;
+}
+
+// duel.c: bind player 2 to any slot (the duel's clone slot is not a selectable party member).
+int p2_bind_slot(int slot) {
+    if (!coop.p2 || slot < 0 || slot >= PARTY_SLOTS) return 0;
+    p2_bind(coop.p2, slot);
+    return 1;
 }
 
 // Player 2's slot changed display row (a transformation): re-read sprite and behaviour, stay idle.

@@ -36,6 +36,8 @@ VTABLE_HOOKS = [
     (0x0802408C, 0, "hud_destroy_hook"),   # HUD object
     (0x0802408C, 2, "hud_update_hook"),
     (0x0802408C, 4, "hud_draw_hook"),
+    (0x08025604, 9, "player_msg_hook"),     # player message handler: duel hits (duel.c)
+    (0x08025604, 16, "p1_take_damage_hook"),# player 1 take-damage: a duel's final blow leaves 1 HP
 ]
 
 # --wide: draw slot (4) of every class whose draw is the base sprite emitter 0x08007773, redirected

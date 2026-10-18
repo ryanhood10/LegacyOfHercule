@@ -118,6 +118,7 @@ void input_poll_hook(InputSystem *in) {
     u16 now = (u16)~raw;
     u16 p1 = now;
     u16 p2 = p2_source(now, &p1);
+    if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
 #ifdef A16_TEST
     if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
         if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, coop2.a16, -1, &g_Party->chars[g_Party->active_slot]);
@@ -133,6 +134,7 @@ void input_poll_hook(InputSystem *in) {
 
     coop_active_check();
     p2_sync_combat();
+    duel_tick();
     wide_update();
 #ifdef SSJ_TEST
     if (coop.p2 && (coop.input2.pressed & KEY_START)) {   // test builds: player 2's Start transforms

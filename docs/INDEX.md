@@ -37,6 +37,9 @@ file and tool, and says where to look for a given question. Keep it current.
 | `exp.c` | EXP credited to the killing player |
 | `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` |
 | `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
+| `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides) and per-boss rules (end_pct, partner model/stat, no twin); the both-down rule lives in `enemies.c` |
+| `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
+| `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
 | `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, flag accessors, VM counter / item / bestiary opcodes |
 | `party_save.c` | save path for N entries: `SaveGame`, `LoadSlot`, `WriteSlot`, the save menu's slot store and queries, start game; EEPROM slots of `SAVE_STRIDE` |
