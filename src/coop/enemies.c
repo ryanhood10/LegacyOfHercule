@@ -40,9 +40,9 @@ static int twinnable(const EnemyRecord *rec, const EnemyStat *st) { return st->e
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
-// The table lives in bosses.c (boss rules). Cooler (stat 29): King Cold's sprite (74) with Cooler's AI
-// set crashes at spawn (so does any other record; Cell's AI takes Cooler's model fine), so Cooler keeps
-// the same model until module 0x0801C05B is understood.
+// The table lives in bosses.c (boss rules). A partner model must have every pose group the boss's AI
+// set plays: King Cold's sprite 74 (5 groups) under Cooler's set 21 crashes at the first charge or
+// attack (groups 5-8 read past the record), so Cooler's partner is the Namekian servant (sprite 166).
 static int partner_sprite(int stat_index) {
     if (coop2.partner_override) return (int)coop2.partner_override;
     const BossRule *r = boss_rule(stat_index);
@@ -132,7 +132,8 @@ static const u32 *down_group(const Entity *e) {
 }
 
 // Enemy vtable slot 2 for co-op enemies: a downed boss plays its knock-down and freezes on the last
-// frame (or after DOWN_SETTLE frames without one): no states, no AI.
+// frame (or after DOWN_SETTLE frames without one): no states, no AI. Defeat scripts still reach it by its
+// sprite: Android 19's swaps its vtable for the explosion, Dr. Gero's despawns it.
 static void coop_enemy_update(Entity *e) {
     if (is_downed(e)) {
         s32 *t = down_timer(record_of(e));
@@ -183,8 +184,13 @@ static int coop_enemy_onhit(Entity *e, const u8 *hit) {
             else go_down(e, hit);
             return 1;
         }
-        // last of the pair: a partner-model twin dies as the original model so the script sees it
-        if (record_of(e)->sprite_id != *record_orig_sprite(record_of(e))) set_sprite(e, *record_orig_sprite(record_of(e)));
+        // last of the pair. With the quiet removal (COOP_OFF_BOTHDOWN) the original is gone, so a
+        // partner-model twin dies as the original model for the script's sprite lookups. Under the
+        // both-down rule the downed original is still on the map and the script finds it by its sprite;
+        // the survivor keeps its own model (switching it made Dr. Gero's defeat script fly off and despawn
+        // the wrong Gero, and Android 13 vanished), so a script can address each of the pair.
+        if ((coop2.off & COOP_OFF_BOTHDOWN) && record_of(e)->sprite_id != *record_orig_sprite(record_of(e)))
+            set_sprite(e, *record_orig_sprite(record_of(e)));
     }
     return Enemy_OnHit(e, hit);
 }
@@ -370,6 +376,22 @@ void coop_debug_tick(void) {
         Entity *e = (Entity *)coop2.cmd_arg;
         if (!e) e = coop2.twins[0].orig ? coop2.twins[0].orig : coop2.twins[0].twin;
         if (!e) return;
+        BossBar *bar = bossbar_create_hook(0, e, 0, 100);
+        if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
+    } else if (cmd == COOP_CMD_SPAWN_RECORD) {
+        // a boss record from any map, beside player 1 on this one (test the boss pairs without their maps'
+        // cutscenes); the record's action is kept, so a defeat fires its dialogue / script
+        const EnemyRecord *src = (const EnemyRecord *)coop2.cmd_arg;
+        EnemyRecord *r = (EnemyRecord *)coop2.boss_rec;
+        Entity *p1 = g_PlayerObject;
+        if (!p1 || (u32)src < 0x08000000u) return;
+        memcpy(r, src, 0x1C);
+        r->behaviour_count = 0;
+        r->x = (s16)((p1->x >> 8) + 48);
+        r->y = (s16)(p1->y >> 8);
+        Entity *e = enemy_spawn_hook(r);
+        if (!e) return;
+        EntityList_Add(g_SceneTable[1], e);
         BossBar *bar = bossbar_create_hook(0, e, 0, 100);
         if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
     }

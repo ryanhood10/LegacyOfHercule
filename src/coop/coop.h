@@ -95,6 +95,7 @@ typedef struct CoopExtra {
     u8 pad_swap;            // 1 = player 1's pad drives player 2's entity and the other way round
     u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
     u8 _pad5[2];
+    u32 boss_rec[8];        // scratch record for COOP_CMD_SPAWN_RECORD (0x1C bytes, no behaviours)
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x2C0, "CoopExtra must fit 0x0203FB00..0x0203FDC0 (StoryTest above it)");
 
@@ -129,6 +130,7 @@ void duel_clear(void);
 void duel_tick(void);
 int duel_p2_final_blow(Entity *e, int dmg);
 void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
+#define COOP_CMD_SPAWN_RECORD 7   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
 extern CoopExtra coop2;

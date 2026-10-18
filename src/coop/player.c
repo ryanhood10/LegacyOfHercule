@@ -17,7 +17,10 @@ typedef struct { s32 dx, dy; } Vec;
 
 static int is_p2(const Entity *e) { return e == coop.p2; }
 
-static const u32 PLAYER_CTRL_VTABLES[] = { IDLE_VTABLE, WALK_VTABLE, 0x080258DCu, 0x08025E20u, 0x080251F4u, 0x08025D70u };
+// Player 1 states in which player 2 keeps its own input (anything else = a cutscene / script holds
+// player 1, and player 2 freezes with it). 0x08025B98 is the hurt state: without it player 2 froze
+// whenever a boss pair was hitting player 1 (found in the Android 19 + 13 tests).
+static const u32 PLAYER_CTRL_VTABLES[] = { IDLE_VTABLE, WALK_VTABLE, 0x080258DCu, 0x08025E20u, 0x080251F4u, 0x08025D70u, 0x08025B98u };
 
 int p1_controllable(void) {
     Entity *p1 = g_PlayerObject;

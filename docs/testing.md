@@ -56,9 +56,13 @@ Select cycling for player 2 registers only every few presses; verify the slot in
 `tools/fork/runfork.ps1 <rom> [-Wait s] [-Slot n] [-State /mnt/f/.../x.ssN]` launches instance n with
 `MGBA_GDB_PORT` 2345+n, `MGBA_P2_PORT` 7778+n and window title `mGBA-n` (slot 0 keeps 2345 / 7778 /
 "mGBA"), stops only that slot's previous instance, installs `tools/fork/*.sh|*.gdb` into `/root`
-(`install.sh`) and attaches the persistent gdb client. Every helper takes the slot from `FORK_SLOT`
-(`tools/fork/slot.sh`: ports, `/tmp/gdbin-n`, `/root/gdb-n.log`), e.g.
-`wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=1 /root/peek.sh"`. Screenshots by title:
+and attaches the persistent gdb client. It installs the helpers of the checkout it lives in
+(`install.sh`, `FORK_TOOLS`): slot 0 into `/root`, slot n into its own `/root/fork-sn`, so another
+session reinstalling `/root/*.sh` never swaps scripts under a running slot; slots >= 1 run as
+`mgba-sn` and `gdb-sn` (symlinks), out of reach of old helpers' `pkill -x mgba` /
+`pkill -INT -x gdb-multiarch`. Every helper takes the slot from `FORK_SLOT` (`tools/fork/slot.sh`:
+ports, `/tmp/gdbin-n`, `/root/gdb-n.log`) and finds its siblings next to itself, e.g.
+`wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=1 /root/fork-s1/peek.sh"`. Screenshots by title:
 `tools\win_shot.ps1 out.png -Title "mGBA-1"` (slot 0: `-Title "mGBA (Ubuntu)"`). Player-2 pad:
 `python tools/fork/p2hold.py --port 7779` for slot 1. Claim a slot before using it (check
 `ss -ltn | grep 234` in WSL); sessions running in parallel should each use their own.
@@ -68,9 +72,37 @@ pointers inline from +8; co-op enemies have vtable 0x0203FB04 (`coop2.enemy_vtab
 
 **Audio sync stall:** with several forks running, a fork launched with sound can stall (a boot stuck on
 the copyright screen for minutes, keys ignored). `runfork.ps1 ... -Mute` passes `-C mute=1 -C
-audioSync=0` and runs at full speed. Interrupting the gdb stub while the CPU idles in the BIOS (title,
-copyright, menus) can drop the connection ("Disconnected from target"); pause only in game and drive
-menus with `win_keys.ps1` (presses of 350 ms with 700 ms gaps register; faster ones drop).
+audioSync=0` and runs at full speed (`-Quiet` and `-NoAudio` are the same switch); a state loaded with
+sound on crawled at about 1 frame per second. **gdb "Disconnected from target"**: a SIGINT that reaches
+gdb while it still waits for the stop reply of the previous one makes it give up and disconnect, and
+the stub never accepts a client again for that run. Under load (several forks) the stub answers late,
+especially while the CPU idles in the BIOS, so back-to-back `pause`s did it. `gdbsrv.sh pause` now
+waits (up to 8 s) for the stop before returning; with that, keys.sh and q.sh cycles run for hours.
+gdb's output reaches the log late (the line of one query can arrive after the next command), so
+`q.sh` tags its `Q:` line and waits for that tag.
+
+## Boss pairs (fork; `docs/coop-design.md` "Android 13, the Namekian servant and the boss-pair tests")
+
+```
+make BUILD=build/bt WIDE=1 DEBUG_MENU=1 A16_TEST=1              # A16_TEST: the autopilot fights any pair
+toolsorkunfork.ps1 /mnt/f/.../build/bt/log2-wide.gba -Slot 3 -Mute -Wait 1
+python tools/fork/p2hold.py --port 7781 --cmd build/bt/p2cmd.txt    # keep running: player 2 present
+wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=3 /root/fork-s3/bootisland.sh 75"   # boot -> island, level-30 pair placed
+tools\win_keys.ps1 "SHIFT+F1:300" -Title "mGBA-3"                  # save; F1 reloads it before each fight
+wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=3 /root/fork-s3/bossfight.sh 0x083FD3BC 150 10"   # 19 + 13
+```
+
+`bootisland.sh` waits for the debug menu (about 75 s from launch when muted), opens Map Test 11/6
+through the pad word, lets player 2 join, writes the level-30 stats of the Android 16 tests (Piccolo
+slot 1, Hercule slot 5) and places player 1 at (89, 347) and player 2 at (200, 330), either side of
+where a spawned pair stands. `bossfight.sh RECORD [SECS] [STEP]` writes `COOP_CMD_SPAWN_RECORD` (7) with
+the record address (any map's boss record: 19 `0x083FD3BC`, Gero `0x083FF970`, Cooler `0x083FB574`,
+17 `0x08406494`), turns on the autopilot (`coop2.a16_bot`, +0x244) and prints both bosses' and both
+players' HP every STEP seconds until both are down or a player's HP is 0. `bosstest.sh` peeks the pair,
+sets a boss's HP (`hp orig|twin N`: drop both low to watch the both-down order and the defeat
+script), `god`, `partner SPRITE` (twin model override), `off BITS`. Runs from the same state are
+deterministic (identical numbers), so vary the start to sample. The autopilot walks to its boss and
+punches, so results are a lower bound on two people.
 
 ## New maps (zone 15, `docs/maps.md`)
 

@@ -1,7 +1,7 @@
 #!/bin/bash
-. /root/slot.sh
+. "$(dirname "$0")/slot.sh"
 # jump the CPU to the ROM entry (ARM mode): a reset that keeps the emulator's EEPROM
-G=/root/gdbsrv.sh
+G="$(dirname "$0")/gdbsrv.sh"
 $G pause; sleep 0.5
 $G cmd 'printf "reset from pc=%08x cpsr=%08x\n", $pc, $cpsr'
 $G cmd 'set $cpsr = $cpsr & ~0x20'

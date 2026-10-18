@@ -1,11 +1,11 @@
 #!/bin/bash
-. /root/slot.sh
+. "$(dirname "$0")/slot.sh"
 # pause the fork, run an optional extra gdb command, then /root/peek.gdb; continue; print the dump
-G=/root/gdbsrv.sh
+G="$(dirname "$0")/gdbsrv.sh"
 $G pause; sleep 0.7
 $G cmd 'printf "--begin--\n"'
 [ -n "$1" ] && $G cmd "$1"
-$G cmd 'source /root/peek.gdb'
+$G cmd "source $(dirname "$0")/peek.gdb"
 sleep 1.5
 $G cmd continue
 sleep 0.3

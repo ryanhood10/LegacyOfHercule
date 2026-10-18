@@ -29,7 +29,6 @@ ROM_FN(void, Entity_GetBox, (s32 *out, const Entity *e), 0x080079B9);
 #define PROJ_VTABLE      0x080259C4u     // the NPC ki blast's vtable (FUN_08011BC4): copied, 3 slots replaced
 #define PROJ_DESTROY     0x08027A69u     // its slot 0: frees the OBJ tiles, then the object
 #define PROJ_MESSAGE     0x08013D69u     // the base projectile message handler (9, 10, 15)
-#define ENEMY_STATES     ((void *const *)0x0840DB00)   // enemy control states by index (0 idle, 1 walk)
 #define IDLE_STATE_VTABLE 0x08024BA0u   // vtable of control state 0 (idle): enter, update, 2, exit, 4.. common
 #define BOSS_CLASS       ((const u32 *)0x086FF3C4)
 #define SHAKE_HEAD       (*(void **)0x03000FF4)        // camera controller chain head (Camera_Shake links in)

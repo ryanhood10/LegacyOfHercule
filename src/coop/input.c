@@ -73,6 +73,31 @@ static u16 p2_source(u16 p1_now, u16 *p1_out) {
 }
 
 #ifdef A16_TEST
+// A boss pair's melee swing in reach (control states 6, 7, 8, 10 play attack groups): step away from it.
+static int swing_threat(const Entity *pl, const Entity *e, s32 *ex, s32 *ey) {
+    void *st = e->ctrl_state;
+    if (st != ENEMY_STATES[6] && st != ENEMY_STATES[7] && st != ENEMY_STATES[8] && st != ENEMY_STATES[10]) return 0;
+    s32 dx = (pl->x - e->x) >> 8, dy = (pl->y - e->y) >> 8;
+    if (dx <= -34 || dx >= 34 || dy <= -20 || dy >= 20) return 0;
+    *ex = dx ? dx : 1;
+    *ey = 0;
+    return 1;
+}
+
+// The boss each player fights when no Android 16 is up: the first registered pair with a boss still
+// standing; player 1 takes the original, player 2 the twin, and both the survivor once one is down.
+static Entity *pair_target(int second) {
+    for (int i = 0; i < TWIN_MAX; i++) {
+        Entity *o = coop2.twins[i].orig, *t = coop2.twins[i].twin;
+        if (o && o->hp <= 0) o = 0;
+        if (t && t->hp <= 0) t = 0;
+        if (!o && !t) continue;
+        if (second) return t ? t : o;
+        return o ? o : t;
+    }
+    return 0;
+}
+
 // Test autopilot for the Android 16 fight (coop2.a16_bot): walk to a spot beside him (player 1 on his
 // left, player 2 on his right), turn to him and punch with A; no dodging and no abilities, so a win
 // by the autopilot is a lower bound on what two people can do.
@@ -83,7 +108,8 @@ static u16 bot_pad(const Entity *pl, const Entity *boss, int side, const Charact
     u32 t = g_FrameCounter;
     u16 pad = 0;
     s32 rx, ry;
-    if (a16_threat(pl, &rx, &ry)) {             // step out of a blast first, as a person would
+    int threat = boss == coop2.a16 ? a16_threat(pl, &rx, &ry) : swing_threat(pl, boss, &rx, &ry);
+    if (threat) {                               // step out of a blast or a swing first, as a person would
         if (rx > 0) pad |= KEY_RIGHT; else pad |= KEY_LEFT;
         if (ry > 4) pad |= KEY_DOWN; else if (ry < -4) pad |= KEY_UP;
         return pad;
@@ -131,6 +157,10 @@ void input_poll_hook(InputSystem *in) {
     if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
         if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, coop2.a16, -1, &g_Party->chars[g_Party->active_slot]);
         if (coop.p2) p2 = bot_pad(coop.p2, coop2.a16, 1, &g_Party->chars[coop.p2_slot]);
+    } else if (coop2.a16_bot) {             // any boss pair (COOP_CMD_SPAWN_RECORD tests)
+        Entity *b1 = pair_target(0), *b2 = pair_target(1);
+        if (g_PlayerObject && b1) p1 = bot_pad(g_PlayerObject, b1, -1, &g_Party->chars[g_Party->active_slot]);
+        if (coop.p2 && b2) p2 = bot_pad(coop.p2, b2, 1, &g_Party->chars[coop.p2_slot]);
     }
 #endif
 

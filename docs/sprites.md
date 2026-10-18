@@ -288,3 +288,85 @@ The player ki blast (`FUN_0800E8B0`, 0x54-byte object, vtable `0x08024CBC`): fra
 frame), hit message type = owner +0x16C, attack `0x086DB2E4` `{1, 3, 0x400}`, impact frame
 `0x0840E53C`; it is spawned by `FUN_0800EAD8(xy, owner)` from the ki blast control state (animation
 34, `0x03002194`, vtable `0x08025D48`; holding B repeats it at 2 EP each).
+
+## Android 13 (id 165) and Cooler's Namekian servant (id 166) (`tools/bossmodels.py`, 2026-10-18)
+
+Both are built from the ROM at build time into `build/gen/boss_models_data.c` (records `a13_record`,
+`namek_record`; previews `build/<dir>/a13_preview.png`, `namek_preview.png` and `_x3` copies). The
+Makefile passes `A13_SPRITE=165` and `NAMEK_SPRITE=166` to the C code and appends both records to the
+relocated sprite index; `src/coop/bosses.c` gives them to the co-op twins (`docs/coop-design.md`
+"Boss rules and extra stats").
+
+**Android 13, base form** (white hair under a yellow-and-black trucker cap with a red Red Ribbon dot,
+pale skin, a dark-yellow sleeveless vest, blue jeans, brown gloves, dark boots). Neither ROM has him
+(`docs/sprites.md` "Buu's Fury"), so he is a re-dress of the biggest android body: the same
+composition as Android 16's sprite 160 (16's own sprite 8 for idle 0, walk 1, hit-stun 2, punch 6,
+knock-down 12; Android 17's fight frames re-headed with 16's head for the fall 3, charge 5 and attacks
+7, 8), then every frame is recoloured by body part. Parts are found per frame from geometry, so lying
+and attacking frames work too: the "up" axis runs from the body's centroid (armour and trousers) to
+the hair's centroid; the face is the skin touching the hair; the torso is a band 3.6 px either side
+of the face's line along that axis; the waist sits at 70 % of the body's length from the head.
+
+| part (16-space colours) | Android 13 |
+|---|---|
+| hair (16's orange mohawk) at or above the forehead line, at most 3.6 px deep | trucker cap: yellow crown, black outline, black band over the forehead, red dot in front views, a 2 px black peak over the face in side views; mohawk above the cap cut off |
+| hair below the cap | white hair (sides and back); in front views hair inside the face's span (16's fringe) becomes forehead skin, two columns of white hair stay at each side for five rows |
+| face skin | pale skin (one step lighter than 16's) |
+| other skin (hands) | brown gloves |
+| armour in the torso band, above the waist | dark-yellow vest (16's red chest light stays: the Red Ribbon badge) |
+| armour outside the band, above the waist | bare pale arms |
+| armour below the waist; 17's blue trousers | blue jeans |
+| back views (facing up) | the face pixels become hair: white hair under the cap |
+
+The head gets a black outline (transparent pixels next to cap, face or hair), which 16's head lacks.
+The record keeps 17's header and group layout (13 groups: 0-3, 5-8 and 12 filled), so Android 19's AI
+set 29 and the melee set 21 find every group they play, and group 3 (stand, stagger, fall, lie) is
+there for the both-down rule. 82 frames, all LZ-compressed (`buu2log2.compress`).
+
+**Cooler's Namekian servant**: Piccolo's capeless complete set (sprite 104, all 23 groups, 168 unique
+frames; 103 is the caped set) recoloured, nothing redrawn: darker teal-green skin (48/49/50 ->
+teal ramp), a maroon warrior gi (88/89, outline 211), a gold sash (77/195/72), black boots (34/35),
+the arm patches pink instead of red (26 -> 247-like pink, 247 lighter) so they stand out from the gi.
+Distinct from Piccolo (player 1 in the Cooler fight) at a glance. Its group 3 is a fall that ends
+lying, used by the both-down rule.
+
+## Making a new enemy model (generic)
+
+What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control
+states address pose groups by fixed index and read the four direction pointers of a group without
+checking the record's group count: a group past the count reads whatever follows the record (descriptor
+arrays, compressed frame bytes) as pointers. A group inside the count may be all zero only where the
+code checks for 0. Rules of thumb:
+
+- Copy a header (`+0x00..+0x4B`: group count, collision boxes) from a stock enemy of the same size
+  class (32x32 bodies: 9, 12, 14; 64x64: 34, 74). Byte 1 is 4 for 32x32 bodies and 0x10 for 64x64.
+- Fill at least every group the stock sprites of that AI set have (table below; from the 666 enemy
+  records in the ROM: groups present on every sprite the game pairs with the set), keep empty groups
+  in place, and set the group count to cover them.
+- Add group 3 (stand, stagger, fall, lie) for a boss that can be the first of a co-op pair to fall
+  (both-down rule, `enemies.c` `DOWN_GROUP`); without it the downed boss freezes in whatever pose
+  the knock-back leaves (Android 19, Cooler).
+- Group 2 is the hit-stun; group 12 the knock-down / death pose of the androids and Cell forms.
+- Build frames with a generator under `tools/` (never commit ROM-derived data): reference unchanged
+  stock descriptor arrays by ROM address (as `a16sprites.py` does) or recolour and re-encode them
+  (`bossmodels.py`, `buu2log2.compress`); add the record to `EXTRA_SPRITES` in the Makefile (the
+  relocated index takes any id; gaps are 0) and preview every group x 4 facings before testing.
+
+| AI set | stats (stock) | sprites the game uses with it | groups on all of them |
+|---|---|---|---|
+| 8 | wolves, snakes and other animals (8, 14, 37-40, 53...) | 17, 44-47, 90-92, 112-119 | 0, 1, 2, 6 |
+| 21 (boss melee) | 3 (17), 4 (18), 26 (Cell Jr), 29 (Cooler), 41, 106 | 9, 11, 31, 34, 48, 156 | 0, 1, 2, 5, 6, 7, 8 |
+| 29 (boss) | 5 (19), 6, 7 (Gero) | 12, 14 | 0, 1, 2, 5, 6, 7, 8, 12 |
+| 45 / 52 | 9, 10 / 75, 86 (tiger bandits, ...) | 18, 19 / 96, 98 | 0, 1, 2, 6, 7, 8 |
+| 59 / 91 | 11, 16, 99, 101 / 31-33 (robots) | 37, 122-124, 127 / 37-39 | 0, 1, 2, 6 / 0, 1, 2, 6, 7 |
+| 80 / 116 | 60 Imperfect Cell / 76 Semi-Perfect Cell | 28 / 29 | 0-3, 5-10, 12, 18, 19 |
+| 98 | 64, 98 (tournament Krillin, Tien) | 76, 121 | 0-6, 12 |
+| 129 | 44 (the red robot) | 50 | 0, 1, 2, 5, 6 |
+| 138 / 148 | 21-25 / 78, 79 (Perfect Cell) | 30 | 0-3, 5-8, 12, 18 |
+| 11, 15, 32, 38, 66, 74, 106, 149 | regular enemies | (various) | 0, 1, 2, 6 (106 also 18) |
+
+So a regular enemy needs idle, walk, hit-stun and one attack; a boss on set 21 or 29 needs the charge
+pose and three attacks as well. King Cold's sprite 74 (5 groups: 0, 1, 3, 4; group 2 empty) under set
+21 crashes the first time the AI charges or attacks: groups 5-8 lie past its count and read compressed
+frame bytes as descriptor pointers ("Jumped to invalid address C002E564", reproduced in the fork). It
+would need a fight set drawn before it can partner Cooler; the story uses the Namekian servant instead.

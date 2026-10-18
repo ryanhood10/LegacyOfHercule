@@ -11,3 +11,8 @@ GDB_FIFO=/tmp/gdbin$SFX
 GDB_LOG=/root/gdb$SFX.log
 GDB_PID=/root/gdb$SFX.pid
 FORK_LOG=/root/mgba$SFX.log
+# Slots >= 1 run their emulator and gdb client under per-slot names (mgba-sN, gdb-sN: symlinks made by
+# runfork.ps1), so an old helper's `pkill -x mgba` / `pkill -INT -x gdb-multiarch` cannot hit them (a
+# stray SIGINT to a gdb that is already waiting for a stop makes it give up and disconnect for good).
+if [ "$FORK_SLOT" = "0" ]; then GDB_BIN=gdb-multiarch; else GDB_BIN=/root/gdb-s$FORK_SLOT; fi
+[ -x "$GDB_BIN" ] || [ "$FORK_SLOT" = "0" ] || ln -sf "$(command -v gdb-multiarch)" "$GDB_BIN"
