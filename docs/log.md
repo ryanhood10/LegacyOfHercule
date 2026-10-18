@@ -13,6 +13,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 3, zone 7 (story-scripts)**: `data/story/ch3_zone7`: Android 13 (sprite 165) in the zone 7
+  cutaway with 19 and 20 and two lines, beside 19 in the fight (stat 5 and Gero's stat 7 are now
+  `BOSS_PAIR`, so 13 is there in single-player too), the defeat (19 explodes, 13 swears revenge, "not
+  even we know what the old man's true plan is", flies off), stock scene after; the three-year skip
+  raises Hercule and Krillin one level with a refill. Tested headless in co-op (both fall orders) and
+  single-player, through to area 16 with Piccolo / Hercule.
 - **Script -> C bridge and the duels (story-scripts)**: game action 130 is `CoopCall` (`vmcall.c`: duel
   start / clear / winner, Hercule's awakening, player 2 present / bind); lscript arguments `seq:NAME`;
   dialogue sequences read across all their segments (script entries return next indexes; round trip

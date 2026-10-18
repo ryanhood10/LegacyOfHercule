@@ -1,0 +1,28 @@
+{
+  "_": "Zone 7 and the three-year skip (docs/story.md section 0 item 3): Android 13 in the zone 7 cutaway and beside Android 19 (both-down, 19 explodes, 13 flies off swearing revenge); Krillin and Hercule get the skip's +1 level and refill. Scripts in ch3_zone7.lscript.",
+  "sources": ["data/story/ch3_zone7.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 2, "area": 1},
+      "_": "Goku's house, 'three years to train': the stock skip raises Gohan (0) and Piccolo (1) one level with a full refill; Hercule (5) and Krillin (6) get the same",
+      "edits": [
+        {"at": "trigger:11/entry:7", "replace": [
+          ["WaitFrames 120", "SetCharHP 5, 500\nSetCharEP 5, 500\nSetCharHP 6, 500\nSetCharEP 6, 500\nStackGetCharLevel 5, 5\nPushByte 1\nAdd\nSetCharacterLevel\nStackGetCharLevel 6, 6\nPushByte 1\nAdd\nSetCharacterLevel\nWaitFrames 120"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 7, "area": 1},
+      "_": "the cutaway to the battlefield: Android 13 stands with 19 and 20",
+      "triggers": {"1": {"payload": "seq:ch3_z7_cutaway"}}
+    },
+    {
+      "map": {"zone": 7, "area": 15},
+      "_": "the battlefield: 13 joins 19 against Vegeta (boss rule: stat 5's partner is 13, stat 110, sprite 165); the defeat",
+      "triggers": {"0": {"payload": "seq:ch3_z7_battle"}},
+      "records": {
+        "2": {"action": "seq:ch3_z7_defeat"}
+      }
+    }
+  ]
+}
