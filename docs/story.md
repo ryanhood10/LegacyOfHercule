@@ -6,11 +6,15 @@ Source: the game's own caption cards and dialogue (dumped per map by `tools/scri
 ## 0. Status and how to resume (2026-10-18)
 
 **Mode:** story first. Ryan and Claude are walking the game chapter by chapter from the player's
-side, deciding co-op casting and new beats; every decision is recorded here the same turn. No
-production code for the story has been written (the engine work that is merged: eight party slots,
-Super Saiyan Hercule, Buu's Fury sprite conversion). Sections 3-4f below are the decisions in play
+side, deciding co-op casting and new beats; every decision is recorded here the same turn. Story
+production started with the tools in `docs/scripts.md` (chapters listed below as implemented). Sections 3-4f below are the decisions in play
 order; this section is the summary. Facts come from the dumped scripts (`python tools/script_dump.py
 map ZONE AREA`, all maps in `build/scripts/` after a full dump) and the quest table.
+
+**Implemented (story-scripts, 2026-10-18; `docs/scripts.md` section 5, `data/story/`):** items 1 and
+2 below as written (old Hercule in the prologue, Krillin's visit, the forest spirit, the landing
+sites, the West City deal, Triceratops Jungle) and the Android 16 island fight from item 6 (Kame House
+deal, 16 over the two stock stages, half health, Cell). Tested headless (`docs/testing.md`).
 
 **Decided so far, in play order** (player 1 / player 2):
 

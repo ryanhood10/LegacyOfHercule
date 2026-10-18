@@ -4,6 +4,18 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-18
 
+- **Story scripts (branch `story-scripts`, worktree `F:\MeltyCreations\log2-story`)**:
+  `tools/script_asm.py` (lscript text form of scripts and dialogue, assembler, round trip over every
+  stock script: 563 scripts, 367 sequences, 2317 entries, 0 failures) and `tools/mapedit.py` (story
+  specs `data/story/*.json`: triggers, records, map scripts, line edits, grown arrays), formats in
+  `docs/scripts.md`. Chapters: the Android 16 island fight (Kame House deal, 16 over both stages, ends at
+  half health standing, Cell arrives), chapter 1 (old Hercule as player 2 in the prologue, Krillin's
+  visit, the forest spirit Frieza + Cooler, no Krillin NPC at the landing site, old Hercule leaves with
+  Trunks) and chapter 2 (the West City mansion deal, Triceratops Jungle with Piccolo and Hercule).
+  Fixes: boss-bar upper percent (r3 clobbered by the entry jump), Camera_Shake self-link crash.
+  Testing moved to a headless libmgba runner (`tools/headless/`) after the fork's GDB link and window
+  proved unreliable for long scenes.
+
 - **Production resumed (Ryan, after the model switch): "get as much progress with the game as you
   can", story planning paused where it stopped** (`docs/story.md` section 0, "Next to decide").
 - **Merged**: `android16-boss` (sprite 160, rockets, AI, stat 109; island scripts still name 17).

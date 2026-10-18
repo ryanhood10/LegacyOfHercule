@@ -19,6 +19,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the ROM's story as scripted, Ryan's opening, beat costs, what is still open | story work |
+| `docs/scripts.md` | story scripts: bytecode, dialogue, triggers, records, condition words, flags, lscript, story specs, chapters implemented | editing a scene or a map's records |
 | `docs/party-8-slots.md` | `PARTY_SLOTS`: the relocated N-entry party, every patched site, save layout, switch screen, verification, limits | before touching the party, saves or the switch screen |
 | `docs/roms.md` | reference ROM hashes | checking a dump |
 | `README.md` | user-facing: setup, playing two-player, netplay, wide view | onboarding a player |
@@ -66,7 +67,7 @@ icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/kril
 `maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`, `broly_crater` (needs
 `roms/buu.gba`); format in
 `docs/maps.md`), built by `tools/mapbuild.py` and placed by `patch_rom.py --maps` (`MAPS=1`).
-`hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
+`story/*.json` + `story/*.lscript` are the story chapters (map edits and scenes, `docs/scripts.md`), included by `hercule.json`. `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
 Keep-Goku byte, included text records); `hercule-text.json` holds dialogue records written by
 `tools/script_dump.py`. Applied by `tools/romdata.py build` then `patch_rom.py --data-patch`.
 
@@ -77,6 +78,10 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `patch_rom.py` | builds the ROM: pad to 16 MiB, place the blob, vtable slot hooks, entry jumps, word/byte patches, literal relocations, `--party-slots N` (count patches, shadow tables, N-entry default table), `--wide`, `--debug-menu`, `--data-patch`, `--maps` (new maps; relocates the MapEntry table last) |
 | `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json`; `build --party-slots N` targets the relocated N-entry table |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
+| `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
+| `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
+| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py` |
+| `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
@@ -114,7 +119,8 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | display rows, transformations | `docs/sprites.md` SSJ section, `src/coop/ssj.c`, `tools/spriteclone.py` |
 | Krillin, old Hercule, per-slot names / portraits / status pages | `docs/hercule.md` 5b / 5c, `src/coop/krillin.c`, `docs/party-8-slots.md` "Krillin", `docs/sprites.md` "Krillin" |
 | ability table, stats, growth | `docs/hercule.md`, `tools/romdata.py`, `data/hercule.json` |
-| dialogue text and scripts | `tools/script_dump.py`, `docs/hercule.md` section 5 |
+| dialogue text and scripts | `docs/scripts.md`, `tools/script_asm.py`, `tools/mapedit.py`, `data/story/` |
+| testing a story chapter | `docs/testing.md` "Story chapters, headless", `tools/headless/` |
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |
 | the Android 16 boss, hit messages, projectiles, enemy control states | `src/coop/android16.c`, `docs/coop-design.md` "Android 16 boss", `docs/sprites.md` "Android 16 boss sprite" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |
