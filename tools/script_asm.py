@@ -67,9 +67,9 @@ QUEST_TABLE, QUEST_COUNT = 0x086D68DC, 43
 STEP_DISPLAY = []
 for _i, _n in enumerate(STEP_NAMES):
     STEP_DISPLAY.append(_n if _n not in STEP_DISPLAY else f"{_n}_{_i}")
-STEP_DISPLAY[130] = "CoopCall"   # repointed to the script -> C bridge (src/coop/vmcall.c); unused by stock scripts
+STEP_DISPLAY[59] = "CoopCall"   # repointed to the script -> C bridge (src/coop/vmcall.c); an assert no stock script calls
 STEP_BY_NAME = {n: i for i, n in enumerate(STEP_DISPLAY)}
-STEP_BY_NAME["sub_800AFD4"] = 130
+STEP_BY_NAME["Deprecated_CharacterSpecialAttack"] = 59
 # Symbol arguments (seq:NAME / script:NAME in an instruction) are resolved to addresses by this callable
 # while assembling; tools/mapedit.py sets it to its reference resolver.
 SYMBOL_RESOLVER = None

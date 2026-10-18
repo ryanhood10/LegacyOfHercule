@@ -1,5 +1,5 @@
-// Script -> C bridge (docs/scripts.md "CoopCall"). Game action 130 (sub_0800AFD4, which no stock script
-// calls) is repointed here by data/hercule.json: `CoopCall fn, a, b, c` pops four values and runs one of
+// Script -> C bridge (docs/scripts.md "CoopCall"). Game action 59 (Deprecated_CharacterSpecialAttack,
+// an assert no stock script calls) is repointed here by data/hercule.json: `CoopCall fn, a, b, c` pops four values and runs one of
 // the functions below; the queries push one result, the rest push nothing (a value left on the stack
 // at the end of a dialogue script entry would be read as the next entry's index).
 //

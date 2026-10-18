@@ -42,7 +42,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler's Namekian) and per-boss rules (end_pct, partner model/stat, no twin); the both-down rule lives in `enemies.c` |
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
-| `vmcall.c` | `CoopCall` (game action 130), the script -> C bridge: duels, winner, Hercule's awakening, player 2 (`docs/scripts.md` 2.2b) |
+| `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2 (`docs/scripts.md` 2.2b) |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
 | `krillin.c/.h` | Krillin (slot 6, row 23, sprite 161) and old Hercule (row 24): status-screen title / pages / technique pages for PARTY_SLOTS, dialogue name opcodes, blue ki blast, Afterimage Rush / Shockwave Punch / Destructo Disc (abilities 19-21), old Hercule's weak combat bytes and `old_hercule_set`, `KR_TEST` triggers; ids in the header |
 | `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, `Party_AddExp` (level-ups), flag accessors, VM counter / item / bestiary opcodes |
