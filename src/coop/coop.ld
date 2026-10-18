@@ -7,6 +7,9 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        bossbar_create_hook coop2 sprite_emit_hook
        g_party_block party_init_hook flag_test_hook flag_set_hook flag_clear_hook flag_cond_hook
        vm_counter_get_hook vm_counter_dec_hook vm_counter_sub_hook item_use_hook vm_seen_hook
+       save_game_hook load_slot_hook write_slot_hook save_menu_load_hook save_menu_any_hook save_menu_saved_hook
+       save_menu_location_hook save_menu_count_hook save_menu_member_in_party_hook save_menu_member_selectable_hook
+       save_menu_active_pos_hook save_menu_member_sprite_hook save_menu_set_active_hook save_menu_erase_hook save_menu_start_hook
        hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use sprite_index display_rows display_row_count ssj_record)
 
 MEMORY

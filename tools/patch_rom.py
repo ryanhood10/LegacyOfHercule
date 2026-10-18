@@ -116,6 +116,22 @@ PARTY_ENTRY_JUMPS = [
     (0x080096E8, "vm_counter_sub_hook"),    # VM opcode: counters[idx] -= value
     (0x0800F3F0, "item_use_hook"),          # item use check / counter increment
     (0x0800B00C, "vm_seen_hook"),           # VM opcode: mark a sprite's bestiary entry seen
+    # save path (src/coop/party_save.c): new EEPROM layout, slot store outside the menu object
+    (0x08004030, "save_game_hook"),         # SaveGame(party, xy): the save pad
+    (0x08003F9C, "load_slot_hook"),         # LoadSlot(dst, slot)
+    (0x08003FEC, "write_slot_hook"),        # WriteSlot(src, slot)
+    (0x08001960, "save_menu_load_hook"),    # save menu: read the three slots
+    (0x080019D4, "save_menu_any_hook"),     # any slot saved
+    (0x080019F6, "save_menu_saved_hook"),   # slot saved
+    (0x08001A0C, "save_menu_location_hook"),   # slot's location name
+    (0x08001A26, "save_menu_count_hook"),   # portraits to draw
+    (0x08001A44, "save_menu_member_in_party_hook"),
+    (0x08001A66, "save_menu_member_selectable_hook"),
+    (0x08001A8A, "save_menu_active_pos_hook"),
+    (0x08001AB8, "save_menu_member_sprite_hook"),
+    (0x08001AE2, "save_menu_set_active_hook"),
+    (0x08001B0E, "save_menu_erase_hook"),
+    (0x0800180C, "save_menu_start_hook"),   # start / load the chosen slot
 ]
 # (file offset, stock byte, new byte as a function of n and the number of defined slots d)
 PARTY_COUNT_PATCHES = [
