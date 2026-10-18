@@ -30,7 +30,9 @@ ROM_FN(void, ProjBase_UpdateBox, (void *obj), 0x08013BF5);
 ROM_FN(int, Proj_InView, (void *obj), 0x08013C23);                     // ahead of it along its facing, still in view
 ROM_FN(void, Player_LaunchPoint, (s32 *xy, const Entity *e), 0x08007A27);   // where the ki blast leaves the hand (px)
 ROM_FN(void, VM_SetCharacterTransformation, (s32 *stack), 0x0800A8ED);
+#ifdef KR_TEST
 ROM_FN(void, PlayerEntity_RefreshSprite, (Entity *e), 0x080086A3);
+#endif
 #define KIBLAST_LIST   (*(void **)0x0840E54C)   // the ki blast module's entity list word (0x0800EAD8)
 #define PROJ_VTABLE    0x080259C4u              // the NPC ki blast's vtable (android16.c): copied, slots replaced
 #define PROJ_MESSAGE   0x08013D69u              // base projectile message handler (9, 10, 15)
@@ -109,7 +111,9 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
     0x086FF6D0, 0x086FF68C, 0x086FF7A8, 0x086FF764, 0x086FF5B8,            // slots 0-4 (stock words 13-22)
     0x086FF71C, 0x086FF63C, 0x086FF83C, 0x086FF68C, 0x086FF7E4,
     0, 0,                                                                   // slot 5: Hercule has no technique pages
+#if PARTY_SLOTS > KRILLIN_SLOT
     (u32)kr_status_icon_disc, (u32)kr_status_icon_ki,                       // slot 6: Krillin
+#endif
 };
 
 int status_title_hook(void *obj, int idx) { return UI_NAME + status_slot(obj, idx); }
