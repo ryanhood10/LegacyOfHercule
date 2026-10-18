@@ -93,7 +93,8 @@ typedef struct CoopExtra {
     u16 duel_hits;          // debug: player-vs-player hits landed
     u8 *duel_tint;          // the clone's shadow remap table (Arena)
     u8 pad_swap;            // 1 = player 1's pad drives player 2's entity and the other way round
-    u8 _pad5[3];
+    u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
+    u8 _pad5[2];
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)

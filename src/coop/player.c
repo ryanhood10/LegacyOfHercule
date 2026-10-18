@@ -101,6 +101,7 @@ void idle_update(IdleState *st, Entity *e) {
 // it shakes links it to itself (an endless loop). Extend the running shake instead.
 #define SHAKE_HEAD (*(void **)0x03000FF4)
 static void install_behaviour(Entity *e, int slot);
+static void p2_bind(Entity *p2, int slot);
 
 void camera_shake_safe(int frames, int strength) {
     if (SHAKE_HEAD == g_Camera) {
@@ -120,7 +121,11 @@ void p2_sync_combat(void) {
     int slot = coop.p2_slot;
     const CharacterEntry *c = &g_Party->chars[slot];
     u32 key = (u32)c->str ^ ((u32)c->pow << 8) ^ ((u32)c->end << 16) ^ ((u32)c->display_row << 24) ^ (u32)slot;
-    if (key != coop2.p2_class_key) install_behaviour(p2, slot);
+    if (key == coop2.p2_class_key) return;
+    // a script changed the form (SetCharacterTransformation only refreshes the active player's
+    // entity): take the new row's sprite too; otherwise only the class (stats, speeds) is re-run
+    if (c->display_row != coop2.p2_class_row) p2_bind(p2, slot);
+    else install_behaviour(p2, slot);
 }
 
 // ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F) ------------------------------------
@@ -307,6 +312,7 @@ static void install_behaviour(Entity *e, int slot) {
     g_Party->active_slot = active;
     const CharacterEntry *c = &g_Party->chars[slot];
     coop2.p2_class_key = (u32)c->str ^ ((u32)c->pow << 8) ^ ((u32)c->end << 16) ^ ((u32)c->display_row << 24) ^ (u32)slot;
+    coop2.p2_class_row = c->display_row;
 }
 
 // Give the live player-2 entity another party slot: what the save-pad switch does to player 1
