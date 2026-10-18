@@ -95,11 +95,22 @@ Ryan's version:
 2. **The duel.** Player 1 controls Vegeta, player 2 the clone, both Super Saiyan, to the death.
 3. **Result.** The winner plays Vegeta. One line, "VEGETA: I've won. I'm a Super Saiyan", fade to the
    landing map. Whoever won is the only player in control through the landing and into zone 7.
-4. **Hercule arrives.** In zone 7 area 1, after the stock Goku / Android 20 / 19 scene, Hercule walks
-   up: "Thank God he's arrived, we need you in the fight." Vegeta: who the hell are you? He is
-   Hercule, Piccolo told him to wait here and watch for Vegeta. From here the loser of the duel is
-   Hercule (the only selectable player-2 character), useless beside Vegeta through the robot zone
-   and the Android 19 fight. The punishment for losing is about five minutes without a pad.
+4. **Hercule arrives at the landing map** (zone 6 area 22, moved up from zone 7 so the loser
+   sits out one scene, not fourteen robot areas): Hercule walks up: "Thank God he's arrived, we
+   need you in the fight." Vegeta: who the hell are you? He is Hercule, Piccolo told him to wait
+   here and watch for Vegeta. From here the loser of the duel is Hercule (the only selectable
+   player-2 character), useless beside Vegeta through the robot zone and the Android 19 fight.
+   No level handicap for the loser (Ryan): pride is the stake.
+5. **The Android 19 fight stays Vegeta's, made two-on-two.** Stock zone 7 area 15 from the player's
+   side: you (Vegeta) arrive on Goku dominating 19, Goku collapses from the heart virus, Yamcha
+   carries him home, 19 asks to "finish Vegeta", you fight 19 as a boss (enemy stat 5, sprite 12),
+   then 20 flees after a talk and Vegeta chases him ("You're not needed anymore"), and Piccolo
+   becomes player 1. Nobody else fights 19. To keep it two-player: Android 20 (sprite 13, an actor
+   with no enemy record in the stock game) joins as 19's twin through the co-op twin mechanism
+   (`enemies.c` already pairs bosses of different models; it needs one new enemy-stat row for
+   sprite 13, say Gero's lab-door stats, stat 7). After both fall, 20 "escapes damaged" so the stock
+   dialogue and the chase still read. Super Android 13 from Buu's Fury is saved for a side story:
+   that ROM's sprite format is not decoded yet and 13 deserves his own arc.
 
 What it costs (no code yet):
 
@@ -118,8 +129,10 @@ timed boost), and a draw rule if both die on the same frame (give it to player 1
 ## 4c. Piccolo's chapter (Ryan, 2026-10-17): Hercule stays player 2
 
 Stock flow (zone 8): after the Android 19 fight, Piccolo is player 1. Robot grunts throughout,
-Dr. Gero at his lab door ("I won't let you get into my lab", two maps), Gero activates 17 and 18, the
-Androids scene (`SetActiveCharacter 1` keeps Piccolo), Cell's lab under the computer (Krillin's
+Dr. Gero at his lab door ("I won't let you get into my lab", two maps; **Gero is a boss there**,
+enemy stat 7, sprite 14, with robot escorts), Gero activates 17 and 18, the Androids scene
+(`SetActiveCharacter 1` keeps Piccolo; **a boss with enemy stat 4, sprite 11 is fought here**, to
+identify in play, likely Android 17 vs Piccolo), Cell's lab under the computer (Krillin's
 lines: "that thing is made up of cells from the greatest fighters", the self-destruct), Yajirobe's
 Senzu drop, then the Lookout (zone 9 area 1) hands player 1 to Gohan. Krillin stands as an NPC in
 zone 8 areas 47, 48 and 65 and talks through the lab scenes, so while Hercule is player 2 Krillin's
