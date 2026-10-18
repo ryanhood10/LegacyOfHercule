@@ -10,6 +10,7 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        save_game_hook load_slot_hook write_slot_hook save_menu_load_hook save_menu_any_hook save_menu_saved_hook
        save_menu_location_hook save_menu_count_hook save_menu_member_in_party_hook save_menu_member_selectable_hook
        save_menu_active_pos_hook save_menu_member_sprite_hook save_menu_set_active_hook save_menu_erase_hook save_menu_start_hook
+       switch_view switch_create_hook switch_next_hook switch_prev_hook switch_select_hook switch_arrows_hook switch_update_hook
        hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use sprite_index display_rows display_row_count ssj_record)
 
 MEMORY

@@ -132,6 +132,13 @@ PARTY_ENTRY_JUMPS = [
     (0x08001AE2, "save_menu_set_active_hook"),
     (0x08001B0E, "save_menu_erase_hook"),
     (0x0800180C, "save_menu_start_hook"),   # start / load the chosen slot
+    # switch screen (src/coop/switch.c): bigger object, window of six portraits, scrolling
+    (0x08010B08, "switch_create_hook"),
+    (0x08010B60, "switch_next_hook"),
+    (0x08010B9A, "switch_prev_hook"),
+    (0x0801110C, "switch_select_hook"),
+    (0x080110BC, "switch_arrows_hook"),
+    (0x08011172, "switch_update_hook"),
 ]
 # (file offset, stock byte, new byte as a function of n and the number of defined slots d)
 PARTY_COUNT_PATCHES = [
@@ -144,10 +151,14 @@ PARTY_COUNT_PATCHES = [
     (0xB250, 0x05, lambda n, d: n - 1),             # VM character ids: (id - 2) <= 5 in 0x0800B1E2 (CMP R2,#5)
     (0x5CA6, 0x06, lambda n, d: d),                 # debug party 0x08005C0A fills slots 0..d-1 (CMP R5,#6)
 ]
+# (pool word file offset, table address, party word offset, target): target None = the party block
+# shifted by the tail; a symbol name = that object instead (the switch screen's view party).
 PARTY_SHADOWS = [
-    (0x45F4, 0x081D9C08, 0x8),    # 0x08004348 status item list: counters (+0x12B)
-    (0x18E3C, 0x086F88C0, 0xC),   # 0x08018A38 journal page: seen bit (+0x11A)
-    (0x195F4, 0x086FD864, 0x8),   # 0x08019204 bestiary list: seen bits (+0x11A)
+    (0x45F4, 0x081D9C08, 0x8, None),    # 0x08004348 status item list: counters (+0x12B)
+    (0x18E3C, 0x086F88C0, 0xC, None),   # 0x08018A38 journal page: seen bit (+0x11A)
+    (0x195F4, 0x086FD864, 0x8, None),   # 0x08019204 bestiary list: seen bits (+0x11A)
+    (0x10F10, 0x086D763C, 0x4, "switch_view"),   # switch screen 0x08010B08..0x08010BCE (src/coop/switch.c)
+    (0x112AC, 0x086D763C, 0x4, "switch_view"),   # ... its update / destroy functions
 ]
 PARTY_SHADOW_AT = romdata.PARTY_TABLE_AT + 0x1000   # shadow tables, 0x200 bytes each
 PARTY_SHADOW_SIZE = 0x200
@@ -183,18 +194,24 @@ def apply_party_patches(rom, syms, n):
     the data patch by apply_party_count_patches)."""
     shift = (n - 6) * 0x1C
     base = syms["g_party_block"]
-    for i, (pool, table, word) in enumerate(PARTY_SHADOWS):
+    shadows = {}   # (table, word, target) -> file offset of the copy
+    for pool, table, word, target in PARTY_SHADOWS:
         cur = struct.unpack_from("<I", rom, pool)[0]
         if cur != table:
             sys.exit(f"shadow pool word at {pool:#x}: expected {table:08x}, found {cur:08x}")
-        at = PARTY_SHADOW_AT + i * PARTY_SHADOW_SIZE
-        rom[at:at + PARTY_SHADOW_SIZE] = rom[table - ROM_BASE:table - ROM_BASE + PARTY_SHADOW_SIZE]
-        old_party = struct.unpack_from("<I", rom, at + word)[0]
-        if old_party != base:   # the table's party word was relocated above
-            sys.exit(f"shadow table {table:08x}+{word:#x}: expected the party block {base:08x}, found {old_party:08x}")
-        struct.pack_into("<I", rom, at + word, base + shift)
-        struct.pack_into("<I", rom, pool, ROM_BASE + at)
-        print(f"shadow {ROM_BASE + pool:08x}: table {table:08x} -> {ROM_BASE + at:08x} (party word +{word:#x} = {base + shift:08x})")
+        key = (table, word, target)
+        if key not in shadows:
+            at = PARTY_SHADOW_AT + len(shadows) * PARTY_SHADOW_SIZE
+            rom[at:at + PARTY_SHADOW_SIZE] = rom[table - ROM_BASE:table - ROM_BASE + PARTY_SHADOW_SIZE]
+            old_party = struct.unpack_from("<I", rom, at + word)[0]
+            if old_party != base:   # the table's party word was relocated above
+                sys.exit(f"shadow table {table:08x}+{word:#x}: expected the party block {base:08x}, found {old_party:08x}")
+            new = base + shift if target is None else syms[target]
+            struct.pack_into("<I", rom, at + word, new)
+            shadows[key] = at
+            print(f"shadow table {table:08x} -> {ROM_BASE + at:08x} (word +{word:#x} = {new:08x}, {target or 'party + shift'})")
+        struct.pack_into("<I", rom, pool, ROM_BASE + shadows[key])
+        print(f"shadow pool word {ROM_BASE + pool:08x} -> {ROM_BASE + shadows[key]:08x}")
 
 
 def apply_party_count_patches(rom, n):
