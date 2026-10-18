@@ -197,12 +197,13 @@ void save_menu_erase_hook(void *handle, int slot) {
 }
 
 // 0x0800180C(menu): the menu's start action. menu + 0x10 = chosen slot (3 = back to the title).
-void save_menu_start_hook(u8 *menu) {
+// Returns 0 like the original (the menu's button handler keeps the result).
+int save_menu_start_hook(u8 *menu) {
     s32 sel = *(s32 *)(menu + 0x10);
     if (sel == 3) {
         TitleScreen_Create(0);
         Scene_Transition();
-        return;
+        return 0;
     }
     g_SelectedSaveSlot = (u8)sel;
     PartyState *party = SAVE_MENU_TABLE[3];
@@ -235,4 +236,5 @@ void save_menu_start_hook(u8 *menu) {
     u32 *timer = Arena_Alloc(0xC);
     if (timer) { timer[0] = TIMER_VTABLE; timer[1] = 0; timer[2] = 4; }
     Scene_Run();
+    return 0;
 }
