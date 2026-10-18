@@ -345,6 +345,20 @@ watch; after the fight Cell arrives as scripted and the warp to the Lookout foll
   announcement at the Briefs' residence ("The Cell Games will be held nine days from today near the
   Northern Wastelands"); the Scouter Note; the Dragon Ball hunt for Dende; "Enter the Cell Games".
 
+- **After Perfect Cell (Ryan):** Vegeta stays selectable (his barriers are needed to progress),
+  the default pair is Trunks + Krillin since they are already in hand, and the pad lets players
+  change later.
+- **The wait for the Cell Games (stock, verified):** Capsule Corporation is the hub: Master Roshi in
+  the atrium offers sparring matches (zone 6 area 70: Yamcha, Krillin and Tien as one-on-one
+  "enemies" with +3 stat capsules as prizes; quest "Train with Master Roshi"); Bulma's Dragon Radar
+  and the seven Dragon Balls scattered across the world map (quest "Collect the seven Dragon
+  Balls", then "Return the Dragon Balls to Dende on the Lookout", who counts them: "You've found %d
+  Dragon Balls! Keep looking!"); side quests that open in this window: Dr. Briefs' 25 Golden
+  Capsules, the seven Missing Nameks, the Warlord's kidnapping, the Capsule Corp espionage, the
+  Scouter parts. Then "Enter the Cell Games". Co-op note: Krillin is one of Roshi's sparring
+  opponents (enemy stat 64, sprite 76); when player 2 is Krillin that match swaps its opponent
+  (Hercule is the obvious stand-in) or is skipped by the duplicate-actor rule.
+
 Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its
 defeat action at that threshold instead of at zero HP and becomes untargetable).
 
