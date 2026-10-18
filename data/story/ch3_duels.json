@@ -1,0 +1,30 @@
+{
+  "_": "The two duels (docs/story.md section 0 items 3 and 6): Vegeta vs his shadow clone in space, Hercule meets Vegeta at the landing, Vegeta vs Trunks in the Hyperbolic Time Chamber. Scripts in ch3_duels.lscript; the duels run through CoopCall (src/coop/vmcall.c, docs/scripts.md).",
+  "sources": ["data/story/ch3_duels.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 5, "area": 3},
+      "_": "Amenbo Island's 'Meanwhile...': besides Gohan and Piccolo, Goku, Hercule and Krillin are locked too, so nobody plays player 2 until the duel (and the loser plays Hercule from the landing on)",
+      "edits": [
+        {"at": "trigger:0/entry:30", "replace": [
+          ["ClearCharacterFlag_Bit1 0", "ClearCharacterFlag_Bit1 0\nClearCharacterFlag_Bit1 4\nClearCharacterFlag_Bit1 5\nClearCharacterFlag_Bit1 6"]
+        ]}
+      ]
+    },
+    {
+      "map": {"zone": 6, "area": 50},
+      "_": "space: the clone scene and the first duel",
+      "triggers": {"0": {"payload": "seq:ch3_space"}}
+    },
+    {
+      "map": {"zone": 6, "area": 22},
+      "_": "the landing: Hercule meets Vegeta and becomes player 2's only choice",
+      "triggers": {"0": {"payload": "seq:ch3_landing"}}
+    },
+    {
+      "map": {"zone": 9, "area": 3},
+      "_": "the Lookout: Vegeta and Trunks go in, the second duel in the chamber (zone 15 area 2), back out to Goku sending Piccolo off",
+      "triggers": {"1": {"payload": "seq:ch6_lookout"}}
+    }
+  ]
+}

@@ -69,6 +69,7 @@ class MapEditor:
     plus the patch records that reproduce the edits."""
 
     def __init__(self, rom, free=STORY_FREE, limit=STORY_LIMIT):
+        sa.SYMBOL_RESOLVER = self.ref     # seq:NAME / script:NAME inside instructions
         self.stock = bytes(rom)
         self.rom = bytearray(rom) + bytearray(max(0, ROM_SIZE - len(rom)))
         self.placer = sa.Placer(free, self.stock, limit)

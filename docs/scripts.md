@@ -15,8 +15,9 @@ format, new maps), `docs/story.md` (what the story is), `docs/testing.md` (how c
 | `tools/script_dump.py` | the older read-only dumper (byte offsets beside each instruction) |
 | `tools/headless/st_headless.c` | headless test runner on the fork's libmgba (section 7, `docs/testing.md`) |
 
-Round trip (`python tools/script_asm.py roundtrip`): 563 scripts and 367 dialogue sequences (2317
-entries: 989 script, 741 text, 537 compressed text, 27 format, 20 compressed format, 3 jump) reached
+Round trip (`python tools/script_asm.py roundtrip`): 563 scripts and 367 dialogue sequences (3068
+entries: 1239 script, 953 text, 781 compressed text, 39 format, 51 compressed format, 5 jump, plus
+328 segment stops) reached
 from the map table (name, music, variation, on-load, on-leave scripts, trigger conditions and
 payloads, record conditions, NPC dialogue, enemy defeat actions, item scripts, chest dialogue) and
 the quest table: dump, parse, assemble, compare: **0 failures**.
@@ -56,9 +57,15 @@ Useful action facts found on the way (decompiled):
 
 ### 2.2 Dialogue sequences and entries
 
-A sequence is an array of entry pointers ended by a word whose top 16 bits are 0 (usually 0; a few
-are small numbers, kept by `end=`). An entry starts `u16 next, u8 mode`; `next` is the index run
-after it (0..count, count = the end). Entries are 2-aligned; modes 2-5 need 4.
+A sequence is an array of entry pointers; a word whose top 16 bits are 0 stops the conversation. An
+entry starts `u16 next, u8 mode`; `next` is the index run after it. Entries are 2-aligned; modes 2-5
+need 4. **A script entry that leaves one value on the stack sets the next index instead**: stock
+talk scripts branch with it (Chi-Chi's returns 1, 3, 5 or 7 by the story flags), so **an array
+holds several segments**, each ended by a stop word, reached only through such returned indexes or
+`next` fields. The reader follows both and keeps reading past a stop word while a reachable index
+lies beyond it (lscript `stop N` lines); the last stop word is the sequence's `end=`. Indexes inside
+scripts are absolute: a `stockseq` that moves a multi-segment range would break them (none of the
+chapters does).
 
 | mode | layout after the 3-byte header |
 |---|---|
@@ -74,6 +81,21 @@ Speaker = portrait and name box (0 narration, 1 the active character's box, 3 / 
 80 Roshi, 81 Mayor, 95 Tien, 98 Trunks). The first character picks the box position: `!` top, `#`,
 `@` and `@^` (captions) as the stock lines use them. `\x0b` is a page break; a page holds about 60
 characters in three lines.
+
+### 2.2b CoopCall, the script -> C bridge (`src/coop/vmcall.c`)
+
+Game action 130 (`sub_0800AFD4`, called by no stock script) is repointed by a `data/hercule.json`
+patch to `vm_coop_call`. `CoopCall fn, a, b, c` always pops four values; the queries push one result
+(use them only where the value is consumed: a value left at a dialogue script's END is a next index).
+
+| fn | call | does |
+|---|---|---|
+| 1 | DuelStart slot, flags, seq:END | player-vs-player duel (`duel.c`): slot = player 2's party slot, or -1 = a clone of player 1 (the clone slot is made available so player 2 spawns into it); flags 1 clone, 2 shadow tint, 4 swap the pads when player 2 wins, 8 full energy; END = sequence run when the duel ends (queued like an enemy's defeat dialogue, outside the damage code). Without a player 2, player 1 wins and END runs at once |
+| 2 | DuelClear | after the end scene: player 2's slot and colours back (`duel_clear`) |
+| 3 | DuelWinner -> 1 / 2 | winner of the last duel: `CoopCall 3, 0, 0, 0; PushByte 1; CmpEq; JumpIfFalse L1; PushByte 1; END; L1: PushByte 2; END` picks entry 1 or 2 |
+| 4 | HerculeAwaken | Super Hercule into his abilities (`ssj.c`, the Buu phase) |
+| 5 | P2Present -> 0 / 1 | is there a player 2 entity |
+| 6 | P2Bind slot | player 2's entity plays that slot now (the entity survives warps, so after a duel the story rebinds it) |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -138,12 +160,14 @@ sequence NAME [@08xxxxxx] [end=N]
   fmt 113 fmt=@083b5fc0 "Hi, %s!"            fmt SPEAKER [fmt=@A] "..."      mode 3, argument script below
   fmtz 1 @A args=@A "..."                    fmtz SPEAKER @A args=@A "..."   mode 4, argument script below
   jump 0x83bb5f4                             jump TARGET [pad=N]             mode 5
+  stop 0x3                                   a stop word between segments (default: the next index)
   stock @083b9d16                            the ROM's entry at that address, with this sequence's next index
   stockseq @083e6078 1 [71]                  entries FROM..TO of a stock sequence, next indexes shifted
 end
 ```
 
-Strings take `\xNN` (`\x0b` page break), `\"`, `\\`. The assembler never compresses: a `textz` /
+Instruction arguments may be `seq:NAME` / `script:NAME`: the address of that block (mapedit places it
+first), e.g. `CoopCall 1, -1, 15, seq:ch3_space_end`. Strings take `\xNN` (`\x0b` page break), `\"`, `\\`. The assembler never compresses: a `textz` /
 `fmtz` whose text still equals the stock entry at its `@ADDR` keeps the stock bytes, an edited one
 becomes mode 1 / mode 3. Anything whose assembled bytes equal the stock bytes at its `@ADDR` is not
 written again. **Committed lscript files restate no stock text**: unchanged lines are `stock` /
@@ -190,6 +214,7 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 |---|---|---|
 | `a16_island` | 293, 296-298 (zone 11 areas 1, 4-6) | Kame House: 16 furious that Goku is absent, Piccolo's deal ("beat me on that island and I'll tell you where Goku is"); 16 (stat 109, sprite 160) replaces 17 in the two stock stages (bar 75-100 in area 4, 50-75 in area 6), stops at half health standing (`android16.c`), replaced by his stand-in actor (new record 6), Cell's stock scene follows (`stockseq`) |
 | `ch1_opening` | 0, 1, 3 (zone 1), 14, 19 (zone 2), 52, 54 (zone 3) | old Hercule (slot 5, row 24 / sprite 158) is player 2 in the future prologue with three comic lines and leaves the party at "Present day"; Krillin walks in instead of phoning (the stock call lines in person) and joins (slot 6); the forest spirit fight (the dream's clearing, Frieza + Cooler as a `BOSS_PAIR`), the warp to the armor cave and the voice's explanation; Krillin's actor and NPC gone from both landing-site scenes; old Hercule beside Trunks, two lines, leaves with him |
+| `ch3_duels` | 143 (zone 5), 166, 168 (zone 6), 263 (zone 9) | Amenbo's "Meanwhile" also locks Goku, Hercule and Krillin; space: Vegeta vs his clone (actors 137 / 140, the monologue, the transformation), the shadow-clone duel (`CoopCall 1, -1, 15`), "I've won. I'm a Super Saiyan", the tutorial, the warp; the landing: Hercule meets Vegeta and becomes player 2's only choice; the Lookout: Vegeta and Trunks walk in, the chamber (zone 15 area 2) with both as Super Saiyans, the duel (`CoopCall 1, 3, 12`), the winner's line, back to the Lookout with Piccolo as player 1 and Hercule as player 2, Goku sends Piccolo off |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 
 Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the
@@ -231,3 +256,5 @@ run by `python tools/headless/st_test.py SCRIPT ROM STATE`, which tiles the scre
 - Gohan's later chapters still show Krillin as an NPC where the stock game has him (18 maps); the
   duplicate-NPC rule (`actors.c`) hides town NPCs, cutscene actors need per-scene edits like zone 3's.
 - Mode 5 (jump) entries round-trip but their runtime meaning is not traced.
+- The duels' real endings (a final blow) are `duel.c`'s, verified by the main session; the chapter
+  tests ended the duels by setting `coop2.duel_active` 0 and `duel_winner` (0x0203FD5C, 0x0203FD5D).

@@ -67,7 +67,12 @@ QUEST_TABLE, QUEST_COUNT = 0x086D68DC, 43
 STEP_DISPLAY = []
 for _i, _n in enumerate(STEP_NAMES):
     STEP_DISPLAY.append(_n if _n not in STEP_DISPLAY else f"{_n}_{_i}")
+STEP_DISPLAY[130] = "CoopCall"   # repointed to the script -> C bridge (src/coop/vmcall.c); unused by stock scripts
 STEP_BY_NAME = {n: i for i, n in enumerate(STEP_DISPLAY)}
+STEP_BY_NAME["sub_800AFD4"] = 130
+# Symbol arguments (seq:NAME / script:NAME in an instruction) are resolved to addresses by this callable
+# while assembling; tools/mapedit.py sets it to its reference resolver.
+SYMBOL_RESOLVER = None
 OP_BY_NAME = {n: o for o, n in MAIN_OPS.items()}
 OP_BY_NAME["PushMulti"] = 0x1D
 SIMPLE_OPS = {o for o in range(0x04, 0x11)} | {0x14, 0x1B}
@@ -244,6 +249,22 @@ def format_ins(ins, labels):
     return "END"
 
 
+def parse_arg(tok):
+    """A number, or ("sym", "seq:NAME") for an address the assembler resolves."""
+    tok = tok.strip()
+    if re.match(r"^(seq|script):\w+$", tok):
+        return ("sym", tok)
+    return parse_int(tok)
+
+
+def resolve_arg(v):
+    if isinstance(v, tuple):
+        if SYMBOL_RESOLVER is None:
+            raise AsmError(f"{v[1]}: symbol arguments need tools/mapedit.py")
+        return SYMBOL_RESOLVER(v[1])
+    return v
+
+
 def parse_int(tok):
     tok = tok.strip()
     try:
@@ -301,9 +322,9 @@ def parse_ins(mn, rest):
             raise AsmError(f"PushByte {v} out of range (use PushVarint)")
         return ("byte", v)
     if mn == "PushVarint":
-        return ("varint", parse_int(args[0]))
+        return ("varint", parse_arg(args[0]))
     if mn in ("PushMulti", "PushMultiVarint"):
-        vals = [parse_int(a) for a in args]
+        vals = [parse_arg(a) for a in args]
         if not 1 <= len(vals) <= 255:
             raise AsmError("PushMulti takes 1..255 values")
         return ("multi", vals)
@@ -328,7 +349,7 @@ def parse_ins(mn, rest):
         raise AsmError(f"{mn} needs its own syntax")
     if mn in STEP_BY_NAME or re.match(r"^Step_?\d+$", mn):
         k = STEP_BY_NAME[mn] if mn in STEP_BY_NAME else int(re.sub(r"\D", "", mn))
-        vals = [parse_int(a) for a in args]
+        vals = [parse_arg(a) for a in args]
         return ("macro", k, vals)
     raise AsmError(f"unknown instruction {mn!r}")
 
@@ -338,9 +359,13 @@ def assemble_script(items, base=0):
     is not END. base is the script's address (only used in error messages)."""
     flat = []
     for it in items:
+        if it[0] == "varint":
+            it = ("varint", resolve_arg(it[1]))
+        elif it[0] == "multi":
+            it = ("multi", [resolve_arg(v) for v in it[1]])
         if it[0] == "macro":
             if it[2]:
-                flat.append(macro_push(it[2]))
+                flat.append(macro_push([resolve_arg(v) for v in it[2]]))
             flat.append(("step", it[1]))
         else:
             flat.append(it)
@@ -479,18 +504,43 @@ def decode_entry(rom, addr):
     return d
 
 
+def script_returns(decoded):
+    """Values a script leaves for the dialogue: the constant pushed right before each END. A script
+    entry's leftover value is the next entry index (stock talk scripts branch with it)."""
+    out = set()
+    for k in range(1, len(decoded)):
+        if decoded[k][1][0] == "end" and decoded[k - 1][1][0] in ("byte", "varint"):
+            out.add(decoded[k - 1][1][1])
+    return out
+
+
 def read_sequence(rom, seq):
-    """[entry addresses], terminator word."""
+    """[entry addresses, or ints for the stop words between segments], terminator word.
+    A sequence can hold several segments, each ended by a word whose top 16 bits are 0; a later
+    segment is reached through an entry's next index or a script entry's returned index, so reading
+    continues past a stop word while any reachable index lies beyond it."""
     o = off(seq)
-    ptrs = []
+    items = []
+    reach = {0}
     while True:
-        p = struct.unpack_from("<I", rom, o + 4 * len(ptrs))[0]
+        i = len(items)
+        p = struct.unpack_from("<I", rom, o + 4 * i)[0]
         if p >> 16 == 0:
-            return ptrs, p
+            if not any(r > i for r in reach):
+                return items, p
+            items.append(p)
+            continue
         if not is_rom(p):
-            raise AsmError(f"sequence {seq:08x}[{len(ptrs)}] = {p:08x} is not an entry pointer")
-        ptrs.append(p)
-        if len(ptrs) > 1000:
+            raise AsmError(f"sequence {seq:08x}[{i}] = {p:08x} is not an entry pointer")
+        items.append(p)
+        try:
+            d = decode_entry(rom, p)
+            reach.add(d["next"])
+            if d["mode"] == 0:
+                reach |= {v for v in script_returns(d["script"]) if 0 <= v < 1000}
+        except AsmError:
+            pass
+        if i > 1000:
             raise AsmError(f"sequence {seq:08x}: no terminator")
 
 
@@ -519,6 +569,9 @@ def format_sequence(rom, seq, name):
     ptrs, term = read_sequence(rom, seq)
     lines = [f"sequence {name} @{seq:08x}" + (f" end={term:#x}" if term else "")]
     for i, p in enumerate(ptrs):
+        if p >> 16 == 0:
+            lines.append(f"  [{i}] stop {p:#x}")
+            continue
         lines += format_entry(decode_entry(rom, p), i)
     lines.append("end")
     return lines
@@ -626,7 +679,7 @@ def parse_entries(body, rom=None):
         st = s.strip()
         if not st:
             continue
-        m = re.match(r"^(?:\[(\d*)\]\s*)?(script|text|textz|fmt|fmtz|jump|stockseq|stock)\b(.*)$", st)
+        m = re.match(r"^(?:\[(\d*)\]\s*)?(script|text|textz|fmt|fmtz|jump|stockseq|stock|stop)\b(.*)$", st)
         if m:
             idx, kind, rest = m.group(1), m.group(2), m.group(3)
             if idx not in (None, "") and int(idx) != len(entries):
@@ -640,6 +693,10 @@ def parse_entries(body, rom=None):
                 hi = parse_int(pos[1]) if len(pos) > 1 else len(ptrs) - 1
                 shift = len(entries) - lo
                 for k in range(lo, hi + 1):
+                    if ptrs[k] >> 16 == 0:   # a stop word between segments (indexes in scripts are not shifted)
+                        entries.append({"kind": "stop", "line": ln, "text": None, "pos": [], "body": [],
+                                        "attrs": {}, "value": ptrs[k]})
+                        continue
                     st_e = decode_entry(rom, ptrs[k])
                     entries.append({"kind": "stock", "line": ln, "text": None, "pos": [], "body": [],
                                     "attrs": {"addr": ptrs[k], "next": st_e["next"] + shift}})
@@ -659,6 +716,8 @@ def parse_entries(body, rom=None):
                     raise AsmError(f"line {ln}: {kind} needs a text string")
             if kind == "jump":
                 cur["target"] = parse_int(pos[0])
+            if kind == "stop":       # stop [N]: the word that ends a segment (default: the next index)
+                cur["value"] = parse_int(pos[0]) if pos else len(entries) + 1
             entries.append(cur)
             continue
         if cur is None or cur["kind"] not in ("script", "fmt", "fmtz"):
@@ -796,7 +855,7 @@ def place_block(name, block, rom, placer):
         if placer.stock_equal(block["addr"], data):
             return block["addr"]
         return placer.put(data, 1, f"script {name}")
-    ptrs = [place_entry(e, rom, placer, name) for e in block["entries"]]
+    ptrs = [e["value"] if e["kind"] == "stop" else place_entry(e, rom, placer, name) for e in block["entries"]]
     arr = b"".join(struct.pack("<I", p) for p in ptrs) + struct.pack("<I", block["end"])
     if placer.stock_equal(block["addr"], arr):
         return block["addr"]
@@ -884,6 +943,7 @@ def roundtrip(rom, verbose=False):
     scripts, seqs = walk_corpus(rom)
     fails = 0
     n_entries = 0
+    stops = 0
     modes = {}
     for addr, where in sorted(scripts.items()):
         try:
@@ -905,6 +965,11 @@ def roundtrip(rom, verbose=False):
             if len(blk["entries"]) != len(ptrs) or blk["end"] != term:
                 raise AsmError("entry count or terminator differs")
             for e, p in zip(blk["entries"], ptrs):
+                if p >> 16 == 0:
+                    if e["kind"] != "stop" or e["value"] != p:
+                        raise AsmError(f"stop word {p:#x} does not round-trip")
+                    stops += 1
+                    continue
                 st = decode_entry(rom, p)
                 ptr = None
                 if e["kind"] == "fmt":
@@ -928,7 +993,7 @@ def roundtrip(rom, verbose=False):
             fails += 1
             print(f"FAIL sequence {addr:08x} ({where}): {e}")
     print(f"round trip: {len(scripts)} scripts, {len(seqs)} sequences, {n_entries} entries "
-          f"(modes {dict(sorted(modes.items()))}), {fails} failures")
+          f"(modes {dict(sorted(modes.items()))}), {stops} segment stops, {fails} failures")
     return fails
 
 

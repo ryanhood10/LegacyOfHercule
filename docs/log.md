@@ -13,6 +13,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Script -> C bridge and the duels (story-scripts)**: game action 130 is `CoopCall` (`vmcall.c`: duel
+  start / clear / winner, Hercule's awakening, player 2 present / bind); lscript arguments `seq:NAME`;
+  dialogue sequences read across all their segments (script entries return next indexes; round trip
+  3068 entries + 328 stops, 0 failures). `data/story/ch3_duels`: the space clone duel and Hercule at the
+  landing, the Time Chamber duel with the winner's line and Piccolo / Hercule after.
 - **Story scripts (branch `story-scripts`, worktree `F:\MeltyCreations\log2-story`)**:
   `tools/script_asm.py` (lscript text form of scripts and dialogue, assembler, round trip over every
   stock script: 563 scripts, 367 sequences, 2317 entries, 0 failures) and `tools/mapedit.py` (story
