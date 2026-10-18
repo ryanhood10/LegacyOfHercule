@@ -384,16 +384,26 @@ ending; check in play when it opens.
 
 **Side quests in the wait (Ryan, 2026-10-18):**
 
-- **Cooler:** open his area to Goku at any level and let him bring any co-op partner. Facts: the
-  stock Cooler area (zone 4 area 50 and zone 6 area 61/62) is gated by **"Only Piccolo" barriers**,
-  not a Goku level gate, and Cooler's line is "You're not Goku... I thought I specifically asked for
-  Goku!"; the Goku-only barriers in the game are elsewhere (maps 28, 55, 217, 317, 323). So the
-  change is: drop or re-key the Piccolo barriers so the party can enter, no level check to lower.
+- **Cooler (Ryan: keep the Piccolo gate as is, make sure it is reachable now, and make the fight
+  two-player).** Facts: Cooler is a two-part bonus. First meeting: zone 4 area 50, reached from
+  Triceratops Jungle (map 103) behind an "Only Piccolo" barrier, gated by West City flag 60:
+  "Frieza??? But how?" / "I am not Frieza. I am his brother Cooler... the last surviving member of
+  my family. You and your friends killed my father and my brother." The fight: zone 6 area 61
+  (boss, enemy stat 29, sprite 34) behind another Piccolo barrier (area 62), with "You're not
+  Goku... I thought I specifically asked for Goku!" There is no level gate and no Goku gate; with
+  Piccolo selectable in the Cell Games wait both parts are reachable now. Co-op: Cooler fights
+  beside **a strong Namekian servant**, explained in the dialogue (a Namekian warrior taken from
+  Namek by Frieza's family and kept by Cooler); art: Piccolo's complete playable set (103/104)
+  recoloured through the entity colour remap, or a cloned record with a changed palette, so no new
+  frames. Both-down rule.
 - **Android 13 in the arctic (progress, not finish):** a new or re-dressed arctic area reached
   through a new "Only Vegeta" barrier; the party goes there to find something and runs into 13,
   who says HE was supposed to absorb 17 and 18, not Cell, his chance at perfection is ruined and he
   would kill Cell if he could; Vegeta: he won't get the chance, because he'll be dead. A fight to
-  half health, 13 leaves. Optional: a story flag records whether it happened, and the post-Cell
+  half health, 13 leaves. Two-player (Ryan): 13 needs a partner; candidates with no new art are
+  one of Gero's large robots (sprites 37-39) under 13's command, or a spare Android 19 unit
+  recoloured; Androids 14 and 15 (his film sidekicks, whom Super 13 absorbs) would be the best
+  story but need drawing. Optional: a story flag records whether it happened, and the post-Cell
   Super 13 encounter has two openings (met before / first meeting). Facts: no map in LoG2 mentions
   snow or an arctic; the Northern Mountains around Gero's lab are the coldest-looking stock area.
   A brand-new map needs tooling we do not have (chunk encoder, collision, map-table entry); a
