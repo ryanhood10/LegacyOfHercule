@@ -73,12 +73,15 @@ boss that dies first only falls until its twin is down ("both-down"); some bosse
 and are reused; a map actor whose sprite is player 2's current sprite is not spawned; duel losers
 swap pads with the winner's role as above, no level handicap; Hercule and Krillin stay weaker.
 
-**Built so far (2026-10-18, on main):** script assembler and map patcher (`docs/scripts.md`,
-`data/story/*.json`), chapter 1 (old Hercule prologue, Krillin's visit, forest spirits, landing
-sites), chapter 2 (mansion deal, Hercule joins in West City, Triceratops Jungle lock), the Android 16
-island fight; engine pieces: duel mode, both-down / half-health boss rules, duplicate-NPC removal,
-Krillin and old Hercule playable, zone-15 maps (arctic, Time Chamber, Broly arena). Still to write:
-chapters 3-8 below (the duels need the script-to-C bridge in `docs/scripts.md`).
+**Built (2026-10-18, on main): every decided chapter, 1 through 8,** as data/story/*.json +
+*.lscript (tools: `docs/scripts.md`), on the engine pieces in `docs/coop-design.md` (duels with the
+CoopCall bridge, both-down / half-health / pair rules, duplicate-NPC removal, Krillin and old Hercule
+playable, Android 13 / 16 / Namekian models, zone-15 maps). Tested per chapter with the headless
+runner (`tools/headless/`); the space duel was also played in the fork with a real final blow.
+Numbers chosen by Claude that Ryan may want to change: Kami's boost (+3 levels and a refill),
+the arctic 13 (stat 114, half health), the gym duos (also fought in single-player).
+Still open for Ryan: Android 13's arctic partner; then plan the Cell Games, the ending and the Buu
+phase (section "Next to decide" above).
 
 **Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
 and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
