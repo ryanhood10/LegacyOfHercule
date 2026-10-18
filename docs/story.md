@@ -270,7 +270,15 @@ Ryan's decisions for this stretch:
   vs Trunks ("all you've done is pump up your muscles", Perfect Cell sprite 30, two boss records),
   robot and animal areas between; then zones 13-14, the Cell Games.
 
-Time Chamber (Ryan is considering an extra gameplay scene there): LoG2 has only the door on the
+**Time Chamber duel (Ryan, 2026-10-18).** At the Lookout, when Vegeta and Trunks go in, fade to
+black and cut to the two of them walking into the chamber. Trunks: let's get settled in. Vegeta
+demands they spar right now. Cut to the two players facing each other: a second duel with the same
+rules as the space one (both start as Super Saiyans, no drain, to the death, draw to player 1, no
+level handicap). The winner's pad plays Piccolo in the next scene, the loser's pad plays Hercule.
+Then fade back to the Lookout where Goku sends Piccolo to Roshi's island. The chamber interior
+needs a map (see the next paragraph); the duel code is the same PvP work as the space scene.
+
+Time Chamber interior: LoG2 has only the door on the
 Lookout map ("You cannot enter the Hyperbolic Time Chamber"); no interior exists in this ROM.
 Buu's Fury has the chamber as a playable location, but its map format is not decoded (the Buu
 session decoded sprites only), so lifting it is a new spike; the cheap stand-in is LoG2's own
