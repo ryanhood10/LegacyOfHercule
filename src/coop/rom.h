@@ -186,7 +186,7 @@ typedef struct AbilityDef {
 #define CAMERA_CELL      (*(const s32 **)0x081DA974)   // ROM cell -> camera object; +0x1C/+0x20 = view origin (world px)
 #define SFX_TABLE        ((const u8 *)0x080E15B0)
 #define DISPLAY_DATA     ((const u8 *)0x081D967C)   // 22 rows x 0x14; +1 spriteId, +0x10 ppVTable
-#define ABILITY_TABLE    ((const AbilityDef *)0x081D9900)
+#define ABILITY_TABLE    (*(const AbilityDef *const *)0x08008024)   // code literal (0x081D9900 stock; relocated by data/hercule.json)
 #define PLAYER_VTABLE    ((const u32 *)0x08025604)
 
 #define ANIM_IDLE 0

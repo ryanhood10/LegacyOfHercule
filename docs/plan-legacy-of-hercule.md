@@ -17,7 +17,7 @@ Majin Buu. Co-op and the wide view stay the foundation.
 | Story and dialogue | Maps carry `mapScripts[]`: NPC (talkable), actor (scripted), enemy records; dialogue sequences and condition scripts run on the bytecode VM (145 opcodes mapped in the reference `OpCodes.csv`, warp opcode pops zone/area/variation/x/y); 43 quests decoded with their flags. Text lives in dialogue sequences we can rewrite or add. | high for reading, medium for authoring (we need our own assembler) |
 | New maps and scenes | `g_MapEntries` (327 x 0x38, count and 4 literals to patch to extend); maps = chunk tilemaps + tileset, already decoded by the wide-view work, so a map *editor/importer* is within reach. | medium |
 | Enemies and bosses | Enemy records (stat index, sprite, action object incl. "run dialogue on defeat"); the co-op session already scales and twins them. | high |
-| Keep Goku after Cell | One byte at file 0x3EC738 (91 -> 79). | high |
+| Keep Goku after Cell | One byte at file 0x3EC738 (91 -> 79); applied by `data/hercule.json`. | done |
 | Co-op, wide view | Done (this repo). | done |
 
 Hard limits: 6 active party slots (the save format bakes them in; widen the pool instead), 128
@@ -34,9 +34,9 @@ existing story-flag bits or reuse spare ones).
 2. Promote characters: add display rows for Krillin (and others whose records have the needed
    groups); give them abilities (Destructo Disc = recoloured Scatter Shot, etc.); make abilities
    per-character.
-3. Hercule's growth: tune his stat table and level curve, give him a real moveset over the arc
-   (Dynamite Kick, Megaton Punch, Rolling Hercule Punch as reskinned animations), and a late
-   transformation row "Super Human Hercule" (recolour + aura) via a transformation ability.
+3. Hercule's growth (done, `docs/hercule.md`): stat table and growth rows tuned, moveset of four
+   reskinned animations (Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Taunt); still to do: a
+   late transformation row "Super Human Hercule" (recolour + aura) via a transformation ability.
 4. Unlocks as story rewards: Mecha Frieza playable after Cooler, Androids 16/18 after their arcs
    (enemy sprite -> playable row where the frame groups allow; otherwise a new sprite record).
 
@@ -73,15 +73,21 @@ than 128 sprites is a no.
 
 ## 3. Order of work (each step ships something playable)
 
-1. **Sprite atlas + roster report** (1 session): the PNG sheet and a table of candidates with their
-   frame groups. Ryan picks the roster.
-2. **Hercule hero pass** (1-2 sessions): stats/level curve, moveset, Super Human form, Keep-Goku
-   byte, dialogue swaps for the first chapter so the game *opens* as Hercule's story.
-3. **Script tooling** (1-2 sessions): VM disassembler/assembler + dialogue text tool, verified by
-   round-tripping the stock scripts; then the scene edits of pillar B.
-4. **New playables** (per character, ~1 session each): Krillin first.
-5. **Animal quest** (1-2 sessions).
-6. **Buu's Fury phase 2** (later): decompile pass, save conversion, handoff.
+1. **Sprite atlas + roster report** (1 session, in progress): the PNG sheet and a table of candidates
+   with their frame groups; the Super Saiyan Hercule sprite as a new sprite id and display row
+   (`docs/sprites.md`). Ryan picks the roster.
+2. **Hercule hero pass, no new sprites** (done 2026-10-17, `docs/hercule.md`): ROM data tools
+   (`tools/romdata.py`, `patch_rom.py --data-patch`, `data/hercule.json`), stats and growth curve,
+   four abilities from existing animations (table entries 14-17), the Keep-Goku byte, the dialogue
+   dumper (`tools/script_dump.py`) and the first two opening-text swaps.
+3. **Hercule hero pass, sprite half** (next, after 1): the "Super Human" transformation entry
+   pointing at the new display row, real icons for the four abilities, a HUD portrait.
+4. **Script tooling** (1-2 sessions): a dialogue/script *assembler* on top of the dumper (new
+   sequences and scripts in free space, not only in-place swaps), verified by round-tripping the
+   stock scripts; then the scene edits of pillar B (the Cell Games as Hercule's win).
+5. **New playables** (per character, ~1 session each): Krillin first.
+6. **Animal quest** (1-2 sessions).
+7. **Buu's Fury phase 2** (later): decompile pass, save conversion, handoff.
 
 ## 4. Rules we keep
 

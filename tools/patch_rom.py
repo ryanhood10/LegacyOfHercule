@@ -1,8 +1,18 @@
 """Build the co-op ROM: pad the original to 16 MiB, drop the compiled code at 0x800000, rewrite the
 vtable slots that redirect into it, and patch function entries with long jumps.
 
-usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba
+usage: patch_rom.py ORIG.gba coop.bin coop.sym OUT.gba [--debug-menu] [--wide] [--data-patch FILE.json ...]
+
+--data-patch FILE.json applies generic data records to the output ROM (after the code and hooks).
+The file is a JSON list; each record is an object with a file offset and one of:
+    {"offset": "0x1D9548", "bytes": "32003200..."}        raw bytes (hex string)
+    {"offset": "0x8024",   "word":  "0x08900000"}         one little-endian u32
+    {"offset": "0x8024",   "word":  "sym:ability_table"}  u32 = that symbol's address from coop.sym
+    {"offset": "0x8024",   "word":  "fn:hercule_taunt"}   u32 = symbol address | 1 (Thumb function pointer)
+An optional "expect": "5b" (hex) aborts the build if the bytes there differ, and "note" is printed.
+Records are applied in order; tools/romdata.py and tools/script_dump.py generate these files.
 """
+import json
 import struct
 import sys
 
@@ -63,10 +73,36 @@ def load_symbols(path):
     return syms
 
 
+def apply_data_patch(rom, path, syms):
+    """Apply the (offset, bytes) records of a JSON data patch file (format: see the header)."""
+    for rec in json.load(open(path)):
+        off = int(rec["offset"], 0) if isinstance(rec["offset"], str) else rec["offset"]
+        if "bytes" in rec:
+            data = bytes.fromhex(rec["bytes"])
+        else:
+            w = rec["word"]
+            if isinstance(w, str) and w.startswith("sym:"):
+                w = syms[w[4:]]
+            elif isinstance(w, str) and w.startswith("fn:"):
+                w = syms[w[3:]] | 1
+            elif isinstance(w, str):
+                w = int(w, 0)
+            data = struct.pack("<I", w)
+        if "expect" in rec:
+            exp = bytes.fromhex(rec["expect"])
+            if rom[off:off + len(exp)] != exp:
+                sys.exit(f"data patch {path} at {off:#x}: expected {exp.hex()}, found {rom[off:off + len(exp)].hex()}")
+        if off + len(data) > len(rom):
+            sys.exit(f"data patch {path} at {off:#x}: {len(data)} bytes run past the ROM")
+        rom[off:off + len(data)] = data
+        print(f"data   {ROM_BASE + off:08x} {len(data):5} bytes  {rec.get('note', '')}")
+
+
 def main():
     orig, blob, symfile, out = sys.argv[1:5]
     debug_menu = "--debug-menu" in sys.argv[5:]
     wide = "--wide" in sys.argv[5:]
+    data_patches = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--data-patch"]
     rom = bytearray(open(orig, "rb").read())
     if debug_menu:
         off, old, new = DEBUG_MENU_PATCH
@@ -111,6 +147,9 @@ def main():
         else:
             sys.exit(f"entry jump at {addr:#x} must be 2-byte aligned")
         print(f"entry  {addr:08x} -> {name} @ {target:08x}")
+
+    for path in data_patches:
+        apply_data_patch(rom, path, syms)
 
     open(out, "wb").write(rom)
     print(f"wrote {out}: {len(rom)} bytes, code {len(code)} bytes at {ROM_BASE + CODE_AT:#x}")

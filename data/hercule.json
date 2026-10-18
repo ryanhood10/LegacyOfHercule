@@ -1,0 +1,73 @@
+{
+  "_": "Legacy of Hercule data edits, applied by tools/romdata.py build -> patch_rom.py --data-patch (see docs/hercule.md)",
+  "free": "0x900000",
+  "party": {
+    "5": {
+      "hp": 50,
+      "ep": 30,
+      "str": 2.0,
+      "pow": 0.5,
+      "end": 1.5,
+      "abilities": [
+        14,
+        15,
+        16,
+        17
+      ],
+      "ability_index": 0
+    }
+  },
+  "growth": {
+    "5": {
+      "str": [
+        360,
+        560
+      ],
+      "pow": [
+        300,
+        500
+      ],
+      "end": [
+        450,
+        650
+      ]
+    }
+  },
+  "abilities": [
+    {
+      "name": "RollingHerculePunch",
+      "icons": 6,
+      "is_ready": "fn:hercule_punch_ready",
+      "on_use": "fn:hercule_punch_use"
+    },
+    {
+      "name": "DynamiteKick",
+      "icons": 2,
+      "is_ready": "fn:hercule_kick_ready",
+      "on_use": "fn:hercule_kick_use"
+    },
+    {
+      "name": "MegatonPunch",
+      "icons": 0,
+      "is_ready": "fn:hercule_megaton_ready",
+      "on_use": "fn:hercule_megaton_use"
+    },
+    {
+      "name": "HerculeTaunt",
+      "icons": 11,
+      "is_ready": "fn:hercule_taunt_ready",
+      "on_use": "fn:hercule_taunt_use"
+    }
+  ],
+  "patches": [
+    {
+      "offset": "0x3EC738",
+      "expect": "5b",
+      "bytes": "4f",
+      "note": "Keep Goku after the Cell Games: ClearCharacterInParty(4) -> SetCharacterInParty(4)"
+    }
+  ],
+  "include": [
+    "data/hercule-text.json"
+  ]
+}
