@@ -203,13 +203,13 @@ frame-stop makes emulated time lag real time, so wait longer before reading the 
 
 ```
 make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
-tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Quiet
+tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute
 python tools\fork\p2hold.py --port 7780 --cmd F:/.../build/kn/p2cmd.txt          # background
 tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"           # toggle the pad to player 1, A
 ```
 
 - **Several forks at once**: with audio sync on, an instance can barely advance (its pad socket's
-  Recv-Q grows, keys "don't register"); `-Quiet` (= `-C mute=1 -C audioSync=0`) fixes it. Other
+  Recv-Q grows, keys "don't register"); `-Mute` (= `-C mute=1 -C audioSync=0`) fixes it. Other
   sessions' scripts (`runa16.ps1`, older `runfork.ps1` copies) run `pkill -9 -x mgba` /
   `pkill -x gdb-multiarch`, which kills every instance or its gdb client; a dead gdb client leaves the
   stub halted (relaunch).

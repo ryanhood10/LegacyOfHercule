@@ -99,7 +99,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `win_keys.ps1`, `win_shot.ps1`, `win_burst.ps1` | keys and screenshots for any window by title (used for the WSL fork window); `win_burst` takes N frames from one process |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |
-| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`); Krillin tests: `padq.sh` (queue steps for `p2hold.py --cmd`), `kr_peek.sh`, `kr_ents.gdb`, `kr_tele2.sh`, `kr_setidx.sh`; `runfork.ps1 -Quiet` (no audio sync, for several forks at once) |
+| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh`; Android 16 fight: `runa16.ps1`, `p2hold.py` (scripted player-2 pad), `a16fight.sh`, `a16peek.sh/.gdb`, `a16hits.gdb`, `a16install.sh` (`docs/testing.md`); Krillin tests: `padq.sh` (queue steps for `p2hold.py --cmd`), `kr_peek.sh`, `kr_ents.gdb`, `kr_tele2.sh`, `kr_setidx.sh`; `runfork.ps1 -Mute` (no audio sync, for several forks at once) |
 
 ## Where to look for...
 

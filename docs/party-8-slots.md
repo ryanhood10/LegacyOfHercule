@@ -153,8 +153,6 @@ journal with seen bits set, a save from the real story (the fork's EEPROM starts
 
 ## Follow-ups
 
-- Player 2's entity combat bytes (+0x160..0x162) come from player 1's slot (the behaviour init reads
-  the active slot); Krillin as player 2 hits with player 1's stats (also noted by the Android 16 work).
 - Save-menu portrait row wider than six (the menu object's 3 x 6 entity arrays).
 - The 6 x 0x1C bytes still reserved for the party inside the save-menu object and the scroll's
   rebuilt portraits (deleted through the entity list, so no leak was seen) are the only loose ends.
