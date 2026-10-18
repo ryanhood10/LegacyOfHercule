@@ -175,7 +175,8 @@ heal, Vegeta storms off, Piccolo leaves alone for the Lookout. In the series it 
 18 on this road and loses, with Piccolo beaten too, so making it Piccolo + Vegeta against 17 + 18
 is closer to the source than the stock scene: for the fight the script makes Vegeta the only
 player-2 choice (whoever lost the duel gets Vegeta back here), 17 joins as 18's twin (needs an
-enemy record; 17's fighting sprite is to be confirmed from the atlas, 9 or 15), both-down rule,
+enemy record; his fighting sprite is 9, a full enemy-grade set with attacks and hurt poses; 15 is
+Android 16's NPC set), both-down rule,
 and the blast knocks both players flat before the stock dialogue resumes. Hercule stands with
 Krillin for the plea; the kiss stays Krillin's unless Ryan wants it on Hercule.
 
