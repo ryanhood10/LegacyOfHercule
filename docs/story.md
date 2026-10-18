@@ -113,6 +113,17 @@ Ryan's version:
    sprite, so this beat depends on decoding that ROM's sprite tables (also needed for old Hercule
    and the Buu phase); until then a recoloured LoG2 android (sprites 12-14 have the same
    enemy-grade pose sets) stands in. Fallback if the art never lands: Android 20 as the twin.
+   Ryan's rules for the fight: 13 stands with 19 and 20 in the zone 7 area 1 scene (Goku coughing,
+   19 volunteering) and is introduced there; both players fight 13 and 19 together; a boss that
+   dies first only falls to the ground, and only when both are down does 19 explode and 13 fly off,
+   swearing revenge and saying they do not know Dr. Gero's true plan. That "both down" rule is a
+   small addition to the twin-boss code in `enemies.c` (downed state, no death action until the
+   pair is dead).
+6. **Three-year skip boosts.** The skip script at Gohan's home sets levels and HP by script
+   (`SetCharacterLevel` / `SetCharHP`, map 7), as do Piccolo's unlock (slot 1 to level 10), Vegeta's
+   space scene (slot 2 to 18), the Time Chamber and the ending (Hercule to 40). Krillin and Hercule
+   get their own scripted bumps at the skip, kept below the Z fighters (numbers with the growth
+   design in `docs/hercule.md`).
 
 What it costs (no code yet):
 
@@ -137,10 +148,14 @@ enemy stat 7, sprite 14, with robot escorts), Gero activates 17 and 18, the Andr
 identify in play, likely Android 17 vs Piccolo), Cell's lab under the computer (Krillin's
 lines: "that thing is made up of cells from the greatest fighters", the self-destruct), Yajirobe's
 Senzu drop, then the Lookout (zone 9 area 1) hands player 1 to Gohan. Krillin stands as an NPC in
-zone 8 areas 47, 48 and 65 and talks through the lab scenes, so while Hercule is player 2 Krillin's
-selectable bit stays clear (set it again when the party next meets at the Lookout). Hercule gets a
-line per scene: scared of the lab door, hiding behind Piccolo when 17 and 18 wake, "I knew it" at
-Cell's tank. Cost: text and a few bytes.
+zone 8 areas 47, 48 and 65 and talks through the lab scenes. Ryan: player 2 defaults to Hercule
+here but the save pad keeps the other unlocked characters selectable, so instead of clearing
+Krillin's bit we add one generic rule in `src/coop`: when a map spawns an actor whose sprite id is
+player 2's current sprite, skip that actor (the dialogue still plays with its portrait). Then Krillin
+as player 2 never meets his own NPC anywhere in the game. Hercule gets a line per scene: scared of
+the lab door, hiding behind Piccolo when 17 and 18 wake. The chapter's fights, as scripted: Dr.
+Gero at the lab door (boss, with robot escorts) and Android 18 on the road (a fight the script ends
+with her "Nice try... who's next?"); both become two-on-two through the twin mechanism.
 
 ## 5. What the plan is missing (engine limits found while checking)
 
