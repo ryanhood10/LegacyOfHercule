@@ -646,3 +646,33 @@ gets `A16_SOLO_HP_PCT` (70%) of his HP (not tested).
 - The island scripts still name 17 (sprite 9, stat 3); the dialogue and scripts are the parent's.
 - AI set 21 drives his melee, so he keeps 17's moves (dash, kicks) rather than moves of his own.
 - The player-2 combat-byte bug above; a Camera_Shake guard for `player.c`.
+
+## Boss rules and extra stats (2026-10-18, src/coop/bosses.c)
+
+Story bosses are configured in `src/coop/bosses.c` (declarations and field meanings in `bosses.h`):
+
+- **Extra stats** (`extra_stats[]`, index `EXTRA_STAT_BASE` 110 + i): a stock stat to start from
+  plus overrides (AI set, HP, EXP, melee/ranged/defence). The spawn resolves it into the enemy's
+  private stat copy, so no ROM table is copied into the build. 110 = Android 13 (base form, 19's AI
+  and class). 109 stays Android 16 (own spawn path in `android16.c`).
+- **Boss rules** (`rules[]`, by stat index, single-player and co-op alike): `end_pct` (the entity
+  gets only the HP above `end_pct` and its bar is drawn over `[end_pct, 100]`, so the fight ends
+  "at half health" with the bar half full), `partner_sprite` / `partner_stat` (the co-op twin's model
+  and stat; 0 = same model, a Multi-Form duplicate), `BOSS_NO_TWIN`. Current rules: 17 <-> 18 models,
+  19 + Android 13 and Dr. Gero + Android 13 (sprite `A13_SPRITE`, 0 until the art lands), Perfect
+  Cell (78, 79) alone to half health. Imperfect and Semi-Perfect Cell use the default duplicate.
+- **Both-down rule** (all boss pairs): the first boss of a pair to fall takes the blow as a
+  non-lethal hit (knock-back, damage popup), then HP 0, no action, list message 0xF (its bar lets
+  go), plays pose group 3 (the knock-down: standing, falling, lying on 17, Gero and the Cell forms;
+  19 has none) and freezes on the lying frame; its AI stops (vtable slot 2 wrapper) and further hits
+  are ignored. The ROM's boss death is never called for it because that removes the entity. The
+  survivor carries the original's record action; its death runs the fight's script as before.
+  `coop2.off |= COOP_OFF_BOTHDOWN` (32) restores the old quiet removal.
+
+Verified in the fork (island zone 11 area 6, `a16_base.ss1`, Map_SpawnScript 0 = the Android 17 boss
+record): 17 + 18-model twin spawned; 17 knocked out first lay down and stayed (HP 0, frozen, no
+action) while the twin fought on with 17's action; knocking out the twin switched it back to 17's
+model and ran the stock defeat dialogue ("This is ridiculous. Piccolo was supposed to be nothing to
+us!"). With the test rule (`make CFLAGS_EXTRA=-DBOSS_RULE_TEST`: 17 alone, end 50 %) 17 spawned
+alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `build/bdtest.sh`,
+`bdfind.sh`, `bdpeek.sh` (not committed; the pattern is in `docs/testing.md`).

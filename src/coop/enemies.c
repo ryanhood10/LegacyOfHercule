@@ -8,6 +8,10 @@
 // walk speed, and BossHealthBar_Create 0x080104C0.
 #include "coop.h"
 #include "android16.h"
+#include "bosses.h"
+
+ROM_FN(void, Enemy_UpdateStates, (Entity *e), 0x0800772B);   // aux + control state; the AI tick follows in 0x0800E5A5
+#define ENEMY_UPDATE 0x0800E5A5u
 
 CoopExtra coop2 __attribute__((section(".coop2"), used));
 
@@ -34,15 +38,13 @@ static int twinnable(const EnemyRecord *rec, const EnemyStat *st) { return st->e
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
+// The table lives in bosses.c (boss rules). Cooler (stat 29): King Cold's sprite (74) with Cooler's AI
+// set crashes at spawn (so does any other record; Cell's AI takes Cooler's model fine), so Cooler keeps
+// the same model until module 0x0801C05B is understood.
 static int partner_sprite(int stat_index) {
     if (coop2.partner_override) return (int)coop2.partner_override;
-    switch (stat_index) {
-    // Cooler (stat 29): King Cold's sprite (74) with Cooler's AI set crashes at spawn (so does any
-    // other record; Cell's AI takes Cooler's model fine) -> same model until module 0x0801C05B is understood
-    case 3:  return 11;   // Android 17 (Z11) -> Android 18
-    case 4:  return 9;    // Android 18 (Z8A49) -> Android 17
-    default: return 0;    // Cell forms, Cell Jr, Garlic Jr and the Spice boys, the robot: same model
-    }
+    const BossRule *r = boss_rule(stat_index);
+    return r ? r->partner_sprite : 0;
 }
 
 // The twin's record copy points its action object here, so a twin's death never fires the
@@ -109,13 +111,61 @@ static void quiet_death(Entity *e) {
     Enemy_RegularDeath(ENEMY_CLASS_REGULAR, e);
 }
 
-// Enemy vtable slot 14 (OnHit: HP -= hit[+8], death at 0) for co-op enemies. Boss pairs: the
-// first of the two to fall is removed quietly and hands the original's role (record action, the
-// script's model) to the survivor, whose death then runs the fight's script as in single-player.
+// A boss that fell while its partner fights on (both-down rule): HP 0, no action, no AI. The ROM's
+// boss death would remove the entity, so a downed boss never reaches it: it takes the blow as a
+// non-lethal hit (knock-back, damage popup), then HP 0; its states run DOWN_SETTLE more frames (the
+// knock-back finishes) and then it stays frozen where it fell until the map changes.
+#define DOWN_SETTLE 90
+static s32 *down_timer(EnemyRecord *r) { return record_orig_sprite(r) + 1; }   // record copy word after the original sprite
+static int is_downed(const Entity *e) {
+    return is_coop_enemy(e) && e->hp <= 0 && record_of_const(e)->action == (void *)no_action;
+}
+
+// The knock-down pose: pose group 3 (standing, falling, lying) on the boss models that have it
+// (17, Gero, the Cell forms); Android 19's record has no group 3.
+#define DOWN_GROUP 3
+static const u32 *down_group(const Entity *e) {
+    const u32 *g = (const u32 *)((const u8 *)e->sprite_record + 0x4C + 0x10 * DOWN_GROUP);
+    return g[0] ? g : 0;
+}
+
+// Enemy vtable slot 2 for co-op enemies: a downed boss plays its knock-down and freezes on the last
+// frame (or after DOWN_SETTLE frames without one): no states, no AI.
+static void coop_enemy_update(Entity *e) {
+    if (is_downed(e)) {
+        s32 *t = down_timer(record_of(e));
+        const u32 *g = down_group(e);
+        int lying = g && *(const u32 **)((const u8 *)e + 0x4C) == g && *((const u8 *)e + 0x14) >= 3;
+        if (*t < DOWN_SETTLE && !lying) { (*t)++; Enemy_UpdateStates(e); }
+        return;
+    }
+    ((void (*)(Entity *))ENEMY_UPDATE)(e);
+}
+
+static void go_down(Entity *e, const u8 *hit) {
+    record_of(e)->action = (void *)no_action;
+    e->action = (void *)no_action;
+    *down_timer(record_of(e)) = 0;
+    // the hit sits inside the caller's message (OnHit reads around it), so trim its damage in place
+    s32 *dmg = (s32 *)(hit + 8);
+    s32 full = *dmg;
+    if (e->hp > 1) { *dmg = e->hp - 1; Enemy_OnHit(e, hit); }   // knock-back and popup, not the death
+    *dmg = full;
+    if (down_group(e)) Entity_SetAnimation(e, DOWN_GROUP);   // control state 3 plays pose group 3
+    e->hp = 0;
+    EntityList_Broadcast(g_SceneTable[1], 0xF, e);   // "entity died": its boss bar lets go
+    coop2.downed++;
+}
+
+// Enemy vtable slot 14 (OnHit: HP -= hit[+8], death at 0) for co-op enemies. Boss pairs follow the
+// both-down rule: the first of the two to fall hands the original's role (record action, the script's
+// model) to the survivor and stays down on the map; the survivor's death then runs the fight's script
+// as in single-player.
 static int coop_enemy_onhit(Entity *e, const u8 *hit) {
+    if (e->hp <= 0) return 1;   // already down: further hits do nothing
     s32 dmg = *(const s32 *)(hit + 8);
     TwinPair *pr = pair_of(e);
-    if (pr && is_boss(e) && e->hp > 0 && dmg >= e->hp) {
+    if (pr && is_boss(e) && dmg >= e->hp) {
         Entity *partner = pr->orig == e ? pr->twin : pr->orig;
         if (partner) {
             if (pr->orig == e) {
@@ -127,7 +177,8 @@ static int coop_enemy_onhit(Entity *e, const u8 *hit) {
             } else {
                 pr->twin = 0;
             }
-            quiet_death(e);
+            if (coop2.off & COOP_OFF_BOTHDOWN) quiet_death(e);
+            else go_down(e, hit);
             return 1;
         }
         // last of the pair: a partner-model twin dies as the original model so the script sees it
@@ -144,6 +195,7 @@ void enemies_init(void) {
     const u32 *orig = (const u32 *)ENEMY_VTABLE;
     for (int i = 0; i < 48; i++) coop2.enemy_vtable[i] = (ENEMY_VTABLE + orig[i]) - base;
     coop2.enemy_vtable[0] = (u32)coop_enemy_destroy - base;
+    coop2.enemy_vtable[2] = (u32)coop_enemy_update - base;
     coop2.enemy_vtable[14] = (u32)coop_enemy_onhit - base;
 
     base = (u32)coop2.bar_vtable;
@@ -161,6 +213,7 @@ void enemies_init(void) {
         coop2.partner_override = 0;
         coop2.a16 = 0;
         coop2.a16_force = 0;
+        coop2.downed = 0;
     }
 }
 
@@ -170,9 +223,9 @@ void enemies_init(void) {
 // shifted spawn point (the constructor registers the collision box at the record's position, so the
 // twin must be created where it stands) and, for boss twins, the partner sprite.
 static u32 record_size(const EnemyRecord *rec) { return 0x1C + 4 * (u32)rec->behaviour_count; }
-static u32 record_copy_size(const EnemyRecord *rec) { return record_size(rec) + 4; }   // + original sprite id
+static u32 record_copy_size(const EnemyRecord *rec) { return record_size(rec) + 8; }   // + original sprite id, down timer
 
-static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, int scale, int dx, int sprite, int twin) {
+static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, int scale, int dx, int sprite, int twin, int stat_index) {
     u32 rsize = record_copy_size(rec);
     u8 *block = Arena_Alloc(ENEMY_SIZE + sizeof(EnemyStat) + rsize);
     if (!block) return 0;
@@ -187,6 +240,7 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
     r->x = (s16)(rec->x + dx);
     *record_orig_sprite(r) = rec->sprite_id;
     if (sprite) r->sprite_id = sprite;
+    if (stat_index >= 0) r->stat_index = stat_index;   // partner stat: rule lookups follow the twin's own stat
     if (twin) r->action = (void *)no_action;   // twins never fire the record's action
     Entity *e = Enemy_Create(block, r, stat);
     if (!e) { Arena_Free(block); return 0; }
@@ -194,14 +248,37 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
     return e;
 }
 
+// The stat a record spawns with: the stock entry, an extra stat (bosses.c), and for a boss rule with
+// end_pct only the HP above end_pct. Returns the stock pointer when nothing changes (no private copy
+// needed in single-player), else fills *buf.
+static const EnemyStat *spawn_stat(int stat_index, const BossRule *rule, EnemyStat *buf) {
+    const EnemyStat *st;
+    if (stat_index < STOCK_STAT_COUNT) {
+        st = &ENEMY_STATS[stat_index];
+    } else {
+        if (!resolve_stat(stat_index, buf)) return 0;
+        st = buf;
+    }
+    if (rule && rule->end_pct) {
+        if (st != buf) { *buf = *st; st = buf; }
+        buf->max_hp = buf->max_hp * (100 - rule->end_pct) / 100;
+    }
+    return st;
+}
+
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
-    const EnemyStat *st = &ENEMY_STATS[rec->stat_index];
-    if (!p2_present() || !twinnable(rec, st)) return Enemy_Create(0, rec, st);
+    const BossRule *rule = boss_rule(rec->stat_index);
+    EnemyStat buf;
+    const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
+    if (!st) return 0;
+    int alone = rule && (rule->flags & BOSS_NO_TWIN);
+    if (!p2_present() || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
+        return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
 
     int boss = is_boss_rec(rec, st);
-    Entity *orig = create_coop_enemy(rec, st, !boss, 0, 0, 0);
+    Entity *orig = create_coop_enemy(rec, st, !boss, 0, 0, 0, -1);
     if (!orig) return 0;
 
     // Twin TWIN_OFFSET px to the right when that spot is walkable, else to the left, else on top.
@@ -211,8 +288,16 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         px[0] = rec->x - TWIN_OFFSET;
         dx = (rec->x >= TWIN_OFFSET + 8 && Collision_Check(COLLISION_MAP, px, (u8 *)orig + 0x154)) ? -TWIN_OFFSET : 0;
     }
+    // the twin: the partner's stat when the rule names one (Android 13 beside 19 or Dr. Gero)
+    const EnemyStat *tst = st;
+    EnemyStat tbuf;
+    int tstat = -1;
+    if (boss && rule && rule->partner_stat && !(coop2.off & COOP_OFF_PARTNER)) {
+        const EnemyStat *p = spawn_stat(rule->partner_stat, boss_rule(rule->partner_stat), &tbuf);
+        if (p) { tst = p; tstat = rule->partner_stat; }
+    }
     Entity *twin = (coop2.off & COOP_OFF_TWINS) ? 0
-                 : create_coop_enemy(rec, st, !boss, dx, (boss && !(coop2.off & COOP_OFF_PARTNER)) ? partner_sprite(rec->stat_index) : 0, 1);
+                 : create_coop_enemy(rec, tst, !boss, dx, (boss && !(coop2.off & COOP_OFF_PARTNER)) ? partner_sprite(rec->stat_index) : 0, 1, tstat);
     if (twin) {
         EntityList_Add(g_SceneTable[1], twin);   // the loader adds the returned original itself
         register_pair(orig, twin);
@@ -265,7 +350,7 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     if (!m) return 0;
     m->vtable = (u32 *)vtable;
     m->speed = (s32)cls[3];
-    if (is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * COOP_SPEED_NUM / COOP_SPEED_DEN;
+    if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * COOP_SPEED_NUM / COOP_SPEED_DEN;
     return m;
 }
 SpeedModule *ai_speed8_create_hook(const u32 *cls, const Entity *e) { return speed_module(cls, e, AI_SPEED8_VTABLE); }
@@ -381,7 +466,15 @@ static void coop_bar_update(BossBar *bar) {
     else if (y > bar->y_target) { bar->y = bar->y_target; bar->step = 0; }
 }
 
+// A boss with an end_pct rule has only the HP above end_pct: its bar starts at end_pct.
+static int bar_lo(const Entity *e, int lo) {
+    if (!is_coop_enemy(e)) return lo;
+    const BossRule *r = boss_rule(record_of_const(e)->stat_index);
+    return (r && r->end_pct > lo) ? r->end_pct : lo;
+}
+
 BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
+    if (e) lo = bar_lo(e, lo);
     if (!coop.p2) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);   // single-player: the ROM object
     TwinPair *pr = pair_of(e);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin

@@ -1,4 +1,5 @@
 #!/bin/bash
+. /root/slot.sh
 # Hold player-1 buttons through the netplay pad word g_p1_remote (0x0203FF02, 0x8000 | active-high
 # mask: A=1 B=2 Select=4 Start=8 Right=0x10 Left=0x20 Up=0x40 Down=0x80 R=0x100 L=0x200).
 # usage: keys.sh MASK SECONDS [MASK SECONDS ...]   (a 0 mask = release / wait)

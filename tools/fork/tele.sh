@@ -1,4 +1,5 @@
 #!/bin/bash
+. /root/slot.sh
 # teleport player 1 (pixels). usage: tele.sh X Y
 G=/root/gdbsrv.sh
 $G pause; sleep 0.5

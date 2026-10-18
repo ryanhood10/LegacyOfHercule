@@ -4,7 +4,8 @@ usage: apply.py <mgba source dir>
 Adds: a runtime frame size (up to 720 x 480) read from an EWRAM descriptor the ROM writes,
 backgrounds drawn from the game's ROM map chunks (software-wide.c), extended OBJ coordinates
 (attr1 bits 9/10 for non-affine sprites), an SDL presenter that scales the current frame size to the
-window, and MGBA_SCRIPT=<file.lua> loading in the SDL frontend.
+window, MGBA_SCRIPT=<file.lua> loading in the SDL frontend, MGBA_P2_PORT for the player-2 TCP pad,
+and MGBA_GDB_PORT for the GDB stub (so several instances can run side by side).
 """
 import os
 import shutil
@@ -398,5 +399,17 @@ edit("src/platform/sdl/main.c", [
      "\tmP2PadInit();\n\tbool didFail = !mCoreThreadStart(&thread);\n"),
     ("#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n",
      "\tmP2PadDeinit();\n#ifdef ENABLE_SCRIPTING\n\tif (scriptPath) {\n\t\tmScriptContextDeinit(&scriptContext);\n\t}\n"),
+])
+# ---- GDB stub port from MGBA_GDB_PORT (default 2345), so several fork instances can run at once --
+edit("src/debugger/debugger.c", [
+    ("\t\tGDBStubListen(&debugger->gdb, 2345, &localHost, GDB_WATCHPOINT_STANDARD_LOGIC);\n",
+     "\t\t{\n\t\t\tconst char* gdbPortStr = getenv(\"MGBA_GDB_PORT\");\n"
+     "\t\t\tint gdbPort = gdbPortStr ? atoi(gdbPortStr) : 0;\n"
+     "\t\t\tGDBStubListen(&debugger->gdb, gdbPort > 0 ? gdbPort : 2345, &localHost, GDB_WATCHPOINT_STANDARD_LOGIC);\n\t\t}\n"),
+])
+# ---- window title from MGBA_TITLE, so tools can find one instance among several by title ----------
+edit("src/platform/sdl/sw-sdl2.c", [
+    ("\trenderer->window = SDL_CreateWindow(projectName, ",
+     "\trenderer->window = SDL_CreateWindow(getenv(\"MGBA_TITLE\") ? getenv(\"MGBA_TITLE\") : projectName, "),
 ])
 print("done")

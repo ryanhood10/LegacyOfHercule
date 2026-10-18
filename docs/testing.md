@@ -50,6 +50,21 @@ Always `pkill -9 -x mgba` before launching: a stale instance keeps ports 7778/23
 silently runs without pad or debugger. The log says `p2pad: sender connected` when the pad is live.
 Select cycling for player 2 registers only every few presses; verify the slot instead of counting.
 
+## Several fork instances at once (slots)
+
+`tools/fork/runfork.ps1 <rom> [-Wait s] [-Slot n] [-State /mnt/f/.../x.ssN]` launches instance n with
+`MGBA_GDB_PORT` 2345+n, `MGBA_P2_PORT` 7778+n and window title `mGBA-n` (slot 0 keeps 2345 / 7778 /
+"mGBA"), stops only that slot's previous instance, installs `tools/fork/*.sh|*.gdb` into `/root`
+(`install.sh`) and attaches the persistent gdb client. Every helper takes the slot from `FORK_SLOT`
+(`tools/fork/slot.sh`: ports, `/tmp/gdbin-n`, `/root/gdb-n.log`), e.g.
+`wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=1 /root/peek.sh"`. Screenshots by title:
+`tools\win_shot.ps1 out.png -Title "mGBA-1"` (slot 0: `-Title "mGBA (Ubuntu)"`). Player-2 pad:
+`python tools/fork/p2hold.py --port 7779` for slot 1. Claim a slot before using it (check
+`ss -ltn | grep 234` in WSL); sessions running in parallel should each use their own.
+
+Finding entities with gdb: the scene list is `g_EntityList` 0x03001120, `count` at +4 and the item
+pointers inline from +8; co-op enemies have vtable 0x0203FB04 (`coop2.enemy_vtable`).
+
 ## Fork helpers (`tools/fork/`, used for the party-slots work)
 
 The stub accepts one client per emulator run: a second `target remote` never completes, and a client
@@ -57,7 +72,7 @@ that quits while attached leaves the stub writing to a dead socket (SIGPIPE kill
 launcher ignores it). So keep one gdb attached for the whole run:
 
 ```
-toolsorkunfork.ps1 /mnt/f/MeltyCreations/log2/build/party8/log2-coop.gba 14   # kill old, launch with -g + trap '' PIPE, attach, continue, wait
+tools\fork\runfork.ps1 /mnt/f/MeltyCreations/log2/build/party8/log2-coop.gba 14   # kill old, launch with -g + trap '' PIPE, attach, continue, wait
 wsl -d Ubuntu -u root -- bash -c "/root/peek.sh"            # pause, dump party / player / EEPROM slots (peek.gdb), continue
 wsl -d Ubuntu -u root -- bash -c "/root/keys.sh 8 0.25"      # hold Start 0.25 s through g_p1_remote (0x0203FF02): A=1 B=2 Sel=4 Start=8 R/L/U/D=0x10/20/40/80 R=0x100 L=0x200
 wsl -d Ubuntu -u root -- bash -c "/root/tele.sh 544 215"     # teleport player 1 (pixels)

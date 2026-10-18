@@ -81,7 +81,10 @@ typedef struct CoopExtra {
     u16 a16_specials;       // debug: specials started
     u32 a16_spawn_frame;    // debug: g_FrameCounter when he spawned / when his HP reached 0
     u32 a16_dead_frame;
+    u16 downed;             // debug: bosses left downed by the both-down rule (enemies.c)
+    u16 _pad3;
 } CoopExtra;
+_Static_assert(sizeof(CoopExtra) <= 0x300, "CoopExtra must fit 0x0203FB00..0x0203FE00");
 #define COOP_CMD_SPAWN_SCRIPT 1   // arg = mapScripts index: spawn it like the TriggerMapEvent opcode (bosses)
 #define COOP_CMD_BOSS_BAR     2   // arg = entity (0 = pair 0's original): the DrawBossHealthBar path
 #define COOP_CMD_ACTOR        3   // arg = sprite id: stand a script actor of that sprite 32 px right of player 1 (model lookup)
@@ -102,6 +105,7 @@ extern CoopExtra coop2;
 #define COOP_OFF_SPEED  4
 #define COOP_OFF_HP     8
 #define COOP_OFF_PARTNER 16  // boss twins keep the original's model
+#define COOP_OFF_BOTHDOWN 32 // the first boss of a pair to fall is removed (pre-2026-10-18 behaviour) instead of staying down
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame

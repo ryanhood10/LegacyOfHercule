@@ -1,4 +1,5 @@
 #!/bin/bash
+. /root/slot.sh
 # jump the CPU to the ROM entry (ARM mode): a reset that keeps the emulator's EEPROM
 G=/root/gdbsrv.sh
 $G pause; sleep 0.5
@@ -8,4 +9,4 @@ $G cmd 'set $pc = 0x08000000'
 sleep 0.3
 $G cmd continue
 sleep 0.5
-grep 'reset from' /root/gdb.log | tail -1
+grep 'reset from' "$GDB_LOG" | tail -1

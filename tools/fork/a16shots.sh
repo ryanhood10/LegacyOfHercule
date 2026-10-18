@@ -1,4 +1,5 @@
 #!/bin/bash
+. /root/slot.sh
 # Paused-frame screenshot series of an Android 16 fight on the fork (Git Bash on Windows):
 # a16shots.sh PREFIX COUNT RUN_SECONDS [FORCE BOT]  -> build/a16/shots/PREFIX<n>.png
 # The emulator is paused for each screenshot, so RUN_SECONDS of game time pass between shots.
