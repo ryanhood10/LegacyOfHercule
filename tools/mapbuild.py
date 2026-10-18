@@ -5,6 +5,7 @@ exits, gates, the variation and a MapEntry row per map. All graphics come from t
 tiles), so nothing from the ROM is committed. Format: docs/maps.md; library: tools/maplib.py.
 
 usage: mapbuild.py build SPEC.json [SPEC.json ...] OUT.json [--rom roms/log2.gba] [--free 0xD00000] [--preview DIR]
+                    [--buu-rom roms/buu.gba]
        mapbuild.py preview SPEC.json [--rom ...] [--out DIR]     render the built map (layers, collision) without a ROM
 
 Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for objects):
@@ -24,8 +25,12 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "triggers": [{"type": "flight", "rect": [x1,y1,x2,y2], "world": [x, y]}, {"type": "script", ...}],
   "exits": [{"type": "edge"|"door", "rect": [...], "dir": "down|up|left|right", "to": [z, a, v], "at": [x, y]}],
   "onload": {"barrier_flag": 280, "rect": [x1,y1,x2,y2]} | null,
-  "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1
+  "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
+  "requires": "buu"                  only built when that ROM is given (--buu-rom)
 }
+A stamp / fill / copy source "map" is [zone, area(, variation)] of this ROM, or a foreign variation record:
+{"rom": "buu", "variation": "0x0822229C"} (Buu's Fury: same map format; its tiles are converted to LoG2's
+palette by nearest colour).
 """
 import argparse
 import colorsys
@@ -41,6 +46,7 @@ from buu2log2 import compress   # noqa: E402  (LZ encoder for the IWRAM decompre
 from mapchunks import decompress   # noqa: E402
 
 DIRS = {"down": 0, "up": 1, "left": 2, "right": 3, "none": 0}
+BUU_BG_PALETTE = 0x0805632C     # Buu's Fury BG palette (0x200 below its OBJ palette 0x0805652C)
 FREE_DEFAULT = 0xD00000          # file offset: maps region (0x800000 code, 0x900000 Hercule data, 0xB00000 story)
 TABLE_LITERALS = [0x5ADC, 0x5D5C, 0xEBD8]   # code literals holding the MapEntry table address
 TABLE_ENTRY3_LITERAL = 0x195C               # &table[3] (the new-game map)
@@ -99,15 +105,21 @@ class Tileset:
 
 
 class Source:
-    """A stock map variation read into world-aligned grids: layers 1..3 (entries with the SOURCE's slots),
-    walk and projectile bitmaps, and the slot -> key mapping used to translate into a Tileset."""
+    """A map variation read into world-aligned grids: layers 0..3 (entries with the SOURCE's slots),
+    walk and projectile bitmaps, and the slot -> key mapping used to translate into a Tileset.
+    A stock map is named by zone / area; a foreign map (Buu's Fury) by its variation address, its tiles
+    becoming raw tiles with the foreign palette mapped onto LoG2's (remap: foreign index -> LoG2 index)."""
 
-    def __init__(self, rom, zone, area, var=1, nth=0, rom_obj=None):
+    def __init__(self, rom, zone=None, area=None, var=1, nth=0, foreign=None):
         self.rom = rom
-        e = L.find_entry(rom, zone, area, nth)
-        if e is None:
-            raise SpecError(f"no map zone {zone} area {area}")
-        self.entry, self.var = e, e.variation(var)
+        self.remap = foreign["remap"] if foreign else None
+        if foreign:
+            self.entry, self.var = None, L.Variation(rom, foreign["variation"])
+        else:
+            e = L.find_entry(rom, zone, area, nth)
+            if e is None:
+                raise SpecError(f"no map zone {zone} area {area}")
+            self.entry, self.var = e, e.variation(var)
         v = self.var
         self.w, self.h = (v.width + 7) // 8, (v.height + 7) // 8
         self.layers = {}
@@ -138,6 +150,10 @@ class Source:
             data = L.anim_frame(rom, frames[0])
             for k in range(nt):
                 self.anim[slot + k] = ("raw", data[64 * k:64 * k + 64].ljust(64, b"\0"))
+        if self.remap:
+            banks = L.TileBanks(rom, v.banks)
+            self.slot_keys = [("raw", bytes(self.remap[p] for p in banks.tile(a))) for _, a in self.slot_keys]
+            self.anim = {s: ("raw", bytes(self.remap[p] for p in t)) for s, (_, t) in self.anim.items()}
 
     def key(self, slot):
         if slot in self.anim:
@@ -149,8 +165,9 @@ class Source:
 
 # ---- the map being built --------------------------------------------------------------------------------
 class Build:
-    def __init__(self, rom, spec, sources):
+    def __init__(self, rom, spec, sources, foreign=None):
         self.rom, self.spec, self.sources = rom, spec, sources
+        self.foreign = foreign or {}
         base = spec.get("base")
         self.base = self.source(base) if base else None
         bvar = self.base.var if self.base else None
@@ -171,7 +188,7 @@ class Build:
             if not self.base:
                 raise SpecError("layout 'base' needs a base map")
             self.W, self.H = self.base.w, self.base.h
-            self.layers = {}
+            self.layers = {0: self.empty()}
             for bg in (1, 2, 3):
                 g = self.base.layers.get(bg)
                 self.layers[bg] = [row[:] for row in g] if g else self.empty()
@@ -181,15 +198,22 @@ class Build:
             self.proj = bytearray(self.base.proj)
         else:
             self.W, self.H = (lay[0] + 7) // 8, (lay[1] + 7) // 8
-            self.layers = {bg: self.empty() for bg in (1, 2, 3)}
+            self.layers = {bg: self.empty() for bg in (0, 1, 2, 3)}
             self.walk, self.proj = bytearray(8192), bytearray(8192)
         self.objects_from_base(spec.get("keep", []) if lay == "base" else [])
         self.spawn = list(bvar.spawn) if (bvar and lay == "base") else [self.W * 4, self.H * 4]
 
     def source(self, ref):
-        key = tuple(ref)
+        """[zone, area(, variation)] of this ROM, or {"rom": "buu", "variation": "0x0822229C"}."""
+        key = json.dumps(ref)
         if key not in self.sources:
-            self.sources[key] = Source(self.rom, *ref)
+            if isinstance(ref, dict):
+                if ref["rom"] not in self.foreign:
+                    raise SpecError(f"a map from the '{ref['rom']}' ROM, which was not given")
+                frm, remap = self.foreign[ref["rom"]]
+                self.sources[key] = Source(frm, foreign={"variation": int(ref["variation"], 0), "remap": remap})
+            else:
+                self.sources[key] = Source(self.rom, *ref)
         return self.sources[key]
 
     def empty(self):
@@ -663,8 +687,13 @@ def emit(b, pk):
     # layers
     cols, rows = (b.W + 31) // 32, (b.H + 31) // 32
     chunk_cache = {}
-    layer_ptrs = [eff_layer or (bvar.layers[0] if (bvar and L.Layer(rom, bvar.layers[0]).create != L.LAYER_TILED) else 0)]
-    for bg in (1, 2, 3):
+    bg0_used = any(e is not None and (e & 0x3FF) for row in b.layers[0] for e in row)
+    if eff_layer and bg0_used:
+        raise SpecError("BG0 has tiles and an effect overlay")
+    layer_ptrs = []
+    if not bg0_used:
+        layer_ptrs = [eff_layer or (bvar.layers[0] if (bvar and L.Layer(rom, bvar.layers[0]).create != L.LAYER_TILED) else 0)]
+    for bg in ((0, 1, 2, 3) if bg0_used else (1, 2, 3)):
         g = b.layers[bg]
         grid = []
         for cy in range(rows):
@@ -783,12 +812,21 @@ def emit(b, pk):
     return bytes(row), info
 
 
-def build_all(rom, specs, free, preview=None):
+def build_all(rom, specs, free, preview=None, buu_rom=None):
     pk = Packer(free)
     rows, infos, sources = [], [], {}
+    foreign = {}
+    if buu_rom and os.path.exists(buu_rom):
+        frm = L.Rom(buu_rom)
+        lpal, fpal = L.bg_palette(rom), L.bg_palette(frm, BUU_BG_PALETTE)
+        foreign["buu"] = (frm, [0] + [nearest(lpal, L.bgr555_to_rgb(fpal[i])) for i in range(1, 256)])
     for path in specs:
         spec = json.load(open(path))
-        b = Build(rom, spec, sources)
+        need = spec.get("requires")
+        if need and need not in foreign:
+            print(f"map {spec['name']}: skipped (needs the {need} ROM)")
+            continue
+        b = Build(rom, spec, sources, foreign)
         for op in spec.get("ops", []):
             b.op(op)
         for op in spec.get("stack_ops", []):
@@ -829,7 +867,7 @@ def render_preview(b, out):
     tc = X.TileCache(tiles, pal)
     im = Image.new("RGBA", (b.W * 8, b.H * 8), L.bgr555_to_rgb(pal[0]) + (255,))
     prio = b.spec.get("priorities") or (b.base.var.priority if b.base else [1, 1, 2, 3])
-    for bg in sorted((1, 2, 3), key=lambda k: (-prio[k], -k)):
+    for bg in sorted(b.layers, key=lambda k: (-prio[k], -k)):
         for y, row in enumerate(b.layers[bg]):
             for x, e in enumerate(row):
                 if e is not None and (e & 0x3FF):
@@ -848,18 +886,19 @@ def main():
     ap.add_argument("--free", type=lambda s: int(s, 0), default=FREE_DEFAULT)
     ap.add_argument("--preview")
     ap.add_argument("--out", default="build/maps/preview")
+    ap.add_argument("--buu-rom", default="roms/buu.gba", help="Buu's Fury ROM, for specs that import its maps")
     a = ap.parse_args()
     rom = L.Rom(a.rom)
     if a.cmd == "build":
         *specs, out = a.files
-        res = build_all(rom, specs, a.free, a.preview)
+        res = build_all(rom, specs, a.free, a.preview, a.buu_rom)
         json.dump(res, open(out, "w"), indent=1)
         for m in res["maps"]:
             print(f"map {m['name']}: zone {m['zone']} area {m['area']} {m['size'][0]}x{m['size'][1]} px, spawn {m['spawn']}, "
                   f"{m['slots']} slots ({m['new_tiles']} new tiles), {m['chunks']} chunks, variation {m['variation']}")
         print(f"{len(res['records'])} records, free {res['free_start']} -> {res['free_end']}, table at {res['table_offset']}")
     else:
-        build_all(rom, a.files, a.free, a.out)
+        build_all(rom, a.files, a.free, a.out, a.buu_rom)
 
 
 if __name__ == "__main__":

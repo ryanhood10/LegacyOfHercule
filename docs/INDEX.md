@@ -60,7 +60,8 @@ Generated at build time (never committed): `build/maps.patch.json` (the new maps
 
 ## Data (`data/`)
 
-`maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`; format in
+`maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`, `broly_crater` (needs
+`roms/buu.gba`); format in
 `docs/maps.md`), built by `tools/mapbuild.py` and placed by `patch_rom.py --maps` (`MAPS=1`).
 `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
 Keep-Goku byte, included text records); `hercule-text.json` holds dialogue records written by
@@ -81,7 +82,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
 | `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates (also reads Buu's Fury variations) |
 | `mapexport.py` | render any map from the ROM: per-layer PNGs, composite, walk / projectile overlays, summary; `--list`, `--all`, `--tileset`, `--table/--count` for a built ROM |
-| `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps, generated tiles, recolour into new banks, effect overlays, collision ops, triggers, exits, gates -> `--maps` records + MapEntry rows |
+| `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps (or Buu's Fury maps, palette-converted), generated tiles, recolour into new banks, effect overlays, collision ops, triggers, exits, gates -> `--maps` records + MapEntry rows |
 | `widerender.py` | offline reference render of the wide view from a savestate |
 | `savestate.py` | dump memory regions/words from an mGBA savestate |
 | `romcheck.py` | ROM header/hash check |

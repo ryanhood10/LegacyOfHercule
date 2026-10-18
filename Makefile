@@ -105,9 +105,9 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 $(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json) tools/romdata.py
 	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
-$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py $(ROM)
+$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	@mkdir -p $(BUILD)
-	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps
+	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps --buu-rom $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
 
 $(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH) $(MAPS_PATCH)
 	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)

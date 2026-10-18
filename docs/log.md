@@ -4,6 +4,20 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-18
 
+- **New maps (branch `new-maps`, worktree `F:\MeltyCreations\log2-maps`)**: the map format is decoded
+  end to end (`docs/maps.md`: MapEntry, variation, tiled and effect layers, the one global BG
+  palette, tileset slot table + shared tile banks, animated tiles, walk / projectile collision
+  bitmaps, triggers, exits, flight spots, level gates and barriers), with `tools/maplib.py`,
+  `tools/mapexport.py` (render any map) and `tools/mapbuild.py` (build maps from
+  `data/maps/*.json`). `patch_rom.py --maps` places them after the data patches and relocates the
+  MapEntry table (331 entries). Zone 15: area 1 arctic (Northern Mountains re-dressed in snow and ice,
+  falling snow, the stock Vegeta barrier at a cave), area 2 Hyperbolic Time Chamber (white void,
+  living quarters), area 3 Broly's arena (wasteland basin and pod crater), area 4 a crater imported
+  from Buu's Fury (built when `roms/buu.gba` is there). All four tested in the WSL fork with both
+  players (collision, wide view, door exit, flight spot). Found on the way: zone 13 is a stock "Snowy
+  Highlands" zone; Buu's Fury uses the same map format (401 maps render; its map table is not found,
+  so Broly's own map is not identified). Fork tip: `runfork.ps1 -Mute` (audio sync stalls a fork).
+
 - **Story planning walked from the player's side through the Cell Games wait** (Ryan + Claude,
   all in `docs/story.md`, section 0 is the summary): the two duels, Android 13 and 16 as new
   bosses, Multi-Form Cell, 2v2 gym, Cooler's Namekian, the half-health and both-down rules, casting

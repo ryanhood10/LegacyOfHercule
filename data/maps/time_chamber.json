@@ -1,198 +1,28 @@
 {
-  "_": "Hyperbolic Time Chamber interior (docs/story.md 4e/4f, the Vegeta vs Trunks duel): a white void (generated floor tiles: white with faint speckles) with the living quarters at the top edge (Kami's Lookout palace facade, zone 9 area 1: BG1 building, BG0 dome and entrance canopy) and a flat walkable arena below. The doorway at the bottom of the canopy leads back to the Lookout.",
+  "_": "Hyperbolic Time Chamber interior (docs/story.md 4e/4f, the Vegeta vs Trunks duel): a white void (generated floor tiles: white with faint speckles) with the living quarters at the top edge (Kami's Lookout palace facade, zone 9 area 1: BG1 building -> BG2, BG0 dome and entrance canopy -> BG1) and a flat walkable arena below. The door under the canopy's arch leads back to the Lookout.",
   "name": "time_chamber",
-  "zone": 15,
-  "area": 2,
-  "base": [
-    9,
-    1
-  ],
+  "zone": 15, "area": 2,
+  "base": [9, 1],
   "tileset": "fresh",
-  "layout": [
-    640,
-    480
-  ],
-  "priorities": [
-    1,
-    2,
-    3,
-    3
-  ],
+  "layout": [640, 480],
+  "priorities": [1, 2, 3, 3],
   "ops": [
-    {
-      "op": "texture",
-      "bg": 3,
-      "rect": [
-        0,
-        0,
-        80,
-        60
-      ],
-      "color": [
-        252,
-        252,
-        252
-      ],
-      "variants": 8,
-      "seed": 7,
-      "speckle": [
-        {
-          "color": [
-            232,
-            236,
-            246
-          ],
-          "density": 0.035
-        },
-        {
-          "color": [
-            214,
-            222,
-            238
-          ],
-          "density": 0.008
-        }
-      ]
-    },
-    {
-      "op": "walk",
-      "rect": [
-        0,
-        0,
-        80,
-        60
-      ],
-      "mask": "both"
-    },
-    {
-      "op": "stamp",
-      "at": [
-        25,
-        1
-      ],
-      "src": {
-        "map": [
-          9,
-          1
-        ],
-        "rect": [
-          82,
-          13,
-          29,
-          19
-        ]
-      },
-      "layers": [
-        1
-      ],
-      "to_layers": [
-        2
-      ],
-      "collision": false
-    },
-    {
-      "op": "stamp",
-      "at": [
-        28,
-        2
-      ],
-      "src": {
-        "map": [
-          9,
-          1
-        ],
-        "rect": [
-          85,
-          14,
-          23,
-          5
-        ]
-      },
-      "layers": [
-        0
-      ],
-      "to_layers": [
-        1
-      ],
-      "collision": false
-    },
-    {
-      "op": "stamp",
-      "at": [
-        33,
-        7
-      ],
-      "src": {
-        "map": [
-          9,
-          1
-        ],
-        "rect": [
-          90,
-          19,
-          12,
-          21
-        ]
-      },
-      "layers": [
-        0
-      ],
-      "to_layers": [
-        1
-      ],
-      "collision": false
-    },
-    {
-      "op": "block",
-      "rect": [
-        25,
-        0,
-        29,
-        20
-      ],
-      "mask": "both"
-    },
-    {
-      "op": "block",
-      "rect": [
-        33,
-        7,
-        12,
-        19
-      ],
-      "mask": "both"
-    },
-    {
-      "op": "border",
-      "width": 1,
-      "mask": "both"
-    }
+    {"op": "texture", "bg": 3, "rect": [0, 0, 80, 60], "color": [252, 252, 252], "variants": 8, "seed": 7,
+     "speckle": [{"color": [232, 236, 246], "density": 0.035}, {"color": [214, 222, 238], "density": 0.008}]},
+    {"op": "walk", "rect": [0, 0, 80, 60], "mask": "both"},
+    {"op": "stamp", "at": [25, 1], "src": {"map": [9, 1], "rect": [82, 13, 29, 19]}, "layers": [1], "to_layers": [2], "collision": false},
+    {"op": "stamp", "at": [28, 2], "src": {"map": [9, 1], "rect": [85, 14, 23, 5]}, "layers": [0], "to_layers": [1], "collision": false},
+    {"op": "stamp", "at": [33, 7], "src": {"map": [9, 1], "rect": [90, 19, 12, 21]}, "layers": [0], "to_layers": [1], "collision": false},
+    {"op": "clear", "bg": 2, "rect": [53, 0, 1, 20]},
+    {"op": "block", "rect": [25, 0, 29, 16], "mask": "both"},
+    {"op": "block", "rect": [31, 16, 17, 4], "mask": "both"},
+    {"op": "block", "rect": [33, 20, 12, 6], "mask": "both"},
+    {"op": "border", "width": 1, "mask": "both"}
   ],
   "exits": [
-    {
-      "type": "door",
-      "rect": [
-        272,
-        200,
-        344,
-        216
-      ],
-      "dir": "up",
-      "to": [
-        9,
-        1,
-        1
-      ],
-      "at": [
-        760,
-        480
-      ]
-    }
+    {"type": "door", "rect": [272, 200, 344, 216], "dir": "up", "to": [9, 1, 1], "at": [760, 480]}
   ],
-  "spawn": [
-    312,
-    280
-  ],
+  "spawn": [312, 280],
   "name_id": 221,
   "music": 39,
   "flags": 1

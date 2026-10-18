@@ -154,8 +154,10 @@ trigger fires), +8 s16 rect x1, y1, x2, y2 (px), +0x10 payload. Create functions
 | 0x08010AC7 | 30 | save / switch-characters pad | (unused) |
 | 0x0801A6B3 | 14 | world-map landing name banner (world map only) | name id |
 
-Activation objects: 0x0800D8AF exits, 0x0800D839 script spots (flight spots, save pads), 0x0800D765
-dialogue on entering, 0x0800D87F dialogue at a barrier, 0x0801087B/0x0801087F script triggers.
+Activation objects: 0x0800D8AF exits (the held direction), 0x0800D839 "press A inside the rect"
+(flight spots, save pads; verified: standing on the arctic's flight spot does nothing until A),
+0x0800D765 dialogue on entering, 0x0800D87F dialogue at a barrier, 0x0801087B/0x0801087F other
+script triggers.
 
 **Exit payload** (+0x10, 8 bytes; trigger data is 0x18 bytes): u8 direction (low nibble 0 down,
 1 up, 2 left, 3 right: the key that must be held, from the table 0x083ED1B4; high nibble = facing on
@@ -212,6 +214,10 @@ for layout and collision, pixels for objects):
   map's own animations move out of the way when their slots collide.
 - `triggers` (flight / warp / script), `exits` (edge / door), `gates`, `onload` (the barrier
   pattern with a flag), `spawn`, `name_id`, `music`, `flags`, `priorities`.
+- Foreign maps: a `src.map` of `{"rom": "buu", "variation": "0x0822229C"}` reads a Buu's Fury
+  variation record (`--buu-rom`, default `roms/buu.gba`); its tiles are converted to LoG2's palette
+  (nearest colour) as new tiles. A spec with `"requires": "buu"` is skipped when that ROM is absent
+  (the Makefile passes it when `BUU=1`), so builds without `roms/buu.gba` still work.
 
 Output: one JSON with `records` (file offset + bytes, all in free ROM from `--free`), `rows` (one
 MapEntry per map), `table_offset` (room for 327 + n rows). `patch_rom.py --maps` writes the records
@@ -228,7 +234,8 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 |---|---|---|---|---|
 | 15 / 1 | `data/maps/arctic.json` | Arctic: zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth behind the stock **Vegeta barrier** (level 50), a frozen pond, two outcrops, a flight spot | 432 x 368 | (216, 200) |
 | 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout | 640 x 480 | (312, 280) |
-| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery; only the basin is walkable; a flight spot | 640 x 544 | (276, 354) |
+| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery, two boulders; only the basin is walkable; a flight spot | 640 x 544 | (276, 354) |
+| 15 / 4 | `data/maps/broly_crater.json` | Optional (built when `roms/buu.gba` is present): Buu's Fury's walled wasteland crater (variation 0x0822229C there) imported whole, tiles converted to LoG2's palette, its own collision | 480 x 400 | (240, 340) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an
@@ -236,20 +243,33 @@ exit record `{dir, 15, AREA, 1, x, y}`; the debug Map Test lists zone 15 too. Th
 (rect (336, 0)-(353, 57) after the stretch) has no exit yet: Android 13's interior or encounter
 attaches there. The barrier's on-load uses the stock flag 280 (see "Open").
 
-## 10. Buu's Fury maps (checked, not imported)
+**Verified in the WSL fork** (slot 4, `make BUILD=build/maps3 WIDE=1 DEBUG_MENU=1`, 2026-10-18):
+the debug Map Test lists zone 15 and loads area 1; the co-op test warp (the WarpToMap opcode handler)
+reaches areas 1 to 4; in each, both players walk and stop at the collision (the arctic's ice cliff,
+outcrops and the Vegeta barrier, which shows its blue 50; the Time Chamber's building, canopy and
+border; the arena's basin walls, rim and boulders; the imported crater's walls); the wide view shows each map; the Time Chamber's
+door under the canopy leads to Kami's Lookout; the arctic's flight spot (press A) flies to the world
+map. Screenshots: `build/maps/shots/` (`zone15_sheet.png`), not committed (ROM graphics).
+
+## 10. Buu's Fury maps (decoded; one imported)
 
 Buu's Fury uses the same map engine: the tiled layer header (create fn 0x08008087, 1374 layers), the
 0x50-byte variation record (identical field layout: blend, priorities, size, animations, four layers,
 decorations, spawn, collision, projectile mask, affine, exits, slot table, bank table) and the same
 resource/decompressor format; its maps render with `maplib` unchanged given its BG palette
 (0x0805632C, 0x200 below the OBJ palette 0x0805652C) and its own bank table (per variation +0x4C).
-What is not found: its MapEntry table (no 0x38-stride table with LoG2's shape; its map names are
-not plain text), so maps cannot yet be found by zone/area or name. Importing Broly's map would take:
-locating its variation (render the 830 candidate variation records to a contact sheet and pick it,
-or find the Buu map table through its `Map_FindEntry`), then a `mapbuild` "import" op that copies its
-chunks and collision and converts its tiles to LoG2's palette (nearest-colour remap, the same as the
-sprite converter in `tools/buu2log2.py`) into new banks. About half a day; the LoG2 arena above
-stands in until then.
+All 401 variation records found by scanning (records whose layer slots point at tiled-layer headers)
+render: contact sheets come from rendering each record (a scratch script over `maplib`; worth turning
+into `mapexport --buu` if more imports are wanted). What is not found: its MapEntry table (no
+0x38-stride table with LoG2's shape; its map names are not plain text), so a record cannot be tied to
+a zone/area, a name or the script that stages a fight; Broly's own battle map is therefore not
+identified. Candidates by look: 0x0822229C (a big crater inside walled wasteland, imported as zone
+15 area 4) and 0x0824F55C (a crater in sand). Also of note for the story: 0x082546A0 / 0x08254DA0
+(round rooms with a table and a bed, likely the Time Chamber's living quarters inside) and
+0x08255C9C / 0x08256F34 (dark rooms with light cones). Importing any of them is one stamp op
+(section 8); what it does not bring: decorations (their sprite sheets live in the Buu ROM),
+animated tiles (frame 0 only), exits and scripts. Finding the map table (through Buu's
+`Map_FindEntry`, the routine that scans for zone and area) would name the records.
 
 ## Open
 
