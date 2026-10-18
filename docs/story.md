@@ -382,6 +382,26 @@ Fury (LoG2 id 159), so a Broly side arc here needs maps and script but no new ar
 bonus area (zone 4 area 50 / zone 6 area 61) is gated by West City-era story flags, not the
 ending; check in play when it opens.
 
+**Side quests in the wait (Ryan, 2026-10-18):**
+
+- **Cooler:** open his area to Goku at any level and let him bring any co-op partner. Facts: the
+  stock Cooler area (zone 4 area 50 and zone 6 area 61/62) is gated by **"Only Piccolo" barriers**,
+  not a Goku level gate, and Cooler's line is "You're not Goku... I thought I specifically asked for
+  Goku!"; the Goku-only barriers in the game are elsewhere (maps 28, 55, 217, 317, 323). So the
+  change is: drop or re-key the Piccolo barriers so the party can enter, no level check to lower.
+- **Android 13 in the arctic (progress, not finish):** a new or re-dressed arctic area reached
+  through a new "Only Vegeta" barrier; the party goes there to find something and runs into 13,
+  who says HE was supposed to absorb 17 and 18, not Cell, his chance at perfection is ruined and he
+  would kill Cell if he could; Vegeta: he won't get the chance, because he'll be dead. A fight to
+  half health, 13 leaves. Optional: a story flag records whether it happened, and the post-Cell
+  Super 13 encounter has two openings (met before / first meeting). Facts: no map in LoG2 mentions
+  snow or an arctic; the Northern Mountains around Gero's lab are the coldest-looking stock area.
+  A brand-new map needs tooling we do not have (chunk encoder, collision, map-table entry); a
+  re-dressed existing map with new triggers and scripts is the cheap route.
+- **Broly (maps and scripts wanted):** Buu's Fury's map format is not decoded (sprites only), so
+  reusing its Broly arena is a spike; the cheap route is an existing LoG2 arena re-scripted. Broly's
+  fight sprite is ready (id 159).
+
 Half-health boss endings are one rule in `enemies.c` (a boss with an "ends at N%" flag fires its
 defeat action at that threshold instead of at zero HP and becomes untargetable).
 
