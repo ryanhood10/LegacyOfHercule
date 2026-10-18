@@ -180,6 +180,29 @@ Android 16's NPC set), both-down rule,
 and the blast knocks both players flat before the stock dialogue resumes. Hercule stands with
 Krillin for the plea; the kiss stays Krillin's unless Ryan wants it on Hercule.
 
+## 4d. After the road: Lookout, Trunks' chapter, the fusion, Imperfect Cell (stock flow, verified)
+
+1. **World map as Piccolo** to the Lookout (zone 9 area 6): Kami refuses to fuse yet ("I need more
+   time... I'll be waiting"). Cut to Gohan's house: the script adds Trunks, Piccolo and Vegeta to
+   the party, sets Trunks to level 27, makes him player 1 and leaves only Gohan and Trunks selectable
+   (Piccolo cleared). Krillin: get Goku to Roshi's; Bulma's satellite photo of a second time capsule
+   near Gingertown; Gohan: "I'm coming with you, Trunks!"; caption "Trunks is now an available
+   character! You are now playing as Trunks."
+2. **Trunks' chapter** (zone 10): the capsule and Cell's shed skin with Bulma, Trunks and Gohan
+   ("giant cicada?"), "head back to Roshi's". The script then makes Piccolo player 1 again.
+3. **The fusion** (Lookout): Kami has felt "a terrible disturbance for four years"; the TV news from
+   Gingertown (15,000 residents gone, piles of clothes), Krillin blames the Androids, Trunks
+   doubts it; Kami agrees ("when you and I become one you will know"), Mr. Popo's goodbye.
+4. **Gingertown** (zone 10 area 20): Piccolo meets Imperfect Cell (boss, enemy stat 60, sprite 28):
+   Cell's Kamehameha, Piccolo's "I can't fight without my arm" trick to make Cell talk (time
+   machine, the computer in the bunker, absorbing 17 and 18 for perfection), the fight, Krillin and
+   Trunks arrive, Cell escapes, and Trunks is player 1 again.
+
+Co-op notes to decide: player 2 in Trunks' chapter is Gohan by the stock flags (Krillin and
+Hercule are also candidates); in Gingertown Piccolo goes alone in the stock game, so Hercule (or
+Krillin) beside him needs one line; Android 13 is loose after the road and is bonus content from
+here (Ryan).
+
 ## 5. What the plan is missing (engine limits found while checking)
 
 1. **Six party slots.** `PartyState` holds exactly 6 characters (Gohan, Vegeta, Goku, Piccolo,
