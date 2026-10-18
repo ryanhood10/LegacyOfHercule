@@ -1,0 +1,11 @@
+{
+  "_": "Cooler's bonus fight (docs/story.md section 0 item 8): the Piccolo gates stay; in co-op Cooler introduces his Namekian servant (bosses.c: sprite 166, stat 113) before the fight. Scripts in ch8_cooler.lscript.",
+  "sources": ["data/story/ch8_cooler.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 6, "area": 61},
+      "_": "Cooler's fight: the three stock openings meet at the co-op check",
+      "triggers": {"0": {"payload": "seq:ch8_cooler"}}
+    }
+  ]
+}

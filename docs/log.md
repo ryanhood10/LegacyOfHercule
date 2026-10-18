@@ -13,6 +13,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 8, Cooler (story-scripts)**: `data/story/ch8_cooler`: in co-op Cooler introduces his Namekian
+  servant before the fight (one co-op check after the three stock openings); both Piccolo gates stay
+  and are reachable in the wait (flag 60 from chapter 2, Piccolo selectable after chapter 7). Tested
+  headless: the Piccolo opening, the servant's lines, Cooler + Namekian with two bars.
 - **Chapter 8, Roshi's gym (story-scripts)**: `data/story/ch8_gym`: the duos Yamcha + Tien and Krillin +
   Hercule (`BOSS_PAIR` rules on the sparring stats 106 / 98 / 64, only used in that room), the "come
   back with a different team" refusal when a player is Hercule or Krillin (new `CoopCall 8`, P2Slot),
