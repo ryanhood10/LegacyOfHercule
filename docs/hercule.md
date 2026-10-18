@@ -79,9 +79,10 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 | 17 | Hercule Taunt (Transformation icon) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
 | 18 | Super Hercule (Hercule icon for now) | switches the slot to display row 22 (the recoloured clone of sprite 72, built by the parent session's `tools/spriteclone.py`) | 50 | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` |
 
-Hercule's four-slot list is **14, 15, 18, 17** (punch, kick, Super Hercule, taunt), so the
-transformation sits in the third slot like every other character's. Megaton Punch (16) stays in the
-table for scripts or a later per-character list. Verified as player 2 from `log2-run.ss1`: row 21 ->
+Hercule's starting list is **14, 15, 16, 17** (punch, kick, Megaton Punch, taunt). Super Hercule (18)
+is kept out of it by Ryan's no-reveal rule (2026-10-18): the late-story script calls
+`hercule_awaken()` (src/coop/ssj.c), which puts 18 into the third slot in place of the Megaton
+Punch. (It was 14, 15, 18, 17 until then.) Verified as player 2 from `log2-run.ss1`: row 21 ->
 22, EP 100 -> 50, the entity's sprite record moved to the cloned sprite (`build/hc10_ssj.png`).
 
 The isReady gate copies the stock one (`[[0x086DB284] + 0xC] != 0`, the game's "abilities allowed"

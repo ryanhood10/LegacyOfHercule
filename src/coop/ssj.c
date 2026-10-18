@@ -30,3 +30,13 @@ void ssj_use(CharacterEntry *c, Entity *e) {
     VM_SetCharacterTransformation(stack);
     if (coop.p2 && slot == coop.p2_slot) p2_refresh_sprite();
 }
+
+// The Super Hercule ability is not in Hercule's starting list (Ryan: nothing reveals Hercule as the hero
+// until the Buu phase); the late-story script calls this to put it in his third slot, in place of the
+// Megaton Punch (16).
+#define HERCULE_SLOT_INDEX 5
+#define SSJ_ABILITY 18
+void hercule_awaken(void) {
+    CharacterEntry *c = &g_Party->chars[HERCULE_SLOT_INDEX];
+    c->ability_list[2] = SSJ_ABILITY;
+}
