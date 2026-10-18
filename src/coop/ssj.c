@@ -24,7 +24,7 @@ int ssj_ready(CharacterEntry *c) {
 void ssj_use(CharacterEntry *c, Entity *e) {
     (void)e;
     int slot = slot_of(c);
-    if (slot < 0 || slot >= 6) return;
+    if (slot < 0 || slot >= PARTY_SLOTS) return;
     c->ep = (u16)(c->ep - SSJ_EP_COST);
     s32 stack[3] = { 2, slot, SSJ_SPRITE };
     VM_SetCharacterTransformation(stack);
