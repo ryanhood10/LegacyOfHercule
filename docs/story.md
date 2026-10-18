@@ -198,10 +198,22 @@ Krillin for the plea; the kiss stays Krillin's unless Ryan wants it on Hercule.
    machine, the computer in the bunker, absorbing 17 and 18 for perfection), the fight, Krillin and
    Trunks arrive, Cell escapes, and Trunks is player 1 again.
 
-Co-op notes to decide: player 2 in Trunks' chapter is Gohan by the stock flags (Krillin and
-Hercule are also candidates); in Gingertown Piccolo goes alone in the stock game, so Hercule (or
-Krillin) beside him needs one line; Android 13 is loose after the road and is bonus content from
-here (Ryan).
+Ryan's decisions for this stretch:
+
+- **World map rule:** only the player who stepped on the flight sign controls the world map; the
+  other player is a passenger (no second entity there). Noted in `docs/coop-design.md`.
+- **Lookout, first visit:** Piccolo flies there with Hercule for the playable moments. When the
+  script locks Piccolo out (he waits for Kami's answer), Hercule is locked out too and stays at the
+  Lookout.
+- **Trunks' chapter:** player 1 Trunks, player 2 Gohan, everyone else locked out (the stock flags
+  already leave only Gohan and Trunks selectable; Krillin is busy moving Goku to Roshi's). Verified
+  content: ordinary enemies (animals and robots, no boss), Yajirobe's Senzu, the time capsule,
+  Cell's shed skin. Nothing in the story needs changing here.
+- **The fusion scene, combined:** before Kami fuses with Piccolo he unlocks Hercule's "potential"
+  for befriending and treating Piccolo well: a scripted level and EXP boost (`SetCharacterLevel`
+  and `AddEXP`, the same opcodes the stock scripts use for Trunks and Vegeta), then the fusion plays
+  as written. Piccolo and the boosted Hercule then go to Gingertown together for Imperfect Cell.
+- Android 13 is loose after the road: bonus content.
 
 ## 5. What the plan is missing (engine limits found while checking)
 
