@@ -31,6 +31,8 @@ static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VT
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
 // are left alone.
 static int is_boss_rec(const EnemyRecord *rec, const EnemyStat *st) {
+    const BossRule *r = boss_rule(rec->stat_index);
+    if (r && (r->flags & BOSS_PAIR)) return 1;     // a pair under boss rules whatever its numbers
     return st->max_hp >= 1000 && (st->exp == 0 || rec->flags == 1);
 }
 static int is_boss(const Entity *e) { return is_boss_rec(record_of_const(e), (const EnemyStat *)e->behaviour); }
@@ -278,7 +280,8 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
     if (!st) return 0;
     int alone = rule && (rule->flags & BOSS_NO_TWIN);
-    if (!p2_present() || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
+    int pair = rule && (rule->flags & BOSS_PAIR);
+    if ((!p2_present() && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
         return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
 
     int boss = is_boss_rec(rec, st);
@@ -308,6 +311,26 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         coop2.spawned++;
     }
     return orig;
+}
+
+// Chapter tests (COOP_CMD_STORY_WIN, or player 1 L + R + Up in STORY_TEST builds): every boss on the map (story bosses, Android 16) takes a
+// blow worth its remaining HP from player 1 through its own OnHit (vtable slot 14), so pair rules,
+// end_pct stages and the defeat action all run as if the players had won the fight.
+void story_test_finish(void) {
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (!is_enemy(e) || e->hp <= 0) continue;
+        int boss = is_coop_enemy(e) ? is_boss(e) : ((const EnemyStat *)e->behaviour)->max_hp >= 1000;
+        const u32 *act = (const u32 *)e->action;     // or any enemy whose death runs a story action
+        if (!is_a16(e) && !boss && !(act && act[0] != ENEMY_ACTION_NONE)) continue;
+        u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
+        memset(m, 0, sizeof m);
+        *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1
+        *(Entity **)(m + 0x30) = g_PlayerObject;
+        *(s32 *)(m + 0x2C) = e->hp;                 // the applied damage OnHit subtracts
+        ((int (*)(Entity *, const u8 *))((u32)e->vtable + e->vtable[14]))(e, m + 0x24);
+    }
 }
 
 // ---- test commands ------------------------------------------------------------------------------
@@ -486,7 +509,7 @@ static int bar_lo(const Entity *e, int lo) {
 }
 
 BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
-    if (e) lo = bar_lo(e, lo);
+    if (e) lo = is_a16(e) ? a16_bar_range(e, lo, hi) : bar_lo(e, lo);
     if (!coop.p2) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);   // single-player: the ROM object
     TwinPair *pr = pair_of(e);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin

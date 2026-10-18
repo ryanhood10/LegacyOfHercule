@@ -30,13 +30,16 @@ PATCH_FLAGS := --party-slots $(PARTY_SLOTS) $(if $(filter 1,$(DEBUG_MENU)),--deb
 # A16_SPRITE: sprite id of Android 16's fighting record (tools/a16sprites.py, always built from the ROM);
 # A16_TEST=1: player 1's L + R + Down spawns the Android 16 boss beside player 1 (src/coop/android16.c)
 A16_SPRITE ?= 160
+# STORY_TEST=1: chapter-test build (docs/testing.md "Story chapters"): the fork's TCP pad drives player 1
+# (player 2 absent), the ROM block at 0xC00000 holds a story-flag preset (tools/fork/st_preset.py), player 1's
+# L + R + Up wins every boss fight on the map (L + R + Left toggles the Android 16 autopilot with A16_TEST)
 # KRILLIN_SPRITE: sprite id of Krillin's playable record (tools/krillinsprites.py, built from the ROM: his
 # NPC set 76 plus Goku's fight groups re-headed); OLD_HERCULE_SPRITE: old Hercule's row 24 (158 = the Buu's
 # Fury Hercule, 72 without roms/buu.gba). KR_TEST=1: player 1's L+R+Up toggles old Hercule on slot 5,
 # L+R+Left sets Krillin's EXP one short of his next level (src/coop/krillin.c)
 KRILLIN_SPRITE ?= 161
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,)  $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
@@ -118,7 +121,7 @@ $(BUILD)/coop.bin: $(BUILD)/coop.elf
 $(BUILD)/coop.sym: $(BUILD)/coop.elf
 	$(NM) $< > $@
 
-$(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json) tools/romdata.py
+$(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json data/story/*.json data/story/*.lscript) tools/romdata.py tools/mapedit.py tools/script_asm.py
 	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
 $(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))

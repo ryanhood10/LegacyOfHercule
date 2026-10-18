@@ -56,7 +56,7 @@ Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `PARTY_SLOTS
 the sprites converted from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test
 build). `A16_SPRITE` (160) is Android 16's boss sprite; `A16_TEST=1` = player 1's L+R+Down spawns the
 Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.md`). `KRILLIN_SPRITE` (161) is Krillin's
-playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's pad (`docs/testing.md` "Krillin"). `make` does not run from PowerShell
+playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's pad (`docs/testing.md` "Krillin"). `STORY_TEST=1` = chapter-test build (fork TCP pad drives player 1, ROM story-flag preset; `docs/testing.md`). `make` does not run from PowerShell
 (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
 
 ## Test (see docs/testing.md for the full recipes)
@@ -68,6 +68,8 @@ playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's
   sender `python tools\p2_keys.py --port 7778`, keys `tools\win_keys.ps1 "M:200 WAIT:500" -Title "mGBA (Ubuntu)"`,
   screenshot `tools\win_shot.ps1 out.png -Title "mGBA (Ubuntu)"`. Add `-g` and attach
   `gdb-multiarch -batch -x <script>` for breakpoints, traces and memory dumps (works; see testing.md).
+- Story chapters (`data/story/`, `docs/scripts.md`) are tested headless: `tools/headless/st_headless.c` on the
+  fork's libmgba, `python tools/headless/st_test.py SCRIPT ROM STATE` (`docs/testing.md` "Story chapters, headless").
 - `DEBUG_MENU=1` also replaces the new-game intro video with the debug menu, so test new games with
   `DEBUG_MENU=0`. Fork test helpers (persistent GDB client, pad-word keys, teleport): `tools/fork/`.
 - Savestates: `build/log2-coop.ss1` = zone 2 area 7 wolf map, level-40 party, Piccolo P1 (slot 1),

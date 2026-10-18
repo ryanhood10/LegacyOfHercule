@@ -1,0 +1,129 @@
+; Chapter 1, the opening (docs/story.md section 0 item 1), applied by ch1_opening.json:
+;  - future prologue: old Hercule is player 2 beside Trunks (party slot 5), comic relief, no hint of
+;    what he becomes; he leaves with Trunks at the end of the Goku-arrival scene;
+;  - present day: Krillin visits Gohan instead of phoning and joins (slot 6, player 2);
+;  - the forest "spirit" (Frieza + Cooler, the stock dream's clearing zone 2 area 8) replaces the dream;
+;  - Krillin's NPC is gone from the Frieza landing site (zone 3 areas 4 and 6).
+; Speakers: 1 Gohan/Trunks box, 3 Piccolo, 44 Cooler, 49 Frieza, 57 Future Gohan, 67 Hercule,
+; 73 Krillin, 98 Trunks. Sprites: 48 Frieza (dream), 34 Cooler, 76 Krillin, 128 Trunks, 158 old Hercule.
+; Story flags of this chapter: 360 = Krillin has visited.
+
+; ---- future prologue ----------------------------------------------------------------------------
+
+; map 0 (zone 1 area 1) trigger 0: Future Gohan's training, with old Hercule hanging back
+sequence ch1_training
+  stockseq @083b6ec8 0 5                 ; Trunks' doubts, Gohan's answer, "I won't let you down"
+  text 67 "#HERCULE: And don't you boys worry about me!\x0bI'll be guarding the rear.  From way back here."
+  stockseq @083b6ec8 6 7                 ; Gohan: the melee practice, destroy that boulder
+  text 67 "#A boulder?  Ha!  I've chopped bigger rocks than that in my sleep!\x0b...You go first, kid."
+  stockseq @083b6ec8 8                   ; Gohan walks off, control back
+end
+
+; map 1 (zone 1 area 2) trigger 0: Gohan's death and the jump to the present
+sequence ch1_future_end
+  stockseq @083b7adc 0 3                 ; the androids' attack, Trunks finds Gohan
+  text 67 "#T-Trunks...  They're gone.\x0bLet's get out of here before those two come back!"
+  stockseq @083b7adc 4                   ; "Present day Earth...", Gohan's chapter begins
+end
+
+; ---- present day: Krillin visits ------------------------------------------------------------------
+
+; map 19 (Gohan's room, zone 2 area 22) trigger 0 condition: math time, before Krillin's visit
+script ch1_room_cond
+    StackTestStoryFlag 4
+    StackTestStoryFlagNot 360
+    And
+end
+
+; map 19 trigger 0: no dozing off and no dream; Krillin walks in instead of phoning
+sequence ch1_krillin_visit
+  stock @083bb624                        ; Gohan sits down at his desk
+  stock @083bb662                        ; "I guess I'll just do my math for a while..."
+  script
+        WaitFrames 40
+        PlayAudio 10
+        SpawnCharacterEntity 76, 216, 148
+        WalkToPosition 76, 160, 120
+        WalkToPosition 76, 144, 108
+        SetEntityFacing 76, 2
+        SetEntityFacing 0, 3
+        PlayAudio 50
+  stock @083b9d16                        ; Krillin: are you feeling what I'm feeling? (the stock call, in person)
+  stock @083b9d4e
+  stock @083b9d94
+  stock @083b9ddc
+  stock @083b9e30
+  stock @083b9ec0                        ; Gohan: first I need my Saiyan Battle Armor, hidden in a cave
+  stock @083b9f2c
+  text 73 "KRILLIN: I'll come with you.  With Frieza around, two of us are safer than one."
+  text 1 "#Thanks, Krillin!  The cave is in the forest, just past our house."
+  script
+        DespawnEntity 76
+        SetCharacterInPartyFlag 6
+        SetCharacterFlag_Bit1 6
+        RemoveItem 37
+        SetStoryFlag 11
+        SetStoryFlag 360
+        PlayAudio 62
+  text 0 "@^Krillin is now available!"
+  stock @083b9f82                        ; Journal Updated!
+  script
+        SetPlayerVisible 1
+end
+
+; ---- the forest spirit (zone 2 area 8, map 14) ----------------------------------------------------
+
+; trigger 0: on the way to the cave the forest goes quiet, Frieza and Cooler appear
+sequence ch1_spirit
+  script
+        SetPlayerVisible 0
+        WalkToPosition 0, 96, 176
+        SetEntityFacing 0, 1
+        PanCameraToPosition 0, 0, 2
+        WaitFrames 40
+        PlayAudio 50
+  text 1 "#GOHAN: The cave is just past this clearing...\x0bHuh?  The whole forest just went quiet."
+  text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us."
+  script
+        FadeToWhite 120
+        TriggerMapEvent 1
+        WhiteFadeOut 30
+        WhiteFlash 40
+  stock @083b952c                        ; Frieza: your dad isn't coming back!
+  text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
+  text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
+  stock @083b958c                        ; boss bar, battle music, control back
+end
+
+; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade, Gohan and
+; Krillin come round at the cave's mouth and are told it was the forest's spirit (the stock dream
+; defeat likewise warps first and talks afterwards: the map change clears both bodies)
+sequence ch1_spirit_end
+  script
+        WhiteFlash 5
+        WaitFrames 40
+        FindPlayerEntity
+        AddEXP 20
+        SetPlayerVisible 0
+        SetStoryFlag 9
+        FadeToWhite 120
+        WarpToMapWithEntities 2, 4, 1, 128, 244
+        WhiteFadeOut 120
+        PlayAudio 50
+  text 0 "@^The two figures melted away into the mist..."
+  text 1 "#GOHAN: They're gone...  Were they even real?"
+  text 0 "@^VOICE: Do not be afraid, children.  You did not fight Frieza and Cooler...\x0b...but the spirit of the forest, wearing the faces of your fears."
+  text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
+  text 1 "#Never mind, Krillin.  My armor is in this cave."
+  script
+        SetPlayerVisible 1
+end
+
+; ---- the Goku-arrival scene (zone 3 area 6, map 54): old Hercule leaves with Trunks --------------
+
+sequence ch1_trunks_talk
+  stockseq @083bfddc 0 77                ; the whole stock conversation up to Trunks' secret
+  text 67 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bThat Frieza fellow isn't coming back, is he?"
+  text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
+  stockseq @083bfddc 78                  ; everyone gathers, the warning retold, home
+end

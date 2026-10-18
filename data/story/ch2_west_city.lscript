@@ -1,0 +1,52 @@
+; Chapter 2, West City (docs/story.md section 0 item 2), applied by ch2_west_city.json:
+;  - Hercule joins (party slot 5) right where Piccolo joins: he wants Piccolo's flying "magic trick",
+;    Piccolo needs a roof for the three years of training, so: the mansion deal;
+;  - Triceratops Jungle is Piccolo and Hercule only (Gohan's and Krillin's available bit is cleared
+;    inside, restored on the way out), and Hercule claims the credit for the dinosaur peace.
+; Speakers: 0 narration, 3 / 90 Piccolo, 67 Hercule, 96 / 97 King Triceratops. Sprites: 72 Hercule,
+; 103 Piccolo. Story flags: 361 = inside the jungle (restore the bits on leaving), 362 = Hercule's deal.
+
+; map 65 (West City, zone 4 area 3) record 2: Piccolo's talk, the mansion deal, both join
+sequence ch2_piccolo_deal
+  stock @083c31a4                        ; music, player hidden
+  stock @083c31b0                        ; Piccolo: how's your training going, Gohan?
+  stock @083c323c                        ; let someone else try
+  script
+        SpawnCharacterEntity 72, 360, 1000
+        WalkToPosition 72, 304, 968
+        SetEntityFacing 72, 2
+        SetEntityFacing 103, 3
+        PlayAudio 50
+  text 67 "HERCULE: Hold it right there, Green Bean!\x0bI saw you fly in this morning.  What's the secret?  Wires?  Mirrors?"
+  text 90 "PICCOLO: It's no trick.  Get lost."
+  text 67 "HERCULE: Teach me that flying act and the crowds will go wild!\x0bTell you what: you can stay at my mansion while you train.  Forty rooms, a pool, room service!"
+  text 90 "PICCOLO: (A roof over my head for three years...)\x0b...Fine.  But you train with us, and you do as I say."
+  text 67 "HERCULE: Ha ha ha!  You've got yourself a deal, Green Bean!"
+  script
+        SetActiveEntity 103
+        WalkToPosition 103, 280, 888
+        DespawnEntity 103
+        WalkToPosition 72, 280, 888
+        DespawnEntity 72
+        SetActiveEntity 0
+        SetCharacterInPartyFlag 1
+        SetCharacterTransformation 0, 55
+        SetCharacterFlag_Bit1 1
+        SetCharacterInPartyFlag 5
+        SetCharacterFlag_Bit1 5
+        SetStoryFlag 362
+        PlayAudio 28
+  stock @083c32c4                        ; save points switch characters
+  stock @083c3328                        ; Piccolo is now available!
+  text 0 "@^Hercule is now available!"
+  stock @083c33c8                        ; Piccolo level 10, flag 57, reload
+  stock @083c33e0                        ; Journal Updated!
+end
+
+; map 105 (zone 4 area 58) record 0 defeat: King Triceratops gives up, Hercule takes the credit
+sequence ch2_triceratops_end
+  stockseq @083c9bf8 0 3                 ; "OK OK!  I give up!", the Triceratops of honor
+  text 67 "HERCULE: Ha ha ha!  Another peace treaty, brought to you by the World Martial Arts Champion!"
+  text 3 "!PICCOLO: You hid behind a rock the whole fight."
+  stockseq @083c9bf8 4                   ; flag 60, back to the farmers
+end

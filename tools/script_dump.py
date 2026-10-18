@@ -30,8 +30,8 @@ checked on the ROM):
     JCALG1-compressed text at +4; 3 = speaker, u32 format string ptr at +4, script at +8 pushing the
     %s/%d arguments; 4 = like 3 with the format text compressed; 5 = u32 jump target at +4.
   Scripts: main dispatch 0x00 PushByte u8, 0x01 PushVarint (7-bit groups MSB first, even/odd sign fold), 0x02 Step u8 (the 145
-    game actions, OpCodes.csv), 0x03 TypeOp u8, 0x04-0x10 arithmetic/compare, 0x11 END, 0x12 Jump s8,
-    0x13 JumpIfFalse s8, 0x14 Pop, 0x15-0x1A StepTypePost u8 u8, 0x1B PushToAltStack, 0x1C LoopOrJump s8,
+    game actions, OpCodes.csv), 0x03 TypeOp u8, 0x04-0x10 arithmetic/compare, 0x11 END, 0x12 Jump u8 (forward),
+    0x13 JumpIfFalse u8 (forward), 0x14 Pop, 0x15-0x1A StepTypePost u8 u8, 0x1B PushToAltStack, 0x1C LoopOrJump u8 (backward),
     0x1D PushMultiVarint (count + N varints).
 """
 import json
@@ -143,7 +143,7 @@ def disasm(rom, o, indent="    ", limit=512):
             print(f"{at}  03 {rom[o + 1]:02x}      {name} {rom[o + 1]}")
             o += 2
         elif op in (0x12, 0x13, 0x1C):
-            d = struct.unpack_from("<b", rom, o + 1)[0]
+            d = rom[o + 1] if op != 0x1C else -rom[o + 1]   # unsigned; LoopOrJump goes back (docs/scripts.md 2.1)
             print(f"{at}  {op:02x} {rom[o + 1]:02x}      {name} {d:+d} -> {ROM_BASE + o + 2 + d:08x}")
             o += 2
         elif 0x15 <= op <= 0x1A:

@@ -739,3 +739,26 @@ Verified in the fork (island save, Piccolo + Hercule): a clone duel turned playe
 Piccolo; each player's punches hurt the other (554 -> 485 and 554 -> 414); player 1's final blow left
 the clone at 1 HP with `winner = 1`; in a rematch player 2's final blow left player 1 at 1 HP, no game
 over, `winner = 2`, pads swapped (player 1's pad then walked player 2's entity).
+
+## Story-scripts engine pieces (2026-10-18, branch `story-scripts`, `docs/scripts.md`)
+
+- **Boss bar argument fix**: the entry jump into `bossbar_create_hook` was `ldr r3,[pc]; bx r3`, which
+  replaced `BossHealthBar_Create`'s fourth argument (r3 = the upper percent of
+  `DrawBossHealthBarRange`) with the hook's address. `patch_rom.py` now jumps through r12 for the
+  entries in `R3_ARG_JUMPS` (push {r0}; ldr r0,[pc]; mov r12,r0; pop {r0}; bx r12).
+- **Camera_Shake hook** (0x0800DD80, `camera.c`): a shake requested while the camera already heads the
+  shake chain (0x03000FF4) extends the running one instead of linking the camera to itself; this was
+  a crash when a player was hit during one of 16's explosion shakes (ROM callers included, beside
+  `player.c`'s `camera_shake_safe`).
+- **Android 16 ends at half health** (`A16_END_PCT` 50, `android16.c`): `A16_HP` is what the players take
+  off over the whole fight; a bar range drawn for him slices his nominal health (stage [75, 100] and
+  [50, 75] on the island, 2000 HP each with two players, 1400 alone); at the bottom of a stage the defeat
+  action fires and he stays standing (idle state, AI off, hits ignored); the rage phases follow the whole
+  fight.
+- **`BOSS_PAIR`** (`bosses.h`): a pair even in single-player, under the boss rules whatever its HP and
+  EXP: the forest spirit's Frieza (stat 41) + Cooler (sprite 34, stat 111 = Cooler's AI with Frieza's
+  tutorial numbers).
+- **Player 2 by party flags** (`player.c`): player 2 is a party member with bits 0 and 1 (Hercule is no
+  longer allowed outside the party), so the story's flag opcodes pick and lock player 2.
+- **Chapter tests**: `StoryTest` preset (0x0203FDC0, applied by Party_Init), `COOP_CMD_STORY_WIN` (7),
+  `STORY_TEST=1` builds; `tools/headless/st_headless.c`.

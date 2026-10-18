@@ -6,6 +6,9 @@ const ExtraStat extra_stats[] = {
     // 110 Android 13, base form (not yet "Super"): Android 19's AI set and boss class, a little
     // tougher than 19. Partner of 19 on the zone 7 battlefield and of Dr. Gero at the lab door.
     { 5, -1, 3200, -1, 24, 20, 16, 0 },
+    // 111 Cooler as the forest spirit shows him to Gohan and Krillin (beside Frieza, stat 41, the stock
+    // dream boss): Cooler's own AI set and class, Frieza's tutorial HP, EXP and attack numbers.
+    { 29, -1, 130, 20, 3, 2, 3, 0 },
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 
@@ -20,6 +23,9 @@ static const BossRule rules[] = {
     // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door)
     { 5,  0, 0, A13_SPRITE, A13_STAT },
     { 7,  0, 0, A13_SPRITE, A13_STAT },
+    // The forest spirit (zone 2 area 8, the stock dream's clearing): Frieza and Cooler, always a pair
+    { 41, 0, BOSS_PAIR, COOLER_SPRITE, COOLER_SPIRIT_STAT },
+    { COOLER_SPIRIT_STAT, 0, BOSS_PAIR, 0, 0 },     // the twin's own stat: boss pair rules for it too
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },
     { 79, 50, BOSS_NO_TWIN, 0, 0 },

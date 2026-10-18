@@ -13,6 +13,8 @@
 //   partner_sprite the co-op twin's model (0 = the same model: a Multi-Form duplicate)
 //   partner_stat   the co-op twin's stat (0 = the same stat as the original)
 //   BOSS_NO_TWIN   the boss fights alone even in co-op
+//   BOSS_PAIR      always a pair, single-player too, under the boss rules (partner model and stat,
+//                  both-down) whatever the stat's HP and EXP (the forest "spirits", Frieza + Cooler)
 // Pairs follow the both-down rule (enemies.c): the first boss to fall stays down on the map and only
 // the last one's death runs the fight's defeat script.
 
@@ -28,6 +30,7 @@ typedef struct ExtraStat {
 } ExtraStat;
 
 #define BOSS_NO_TWIN 1
+#define BOSS_PAIR    2
 
 typedef struct BossRule {
     s16 stat;            // stat index this rule applies to; -1 ends the table
@@ -42,6 +45,8 @@ typedef struct BossRule {
 #define A13_SPRITE 0
 #endif
 #define A13_STAT 110        // Android 13, base form
+#define COOLER_SPIRIT_STAT 111   // the forest spirit's Cooler (docs/story.md 4): Frieza's tutorial numbers
+#define COOLER_SPRITE 34
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;
