@@ -545,7 +545,9 @@ static int bar_lo(const Entity *e, int lo) {
 
 BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
     if (e) lo = is_a16(e) ? a16_bar_range(e, lo, hi) : bar_lo(e, lo);
-    if (!coop.p2) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);   // single-player: the ROM object
+    // single-player: the ROM object. Co-op goes by the pad, as the twins do: after a warp without entities
+    // player 2's entity is gone until player 1 is free (Gingertown's bar is drawn right after one).
+    if (!coop.p2 && !p2_present()) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);
     TwinPair *pr = pair_of(e);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin
     BossBar *bar = bar_create(mem, e, lo, hi, coop2.bar_vtable, BAR_X_COOP, BAR_Y_TOP);

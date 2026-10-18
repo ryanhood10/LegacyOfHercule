@@ -1,0 +1,28 @@
+{
+  "_": "Chapter 5 (docs/story.md section 0 item 5): the first Lookout visit (Hercule stays), Trunks' chapter with Gohan as player 2, Kami's boost for Hercule before the fusion, Gingertown with Imperfect Cell's Multi-Form duplicate in co-op. Scripts in ch5_lookout.lscript.",
+  "sources": ["data/story/ch5_lookout.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 9, "area": 6},
+      "_": "Kami defers; Hercule stays at the Lookout; Gohan's house: player 1 Trunks, player 2 Gohan",
+      "triggers": {"0": {"payload": "seq:ch5_lookout_first"}}
+    },
+    {
+      "map": {"zone": 10, "area": 16},
+      "_": "the cicada skin, then the Lookout: Kami's boost for Hercule, the fusion, Piccolo and Hercule leave for Gingertown",
+      "triggers": {"0": {"payload": "seq:ch5_fusion"}}
+    },
+    {
+      "map": {"zone": 10, "area": 17},
+      "_": "Gingertown: Cell's introduction; in co-op the Multi-Form lines",
+      "triggers": {"0": {"payload": "seq:ch5_gingertown"}}
+    },
+    {
+      "map": {"zone": 10, "area": 20},
+      "_": "Imperfect Cell's defeat: in co-op the fallen duplicate is reabsorbed; Gohan and Trunks selectable again at the end",
+      "records": {
+        "0": {"action": "seq:ch5_gingertown_end"}
+      }
+    }
+  ]
+}

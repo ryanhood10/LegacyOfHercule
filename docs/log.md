@@ -13,6 +13,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 5 (story-scripts)**: `data/story/ch5_lookout`: Hercule stays at the Lookout when Kami defers,
+  Gohan is player 2 in Trunks' chapter, Kami draws out Hercule's potential before the fusion (+3
+  levels and a refill; the amount is ours, Ryan's note said "level + EXP"), Piccolo and Hercule go to
+  Gingertown, Cell's Multi-Form lines and the reabsorption of the fallen body. Engine fixes found
+  there: after a warp without entities player 2's entity is gone until player 1 is free, so
+  `CoopCall 5` (P2Present) now also counts the pad, `CoopCall 6` (P2Bind) without an entity sets the
+  slot the respawn takes, and the boss-bar hook picks the co-op bars by the pad too (Gingertown's bar
+  had been the single-player one, under player 2's HUD, with no twin bar). Tested headless in co-op
+  (both fall orders at Gingertown) through to each chapter end.
 - **Chapter 4, Piccolo's chapter (story-scripts)**: `data/story/ch4_piccolo`: 13 backs Gero up in all three
   stages and flies off after each; Hercule's "negotiate" at the lab door; 13 watches 17 and 18 turn
   on Gero in the lab and walks out promising to fulfil his destiny; the road: Vegeta arrives and is
