@@ -47,8 +47,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 ## Open items
 
 - Party: Krillin's own names / portrait / abilities (the status screen's per-slot tables have six
-  entries), the save menu's six-wide portrait rows, the status screen's paging key, erase and the
-  journal with seen bits not exercised in the fork.
+  entries), the save menu's six-wide portrait rows, the status screen's paging key; the journal with
+  seen bits set was not exercised in the fork.
 
 - Human test of the save-pad switch with player 2 present; a real two-PC netplay run.
 - Unexplained crash on the stock ROM reported by Ryan ("jumped to invalid address 27994586"),

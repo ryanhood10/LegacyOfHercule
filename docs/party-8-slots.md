@@ -122,8 +122,9 @@ area 1: the save pad tutorial flag lands in the moved bank (+0xEC), Save writes 
 zone/area/position), the Select Game menu shows the slot's six-portrait window and "East District
 439", loading restores all eight entries and lands on the pad; a new game runs through the hooks.
 Switch Characters: six portraits, right indicator, Right scrolls to Piccolo..Krillin with the left
-indicator, A makes Krillin player 1 (active slot 6), the pause menu shows his stats. Not exercised:
-erase, the journal with seen bits set, a save from the real story (the fork's EEPROM starts as a
+indicator, A makes Krillin player 1 (active slot 6), the pause menu shows his stats. Erase: the menu's R
+mode, Delete Game? Yes, and the slot reads as a new game (active 3, flags 0). Not exercised: the
+journal with seen bits set, a save from the real story (the fork's EEPROM starts as a
 512-byte device and zero-extends; slots beyond it read as empty until written).
 
 ## Follow-ups
@@ -131,3 +132,5 @@ erase, the journal with seen bits set, a save from the real story (the fork's EE
 - Krillin's names, portrait, abilities and growth (per-slot tables in the status screen module).
 - Save-menu portrait row wider than six (the menu object's 3 x 6 entity arrays).
 - The status screen's paging key, and an indicator there if it is wanted.
+- The 6 x 0x1C bytes still reserved for the party inside the save-menu object and the scroll's
+  rebuilt portraits (deleted through the entity list, so no leak was seen) are the only loose ends.
