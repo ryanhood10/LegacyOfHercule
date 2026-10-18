@@ -95,3 +95,5 @@ than 128 sprites is a no.
 - The Arefu/Legacy reference is used for facts (addresses, formats), never copied.
 - Every change tested in mGBA from a savestate; the wide build and the stock build stay in step.
 - Story edits keep the original beats; Hercule gains, nobody else loses their moment.
+- Nothing reveals Hercule as the hero until much later in the story (Ryan, 2026-10-18): no intro
+  captions, no foreshadowing lines; he is comic relief until the payoff.

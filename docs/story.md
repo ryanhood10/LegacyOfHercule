@@ -294,6 +294,22 @@ end of the scene the script flies you straight to the fight island (zone 11 area
 small enemies (zone 11 has none), and the fight island has no pad. The boss continues across areas
 4, 5 and 6 by script warps.
 
+**Android 16 as the island boss (Ryan's idea, 2026-10-18):** change the dialogue so 16 is furious
+that Goku is not there, and Piccolo tricks him: beat me on the next island and I'll tell you where
+Goku is. 16 as a strong boss with rocket attacks: heat-seeking rockets that lock on and blow up
+after three seconds, rocket barrages, big explosives all over the field, none of which hurt him.
+Facts: LoG2's Android 16 (sprite 15) is a 16x32 NPC set with idle, walk and one blast pose only, and
+he is not in Buu's Fury (he dies in the Cell saga), so a fighting 16 needs new frames (attacks,
+rocket punch with the forearm detached, hurt) drawn or edited from a big body; the rockets need a
+projectile sprite (no missile exists; the robots' shots and ki blasts are the nearest) and their
+behaviour (lock-on, fuse, barrage, area explosions that spare the owner) is new boss AI in
+`src/coop` (a few days of code once the art exists). 17's fight sprite (9) is complete, so 17 + 18
+is the no-art alternative.
+
+**Rule (Ryan):** nothing in the story reveals Hercule as the hero until much later. The prologue
+caption rewrites from the first text swap ("Earth's true hope is a man with no ki at all" and
+"Sixteen years before Hercule's rise") are removed; `data/hercule-text.json` is empty again.
+
 Open for Kame House: player 2 beside Piccolo against 17 (Hercule, who flew in with him), and 18
 joining as 17's twin instead of "sitting this one out", or 16 stepping in.
 
