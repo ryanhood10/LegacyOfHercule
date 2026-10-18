@@ -327,9 +327,15 @@ watch; after the fight Cell arrives as scripted and the warp to the Lookout foll
   alongside you", Trunks takes him to Capsule Corporation, and Bulma reads his memory there.
 - **Semi-Perfect Cell vs Vegeta and Trunks:** Cell splits into two (Multi-Form duplicate), the same
   mechanics as Gingertown. The stock twist stays: Cell talks Vegeta into letting him absorb 18.
-- **Perfect Cell vs Trunks:** Cell fights alone; the fight ends at about half of his health, when he
-  laughs it off ("All you've done is pump up your muscles"); Trunks' transformation beats stay as
-  scripted (the script also resets both Saiyans to their base sprites afterwards).
+- **Perfect Cell vs Trunks and Krillin (Ryan):** in the stock scene Vegeta is the one knocked out
+  ("That kick! I put all my energy into it!" and Cell's "now do you understand perfection?");
+  Krillin is not in the scene at all. So: after Vegeta goes down, Krillin flies in (as he does in
+  the series, detonator in hand) and the pad that played Vegeta switches to Krillin, selectable only
+  with Trunks for this fight; Ascended Trunks and Krillin fight Perfect Cell with no twin, the fight
+  ends at about half of Cell's health when he laughs it off ("All you've done is pump up your
+  muscles"), and Krillin's rush-and-one-hit-KO from the series is the opening beat of the scripted
+  ending. Trunks' transformation beats stay as scripted (the script resets both Saiyans to their
+  base sprites afterwards).
 - **After that, from the pad (verified):** Cell announces the tournament ("a tournament will begin in
   ten days... I'm giving you a second chance"); Trunks: "I should return to Capsule Corporation and
   tell the others"; 16 asks for repairs; Vegeta's "Foolish boy" and Cell's "I have fought you
