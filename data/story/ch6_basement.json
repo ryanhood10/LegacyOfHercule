@@ -1,0 +1,34 @@
+{
+  "_": "Chapter 6 before the Time Chamber (docs/story.md section 0 item 6): the lab basement with Trunks and Krillin (Krillin's NPC left out when player 2 plays him), Piccolo a scene actor at Kame House, Krillin stays home when Trunks flies to the Lookout. Scripts in ch6_basement.lscript.",
+  "sources": ["data/story/ch6_basement.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 8, "area": 61},
+      "_": "the plans room: Krillin's NPC walk only in single-player",
+      "triggers": {"2": {"payload": "seq:ch6_basement_enter"}}
+    },
+    {
+      "map": {"zone": 8, "area": 62},
+      "_": "Cell's larva",
+      "triggers": {"0": {"payload": "seq:ch6_larva"}}
+    },
+    {
+      "map": {"zone": 8, "area": 63},
+      "_": "the master computer and the self-destruct",
+      "triggers": {"0": {"payload": "seq:ch6_computer"}}
+    },
+    {
+      "map": {"zone": 8, "area": 48},
+      "_": "out of the lab: Krillin's actor only in single-player; Piccolo stays unselectable",
+      "triggers": {"1": {"payload": "seq:ch6_lab_exit"}},
+      "records": {
+        "0": {"condition": "script:ch6_a48_krillin_cond"}
+      }
+    },
+    {
+      "map": {"zone": 11, "area": 3},
+      "_": "Kame House upstairs: Goku wakes; Krillin stays home",
+      "triggers": {"0": {"payload": "seq:ch6_goku_wakes"}}
+    }
+  ]
+}

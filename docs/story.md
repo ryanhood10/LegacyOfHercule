@@ -19,7 +19,8 @@ Hercule at the landing; Time Chamber duel, winner Piccolo / loser Hercule), zone
 boosts for Hercule and Krillin), Piccolo's chapter of item 4 (13 beside Gero in his three stages,
 Hercule's "negotiate" at the lab door, 13 in the lab, the road with Vegeta as player 2), item 5 (Hercule
 stays at the Lookout, Gohan as player 2 in Trunks' chapter, Kami's boost for Hercule, Gingertown with
-Cell's Multi-Form duplicate) and the Android
+Cell's Multi-Form duplicate), item 6's lab basement (Trunks + Krillin, the NPC left out in co-op) and
+Kame House (Piccolo a scene actor, Krillin stays home) and the Android
 16 island
 fight from item 6 (Kame House deal, 16 over the two stock stages, half health, Cell). Tested headless
 (`docs/testing.md`).

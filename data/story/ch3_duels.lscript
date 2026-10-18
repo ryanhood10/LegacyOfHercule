@@ -200,8 +200,9 @@ sequence ch6_chamber_end
         ClearCharacterFlag_Bit1 0
         ClearCharacterFlag_Bit1 2
         ClearCharacterFlag_Bit1 3
-        ClearCharacterFlag_Bit1 6
+        SetCharacterFlag_Bit1 1
         SetCharacterFlag_Bit1 5
+        SetCharacterFlag_Bit1 6          ; Krillin, at home on the island, is selectable for the 17 fight
         SetActiveCharacter 1
         WarpToMapWithEntities 9, 3, 1, 128, 168
         CoopCall 6, 5, 0, 0                ; player 2 (kept across the warp) plays Hercule
