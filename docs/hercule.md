@@ -123,17 +123,13 @@ The prologue (zone 1 area 4, map entry 3) is one screen-wide trigger with a five
 text, and a script that sets Trunks (slot 3) to level 6, makes him active and warps to Z1A1 at
 (200,664).
 
-Two write paths, both emitted by the tool into `data/hercule-text.json`:
-- in place (`text`): entry 0 "Sixteen years from the present day..." -> "Sixteen years before
-  Hercule's rise." (must fit the old string; NUL padded);
-- relocated (`entry`): entry 3 (compressed in the stock ROM) replaced by a new plain-text entry at
-  file `0x901000` that keeps its next-index and speaker, with the sequence slot repointed:
-  "Trunks and Gohan are the last of the Saiyan warriors... But Earth's true hope is a man with no ki
-  at all: HERCULE!"
-
-`script_dump.py --rom build/log2-coop.gba seq 0x083B8340` shows both in the built ROM, and a new
-game in mGBA displays them (`build/hc9_t3.png`, `build/hc9_o5.png`) before the stock chain continues
-into the Z1A1 start with Trunks at level 6.
+Two write paths, both emitted by the tool as records (`text` in place, must fit the old string, NUL
+padded; `entry` writes a new plain-text entry in free space that keeps the old entry's next-index and
+speaker and repoints the sequence slot). They were proven on the prologue (entries 0 and 3 of the
+sequence at `0x083B8340`, shown by a new game in mGBA: `build/hc9_t3.png`, `build/hc9_o5.png`) and
+then **removed again** (commit e78e78e): Ryan's rule is that nothing reveals Hercule as the hero until
+much later, so `data/hercule-text.json` is empty and the stock opening plays. Dialogue edits from here
+follow `docs/story.md`; the tool and the write path stay.
 
 ## 6. Verification log
 
@@ -143,7 +139,7 @@ into the Z1A1 start with Trunks at level 6.
 | 2 growth | Map Test party and a live level-up match the new ranges (section 2) |
 | 3 moveset | four abilities fire as player 2, EP costs right, no crash (section 3) |
 | 4 Keep Goku | byte applied; Cell finale played in mGBA, Goku's slot keeps bit 0 (section 4) |
-| 5 dialogue | prologue dump verified; both text swaps shown by a new game in mGBA (section 5) |
+| 5 dialogue | prologue dump verified; both write paths shown by a new game in mGBA, then reverted per the no-reveal rule (section 5) |
 
 Test states on the run copy: `build/log2-run.ss1` (Z2A7, player 2 = Hercule, this build),
 `log2-run.ss3` (debug menu). Driving recipe: `tools/mgba_run.ps1 -NoStates`, then
