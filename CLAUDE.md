@@ -35,11 +35,13 @@ export PATH="/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti
 make                       # build/log2-coop.gba (HERCULE=1 data patch on by default)
 make WIDE=1 DEBUG_MENU=1   # build/log2-wide.gba for the WSL fork, debug menu on the title screen
 make BUILD=build/ssj SSJ_TEST=1 DEBUG_MENU=1 WIDE=1 DATA_PATCH=   # private dir, P2 Start = transform
+make BUILD=build/p6 PARTY_SLOTS=6                                  # stock-sized party (default 8)
 ```
 
-Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `WIDE_TEST=<w>` forces a view
-width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger; `BUU=0` leaves out the sprites converted
-from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test build). `make` does not run from PowerShell
+Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `PARTY_SLOTS=N` party size (6..16);
+`WIDE_TEST=<w>` forces a view width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger; `BUU=0` leaves out
+the sprites converted from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test
+build). `make` does not run from PowerShell
 (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
 
 ## Test (see docs/testing.md for the full recipes)
@@ -51,14 +53,17 @@ from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for
   sender `python tools\p2_keys.py --port 7778`, keys `tools\win_keys.ps1 "M:200 WAIT:500" -Title "mGBA (Ubuntu)"`,
   screenshot `tools\win_shot.ps1 out.png -Title "mGBA (Ubuntu)"`. Add `-g` and attach
   `gdb-multiarch -batch -x <script>` for breakpoints, traces and memory dumps (works; see testing.md).
+- `DEBUG_MENU=1` also replaces the new-game intro video with the debug menu, so test new games with
+  `DEBUG_MENU=0`. Fork test helpers (persistent GDB client, pad-word keys, teleport): `tools/fork/`.
 - Savestates: `build/log2-coop.ss1` = zone 2 area 7 wolf map, level-40 party, Piccolo P1 (slot 1),
   Gohan P2 (slot 0); `ss2` = prologue Flight Circle. Re-make states after every `make` of the same
   ROM name (player 2's vtable copies hold code addresses).
 
 ## Key addresses (details in docs/engine.md and src/coop/rom.h)
 
-Party `0x03000E90` (active slot byte, 6 x 0x1C entries at +0xC; entry +8 = display row);
-Character_DisplayData 22 rows x 20 (relocated into the blob as `display_rows`, row 22 = SSJ Hercule);
+Party: stock `0x03000E90`, relocated to `g_party_block` `0x0203F000` with `PARTY_SLOTS` (8) x 0x1C
+entries at +0xC (entry +8 = display row; `docs/party-8-slots.md`); Character_DisplayData 22 rows x 20
+(relocated into the blob as `display_rows`, row 22 = SSJ Hercule, row 23 = Krillin placeholder);
 sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule, 158+ from Buu's Fury;
 Buu ROM: index `0x086B6BDC`, OBJ palette `0x0805652C`, see `docs/sprites.md`); entity list
 `0x03001120`; world/camera object `0x03001090`; input `0x0300229C`; co-op state `0x0203FF04`;

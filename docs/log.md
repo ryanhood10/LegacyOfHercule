@@ -44,8 +44,18 @@ Newest first. One entry per landed piece or decision; details live in the linked
   the game's decompressor; `make` links them as sprite ids 158 (Buu-saga Hercule, record 128) and
   159 (LSSJ Broly, record 28) when `roms/buu.gba` is present. Hercule verified in game as player 2.
   **Android 13 is not in Buu's Fury** (all 297 records checked); the story needs it drawn.
+- **PARTY_SLOTS** (branch `party-slots`, 2026-10-17): the party block relocated to EWRAM and grown to
+  N entries (default 8; Krillin placeholder at slot 6, slot 7 empty), every six-slot site patched or
+  re-implemented (`src/coop/party.c`), a new EEPROM save layout and save-menu slot store
+  (`party_save.c`), a scrolling Switch Characters screen with edge indicators (`switch.c`). Verified
+  in the WSL fork: save, Select Game, load, switch to Krillin. `docs/party-8-slots.md`. Found on the
+  way: the arena's usable end is cap words + 8 bytes (old cap overlapped `coop2` by 8 bytes).
 
 ## Open items
+
+- Party: Krillin's own names / portrait / abilities (the status screen's per-slot tables have six
+  entries), the save menu's six-wide portrait rows, the status screen's paging key; the journal with
+  seen bits set was not exercised in the fork.
 
 - Human test of the save-pad switch with player 2 present; a real two-PC netplay run.
 - Unexplained crash on the stock ROM reported by Ryan ("jumped to invalid address 27994586"),

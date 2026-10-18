@@ -53,7 +53,7 @@ player 2 an identical structure that the controller code can read.
 | `0x03000E20` | `g_FrameCounter` |
 | `0x03000E24` | `g_CoroutineDepth` |
 | `0x03000E3C` | `g_IntrVectorTable` |
-| `0x03000E90` | `g_PartyState` (0x164 bytes; 6 x 28-byte `CharacterEntry` at +0x0C) |
+| `0x03000E90` | `g_PartyState` (stock: 0x164 bytes; 6 x 28-byte `CharacterEntry` at +0x0C). The build relocates it to `g_party_block` 0x0203F000 with `PARTY_SLOTS` entries: `docs/party-8-slots.md` |
 | `0x03001120` | `g_EntityList` |
 | `0x03001FA8` | `g_PlayerObject` (player entity pointer, 0 if none) |
 | `0x03001FAC` | `g_VMContextPtr` |

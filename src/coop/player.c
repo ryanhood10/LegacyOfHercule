@@ -250,7 +250,7 @@ void coop_init_once(void) {
 // but never flags him in the party until late, so he is allowed whenever his entry is filled.
 #define HERCULE_SLOT 5
 static int slot_ok(int s, int avail) {
-    if (s < 0 || s >= 6 || s == g_Party->active_slot) return 0;
+    if (s < 0 || s >= PARTY_SLOTS || s == g_Party->active_slot) return 0;
     if (s == HERCULE_SLOT) return g_Party->chars[s].max_hp != 0;
     u32 f = g_Party->chars[s].flags;
     return (f & 1) && (!avail || (f & 2));
@@ -261,7 +261,7 @@ static int slot_ok(int s, int avail) {
 static int pick_p2_slot(void) {
     if (slot_ok(coop.p2_slot, 0)) return coop.p2_slot;
     if (slot_ok(HERCULE_SLOT, 0)) return HERCULE_SLOT;
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < PARTY_SLOTS; i++)
         if (slot_ok(i, 0)) return i;
     return -1;
 }
@@ -298,7 +298,7 @@ void coop_active_check(void) {
     coop.last_active = (u8)active;
     if (!coop.p2 || active != coop.p2_slot) return;
     int ns = slot_ok(old, 0) ? old : -1;
-    for (int i = 0; ns < 0 && i < 6; i++)
+    for (int i = 0; ns < 0 && i < PARTY_SLOTS; i++)
         if (slot_ok(i, 0)) ns = i;
     if (ns >= 0) p2_bind(coop.p2, ns);
 }
@@ -306,8 +306,8 @@ void coop_active_check(void) {
 // Player 2's own switch: next available party member after the current one, never player 1's.
 void p2_cycle(void) {
     if (!coop.p2) return;
-    for (int k = 1; k < 6; k++) {
-        int s = (coop.p2_slot + k) % 6;
+    for (int k = 1; k < PARTY_SLOTS; k++) {
+        int s = (coop.p2_slot + k) % PARTY_SLOTS;
         if (slot_ok(s, 1)) { p2_bind(coop.p2, s); return; }
     }
     play_cant_sfx();

@@ -14,6 +14,7 @@ local function symbol(name, fallback)
   return fallback
 end
 local COOP = symbol("coop", 0x0203FF04)
+local PARTY = symbol("g_party_block", 0x03000E90)   -- relocated party block (stock 0x03000E90)
 
 function peek()
   local p1 = emu:read32(0x03001FA8)
@@ -30,11 +31,11 @@ function peek()
   ent("P1", p1)
   ent("P2", p2)
   console:log(string.format("coop@%s remote=%04x input2=%04x age=%d slot2=%d active=%d spawns=%d destroys=%d", hex(COOP),
-    emu:read16(0x0203FF00), emu:read16(COOP + 0x7A), emu:read16(COOP + 0xB6), emu:read8(COOP + 0x80), emu:read8(0x03000E90),
+    emu:read16(0x0203FF00), emu:read16(COOP + 0x7A), emu:read16(COOP + 0xB6), emu:read8(COOP + 0x80), emu:read8(PARTY),
     emu:read16(COOP + 0xB8), emu:read16(COOP + 0xBA)))
-  local function exp(slot) return emu:read32(0x03000E90 + 0xC + slot * 0x1C + 0x10) end
-  local function hp(slot) return emu:read16(0x03000E90 + 0xC + slot * 0x1C) end
-  local a, b = emu:read8(0x03000E90), emu:read8(COOP + 0x80)
+  local function exp(slot) return emu:read32(PARTY + 0xC + slot * 0x1C + 0x10) end
+  local function hp(slot) return emu:read16(PARTY + 0xC + slot * 0x1C) end
+  local a, b = emu:read8(PARTY), emu:read8(COOP + 0x80)
   console:log(string.format("exp: active=%d p2slot=%d hp=%d/%d acting=%s awards p1=%d p2=%d rebinds=%d", exp(a), exp(b), hp(a), hp(b),
     hex(emu:read32(COOP + 0xBC)), emu:read16(COOP + 0xD8), emu:read16(COOP + 0xDA), emu:read16(COOP + 0xDE)))
   if p1 ~= 0 and p2 ~= 0 then

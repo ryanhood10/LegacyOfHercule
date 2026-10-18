@@ -15,6 +15,20 @@
         17
       ],
       "ability_index": 0
+    },
+    "6": {
+      "hp": 80,
+      "ep": 20,
+      "str": 3.0,
+      "pow": 4.0,
+      "end": 3.0,
+      "display_row": 23,
+      "flags": "0x40",
+      "abilities": [
+        2
+      ],
+      "ability_index": 0,
+      "_": "Krillin placeholder (slot 6): Gohan-like level-1 stats, Ki Blast, display row 23 = Hercule row with Krillin NPC sprite (tools/spriteclone.py). Real art, abilities and growth are a later pass; slot 7 stays empty."
     }
   },
   "growth": {
@@ -30,6 +44,20 @@
       "end": [
         450,
         650
+      ]
+    },
+    "6": {
+      "str": [
+        300,
+        500
+      ],
+      "pow": [
+        300,
+        500
+      ],
+      "end": [
+        256,
+        456
       ]
     }
   },

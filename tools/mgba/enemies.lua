@@ -19,6 +19,7 @@ local function symbol(name, fallback)
 end
 local COOP = symbol("coop", 0x0203FF04)
 local COOP2 = symbol("coop2", 0x0203FB00)
+local PARTY = symbol("g_party_block", 0x03000E90)   -- relocated party block
 local TWINS = COOP2 + 4 + 48 * 4 + 24 * 4
 local DBG = TWINS + 24 * 8   -- spawned, scaled, bars, dmg_calls, off, pad, unused (u16), dmg_player, dmg_scaled, last_dmg...
 
@@ -143,7 +144,7 @@ callbacks:add("frame", function()
   end
   if hp_watch then
     for slot = 0, 5 do
-      local hp = emu:read16(0x03000E90 + 0xC + slot * 0x1C)
+      local hp = emu:read16(PARTY + 0xC + slot * 0x1C)
       if last[slot] and last[slot] ~= hp then
         console:log(string.format("frame %d slot %d hp %d -> %d (%+d)", emu:read32(0x03000E20), slot, last[slot], hp, hp - last[slot]))
       end

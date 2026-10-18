@@ -3,11 +3,18 @@ per-slot level-up growth rows, the ability table and the level EXP table. Reads 
 a ROM, and turns a design spec (JSON) into a data patch file that tools/patch_rom.py applies with
 --data-patch (records of file offset + bytes, see that file's header).
 
-usage: romdata.py party     [ROM]              default party (6 CharacterEntry) + growth rows
+usage: romdata.py party     [ROM]              default party (CharacterEntry per slot) + growth rows
        romdata.py abilities [ROM]              ability table (icons, functions, EP cost, animation)
        romdata.py exp       [ROM]              level EXP table (50 levels)
-       romdata.py build SPEC.json OUT.json [ROM]   spec -> data patch records
-       ROM defaults to roms/log2.gba; a built ROM works too (the ability table follows its relocation).
+       romdata.py build SPEC.json OUT.json [ROM] [--party-slots N]   spec -> data patch records
+       ROM defaults to roms/log2.gba; a built ROM works too (the ability and party tables follow
+       their relocation).
+
+Party slots: a build with PARTY_SLOTS=N (tools/patch_rom.py --party-slots N) moves the default party
+and growth rows to an N-entry table at file PARTY_TABLE_AT (stock rows 0-5, zero entries above) and
+repoints the literal at 0x3EA0 so literal + 0xA8 is still the growth rows. `build --party-slots N`
+writes its party/growth records into that table (slots 0..N-1); without the flag they edit the stock
+six-entry table in place.
 
 Spec file (all sections optional; numbers may be JSON ints or "0x.." strings):
 {
@@ -54,6 +61,31 @@ STOCK_ABILITY_NAMES = ["BigBang", "BurningAttack", "KiBlast", "Kamehameha", "Mas
                        "EnergyPunch", "ScatterShot", "SpecialBeamCannon", "SpiritBomb", "Transformation",
                        "TransformationB", "SwordBlast"]
 ENTRY = struct.Struct("<HHHHBBHHHII4B")   # CharacterEntry
+PARTY_TABLE_AT = 0xA00000   # file offset of the N-entry default party table in a built ROM (then growth rows)
+PARTY_STOCK_SLOTS = 6
+GROWTH_AT_LITERAL = 0xA8    # the level-up code reads growth rows at literal(0x3EA0) + 0xA8
+
+
+def party_table_layout(n):
+    """(entries offset, growth offset, literal value) of the relocated N-entry table."""
+    return PARTY_TABLE_AT, PARTY_TABLE_AT + n * ENTRY.size, ROM_BASE + PARTY_TABLE_AT + n * ENTRY.size - GROWTH_AT_LITERAL
+
+
+def party_slots_of(rom):
+    """Slot count of a ROM: 6 for the stock table, else derived from the relocated literal."""
+    lit = rom_ptr(rom, PARTY_REF)
+    if lit == ROM_BASE + PARTY_OFF:
+        return PARTY_STOCK_SLOTS
+    return (lit + GROWTH_AT_LITERAL - ROM_BASE - PARTY_TABLE_AT) // ENTRY.size
+
+
+def party_offsets(rom):
+    """(entries offset, growth offset, slot count) for reading a stock or built ROM."""
+    n = party_slots_of(rom)
+    if n == PARTY_STOCK_SLOTS and rom_ptr(rom, PARTY_REF) == ROM_BASE + PARTY_OFF:
+        return PARTY_OFF, GROWTH_OFF, n
+    ent, grow, _ = party_table_layout(n)
+    return ent, grow, n
 
 
 def num(v):
@@ -64,8 +96,13 @@ def rom_ptr(rom, off):
     return struct.unpack_from("<I", rom, off)[0]
 
 
-def read_entry(rom, slot):
-    f = ENTRY.unpack_from(rom, PARTY_OFF + slot * 28)
+def read_entry(rom, slot, table=None):
+    if table is None:
+        table = party_offsets(rom)[0]
+    if slot >= PARTY_STOCK_SLOTS and table == PARTY_OFF:
+        return dict(hp=0, max_hp=0, ep=0, max_ep=0, display_row=0, ability_index=0, str=0, pow=0, end=0, exp=0,
+                    flags=0, abilities=[0, 0, 0, 0])
+    f = ENTRY.unpack_from(rom, table + slot * 28)
     return dict(hp=f[0], max_hp=f[1], ep=f[2], max_ep=f[3], display_row=f[4], ability_index=f[5], str=f[6], pow=f[7],
                 end=f[8], exp=f[9], flags=f[10], abilities=list(f[11:15]))
 
@@ -75,8 +112,12 @@ def pack_entry(e):
                       e["pow"], e["end"], e["exp"], e["flags"], *e["abilities"])
 
 
-def read_growth(rom, slot):
-    v = struct.unpack_from("<6H", rom, GROWTH_OFF + slot * 12)
+def read_growth(rom, slot, table=None):
+    if table is None:
+        table = party_offsets(rom)[1]
+    if slot >= PARTY_STOCK_SLOTS and table == GROWTH_OFF:
+        return {"str": [0, 0], "pow": [0, 0], "end": [0, 0]}
+    v = struct.unpack_from("<6H", rom, table + slot * 12)
     return {"str": [v[0], v[1]], "pow": [v[2], v[3]], "end": [v[4], v[5]]}
 
 
@@ -139,12 +180,13 @@ def read_exp(rom):
 # ---- printing ------------------------------------------------------------------------------------
 
 def show_party(rom):
-    print(f"default party @ file {PARTY_OFF:#x} (ROM {ROM_BASE + PARTY_OFF:#x}), literal at {PARTY_REF:#x} = "
-          f"{rom_ptr(rom, PARTY_REF):#010x}")
+    ent, grow, n = party_offsets(rom)
+    print(f"default party @ file {ent:#x} (ROM {ROM_BASE + ent:#x}), {n} slots, growth rows @ {grow:#x}, literal at "
+          f"{PARTY_REF:#x} = {rom_ptr(rom, PARTY_REF):#010x}")
     print("slot row  hp/max   ep/max   str    pow    end    exp  flags  sel abilities   growth str/pow/end (min-max /256)")
-    for s in range(6):
-        e = read_entry(rom, s)
-        g = read_growth(rom, s)
+    for s in range(n):
+        e = read_entry(rom, s, ent)
+        g = read_growth(rom, s, grow)
         gs = " ".join(f"{g[k][0]}-{g[k][1]}" for k in ("str", "pow", "end"))
         print(f"{s:4} {e['display_row']:3} {e['hp']:4}/{e['max_hp']:<4} {e['ep']:4}/{e['max_ep']:<4} "
               f"{e['str'] / 256:5.2f} {e['pow'] / 256:5.2f} {e['end'] / 256:5.2f} {e['exp']:6} {e['flags']:#06x} "
@@ -174,17 +216,26 @@ def show_exp(rom):
 
 # ---- spec -> patch -------------------------------------------------------------------------------
 
-def build(rom, spec):
+def build(rom, spec, party_slots=None):
     recs = []
     free = num(spec.get("free", 0x900000))
     free = (free + 3) & ~3
+    if party_slots:
+        ent_off, grow_off, _ = party_table_layout(party_slots)
+        src_ent, src_grow = PARTY_OFF, GROWTH_OFF     # stock rows: the relocated table starts as their copy
+    else:
+        ent_off, grow_off = PARTY_OFF, GROWTH_OFF
+        src_ent, src_grow = PARTY_OFF, GROWTH_OFF
+        party_slots = PARTY_STOCK_SLOTS
 
     def hexw(v):
         return f"{v:#010x}"
 
     for slot_s, edits in spec.get("party", {}).items():
         slot = int(slot_s)
-        e = read_entry(rom, slot)
+        if not 0 <= slot < party_slots:
+            sys.exit(f"party slot {slot}: the build has {party_slots} slots (PARTY_SLOTS)")
+        e = read_entry(rom, slot, src_ent)
         for k, v in edits.items():
             if k == "hp":
                 e["hp"] = e["max_hp"] = num(v)
@@ -196,19 +247,23 @@ def build(rom, spec):
                 e["abilities"] = [num(x) for x in v] + [2] * (4 - len(v)) if len(v) < 4 else [num(x) for x in v]
             elif k in ("display_row", "ability_index", "flags", "exp"):
                 e[k] = num(v)
+            elif k == "_":
+                pass   # comment
             else:
                 sys.exit(f"party slot {slot}: unknown field {k!r}")
-        recs.append({"offset": f"{PARTY_OFF + slot * 28:#x}", "bytes": pack_entry(e).hex(),
+        recs.append({"offset": f"{ent_off + slot * 28:#x}", "bytes": pack_entry(e).hex(),
                      "note": f"default party slot {slot}: hp {e['hp']} ep {e['ep']} str/pow/end "
                              f"{e['str'] / 256:.2f}/{e['pow'] / 256:.2f}/{e['end'] / 256:.2f} abilities {e['abilities']}"})
 
     for slot_s, g in spec.get("growth", {}).items():
         slot = int(slot_s)
-        cur = read_growth(rom, slot)
+        if not 0 <= slot < party_slots:
+            sys.exit(f"growth slot {slot}: the build has {party_slots} slots (PARTY_SLOTS)")
+        cur = read_growth(rom, slot, src_grow)
         for k in ("str", "pow", "end"):
             if k in g:
                 cur[k] = [num(g[k][0]), num(g[k][1])]
-        recs.append({"offset": f"{GROWTH_OFF + slot * 12:#x}", "bytes": pack_growth(cur).hex(),
+        recs.append({"offset": f"{grow_off + slot * 12:#x}", "bytes": pack_growth(cur).hex(),
                      "note": f"growth slot {slot}: str {cur['str']} pow {cur['pow']} end {cur['end']} per level (/256)"})
 
     if spec.get("exp"):
@@ -276,10 +331,15 @@ def main():
         sys.exit(__doc__)
     cmd = args[0]
     if cmd == "build":
+        party_slots = None
+        if "--party-slots" in args:
+            i = args.index("--party-slots")
+            party_slots = int(args[i + 1])
+            del args[i:i + 2]
         spec_path, out_path = args[1], args[2]
         rom_path = args[3] if len(args) > 3 else "roms/log2.gba"
         rom = open(rom_path, "rb").read()
-        recs = build(rom, json.load(open(spec_path)))
+        recs = build(rom, json.load(open(spec_path)), party_slots)
         json.dump(recs, open(out_path, "w"), indent=1)
         print(f"{out_path}: {len(recs)} records from {spec_path}")
         for r in recs:

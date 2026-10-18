@@ -18,7 +18,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the ROM's story as scripted, Ryan's opening, beat costs, what is still open | story work |
-| `docs/party-8-slots.md` | plan and site inventory for growing the party from 6 to 8 slots | before touching the party |
+| `docs/party-8-slots.md` | `PARTY_SLOTS`: the relocated N-entry party, every patched site, save layout, switch screen, verification, limits | before touching the party, saves or the switch screen |
 | `docs/roms.md` | reference ROM hashes | checking a dump |
 | `README.md` | user-facing: setup, playing two-player, netplay, wide view | onboarding a player |
 
@@ -37,6 +37,9 @@ file and tool, and says where to look for a given question. Keep it current.
 | `exp.c` | EXP credited to the killing player |
 | `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
+| `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, flag accessors, VM counter / item / bestiary opcodes |
+| `party_save.c` | save path for N entries: `SaveGame`, `LoadSlot`, `WriteSlot`, the save menu's slot store and queries, start game; EEPROM slots of `SAVE_STRIDE` |
+| `switch.c` | Switch Characters screen: view party of six, scrolling window, edge indicators |
 | `ssj.c` | Super Saiyan Hercule ability pair (`ssj_ready` / `ssj_use`): row 22, sprite 157, EP cost 50 |
 | `controller.c` | "controller mode": this GBA becomes player 2's pad over the link cable |
 | `wrap.c` | run original ROM handlers for player 2 by swapping the input block |
@@ -58,8 +61,8 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 
 | tool | what it does |
 |---|---|
-| `patch_rom.py` | builds the ROM: pad to 16 MiB, place the blob, vtable slot hooks, entry jumps, word/byte patches, literal relocations, `--wide`, `--debug-menu`, `--data-patch` |
-| `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json` |
+| `patch_rom.py` | builds the ROM: pad to 16 MiB, place the blob, vtable slot hooks, entry jumps, word/byte patches, literal relocations, `--party-slots N` (count patches, shadow tables, N-entry default table), `--wide`, `--debug-menu`, `--data-patch` |
+| `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json`; `build --party-slots N` targets the relocated N-entry table |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule) and emits the C data file; `--extra` appends more records to the index |
@@ -78,12 +81,14 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `win_keys.ps1`, `win_shot.ps1` | keys and screenshots for any window by title (used for the WSL fork window) |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |
+| `fork/` | WSL fork test loop: `runfork.ps1` (launch + attach), `gdbsrv.sh` (persistent gdb client over a FIFO), `peek.sh`/`peek.gdb` (pause, dump party + EEPROM, continue), `keys.sh` (player-1 buttons through the pad word), `tele.sh`, `reset.sh` |
 
 ## Where to look for...
 
 | question | place |
 |---|---|
 | an engine address or struct offset | `src/coop/rom.h`, then `docs/engine.md`, `docs/rom-map.md` |
+| the party block, saves, the switch screen, slot counts | `docs/party-8-slots.md`, `src/coop/party.c`, `party_save.c`, `switch.c` |
 | how player 2 is spawned / bound / switched | `src/coop/player.c`, `docs/coop-design.md` "Character switching" |
 | why a build crashed with "Jumped to invalid address" | `docs/testing.md` GDB recipe; savestate from an older build? (vtable copies) |
 | sprite record layout, frame encoding | `docs/sprites.md`, `tools/sprites.py` |

@@ -15,6 +15,8 @@ public static class WT {
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr h, ref POINTW p);
   [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+  [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
+  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
   public static IntPtr Find(string needle) {
     IntPtr found = IntPtr.Zero;
     EnumWindows((h, l) => { if (!IsWindowVisible(h)) return true; var sb = new StringBuilder(256); GetWindowText(h, sb, 256);
@@ -26,6 +28,7 @@ public static class WT {
 [WT]::SetProcessDPIAware() | Out-Null
 $h = [WT]::Find($Title)
 if ($h -eq [IntPtr]::Zero) { throw "no window with title containing '$Title'" }
+if ([WT]::IsIconic($h)) { [WT]::ShowWindow($h, 9) | Out-Null; Start-Sleep -Milliseconds 400 }   # restore a minimised window
 [WT]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Milliseconds 250
 $rc = New-Object RECTW; [WT]::GetClientRect($h, [ref]$rc) | Out-Null
 $pt = New-Object POINTW; [WT]::ClientToScreen($h, [ref]$pt) | Out-Null
