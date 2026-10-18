@@ -155,8 +155,17 @@ Krillin's bit we add one generic rule in `src/coop`: when a map spawns an actor 
 player 2's current sprite, skip that actor (the dialogue still plays with its portrait). Then Krillin
 as player 2 never meets his own NPC anywhere in the game. Hercule gets a line per scene: scared of
 the lab door, hiding behind Piccolo when 17 and 18 wake. The chapter's fights, as scripted: Dr.
-Gero at the lab door (boss, with robot escorts) and Android 18 on the road (a fight the script ends
-with her "Nice try... who's next?"); both become two-on-two through the twin mechanism.
+Gero at the lab door and Android 18 on the road (a fight the script ends with her "Nice try... who's
+next?"); both become two-on-two through the twin mechanism.
+
+**Gero's lab door (Ryan):** yes, the player fights Gero himself (Android 20, enemy stat 7, sprite
+14) at the door, "I won't let you get into my lab", with robot escorts (three in zone 8 area 27, six
+in area 40, the two map variants). Co-op makes it harder the way the difficulty code already does
+(scaled stats, twins, extra escorts), and **Android 13 backs Gero up** as his twin: both-down rule
+again, 13 flies off when the pair is beaten. Inside the lab (area 60) the stock scene plays: Gero
+wakes 17 and 18, 17 takes and destroys the controller ("You're not going to put us to sleep again,
+old man") and Gero dies at their hands; 13 watches, then leaves promising his master he will fulfil
+his destiny. Hercule's line at the door: offers to "negotiate".
 
 ## 5. What the plan is missing (engine limits found while checking)
 
