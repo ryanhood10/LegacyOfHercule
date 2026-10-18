@@ -93,7 +93,8 @@ typedef struct CoopExtra {
     u16 duel_hits;          // debug: player-vs-player hits landed
     u8 *duel_tint;          // the clone's shadow remap table (Arena)
     u8 pad_swap;            // 1 = player 1's pad drives player 2's entity and the other way round
-    u8 _pad5[3];
+    u8 p2_class_row;        // display row player 2's class init last ran with (player.c)
+    u8 _pad5[2];
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x2C0, "CoopExtra must fit 0x0203FB00..0x0203FDC0 (StoryTest above it)");
 
@@ -162,3 +163,5 @@ void exp_init(void);         // build the EXP event vtable copy (called from coo
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
 void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
 void p2_cycle(void);            // player 2 picks the next available character (Select)
+void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
+void old_hercule_set(int on);   // krillin.c: slot 5 -> old Hercule's row (1) or Hercule's (0)

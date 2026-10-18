@@ -1,5 +1,5 @@
 {
-  "_": "Chapter 1, the opening (docs/story.md section 0 item 1): old Hercule in the future prologue, Krillin's visit, the forest spirit fight, Krillin's NPC gone from the landing site. Scripts in ch1_opening.lscript; see docs/scripts.md. SetCharacterTransformation takes a sprite id and looks up the display row showing it: map 3 uses 72 (Hercule) until a row with old Hercule's sprite 158 exists, then 158.",
+  "_": "Chapter 1, the opening (docs/story.md section 0 item 1): old Hercule in the future prologue, Krillin's visit, the forest spirit fight, Krillin's NPC gone from the landing site. Scripts in ch1_opening.lscript; see docs/scripts.md. SetCharacterTransformation takes a sprite id and looks up the display row showing it: map 3 switches slot 5 to old Hercule's sprite 158 (row 24, src/coop/krillin.c), map 1 back to Hercule's 72.",
   "sources": ["data/story/ch1_opening.lscript"],
   "maps": [
     {
@@ -7,7 +7,7 @@
       "_": "the opening captions: old Hercule (slot 5) joins Trunks' party as player 2",
       "edits": [
         {"at": "trigger:0/entry:4", "replace": [
-          ["SetActiveCharacter 3", "SetActiveCharacter 3\nSetCharacterInPartyFlag 5\nSetCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 72"]
+          ["SetActiveCharacter 3", "SetActiveCharacter 3\nSetCharacterInPartyFlag 5\nSetCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 158"]
         ]}
       ]
     },

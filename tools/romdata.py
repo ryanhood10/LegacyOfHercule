@@ -26,7 +26,7 @@ Spec file (all sections optional; numbers may be JSON ints or "0x.." strings):
   "abilities": [{"name": "Taunt", "icons": 11, "is_ready": "fn:hercule_taunt_ready",
                  "on_use": "fn:hercule_taunt_use"}],
             new entries appended after the 14 stock ones (indices 14, 15, ...); "icons" copies the icon
-            pair of stock ability N or is ["0x...", "0x..."]; functions are "fn:<symbol>" (coop.sym,
+            pair of stock ability N or is ["0x...", "0x..."] (or "sym:<symbol>" each); functions are "fn:<symbol>" (coop.sym,
             Thumb bit added by patch_rom.py) or addresses. The table is relocated to "free" and the
             two code literals that point at it are repointed.
   "strings": [{"offset": "0x3B81B0", "text": "..."}],   in-place text replacement, must fit the old string
@@ -291,11 +291,19 @@ def build(rom, spec, party_slots=None):
         for i, a in enumerate(new_abilities):
             idx = STOCK_ABILITIES + i
             icons = a["icons"]
+            entry_off = table_off + idx * 16
             if isinstance(icons, list):
-                ready, cooling = num(icons[0]), num(icons[1])
+                pair = []
+                for k, ic in enumerate(icons):
+                    if isinstance(ic, str) and ic.startswith("sym:"):
+                        fn_fixups.append({"offset": f"{entry_off + 4 * k:#x}", "word": ic,
+                                          "note": f"ability {idx} {a.get('name', '')} icon {k}"})
+                        pair.append(0)
+                    else:
+                        pair.append(num(ic))
+                ready, cooling = pair
             else:
                 ready, cooling = stock[num(icons)][0], stock[num(icons)][1]
-            entry_off = table_off + idx * 16
             words = [ready, cooling]
             for k, fn in (("is_ready", a["is_ready"]), ("on_use", a["on_use"])):
                 if isinstance(fn, str) and (fn.startswith("fn:") or fn.startswith("sym:")):

@@ -89,21 +89,45 @@ VRAM 0x06004600, placed on the frame's edge columns of the tilemap at 0x0600E800
 one is the horizontal flip) while more characters exist on that side. Confirm writes the real party's
 active slot and refreshes player 1 as the original did.
 
-**Status screen** (0x0800379C): its list object is sized for N (above) and shows one character per
-page, so nothing crowds; paging through the list is stock code (Left/Right and Select did not page it
-in the fork test, so the paging key is unconfirmed).
+**Status screen** (0x0800379C, the pause menu): its list object is sized for N (above) and shows one
+character per page set. In the pause menu **Right / Left step through the characters and Up / Down
+through a character's pages** (stats, then techniques); the corner arrows switch Journal / Status /
+Items. Per-slot titles, page counts and technique pages: "Krillin (slot 6)" below.
 
 **Co-op code**: `PartyState chars[PARTY_SLOTS]`, `player.c` slot loops and `p2_cycle`, `ssj.c`,
 `tools/mgba/peek.lua` / `enemies.lua` read the block through the `g_party_block` symbol.
 
 ## Krillin (slot 6) and slot 7
 
-`data/hercule.json` gives slot 6 Gohan-like level-1 stats, Ki Blast, flags 0x40 and display row 23
-(`tools/spriteclone.py`: Hercule's row with Krillin's NPC sprite 76, no transformation links; the
-row-limit byte 0x42D6 is now 24). Slot 7 is empty (all zero, never flagged in party). Placeholder
-limits seen in the fork: the status screen names slot 6 from the per-slot name / ability-name tables,
-which have six entries (it shows "GOHAN" and Piccolo's ability names), and his portrait is Hercule's.
-Krillin's own pass (art, abilities, names, growth) is a separate plan (`docs/sprites.md`).
+Slot 6 is Krillin for real since 2026-10-18 (`docs/hercule.md` 5b, `src/coop/krillin.c`): display row
+23 (Gohan's standard row with sprite 161, dialogue portrait 73, status portrait 119), his own stats,
+growth and abilities 21 / 19 / 20 / 2. The per-slot tables that had six entries are grown for
+PARTY_SLOTS (16 rows in the generated tables, `UI_BLOCK`):
+
+| six-slot site | now |
+|---|---|
+| status title `slot + 0x30` (`0x08003B7E`, vtable slot 13 of `0x08023B3C` / `0x080248CC`) | `status_title_hook`: `ui_strings[UI_NAME + slot]` |
+| status page count (`0x0800350A`: Hercule 1, others 4) | `status_pages_hook`: slots 0-4 four, Hercule one, Krillin three, others one |
+| status page dispatch (`0x08003B44`) | `status_draw_hook`: Krillin's pages 1-2 = the stock energy page `0x08003520` (p 0 / 1) |
+| technique names / descriptions `X[1..4] + slot`, icons `X[13 + 2 slot + p]` (module table `0x081D94D0`, literal 0x377C) | `status_module`: per-slot icon pairs for PARTY_SLOTS, string bases = the `UI_ENERGY1/2`, `UI_DESC1/2` blocks |
+| special melee page `0x9D/0xA2 + slot` (`0x08003684`) | not shown for slots 5+ (page count) |
+| dialogue `%s` name `0x30/0x36 + active` (`0x080094B0/CC`) | `vm_push_name_hook` / `vm_push_caps_hook`: the `UI_NAME` / `UI_CAPS` blocks |
+| status portrait (row +3 -> `Portrait_Table`, ids 8-25) | Krillin's appended as id 119 (`portrait_module`) |
+| level-up victory poses (script `0x083B6524`, slots 0-5 by `PushActiveCharIndex`) | none for slot 6: he keeps standing (harmless) |
+
+Slot 7 is still empty (never flagged in party).
+
+## Level-ups (fixed 2026-10-18)
+
+`Party_AddExp` 0x08003D58 (the EXP event's fire) reaches its module words (SFX mixer, entity list,
+map state, the dialogue's "no actor" pair) at **negative offsets from the default-table literal
+0x3EA0** (`literal - 0x1C .. - 0x8`, the module table `0x081D952C` in the stock ROM). Relocating the
+table moved the literal (`table + N * 0x1C - 0xA8`), so in every PARTY_SLOTS build a level-up read
+party data as those pointers and its message-0x15 broadcast jumped to `0x526F526E` when the level-up
+dialogue closed (seen in the fork with Krillin; any character would crash). `party_add_exp_hook`
+(`src/coop/party.c`, entry jump) re-implements it with the words read from the stock table; other
+users of the literal (`Party_Init`, replaced; the growth code, `literal + 0xA8`) were checked in the
+disassembly. Verified: level 40 -> 41 for Krillin as player 1, dialogue closed, play continued.
 
 ## Limits
 
@@ -112,8 +136,8 @@ Krillin's own pass (art, abilities, names, growth) is a separate plan (`docs/spr
   (3 slots + 8 bytes each) and the view: 0x87C bytes for N = 8, 0xCC4 for N = 16 (region 0xB00, so
   N = 16 needs the region and heap cap lowered by 0x200; `coop.ld` errors when it overflows).
 - The save menu shows at most six members per slot; the switch screen shows six at a time.
-- The debug party (Map Test) fills slots 0..defined-1 with level-40 characters, so Krillin appears
-  there with Hercule's look.
+- The debug party (Map Test) fills slots 0..defined-1 with level-40 characters (flags 0x3F for every
+  slot but Hercule's, so Krillin shows both technique pages there).
 
 ## Verified (WSL fork, `build/party8`, PARTY_SLOTS=8, docs/testing.md "fork helpers")
 
@@ -129,8 +153,6 @@ journal with seen bits set, a save from the real story (the fork's EEPROM starts
 
 ## Follow-ups
 
-- Krillin's names, portrait, abilities and growth (per-slot tables in the status screen module).
 - Save-menu portrait row wider than six (the menu object's 3 x 6 entity arrays).
-- The status screen's paging key, and an indicator there if it is wanted.
 - The 6 x 0x1C bytes still reserved for the party inside the save-menu object and the scroll's
   rebuilt portraits (deleted through the entity list, so no leak was seen) are the only loose ends.
