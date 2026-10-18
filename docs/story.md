@@ -105,12 +105,14 @@ Ryan's version:
    side: you (Vegeta) arrive on Goku dominating 19, Goku collapses from the heart virus, Yamcha
    carries him home, 19 asks to "finish Vegeta", you fight 19 as a boss (enemy stat 5, sprite 12),
    then 20 flees after a talk and Vegeta chases him ("You're not needed anymore"), and Piccolo
-   becomes player 1. Nobody else fights 19. To keep it two-player: Android 20 (sprite 13, an actor
-   with no enemy record in the stock game) joins as 19's twin through the co-op twin mechanism
-   (`enemies.c` already pairs bosses of different models; it needs one new enemy-stat row for
-   sprite 13, say Gero's lab-door stats, stat 7). After both fall, 20 "escapes damaged" so the stock
-   dialogue and the chase still read. Super Android 13 from Buu's Fury is saved for a side story:
-   that ROM's sprite format is not decoded yet and 13 deserves his own arc.
+   becomes player 1. Nobody else fights 19. To keep it two-player (Ryan): **Android 13, base form,
+   not yet "Super"**, fights beside 19 as its twin through the co-op twin mechanism (`enemies.c`
+   pairs bosses of different models; it needs an enemy-stat row and a sprite for 13). 19 dies as in
+   the story; 13 flees damaged and is not heard from for a while, which sets up a later side arc
+   (in the film he absorbs 14 and 15 to become Super 13). 13's art is in Buu's Fury as an unused
+   sprite, so this beat depends on decoding that ROM's sprite tables (also needed for old Hercule
+   and the Buu phase); until then a recoloured LoG2 android (sprites 12-14 have the same
+   enemy-grade pose sets) stands in. Fallback if the art never lands: Android 20 as the twin.
 
 What it costs (no code yet):
 
