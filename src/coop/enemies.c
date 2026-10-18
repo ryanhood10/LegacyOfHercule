@@ -31,6 +31,8 @@ static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VT
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
 // are left alone.
 static int is_boss_rec(const EnemyRecord *rec, const EnemyStat *st) {
+    const BossRule *r = boss_rule(rec->stat_index);
+    if (r && (r->flags & BOSS_PAIR)) return 1;     // a pair under boss rules whatever its numbers
     return st->max_hp >= 1000 && (st->exp == 0 || rec->flags == 1);
 }
 static int is_boss(const Entity *e) { return is_boss_rec(record_of_const(e), (const EnemyStat *)e->behaviour); }
@@ -278,7 +280,8 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
     if (!st) return 0;
     int alone = rule && (rule->flags & BOSS_NO_TWIN);
-    if (!p2_present() || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
+    int pair = rule && (rule->flags & BOSS_PAIR);
+    if ((!p2_present() && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
         return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
 
     int boss = is_boss_rec(rec, st);
@@ -318,8 +321,8 @@ void story_test_finish(void) {
     for (int i = 0; i < l->count; i++) {
         Entity *e = l->items[i];
         if (!is_enemy(e) || e->hp <= 0) continue;
-        const EnemyStat *st = (const EnemyStat *)e->behaviour;
-        if (!is_a16(e) && !(st->exp == 0 && st->max_hp >= 1000)) continue;
+        int boss = is_coop_enemy(e) ? is_boss(e) : ((const EnemyStat *)e->behaviour)->max_hp >= 1000;
+        if (!is_a16(e) && !boss) continue;
         u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
         memset(m, 0, sizeof m);
         *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1

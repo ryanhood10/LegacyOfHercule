@@ -19,7 +19,9 @@ A spec (docs/scripts.md has the reference and examples):
                   "3": {"sprite": 9}, "5": "disable"},
       "add_records": [{"kind": "actor", "sprite": 76, "x": 400, "y": 300, "facing": 2, "condition": COND},
                       {"like": 4, "sprite": 72, "talk": "seq:NAME"}],
-      "edits": [{"at": "trigger:3/entry:15", "replace": [["SetStoryFlag 145", "SetStoryFlag 146"]]}]
+      "edits": [{"at": "trigger:3/entry:15", "replace": [["SetStoryFlag 145", "SetStoryFlag 146"]]}],
+      "pre_edits": [...]                         as "edits", applied first (before the payload/record
+                                                 changes, so stock/stockseq entries see them)
     }
   ]
 }
@@ -36,7 +38,8 @@ script = defeat script, "none"); NPC: talk (REF); actor/NPC/enemy built from scr
 one FaceAndWait behaviour ("facing": 0 down, 1 up, 2 left, 3 right).
 Edit paths: "trigger:N", "record:N/defeat", "record:N/talk", "onload" (and the other map scripts),
 with "/entry:K" for one entry of a sequence. "replace" pairs match whole instruction or entry lines
-(whitespace-normalised, as tools/script_asm.py dump prints them); an edited script is reassembled
+(whitespace-normalised, as tools/script_asm.py dump prints them; a replacement of "" deletes the
+line, one with a newline in it inserts several); an edited script is reassembled
 into free ROM and its pointer field repointed, an edited entry is re-placed and its sequence slot
 repointed (sequences are shared, so the edit applies wherever the sequence is used).
 """
@@ -100,11 +103,14 @@ class MapEditor:
 
     # -- sources and references --
     def load_sources(self, paths):
+        """Sources are parsed when a block is first referenced, against the ROM as edited so far, so
+        stock / stockseq entries pick up "pre_edits" made to the stock entries."""
         for p in paths:
-            for name, blk in sa.parse_file(open(p).read(), p, self.stock).items():
+            text = open(p).read()
+            for name in sa.parse_file(text, p, self.stock):      # names (and syntax) now
                 if name in self.blocks:
                     raise AsmError(f"{p}: {name} is already defined by another source")
-                self.blocks[name] = blk
+                self.blocks[name] = (text, p)
 
     def ref(self, v, want=None):
         """Address of a REF ("seq:NAME", "script:NAME", "@08xxxxxx")."""
@@ -117,16 +123,17 @@ class MapEditor:
         kind, _, name = v.partition(":")
         if kind not in ("seq", "script") or not name:
             raise AsmError(f"bad reference {v!r}")
-        blk = self.blocks.get(name)
-        if blk is None:
+        src = self.blocks.get(name)
+        if src is None:
             raise AsmError(f"{v}: no block named {name} in the sources")
+        blk = sa.parse_file(src[0], src[1], bytes(self.rom))[name]
         if (kind == "seq") != (blk["type"] == "sequence"):
             raise AsmError(f"{v}: {name} is a {blk['type']}")
         if want and want != blk["type"]:
             raise AsmError(f"{v}: a {want} is needed here")
         if name not in self.placed:
             n = len(self.placer.records)
-            self.placed[name] = sa.place_block(name, blk, self.stock, self.placer)
+            self.placed[name] = sa.place_block(name, blk, bytes(self.rom), self.placer)
             self.sync(n)
         return self.placed[name]
 
@@ -176,6 +183,8 @@ class MapEditor:
 
     def apply_map(self, idx, m, tag):
         me = self.entry(idx)
+        for e in m.get("pre_edits", []):    # edits to stock data that the replacements below build on
+            self.edit_path(me, e["at"], e["replace"], tag)
         for field, k in MAP_FIELDS.items():
             if field in m:
                 self.write(me + k, struct.pack("<I", self.ref(m[field], "script")), f"{tag} {field} script")
@@ -379,12 +388,14 @@ class MapEditor:
             out = []
             for ln in lines:
                 key = " ".join(ln.split())
+                new = [ln]
                 for a, b in pairs:
-                    if key == a:
-                        ln = ln[:len(ln) - len(ln.lstrip())] + b
+                    if key == a:     # the replacement may be several lines (newlines) or none ("")
+                        ind = ln[:len(ln) - len(ln.lstrip())]
+                        new = [ind + x for x in b.split(chr(10))] if b else []
                         hits[a] += 1
                         break
-                out.append(ln)
+                out.extend(new)
             return out
 
         if kind == "script":

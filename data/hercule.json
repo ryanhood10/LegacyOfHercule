@@ -104,6 +104,7 @@
   "story_free": "0xB00000",
   "include": [
     "data/hercule-text.json",
-    "data/story/a16_island.json"
+    "data/story/a16_island.json",
+    "data/story/ch1_opening.json"
   ]
 }
