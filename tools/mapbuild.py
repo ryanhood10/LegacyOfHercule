@@ -22,7 +22,14 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "effect": {"from": [13, 1]},       BG0 effect overlay (snowfall, rain) + its animated tiles, blend, BG0 priority
   "keep": ["decorations", "gates", "triggers", "exits"],  base objects kept (positions follow stack ops)
   "gates": [{"x":, "y":, "barrier": 0, "color": 3, "level": 50, "char": 2}],  replace/add level gates
-  "triggers": [{"type": "flight", "rect": [x1,y1,x2,y2], "world": [x, y]}, {"type": "script", ...}],
+  "triggers": [{"type": "flight", "rect": [x1,y1,x2,y2], "world": [x, y]}, {"type": "script", ...},
+               {"type": "dialogue", "rect": [...], "payload": "seq:NAME", "condition": COND}],
+  "sources": ["data/story/NAME.lscript"],  story scripts (tools/script_asm.py) named by payloads, record
+                                     actions and conditions as seq:NAME / script:NAME; a COND is 0, "flag:N",
+                                     "noflag:N", "script:NAME", "never" or a number
+  "records": [{"kind": "actor", "sprite":, "x":, "y":, "facing": 0, "condition": COND},
+              {"kind": "enemy", "like": [zone, area, record], "stat":, "sprite":, "x":, "y":, "condition": COND,
+               "action": "seq:NAME"}],   map script records; an enemy copies a stock record's behaviours
   "exits": [{"type": "edge"|"door", "rect": [...], "dir": "down|up|left|right", "to": [z, a, v], "at": [x, y]}],
   "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [x1,y1,x2,y2], "decoration": 0, "dialogue_trigger": 0},
                                      a working level barrier on a kept decoration + gate (item, on-load, dialogue condition)
@@ -595,6 +602,86 @@ def script_barrier_onload(flag, rect, deco=0):
     return head + body + b"\x11"
 
 
+class StoryRefs:
+    """seq:NAME / script:NAME from a spec's lscript sources, assembled into the map packer on first use
+    (script_asm's placer interface: put, stock_equal)."""
+
+    def __init__(self, rom, spec, pk):
+        import script_asm as sa
+        self.sa, self.rom, self.pk, self.placed, self.blocks = sa, bytes(rom.data), pk, {}, {}
+        for path in spec.get("sources", []):
+            text = open(path, encoding="utf-8").read()
+            for name, blk in sa.parse_file(text, path, self.rom).items():
+                self.blocks[name] = (text, path, blk["type"])
+        sa.SYMBOL_RESOLVER = self.ref
+
+    def put(self, data, align=1, note=""):
+        return self.pk.put(data, note, max(align, 1))
+
+    def stock_equal(self, addr, data):
+        return False
+
+    def ref(self, v):
+        kind, _, name = v.partition(":")
+        if kind not in ("seq", "script") or name not in self.blocks:
+            raise SpecError(f"unknown story reference {v!r}")
+        if name not in self.placed:
+            text, path, _ = self.blocks[name]
+            blk = self.sa.parse_file(text, path, self.rom)[name]
+            self.placed[name] = self.sa.place_block(name, blk, self.rom, self)
+        return self.placed[name]
+
+    def kind(self, v):
+        return self.blocks[v.partition(":")[2]][2]
+
+    def condition(self, v):
+        if isinstance(v, int):
+            return v
+        k, _, arg = v.partition(":")
+        if k == "flag":
+            return 0x10000 | int(arg, 0)
+        if k == "noflag":
+            return 0x20000 | int(arg, 0)
+        if k == "script":
+            return self.ref(v)
+        return {"always": 0, "never": 1}[v] if v in ("always", "never") else int(v, 0)
+
+
+FACE_AND_WAIT = 0x0800CB0F      # NpcBehavior_FaceAndWait_Create {fn, facing << 16 | ticks} (tools/mapedit.py)
+HANDLER_ACTOR, HANDLER_ENEMY = 0x0800D6DF, 0x0800E77F
+ACTION_SCRIPT, ACTION_DIALOG, ACTION_NONE = 0x0801069B, 0x080106B3, 0x08010699
+TRIGGER_DIALOG_COND, TRIGGER_DIALOG_FN = 0x0800D7E1, 0x0800D765   # a dialogue run on entering the rect
+
+
+def emit_records(b, pk, refs):
+    """The spec's map script records (actors, enemies); returns (count, array pointer)."""
+    rom, ptrs = b.rom, []
+    for r in b.spec.get("records", []):
+        cond = refs.condition(r.get("condition", 0))
+        x, y, sprite = r["x"], r["y"], r["sprite"]
+        if r["kind"] == "actor":
+            beh = pk.put(struct.pack("<II", FACE_AND_WAIT, (r.get("facing", 0) << 16) | 0x7D00), "actor behaviour")
+            ptrs.append(pk.put(struct.pack("<IIhhIII", HANDLER_ACTOR, cond, x, y, sprite, 1, beh), f"{b.spec['name']} actor record"))
+        elif r["kind"] == "enemy":
+            z, a, n = r["like"]
+            src = rom.u32(L.find_entry(rom, z, a).scripts + 4 * n)
+            cnt, beh_arr = rom.u32(src + 0x18), rom.u32(src + 0x1C)
+            beh = pk.put(rom.read(beh_arr, 4 * cnt), "enemy behaviours") if cnt else 0
+            act = r.get("action", "none")
+            if act == "none":
+                action = pk.put(struct.pack("<II", ACTION_NONE, 0), "enemy action")
+            else:
+                fn = ACTION_SCRIPT if refs.kind(act) == "script" else ACTION_DIALOG
+                action = pk.put(struct.pack("<II", fn, refs.ref(act)), "enemy action")
+            ptrs.append(pk.put(struct.pack("<IIIhhIIII", HANDLER_ENEMY, cond, r["stat"], x, y, sprite, action, cnt, beh),
+                               f"{b.spec['name']} enemy record"))
+        else:
+            raise SpecError(f"record kind {r['kind']!r} (actor, enemy)")
+    if not ptrs:
+        return 0, 0
+    return len(ptrs), pk.put(b"".join(struct.pack("<I", p) for p in ptrs), f"{b.spec['name']} record array")
+
+
 def emit(b, pk):
     """Write one built map into the packer; returns the MapEntry row (0x38 bytes)."""
     rom, spec = b.rom, b.spec
@@ -744,6 +831,8 @@ def emit(b, pk):
     # barrier (the stock pattern of zone 8 area 28): an item on the decoration that runs the open script when
     # its condition holds at load (the right character at the level), the on-load script that keeps it open
     # once the flag is set, and the "only X may pass" dialogue trigger's condition
+    refs = StoryRefs(rom, spec, pk)
+    rec_count, rec_arr = emit_records(b, pk, refs)
     bar = spec.get("barrier")
     items = []
     if bar:
@@ -774,9 +863,11 @@ def emit(b, pk):
         elif t["type"] == "script":
             s = pk.put(bytes.fromhex(t["bytes"]), f"{spec['name']} script")
             d = struct.pack("<IIhhhhI", L.SCRIPT_CREATE, t.get("activation", ACT_PRESS), x1, y1, x2, y2, s)
+        elif t["type"] == "dialogue":
+            d = struct.pack("<IIhhhhI", TRIGGER_DIALOG_COND, TRIGGER_DIALOG_FN, x1, y1, x2, y2, refs.ref(t["payload"]))
         else:
             raise SpecError(f"unknown trigger type {t['type']}")
-        trig.append((t.get("condition", 0), pk.put(d)))
+        trig.append((refs.condition(t.get("condition", 0)), pk.put(d)))
     trig_arr = pk.put(b"".join(struct.pack("<II", c, p) for c, p in trig)) if trig else 0
     # exits (variation triggers)
     ex_ptrs = [pk.put(x) for x in b.exits]
@@ -822,10 +913,10 @@ def emit(b, pk):
     # MapEntry
     be = b.base.entry if b.base else None
     row = bytearray(L.MAP_ENTRY_SIZE)
-    row[0:8] = bytes([spec["zone"], spec["area"], 1, len(trig), 0, len(items), 0, len(b.gates)])
+    row[0:8] = bytes([spec["zone"], spec["area"], 1, len(trig), rec_count, len(items), 0, len(b.gates)])
     struct.pack_into("<I", row, 0x08, spec.get("flags", be.flags if be else 1))
     struct.pack_into("<I", row, 0x0C, spec.get("name_id", be.name if be else 0xDD))
-    struct.pack_into("<IIIII", row, 0x10, trig_arr, 0, item_arr, 0, gate_ptr)
+    struct.pack_into("<IIIII", row, 0x10, trig_arr, rec_arr, item_arr, 0, gate_ptr)
     struct.pack_into("<I", row, 0x24, spec.get("music", be.music if be else 2))
     struct.pack_into("<IIII", row, 0x28, 0, var_arr, onload, 0)
     info = dict(name=spec["name"], zone=spec["zone"], area=spec["area"], size=[b.W * 8, b.H * 8], spawn=[sx, sy],

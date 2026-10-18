@@ -1,0 +1,47 @@
+; Cooler's bonus fight in the ten-day wait (docs/story.md section 0 item 8, "Side quests in the wait"),
+; applied by ch8_cooler.json. The Piccolo gates stay as they are (zone 4 area 50 behind the Triceratops
+; Jungle, flag 60 from chapter 2; zone 6 area 61 behind area 62's barrier); in co-op Cooler (stat 29)
+; fights beside his Namekian servant (bosses.c: sprite 166, stat 113, both-down), introduced here: a
+; Namekian warrior Frieza's family took from Namek and Cooler kept. The three stock openings (Goku,
+; Trunks, anyone else) meet at one co-op check before the fight; entry 0's returned indexes are restated.
+; Speakers: 0 narration (the Namekian has no portrait), 1 the active character, 44 Cooler.
+
+sequence ch8_cooler
+  script                                 ; stock entry 0: Goku -> 4, Trunks -> 7, else 1
+        PanCameraToPosition 100, 176, 2
+        WaitFrames 60
+        PushActiveCharIndex
+        PushByte 4
+        CmpEq
+        JumpIfFalse L1
+        PushByte 4
+        END
+      L1:
+        PushActiveCharIndex
+        PushByte 3
+        CmpEq
+        JumpIfFalse L2
+        PushByte 7
+      L2:
+  stock @083d280c                        ; "You're not Goku..."
+  stock @083d2858                        ; "He couldn't make it!"
+  stock @083d28ac -> 10                  ; "I shall enjoy causing you pain!"
+  stock @083d28f4                        ; Goku: "I didn't think you were going to come."
+  stock @083d2948
+  stock @083d296c -> 10                  ; "Prepare to meet your maker!"
+  stock @083d29ee                        ; Trunks: "Who are you?"
+  stock @083d2a08
+  stock @083d2a78 -> 10                  ; "I'll destroy you!"
+  script                                 ; co-op: the servant (next 11), else the fight (14)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 11
+        END
+      L1:
+        PushByte 14
+        END
+  text 44 "COOLER: And you brought a friend?  Then I'll bring mine.\x0bA Namekian warrior my father took from Namek long ago.  He serves me now."
+  text 0 "@^NAMEKIAN: ...As you command, Lord Cooler."
+  text 1 "A Namekian...  serving Frieza's family?!"
+  stock @083d2a98                        ; the fight (Cooler, and his servant in co-op)
+end

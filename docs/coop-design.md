@@ -721,6 +721,10 @@ empty (message 0xF clears its entity), but the stock death only removes the last
 the empty one stayed on screen after every pair fight (19 + 13, Gero + 13). `coop_bar_update` now
 slides a bar without an entity out once no co-op boss with HP is left on the map.
 
+**Gym duos (story-scripts, 2026-10-18):** Roshi's sparring stats are pair rules: Yamcha (106) with Tien's
+model and stat (121 / 98), Krillin (64) with Hercule's playable sprite 72 at Krillin's numbers (AI set 98
+plays on the 21-group player set without a crash). `BOSS_PAIR`, so single-player fights the duos too.
+
 **Found and fixed on the way:** player 2 froze whenever player 1 was in the hurt state
 (`0x08025B98`): `p1_controllable()` whitelists player 1's control states to tell cutscenes from play,
 and the hurt state was missing, so a boss pair pummelling player 1 also froze player 2. It is in the

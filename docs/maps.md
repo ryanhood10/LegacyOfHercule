@@ -290,6 +290,12 @@ animated tiles (frame 0 only), exits and scripts. Finding the map table (through
 ## Open
 
 - Story flags taken by the maps: 380 (the arctic barrier). Keep new map flags in 380-399 and tell the
-  story session.
+  story session. The story's flags are 360-379 (376: Android 13 met in the arctic).
+- **Story content in a built map (story-scripts, 2026-10-18):** `tools/mapedit.py` edits the stock map
+  table before the new maps exist, so a zone-15 map carries its story itself: `"sources"` (lscript
+  files), `"triggers"` of type `"dialogue"` (`payload` seq:NAME, `condition` 0 / "flag:N" / "noflag:N" /
+  "script:NAME"), and `"records"` (actors, and enemies copied from a stock record's behaviours with
+  `"like": [zone, area, record]`, `"action"` seq:NAME). mapbuild assembles the referenced blocks into
+  the map's free space (`StoryRefs`). The arctic uses it for Android 13 (`data/story/ch8_arctic.lscript`).
 - The activation objects (0x0300209x) are named by use, not decoded.
 - Decoration records beyond the barrier pattern, item and chest record layouts: not needed yet.

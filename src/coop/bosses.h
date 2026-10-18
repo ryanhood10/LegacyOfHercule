@@ -53,6 +53,7 @@ typedef struct BossRule {
 #define COOLER_SPRITE 34
 #define NAMEK_STAT 113      // Cooler's Namekian servant (New Namek bonus)
 #define A13_GERO_STAT 112   // Android 13 beside Dr. Gero at the lab door
+#define A13_ARCTIC_STAT 114 // Android 13 in the arctic (the ten-day wait), a half-health boss
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;

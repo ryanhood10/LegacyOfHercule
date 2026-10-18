@@ -1,0 +1,57 @@
+; Android 13 in the arctic (docs/story.md section 0 item 8, "Side quests in the wait"): optional, behind the
+; arctic's "Only Vegeta" barrier (zone 15 area 1, story flag 380). Built into the map by tools/mapbuild.py
+; from data/maps/arctic.json ("sources", a dialogue trigger at the cave mouth, the boss record). Vegeta
+; walks into the cave, 13 comes out: he was the one meant to absorb 17 and 18, Cell stole his perfection,
+; he would kill Cell himself; Vegeta: he will not get the chance. The fight ends at half health (stat 114,
+; bosses.c) and 13 flies off. Story flag 376 records the encounter for the post-Cell variant (met before /
+; first meeting). 13 fights alone until Ryan picks his partner (docs/story.md: undecided).
+; Speakers: 0 narration (13 has no portrait), 4 Vegeta.
+
+; the cave mouth, once the barrier is open and 13 has not been met
+script ch8_arctic_cond
+        StackTestStoryFlag 380
+        StackTestStoryFlagNot 376
+        And
+end
+
+sequence ch8_arctic_13
+  script
+        SetPlayerVisible 0
+        PlayMusic 39
+        WalkToPosition 0, 352, 128
+        SetEntityFacing 0, 1
+        SpawnCharacterEntity 165, 352, 48
+        WalkToPosition 165, 352, 96
+        SetEntityFacing 165, 0
+        PlayAudio 50
+  text 0 "@^ANDROID 13: Well, well.  Vegeta.  Long way from home, ain't ya?"
+  text 4 "VEGETA: You.  The machine that ran from me after I scrapped 19."
+  text 0 "@^ANDROID 13: Ran?  I was waitin'.  Dr. Gero built ME to take in 17 and 18!\x0bThat was MY perfection, not that overgrown bug's.  Cell stole it right out from under me!"
+  text 0 "@^If I could get my hands on Cell, I'd tear him apart myself."
+  text 4 "VEGETA: You won't get the chance.\x0bYou'll be scrap long before then!"
+  script
+        DespawnCharacterAndRecordPosition 165, 0
+        SetPlayerVisible 1
+        DrawBossHealthBar 165
+        SetActiveEntity 0
+end
+
+; 13 at half health: he backs off and flies away
+sequence ch8_arctic_13_end
+  script
+        PlayAudio 60
+        FindPlayerEntity
+        AddEXP 15000
+        SetStoryFlag 376
+        SetPlayerVisible 0
+        WaitFrames 40
+        PlayAudio 50
+  text 0 "@^ANDROID 13: Heh...  Not bad, Saiyan.  Not bad at all."
+  text 0 "@^But this ain't over.  Next time we meet, I won't be holdin' back."
+  script
+        PlayAudio 26
+        FlyToPosition 165, 352, 0
+        DespawnEntity 165
+        WaitFrames 30
+        SetPlayerVisible 1
+end

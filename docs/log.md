@@ -13,6 +13,24 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 8, Android 13 in the arctic (story-scripts)**: `data/story/ch8_arctic` through
+  `data/maps/arctic.json`: `tools/mapbuild.py` now takes story content for built maps (`"sources"`,
+  dialogue triggers, actor / enemy records with seq:NAME actions; `docs/maps.md`), since mapedit runs on
+  the stock table before zone 15 exists. 13 meets Vegeta at the cave mouth behind the barrier, a
+  half-health fight (new stat 114 and rule in `bosses.c`, no twin until Ryan picks his partner), he
+  flies off, flag 376 for the post-Cell variant. Tested headless to the end of the fight.
+- **Chapter 8, Cooler (story-scripts)**: `data/story/ch8_cooler`: in co-op Cooler introduces his Namekian
+  servant before the fight (one co-op check after the three stock openings); both Piccolo gates stay
+  and are reachable in the wait (flag 60 from chapter 2, Piccolo selectable after chapter 7). Tested
+  headless: the Piccolo opening, the servant's lines, Cooler + Namekian with two bars.
+- **Chapter 8, Roshi's gym (story-scripts)**: `data/story/ch8_gym`: the duos Yamcha + Tien and Krillin +
+  Hercule (`BOSS_PAIR` rules on the sparring stats 106 / 98 / 64, only used in that room), the "come
+  back with a different team" refusal when a player is Hercule or Krillin (new `CoopCall 8`, P2Slot),
+  and the animal-ninja finale in three rounds (eleven kinds at once ran out of OBJ tiles; flags
+  363-375). The bestiary table at 0x086F8E40 ({name, description, sprite, portrait, stat}, 128
+  entries) gives every enemy's sprite and stat. Tested headless: both duos (refusal with player 2 as
+  Hercule, the fight with Gohan; Hercule's model as Krillin's twin does not crash), the finale to the
+  capsule and flag 214.
 - **Chapter 7 (story-scripts)**: `data/story/ch7_cell`: Vegeta + Trunks out of the chamber, Semi-Perfect Cell's
   Multi-Form duplicate in co-op and its reabsorption, Krillin flies in after Perfect Cell's kick and
   takes the pad that played Vegeta (new `CoopCall 7`, PadSwap: the pads trade players, so the Trunks

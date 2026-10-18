@@ -15,6 +15,8 @@
 //   5 P2Present () -> 0 / 1             is player 2 there (its entity, or its pad: the twins spawn by the pad)
 //   6 P2Bind (slot)                     player 2 plays this party slot now (or at its respawn after a warp)
 //   7 PadSwap ()                        the two pads trade players (coop2.pad_swap, as a duel won by player 2)
+//   8 P2Slot () -> slot / -1            player 2's party slot (the last bound one while a warp has the entity
+//                                       despawned), -1 without player 2
 #include "coop.h"
 
 void hercule_awaken(void);                 // ssj.c
@@ -83,6 +85,7 @@ void vm_coop_call(s32 *st) {
         if (a >= 0 && a < PARTY_SLOTS) { if (coop.p2) p2_bind_slot(a); else coop.p2_slot = (u8)a; }
         break;
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
+    case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
     default: (void)b; break;
     }
 }

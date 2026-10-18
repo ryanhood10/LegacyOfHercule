@@ -17,6 +17,9 @@ const ExtraStat extra_stats[] = {
     // but 6000 HP of his 10200 (75/85/79), so the pair is one fight's worth for two players. (At 68/60/64
     // he barely scratched a level-30 Hercule in the fork while Cooler shredded Piccolo.)
     { 29, -1, 6000, -1, 74, 70, 68, 0 },
+    // 114 Android 13 in the arctic (the ten-day wait, data/story/ch8_arctic.lscript): 19's AI set and class,
+    // a Cell-saga boss's numbers; the fight ends at half health (rule below). Our tuning, untested in play.
+    { 5, -1, 6000, -1, 30, 24, 22, 0 },
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 
@@ -39,6 +42,13 @@ static const BossRule rules[] = {
     { COOLER_SPIRIT_STAT, 0, BOSS_PAIR, 0, 0 },     // the twin's own stat: boss pair rules for it too
     // Cooler (New Namek bonus) + his Namekian servant
     { 29, 0, 0, NAMEK_SPRITE, NAMEK_STAT },
+    // Roshi's gym in the ten-day wait: the sparring matches are duos, Yamcha + Tien and Krillin + Hercule
+    // (Hercule's sprite with Krillin's numbers); always pairs, so the duos stand in single-player too
+    { 106, 0, BOSS_PAIR, 121, 98 },
+    { 98,  0, BOSS_PAIR, 0, 0 },
+    { 64,  0, BOSS_PAIR, 72, 0 },
+    // Android 13 in the arctic: alone until Ryan picks his partner (docs/story.md 4f), ends at half health
+    { A13_ARCTIC_STAT, 50, BOSS_NO_TWIN, 0, 0 },
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },
     { 79, 50, BOSS_NO_TWIN, 0, 0 },
