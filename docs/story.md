@@ -233,7 +233,19 @@ Ryan's decisions for this stretch:
   ("WARNING! SECURITY BREACH! DESTRUCT SEQUENCE ACTIVATED!"). Story-wise player 2 here is
   **Krillin** (Ryan: the locked pair for this chapter is Trunks + Krillin; his NPC copy is removed
   by the duplicate-actor rule), while Hercule flies on with Piccolo.
-- **After the lab, in quest order** (the ROM's quest table, each quest opened by the previous one's
+- **From the pad, after the computer blows:** the self-destruct script warps Trunks and Krillin to the
+  lab's outer area (zone 8 area 65, no dialogue), you walk out to the world map (one player flies,
+  Ryan's rule) with the journal reading "Check on Goku's progress at Master Roshi's island". At
+  Kame House (zone 11 area 1, then the upstairs room area 3) Goku wakes, "Kamiccolo", "I'm going to
+  go find Vegeta. Meet me at Kami's Lookout", and you are put back outside the house. World map to
+  the Lookout (zone 9 area 3): Goku's "only two of us can train", Vegeta and Trunks enter the
+  chamber, Mr. Popo's rules, then Goku: "Piccolo, you should get back to Roshi's Island... when the
+  Androids don't find me..." and the script makes **Piccolo player 1** (Vegeta and Trunks are made
+  unselectable: they are in the chamber), so player 2 can be Hercule or Gohan. World map back to
+  Roshi's island: 17, 18 and 16 are waiting, the island fight (areas 4, 5, 6), Cell's arrival, and
+  the warp back to the Lookout where Vegeta comes out ("Vegeta has achieved Level %d", Tien: "Cell
+  has swallowed up Android 17", Bulma's armour) and becomes player 1.
+- **The same, in quest order** (the ROM's quest table, each quest opened by the previous one's
   completion flag): "Check on Goku's progress at Master Roshi's island" (Trunks and Krillin fly
   there: Goku wakes, "Kamiccolo", Goku leaves to train; Piccolo is a scene actor here) -> "Meet
   Goku at Kami's Lookout" (the Time Chamber intro: "only two of us can train", Vegeta and Trunks go
