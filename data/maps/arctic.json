@@ -27,8 +27,15 @@
   },
   "effect": {"from": [13, 1]},
   "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [336, 40, 368, 72], "decoration": 0, "dialogue_trigger": 0},
+  "sources": ["data/story/ch8_arctic.lscript"],
   "triggers": [
-    {"type": "flight", "rect": [104, 280, 152, 320], "world": [1632, 1592]}
+    {"type": "flight", "rect": [104, 280, 152, 320], "world": [1632, 1592]},
+    {"type": "dialogue", "rect": [328, 24, 376, 60], "payload": "seq:ch8_arctic_13", "condition": "script:ch8_arctic_cond",
+     "_": "Android 13 at the cave mouth once the barrier is open (story-scripts, docs/story.md 4f)"}
+  ],
+  "records": [
+    {"kind": "enemy", "like": [7, 15, 2], "stat": 114, "sprite": 165, "x": 352, "y": 96, "condition": "never",
+     "action": "seq:ch8_arctic_13_end", "_": "Android 13, a half-health boss (stat 114, bosses.c), a copy of Android 19's boss record"}
   ],
   "spawn": [216, 200],
   "name_id": 233,

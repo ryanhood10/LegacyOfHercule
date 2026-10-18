@@ -21,7 +21,8 @@ Hercule's "negotiate" at the lab door, 13 in the lab, the road with Vegeta as pl
 stays at the Lookout, Gohan as player 2 in Trunks' chapter, Kami's boost for Hercule, Gingertown with
 Cell's Multi-Form duplicate), item 6's lab basement (Trunks + Krillin, the NPC left out in co-op) and
 Kame House (Piccolo a scene actor, Krillin stays home), item 7 (Semi-Perfect Cell's duplicate, Krillin
-on the pad that played Vegeta, his one-hit KO) and the Android
+on the pad that played Vegeta, his one-hit KO), item 8's gym duos and animal finale, Cooler's Namekian
+servant and the arctic Android 13 (alone until his partner is decided; flag 376) and the Android
 16 island
 fight from item 6 (Kame House deal, 16 over the two stock stages, half health, Cell). Tested headless
 (`docs/testing.md`).

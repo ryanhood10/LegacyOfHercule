@@ -13,6 +13,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
   twin because record 74 lacks the attack groups set 21 plays. Fork: per-slot helper dirs and process
   names, pause waits for the stop (no more gdb disconnects). Details: `docs/coop-design.md` "Android
   13, the Namekian servant and the boss-pair tests", `docs/sprites.md`, `docs/testing.md` "Boss pairs".
+- **Chapter 8, Android 13 in the arctic (story-scripts)**: `data/story/ch8_arctic` through
+  `data/maps/arctic.json`: `tools/mapbuild.py` now takes story content for built maps (`"sources"`,
+  dialogue triggers, actor / enemy records with seq:NAME actions; `docs/maps.md`), since mapedit runs on
+  the stock table before zone 15 exists. 13 meets Vegeta at the cave mouth behind the barrier, a
+  half-health fight (new stat 114 and rule in `bosses.c`, no twin until Ryan picks his partner), he
+  flies off, flag 376 for the post-Cell variant. Tested headless to the end of the fight.
 - **Chapter 8, Cooler (story-scripts)**: `data/story/ch8_cooler`: in co-op Cooler introduces his Namekian
   servant before the fight (one co-op check after the three stock openings); both Piccolo gates stay
   and are reachable in the wait (flag 60 from chapter 2, Piccolo selectable after chapter 7). Tested
