@@ -689,7 +689,7 @@ alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `
 ### Android 13, the Namekian servant and the boss-pair tests (2026-10-18, branch `boss-models`)
 
 Models: `docs/sprites.md` "Android 13 (id 165) and Cooler's Namekian servant (id 166)". Tested in the
-fork (slot 3) on the island path (debug Map Test 11/6) with `COOP_CMD_SPAWN_RECORD` (7: any map's
+fork (slot 3) on the island path (debug Map Test 11/6) with `COOP_CMD_SPAWN_RECORD` (8: any map's
 boss record beside player 1, plus its bars; `tools/fork/bossfight.sh`, `docs/testing.md` "Boss pairs"):
 Piccolo (player 1) and Hercule (player 2) at the level-30 stats of the Android 16 tests, the
 `A16_TEST` autopilot (now fights any registered pair: player 1 the original, player 2 the twin).

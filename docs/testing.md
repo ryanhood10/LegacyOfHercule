@@ -85,7 +85,8 @@ gdb's output reaches the log late (the line of one query can arrive after the ne
 
 ```
 make BUILD=build/bt WIDE=1 DEBUG_MENU=1 A16_TEST=1              # A16_TEST: the autopilot fights any pair
-toolsorkunfork.ps1 /mnt/f/.../build/bt/log2-wide.gba -Slot 3 -Mute -Wait 1
+toolsork
+unfork.ps1 /mnt/f/.../build/bt/log2-wide.gba -Slot 3 -Mute -Wait 1
 python tools/fork/p2hold.py --port 7781 --cmd build/bt/p2cmd.txt    # keep running: player 2 present
 wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=3 /root/fork-s3/bootisland.sh 75"   # boot -> island, level-30 pair placed
 tools\win_keys.ps1 "SHIFT+F1:300" -Title "mGBA-3"                  # save; F1 reloads it before each fight
@@ -95,7 +96,7 @@ wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=3 /root/fork-s3/bossfight.sh 0x083FD
 `bootisland.sh` waits for the debug menu (about 75 s from launch when muted), opens Map Test 11/6
 through the pad word, lets player 2 join, writes the level-30 stats of the Android 16 tests (Piccolo
 slot 1, Hercule slot 5) and places player 1 at (89, 347) and player 2 at (200, 330), either side of
-where a spawned pair stands. `bossfight.sh RECORD [SECS] [STEP]` writes `COOP_CMD_SPAWN_RECORD` (7) with
+where a spawned pair stands. `bossfight.sh RECORD [SECS] [STEP]` writes `COOP_CMD_SPAWN_RECORD` (8; 7 is `COOP_CMD_STORY_WIN`) with
 the record address (any map's boss record: 19 `0x083FD3BC`, Gero `0x083FF970`, Cooler `0x083FB574`,
 17 `0x08406494`), turns on the autopilot (`coop2.a16_bot`, +0x244) and prints both bosses' and both
 players' HP every STEP seconds until both are down or a player's HP is 0. `bosstest.sh` peeks the pair,

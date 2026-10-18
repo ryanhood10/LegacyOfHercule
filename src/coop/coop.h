@@ -130,7 +130,7 @@ void duel_clear(void);
 void duel_tick(void);
 int duel_p2_final_blow(Entity *e, int dmg);
 void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
-#define COOP_CMD_SPAWN_RECORD 7   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
+#define COOP_CMD_SPAWN_RECORD 8   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
 extern CoopExtra coop2;

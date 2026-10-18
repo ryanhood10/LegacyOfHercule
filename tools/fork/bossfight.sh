@@ -11,7 +11,7 @@ C=0x0203FB00
 ADDR=$1; SECS=${2:-240}; STEP=${3:-5}; E1=${4:-0x0203F028}; E2=${5:-0x0203F098}
 $G pause; sleep 0.6
 $G cmd "set *(unsigned*)($C+0x20C) = $ADDR"
-$G cmd "set *(unsigned*)($C+0x208) = 7"
+$G cmd "set *(unsigned*)($C+0x208) = 8"
 $G cmd "set *(unsigned short*)($C+0x244) = 1"
 sleep 0.3; $G cmd continue
 t=0
