@@ -2,6 +2,16 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-18
+
+- **Android 16 boss** (branch `android16-boss`, worktree `F:\MeltyCreations\log2-a16`, not merged):
+  sprite 160 (`tools/a16sprites.py`: 16's stock sprite 8 groups + 17's fight frames re-headed + a
+  rocket-punch group), missile / fist / fire-explosion frames, the AI `src/coop/android16.c`
+  (heat-seeking rocket on the nearer player with a 3 s fuse, barrage, area bombs, rocket punch,
+  poise), enemy stat 109 (4000 HP), `A16_TEST` spawn + autopilot. The autopilot pair at level 30
+  wins 3 of 5 fights. Android 16 is sprite 8 in the stock game (15 is Dr. Gero). Placement for the
+  island scripts, engine facts and tuning: `docs/coop-design.md` "Android 16 boss".
+
 ## 2026-10-17
 
 - **Story decision (Ryan): "Canon plus Hercule"**: the DBZ story stays, Hercule is in every scene as
