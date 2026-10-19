@@ -6,7 +6,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - **Ten-day wait: Time Chamber training waves and Roshi's dojo sparring** (branch `lookout-training`,
   worktree `F:\MeltyCreations\log2-lookout`): `src/coop/waves.c` (ten fixed rounds of stock enemies,
-  spawned on a ring around the players, the next round when none stands, state in `.party.wv` 0x0203F874,
+  spawned on a ring around the players, the next round when none stands, state in `.party.wv` (0x0203F880 after the merge),
   no coop2 bytes) behind `CoopCall 13` / `14`; `data/story/wait_chamber` (the Lookout's chamber door opens
   from flag 157, Mr. Popo beside it with his line, "Round N" captions, "Training completed!"; the
   chamber's door now returns to the chamber room) and `data/story/wait_spar` (Roshi's offer after flag

@@ -147,7 +147,7 @@ void story_test_finish(void);     // enemies.c: win every boss fight on the map 
 void story_test_partner_down(void);   // enemies.c
 extern CoopExtra coop2;
 
-// Time Chamber training waves (waves.c; state `waves` in .party.wv, 24 bytes at 0x0203F874)
+// Time Chamber training waves (waves.c; state `waves` in .party.wv, 0x9C bytes; 0x0203F880 in the merged build, see coop.map)
 #define COOP_CMD_WAVE_CLEAR 13    // every standing enemy on the map takes a blow worth its HP (wave tests)
 #define COOP_CMD_WAVE_SKIP  14    // arg = round: the next round announced is arg (wave tests; the training must be running)
 void coop_run_sequence(u32 *action, const void *seq);   // vmcall.c: queue a dialogue sequence (action = 2 live words)

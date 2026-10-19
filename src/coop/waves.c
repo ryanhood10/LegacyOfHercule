@@ -50,7 +50,7 @@ typedef struct WaveState {
     WaveRec recs[4];       // the round being fought (WAVE_MAX)
 } WaveState;
 _Static_assert(sizeof(WaveState) == 28 + 4 * 0x20, "WaveState layout (docs/testing.md peeks)");
-WaveState waves __attribute__((section(".party.wv"), used));   // 0x0203F874, after krillin.c's state
+WaveState waves __attribute__((section(".party.wv"), used));   // after the .party.kr states (0x0203F880 since the merge; the address moves: read coop.map)
 
 ROM_FN(int, ObjVram_Largest, (void *list), 0x08006D71);       // largest free OBJ VRAM block (bytes)
 Entity *enemy_spawn_hook(const EnemyRecord *rec);             // enemies.c: twins, co-op scaling

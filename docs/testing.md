@@ -308,7 +308,7 @@ Mr. Popo stands at (64, 128): test-warp player 1 to (64, 150) (`COOP_CMD_WARP`, 
 out; an extra A talks to him again). The door wants A while facing up inside (73, 113)-(120, 140): warp
 to (96, 160), hold Up, press A, `waitmap 15 2`. "Round 1" shows about 220 frames later; A spawns it.
 
-- `waves` (`src/coop/waves.c`, 0x0203F874): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
+- `waves` (`src/coop/waves.c`; 0x0203F880 on merged main, 0x0203F874 on the branch alone: it sits after `.party.kr`, so read `$(BUILD)/coop.map`): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
   +0x10 round / state (0 off, 1 pause, 2 caption, 3 fight, 4 done) / timer / standing enemies, +0x14
   records spawned, +0x16 the round's smallest largest-free OBJ VRAM block (32-byte units), +0x18
   input polls (game-loop iterations: against `g_FrameCounter`, which ticks in VBlank, they count lag),
