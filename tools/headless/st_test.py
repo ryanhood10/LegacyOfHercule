@@ -2,7 +2,8 @@ r"""Run a headless chapter test (tools/headless/st_headless.c in WSL) and tile i
 usage: python tools/headless/st_test.py SCRIPT ROM [STATE] [--sheet OUT.png] [--cols 3] [--out DIR]
 SCRIPT, ROM and STATE are Windows paths under F:\MeltyCreations. Bare names in "shot NAME", "save NAME"
 and "load NAME" lines land in DIR (default build/hl): NAME.ppm for shots. Prints the runner's output;
-the sheet defaults to DIR/<script name>.png. Build the runner first (st_headless.c header).
+the sheet defaults to DIR/<script name>.png. Build the runner first (st_headless.c header); ST_HEADLESS=PATH
+runs another build of it (a private copy while other sessions rebuild /root/st_headless).
 tools/headless/mkmenu.txt makes the debug-menu savestate (DIR/menu.ss) for a DEBUG_MENU=1 ROM."""
 import os
 import re
@@ -37,7 +38,7 @@ for ln in open(script):
     lines.append(ln)
 tmp = os.path.join(here, os.path.basename(script) + ".run")
 open(tmp, "w", newline="\n").write("".join(lines))
-cmd = ["wsl", "-d", "Ubuntu", "-u", "root", "--", "/root/st_headless", wsl(rom), wsl(tmp)] + ([wsl(state)] if state else [])
+cmd = ["wsl", "-d", "Ubuntu", "-u", "root", "--", os.environ.get("ST_HEADLESS", "/root/st_headless"), wsl(rom), wsl(tmp)] + ([wsl(state)] if state else [])
 out = subprocess.run(cmd, capture_output=True, text=True, env=dict(os.environ, MSYS_NO_PATHCONV="1"))
 sys.stdout.write(out.stdout)
 sys.stderr.write(out.stderr[-2000:])

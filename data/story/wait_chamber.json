@@ -1,0 +1,34 @@
+{
+  "_": "Time Chamber training waves (docs/story.md 4g): the Lookout's chamber door opens after Cell's announcement (flag 157) and starts the waves (src/coop/waves.c, CoopCall 13/14); Mr. Popo beside the door points the players to it. Scripts in wait_chamber.lscript; the chamber map is data/maps/time_chamber.json.",
+  "sources": [
+    "data/story/wait_chamber.lscript"
+  ],
+  "maps": [
+    {
+      "map": {
+        "zone": 9,
+        "area": 3
+      },
+      "_": "trigger 0 (the door, stock 'You cannot enter') lets the players in from flag 157; record 0 (Mr. Popo in front of the door) until flag 157, the new record 9 (Popo beside the door, his chamber line) from it",
+      "triggers": {
+        "0": {
+          "payload": "seq:lk_tc_door"
+        }
+      },
+      "records": {
+        "0": {
+          "condition": "script:lk_popo_stock_cond"
+        }
+      },
+      "add_records": [
+        {
+          "like": 0,
+          "x": 64,
+          "y": 128,
+          "talk": "seq:lk_popo",
+          "condition": "script:lk_popo_cond"
+        }
+      ]
+    }
+  ]
+}

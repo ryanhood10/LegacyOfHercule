@@ -244,7 +244,7 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 | zone / area | spec | what | size | spawn |
 |---|---|---|---|---|
 | 15 / 1 | `data/maps/arctic.json` | Arctic: zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth behind the stock **Vegeta barrier** (level 50), a frozen pond, two outcrops, a flight spot | 432 x 368 | (216, 200) |
-| 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout | 640 x 480 | (312, 280) |
+| 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout's chamber room (zone 9 area 3 at (96, 168), in front of the chamber door; until 2026-10-19 it led outside to zone 9 area 1) | 640 x 480 | (312, 280) |
 | 15 / 3 | `data/maps/broly_arena.json` | Broly's arena: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery, two boulders; only the basin is walkable; a flight spot | 640 x 544 | (276, 354) |
 | 15 / 4 | `data/maps/broly_crater.json` | Optional (built when `roms/buu.gba` is present): Buu's Fury's walled wasteland crater (variation 0x0822229C there) imported whole, tiles converted to LoG2's palette, its own collision | 480 x 400 | (240, 340) |
 

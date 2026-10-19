@@ -298,6 +298,38 @@ player 1 is Piccolo (`poke8 0x0203F000 0` then a warp makes Gohan player 1). `ST
 `tools/fork/st_run.ps1` launches the fork without the debugger and `st_place.ps1` moves a window out
 from under another session's.
 
+### Time Chamber waves and Roshi's sparring (headless, branch `lookout-training`, 2026-10-19)
+
+Build `make BUILD=build/lk DEBUG_MENU=1` (and `BUILD=build/lkw WIDE=1 DEBUG_MENU=1` for the lag check),
+make the menu state per build, then Map Test the Lookout's chamber room (entry 263) with the wait's flags
+`preset +143 +144 +148 +149 +151 +154 +157` (fewer flags replay the stock Goku / Vegeta cutscene there).
+Mr. Popo stands at (64, 128): test-warp player 1 to (64, 150) (`COOP_CMD_WARP`, `cmd_arg` 0x0309,
+`cmd_arg2` 0x00960040), tap Up, press A, and press A once per page **120 frames apart** (the text types
+out; an extra A talks to him again). The door wants A while facing up inside (73, 113)-(120, 140): warp
+to (96, 160), hold Up, press A, `waitmap 15 2`. "Round 1" shows about 220 frames later; A spawns it.
+
+- `waves` (`src/coop/waves.c`, 0x0203F874): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
+  +0x10 round / state (0 off, 1 pause, 2 caption, 3 fight, 4 done) / timer / standing enemies, +0x14
+  records spawned, +0x16 the round's smallest largest-free OBJ VRAM block (32-byte units), +0x18
+  input polls (game-loop iterations: against `g_FrameCounter`, which ticks in VBlank, they count lag),
+  +0x1C the round's four records.
+- `poke32 0x0203FD08 13` (`COOP_CMD_WAVE_CLEAR`): every standing enemy dies the regular death (EXP to
+  player 1); `poke32 0x0203FD0C N` then `poke32 0x0203FD08 14` (`COOP_CMD_WAVE_SKIP`): the next round
+  announced is N (11 = completed). Refill the players between rounds (`poke16 0x0203F00C 999`, slot 1
+  at 0x0203F028, Hercule 0x0203F098): an idle pair dies by round 5. Level-up dialogs need extra A.
+- Leaving: warp to (308, 230) in the chamber and hold Up (the door rect (272, 200)-(344, 216)).
+- Sparring: Map Test 147 with the gym done (`+212 +213 +214`, and `+215 +216 +217` so Roshi skips the
+  technique lessons); Roshi at (488, 576): warp to (488, 604), Up, A, four pages. Into the dojo through
+  the atrium door: warp to (268, 334), hold Up, `waitmap 6 70`; the mat trigger fires on arrival.
+  `0x0203FD5C` = `duel_active`, `duel_winner`. A real final blow: player 2's HP to 1 (its slot from
+  `coop.p2_slot` 0x0203FF84; a Map Test's player 2 is Hercule, slot 5), player 1 taps Left and A three
+  times 6 frames apart (more A dismisses the winner caption); for player 2's win, player 1's HP to 1 and
+  `p2 0x10` then `p2 1`.
+- A private runner: build it to `/root/st_headless_lk` and set `ST_HEADLESS=/root/st_headless_lk` (from Git
+  Bash also `MSYS2_ENV_CONV_EXCL=ST_HEADLESS`, or the path is rewritten to a Windows one).
+- The fork: `tools/fork/st_run.ps1 -Slot 5 -State <headless .ss>` loads a headless savestate of the same
+  ROM (the round-3 caption here); `p2hold.py --port 7783` keeps player 2 present.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

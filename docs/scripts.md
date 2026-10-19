@@ -103,6 +103,8 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 6 | P2Bind slot | player 2's entity plays that slot now (the entity survives warps with entities, so after a duel the story rebinds it); after a warp without entities player 2 is gone until player 1 is free again, and the respawn takes this slot when it is selectable |
 | 7 | PadSwap | the two pads trade players (`coop2.pad_swap` toggles, as when player 2 wins a duel with the swap flag): Perfect Cell, where the pad that played Vegeta takes Krillin and Trunks' pad becomes player 1 |
 | 8 | P2Slot -> slot / -1 | player 2's party slot (the last bound one while a warp has the entity despawned), -1 without player 2: Roshi's gym checks whether either player is Hercule or Krillin |
+| 13 | WaveStart seq:ROUND, first | the Time Chamber training (`waves.c`): from round `first` (0 / 1 = the first); ROUND = the sequence queued before every round and once after the last (it asks fn 14 which) |
+| 14 | Wave op | op 0 -> the round being announced / fought (11 = completed); op 1 spawns the announced round (no result); op 2 -> player 2's character name (a `%s` argument: "%s wins the sparring match!") |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -122,6 +124,7 @@ payload}`, created at map load when the condition holds (so flags must be set be
 | 0x0800D7E1 / 0x0800D765 | dialogue, on entering the rect |
 | 0x0800C2C3 / 0x0800D765 or 0x0801087B / 0x0801087F | script, on entering the rect |
 | 0x0800C2C3 / 0x0800D839 | script, **A pressed inside the rect** (the island's area-5 exit) |
+| 0x0800D7E1 / 0x0800D87F | dialogue, **A pressed while facing the activation object's direction** (object 0x0300209C, byte +4; check 0x0800D844): doors such as the Lookout's chamber door (zone 9 area 3 trigger 0) |
 | 0x08010AC7 / 0x0800D839 | save pad (16 bytes, no payload) |
 | 0x0800C233, 0x0800D9C3 | exits (door / walk-off); the map's always-on exits are the variation's (`docs/maps.md`) |
 
@@ -144,7 +147,9 @@ lock), and a stock chapter lock applies to player 2 too.
 ### 2.5 Story flags
 
 Stock scripts use flags up to 306. Party_Init clears flags 0-399 at a new game; flags 400+ are
-never cleared, so new flags stay below 400. **360-379: story-scripts** (360 Krillin has visited,
+never cleared, so new flags stay below 400 (the bank, `event_flags[0x66]`, holds 816 and is saved; the
+ten-day-wait sessions took 400-459 by allocation: **440 = Roshi's dojo booked for a spar**, `wait_spar`).
+**360-379: story-scripts** (360 Krillin has visited,
 361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`).
 
 ## 3. lscript, the text form
@@ -230,6 +235,8 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 | `ch8_gym` | 175 (zone 6 area 70) | Roshi's sparring room as duos: Yamcha + Tien (stat 106 pairs with Tien's model and stat 98), then Krillin + Hercule (stat 64 pairs with Hercule's sprite 72), `BOSS_PAIR` rules so single-player gets the duos too; when either player is Hercule or Krillin (`CoopCall 8`) the second duo refuses ("Master Roshi says I can only fight duos with Krillin on my team right now... Come back with a different team!") and only the other of the pair stands (record condition scripts); the finale: Roshi's animal ninjas, eleven new enemy records (copies of Yamcha's: alligator, hawk, ladybug, pterodactyl, saber-toothed tiger, scorpion, snake, T-Rex, triceratops, two Ninjas; stats from the bestiary table 0x086F8E40, `{name, description, sprite, portrait, stat}` x 128) in three rounds (all at once ran out of OBJ tiles), flags 363-375, the last defeat pays Tien's +3 Endurance Capsule and flag 214 |
 | `ch8_cooler` | 172 (zone 6 area 61) | Cooler's fight: the three stock openings (Goku, Trunks, anyone else) meet at a co-op check (`stock @A -> 10`), where Cooler brings "a Namekian warrior my father took from Namek long ago" ("...As you command, Lord Cooler.") before the fight with his servant (bosses.c: sprite 166, stat 113); the Piccolo gates are unchanged (zone 4 area 50 needs flag 60 from chapter 2, area 62's barrier Piccolo) |
 | `ch8_arctic` | zone 15 area 1 (built by `tools/mapbuild.py` from `data/maps/arctic.json`, which names this file in `"sources"`) | Android 13 at the cave mouth once Vegeta has opened the barrier (flag 380, encounter flag 376 clear): he was meant to absorb 17 and 18, Cell stole his perfection, he would kill Cell himself; Vegeta: he won't get the chance; a half-health fight (stat 114, alone until Ryan picks his partner), 13 flies off, flag 376 for the post-Cell variant |
+| `wait_chamber` | 263 (zone 9 area 3), zone 15 area 2 | the ten-day wait's Time Chamber training: the chamber door (trigger 0) lets the players in from flag 157 (fade, warp, `CoopCall 13`); `lk_tc_round` before every round ("Round %d" with `CoopCall 14, 0`, then `CoopCall 14, 1` spawns) and "Training completed!"; Mr. Popo in front of the door until flag 157 (record 0's condition), beside it from 157 with his chamber line (new record 9). Enemies per round in `src/coop/waves.c`, table in `docs/story.md` 4g |
+| `wait_spar` | 147 (zone 6 area 3), 175 (zone 6 area 70) | Roshi's dojo sparring: his talk sequence restated (`stockseq` 0-9 and 11-30 at their own indexes, so the returned indexes hold) with entry 10 branching to the offer once flag 214 is set; in co-op the offer books the dojo (flag 440), a new mat trigger (condition 214 and 440) starts `CoopCall 1` with player 2's slot (`CoopCall 8` pushed as the argument); the end: the winner by name (fn 14 op 2 for player 2), HP / EP refilled, back to the atrium |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 
 Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the
