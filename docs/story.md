@@ -557,8 +557,24 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   - *End (Ryan):* warp back to Capsule Corp; the players become Krillin (player 1) and Hercule
     (player 2), and 16 is never playable again (out of the selectable set; he stays a scene actor).
     From here the players proceed to the Cell Games.
-  - *To confirm before building:* the zone 8 lab maps can be entered again after chapter 6; 16's
-    player poses, row and abilities (portrait speaker 26 exists; sprite 160 is enemy-grade).
+  - *Boss (Ryan, 2026-10-19):* two Android 19s at once in the bunker.
+  - *World map star (Ryan):* while the chapter is active, the lab's landing site on the world map shows
+    a star so the players know where to go. Facts: the world map's on-load script (map 176) places
+    icons at tile coordinates through steps 101 and 102, each gated on story flags, and the minimap
+    already shows star markers. The zone 8 landing (world-map rect 2560,1000) is gated only on flag 86.
+  - *Lab re-entry, checked 2026-10-19 (static data plus a headless run with flags 0-191 set):*
+    the zone 8 landing stays open; area 16 to 47 (flag 126) works; the clearing outside the lab
+    (area 48, "Northern Mountains") has a flight spot back to the world map once flag 141 is set
+    (verified, it lands at 2608,1060). Flag 141 is set by Krillin's "head back to Master Roshi's
+    Island" line after the self-destruct, and from then on **the cave mouth into the basement is
+    sealed** (a rubble layer; the player stops below the door). Inside, the basement doors work
+    (61 to 64 with flag 138, 64 to the outer area 65 with flag 140) and the computer room (area 63)
+    still loads, but after flag 140 its doors lead to area 65 instead. So the chapter must reopen
+    the cave mouth (16 punches through the rubble, a chapter flag) and send the basement door to the
+    computer room (63) while the chapter runs. Area 47's top exit into 48 did not fire in the
+    headless run (player stopped at y 20): recheck in play.
+  - *To build:* 16 as a player (poses, row, abilities; portrait speaker 26 exists; sprite 160 is
+    enemy-grade) and a party slot for him.
 - **The wait's story is complete (Ryan, 2026-10-19):** after the 16 chapter the players proceed to
   the Cell Games; no more story is planned for the wait.
 - **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate
