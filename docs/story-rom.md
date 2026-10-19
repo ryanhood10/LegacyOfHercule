@@ -254,9 +254,54 @@ room's doors lead to area 65. Area 47's top exit into 48 never fires in the stoc
 table puts "Return the Dragon Balls to Dende" right before "Enter the Cell Games", and the world map
 checks the all-seven flag 158. To confirm in play.
 
-## 9. The Cell Games and after (2026-10-17, not yet walked in detail)
+## 9. The Cell Games and after (walked from the script dump, 2026-10-19)
 
-Zones 13-14 are the Cell Games. Stock beats from section 1: Hercule's public "victory", the Cell
-Juniors, Gohan's win, Cell's defeat dialogue, after which the script removes Goku and makes Hercule
-available. The ending sets Hercule to level 40. Android 16 stands at the arena with his bomb removed.
-To be dumped and walked from the player's side when Ryan plans this part.
+Maps: zone 14 area 1 (map 323, the arena grounds), area 2 (324, the ring), area 3 (325, the desert
+after the ring is destroyed), area 4 (326, the beam struggle). Disassembly:
+`python tools/script_asm.py dump map 14 N`. Perfect Cell is sprite 30 with five stage stats 21-25;
+the Cell Juniors are stat 26, sprite 31. None of 21-26 has a boss rule in `bosses.c`, so in co-op
+each stage would spawn a twin today.
+
+**How it opens.** Hand all seven Dragon Balls to Dende at the Lookout (zone 9 area 1): "You've found
+all the Dragon Balls!", then Goku: "Now all that remains is to finish up any training we still need
+to do. Once we're ready, let's head for the Cell Games Arena." That sets flag 191, which opens the
+arena's landing on the world map (zone 14 area 1). So the Dragon Ball hunt does gate the Games.
+
+**Arena grounds (323).** Everyone stands around as NPCs with one line each: Android 16 ("I was
+created solely to destroy Goku, though I've chosen not to"), Yamcha, Tien, Piccolo, Hercule ("everything
+he does is a trick!"), Gohan, Vegeta, Trunks, Krillin (the new Dragon Balls cannot revive anyone
+wished back before), Goku. The way into the ring is a barrier: "Only Goku is allowed to pass through
+this barrier." A flight spot leads back to the world map until the Games are over (flag 195).
+
+**The ring (324).** Goku: "I'll fight Cell first." Hercule cuts in ("I've had enough of you clowns"),
+the announcer introduces him, he attacks, Cell: "Your ignorance is painful," Hercule is knocked out
+of the ring (actor sprite 72 despawns). Krillin: "To be honest... I was rooting for Cell that time."
+Cell asks for Goku. **Fight 1: Goku vs Cell (stat 21) down to 75%.** Then Cell: "I'm tired of being
+confined to this little ring," blows the ring apart, and the fight moves to the desert.
+
+**The desert (325).**
+1. **Fight 2: Goku vs Cell (stat 22)** to about half. Goku gives up ("You win. I give up"), Vegeta:
+   "You coward!!!", Goku names Gohan.
+2. **Fight 3: Gohan vs Cell (stat 23) down to 60%** (the script makes Gohan player 1). Cell taunts
+   him, Gohan explains his hidden power, Piccolo wants to help, Goku says no.
+3. Android 16 grabs Cell to self-destruct; Krillin: "Your bomb was removed!" Cell destroys 16.
+4. Cell spawns three Cell Juniors ("My children! Give them pain!"). **Fights 4-6: one Cell Junior
+   each, in turn, as Piccolo, then Vegeta, then Trunks** (the script switches player 1 between them).
+5. **Fight 7: Gohan vs Cell (stat 24).** Mid-fight, Hercule carries 16's head to Gohan (16: "Take me
+   over to the boy!"); 16's last words; Cell crushes him; Gohan: "I won't watch this ANYMORE!!!",
+   becomes Super Saiyan 2 ("Gohan has entered Super Saiyan Rage!"), Cell: "NOW TASTE MY TRUE POWER."
+6. Gohan beats Cell down until he spits out Android 18 (back to Semi-Perfect, sprite 29), then Cell
+   swells to self-destruct (sprite 27). Goku: "Goodbye friends," teleports Cell to King Kai's planet.
+   Gohan: "DADDY!!!" Krillin consoles him, remembers 18 is alive.
+7. Cell returns as Perfect Cell (he regenerated from his core), kills Trunks, Vegeta attacks in rage.
+   Goku speaks to Gohan from the Other World. **Fight 8: Gohan vs Cell (stat 25) down to 20%.**
+
+**The beam struggle (326).** Scripted: Goku: "Dig deeper Gohan!", Vegeta's blast distracts Cell,
+Gohan's Kamehameha wins. Piccolo: "Cell's energy completely vanished!" They leave for Dende with
+Trunks and 18; Vegeta's thoughts about Goku; then the announcer and Hercule: "I DEFEATED CELL!!!!
+SINGLE HANDEDLY!!!!!!" Flag 195 is set; Hercule joins the party at level 40 ("Hercule is now an
+available character!"), Goku leaves the party, and the game warps to the world map.
+
+**After.** At the Lookout: Dende heals Gohan, Shenron is summoned; the first wish revives everyone
+Cell killed, Goku cannot be revived and chooses to stay dead, and the second wish is debated (Krillin
+asks Shenron to make the Androids human, which is beyond its power, so he wishes the bombs out of them instead: "THERE - IT HAS BEEN DONE."). The world map script tests flags 195 and 196.
