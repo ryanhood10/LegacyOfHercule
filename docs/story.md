@@ -63,6 +63,9 @@ fight from item 6 (Kame House deal, 16 over the two stock stages, half health, C
    quests; Cooler's two-part bonus kept (Piccolo gate) with a Namekian servant beside him; optional
    Android 13 arctic encounter behind a Vegeta barrier (partner undecided; story flag for the
    post-Cell variant); a Broly side arc wanted (maps and scripts; sprite 159 ready).
+   Revised in 4g (2026-10-19): Android 13 moved to after Cell; Broly chapter, dojo sparring, Time
+   Chamber waves and the Krillin + 16 "Gero's computer" chapter added (ends as Krillin + Hercule);
+   the wait's story is complete.
 
 **Next to decide:** Android 13's arctic partner; then the Cell Games (Hercule's stock "victory", Cell
 Juniors, Gohan's win, Keep Goku), the ending, and the Buu's Fury phase (Super Saiyan Hercule beats
@@ -80,8 +83,8 @@ playable, Android 13 / 16 / Namekian models, zone-15 maps). Tested per chapter w
 runner (`tools/headless/`); the space duel was also played in the fork with a real final blow.
 Numbers chosen by Claude that Ryan may want to change: Kami's boost (+3 levels and a refill),
 the arctic 13 (stat 114, half health), the gym duos (also fought in single-player).
-Still open for Ryan: the rest of the ten-day wait (section 4g: Broly?), then the Cell Games, the
-ending and the Buu phase. Android 13 returns after Cell (4g).
+Still open for Ryan: the ten-day wait is fully planned (section 4g, not built yet); next the Cell
+Games, the ending and the Buu phase. Android 13 returns after Cell (4g).
 
 **Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
 and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
@@ -529,18 +532,35 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   stops and a caption says "Training completed!". Repeatable as many times as the players want. Limit to respect: sprite memory, not a fixed
   count; in co-op every regular enemy brings a twin, so about 4 per wave (8 on screen) is the working
   number until it is measured. Open: round display between waves, and any reward beyond EXP.
-- **Android 16 side chapter (Ryan, idea, 2026-10-18):** a chapter in the wait with the players locked
-  to Android 16 and Krillin. Facts: the game never shows 16 repaired. Right before Cell's TV
-  announcement, Bulma and Dr. Briefs read his memory in Dr. Briefs' workshop (zone 6 area 5, quest
-  "Talk to Bulma in Dr. Briefs' workshop"); he is next seen standing at the Cell Games arena, and
-  Krillin reveals there that they removed his bomb while repairing him. So he is fixed some time in
-  the ten days, off screen. Where the players meet him and where the chapter goes: Ryan to decide.
-  Making 16 playable is a new party character like Krillin (player poses, row, abilities); his
-  portrait exists (speaker 26) and his fighting sprite (160) is enemy-grade.
-  Pair confirmed (Ryan): Krillin player 1, Android 16 player 2, locked for the chapter.
-  Where 16 is: at Capsule Corporation for the whole wait (he asks for repairs on the island; the workshop
-  scene is about his memory). The workshop map (map 149) places no 16 actor (no sprite 8; only Bulma,
-  Dr. Briefs and staff), so the chapter would add him there.
+- **Android 16 side chapter: "Gero's computer" (Ryan, decided 2026-10-19).** Player 1 is Krillin and
+  player 2 is Android 16, locked for the whole chapter; the other characters unlock when it ends.
+  - *Facts it rests on:* the game never shows 16 repaired. On the island he asks for repairs; Bulma
+    and Dr. Briefs read his memory in Dr. Briefs' workshop (zone 6 area 5, map 149) just before Cell's
+    TV announcement; he is next seen standing at the Cell Games arena, where Krillin says they removed
+    his bomb. The workshop map places no 16 actor (no sprite 8), so the chapter adds him there. Cell
+    tells Piccolo that Gero's computer "was hidden in a bunker deep below Gero's lab". Krillin has been
+    in the lab basement (chapter 6, zone 8 areas 48 and 61-63). 16 was built in that lab.
+  - *Trigger:* after Cell's TV announcement and the Scouter Note, entering the workshop plays a new
+    scene: Dr. Briefs says 16 is repaired and the bomb is out; 16 wakes and picks up a signal from
+    Gero's lab: the computer is running again. Krillin goes with him because he has been down there.
+    The party locks to Krillin (player 1) and 16 (player 2).
+  - *The lab:* they fly to the lab in the Northern Mountains (the zone 8 lab maps from the Piccolo
+    and basement chapters). The robot grunts are back online and the generators have to be shut down
+    again.
+  - *The bunker boss:* the computer is finishing a spare Android 19 body; the players fight it
+    (Android 19's existing fight, enemy stat 5, sprite 12). 16 is a puncher, so his first fight as a
+    player suits a brawl.
+  - *Easter egg:* before they smash the computer, one file on it names Android 13 as unfinished: a
+    hint at the post-Cell story, without bringing 13 in.
+  - *The way home:* on the way out 16 stops to watch the birds, and tells Krillin he will go to the
+    Cell Games (this is why he stands at the arena later).
+  - *End (Ryan):* warp back to Capsule Corp; the players become Krillin (player 1) and Hercule
+    (player 2), and 16 is never playable again (out of the selectable set; he stays a scene actor).
+    From here the players proceed to the Cell Games.
+  - *To confirm before building:* the zone 8 lab maps can be entered again after chapter 6; 16's
+    player poses, row and abilities (portrait speaker 26 exists; sprite 160 is enemy-grade).
+- **The wait's story is complete (Ryan, 2026-10-19):** after the 16 chapter the players proceed to
+  the Cell Games; no more story is planned for the wait.
 - **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate
   castle-defense game where waves of Cell Juniors try to steal it. Facts: the hunt appears to gate the
   Cell Games (the quest table puts "Return the Dragon Balls to Dende" right before "Enter the Cell
