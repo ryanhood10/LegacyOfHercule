@@ -268,6 +268,31 @@ the Time Chamber's
 door under the canopy leads to Kami's Lookout; the arctic's flight spot (press A) flies to the world
 map. Screenshots: `build/maps/shots/` (`zone15_sheet.png`), not committed (ROM graphics).
 
+## 9b. World-map markers and the Gero's lab re-entry (`data/story/ch9_gero`, 2026-10-19)
+
+**World-map icons.** The world map's on-load script (map 176, zone 6 area 99) draws one marker per
+landing site with two game actions taking tile coordinates: **101 `sub_800AC5C` (x, y) = the plain
+marker** and **102 `sub_800ACAC` (x, y) = the star** (something to do there; the minimap shows it as a
+star). Each site's block computes a condition (story flags, item 45), `JumpIfFalse` to the plain marker
+when it is false, else the star. Opcode **0x05** (lscript `Not`) is the VM's **binary OR** (decompiled
+0x08008FE6: pops two, pushes `a | b != 0`), which is how the stock blocks join their cases. The zone 8
+landing (rect 2560,1000) is the icon at **(213, 13)**; the chapter ORs `flag 420 and not 421` into its
+condition (an `edits` replace of `JumpIfFalse L21`), and the headless run shows the star on the minimap
+only while the chapter runs.
+
+**Lab re-entry after the self-destruct (flag 141), as the chapter changes it:**
+
+| area | stock | chapter |
+|---|---|---|
+| 47 | the top exit (variation exit, rect (160,0)-(185,17), to 48 at 552,660) **never fires**: walk collision stops the player at y 20 (arriving from 48 at y 4 also clamps to 20) | an added door exit (`mapedit` `"kind": "exit"`) with rect (160,0)-(185,28) and the same target; verified headless |
+| 48 | on-load with 141: `FindCharacterEntity 2` (the flight-spot sign), `FindCharacterEntity 10` (**the boulders in the cave mouth**), `EnableLayer 1`, `ClearCollisionRect 192,456,208,464`, `ClearCollisionRect 128,272,192,296` (the approach). The cave mouth itself (136..168, 240..272) is blocked in the walk bitmap (the stock "Only Trunks" barrier opened it in the basement chapter) | on-load replaced (`ch9_a48_onload`): once 16 has punched through (flag 422) no boulders, no layer 1, no blocked approach, and `SetCollisionRect 136,240,168,272` opens the mouth; the rubble scene (dialogue trigger, rect (81,265)-(200,312)) does the same at run time |
+| 64 | door trigger 1 (flag 140 clear) to the computer room 63, trigger 2 (flag 140 set) to the wrecked room 65 | conditions: 63 while `140 clear or (420 set and 425 clear)`, 65 otherwise |
+| 63 | trigger 0 (flag 139 clear): the master computer scene | a new dialogue trigger (420 set, 425 clear): the bunker scene; record 1 = Android 19, stat 120 |
+
+Area 61's doors are unchanged (flag 138 set: to 64). Areas 27 and 40 (the generators of Gero's
+stages) get one dialogue trigger each on the stock trigger's rect. A `WarpToMapNoEntities` into 48
+also runs the on-load script (the bunker's ending lands there with the cave open).
+
 ## 10. Buu's Fury maps (decoded; one imported)
 
 Buu's Fury uses the same map engine: the tiled layer header (create fn 0x08008087, 1374 layers), the

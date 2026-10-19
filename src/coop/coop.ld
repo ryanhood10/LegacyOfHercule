@@ -14,7 +14,8 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use sprite_index display_rows display_row_count ssj_record
        ui_strings portrait_module status_module status_title_hook status_pages_hook status_draw_hook
        vm_push_name_hook vm_push_caps_hook kiblast_spawn_hook krillin_rush_ready krillin_rush_use krillin_shock_ready
-       krillin_shock_use krillin_disc_ready krillin_disc_use kr_disc_icon_0 kr_disc_icon_1 kr_state krillin_record)
+       krillin_shock_use krillin_disc_ready krillin_disc_use kr_disc_icon_0 kr_disc_icon_1 kr_state krillin_record
+       a16_rocket_ready a16_rocket_use a16p_record)
 
 MEMORY
 {

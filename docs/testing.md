@@ -357,6 +357,29 @@ python tools/headless/st_test.py tools/headless/mkmenu.txt build/broly/log2-coop
   gdb loop (from Git Bash set `MSYS_NO_PATHCONV=1` before `wsl ... bash /mnt/...`).
 - Single-player: the same scripts without `p2 0` (slower through the dialogue; one boss bar).
 
+## Gero's computer (headless chapter run and the bunker fight in the fork, 2026-10-19)
+
+```
+make BUILD=build/gero DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/gero/log2-coop.gba --out build/gero/hl
+python tools/headless/st_test.py tools/headless/ch9_gero.txt build/gero/log2-coop.gba build/gero/hl/menu.ss --out build/gero/hl --cols 6
+```
+
+`tools/headless/ch9_gero.txt` Map Tests the workshop with the wait's flags (151, 155-157), plays the
+scene, checks the party (active slot 6, `coop.p2_slot` 7), sets flags 0-191, then warps (COOP_CMD_WARP)
+to each beat and lets its trigger fire: the world map near the zone 8 landing (the star on the
+minimap), the two generators, area 47's top exit, the rubble, the doors 61 -> 64 -> 63, the bunker; it
+wins the fight with `COOP_CMD_STORY_WIN`, then the 13 file, the birds and home (active 6, player 2 slot
+5, flags 420-425 set). Savestates `g_ws.ss`, `g_fight.ss`, `g_home.ss` land beside the shots.
+
+Fork (bunker pair, Rocket Punch): `make BUILD=build/gerof WIDE=1 DEBUG_MENU=1 A16_TEST=1`, launch a
+slot, `p2hold.py`, `bootisland.sh 75`, then `COOP_CMD_A16_PARTY` (write 11 to `coop2.cmd` 0x0203FD08:
+the chapter's party without its scene) and `bossfight.sh <bunker record> 120 4 0x0203F0B4 0x0203F0D0`
+(Krillin's and 16's entries). The record address is the `map 257 new enemy record 1` line of
+`build/<dir>/hercule.patch.json`. Player 2's B (p2hold `--cmd` file, e.g. `0x20:0.2 0:0.2 2:0.1`) fires
+the Rocket Punch; `a16p` (coop.sym) counts punches (+8) and hits (+10). Boot fresh for each build: a
+state saved after the party switch sometimes left every boss idle.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

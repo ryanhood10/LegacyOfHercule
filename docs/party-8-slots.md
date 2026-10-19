@@ -115,7 +115,13 @@ PARTY_SLOTS (16 rows in the generated tables, `UI_BLOCK`):
 | status portrait (row +3 -> `Portrait_Table`, ids 8-25) | Krillin's appended as id 119 (`portrait_module`) |
 | level-up victory poses (script `0x083B6524`, slots 0-5 by `PushActiveCharIndex`) | none for slot 6: he keeps standing (harmless) |
 
-Slot 7 is still empty (never flagged in party).
+Slot 7 is the duel clone's slot (`duel.c` copies player 1's entry into it for a clone duel) and,
+during the "Gero's computer" chapter only, **Android 16** (`src/coop/a16player.c`, 2026-10-19): no duel
+runs in that chapter, so `CoopCall 11` writes his entry there (row 25, Krillin's EXP, his stats, flags
+0x43, abilities 22 / 19 / 0 / 2) and `CoopCall 12` clears its flags when he leaves (a later clone duel
+overwrites the slot as before). Growing `PARTY_SLOTS` was not needed. Growth row 7 (`data/hercule.json`)
+is 16's level-up range. The status screen names slot 7 "Android 16" on row 25 and names a clone after
+the character whose row it copies (`krillin.c name_slot`).
 
 ## Level-ups (fixed 2026-10-18)
 

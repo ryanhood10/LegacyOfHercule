@@ -118,10 +118,10 @@ LITERAL_RELOCATIONS = [
     (0x081D94D0, "status_module", 0, [0x377C]),
     (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 25
-# (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule; tools/spriteclone.py)
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 26
+# (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule, row 25 = Android 16; tools/spriteclone.py)
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x19),
+    (0x42D6, 0x16, 0x1A),
 ]
 
 

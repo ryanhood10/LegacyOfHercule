@@ -36,6 +36,9 @@ counter), 0x1C LoopOrJump, 0x1D PushMulti u8 count + varints.
   Jump and JumpIfFalse go **forward** to (address after the operand) + byte; LoopOrJump decrements
   the counter pushed by PushToAltStack and, unless it reached 0, goes **back** to (address after the
   operand) - byte. A script can continue past an END when a jump targets beyond it.
+- **0x05 is a binary OR** (decompiled 0x08008FE6: pops two values, pushes 1 when either is nonzero),
+  though the tools print it `Not` (the reference notes' name); stock conditions join cases with it
+  (`A; B; Not` = A or B). There is no unary NOT: use the `StackTestStoryFlagNot` form.
 - **Varints**: 7-bit groups MSB first, bit 7 = more; then u even -> u/2, u odd -> -(u/2). Every stock
   varint is minimal (the assembler can rely on it; the disassembler would print `.bytes` otherwise).
 - **Arguments**: actions pop their arguments; the stock scripts push them with PushByte (one value
@@ -110,6 +113,8 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 8 | P2Slot -> slot / -1 | player 2's party slot (the last bound one while a warp has the entity despawned), -1 without player 2: Roshi's gym checks whether either player is Hercule or Krillin |
 | 13 | WaveStart seq:ROUND, first | the Time Chamber training (`waves.c`): from round `first` (0 / 1 = the first); ROUND = the sequence queued before every round and once after the last (it asks fn 14 which) |
 | 14 | Wave op | op 0 -> the round being announced / fought (11 = completed); op 1 spawns the announced round (no result); op 2 -> player 2's character name (a `%s` argument: "%s wins the sparring match!") |
+| 11 | A16Join | "Gero's computer" (`a16player.c`): Android 16 joins in the last party slot (row 25, Krillin's EXP, stats scaled from Krillin's, abilities 22 / 19 / 0 / 2), every other slot but Krillin's loses its available bit (saved in flags 430 + slot), flag 420. The script then sets `SetActiveCharacterNoReset 6` and `CoopCall 6, 7` |
+| 12 | A16Leave | 16 leaves the party for good (slot flags 0), the saved bits come back, Krillin and Hercule in the party and available, flag 421. The script then sets Krillin player 1 and `CoopCall 6, 5` |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -159,6 +164,8 @@ wait's side chapters use 400-459 and `party.c` now clears flags 400-479 at a new
 **400-419 the Broly chapter** (400 the ship has landed, 401 the trip is under way, 402 done, 403 the
 confrontation seen, 404-419 the party kept by CoopCall 10), 420-439 Android 16's, 440-459 the Lookout /
 dojo's (**440 = Roshi's dojo booked for a spar**, `wait_spar`).
+**420-439 "Gero's computer"**: 420 running (16 in the party), 421 over, 422 rubble punched, 423 / 424
+west / east generator down, 425 bunker done, 430-437 the available bits of slots 0-7 saved by the lock.
 
 ## 3. lscript, the text form
 
@@ -212,6 +219,10 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 }
 ```
 
+- `add_triggers` entries copy trigger N of the same map (`"like"`), or build a door exit from scratch:
+  `{"kind": "exit", "rect": [...], "exit": [DIR, ZONE, AREA, VAR, X, Y], "condition": ...}` (create
+  0x0800C233, activation 0x0800D8AF, the 8-byte payload inline; `docs/maps.md` 7). A map without
+  triggers gets its first one this way (area 47).
 - References: `seq:NAME`, `script:NAME` (assembled once, on first use), `@08xxxxxx`, `none`.
   Conditions: `always`, `never`, `flag:N`, `noflag:N`, `once:N`, `script:NAME`, a number.
 - Record fields: `condition`, `x`, `y`, `sprite`; enemies `stat`, `action` (a sequence = defeat
@@ -246,6 +257,7 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 | `wait_chamber` | 263 (zone 9 area 3), zone 15 area 2 | the ten-day wait's Time Chamber training: the chamber door (trigger 0) lets the players in from flag 157 (fade, warp, `CoopCall 13`); `lk_tc_round` before every round ("Round %d" with `CoopCall 14, 0`, then `CoopCall 14, 1` spawns) and "Training completed!"; Mr. Popo in front of the door until flag 157 (record 0's condition), beside it from 157 with his chamber line (new record 9). Enemies per round in `src/coop/waves.c`, table in `docs/story.md` 4g |
 | `wait_spar` | 147 (zone 6 area 3), 175 (zone 6 area 70) | Roshi's dojo sparring: his talk sequence restated (`stockseq` 0-9 and 11-30 at their own indexes, so the returned indexes hold) with entry 10 branching to the offer once flag 214 is set; in co-op the offer books the dojo (flag 440), a new mat trigger (condition 214 and 440) starts `CoopCall 1` with player 2's slot (`CoopCall 8` pushed as the argument); the end: the winner by name (fn 14 op 2 for player 2), HP / EP refilled, back to the atrium |
 | `broly` | 160, 165 (zone 6 areas 16, 21) and zone 15 area 3 (through `data/maps/broly_arena.json`'s `"sources"`) | the Broly side chapter (docs/story.md 4g): after Cell's broadcast (trigger 1's sequence restated with Bulma's entries appended as 9-11) Bulma walks in about the Saiyan ship (flag 400); the backyard's new ship actor (171) and a new dialogue trigger: without Vegeta as a player a hint, with him Paragus (actor 170, speaker 120), the trip's others walk in (each only when no player plays him), everyone boards, the ship lifts off, CoopCall 10 keeps the party, the five are selectable, warp to the landing zone; the rim trigger (once, flag 403, then straight to the fight): Paragus' betrayal, Broly, `DespawnCharacterAndRecordPosition 159, 2` (stat 115 + Paragus 116 as a `BOSS_PAIR`), CoopCall 9 sets the rage dialogue; the defeat: the explosion (19's effects), the warp home, the debrief, CoopCall 10 restores the party, `ReloadMap` |
+| `ch9_gero` | 149 (zone 6 area 5), 176 (world map), 229, 242, 249, 250, 257, 258 (zone 8 areas 27, 40, 47, 48, 63, 64) | "Gero's computer" (`docs/story.md` 4g): 16 stands in Dr. Briefs' workshop during the wait (new actor, sprite 8); after the memory scene, the TV announcement and the Scouter Note (155, 157, item 22 / 23 / 24 or flag 156) the workshop scene: Briefs (16 repaired, bomb out), 16 wakes and picks up the computer's signal, Krillin walks in unless a player is Krillin, `CoopCall 11`, Krillin player 1 and 16 player 2, a warp into the workshop clears the actors; the world-map star at the zone 8 landing; the two generators under the waterfalls of areas 27 / 40 (flags 423 / 424, robots back online are the stock records); area 47's top exit fixed; the rubble at the cave mouth (16 punches through once both generators are down, flag 422); the basement door to the intact computer room; the bunker: "assembly complete" captions, two Android 19 spare bodies (record 1, stat 120, `BOSS_PAIR` with stat 121, single-player too), both down: the Android 13 file ("UNFINISHED. FINAL STAGE ON HOLD", absorbing two androids), the computer smashed (flag 425), outside 16 watches two hawks (sprites 63 / 64) and says he will go to the Cell Games, `CoopCall 12`, the warp to the workshop with Krillin player 1 and Hercule player 2 |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 
 Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the

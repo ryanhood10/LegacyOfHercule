@@ -30,7 +30,11 @@
 //                                       story flags 404-419; op 1 puts the bits back and pushes player 1's
 //                                       slot for a SetActiveCharacter step; op 2 (after that step) binds
 //                                       player 2 to its kept slot again
+//  11 A16Join ()                        "Gero's computer": 16 joins in the last party slot, the party locks to
+//                                       Krillin + 16 (a16player.c; the script then sets player 1 and 2)
+//  12 A16Leave ()                       16 leaves the party for good, the lock is undone, Hercule available
 #include "coop.h"
+#include "a16player.h"
 #include "krillin.h"
 
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
@@ -152,6 +156,8 @@ void vm_coop_call(s32 *st) {
         else if (a == 1 && coop.p2) { coop.p2->x = b << 8; coop.p2->y = c << 8; coop.p2->facing = 1; }
         break;
     case 10: party_keep(st, a); break;
+    case 11: a16_join(); break;
+    case 12: a16_leave(); break;
     default: break;
     }
 }

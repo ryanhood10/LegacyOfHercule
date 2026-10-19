@@ -70,6 +70,11 @@ typedef struct BossRule {
 #ifndef PARAGUS_SPRITE
 #define PARAGUS_SPRITE 0    // Vegeta's set made old (tools/brolysprites.py; the Makefile passes 170)
 #endif
+// "Gero's computer" (docs/story.md 4g) owns stats 120-124, kept in their own table (gero_stats[], bosses.c)
+// so other ranges can be added beside it without renumbering
+#define GERO_STAT_BASE 120
+#define BUNKER19_STAT 120   // the bunker's Android 19 spare body A (the record), BOSS_PAIR with B
+#define BUNKER19B_STAT 121  // spare body B (the pair's twin)
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;

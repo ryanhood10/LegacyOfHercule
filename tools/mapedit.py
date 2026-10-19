@@ -15,7 +15,8 @@ A spec (docs/scripts.md has the reference and examples):
       "onload": "script:NAME",                   also "name", "music", "variation", "onleave"
       "triggers": {"0": {"payload": "seq:NAME", "rect": [x1, y1, x2, y2], "condition": COND}},
       "add_triggers": [{"like": 0, "rect": [..], "payload": "seq:NAME", "condition": COND},
-                       {"kind": "dialogue", "rect": [..], "payload": "seq:NAME", "condition": COND}],
+                       {"kind": "dialogue", "rect": [..], "payload": "seq:NAME", "condition": COND},
+                       {"kind": "exit", "rect": [..], "exit": [DIR, ZONE, AREA, VAR, X, Y], "condition": COND}],
       "records": {"1": {"stat": 109, "sprite": 160, "action": "seq:NAME"},
                   "3": {"sprite": 9}, "5": "disable"},
       "add_records": [{"kind": "actor", "sprite": 76, "x": 400, "y": 300, "facing": 2, "condition": COND},
@@ -53,6 +54,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import script_asm as sa  # noqa: E402
 from script_asm import AsmError, ROM_BASE, off, is_rom  # noqa: E402
 
+EXIT_CREATE = 0x0800C233       # trigger create function of a door exit (docs/maps.md 7)
+EXIT_ACTIVATION = 0x0800D8AF   # its activation object: the held direction
 STORY_FREE = 0xB00000          # file offset of the story data region in the 16 MiB output ROM
 STORY_LIMIT = 0xC00000
 ROM_SIZE = 0x01000000
@@ -223,6 +226,13 @@ class MapEditor:
 
     def add_trigger(self, me, t, tag):
         count = self.rom[off(me) + 3]
+        if t.get("kind") == "exit":   # a door exit (docs/maps.md 7): held direction inside the rect, payload inline
+            d, z, a, v, x, y = [num(q) for q in t["exit"]]
+            cond = self.condition(t.get("condition", "always"))
+            data = self.put(struct.pack("<II4hBBBBhh", EXIT_CREATE, EXIT_ACTIVATION, *[num(q) for q in t["rect"]],
+                                        d, z, a, v, x, y), 4, f"{tag} new exit trigger {count} data")
+            self.append_trigger(me, count, cond, data, tag)
+            return
         if t.get("kind") == "dialogue":       # a dialogue run on entering the rect, without a trigger to copy
             cond, cfn, fn, payload = 0, 0x0800D7E1, 0x0800D765, 0
             x1, y1, x2, y2 = t["rect"]
@@ -236,6 +246,9 @@ class MapEditor:
         if "condition" in t:
             cond = self.condition(t["condition"])
         data = self.put(struct.pack("<II4hI", cfn, fn, *rect, payload), 4, f"{tag} new trigger {count} data")
+        self.append_trigger(me, count, cond, data, tag)
+
+    def append_trigger(self, me, count, cond, data, tag):
         arr = bytes(self.rom[off(self.w32(me + 0x10)):off(self.w32(me + 0x10)) + 8 * count])
         arr += struct.pack("<II", cond, data)
         new = self.put(arr, 4, f"{tag} trigger array ({count + 1})")

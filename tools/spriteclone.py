@@ -4,13 +4,14 @@ committed: the output lives in build/gen.
 
 usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ssj_preview.png]
                       [--extra 158=buu_record_158,159=buu_record_159] [--row-sprite 157]
-                      [--krillin-sprite 161] [--old-hercule-sprite 158]
+                      [--krillin-sprite 161] [--old-hercule-sprite 158] [--a16-sprite 175]
   --extra       more records (symbols defined in another generated file, e.g. tools/buu2log2.py's
                 build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids
   --row-sprite  the sprite id the Super Saiyan Hercule display row (22) uses (default 157; a test
                 build can point it at a converted Buu record to see it in game)
   --krillin-sprite      sprite of Krillin's row 23 (default 161, tools/krillinsprites.py; 76 = his NPC set)
   --old-hercule-sprite  sprite of old Hercule's row 24 (default 158, the Buu's Fury Hercule; 72 without it)
+  --a16-sprite          sprite of Android 16's player row 25 (default 175, a16p_record from tools/a16sprites.py)
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -32,6 +33,10 @@ KRILLIN_SPRITE = 161     # Krillin's playable record (tools/krillinsprites.py; 7
 KRILLIN_ROW = 23
 KRILLIN_PORTRAIT = 73    # Portrait_Table: his dialogue portrait (switch screen / dialogue, OBJ palette)
 KRILLIN_STATUS_PORTRAIT = 119   # status-screen portrait, appended by tools/krillinsprites.py (portrait_module)
+A16_ROW = 25             # Android 16 as a player (party slot 7 in the "Gero's computer" chapter)
+A16P_SPRITE = 175        # his player record (tools/a16sprites.py a16p_record)
+A16_PORTRAIT = 26        # his dialogue portrait (speaker 26)
+A16_STATUS_PORTRAIT = 121   # appended by tools/krillinsprites.py (portrait_module)
 OLD_HERCULE_SPRITE = 158 # Hercule in his Buu-saga gi (tools/buu2log2.py)
 OLD_HERCULE_ROW = 24
 GOHAN_ROW = 0            # a standard ground/flight row (behaviour class 0x030021E0) to copy for Krillin
@@ -145,6 +150,7 @@ def main():
     row_sprite = int(sys.argv[sys.argv.index("--row-sprite") + 1]) if "--row-sprite" in sys.argv else NEW_SPRITE
     krillin_sprite = int(sys.argv[sys.argv.index("--krillin-sprite") + 1]) if "--krillin-sprite" in sys.argv else KRILLIN_SPRITE
     old_sprite = int(sys.argv[sys.argv.index("--old-hercule-sprite") + 1]) if "--old-hercule-sprite" in sys.argv else OLD_HERCULE_SPRITE
+    a16_sprite = int(sys.argv[sys.argv.index("--a16-sprite") + 1]) if "--a16-sprite" in sys.argv else A16P_SPRITE
     sp = S.Sprites(rom)
     rec = sp.record(SRC_SPRITE)
     groups = sp.groups(rec)
@@ -260,8 +266,18 @@ def main():
     old[4] = OLD_HERCULE_ROW
     old[5] = OLD_HERCULE_ROW
     rows += old
+    # row 25 = Android 16 as a player (docs/story.md 4g "Gero's computer"): a standard row like Krillin's with
+    # his player sprite and portraits, no transformation links
+    a16 = bytearray(rows[GOHAN_ROW * 20:GOHAN_ROW * 20 + 20])
+    a16[0] = 0
+    a16[1] = a16_sprite
+    a16[2] = A16_PORTRAIT
+    a16[3] = A16_STATUS_PORTRAIT
+    a16[4] = A16_ROW
+    a16[5] = A16_ROW
+    rows += a16
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
-    lines.append(f"const u32 display_row_count = {ROW_COUNT + 3};")
+    lines.append(f"const u32 display_row_count = {ROW_COUNT + 4};")
     os.makedirs(os.path.dirname(out_c), exist_ok=True)
     open(out_c, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     total = sum(len(b) for (_, _), b in [((p, fi), fr[5]) for p, frs in arrays.items() for fi, fr in enumerate(frs) if fr[5]])

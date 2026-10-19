@@ -138,6 +138,8 @@ void duel_tick(void);
 void coop_call_tick(void);                           // vmcall.c, every input poll
 int duel_p2_final_blow(Entity *e, int dmg);
 void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
+#define COOP_CMD_A16_PARTY   11   // "Gero's computer" test: CoopCall 11's party (Krillin player 1, Android 16 player 2; a16player.c)
+void a16_test_party(void);
 #define COOP_CMD_SPAWN_RECORD 8   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
