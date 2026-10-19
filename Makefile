@@ -42,12 +42,17 @@ KRILLIN_SPRITE ?= 161
 # built from the ROM); src/coop/bosses.c gives them to the co-op twins of 19, Dr. Gero and Cooler
 A13_SPRITE ?= 165
 NAMEK_SPRITE ?= 166
+# PARAGUS_SPRITE / SHIP_SPRITE / PARAGUS_PORTRAIT: the Broly side chapter's art (tools/brolysprites.py, built from
+# the ROMs: Vegeta's set made old, Buu's Fury ship record 1, Vegeta's portrait made old); src/coop/bosses.c
+PARAGUS_SPRITE ?= 170
+SHIP_SPRITE ?= 171
+PARAGUS_PORTRAIT ?= 120
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o
 SSJ_TEST ?= 0
 
 # BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
@@ -61,7 +66,7 @@ BUU_ROM ?= roms/buu.gba
 BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
-EXTRA_SPRITES := $(A16_SPRITE)=a16_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record
+EXTRA_SPRITES := $(A16_SPRITE)=a16_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
@@ -102,7 +107,7 @@ $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu
 # Krillin's playable sprite, status portrait, ki blast / Destructo Disc frames and icons, the relocated UI
 # string table and portrait module table (never committed)
 $(BUILD)/gen/krillin_sprites_data.c: tools/krillinsprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
-	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png
+	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait
 
 $(BUILD)/obj/krillin_sprites_data.o: $(BUILD)/gen/krillin_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
@@ -117,6 +122,14 @@ $(BUILD)/gen/boss_models_data.c: tools/bossmodels.py tools/a16sprites.py tools/b
 	$(PYTHON) tools/bossmodels.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/boss_models_data.o: $(BUILD)/gen/boss_models_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# Paragus (sprite + dialogue portrait) and the Saiyan ship for the Broly chapter (never committed); preview beside them
+$(BUILD)/gen/broly_sprites_data.c: tools/brolysprites.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	$(PYTHON) tools/brolysprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
+
+$(BUILD)/obj/broly_sprites_data.o: $(BUILD)/gen/broly_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

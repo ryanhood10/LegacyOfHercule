@@ -205,6 +205,7 @@ void input_poll_hook(InputSystem *in) {
     // chapter tests (COOP_CMD_STORY_WIN from a debugger or the headless runner): run here, outside the
     // entity-list update, where a boss death (its events, its removal) is safe
     if (coop2.cmd == COOP_CMD_STORY_WIN) { coop2.cmd = 0; story_test_finish(); }
+    if (coop2.cmd == COOP_CMD_PARTNER_WIN) { coop2.cmd = 0; story_test_partner_down(); }
 #ifdef STORY_TEST
     // chapter tests: player 1 holds L and R and presses Up -> every boss fight on the map is won
     if ((in->current & (KEY_L | KEY_R)) == (KEY_L | KEY_R) && (in->pressed & KEY_UP)) story_test_finish();

@@ -730,6 +730,19 @@ plays on the 21-group player set without a crash). `BOSS_PAIR`, so single-player
 and the hurt state was missing, so a boss pair pummelling player 1 also froze player 2. It is in the
 list now (player.c).
 
+
+**Broly and Paragus (2026-10-19, Broly chapter):** stats 115 (Broly: Cooler's AI set 21 and class,
+8000 HP, 52/54/50) and 116 (Paragus: 2000 HP, 24/22/20), `BOSS_PAIR` with Paragus' sprite 170 as the
+partner model. New rule flag **`BOSS_RAGE`** (on the partner's stat): when that boss falls while the
+other still stands, the survivor rages once (`enemies.c` `rage()`): HP back to its max, attack bytes
++`BOSS_RAGE_MELEE` (10), defence +`BOSS_RAGE_DEFENCE` (6), chase modules created from then on x 13/10
+(`speed_module`), and the dialogue set by `CoopCall 9, 0, seq:NAME` queued like a defeat dialogue. The
+mark is bit 31 of the record copy's spawn-condition word. Then the both-down rule as usual. Verified:
+headless, Broly at 3000 HP when Paragus fell went back to 8000 with 62/64/56; a natural autopilot fight
+(test build, HP topped up) went Paragus down, the refill, Broly down, the ending; the same in fork slot
+6. Unrefilled, the autopilot with the Map Test party (about 1000 HP) lost to the first tuning
+(58/60/55, rage +14) in about 20 s. `COOP_CMD_PARTNER_WIN` (9) drops only boss partners (tests).
+
 ## Player 2's combat stats, duplicate NPCs, test warp (2026-10-18)
 
 - **Player 2's combat bytes**: the behaviour classes write entity +0x160/+0x161/+0x162 (melee,

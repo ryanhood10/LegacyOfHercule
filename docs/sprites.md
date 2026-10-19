@@ -330,6 +330,39 @@ the arm patches pink instead of red (26 -> 247-like pink, 247 lighter) so they s
 Distinct from Piccolo (player 1 in the Cooler fight) at a glance. Its group 3 is a fall that ends
 lying, used by the both-down rule.
 
+## Paragus and the Saiyan ship (ids 170, 171, portrait 120; `tools/brolysprites.py`, 2026-10-19)
+
+**Record header +0 (u16) is the record's largest frame in bytes** (checked on every stock record:
+0x200 for 16x32 NPCs, 0x400 for 32x32 bodies, 0x1000 for the 64x64 bosses 27, 30, 34, 37, 74, 105, 122);
+the entity's OBJ VRAM slot and staging buffer are sized from it. `tools/buu2log2.py` copied its
+template's header (Hercule, 0x400), so Broly's 64x64 frames (id 159) would have overrun their slot; it
+now writes the real size (and byte 3 = 0x18 for 64x64, as Frieza 34 and Perfect Cell 30 have). Broly
+then draws cleanly as a boss in the fork.
+
+**Paragus (sprite 170, `paragus_record`)**: Vegeta's playable set in Saiyan armour (sprite 137, all 21
+groups, 213 unique frames) aged per frame. Vegeta's skin shows only on his face (white gloves, blue
+suit), so the hair is the black left after removing the eyes (black with face skin on both sides
+within 4 px, across or up and down), taken as the 4-connected black components that touch the face
+(8-way), or in back views the component holding the topmost black pixel (the ground shadow under the
+boots touches no skin). Hair edges stay black, the inside becomes mid grey, a darker band sits on the
+forehead line, Vegeta's grey highlights (13) inside the hair go light grey. A grey goatee: the chin's
+lowest face rows at the centre in front views, at the chin's front edge in side views (the side the
+stored frame faces, h-flip aware), only when the head is upright (hair centroid above the face's).
+Group 9 (the Super Saiyan transform's flames) stays as it is; Paragus never plays it. The header is
+137's, so the melee boss AI set 21 finds groups 0-2 and 5-8, and group 3 serves the both-down rule.
+
+**Paragus' dialogue portrait (id 120, `paragus_portrait`)**: Vegeta's (Portrait_Table 106, OBJ
+palette) with the hair (black and navy outside the face box, read off the portrait) grey with a black
+outline and lighter inner streaks, plus a grey moustache over the upper lip and a pointed chin beard.
+Speakers >= 8 read `portrait_module[id + 1]` (`0x0800BDCC`), so `tools/krillinsprites.py` takes
+`--extra-portrait 120=paragus_portrait` and appends the word; dialogue `text 120 "PARAGUS: ..."`.
+
+**The Saiyan ship (sprite 171, `ship_record`)**: Buu's Fury record 1, a purple ship 64x32 with two
+animations of two frames x 4 facings (front, back, two sides), converted with `buu2log2`'s converter
+into a two-group actor record (header from Bulma's 23 with the size 0x800). Without `roms/buu.gba` the
+record points at stock sprite 43's groups (a stand-in; the chapter needs Broly from that ROM anyway).
+Preview: `build/<dir>/paragus_preview.png` (every group, both portraits).
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control

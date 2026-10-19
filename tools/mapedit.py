@@ -14,7 +14,8 @@ A spec (docs/scripts.md has the reference and examples):
       "map": {"zone": 11, "area": 4},            or {"index": 296}; "which": N picks among duplicates
       "onload": "script:NAME",                   also "name", "music", "variation", "onleave"
       "triggers": {"0": {"payload": "seq:NAME", "rect": [x1, y1, x2, y2], "condition": COND}},
-      "add_triggers": [{"like": 0, "rect": [..], "payload": "seq:NAME", "condition": COND}],
+      "add_triggers": [{"like": 0, "rect": [..], "payload": "seq:NAME", "condition": COND},
+                       {"kind": "dialogue", "rect": [..], "payload": "seq:NAME", "condition": COND}],
       "records": {"1": {"stat": 109, "sprite": 160, "action": "seq:NAME"},
                   "3": {"sprite": 9}, "5": "disable"},
       "add_records": [{"kind": "actor", "sprite": 76, "x": 400, "y": 300, "facing": 2, "condition": COND},
@@ -222,9 +223,13 @@ class MapEditor:
 
     def add_trigger(self, me, t, tag):
         count = self.rom[off(me) + 3]
-        like_slot, like_data = self.trigger(me, num(t["like"]))
-        cond = self.w32(like_slot)
-        cfn, fn, x1, y1, x2, y2, payload = struct.unpack_from("<IIhhhhI", self.rom, off(like_data))
+        if t.get("kind") == "dialogue":       # a dialogue run on entering the rect, without a trigger to copy
+            cond, cfn, fn, payload = 0, 0x0800D7E1, 0x0800D765, 0
+            x1, y1, x2, y2 = t["rect"]
+        else:
+            like_slot, like_data = self.trigger(me, num(t["like"]))
+            cond = self.w32(like_slot)
+            cfn, fn, x1, y1, x2, y2, payload = struct.unpack_from("<IIhhhhI", self.rom, off(like_data))
         rect = [num(x) for x in t.get("rect", [x1, y1, x2, y2])]
         if "payload" in t:
             payload = self.ref(t["payload"])

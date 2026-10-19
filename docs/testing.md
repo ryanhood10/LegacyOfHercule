@@ -330,6 +330,33 @@ to (96, 160), hold Up, press A, `waitmap 15 2`. "Round 1" shows about 220 frames
 - The fork: `tools/fork/st_run.ps1 -Slot 5 -State <headless .ss>` loads a headless savestate of the same
   ROM (the round-3 caption here); `p2hold.py --port 7783` keeps player 2 present.
 
+## Broly chapter (headless + fork slot 6, 2026-10-19)
+
+```
+make BUILD=build/broly DEBUG_MENU=1                     # chapter tests; A16_TEST=1 (build/brolyt) for the autopilot fight
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/broly/log2-coop.gba --out build/broly/hl
+```
+
+- Broadcast: `preset +151 +156`, `maptest 160`; the Map Test spawns player 1 inside the broadcast's
+  trigger rect, which fires only on entering: walk out and back in (`key 0x20 30`, `key 0x80 40`,
+  `key 0x10 30`), mash; Bulma's three pages follow Cell's last line; flag 400 is bit 0 of 0x0203F11E;
+  the stock jump to "Meanwhile..." follows.
+- Backyard: `p2 0`, `preset +151 +156 +157 +400`, `maptest 165`, walk right (the hint without Vegeta);
+  for the scene make Vegeta player 1 (`poke8 0x0203F000 2`, then the test warp `poke32 0x0203FD0C
+  0x1506`, `poke32 0x0203FD54 0x01100010`, `poke32 0x0203FD08 5`), walk right, mash about 36 presses
+  to the landing zone; save a state there.
+- New Planet Vegeta: dismiss the last caption first, then walk **both** pads north (`p2 0x40` with
+  `key 0x40 ...`; player 1 alone stops at the co-op leash); about 14 presses through the
+  confrontation. `deref B 0x0203FC24` = Broly (pair 0's original); `poke32 0x0203FD08 9` drops Paragus
+  only (the rage: B+0x188 HP back to max, B+0x160 attack / defence bytes up), `7` wins the fight;
+  then flags 0x0203F11E = 0xff and the party as kept (player 1 0x0203F000, player 2 0x0203FF84).
+- Autopilot fight (A16_TEST build): from the fight state `poke16 0x0203FD44 1`; the autopilot never
+  presses A, so each cycle pause it, tap A (dialogue), resume; top up the players' HP (slot 2 at
+  0x0203F044, slot 3 at 0x0203F060) to see the whole fight. In the fork the same with
+  `runfork.ps1 ... -Slot 6 -Mute -State .../fight.ss` (a headless savestate loads in the fork) and a
+  gdb loop (from Git Bash set `MSYS_NO_PATHCONV=1` before `wsl ... bash /mnt/...`).
+- Single-player: the same scripts without `p2 0` (slower through the dialogue; one boss bar).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

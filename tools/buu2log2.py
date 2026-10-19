@@ -283,6 +283,15 @@ class Converter:
             for d in range(4):
                 dirs.append([self.convert_frame(frames[fi % len(frames)][d], rec["remap"], bu_id) for fi in range(count)])
             groups.append(dirs)
+        # header +0 (u16) is the record's largest frame in bytes: the entity's OBJ VRAM slot and staging
+        # buffer are sized from it (stock: 0x400 for 32x32 bodies, 0x1000 for 64x64 ones), so a 64x64
+        # record on a 32x32 template must say so. Byte 3 follows the stock 64x64 bosses (Frieza 34,
+        # Perfect Cell 30: 0x18).
+        size = max(f[2] * f[3] for g in groups if g for dirs in g for f in dirs)
+        if size > struct.unpack_from("<H", header, 0)[0]:
+            struct.pack_into("<H", header, 0, size)
+            if size >= 0x1000:
+                header[3] = max(header[3], 0x18)
         return header, groups, rec
 
 

@@ -1,0 +1,21 @@
+{
+  "_": "The Broly side chapter of the ten-day wait (docs/story.md 4g): Bulma's news after Cell's broadcast (zone 6 area 16) and the backyard ship scene (zone 6 area 21). New Planet Vegeta (zone 15 area 3) carries its own records and triggers in data/maps/broly_arena.json. Scripts in broly.lscript.",
+  "sources": ["data/story/broly.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 6, "area": 16},
+      "_": "the Briefs' residence: Bulma walks in after Cell's broadcast (flag 400)",
+      "triggers": {"1": {"payload": "seq:broly_tv"}}
+    },
+    {
+      "map": {"zone": 6, "area": 21},
+      "_": "the backyard: the Saiyan ship (sprite 171) from Bulma's news until it leaves; Paragus' scene when Vegeta is a player",
+      "add_records": [
+        {"kind": "actor", "sprite": 171, "x": 368, "y": 240, "facing": 0, "condition": "script:broly_ship_cond"}
+      ],
+      "add_triggers": [
+        {"kind": "dialogue", "rect": [64, 232, 112, 312], "payload": "seq:broly_yard", "condition": "script:broly_ship_cond"}
+      ]
+    }
+  ]
+}

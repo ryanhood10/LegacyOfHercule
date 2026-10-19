@@ -223,7 +223,8 @@ for layout and collision, pixels for objects):
   new banks appended to a copy of the bank table.
 - `effect` {from: [zone, area]}: that map's BG0 overlay, its animated tiles and blend; the base
   map's own animations move out of the way when their slots collide.
-- `triggers` (flight / warp / script), `exits` (edge / door), `gates`, `onload` (the barrier
+- `triggers` (flight / warp / script / dialogue / savepad: the stock save and switch-characters pad,
+  16 bytes, stamp its art from a map that has one), `exits` (edge / door), `gates`, `onload` (the barrier
   pattern with a flag), `spawn`, `name_id`, `music`, `flags`, `priorities`.
 - Foreign maps: a `src.map` of `{"rom": "buu", "variation": "0x0822229C"}` reads a Buu's Fury
   variation record (`--buu-rom`, default `roms/buu.gba`); its tiles are converted to LoG2's palette
@@ -245,7 +246,7 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 |---|---|---|---|---|
 | 15 / 1 | `data/maps/arctic.json` | Arctic: zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth behind the stock **Vegeta barrier** (level 50), a frozen pond, two outcrops, a flight spot | 432 x 368 | (216, 200) |
 | 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout's chamber room (zone 9 area 3 at (96, 168), in front of the chamber door; until 2026-10-19 it led outside to zone 9 area 1) | 640 x 480 | (312, 280) |
-| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery, two boulders; only the basin is walkable; a flight spot | 640 x 544 | (276, 354) |
+| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena, New Planet Vegeta in the Broly chapter: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery; a 224 px landing zone south of the basin (walkable up to the rim) with zone 3 area 3's save pad, the Saiyan ship and Broly actors, the rim trigger and Broly's boss record (`data/story/broly.lscript`); the two boulders and the flight spot were removed (the pad needed their 44 of the 896 tile slots; the players leave by the story) | 640 x 768 | (320, 700) |
 | 15 / 4 | `data/maps/broly_crater.json` | Optional (built when `roms/buu.gba` is present): Buu's Fury's walled wasteland crater (variation 0x0822229C there) imported whole, tiles converted to LoG2's palette, its own collision | 480 x 400 | (240, 340) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38

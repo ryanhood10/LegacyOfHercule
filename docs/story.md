@@ -642,6 +642,19 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
     dialogue portrait.
   - *End:* after both fall, a huge explosion, a short scene back at Capsule Corp with everyone talking
     it over, fade to black, and player 1 and player 2 are at Capsule Corp with the game back to normal.
+  - **Built (2026-10-19, branch `broly-chapter`, `data/story/broly.*`, `docs/scripts.md` section 5):**
+    as above. Choices made in building it: Bulma is not in the residence after Perfect Cell (her records
+    end at flags 68 / 151), so she walks in right after the broadcast's last line, before the stock
+    jump to "Meanwhile..."; the ship is Buu's Fury's purple ship (sprite 171), standing on the patio from
+    her news (flag 400) and, without Vegeta as a player, a narration line says Vegeta should see it;
+    the trip's five (Vegeta, Trunks, Krillin, Gohan, Piccolo) are the only selectable characters until
+    the way home (Hercule stays home), Vegeta is player 1 and Trunks player 2 on arrival; New Planet
+    Vegeta is the arena map with a landing zone added south of the basin (Broly already standing in
+    it); the confrontation spawns each character's actor only when no player plays him (the stock
+    scenes' pattern), Broly mistakes Gohan for Kakarot's son; numbers (our tuning): Broly 8000 HP,
+    52/54/50 on Cooler's melee boss AI, Paragus 2000 HP 24/22/20, the rage +10 attack / +6 defence /
+    chase x1.3 with full HP; the win pays 20000 EXP; the debrief is in the backyard with Bulma; after
+    the fade the party is exactly as before the trip (selectable bits, player 1 and player 2).
 
 ## 5. What the plan is missing (engine limits found while checking)
 

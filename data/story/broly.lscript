@@ -1,0 +1,567 @@
+; The Broly side chapter of the ten-day wait (docs/story.md 4g "Broly side chapter"), applied by
+; data/story/broly.json (Capsule Corp maps) and data/maps/broly_arena.json (zone 15 area 3, which names
+; this file in "sources"). Generated guard blocks: an actor of a trip member is spawned, moved or
+; despawned only when neither player plays that character (the stock scenes' pattern; a script step on
+; a sprite with no entity writes through a null pointer).
+;
+; Right after Cell's TV broadcast Bulma walks in: a Saiyan ship has landed in the backyard for Vegeta
+; (flag 400). In the backyard (zone 6 area 21), with Vegeta as a player, Paragus steps out of the ship
+; and offers him New Planet Vegeta; Vegeta boards, Trunks follows with Krillin, Gohan and Piccolo, the
+; ship leaves (flag 401; the party's state is kept in flags 404-419 by CoopCall 10 and the trip's five
+; are selectable, Hercule stays home). The arena (zone 15 area 3) has the landing zone with the ship and
+; a save pad; crossing the basin's rim brings everyone on screen for Paragus' betrayal and Broly
+; (sprite 159, waiting in the basin), then players 1 and 2 fight Broly (stat 115) and Paragus (stat
+; 116, sprite 170) as a pair (bosses.c): if Paragus falls first Broly rages once (full HP, stronger,
+; faster; the rage dialogue set by CoopCall 9). Both down: the planet explodes, Capsule Corp's backyard,
+; everyone talks it over, fade to black, the party as before the trip (flag 402).
+; Flags: 400 ship arrived, 401 trip under way, 402 chapter done, 403 confrontation seen, 404-419 the kept
+; party (vmcall.c PartyKeep). Speakers: 0 narration (Broly has no portrait), 2 Gohan, 3 Piccolo,
+; 4 Vegeta, 5 Trunks (party slots 0-3: their current portraits), 36 Bulma, 73 Krillin, 120 Paragus
+; (tools/brolysprites.py).
+
+; ---- zone 6 area 16: Cell's broadcast, then Bulma's news ------------------------------------------
+
+; stock entries 0-8 keep their indexes (entry 6 returns 8 absolutely); Bulma's lines are appended as
+; 9-11 and run between the broadcast's last line (5) and its closing script (6)
+sequence broly_tv
+  stockseq @083d1534 0 4                 ; Cell: "I am Cell...", the Cell Games in nine days
+  stock @083d14ec -> 9                   ; "Now, let the games begin!"
+  stock @083d150a                        ; stock 6: flag 157; Goku and Gohan's scene next when flag 156
+  stop 0x0
+  stock @083d152c                        ; stock 8: jump to "Meanwhile..."
+  script
+        SpawnCharacterEntity 24, 240, 256
+        WalkToPosition 24, 240, 136
+        SetEntityFacing 24, 1
+        PlayAudio 50
+  text 36 "BULMA: Hey, everybody!  A spaceship just landed in our backyard!\x0bIt looks like a Saiyan ship...  Somebody tell Vegeta.\x0bI think it's here for him."
+  script -> 6
+        WalkToPosition 24, 240, 256
+        DespawnEntity 24
+        SetStoryFlag 400
+end
+
+; ---- conditions -----------------------------------------------------------------------------------
+
+; the ship stands in the backyard from Bulma's news until it leaves
+script broly_ship_cond
+        StackTestStoryFlag 400
+        StackTestStoryFlagNot 401
+        And
+end
+
+; the trip is under way (the arena's ship and Broly, the rim trigger)
+script broly_trip_cond
+        StackTestStoryFlag 401
+        StackTestStoryFlagNot 402
+        And
+end
+
+; ---- zone 6 area 21: the backyard ----------------------------------------------------------------
+
+sequence broly_yard
+  script                                 ; Vegeta is player 1 or player 2: the scene (3), else a hint (1)
+        PushActiveCharIndex
+        PushByte 2
+        CmpEq
+        CoopCall 8, 0, 0, 0
+        PushByte 2
+        CmpEq
+        Add
+        JumpIfFalse L1
+        PushByte 3
+        END
+      L1:
+        PushByte 1
+        END
+  text 0 "@^A round ship with Saiyan markings sits on the patio, humming quietly.\x0bVegeta should see this."
+  stop 0x0
+  script
+        SetPlayerVisible 0
+        PlayMusic 39
+        WalkToPosition 0, 304, 280
+        SetEntityFacing 0, 3
+        CoopCall 9, 1, 288, 312
+        PanCameraToPosition 216, 176, 2
+        WaitFrames 30
+        PlayAudio 50
+        SpawnCharacterEntity 170, 368, 248
+        WalkToPosition 170, 368, 280
+        SetEntityFacing 170, 2
+        WaitFrames 20
+  text 120 "PARAGUS: Prince Vegeta...  At last I have found you."
+  text 4 "VEGETA: That armor...  You're a Saiyan!  Who are you?"
+  text 120 "PARAGUS: My name is Paragus.  I served your father, King Vegeta, before Frieza destroyed our world."
+  text 120 "PARAGUS: I have found a new home for our people, my prince.  A New Planet Vegeta.\x0bIt has everything a Saiyan could want...  except a king."
+  text 4 "VEGETA: A planet of my own...  Hmph.\x0bLet Kakarot have his little tournament.  A prince belongs on a throne."
+  script
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N1
+        SpawnCharacterEntity 132, 16, 272
+        WalkToPosition 132, 256, 256
+        SetEntityFacing 132, 3
+      N1:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N2
+        SpawnCharacterEntity 56, 16, 272
+        WalkToPosition 56, 224, 272
+        SetEntityFacing 56, 3
+      N2:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N3
+        SpawnCharacterEntity 103, 16, 272
+        WalkToPosition 103, 240, 296
+        SetEntityFacing 103, 3
+      N3:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N4
+        SpawnCharacterEntity 76, 16, 272
+        WalkToPosition 76, 208, 288
+        SetEntityFacing 76, 3
+      N4:
+        WaitFrames 20
+  text 5 "TRUNKS: Father, wait!  You can't just fly off with a stranger!\x0bCell's tournament is only days away!"
+  text 73 "KRILLIN: A brand-new Planet Vegeta, out of nowhere?  This smells like a trap to me..."
+  text 3 "PICCOLO: Then we all go.  If it's a trap, we spring it together."
+  text 2 "GOHAN: I'm coming too!"
+  text 120 "PARAGUS: ...As you wish.  All are welcome.  Come, my king."
+  script
+        WalkToPosition 170, 368, 248
+        DespawnEntity 170
+        WalkToPosition 0, 368, 256
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N5
+        WalkToPosition 132, 368, 256
+        DespawnEntity 132
+      N5:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N6
+        WalkToPosition 56, 368, 256
+        DespawnEntity 56
+      N6:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N7
+        WalkToPosition 103, 368, 256
+        DespawnEntity 103
+      N7:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N8
+        WalkToPosition 76, 368, 256
+        DespawnEntity 76
+      N8:
+        PlayAudio 26
+        PanCameraToPosition 216, 0, 1
+        FlyToPosition 171, 368, 40
+        FadeOut 120
+        WaitFrames 30
+        SetStoryFlag 401
+        CoopCall 10, 0, 0, 0             ; keep the party as it is (flags 404-419) for the way home
+        SetCharacterInPartyFlag 0
+        SetCharacterFlag_Bit1 0
+        SetCharacterFlag_Bit1 1
+        SetCharacterFlag_Bit1 2
+        SetCharacterFlag_Bit1 3
+        SetCharacterFlag_Bit1 6
+        ClearCharacterFlag_Bit1 4
+        ClearCharacterFlag_Bit1 5
+        ClearCharacterFlag_Bit1 7
+        SetActiveCharacter 2
+        WarpToMapWithEntities 15, 3, 1, 280, 680
+        CoopCall 6, 3, 0, 0                ; player 2 (kept across the warp) plays Trunks
+        SpawnCharacterEntity 170, 248, 664
+        SetEntityFacing 170, 0
+        FadeFromWhite 60
+        PlayAudio 50
+  text 120 "PARAGUS: Welcome to New Planet Vegeta, my king.\x0bYour people await you beyond that ridge.  Rest, if you need to.  Then come."
+  text 4 "VEGETA: Hmph.  Lead the way, old man."
+  script
+        WalkToPosition 170, 248, 600
+        WalkToPosition 170, 320, 520
+        DespawnEntity 170
+        SetPlayerVisible 1
+        SetActiveEntity 0
+  text 0 "@^Any of the five can be chosen on the save pad before going on."
+end
+
+; ---- zone 15 area 3: New Planet Vegeta ------------------------------------------------------------
+
+sequence broly_rim
+  script                                 ; seen before (flag 403): straight to the fight (the last entry)
+        StackTestStoryFlag 403
+        JumpIfFalse L1
+        PushByte 13
+        END
+      L1:
+        PushByte 1
+        END
+  script
+        SetPlayerVisible 0
+        PlayMusic 39
+        WalkToPosition 0, 312, 414
+        SetEntityFacing 0, 3
+        CoopCall 9, 1, 280, 414
+        PanCameraToPosition 212, 330, 2
+        WalkToPosition 159, 400, 414
+        SetEntityFacing 159, 2
+        SpawnCharacterEntity 170, 360, 400
+        SetEntityFacing 170, 2
+        PushActiveCharIndex
+        PushByte 2
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 2
+        CmpNe
+        And
+        JumpIfFalse N9
+        SpawnCharacterEntity 137, 248, 414
+        SetEntityFacing 137, 3
+      N9:
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N10
+        SpawnCharacterEntity 132, 216, 414
+        SetEntityFacing 132, 3
+      N10:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N11
+        SpawnCharacterEntity 56, 296, 390
+        SetEntityFacing 56, 3
+      N11:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N12
+        SpawnCharacterEntity 103, 264, 390
+        SetEntityFacing 103, 3
+      N12:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N13
+        SpawnCharacterEntity 76, 232, 390
+        SetEntityFacing 76, 3
+      N13:
+        WaitFrames 30
+  text 4 "VEGETA: Paragus!  What is this?  Where are my people?"
+  text 120 "PARAGUS: Your people?  There are none, Prince.  There is no kingdom.\x0bThis planet is a graveyard...  and it is about to become yours."
+  text 120 "PARAGUS: Your father sentenced my son to death as an infant, because his power dwarfed yours.\x0bWe survived.  Now meet him.  Broly!"
+  script
+        PlayAudio 50
+        SetEntityFacing 159, 2
+        WhiteFlash 5
+        ScreenShake 0, 20, 30
+  text 0 "@^BROLY: ...Ka...  ka...  rot..."
+  text 2 "GOHAN: Kakarot?  That's my dad's Saiyan name!  He thinks I'm...?"
+  text 3 "PICCOLO: His power is off the charts...  Everyone, stay sharp!"
+  text 4 "VEGETA: The Legendary Super Saiyan...  It can't be..."
+  text 5 "TRUNKS: Father, snap out of it!  We have to fight!"
+  text 0 "@^BROLY: KAKAROOOOT!!"
+  script                                 ; the others step back; players 1 and 2 fight
+        SetStoryFlag 403
+        DespawnEntity 170
+        PushActiveCharIndex
+        PushByte 2
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 2
+        CmpNe
+        And
+        JumpIfFalse N14
+        DespawnEntity 137
+      N14:
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N15
+        DespawnEntity 132
+      N15:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N16
+        DespawnEntity 56
+      N16:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N17
+        DespawnEntity 103
+      N17:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N18
+        DespawnEntity 76
+      N18:
+  script
+        PlayMusic 30
+        CoopCall 9, 0, seq:broly_rage, 0
+        DespawnCharacterAndRecordPosition 159, 2
+        SetPlayerVisible 1
+        DrawBossHealthBar 159
+        SetActiveEntity 0
+end
+
+; Paragus fell while Broly stands (bosses.c BOSS_RAGE; queued by enemies.c)
+sequence broly_rage
+  script
+        WhiteFlash 5
+        ScreenShake 0, 20, 40
+        PlayAudio 50
+  text 0 "@^BROLY: Pa...  ra...  gus...?"
+  text 0 "@^BROLY: RRRAAAAAAAAAGH!!"
+  script
+        WhiteFlash 5
+        ScreenShake 0, 20, 60
+  text 0 "@^Broly's power explodes!  He is stronger and faster than ever!"
+end
+
+; both down: the planet blows, home to Capsule Corp, the party as it was before the trip
+sequence broly_end
+  script
+        PlayAudio 60
+        FindPlayerEntity
+        AddEXP 20000
+        SetStoryFlag 402
+        SetPlayerVisible 0
+        WaitFrames 40
+  text 0 "@^BROLY: KAKAROOOOOOT!!"
+  script
+        WhiteFlash 5
+        BeginCommandBatch
+        ScreenShake 0, 20, 30
+        PlaySFX 159, 31
+        PlayDamageEffect 159
+        CommitCommandBatch
+        WaitFrames 20
+        WhiteFlash 5
+        ScreenShake 0, 20, 40
+        PlaySFX 159, 20
+        WaitFrames 20
+  text 4 "VEGETA: His power is tearing the whole planet apart!  Everyone, back to the ship!"
+  script
+        BeginCommandBatch
+        ScreenShake 0, 20, 80
+        PlaySFX 159, 21
+        CommitCommandBatch
+        WaitFrames 20
+        WhiteFlash 5
+        ScreenShake 0, 20, 80
+        PlaySFX 159, 31
+        PlayAudioBlocking 10, 20
+        FadeToWhite 10
+        WhiteFadeOut 20
+        WaitFrames 60
+        WarpToMapWithEntities 6, 21, 1, 240, 272
+        SetEntityFacing 0, 3
+        CoopCall 9, 1, 240, 304
+        SpawnCharacterEntity 24, 336, 280
+        SetEntityFacing 24, 2
+        PushActiveCharIndex
+        PushByte 2
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 2
+        CmpNe
+        And
+        JumpIfFalse N19
+        SpawnCharacterEntity 137, 288, 256
+        SetEntityFacing 137, 2
+      N19:
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N20
+        SpawnCharacterEntity 132, 288, 288
+        SetEntityFacing 132, 2
+      N20:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N21
+        SpawnCharacterEntity 56, 208, 256
+        SetEntityFacing 56, 3
+      N21:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N22
+        SpawnCharacterEntity 103, 208, 296
+        SetEntityFacing 103, 3
+      N22:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N23
+        SpawnCharacterEntity 76, 272, 320
+        SetEntityFacing 76, 1
+      N23:
+        PlayMusic 41
+        FadeFromWhite 60
+  text 36 "BULMA: You're back!  And where's that ship?  What happened out there?"
+  text 73 "KRILLIN: Long story.  The new Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
+  text 2 "GOHAN: He kept calling me Kakarot.  He really hated my dad."
+  text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...  Cell won't be any easier."
+  text 3 "PICCOLO: Then we use the days we have left.  Train."
+  text 4 "VEGETA: Hmph.  A Legendary Super Saiyan...  and I sent him to the grave.  Remember that."
+  script
+        FadeOut 120
+        WaitFrames 60
+        DespawnEntity 24
+        PushActiveCharIndex
+        PushByte 2
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 2
+        CmpNe
+        And
+        JumpIfFalse N24
+        DespawnEntity 137
+      N24:
+        PushActiveCharIndex
+        PushByte 3
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 3
+        CmpNe
+        And
+        JumpIfFalse N25
+        DespawnEntity 132
+      N25:
+        PushActiveCharIndex
+        PushByte 0
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpNe
+        And
+        JumpIfFalse N26
+        DespawnEntity 56
+      N26:
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse N27
+        DespawnEntity 103
+      N27:
+        PushActiveCharIndex
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse N28
+        DespawnEntity 76
+      N28:
+        CoopCall 10, 1, 0, 0             ; the party as before the trip; pushes player 1's slot
+        Step SetActiveCharacter
+        CoopCall 10, 2, 0, 0             ; player 2 as before the trip
+        SetPlayerVisible 1
+        SetActiveEntity 0
+        ReloadMap
+        FadeFromWhite 60
+end

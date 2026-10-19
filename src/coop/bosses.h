@@ -15,6 +15,9 @@
 //   BOSS_NO_TWIN   the boss fights alone even in co-op
 //   BOSS_PAIR      always a pair, single-player too, under the boss rules (partner model and stat,
 //                  both-down) whatever the stat's HP and EXP (the forest "spirits", Frieza + Cooler)
+//   BOSS_RAGE      on the partner's stat: when this boss falls while the other of the pair still stands,
+//                  the survivor rages once (enemies.c): full HP again, BOSS_RAGE_* more attack and defence,
+//                  faster chase modules, and the rage dialogue set by CoopCall 9 (Paragus -> Broly)
 // Pairs follow the both-down rule (enemies.c): the first boss to fall stays down on the map and only
 // the last one's death runs the fight's defeat script.
 
@@ -31,6 +34,13 @@ typedef struct ExtraStat {
 
 #define BOSS_NO_TWIN 1
 #define BOSS_PAIR    2
+#define BOSS_RAGE    4
+
+// Broly's rage when Paragus falls first (docs/story.md 4g); our tuning
+#define BOSS_RAGE_MELEE    10     // added to the survivor's melee / ranged attack bytes (capped at 255)
+#define BOSS_RAGE_DEFENCE  6      // added to its defence byte
+#define BOSS_RAGE_SPEED_NUM 13    // chase speed x 13/10 from the rage on
+#define BOSS_RAGE_SPEED_DEN 10
 
 typedef struct BossRule {
     s16 stat;            // stat index this rule applies to; -1 ends the table
@@ -54,6 +64,12 @@ typedef struct BossRule {
 #define NAMEK_STAT 113      // Cooler's Namekian servant (New Namek bonus)
 #define A13_GERO_STAT 112   // Android 13 beside Dr. Gero at the lab door
 #define A13_ARCTIC_STAT 114 // Android 13 in the arctic (the ten-day wait), a half-health boss
+#define BROLY_STAT 115      // Legendary Super Saiyan Broly (Broly side chapter, zone 15 area 3)
+#define PARAGUS_STAT 116    // Paragus beside him (BOSS_RAGE: Broly rages when his father falls first)
+#define BROLY_SPRITE 159    // Buu's Fury Broly (tools/buu2log2.py)
+#ifndef PARAGUS_SPRITE
+#define PARAGUS_SPRITE 0    // Vegeta's set made old (tools/brolysprites.py; the Makefile passes 170)
+#endif
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;
