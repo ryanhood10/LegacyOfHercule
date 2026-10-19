@@ -516,6 +516,14 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   beside Gero, watching in the lab) stay.
 - **Kept as planned:** Roshi's 2v2 gym and its finale; Cooler with his Namekian servant, reachable
   in the wait (the gate is the stock "Only Piccolo" barrier; there is no level gate).
+- **Roshi's dojo sparring (Ryan):** once the players have cleared all three dojo matches and Roshi
+  has handed over the last +3 capsule, they can ask him to use the dojo to spar 1 v 1, players only
+  (the duel mode, no story stakes, as many times as they like).
+- **Dragon Ball race:** dropped (Ryan).
+- **Time Chamber training waves (Ryan: approved, to be scoped thoroughly):** at Kami's Lookout the
+  players can enter the Hyperbolic Time Chamber (zone 15 area 2) and fight waves of enemies to level
+  up instead of grinding in the wild. To decide: which enemies per wave, how many, how the round is
+  shown, how a run ends.
 - **Broly side chapter (Ryan, 2026-10-18), in the wait:**
   - *Trigger:* right after Cell's TV announcement in the Briefs' residence (zone 6 area 16, where
     Bulma already hands over the Scouter Note), Bulma adds: tell Vegeta a ship is arriving for him in
