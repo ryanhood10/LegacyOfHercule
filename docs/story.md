@@ -537,6 +537,13 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   the ten days, off screen. Where the players meet him and where the chapter goes: Ryan to decide.
   Making 16 playable is a new party character like Krillin (player poses, row, abilities); his
   portrait exists (speaker 26) and his fighting sprite (160) is enemy-grade.
+  Ryan asked for Krillin (P1) + Android 18 (P2) locked; open question: 18 is inside Cell for the whole
+  wait (absorbed in chapter 7, back only after Gohan's fight), so in the wait the pair would be Krillin
+  + 16, and Krillin + 18 fits after the Cell Games.
+- **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate
+  castle-defense game where waves of Cell Juniors try to steal it. Facts: the hunt appears to gate the
+  Cell Games (the quest table puts "Return the Dragon Balls to Dende" right before "Enter the Cell
+  Games", and the world map checks the all-seven flag 158), to confirm in play before building on it.
 - **Broly side chapter (Ryan, 2026-10-18), in the wait:**
   - *Trigger:* right after Cell's TV announcement in the Briefs' residence (zone 6 area 16, where
     Bulma already hands over the Scouter Note), Bulma adds: tell Vegeta a ship is arriving for him in
