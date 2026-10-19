@@ -2,8 +2,7 @@
 
 What this pass changed, how it is built, and what was verified in mGBA (2026-10-17). It covers the
 work that needs no new sprites: the ROM data tools, Hercule's stats and growth, his moveset, the
-Keep-Goku byte and the first dialogue swap. The Super Saiyan/"Super Human" form waits for the
-sprite pipeline (`docs/sprites.md`, in progress in another session).
+Keep-Goku byte and the first dialogue swap. The Super Saiyan form was built later (sprite 157, row 22, ability 18; `docs/sprites.md`).
 
 ## 1. Build and tools
 
@@ -28,7 +27,7 @@ Facts used (file offsets, all checked on the ROM and in the emulator; see `tools
 | growth rows | `0x1D95F0`, 6 x 3 x {u16 min, u16 max} | per level-up: stat += rand(max-min+1) + min, one draw for all levels gained, cap 25600 |
 | HP / EP growth | code `0x08003CA0` | max HP x (1 + 0x0E14..0x1333 / 65536) per level (5.5..7.5 %), EP + 2..4; shared by every slot |
 | level EXP table | `0x1D9834`, 50 words | literal `0x42EC`; level 50 = 22 965 105 |
-| ability table | `0x1D9900`, 14 x 16 B | literals `0x8024` and `0x8E8C`; relocated to `0x900000` with 18 entries |
+| ability table | `0x1D9900`, 14 x 16 B | literals `0x8024` and `0x8E8C`; relocated by `romdata.py` into free ROM, now 23 entries (0-22; `docs/ids.md` "Ability table") |
 | player combat bytes | code `0x08016FE0` | entity +0x160/161/162 = str/pow/end >> 8; damage taken x (128 - end/256) / 128 |
 | Keep Goku | `0x3EC738` | Cell's defeat dialogue, entry 53: `ClearCharacterInPartyFlag(4)` -> `SetCharacterInPartyFlag(4)` |
 
@@ -62,7 +61,7 @@ HP 487, str 17966 / pow 13088 / end 19395 at level 40 (inside the new ranges). A
 (EXP set to 3 335 400, one wolf kill by Hercule as player 2, +4747 EXP) raised him to 41 with
 str +529, pow +482, end +489 and HP +5.5 % (`build/hc6_levelup.png`).
 
-## 3. Moveset (ability table entries 14-17, `src/coop/hercule.c`)
+## 3. Moveset (ability table entries 14-18, `src/coop/hercule.c`, `ssj.c`; Krillin 19-21, Android 16 22)
 
 Abilities are {ready icon, cooling icon, isReady, onUse}; onUse spends EP and runs an *animation*,
 which is a control state from the table at `0x083B5268` that reads a fixed frame group of the
@@ -184,7 +183,7 @@ Row 24 is Hercule's row 21 with the Buu's Fury Hercule sprite (158; `OLD_HERCULE
   row 24 in the default build; a test build with `SSJ_SPRITE=158` would match row 22 first);
 - **off**: `SetCharacterTransformation(5, 72)` (row 21, the first row with sprite 72).
 
-Abilities stay slot 5's (Rolling Hercule Punch, Dynamite Kick, Super Hercule, Taunt), tuned weak:
+Abilities stay slot 5's (14-17: Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Taunt), tuned weak:
 while slot 5 shows row 24, `krillin_frame` (every input poll) divides his entity's combat bytes
 (+0x160 melee, +0x161 ranged) by `OLD_HERCULE_WEAKNESS` (3) for whichever player plays him, and
 `ssj_ready` refuses Super Hercule on row 24. C code can call `old_hercule_set(1 / 0)`. Verified in the

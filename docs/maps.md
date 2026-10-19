@@ -4,7 +4,7 @@ Everything a Legacy of Goku II map needs, decoded from the ROM (Ghidra corpus `b
 checked against savestates and by rendering every map), and the tools that read and write it:
 `tools/maplib.py` (format library), `tools/mapexport.py` (render any map from the ROM),
 `tools/mapbuild.py` (build new maps from `data/maps/*.json`), `tools/patch_rom.py --maps` (place
-them and relocate the map table). The first new maps (zone 15) are listed at the end.
+them and relocate the map table). The new maps (zone 15) are in section 9; world-map markers in 9b.
 
 Addresses are GBA addresses (file offset + 0x08000000). "Resource" means the loader format of
 `Resource_LoadOrDecompress` 0x0801F394: `{u32 mode, u32 size}` then data; mode 0 = stored, 1/2 =
@@ -197,7 +197,7 @@ python tools/mapexport.py --list                         every map: index, zone,
 python tools/mapexport.py 8 28 [--var V] [--grid]        build/maps/z8a28v1*.png: per layer, composite, walk / projectile overlays, .txt summary
 python tools/mapexport.py --all --out build/maps/all     all 335 variations (about 25 minutes)
 python tools/mapexport.py --tileset 8 28                 the VRAM tile slots of a map, numbered
-python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table 0x08D05C80 --count 330   a built ROM's new maps
+python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table <table_offset> --count <rows>   a built ROM's new maps (both from build/maps.patch.json)
 python tools/mapbuild.py build data/maps/*.json OUT.json [--free 0xD00000] [--preview DIR]
 python tools/mapbuild.py preview data/maps/arctic.json --out build/maps/preview
 ```
@@ -315,8 +315,8 @@ animated tiles (frame 0 only), exits and scripts. Finding the map table (through
 
 ## Open
 
-- Story flags taken by the maps: 380 (the arctic barrier). Keep new map flags in 380-399 and tell the
-  story session. The story's flags are 360-379 (376: Android 13 met in the arctic).
+- Story flags: maps own 380-399 (380 the arctic barrier); the full allocation is `docs/ids.md`
+  "Story flags".
 - **Story content in a built map (story-scripts, 2026-10-18):** `tools/mapedit.py` edits the stock map
   table before the new maps exist, so a zone-15 map carries its story itself: `"sources"` (lscript
   files), `"triggers"` of type `"dialogue"` (`payload` seq:NAME, `condition` 0 / "flag:N" / "noflag:N" /

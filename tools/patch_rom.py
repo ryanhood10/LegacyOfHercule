@@ -101,7 +101,7 @@ PARTY_PTR_WORDS = [0x22EE8, 0x1D4F20, 0x1D94D0, 0x1D9534, 0x1D9C10, 0x1D9CA8, 0x
 
 # (old literal value, symbol, add, [file offsets]): every listed pool word must hold the old value and
 # becomes symbol+add. Used to move ROM tables that have no spare room into the co-op code area:
-# Character_DisplayData (22 rows -> 23, the 18 literals from the reference notes) and
+# Character_DisplayData (22 rows -> 26 since rows 22-25 were added, the 18 literals from the reference notes) and
 # g_CharacterSpriteIndex (the one literal loads table+7 words).
 LITERAL_RELOCATIONS = [
     (0x081D967C, "display_rows", 0, [0x1954, 0x1B3C, 0x3B30, 0x414C, 0x42F0, 0x854C, 0x886C, 0x8B04, 0xA77C, 0xAA04,

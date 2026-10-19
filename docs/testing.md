@@ -6,6 +6,24 @@ mGBA (Qt, Lua scripting works there). The wide ROM (`build/log2-wide.gba`) needs
 fork's Lua runtime never fires frame callbacks, so player 2 goes in through a native TCP pad and
 inspection goes through the GDB stub.
 
+
+**Recipes on this page** (pick the first that fits; story work is almost always headless):
+
+| section | use it for |
+|---|---|
+| Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
+| Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
+| Several fork instances at once (slots) | running the WSL fork beside other sessions |
+| WSL fork (wide ROM), Fork helpers | real-time play, the wide view, gdb peeks, pad keys, teleport |
+| Boss pairs, Android 16 boss fight | fights with the autopilot and hit logs |
+| Krillin / old Hercule tests | the playable-character test triggers |
+| New maps (zone 15) | building and warping to the new maps |
+| GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
+| Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
+| Savestates, Reading screenshots, Ghidra headless | supporting tools |
+
+Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
+
 ## Savestates
 
 `build/log2-coop.ss1`: zone 2 area 7 (wolf map, debug Map Test), level-40 party, Piccolo is
@@ -13,7 +31,7 @@ player 1 (active slot 1), Gohan is player 2 (slot 0); Hercule is slot 5. `ss2`: 
 Circle. A state made with build A crashes under build B as soon as player 2 acts (its vtable copy in
 EWRAM holds code addresses), so re-make states after rebuilding the same ROM name; the fork reports
 "Savestate is for a different version" and still loads it. The debug menu (`DEBUG_MENU=1`) appears
-after ~75 s idle on the title; its Area number is the index inside the zone's entry block.
+after 30 s idle on the title (1800 frames, checked at 0x08000434), about 75 s from power-on; its Area number is the index inside the zone's entry block.
 
 ## Windows mGBA (stock ROM)
 
@@ -85,8 +103,7 @@ gdb's output reaches the log late (the line of one query can arrive after the ne
 
 ```
 make BUILD=build/bt WIDE=1 DEBUG_MENU=1 A16_TEST=1              # A16_TEST: the autopilot fights any pair
-toolsork
-unfork.ps1 /mnt/f/.../build/bt/log2-wide.gba -Slot 3 -Mute -Wait 1
+tools\fork\runfork.ps1 /mnt/f/.../build/bt/log2-wide.gba -Slot 3 -Mute -Wait 1
 python tools/fork/p2hold.py --port 7781 --cmd build/bt/p2cmd.txt    # keep running: player 2 present
 wsl -d Ubuntu -u root -- bash -c "FORK_SLOT=3 /root/fork-s3/bootisland.sh 75"   # boot -> island, level-30 pair placed
 tools\win_keys.ps1 "SHIFT+F1:300" -Title "mGBA-3"                  # save; F1 reloads it before each fight
@@ -126,13 +143,13 @@ that quits while attached leaves the stub writing to a dead socket (SIGPIPE kill
 launcher ignores it). So keep one gdb attached for the whole run:
 
 ```
-tools\fork\runfork.ps1 /mnt/f/MeltyCreations/log2/build/party8/log2-coop.gba 14   # kill old, launch with -g + trap '' PIPE, attach, continue, wait
+tools\fork\runfork.ps1 /mnt/f/MeltyCreations/log2/build/log2-coop.gba -Wait 14   # kill old, launch with -g + trap '' PIPE, attach, continue, wait
 wsl -d Ubuntu -u root -- bash -c "/root/peek.sh"            # pause, dump party / player / EEPROM slots (peek.gdb), continue
 wsl -d Ubuntu -u root -- bash -c "/root/keys.sh 8 0.25"      # hold Start 0.25 s through g_p1_remote (0x0203FF02): A=1 B=2 Sel=4 Start=8 R/L/U/D=0x10/20/40/80 R=0x100 L=0x200
 wsl -d Ubuntu -u root -- bash -c "/root/tele.sh 544 215"     # teleport player 1 (pixels)
 ```
 
-Copy the `.sh`/`.gdb` files to `/root` first (`runfork.ps1` expects them there; strip CR). `keys.sh`
+`runfork.ps1` installs the `.sh`/`.gdb` helpers itself (CR stripped; slot n into `/root/fork-sn`). `keys.sh`
 pauses, writes the pad word, continues, sleeps, releases: the title, the debug menu, the Select Game
 menu and in-game movement take it; the save pad's Save/Switch dialog, the switch screen and the pause
 menu do not (they read the pad during a modal loop), so drive those with `win_keys.ps1` (arrows,
@@ -147,11 +164,11 @@ buttons; kill it before testing.
 
 ## Android 16 boss fight (fork, scripted; `docs/coop-design.md` "Android 16 boss")
 
-Build and helpers (from the `android16-boss` worktree, `F:\MeltyCreations\log2-a16`):
+Build and helpers (merged into main 2026-10-18; the paths below that name the old `log2-a16` worktree now live in this checkout, and its savestate must be re-made with your own build):
 
 ```
 make BUILD=build/a16 WIDE=1 DEBUG_MENU=1 A16_TEST=1        # Git Bash, toolchain PATH as above
-wsl -d Ubuntu -u root -- bash -c "tr -d '\r' < /mnt/f/MeltyCreations/log2-a16/tools/fork/a16install.sh | bash"   # copies a16*.sh/.gdb to /root
+wsl -d Ubuntu -u root -- bash -c "tr -d '\r' < /mnt/f/MeltyCreations/log2/tools/fork/a16install.sh | bash"   # copies a16*.sh/.gdb to /root
 python tools/fork/p2hold.py --cmd build/a16/p2cmd.txt      # keep running (background): player 2 present, scripted pad
 ```
 
@@ -169,7 +186,7 @@ player 1 so player 2 spawns (Hercule), poke the values above with gdb, then Shif
 Run a fight (Git Bash; `MSYS_NO_PATHCONV=1` stops Git Bash rewriting `/mnt/...` and `/root/...`):
 
 ```
-MSYS_NO_PATHCONV=1 powershell -NoProfile -File tools/fork/runa16.ps1 -State /mnt/f/MeltyCreations/log2-a16/build/a16/a16_base.ss1
+MSYS_NO_PATHCONV=1 powershell -NoProfile -File tools/fork/runa16.ps1 -State /mnt/f/MeltyCreations/log2/build/a16/a16_base.ss1
 MSYS_NO_PATHCONV=1 wsl -d Ubuntu -u root -- bash -c "/root/a16fight.sh 0 1 300 10"   # FORCE BOT SECS STEP
 MSYS_NO_PATHCONV=1 wsl -d Ubuntu -u root -- bash -c "/root/a16peek.sh"               # one readout
 ```
@@ -236,7 +253,7 @@ frame-stop makes emulated time lag real time, so wait longer before reading the 
 
 ```
 make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
-tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute
+tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute   # dbgmenu.ss3: a debug-menu state you make with this build (boot, idle on the title, save)
 python tools\fork\p2hold.py --port 7780 --cmd F:/.../build/kn/p2cmd.txt          # background
 tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"           # toggle the pad to player 1, A
 ```
@@ -272,7 +289,7 @@ headless runner built on the fork's own `libmgba`: no window, no debugger, deter
 about seven times faster than real time.
 
 ```
-wsl -d Ubuntu -u root -- bash -c "cd /mnt/f/MeltyCreations/log2-story && gcc -O2 -o /root/st_headless tools/headless/st_headless.c -I/root/mgba-build/include -I/mnt/f/MeltyCreations/tools/downloads/mgba/include -L/root/mgba-build -lmgba -Wl,-rpath,/root/mgba-build"
+wsl -d Ubuntu -u root -- bash -c "cd /mnt/f/MeltyCreations/log2 && gcc -O2 -o /root/st_headless tools/headless/st_headless.c -I/root/mgba-build/include -I/mnt/f/MeltyCreations/tools/downloads/mgba/include -L/root/mgba-build -lmgba -Wl,-rpath,/root/mgba-build"
 make BUILD=build/sth DEBUG_MENU=1                       # co-op tests (player 2 present with "p2 0")
 python tools/headless/st_test.py tools/headless/mkmenu.txt build/sth/log2-coop.gba    # once per build: build/hl/menu.ss
 python tools/headless/st_test.py build/hl/x.txt build/sth/log2-coop.gba build/hl/menu.ss --cols 4
@@ -298,7 +315,7 @@ player 1 is Piccolo (`poke8 0x0203F000 0` then a warp makes Gohan player 1). `ST
 `tools/fork/st_run.ps1` launches the fork without the debugger and `st_place.ps1` moves a window out
 from under another session's.
 
-### Time Chamber waves and Roshi's sparring (headless, branch `lookout-training`, 2026-10-19)
+## Time Chamber waves and Roshi's sparring (headless, merged 2026-10-19)
 
 Build `make BUILD=build/lk DEBUG_MENU=1` (and `BUILD=build/lkw WIDE=1 DEBUG_MENU=1` for the lag check),
 make the menu state per build, then Map Test the Lookout's chamber room (entry 263) with the wait's flags
@@ -308,7 +325,7 @@ Mr. Popo stands at (64, 128): test-warp player 1 to (64, 150) (`COOP_CMD_WARP`, 
 out; an extra A talks to him again). The door wants A while facing up inside (73, 113)-(120, 140): warp
 to (96, 160), hold Up, press A, `waitmap 15 2`. "Round 1" shows about 220 frames later; A spawns it.
 
-- `waves` (`src/coop/waves.c`; 0x0203F880 on merged main, 0x0203F874 on the branch alone: it sits after `.party.kr`, so read `$(BUILD)/coop.map`): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
+- `waves` (`src/coop/waves.c`; 0x0203F880 on main; it sits after `.party.kr` and moves when that grows, so read `$(BUILD)/coop.map`): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
   +0x10 round / state (0 off, 1 pause, 2 caption, 3 fight, 4 done) / timer / standing enemies, +0x14
   records spawned, +0x16 the round's smallest largest-free OBJ VRAM block (32-byte units), +0x18
   input polls (game-loop iterations: against `g_FrameCounter`, which ticks in VBlank, they count lag),

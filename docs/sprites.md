@@ -67,11 +67,11 @@ similar body and recoloured).
 `tools/spriteclone.py` clones record 72 with the afro recoloured (connected black components in the
 upper half of each frame: interior -> gold 120, brown highlights -> yellow 46; eyes, moustache and
 outlines stay black), re-encodes every frame literal-only, and emits `build/gen/sprites_data.c`:
-`ssj_record` (all 21 groups, 144 frames, ~130 KB), `sprite_index[158]` (stock 3..156 plus 157 ->
-`ssj_record`) and `display_rows[23 x 20]` (stock rows; row 21 Hercule now links transformed -> 22;
+`ssj_record` (all 21 groups, 144 frames, ~130 KB), `sprite_index[158]` at the time (stock 3..156 plus 157 ->
+`ssj_record`; it now runs to id 175, `docs/ids.md`) and `display_rows[23 x 20]` (now 26 rows) (stock rows; row 21 Hercule now links transformed -> 22;
 row 22 = Hercule's row with flag bit0, sprite 157, detransformed -> 21). `patch_rom.py` repoints the
 18 display-row literals and the one sprite-index literal (`table + 0x1C`, file 0x959C) at the new
-tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6) to 23. `src/coop/ssj.c`
+tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6), first to 23, now 26. `src/coop/ssj.c`
 transforms through the game's own opcode-73 handler `{2, slot, 157}` (EP cost 50) and re-binds
 player 2's entity when the slot is player 2's; `src/coop/rom.h` `DISPLAY_DATA` is the relocated
 table. The hercule-hero session wired it as ability 18 in Hercule's third slot (`docs/hercule.md`).
@@ -153,8 +153,8 @@ Pose indices differ between the games (read off the sheets of the playables):
   link and appends the records to the relocated sprite index (`spriteclone.py --extra`);
   `BUU_SPRITES="158=128 159=28"` picks them; `SSJ_SPRITE=158` makes the Super Saiyan Hercule row
   (22) use a converted sprite instead of 157 (test builds). `BUU=0` builds without the Buu ROM.
-  New ids need display rows of their own before a character can use them (row 22 is the only
-  relocated row so far).
+  New ids need display rows of their own before a character can use them (rows 22-25 exist:
+  `docs/ids.md` "Display rows").
 
 Colour report (`build/gen/buu_sprites_report.md`): Hercule keeps 24574 pixels exact and moves 2429
 pixels in 10 colours, all greys and dark browns within distance 13-51 (worst: a near-black brown

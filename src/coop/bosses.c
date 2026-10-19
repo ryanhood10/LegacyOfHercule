@@ -65,7 +65,7 @@ static const BossRule rules[] = {
     { 106, 0, BOSS_PAIR, 121, 98 },
     { 98,  0, BOSS_PAIR, 0, 0 },
     { 64,  0, BOSS_PAIR, 72, 0 },
-    // Android 13 in the arctic: alone until Ryan picks his partner (docs/story.md 4f), ends at half health
+    // Android 13 in the arctic: unused since the encounter was removed 2026-10-18 (docs/story-archive.md H); kept for 13's post-Cell return
     { A13_ARCTIC_STAT, 50, BOSS_NO_TWIN, 0, 0 },
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },

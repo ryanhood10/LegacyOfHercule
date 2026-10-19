@@ -5,9 +5,17 @@ turned into a two-player co-op mod, growing into **The Legacy of Hercule** (Herc
 Super Saiyan Hercule, co-op difficulty, twin bosses, story edits). Ryan plays it with his brother.
 Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and notes only.
 
-**Map of everything:** `docs/INDEX.md` (wiki home). Engine facts: `docs/engine.md`, `docs/rom-map.md`.
-Co-op design and verified findings: `docs/coop-design.md`. Game plan: `docs/plan-legacy-of-hercule.md`.
-Story: `docs/story.md`. Testing recipes: `docs/testing.md`. Progress log: `docs/log.md`.
+## Start here (pick by task)
+
+| task | read first |
+|---|---|
+| any task: where things are | `docs/INDEX.md` (wiki home, "Where to look for...") |
+| taking any new number (flag, stat, sprite, row, portrait, ability, CoopCall, test command, map, RAM) | `docs/ids.md` (the registry; update it in the same commit) |
+| doing a common job (chapter, boss, sprite, playable character, map, test, parallel sessions) | `docs/howto.md` |
+| story questions or story work | `docs/story.md` section 0 (status) and 4g (latest decisions); stock-game facts in `docs/story-rom.md` and `build/scripts/`; why things changed in `docs/story-archive.md` |
+| scripts, dialogue, flags, CoopCall | `docs/scripts.md` |
+| testing anything | `docs/testing.md` (headless runner first; fork for real-time and fights) |
+| what landed recently | `docs/log.md` (newest first), `git log --oneline -20` |
 
 ## Rules (Ryan's, standing)
 
@@ -22,67 +30,65 @@ Story: `docs/story.md`. Testing recipes: `docs/testing.md`. Progress log: `docs/
   is for facts and names only; never copy code or data from it.
 - Never change Windows security settings (Smart App Control is on; it blocks unsigned new binaries
   such as `ld.exe` and any mGBA we build on Windows, which is why the fork lives in WSL).
-- Two Claude sessions often share this working tree. Never SendKeys to another session's mGBA
-  window; this session only drives the WSL fork window titled `mGBA (Ubuntu)`. Build into a
-  private directory (`make BUILD=build/<name> ...`) so object files and `coop.sym` are not swapped
-  under each other. Commit only your own files (`git add <paths>`, never `-A`).
+- Several Claude sessions often share this machine. Never send keys to another session's mGBA
+  window: drive only your own fork slot (window title `mGBA` for slot 0, `mGBA-n` for slot n). Build
+  into a private directory (`make BUILD=build/<name> ...`) so object files and `coop.sym` are not
+  swapped under each other. Commit only your own files (`git add <paths>`, never `-A`).
 - Decompile from the ROM (Ghidra headless) before guessing at engine behaviour; it is the fastest
   way to a fact. Record each new fact in the relevant `docs/*.md`.
-- Keep these docs current: when a build flag, tool, address or test recipe changes, update
-  `docs/INDEX.md` / the owning doc in the same commit.
+- Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
+  `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-18): story first
+## Current phase (2026-10-19): story planning, chapter by chapter
 
-Ryan is designing the story and co-op casting chapter by chapter in chat; `docs/story.md` section 0
-is the summary, the standing rules and the list of mechanics the story will need. Do not start
-production story code until Ryan says the plan is done; engine pieces he explicitly started run in
-side sessions on their own branches. Nothing may reveal Hercule as the hero before the Buu phase.
-Facts about the game come from the script dump (`tools/script_dump.py`, full dump in
-`build/scripts/`), the quest table (reference notes) and Ghidra; check them before answering a
-story question. `docs/log.md` says what landed last.
+Built and merged: every chapter through the ten-day wait (chapters 1-8, the Broly chapter, the
+Krillin + Android 16 "Gero's computer" chapter, the Time Chamber training waves, Roshi's dojo
+sparring). Next: Ryan plans the Cell Games, the ending and the Buu phase in chat. He wants a slow
+pace, one decision at a time, answers from the player's point of view grounded in ROM facts, and no
+suggestions he did not ask for. Do not build a part of the story until he says its plan is done.
+Nothing may reveal Hercule as the hero before the Buu phase. Facts about the game come from the
+script dump (`build/scripts/`), the quest table (reference notes) and Ghidra.
 
 ## Build (Windows, Git Bash)
 
 ```
 export PATH="/c/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti-rel1/bin:/c/Program Files (x86)/GnuWin32/bin:$PATH"
-make                       # build/log2-coop.gba (HERCULE=1 data patch on by default)
-make WIDE=1 DEBUG_MENU=1   # build/log2-wide.gba for the WSL fork, debug menu on the title screen
-make BUILD=build/ssj SSJ_TEST=1 DEBUG_MENU=1 WIDE=1 DATA_PATCH=   # private dir, P2 Start = transform
-make BUILD=build/p6 PARTY_SLOTS=6                                  # stock-sized party (default 8)
+make                                  # build/log2-coop.gba (HERCULE=1 data patch on by default)
+make WIDE=1 DEBUG_MENU=1              # build/log2-wide.gba for the WSL fork, debug menu on the title screen
+make BUILD=build/<name> DEBUG_MENU=1  # private dir: what every test session should use
 ```
 
-Flags: `HERCULE=0` plain co-op; `DATA_PATCH=` skips the data patch; `PARTY_SLOTS=N` party size (6..16);
-`WIDE_TEST=<w>` forces a view width; `P2_MODE` input transport; `SSJ_TEST=1` test trigger; `BUU=0` leaves out
-the sprites converted from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`, `SSJ_SPRITE=158` for a test
-build). `A16_SPRITE` (160) is Android 16's boss sprite; `A16_TEST=1` = player 1's L+R+Down spawns the
-Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.md`). `A16P_SPRITE` (175) is Android 16's player record (row 25, last party slot in the "Gero's computer" chapter, `src/coop/a16player.c`). `KRILLIN_SPRITE` (161) is Krillin's
-playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's pad (`docs/testing.md` "Krillin"). `STORY_TEST=1` = chapter-test build (fork TCP pad drives player 1, ROM story-flag preset; `docs/testing.md`). `A13_SPRITE` (165) / `NAMEK_SPRITE` (166) are
-Android 13 and Cooler's Namekian servant (`tools/bossmodels.py`; boss rules in `src/coop/bosses.c`). `PARAGUS_SPRITE` (170) / `SHIP_SPRITE` (171) / `PARAGUS_PORTRAIT` (120) are the Broly chapter's art (`tools/brolysprites.py`; Broly 159 and the ship need `roms/buu.gba`). `make` does not run from PowerShell
-(GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
+`make` does not run from PowerShell (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git
+Bash with the PATH above. Python one-offs that read untrusted files run with `python -I`.
 
-## Test (see docs/testing.md for the full recipes)
+| flag | effect |
+|---|---|
+| `HERCULE=0` / `DATA_PATCH=` | plain co-op / skip the data patch (story, abilities, growth) |
+| `PARTY_SLOTS=N` | party size (default 8; slot 7 is the duel clone's); the check allows 6..16, but 16 overflows `partyram` and does not link (`docs/party-8-slots.md`) |
+| `WIDE=1`, `WIDE_TEST=<w>` | wide view for the fork / force a view width |
+| `DEBUG_MENU=1` | 30 s idle on the title opens the debug menu instead of the intro video (about 75 s from power-on); test a new game's own flow with 0 |
+| `BUU=0` | leave out the sprites converted from Buu's Fury (they need `roms/buu.gba`) |
+| `P2_MODE` | player 2's input transport |
+| `SSJ_TEST=1`, `A16_TEST=1`, `KR_TEST=1`, `STORY_TEST=1` | test triggers and autopilots (`docs/testing.md`) |
+| `*_SPRITE`, `*_PORTRAIT` | ids of generated art (defaults and owners in `docs/ids.md`) |
 
-- Stock ROM in Windows mGBA: `tools\mgba_run.ps1` (runs a copy; mGBA locks the file), Lua helpers
-  via `tools/mgba/coop.lua`, pad sender `python tools\p2_keys.py`, TCP command server for
-  focus-free tests (`tools/mgba_cmd.py`).
-- Wide ROM in the WSL fork: `wsl -d Ubuntu -u root -- bash -c "cd /root/mgba-build/sdl && MGBA_P2=1 MGBA_P2_PORT=7778 ./mgba -2 -t <state> <rom>"`,
-  sender `python tools\p2_keys.py --port 7778`, keys `tools\win_keys.ps1 "M:200 WAIT:500" -Title "mGBA (Ubuntu)"`,
-  screenshot `tools\win_shot.ps1 out.png -Title "mGBA (Ubuntu)"`. Add `-g` and attach
-  `gdb-multiarch -batch -x <script>` for breakpoints, traces and memory dumps (works; see testing.md).
-- Story chapters (`data/story/`, `docs/scripts.md`) are tested headless: `tools/headless/st_headless.c` on the
-  fork's libmgba, `python tools/headless/st_test.py SCRIPT ROM STATE` (`docs/testing.md` "Story chapters, headless").
-- `DEBUG_MENU=1` also replaces the new-game intro video with the debug menu, so test new games with
-  `DEBUG_MENU=0`. Fork test helpers (persistent GDB client, pad-word keys, teleport): `tools/fork/`.
-- Savestates: `build/log2-coop.ss1` = zone 2 area 7 wolf map, level-40 party, Piccolo P1 (slot 1),
-  Gohan P2 (slot 0); `ss2` = prologue Flight Circle. Re-make states after every `make` of the same
-  ROM name (player 2's vtable copies hold code addresses).
+## Test (full recipes in docs/testing.md)
 
-## Key addresses (details in docs/engine.md and src/coop/rom.h)
+- **Headless (story chapters, most checks):** `python tools/headless/st_test.py SCRIPT ROM STATE`
+  (`docs/testing.md` "Story chapters, headless"; a whole-chapter example is `tools/headless/ch9_gero.txt`).
+- **WSL fork (real time, fights, wide view):** `tools\fork\runfork.ps1 /mnt/f/.../x.gba -Slot n -Mute
+  [-State /mnt/f/.../x.ss1]`, GDB on port 2345+n, pad on 7778+n; slot n's helpers install into
+  `/root/fork-sn` (`FORK_SLOT=n`); see `tools/fork/` (persistent GDB client, pad keys, teleport).
+- **Windows mGBA (stock ROM):** `tools\mgba_run.ps1`, Lua helpers in `tools/mgba/`, TCP command server
+  `tools/mgba_cmd.py`.
+- **Test commands** (write `coop2.cmd` 0x0203FD08, argument at 0x0203FD0C): warp, spawn a record,
+  win the map's fights and more; the full list is in `docs/ids.md`.
+- Savestates break after every rebuild of the same ROM name (player 2's vtable copies hold code
+  addresses): remake them.
 
-Party: stock `0x03000E90`, relocated to `g_party_block` `0x0203F000` with `PARTY_SLOTS` (8) x 0x1C
-entries at +0xC (entry +8 = display row; `docs/party-8-slots.md`); Character_DisplayData 22 rows x 20
-(relocated into the blob as `display_rows`, row 22 = SSJ Hercule, row 23 = Krillin, row 24 = old Hercule, row 25 = Android 16);
-sprite index `0x083B4E74` (relocated as `sprite_index`, id 157 = SSJ Hercule, 158+ from Buu's Fury, 160 = Android 16 boss, 161 = Krillin, 165 = Android 13, 166 = Cooler's Namekian, 175 = Android 16 as a player;
-Buu ROM: index `0x086B6BDC`, OBJ palette `0x0805652C`, see `docs/sprites.md`); entity list
-`0x03001120`; world/camera object `0x03001090`; input `0x0300229C`; co-op state `0x0203FF04`;
-player-2 vtable `0x0203FE00`; wide descriptor `0x0203FEC0`; ability table literal `0x08008024`.
+## Key addresses (all of them: docs/ids.md "Memory"; structs: src/coop/rom.h)
+
+Party block `g_party_block` 0x0203F000 (entries at +0xC, 0x1C each; story flags at 0x0203F0EC + n/8);
+co-op state `coop` 0x0203FF04 (`p2` +4, `p2_slot` +0x80); `coop2` 0x0203FB00 (must stay <= 0x2C0
+bytes); player-2 vtable 0x0203FE00; wide descriptor 0x0203FEC0; entity list 0x03001120; input
+0x0300229C; sprite index 0x083B4E74 (relocated); ability table literal 0x08008024.

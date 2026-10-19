@@ -1,10 +1,12 @@
-; Android 13 in the arctic (docs/story.md section 0 item 8, "Side quests in the wait"): optional, behind the
+; REMOVED from the game 2026-10-18 (not in data/hercule.json; arctic.json has no trigger or record for it): Ryan holds
+; Android 13 until after Cell (docs/story.md 4g; history in docs/story-archive.md H). Kept for his post-Cell return.
+; Android 13 in the arctic (formerly docs/story.md section 0 item 8): optional, behind the
 ; arctic's "Only Vegeta" barrier (zone 15 area 1, story flag 380). Built into the map by tools/mapbuild.py
 ; from data/maps/arctic.json ("sources", a dialogue trigger at the cave mouth, the boss record). Vegeta
 ; walks into the cave, 13 comes out: he was the one meant to absorb 17 and 18, Cell stole his perfection,
 ; he would kill Cell himself; Vegeta: he will not get the chance. The fight ends at half health (stat 114,
 ; bosses.c) and 13 flies off. Story flag 376 records the encounter for the post-Cell variant (met before /
-; first meeting). 13 fights alone until Ryan picks his partner (docs/story.md: undecided).
+; first meeting). 13 fought alone (his partner was never decided).
 ; Speakers: 0 narration (13 has no portrait), 4 Vegeta.
 
 ; the cave mouth, once the barrier is open and 13 has not been met

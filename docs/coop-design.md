@@ -32,7 +32,8 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
 
 **Shadow milestone reached (2026-10-17).** `make` produces `build/log2-coop.gba` (16 MiB, code at
 `0x08800000`). The only ROM edit is the idle state's update slot, redirected to `idle_update_hook`
-(`src/coop/coop.c`), which lazily creates a second player entity next to the first the moment the
+(now in `src/coop/player.c`; there is no `coop.c`), which lazily creates a second player entity next
+to the first the moment the
 player is idle on a map. The second entity shares the input block, so it mirrors player 1: verified
 in mGBA on the prologue map (two Trunks, both walking with the D-pad, each with its own collision).
 The second entity gets a private copy of the player vtable whose destroy clears `coop.p2` instead
@@ -45,7 +46,9 @@ Select-swaps-control). The idle, walk and diagonal control states are ported to 
 (`src/coop/player.c`) and take input and the party slot per entity; both players run the ports.
 Verified in mGBA in mirror mode: holding Right sends P1 right and P2 left. Player 2 binds to the
 first other in-party slot (own HP/EP/abilities/sprite/behaviour); with a one-member party it falls
-back to sharing the active slot. Not yet: dash state for P2, HUD for P2, enemies targeting P2.
+back to sharing the active slot. (At that point player 2 still lacked the dash state, a HUD and
+enemy targeting; all three landed the same day, see the sections below. The one-member fallback was
+later dropped: the players never share a character.)
 
 **Dual HUD reached (2026-10-17).** The HUD object (vtable `0x0802408C`, created by `HUD_Create`
 `0x08008B14`) has its draw / update / destroy slots redirected to `src/coop/hud.c`, which calls the
@@ -56,8 +59,9 @@ are freed when the HUD object is destroyed. Verified in mGBA.
 
 **Input transport note.** A GBA cartridge sees exactly 10 buttons, so a second key set on one
 keyboard cannot reach the ROM; same-system play uses mGBA's second multiplayer window (link cable)
-with a second gamepad, or `P2_MODE_SWAP`. Extra keyboard keys and online play both need the
-emulator-side input patch planned for Phase 3.
+with a second gamepad, or `P2_MODE_SWAP`. (Done since, without an emulator patch: a second key set
+on one keyboard goes through the TCP bridge below, online play through lockstep netplay, section
+"Lockstep netplay".)
 
 ## Player 2 input transports (2026-10-17)
 
@@ -70,7 +74,8 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
    and streams changes over TCP 7777; the script writes them into `g_p2_remote` every frame.
    Verified: P2 walks while P1 stands still, in a single window.
 2. **Remote (same path).** The brother runs `p2_keys.py --host <host ip>` and watches the game
-   over a screen share; the host forwards port 7777. Proper lockstep netplay stays Phase 3.
+   over a screen share; the host forwards port 7777. Lockstep netplay (each player runs the ROM, no
+   screen share) was built later: section "Lockstep netplay".
 3. **Link cable (real hardware; stalls under mGBA).** Every boot puts the serial port in multiplayer
    mode; the host starts a 16-bit transfer per frame and reads `SIOMULTI1`; holding L+R in the first
    10 s turns a second cartridge into a pad (`src/coop/controller.c`, mode-3 button display, marker
@@ -91,7 +96,10 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
 - Dash/charge (`0x08025E20`), `0x080251F4` and `0x08025D70` control states run the *original* code
   for player 2 through `src/coop/wrap.c`, which swaps player 2's `InputSystem` contents into the
   global block (and the last-direction globals) around the call.
-- `make DEBUG_MENU=1` applies the documented title-screen patch: ~75 s idle opens the debug menu;
+- `make DEBUG_MENU=1` applies the documented title-screen patch: the title's idle timeout, which
+  normally starts the intro video, opens the debug menu instead. The title waits 1800 frames (30 s)
+  with no key held (`0x08000434` compares `g_FrameCounter` with 0x708); counted from power-on it is
+  about 75 s, since the logos and intro run first;
   Map Test loads any map with a full level-40 party (so player 2 gets a real second character).
   Rows: Music, Sample, Map Test; Zone/Area/Variation adjust with the d-pad under Map Test.
 - The TCP bridge now repeats the pad word 20x/s and the Lua side drains the socket every frame
@@ -109,17 +117,33 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
   and after the wrapped originals), so the screen edge is the separation limit: a player walking
   away stops at the edge until the other follows. Scripted movement is unaffected since the leash
   only runs in player-controlled states. Verified in zone 2 area 7.
-- A zoomed-out view is not possible on GBA hardware (tiled backgrounds cannot be scaled); it would
-  be an emulator-side renderer feature for Phase 3, alongside widescreen.
+- A zoomed-out view is not possible on GBA hardware (tiled backgrounds cannot be scaled). Done as an
+  emulator-side renderer: `make WIDE=1` with the WSL mGBA fork widens the view as the players
+  separate (`docs/widescreen.md`).
 
 ## Memory placement (important)
 
-The co-op state lives at the top of EWRAM in a pinned section (`g_p2_remote` `0x0203FF00`, `coop`
-`0x0203FF04`, see `coop.ld`). The game's heap (`Arena_Init`, `0x0801EFA4`) is `0xFDFE` words from
-`0x02000800`, i.e. it reaches `0x0203FFF8` and overwrote that block on entity-heavy maps (symptoms:
-player 2 respawning every frame, garbage input). `tools/patch_rom.py` shrinks the size word at ROM
-`0x1F20C` to `0xFD7E`, reserving the top 512 bytes. Entity state fields: `+0x18` is the control state
-(idle `0x08025A84`, walk `0x080256C4`, ...), `+0x1C` a secondary state (default `0x03001F3C`).
+All co-op RAM lives in pinned regions at the top of EWRAM (`src/coop/coop.ld`), above the game's
+heap. The heap (`Arena_Init`, `0x0801EFA4`) hands out `[0x02000808, 0x02000808 + 4 * cap)`; the stock
+cap `0xFDFE` words runs to `0x02040000` and overwrote co-op state on entity-heavy maps (player 2
+respawning every frame, garbage input). `tools/patch_rom.py` (`WORD_PATCHES`, file offset `0x1F20C`)
+sets the cap to **`0xF9FE`**, so the heap ends at `0x0203F000`. The regions above it:
+
+| address | region / section | contents |
+|---|---|---|
+| `0x0203F000` | `partyram` (0xB00): `.party`, `.party.kr`, `.party.wv` | relocated party block `g_party_block`, save-menu slot store, switch screen's `switch_view`; then `a16p` and `kr_state`; then the Time Chamber `waves` state (`0x0203F880` in the merged build, 0x91C of 0xB00 used with `PARTY_SLOTS` 8) |
+| `0x0203FB00` | `ewram2`: `.coop2` | `coop2` (`CoopExtra`, enemies.c; static assert <= 0x2C0) |
+| `0x0203FDC0` | (fixed address) | `StoryTest` preset copy (0x40, coop.h) |
+| `0x0203FE00` | `vtram`: `.coop.vt` | `g_p2_vtable[48]` (0xC0) |
+| `0x0203FEC0` | (fixed address) | wide-view descriptor (8 bytes), `WideState` at `0x0203FEC8` (wide.h) |
+| `0x0203FF00` | `ewram`: `.coop`, `.bss` | `g_p2_remote`, `g_p1_remote` (`0x0203FF02`), `coop` (`CoopState`, `0x0203FF04`), then `.bss` |
+
+The full map with every field is in `docs/ids.md` "Memory"; exact addresses of a build are in its
+`coop.map` / `coop.sym`. (History: the cap was `0xFD7E` on 2026-10-17, then `0xFCC0` when `coop2`
+arrived; both superseded by `0xF9FE` when the party block moved to `0x0203F000`.)
+
+Entity state fields: `+0x18` is the control state (idle `0x08025A84`, walk `0x080256C4`, ...), `+0x1C`
+a secondary state (default `0x03001F3C`).
 
 Live inspection without pausing: `dofile("…/tools/mgba/peek.lua")` in the Scripting console, then
 `peek()` prints both players' positions/states, both slots' EXP/HP and the co-op counters (addresses
@@ -167,7 +191,9 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
 - Both players' `+0x180` behaviour pointer is the same IWRAM cell (`0x030021E0`): the 22 display
   rows map onto five cells by behaviour *type* (rows 0-3 = the base forms share one), so
   `install_behaviour` for player 2 re-initialises a type singleton of the same type, which is
-  benign. Rows of another type (4, 5, 7, 10, 11, 14, 16, 17, 20) use their own cells.
+  benign. Rows of another type (4, 5, 7, 10, 11, 14, 16, 17, 20) use their own cells. (The build has
+  26 rows; the added rows 22-25 are copies of standard rows and use the base-form cell, see
+  `docs/engine.md`.)
 
 ## Character switching (2026-10-17)
 
@@ -208,13 +234,22 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
 
 - Ryan's call: player 2 defaults to Hercule (party slot 5, display row 21, sprite 72). The game
   fills his entry at new game (level 1, 50 HP, 20 EP, no flight, one ability) but only flags him
-  into the party late in the story, so `slot_ok` accepts slot 5 whenever its `max_hp` is set. Player
-  2 can still cycle to other available members with Select and comes back to Hercule by cycling.
+  into the party late in the story, so `slot_ok` accepted slot 5 whenever its `max_hp` was set.
+  (Superseded 2026-10-18: `slot_ok` in `player.c` now needs party flag bit 0 (in the party) and, when
+  picking player 2, bit 1 (available), for Hercule too, so the story's flag opcodes choose and lock
+  player 2. `pick_p2_slot` still prefers Hercule when he qualifies.) Player 2 can still cycle to other
+  available members with Select and comes back to Hercule by cycling.
 - Verified from the prologue Flight Circle savestate: Hercule appears with his own panel, flies with
   Trunks and respawns on him at the landing spot. Player 2 spawns 12 px left of player 1 when that
   spot is walkable, else exactly on player 1 (overlap beats leaving the map).
 
 ## Plan: co-op difficulty, twin bosses (stages 1-4 done, see the next section; stage 5 tuning open)
+
+History (2026-10-17, superseded by "Co-op difficulty: enemy object map, twins and scaling" and "Boss
+rules and extra stats" below, which are authoritative): the spawn hook turned out to be the map
+loader's enemy record handler (`0x0800E77E`), not a bytecode native; the enemy stat entry is mapped;
+the pair ideas (Frieza + Cooler, Cooler + King Cold, robots duplicated) gave way to the rules table in
+`src/coop/bosses.c`. The plan as written then:
 
 Ryan's direction: with two players, enemies should be stronger, smarter, faster, more numerous,
 and every boss fight gets a second boss of a different model at the original's strength (Frieza +
@@ -285,7 +320,7 @@ players go through it (player collision slot 9 `0x08008945` cases 0 / 1 call it 
 `desc+0x14`). Two RNG draws (`0x0802142F` chance, `0x0802141D` range) in a fixed order.
 
 **AI** sets: table `0x086D5194`, 154 x `{class, param}`; module classes are `{create, update, finish,
-param, ...}` trees: SELECT by distance� to `g_PlayerObject` (`0x0801AEF3`, `0x0801D749` with
+param, ...}` trees: SELECT by distance² to `g_PlayerObject` (`0x0801AEF3`, `0x0801D749` with
 hysteresis), GOTO set (`0x0801AB65`), SEQUENCE (`0x0801B887`), PARALLEL (`0x0801B63F`), CHANCE
 (`0x0801BA47`), wait (`0x0801BBAD`), and the leaf movers whose objects are `{vtable, speed 8.8}`:
 8-direction chase `0x0801B333` (vtable `0x08023BE0`; wolves 0xB3 = 0.7 px/frame) and axis-aligned
@@ -308,8 +343,8 @@ entity pointer, `0x10` slides it out.
 
 ### What co-op changes (src/coop/enemies.c)
 
-- `.coop2` block at `0x0203FB00` (heap size word now `0xFCC0`, reserving the top 1.25 KiB): enemy and
-  boss-bar vtable copies, a 24-pair twin registry and counters (`ents()` prints them).
+- `.coop2` block at `0x0203FB00` (the heap cap was `0xFCC0` then; it is `0xF9FE` now, see "Memory
+  placement"): enemy and boss-bar vtable copies, a 24-pair twin registry and counters (`ents()` prints them).
 - Spawn hook on `0x0800E77E`: with a player-2 source present every enemy with EXP (and every boss)
   is created from a private stat copy and record copy carried in its own arena block (`0x1F0` +
   stat + record, freed with the entity), plus a twin 24 px to the right (left if blocked, else on
@@ -362,7 +397,7 @@ get twins too. First forms with condition 0 (Cell at the Cell Games) spawn at ma
 | Z2 A50 East District 439 (2/40) | 44 | 50 | 6400 | the red robot |
 | Z10 A20 / Z12 A4 | 60 / 76 | 28 / 29 | 5210 / 4890 | Imperfect / Semi-Perfect Cell |
 | Z12 A6, Z14 A2, Z14 A3 | 78-79, 21-25 | 30 | 5160-8230 | Perfect Cell forms; stat 26 sprite 31 x3 = Cell Jr |
-| Z6 A70 (6/31) | 106, 64, 98 | 156, 76, 121 | 800, 1800, 2110 | tournament gauntlet (EXP, condition 1): Yamcha?, Krillin, Tien |
+| Z6 A70 (6/31) | 106, 64, 98 | 156, 76, 121 | 800, 1800, 2110 | tournament gauntlet (EXP, condition 1): Yamcha, Krillin, Tien |
 
 Other sprites: 74 King Cold (cutscene only), 49 Frieza (cutscene only, no enemy record anywhere),
 41 Dr. Gero, 72 Hercule, 75 Korin, 76 Krillin, 102 Oolong, 121 Tien, 7 Saibaman, 38-40 and 44-47
@@ -383,7 +418,12 @@ The debug menu's Area counter is the index within the zone's map-entry block, no
   other sprite record (King Cold 74, Android 17 9 tried; Cell's AI with Cooler's model is fine), so
   Cooler's twin is a second Cooler until that module (`0x0801C05B` sequences bound to the record) is
   understood. `partner(n)` from the console overrides the table for experiments.
-- Pair rule (private vtable slot 14): the first boss of a pair to reach 0 HP dies quietly (list
+  (Superseded 2026-10-18: the crash came from King Cold's 5-group record, Cooler with Android 17's
+  model fights fine, and Cooler's partner is now the Namekian servant, sprite 166 / stat 113; see
+  "Android 13, the Namekian servant and the boss-pair tests". The partner table moved to
+  `src/coop/bosses.c`, "Boss rules and extra stats".)
+- History (2026-10-17, superseded by the both-down rule in "Boss rules and extra stats"; this
+  behaviour now runs only with `coop2.off |= COOP_OFF_BOTHDOWN`). Pair rule (private vtable slot 14): the first boss of a pair to reach 0 HP dies quietly (list
   broadcast `0xF` so its bar empties, regular-enemy death routine: dust, SFX, removal, no action);
   if it was the original, the twin inherits the record action and becomes the original. The last one
   dies the normal boss way, which runs the fight's script. A partner-model twin switches back to the
@@ -397,10 +437,11 @@ The debug menu's Area counter is the index within the zone's map-entry block, no
   y = 8, the twin's at y = 20. Single-player keeps the ROM object at x = 160. When the script finds
   the twin (the list search runs from the end) the first bar is still bound to the original.
   Verified with `bar(0)` on the Cell pair and on a Cooler pair (6/28, `spawnrec(1)`).
-- Console test commands (`coop2.cmd`, run by the entity-list hook, so not during dialogue boxes):
-  `spawnrec(i)` = TriggerMapEvent i, `bar(e)`, `actor(sprite)` (grid of 12 around player 1),
-  `lowhp(n)`, `tele(dx)`, `partner(n)`, `coopoff(bits)` (1 damage, 2 twins, 4 speed, 8 HP, 16 partner
-  models).
+- Test commands: `coop2.cmd` (`0x0203FD08`) with `cmd_arg` takes the `COOP_CMD_*` numbers 1-14
+  defined in `src/coop/coop.h` (10 and 12 unused); they run from the entity-list hook, so not during
+  dialogue boxes. The list with arguments is in `docs/ids.md` "Test commands". `coop2.off` takes the
+  `COOP_OFF_*` bits in coop.h. The Lua wrappers for the Windows mGBA console (`spawnrec`, `bar`,
+  `actor`, `lowhp`, `tele`, `partner`, `coopoff`, ...) are in `tools/mgba/enemies.lua`.
 
 ## Two-player dash crash and the view limit (2026-10-17)
 
@@ -414,8 +455,8 @@ The debug menu's Area counter is the index within the zone's map-entry block, no
   (`x in [left+4, left+236]`, `y in [top+20, top+158]`). More is not possible in the ROM: the GBA
   draws exactly 240 x 160 and the emulator only scales that image, so a player beyond it is simply
   invisible. Ryan wants 2-3x the width for big screens; that needs an emulator that renders a wider
-  window of the map (a modified mGBA renderer plus ROM-side camera/leash/HUD changes), tracked as
-  the Phase 3 "widescreen" item. An in-ROM split screen (per-scanline BG scroll via HDMA) is the
+  window of the map (a modified mGBA renderer plus ROM-side camera/leash/HUD changes); built the same
+  day as `WIDE=1` with the WSL fork (`docs/widescreen.md`). An in-ROM split screen (per-scanline BG scroll via HDMA) is the
   hardware-only alternative but doubles every sprite and clips badly at the seam.
 
 ## Test tooling additions
@@ -425,7 +466,7 @@ The debug menu's Area counter is the index within the zone's map-entry block, no
 - `tools/mgba/force.lua`: `p2_force = 0x8000 | keys` drives player 2's pad from the console (bit 15
   valid, bits 0-9 GBA keys), `p2_force = nil` returns control to the TCP bridge; `p2_play{{word,frames},...}`
   scripts a frame-exact sequence and `p2_dash(keys)` performs a double-tap dash. Useful with mGBA
-  savestates (Shift+F1 / F1) to retry a fight without the 75 s debug-menu idle.
+  savestates (Shift+F1 / F1) to retry a fight without the debug-menu wait (about 75 s from power-on).
 - `tools/mgba/enemies.lua` (loaded by coop.lua): `spd()` scans EWRAM for live chase modules and
   prints their speeds, `track(e, n)` logs an entity's displacement over n frames, `hits()` logs every
   party-slot HP change (damage per hit). `ents()` tags co-op enemies `CE` and twins `TW` and prints
@@ -439,7 +480,8 @@ The debug menu's Area counter is the index within the zone's map-entry block, no
   mGBA no longer collides (two sessions driving one window by keystrokes garbled both).
 - Debug-menu navigation that works from a fresh menu: Down, Down (Map Test row, Zone editable),
   Right = zone+1, Down (Area), Right x n, A. Keep a savestate of the menu itself (slot 3) so a Map
-  Test costs seconds instead of the 75 s idle; `tools/mgba_input.ps1` knows F1-F9 for the slots.
+  Test costs seconds instead of the wait (30 s of title idle, about 75 s from power-on);
+  `tools/mgba_input.ps1` knows F1-F9 for the slots.
 - Typing into the Scripting console while another helper focuses the game window sends keystrokes
   into the game (one such slip opened the pause menu and quit to the title); keep console typing and
   game-window key presses sequential.
@@ -505,7 +547,7 @@ Lessons:
 - Debug menu controls (for making states): the cursor rows are Music, Sample, Map Test; on Map
   Test, Down cycles the edited field (Zone > Area > Variation, green; a further Down wraps the
   cursor to Music), Right/Left change it (changing Zone resets Area to 1), A starts the map, B
-  leaves the menu back to the title (and the 75 s idle starts over).
+  leaves the menu back to the title (and the title's 30 s idle timer starts over).
 - Test helpers: `tools/mgba_script.ps1 '<lua>' -Window N` opens Tools > Scripting by mouse (the
   menu bar ignores Alt mnemonics) and types the line into instance N's console;
   `tools/mgba_shot.ps1 out.png -Title 'Scripting*' -Of N` shoots that console;
@@ -517,6 +559,11 @@ e.g. `DEBUG_MENU=1`); mGBA's BIOS choice is not checked (HLE on both is the defa
 save file is replaced by the host's snapshot.
 
 ## Plan for the two-Goku proof (Phase 2 start)
+
+History (2026-10-17, resolved): the plan that opened Phase 2. It was carried out differently: the
+control states were ported to C taking input per entity (no `entity+0x1A0` field), player 2 is
+created lazily from `idle_update_hook` rather than by hooking `PlayerEntity_Create`, `Input_Poll` is
+replaced by `input_poll_hook`, and the camera follows the midpoint (sections above). Kept as written:
 
 1. **Extend the ROM to 16 MiB** and place new code at `0x08800000` (only ~6.8 KB is free below).
 2. **Reimplement in C** (compiled with arm-none-eabi-gcc, calling original ROM routines by address):
@@ -538,17 +585,22 @@ Open items: which player-vtable slot calls `state->update` each frame (find dyna
 
 ## World map rule (Ryan, 2026-10-17)
 
+History (resolved 2026-10-18): no code was needed; the stock behaviour already matches the rule (see
+"World map" under "Player 2's combat stats, duplicate NPCs, test warp"). The rule as written:
+
 Only the player who stepped on the flight sign controls the world map (zone 6 area 99); the other
 player is a passenger and has no entity there. Both players land together at the destination. To
 implement when the story scripts land: suppress player 2's spawn while the world map is loaded and
 give the pad that initiated the flight player 1's input for its duration.
 
-## Android 16 boss (2026-10-18, branch `android16-boss`)
+## Android 16 boss (2026-10-18, merged 2026-10-18)
 
 Ryan's decision (`docs/story.md` 4e): 16 is the island boss Piccolo and player 2 fight next to Kame
 House. What exists: sprite **160** (`tools/a16sprites.py`, `docs/sprites.md` "Android 16 boss
-sprite"), enemy stat **109**, the AI in `src/coop/android16.c` with knobs in `src/coop/android16.h`,
-and a test placement. The island scripts are unchanged (the parent session owns them).
+sprite"), enemy stat **109**, the AI in `src/coop/android16.c` with knobs in `src/coop/android16.h`.
+The island story uses him: `data/story/a16_island.lscript` / `.json` (story-scripts, merged
+2026-10-18) put stat 109 / sprite 160 on the island records (maps 296-298) and rewrite the Kame House
+and island scenes. (When this section was written the island scripts were still stock.)
 
 ### How to place him (for the story work)
 
@@ -556,14 +608,18 @@ and a test placement. The island scripts are unchanged (the parent session owns 
   him through `enemy_spawn_hook` (map load, or TriggerMapEvent opcode 84 with condition word 1 for a
   scripted boss). Stat 109 is past the stock table (0..108); the hook resolves it to `a16_stat`.
   He never gets a co-op twin (one boss; 17 and 18 watch).
-- The stock island fight refers to the boss by sprite: map 296's trigger runs
+- (Done by `data/story/a16_island.json`; kept as the recipe.) The stock island fight refers to the
+  boss by sprite: map 296's trigger runs
   `DespawnCharacterAndRecordPosition [9, 1]` and `DrawBossHealthBarRange [9, 75, 100]`, and its
   defeat script moves char 9. A 16 fight needs those arguments to say 160, the record changed (map 296
   script 1 at `0x08406494`: `+8` stat 3 -> 109, `+0x10` sprite 9 -> 160), and the actor standing in
   for him before the fight (`actor sprite 8`) swapped with 17's (`actor sprite 9`).
 - Android 16 in the stock game is **sprite 8** (the island actor), not 15 (that is Dr. Gero).
-- Defeated (HP 0) he stays on the map in his knock-down frame and fires nothing; the boss death class
-  (`0x086FF3C4`) runs the record's action, as for 17.
+- History (superseded 2026-10-18 by "Android 16 ends at half health" under "Story-scripts engine
+  pieces"): defeated (HP 0) he stayed on the map in his knock-down frame and fired nothing. Now the
+  fight ends at half health (`A16_END_PCT` 50): at the bottom of each boss-bar stage the record's
+  defeat action fires (`seq:a16_island_break`, then `seq:a16_island_half` in `a16_island.json`) and he
+  stays standing.
 
 ### Attacks (special-attack scheduler between ticks of the stock boss AI set 21)
 
@@ -605,15 +661,17 @@ special cannot be interrupted, so two players cannot stun-lock him.
 - Enemy update = `0x0800772B` (aux + control state), then the AI tick `0x0801AB09(e + 0x19C)`.
 - **Camera_Shake(cam, frames, strength 0-100)** links the camera object into the controller chain
   headed at `0x03000FF4`; calling it again while it shakes links it to itself (an endless loop).
-  16 starts a shake only when the head is not the camera and otherwise extends the timer. The
-  player bump in `player.c` calls it unguarded (follow-up).
+  16 starts a shake only when the head is not the camera and otherwise extends the timer. (The
+  player bump's unguarded call is fixed: `camera_shake_safe()` in `player.c`, and since 2026-10-18 a
+  hook on `Camera_Shake` itself, `0x0800DD80` in `camera.c`, guards every caller.)
 - OBJ VRAM free space = `0x08006D71(g_EntityList)` (largest free block); 16 skips a projectile's art
   when it would leave less than 0x100 bytes (the damage still happens).
 - The scouter registration (message 0x14) searches the bestiary by stat pointer, so a stat outside
   the table simply has no scouter entry.
 - **Player 2's combat bytes** (entity +0x160..+0x162: melee, ranged, defence) are player 1's
-  character's, not their own (Hercule as player 2 at level 40 had 61/65/51 = Piccolo's). Not fixed
-  here (follow-up); the tests below wrote the right bytes by hand.
+  character's, not their own (Hercule as player 2 at level 40 had 61/65/51 = Piccolo's). The tests
+  below wrote the right bytes by hand. (Fixed 2026-10-18: `install_behaviour()` / `p2_sync_combat()`,
+  section "Player 2's combat stats, duplicate NPCs, test warp".)
 
 ### Tuning and test results (fork, island area 6, Piccolo + Hercule at level-30 stats)
 
@@ -643,28 +701,55 @@ gets `A16_SOLO_HP_PCT` (70%) of his HP (not tested).
 - Screenshots of a missile in flight: the in-fight captures show 16 between both players, the boss
   bar, hit flashes and explosions, but no frame caught a missile mid-flight; the paused-frame
   capture (`tools/fork/a16shots.sh`) made the fork exit twice (cause not found).
-- The island scripts still name 17 (sprite 9, stat 3); the dialogue and scripts are the parent's.
 - AI set 21 drives his melee, so he keeps 17's moves (dash, kicks) rather than moves of his own.
-- The player-2 combat-byte bug above; a Camera_Shake guard for `player.c`.
+- Resolved since: the island scripts now name 16 (`data/story/a16_island.*`); the player-2
+  combat-byte bug and the Camera_Shake guard are fixed (see the notes above).
 
 ## Boss rules and extra stats (2026-10-18, src/coop/bosses.c)
 
 Story bosses are configured in `src/coop/bosses.c` (declarations and field meanings in `bosses.h`):
 
-- **Extra stats** (`extra_stats[]`, index `EXTRA_STAT_BASE` 110 + i): a stock stat to start from
-  plus overrides (AI set, HP, EXP, melee/ranged/defence). The spawn resolves it into the enemy's
-  private stat copy, so no ROM table is copied into the build. 110 = Android 13 beside 19 (19's AI
-  set 29 and class), 111 = the forest spirit's Cooler, 112 = Android 13 beside Dr. Gero, 113 = Cooler's
-  Namekian servant (Cooler's set 21 and class). 109 stays Android 16 (own spawn path in
-  `android16.c`). Ids 114-119 are free.
+- **Extra stats** (`extra_stats[]`, index `EXTRA_STAT_BASE` 110 + i; `gero_stats[]` from
+  `GERO_STAT_BASE` 120): a stock stat to start from plus overrides (AI set, HP, EXP,
+  melee/ranged/defence). The spawn resolves it into the enemy's private stat copy, so no ROM table is
+  copied into the build. 109 stays Android 16 (own spawn path in `android16.c`). Defined today:
+
+  | stat | who | base stat (AI set, class) | HP, melee/ranged/defence |
+  |---|---|---|---|
+  | 110 | Android 13 beside 19 | 5 (19) | 3200, 22/16/14 |
+  | 111 | the forest spirit's Cooler | 29 (Cooler) | 130, 3/2/3, 20 EXP (Frieza's tutorial numbers) |
+  | 112 | Android 13 beside Dr. Gero | 5 | 2400, 24/20/16 |
+  | 113 | Cooler's Namekian servant | 29 | 6000, 74/70/68 |
+  | 114 | Android 13 in the arctic | 5 | 6000, 30/24/22; unused: the arctic encounter was removed 2026-10-18 (13 returns after Cell), the stat and its rule stay |
+  | 115 | Broly | 29 | 8000, 52/54/50 |
+  | 116 | Paragus | 29 | 2000, 24/22/20 |
+  | 120, 121 | the bunker's two Android 19 bodies ("Gero's computer") | 5 | 3600, 23/17/16 each |
+
+  117-119 and 122-124 have no entry (the Gero chapter reserves 120-124). Take new numbers from
+  `docs/ids.md`, the registry.
 - **Boss rules** (`rules[]`, by stat index, single-player and co-op alike): `end_pct` (the entity
   gets only the HP above `end_pct` and its bar is drawn over `[end_pct, 100]`, so the fight ends
   "at half health" with the bar half full), `partner_sprite` / `partner_stat` (the co-op twin's model
-  and stat; 0 = same model, a Multi-Form duplicate), `BOSS_NO_TWIN`. Current rules: 17 <-> 18 models,
-  19 + Android 13 (sprite `A13_SPRITE` 165, stat 110), Dr. Gero + Android 13 (165, stat 112), Cooler +
-  the Namekian servant (`NAMEK_SPRITE` 166, stat 113), the forest spirit's Frieza + Cooler (41 + 111), Perfect Cell (78, 79) alone to half health.
-  Imperfect and Semi-Perfect Cell use the default duplicate. A partner model needs every pose group the
-  boss's AI set plays (`docs/sprites.md` "Making a new enemy model").
+  and stat; 0 = same model, a Multi-Form duplicate), flags `BOSS_NO_TWIN`, `BOSS_PAIR` (a pair in
+  single-player too) and `BOSS_RAGE` (see "Broly and Paragus"). The table in `src/coop/bosses.c`:
+
+  | stat | rule |
+  |---|---|
+  | 3 (17) / 4 (18) | twin with the other's model (sprite 11 / 9); `BOSS_RULE_TEST` builds: 17 alone, ends at 50 % |
+  | 5 (19) + 110 | `BOSS_PAIR`, partner Android 13 (`A13_SPRITE` 165, stat 110) |
+  | 7 (Dr. Gero) + 112 | `BOSS_PAIR`, partner Android 13 (165, stat 112) |
+  | 41 (Frieza, forest spirit) + 111 | `BOSS_PAIR`, partner Cooler (sprite 34, stat 111) |
+  | 29 (Cooler, New Namek) | co-op twin is the Namekian servant (`NAMEK_SPRITE` 166, stat 113) |
+  | 106 (Yamcha) + 98 (Tien) | gym duo, `BOSS_PAIR`, partner Tien's model 121 and stat 98 |
+  | 64 (Krillin) | gym duo, `BOSS_PAIR`, partner Hercule's playable sprite 72 at Krillin's numbers |
+  | 114 (arctic 13) | `BOSS_NO_TWIN`, ends at 50 % (no map spawns it now) |
+  | 78, 79 (Perfect Cell) | `BOSS_NO_TWIN`, ends at 50 % |
+  | 115 (Broly) + 116 (Paragus) | `BOSS_PAIR`, partner Paragus (`PARAGUS_SPRITE` 170, stat 116); 116 has `BOSS_RAGE` |
+  | 120 + 121 (bunker 19s) | `BOSS_PAIR`, partner model 12 (19), stat 121 |
+
+  Any other boss (Imperfect Cell 60, Semi-Perfect Cell 76, ...) gets the default co-op twin: a
+  same-model duplicate with the original's stat. A partner model needs every pose group the boss's AI
+  set plays (`docs/sprites.md` "Making a new enemy model").
 - **Both-down rule** (all boss pairs): the first boss of a pair to fall takes the blow as a
   non-lethal hit (knock-back, damage popup), then HP 0, no action, list message 0xF (its bar lets
   go), plays pose group 3 (the knock-down: standing, falling, lying on 17, Gero and the Cell forms;
@@ -686,7 +771,7 @@ us!"). With the test rule (`make CFLAGS_EXTRA=-DBOSS_RULE_TEST`: 17 alone, end 5
 alone with 1775 of 3550 HP and his bar read 58 % at 300 HP. Test drivers used: `build/bdtest.sh`,
 `bdfind.sh`, `bdpeek.sh` (not committed; the pattern is in `docs/testing.md`).
 
-### Android 13, the Namekian servant and the boss-pair tests (2026-10-18, branch `boss-models`)
+### Android 13, the Namekian servant and the boss-pair tests (2026-10-18, merged 2026-10-18)
 
 Models: `docs/sprites.md` "Android 13 (id 165) and Cooler's Namekian servant (id 166)". Tested in the
 fork (slot 3) on the island path (debug Map Test 11/6) with `COOP_CMD_SPAWN_RECORD` (8: any map's
@@ -774,7 +859,7 @@ headless, Broly at 3000 HP when Paragus fell went back to 8000 with 62/64/56; a 
   (`0x08009A89`, stack `{5, zone, area, 1, x, y}`) from the entity-list hook. Offsets: `coop2` is
   at `0x0203FB00`, `cmd` +0x208, `cmd_arg` +0x20C.
 
-## Gero's bunker and Android 16 as a player (2026-10-19, branch `gero-computer`)
+## Gero's bunker and Android 16 as a player (2026-10-19, merged 2026-10-19)
 
 **Two Android 19s.** Ryan wants two 19s on screen, in co-op and alone. The bunker's record (map 257,
 record 1) has stat **120** (19's stat 5 with overrides, in `gero_stats[]` of `bosses.c`, looked up
@@ -817,7 +902,9 @@ For the story's two duels (Vegeta vs his shadow clone in space, Vegeta vs Trunks
   is set (`coop2.pad_swap`, applied in `input_poll_hook` while a player-2 source exists), and the
   duel's end script (a mapScripts index, TriggerMapEvent style) runs.
 - **Clone**: `duel_start(-1, flags, end_script)` copies player 1's party entry into the last party
-  slot (`DUEL_SLOT` = `PARTY_SLOTS - 1`, so slot 7 is reserved for duels) and binds player 2 to it;
+  slot (`DUEL_SLOT` = `PARTY_SLOTS - 1`, so slot 7 is reserved for duels; during the "Gero's computer"
+  chapter it also holds Android 16 as a player, `A16_SLOT` in `a16player.h`, since no duel runs
+  there) and binds player 2 to it;
   `DUEL_SHADOW` draws player 2 through a 256-entry colour remap toward darker violet palette colours
   (entity +0x24, decoded per frame by the sprite emitter `0x08007772`; the hit flash borrows the same
   field and clears it, so `duel_tick` puts the tint back). `duel_clear()` drops the clone slot and the
@@ -831,7 +918,7 @@ Piccolo; each player's punches hurt the other (554 -> 485 and 554 -> 414); playe
 the clone at 1 HP with `winner = 1`; in a rematch player 2's final blow left player 1 at 1 HP, no game
 over, `winner = 2`, pads swapped (player 1's pad then walked player 2's entity).
 
-## Story-scripts engine pieces (2026-10-18, branch `story-scripts`, `docs/scripts.md`)
+## Story-scripts engine pieces (2026-10-18, merged 2026-10-18, `docs/scripts.md`)
 
 - **Boss bar argument fix**: the entry jump into `bossbar_create_hook` was `ldr r3,[pc]; bx r3`, which
   replaced `BossHealthBar_Create`'s fourth argument (r3 = the upper percent of
@@ -853,3 +940,52 @@ over, `winner = 2`, pads swapped (player 1's pad then walked player 2's entity).
   longer allowed outside the party), so the story's flag opcodes pick and lock player 2.
 - **Chapter tests**: `StoryTest` preset (0x0203FDC0, applied by Party_Init), `COOP_CMD_STORY_WIN` (7),
   `STORY_TEST=1` builds; `tools/headless/st_headless.c`.
+
+## Time Chamber training waves and Roshi's dojo spar (merged 2026-10-19)
+
+Story side: `docs/story.md` 4g. Both open in the ten-day wait.
+
+**Training waves** (`src/coop/waves.c`, `data/story/wait_chamber.*`, map `data/maps/time_chamber.json`).
+From story flag 157 (Cell's TV announcement) the Lookout's chamber door (zone 9 area 3) warps the
+players into the chamber (zone 15 area 2) and calls `CoopCall 13` (WaveStart: the round sequence
+`seq:lk_tc_round`, first round 1). Ten fixed rounds of stock enemies follow, four records per round,
+harder as they go; the records are built in RAM around the players' midpoint and spawned through
+`enemy_spawn_hook`, so in co-op each brings its twin (eight on screen). The controller is a small
+state machine run every input poll (`waves_tick`): CLEAR (a 75-frame pause after the last kill, then
+the round number goes up and the round sequence is queued like a defeat dialogue), ANNOUNCE (the
+sequence shows the "Round N" caption and calls `CoopCall 14, 1` = WaveSpawn; `CoopCall 14, 0` returns
+the round), FIGHT (until no enemy is left standing), DONE (after round 10 the sequence says "Training
+completed!" and nothing more spawns). Leaving the map (the chamber's door, a game over) switches it
+off; the Lookout door starts again from round 1. Rewards: EXP from the kills only. State: `waves`
+(`WaveState`, 0x9C bytes) in section `.party.wv` (`0x0203F880` in the merged build; read `coop.map`).
+Test commands: `COOP_CMD_WAVE_CLEAR` (13) and `COOP_CMD_WAVE_SKIP` (14, arg = round).
+
+The rounds (`rounds[]` in waves.c; stock stat / sprite, HP before the co-op x1.5; copied from
+`docs/story.md` 4g, the code is the source):
+
+| round | enemies | HP |
+|---|---|---|
+| 1 | 2 wolves (57 / 148), 2 hawks (107 / 64) | 675, 700 |
+| 2 | 2 sabre-toothed tigers (92 / 108), 2 Kuma mercenaries (70 / 91) | 750, 940 |
+| 3 | 2 ninjas (75 / 96), 2 pterodactyls (80 / 105) | 900, 900 |
+| 4 | 2 Warlord's henchmen (12 / 142), 2 warthogs (56 / 145) | 900, 900 |
+| 5 | 2 hawks (84 / 65), 2 wolves (104 / 149) | 1000, 1000 |
+| 6 | 2 Warlord's henchmen (51 / 143), 2 tiger bandits (10 / 19) | 1100, 1120 |
+| 7 | 2 Eggbots (40 / 47), 2 pterodactyls (88 / 106) | 1130, 1200 |
+| 8 | 2 ninjas (86 / 98), 2 Eggbots (39 / 46) | 1400, 1349 |
+| 9 | sabre-toothed tiger (89 / 110), 2 scorpions (47 / 112), ninja (45 / 97) | 1750, 2000, 1600 |
+| 10 | snake (48 / 117), 2 wolves (50 / 147), Destroyer (32 / 38) | 3530, 3980, 4200 |
+
+Sprite memory, not a count, is the limit: with all eight standing the largest free OBJ VRAM block
+stayed above 6.9 KB; two Destroyers per round had left only 2.2 KB, so round 10 keeps one
+(measurements in `docs/story.md` 4g).
+
+**Roshi's dojo spar** (`data/story/wait_spar.*`). Once Roshi's gym matches are cleared and the last
+capsule is paid (story flag 214), talking to Master Roshi in the Capsule Corp atrium (zone 6 area 3)
+ends with his offer: with player 2 present (`CoopCall 5`) he books the dojo (story flag 440); alone, he
+says you need a partner. Walking onto the sparring mat (zone 6 area 70) starts a 1 v 1 player duel
+(`CoopCall 1` DuelStart with player 2's own slot from `CoopCall 8`, flags 0: no clone, no pad swap,
+no stakes; duel mode as in "Player-vs-player duel"). The final blow leaves the loser at 1 HP; a
+caption names the winner (`CoopCall 3` gives the winner, `CoopCall 14, 2` player 2's name), the duel
+is cleared (`CoopCall 2`), both players are healed and the fade returns them to the atrium. The match
+clears flag 440 as it starts, so each spar needs a new talk with Roshi.

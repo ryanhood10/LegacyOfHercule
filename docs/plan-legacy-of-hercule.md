@@ -1,5 +1,16 @@
 # The Legacy of Hercule: build plan
 
+**Status (2026-10-19).** Most of this plan dates from 2026-10-17. Done since: an 8-slot party
+(`PARTY_SLOTS`, `docs/party-8-slots.md`); 26 display rows (22 Super Saiyan Hercule, 23 Krillin, 24 old
+Hercule, 25 Android 16); new sprite ids up to 175 (`docs/ids.md`); the extended ability table (ids
+0-22); the script assembler (`tools/script_asm.py`, `docs/scripts.md`); the map builder
+(`tools/mapbuild.py`, `docs/maps.md`) and the new zone 15 maps (arctic, Time Chamber, Broly's arena,
+the Buu crater); Super Saiyan Hercule; Krillin playable (slot 6) and Android 16 playable in one
+chapter (slot 7); the story chapters 1-8 plus the ten-day wait (Broly chapter, "Gero's computer",
+Time Chamber training waves, Roshi's dojo spar). Still to do: the Cell Games story, the ending, the
+Buu phase, a full save-pad run with two players, and the animal quest. Story status lives in
+`docs/story.md` section 0, recent work in `docs/log.md`. Section 4 "Rules we keep" stands.
+
 Ryan's direction (2026-10-17): keep Legacy of Goku II's story backbone (it is good and already built),
 but retell it with Hercule as the true hero who grows through the Android and Cell sagas, keep every
 beloved character in a role, add playable characters, new scenes, enemies, levels, movesets and silly
@@ -10,9 +21,9 @@ Majin Buu. Story frame decided 2026-10-17: "Canon plus Hercule" (see `docs/story
 
 | Want | How the ROM supports it | Confidence |
 |---|---|---|
-| New playable characters / forms | `Character_DisplayData` rows (22 today, relocatable, limit byte at file 0x42D6 up to 255); each row = sprite id + portrait + behaviour class. Party stays 6 *slots*; who sits in a slot is swapped by the existing script opcode (`SetCharacterInParty` 79 / `ClearCharacterInParty` 91, `SetCharacterTransformation` 73). | high |
-| Sprites for them | `g_CharacterSpriteIndex` (ids 3..156, relocatable); records = header + per-direction frame arrays, frames are JCALG1 streams (our decoder is ported both ways: `tools/mapchunks.py`, the fork). NPC and enemy sprites (Krillin, Yamcha, Tien, Mecha Frieza, Cooler, Androids, animals) exist as sprite records; a playable needs the walk/attack frame groups a player row expects. | high for playables, medium for promoting NPCs |
-| Movesets | `g_AbilityTable` (14 entries, relocatable): icon pair, isReady, onUse (EP cost + animation). Abilities belong to the *slot* (4 per slot); making them per-character is a small patch (store the list in the row's spare word and read it in `Player_UseAbility` / HUD). | high |
+| New playable characters / forms | `Character_DisplayData` rows (22 in the stock ROM, 26 in the build since relocation; limit byte at file 0x42D6 up to 255); each row = sprite id + portrait + behaviour class. The party has `PARTY_SLOTS` slots (8 by default since 2026-10-17; this row first said it stays 6); who sits in a slot is swapped by the existing script opcode (`SetCharacterInParty` 79 / `ClearCharacterInParty` 91, `SetCharacterTransformation` 73). | high |
+| Sprites for them | `g_CharacterSpriteIndex` (stock ids 3..156; relocated, the build adds ids up to 175); records = header + per-direction frame arrays, frames are JCALG1 streams (our decoder is ported both ways: `tools/mapchunks.py`, the fork). NPC and enemy sprites (Krillin, Yamcha, Tien, Mecha Frieza, Cooler, Androids, animals) exist as sprite records; a playable needs the walk/attack frame groups a player row expects. | high for playables, medium for promoting NPCs |
+| Movesets | `g_AbilityTable` (14 stock entries; relocated and extended to ids 0-22 in `HERCULE=1` builds, `docs/engine.md`): icon pair, isReady, onUse (EP cost + animation). Abilities belong to the *slot* (4 per slot); making them per-character is a small patch (store the list in the row's spare word and read it in `Player_UseAbility` / HUD). | high |
 | Transformations (Super Human Hercule) | A new display row (recoloured copy of a sprite) plus a transformation ability that targets it; the stock Transformation reverts rows flagged as transformed. | high (documented pattern), untested by us |
 | Story and dialogue | Maps carry `mapScripts[]`: NPC (talkable), actor (scripted), enemy records; dialogue sequences and condition scripts run on the bytecode VM (145 opcodes mapped in the reference `OpCodes.csv`, warp opcode pops zone/area/variation/x/y); 43 quests decoded with their flags. Text lives in dialogue sequences we can rewrite or add. | high for reading, medium for authoring (we need our own assembler) |
 | New maps and scenes | `g_MapEntries` (327 x 0x38, count and 4 literals to patch to extend); maps = chunk tilemaps + tileset, already decoded by the wide-view work, so a map *editor/importer* is within reach. | medium |
@@ -20,7 +31,8 @@ Majin Buu. Story frame decided 2026-10-17: "Canon plus Hercule" (see `docs/story
 | Keep Goku after Cell | One byte at file 0x3EC738 (91 -> 79); applied by `data/hercule.json`. | done |
 | Co-op, wide view | Done (this repo). | done |
 
-Hard limits: 6 active party slots (the save format bakes them in; widen the pool instead), 128
+Hard limits: party slots, first thought fixed at 6 by the save format, are now `PARTY_SLOTS` (6..16,
+default 8) with a rebuilt save layout (`docs/party-8-slots.md`); 128
 sprites on screen, 240x160 native (the fork widens it), SRAM save layout (new flags must fit the
 existing story-flag bits or reuse spare ones).
 
@@ -35,8 +47,8 @@ existing story-flag bits or reuse spare ones).
    groups); give them abilities (Destructo Disc = recoloured Scatter Shot, etc.); make abilities
    per-character.
 3. Hercule's growth (done, `docs/hercule.md`): stat table and growth rows tuned, moveset of four
-   reskinned animations (Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Taunt); still to do: a
-   late transformation row "Super Human Hercule" (recolour + aura) via a transformation ability.
+   reskinned animations (Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Taunt); the late
+   transformation is done as Super Saiyan Hercule (display row 22, ability 18, `src/coop/ssj.c`).
 4. Unlocks as story rewards: Mecha Frieza playable after Cooler, Androids 16/18 after their arcs
    (enemy sprite -> playable row where the frame groups allow; otherwise a new sprite record).
 
@@ -72,6 +84,10 @@ the netplay reader ported to C like the pad reader), HUD at wide corners for dia
 than 128 sprites is a no.
 
 ## 3. Order of work (each step ships something playable)
+
+History (2026-10-17): the "in progress" and "next" marks below are from that day. Steps 1, 2, 4 and
+5 are done; of step 3 the transformation (Super Saiyan Hercule) is in, while Hercule's four abilities
+still borrow stock icons (`data/hercule.json`). Steps 6 (animal quest) and 7 (Buu's Fury) remain.
 
 1. **Sprite atlas + roster report** (1 session, in progress): the PNG sheet and a table of candidates
    with their frame groups; the Super Saiyan Hercule sprite as a new sprite id and display row

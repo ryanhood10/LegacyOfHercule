@@ -30,8 +30,12 @@ offsets for N = 6, everything after the entries moves by `(N - 6) * 0x1C`):
 ```
 
 `Party_Init` fills the entries from the default table and zeroes 50 bytes at +0xB4 and at +0x12A.
-The region `partyram` (`coop.ld`, 0x0203F000..0x0203FB00) also holds the save menu's slot store and
-the switch screen's view party; `coop2` keeps 0x0203FB00. (The three sites `0x0800831C/8330/833E`
+The region `partyram` (`coop.ld`, 0x0203F000..0x0203FB00) also holds, in link order: the save menu's
+slot store (`party_save.c`) and the switch screen's view party (`switch.c`) in `.party`; then
+`.party.kr` (`a16p` from `a16player.c`, `kr_state` from `krillin.c`); then `.party.wv` (`waves`, the
+Time Chamber state from `waves.c`, `0x0203F880` in the merged build). `coop2` keeps 0x0203FB00.
+Addresses after the party block move with `PARTY_SLOTS` and with code changes; read the build's
+`coop.map`. (The three sites `0x0800831C/8330/833E`
 listed by the earlier inventory touch an Entity's resistance bytes, not the party.)
 
 ## Every site that assumed six, and its patch
@@ -112,7 +116,7 @@ PARTY_SLOTS (16 rows in the generated tables, `UI_BLOCK`):
 | technique names / descriptions `X[1..4] + slot`, icons `X[13 + 2 slot + p]` (module table `0x081D94D0`, literal 0x377C) | `status_module`: per-slot icon pairs for PARTY_SLOTS, string bases = the `UI_ENERGY1/2`, `UI_DESC1/2` blocks |
 | special melee page `0x9D/0xA2 + slot` (`0x08003684`) | not shown for slots 5+ (page count) |
 | dialogue `%s` name `0x30/0x36 + active` (`0x080094B0/CC`) | `vm_push_name_hook` / `vm_push_caps_hook`: the `UI_NAME` / `UI_CAPS` blocks |
-| status portrait (row +3 -> `Portrait_Table`, ids 8-25) | Krillin's appended as id 119 (`portrait_module`) |
+| status portrait (row +3 -> `Portrait_Table`, ids 8-25) | appended to `portrait_module` (`tools/krillinsprites.py`): 119 Krillin's status portrait, 120 Paragus' dialogue portrait (`tools/brolysprites.py`), 121 Android 16's status portrait (row 25 +3) |
 | level-up victory poses (script `0x083B6524`, slots 0-5 by `PushActiveCharIndex`) | none for slot 6: he keeps standing (harmless) |
 
 Slot 7 is the duel clone's slot (`duel.c` copies player 1's entry into it for a clone duel) and,
@@ -138,9 +142,13 @@ disassembly. Verified: level 40 -> 41 for Krillin as player 1, dialogue closed, 
 ## Limits
 
 - `PARTY_SLOTS` 6..16 (static assert). The count patches are imm8; the object-size patches reach
-  N = 16; the shadow tables and C code have no limit. `partyram` holds the party, the save store
-  (3 slots + 8 bytes each) and the view: 0x87C bytes for N = 8, 0xCC4 for N = 16 (region 0xB00, so
-  N = 16 needs the region and heap cap lowered by 0x200; `coop.ld` errors when it overflows).
+  N = 16; the shadow tables and C code have no limit. `partyram` (region 0xB00) holds the party, the
+  save store (3 slots + 8 bytes each), the view, `.party.kr` and `.party.wv`: 0x91C bytes for N = 8
+  (merged build, 2026-10-19). N = 16 does not fit: a test link on 2026-10-19 needed 0xDB4 bytes and
+  failed with "region `partyram' overflowed by 692 bytes". It needs the region start and the heap cap
+  lowered by at least 0x2B4 (0x300 keeps alignment: region at 0x0203ED00, cap
+  (0x0203ED00 - 0x02000808) / 4 = 0xF93E). (The earlier figures, 0x87C for N = 8 and 0xCC4 for N = 16
+  with a 0x200 shortfall, predate `.party.kr` and `.party.wv`.)
 - The save menu shows at most six members per slot; the switch screen shows six at a time.
 - The debug party (Map Test) fills slots 0..defined-1 with level-40 characters (flags 0x3F for every
   slot but Hercule's, so Krillin shows both technique pages there).

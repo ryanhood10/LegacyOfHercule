@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **Docs pass for faster agents:** new `docs/ids.md` (every allocated flag, stat, sprite, row, portrait,
+  ability, CoopCall, test command, zone-15 area and RAM region, with the free ranges) and `docs/howto.md`
+  (recipes: chapter, CoopCall, boss, sprite, portrait, playable character, map, test, parallel sessions);
+  `CLAUDE.md` reorganised around a task-routing table; stale statements fixed across the docs;
+  `docs/story.md` split into the current plan, `docs/story-rom.md` (stock ROM facts) and
+  `docs/story-archive.md` (superseded options).
+- **The ten-day wait merged into main** (8ef947c lookout-training, 8ae34a6 broly-chapter, 10f7e98
+  gero-computer, e45c765): each branch's tests re-run on the merged build and passed. Merge fixes: the
+  Broly calls to `coop_run_sequence` use the waves branch's two-argument form; Paragus' dialogue portrait
+  and Android 16's status portrait both took id 120, so 16's moved to 121 and `krillinsprites.py` now
+  asserts portrait ids are unique. The three entries below describe the branches as built.
 - **Ten-day wait: Time Chamber training waves and Roshi's dojo sparring** (branch `lookout-training`,
   worktree `F:\MeltyCreations\log2-lookout`): `src/coop/waves.c` (ten fixed rounds of stock enemies,
   spawned on a ring around the players, the next round when none stands, state in `.party.wv` (0x0203F880 after the merge),
@@ -39,7 +50,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
   the computer room, two Android 19s in the bunker (stats 120 / 121, `BOSS_PAIR`), the Android 13 file,
   the birds, home as Krillin + Hercule. Stock fix: area 47's top exit never fired. Headless end to end
   (`tools/headless/ch9_gero.txt`), bunker fight and Rocket Punch in the fork. IDs: flags 420-437,
-  CoopCall 11-12, COOP_CMD 11, stats 120-121, sprite 175, row 25, ability 22, portrait 120; no CoopExtra
+  CoopCall 11-12, COOP_CMD 11, stats 120-121, sprite 175, row 25, ability 22, portrait 120 (121 after the merge); no CoopExtra
   bytes. Details: `docs/story.md` 4g, `docs/scripts.md`, `docs/maps.md` 9b, `docs/sprites.md`,
   `docs/coop-design.md` "Gero's bunker", `docs/testing.md` "Gero's computer".
 
@@ -201,7 +212,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
   comic-relief player 2; present day opens with Krillin visiting Gohan (player 2 = Krillin), a
   Frieza + Cooler "spirit of the forest" fight replaces the dream, Hercule joins in West City via a
   mansion deal with Piccolo. Checked against the dumped scripts (`build/scripts/`); the one engine
-  blocker is the six-slot party (`docs/story.md` section 5). No code yet, by Ryan's request.
+  blocker is the six-slot party (`docs/story.md` section 5 then; now `docs/story-archive.md` M). No code yet, by Ryan's request.
 - **Eight party slots decided** (Ryan): `docs/party-8-slots.md` inventories every six-slot
   assumption in the ROM (27 pointer words, ~15 tail offsets, 8 count constants, the default table,
   the save path, two screens) from a whole-ROM decompile (`build/decomp_all/`) and plans the work
@@ -247,8 +258,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Gero fights (13 mostly fights player 2, Hercule); re-run the Namekian's final 74/70/68 numbers in
   the fork; King Cold needs a fight set (pose groups 2 and 5-8) before he can partner anyone.
 - Old Hercule needs his own dialogue portrait (he uses Hercule's).
-- Party: Krillin's own names / portrait / abilities (the status screen's per-slot tables have six
-  entries), the save menu's six-wide portrait rows, the status screen's paging key; the journal with
+- Party: the save menu's six-wide portrait rows, the status screen's paging key; the journal with
   seen bits set was not exercised in the fork.
 
 - Human test of the save-pad switch with player 2 present; a real two-PC netplay run.
@@ -258,4 +268,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - Super Saiyan Hercule: icon for the ability, aura/flash on transform, EP drain and revert rules,
   Hercule-specific SSJ moveset; the game's own transformed-state handling only runs for the active
   player (opcode 73 refreshes player 1's entity only; `p2_refresh_sprite` covers player 2).
-- Story: continue from `docs/story.md` section 0 ("Next to decide").
+- Story: Ryan plans the Cell Games, the ending and the Buu phase next (`docs/story.md` section 0).
+- Removed from the wait (2026-10-18): the arctic Android 13 encounter (`ch8_arctic`), held for after Cell;
+  stat 114 and flag 376 are unused.
+- Training waves: rewards beyond EXP are Ryan's call (ideas in `docs/story.md` 4g).

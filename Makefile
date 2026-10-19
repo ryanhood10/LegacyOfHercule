@@ -21,7 +21,7 @@ PARTY_SLOTS ?= 8
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
 # MAPS=1 (default): new maps built from data/maps/*.json by tools/mapbuild.py (zone 15: arctic, Time
-# Chamber, Broly's arena; docs/maps.md), placed from MAP_FREE and appended to the relocated map table
+# Chamber, Broly's arena, the Buu crater; docs/ids.md, docs/maps.md), placed from MAP_FREE and appended to the relocated map table
 MAPS ?= 1
 MAP_SPECS ?= $(sort $(wildcard data/maps/*.json))
 MAP_FREE ?= 0xD00000

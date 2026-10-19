@@ -6,6 +6,9 @@ can roam. The GBA draws exactly 240 x 160 and no emulator option enlarges that, 
 co-design: a modified mGBA renderer plus ROM-side changes. Findings from mGBA 0.10 source
 (`tools/downloads/mgba`, MPL-2.0) and the running game.
 
+**Status: built and working since 2026-10-17.** Current facts: "Map streaming, decoded", "The fork"
+and "Status: working". Sections marked History are the planning trail and are superseded.
+
 ## What the game gives the hardware
 
 | Fact | Value | Consequence |
@@ -16,11 +19,15 @@ co-design: a modified mGBA renderer plus ROM-side changes. Findings from mGBA 0.
 | Culling | per-entity screen box test against the camera cell's view rect (`0x08007A84`) | entities outside 240 x 160 emit no OBJ |
 
 So the emulator cannot "render more map": the map outside the 256-px tilemap ring is not in VRAM.
-The game streams tile columns/rows into that ring as the camera moves (streaming routine still to
-be located; the map loader `0x0800C584` and the camera `Camera_Apply 0x080062E8` are the entry
-points).
+The game streams map chunks into that ring as the camera moves (the streaming routine was located
+the same day: "Map streaming, decoded" below).
 
 ## Design that works within those limits
+
+History (2026-10-17, superseded): item 1, the EWRAM extended tilemaps, was dropped once the map
+streaming was decoded: the fork's renderer draws straight from the ROM's chunk table and the ROM only
+publishes a small descriptor (see "Map streaming, decoded" and "The fork"). Items 2-5 were built
+roughly as described, with the details in "The fork" and "Status: working".
 
 1. **Extended tilemaps in EWRAM.** The ROM, when the wide view is active, writes the tilemap
    entries of the whole wide area (up to 720 x 480 px = 90 x 60 tiles per BG) into an EWRAM buffer
@@ -76,6 +83,9 @@ rows; mGBA savestates and the Lua bridge keep working since the core is unchange
 
 ## Blocker: Windows Smart App Control (2026-10-17)
 
+History (resolved 2026-10-17): the fork is built and run inside WSL Ubuntu; Smart App Control stays
+on (a standing rule: never change Windows security settings). The note as written:
+
 MSYS2 installed fine (GCC 16, CMake 4.4, Ninja, SDL2, Lua), but `ld.exe` is blocked by Smart App
 Control ("An Application Control policy has blocked this file"; `VerifiedAndReputablePolicyState=1`,
 code-integrity enforcement 2). It allowed `gcc.exe`/`cmake.exe` only because those exact unsigned
@@ -86,6 +96,9 @@ are not subject to it; WSLg shows the window; the Lua bridge works over localhos
 wide view. Decision is Ryan's.
 
 ## Build requirements
+
+History (superseded): the MSYS2 route below was blocked by Smart App Control and is not used. The
+fork builds in WSL with `tools/mgba-wide/build-wsl.sh` ("The fork" below).
 
 MSYS2 is now installed at C:\msys64 with the packages below. The lean route is
 MSYS2 (`mingw-w64-ucrt-x86_64-{gcc,cmake,ninja,SDL2,lua,zlib,libpng,libzip,sqlite3}`), building
@@ -110,7 +123,8 @@ packages on top and is optional.
 - Build and run (WSL, see the Smart App Control note): `wsl -d Ubuntu -u root -- bash
   /mnt/f/MeltyCreations/log2/tools/mgba-wide/build-wsl.sh`, then
   `MGBA_SCRIPT=/mnt/f/MeltyCreations/log2/tools/mgba/coop.lua /root/mgba-build/sdl/mgba -3
-  /mnt/f/MeltyCreations/log2/build/log2-coop.gba` (WSLg shows the window on the Windows desktop;
+  /mnt/f/MeltyCreations/log2/build/log2-wide.gba` (a `make WIDE=1` build writes `log2-wide.gba`; the
+  stock-view `log2-coop.gba` also runs; WSLg shows the window on the Windows desktop;
   `tools/win_shot.ps1 out.png -Title "mGBA (Ubuntu)"` screenshots it). `tools/mgba/wide_test.lua`
   forces a descriptor (`WIDE_W`/`WIDE_H` env) so the renderer can be exercised before the ROM side.
 
@@ -141,6 +155,9 @@ pause menu and BG0 text stay at native size in the top-left of a wide frame; OBJ
 the stock Windows mGBA ignores the descriptor and shows the normal 240 x 160 of a `WIDE=1` ROM.
 
 ## Plan
+
+History (2026-10-17, done): every step below was carried out, with the EWRAM tilemap of step 2
+replaced by drawing from the ROM's chunks (see the top of the file).
 
 1. Toolchain install (needs Ryan's OK), stock SDL build, run `build/log2-coop.gba`.
 2. Locate and document the map tile streaming routine and tilemap entry format; C reimplementation

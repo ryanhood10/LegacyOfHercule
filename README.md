@@ -1,9 +1,17 @@
-# Legacy of Goku II — decomp + co-op
+# The Legacy of Hercule: a co-op mod of Legacy of Goku II
 
-Decompilation of *Dragon Ball Z: The Legacy of Goku II* (GBA, USA, `ALFE`) with the goal of
-adding shared-screen co-op (link cable as second controller) and later merging *Buu's Fury*.
+A mod of *Dragon Ball Z: The Legacy of Goku II* (GBA, USA, `ALFE`) in two layers:
 
-This repo contains code and notes only. No ROM data or game assets are committed.
+- **Two-player co-op**: a second player on the same screen with their own character, HUD, damage
+  and EXP, a midpoint camera, stronger enemies and twin bosses, player-vs-player duels, and an
+  optional wide view on big screens.
+- **The Legacy of Hercule**: a story mod on top, with Hercule as the hidden hero (Super Saiyan
+  Hercule, Krillin playable, new chapters, bosses and maps). *Buu's Fury* is a later phase.
+
+It is not a rebuildable decomp. The build compiles our C (`src/coop/`) into a blob, drops it into the
+stock ROM padded to 16 MiB and patches the ROM to call it (vtable slots, entry jumps, relocated
+tables, data records). This repo contains code, tools and notes only; no ROM data or game assets are
+committed.
 
 Working on it with Claude? `CLAUDE.md` is the one-page quick-start and `docs/INDEX.md` maps every
 document, source file and tool; `docs/log.md` says what landed last and what is open.
@@ -14,7 +22,7 @@ Drop dumps of your own cartridges here (git-ignored):
 
 ```
 roms/log2.gba     Dragon Ball Z: The Legacy of Goku II (USA)   game code ALFE
-roms/buu.gba      Dragon Ball Z: Buu's Fury (USA)
+roms/buu.gba      Dragon Ball Z: Buu's Fury (USA)              optional: a few converted sprites (left out when absent, or with BUU=0)
 ```
 
 Then check them:
@@ -25,50 +33,79 @@ python tools/romcheck.py roms/log2.gba roms/buu.gba
 
 ## Ghidra
 
-Builds a headless Ghidra project in `build/ghidra/` with the GBA memory map, functions seeded from
-`bl` targets and pointer tables (Ghidra's own code finder is useless on this ROM), and a function
-list in `build/log2.functions.csv`:
+Builds a headless Ghidra project in `build/ghidra/` with the GBA memory map and functions seeded from
+`bl` targets and pointer tables (Ghidra's own code finder is useless on this ROM):
 
 ```
 tools\ghidra_import.ps1 roms\log2.gba
 ```
 
-Open `build\ghidra\log2.gpr` in the Ghidra GUI afterwards. Findings go in `docs/rom-map.md`.
+Open `build\ghidra\log2.gpr` in the Ghidra GUI afterwards. `tools/ghidra/DecompileFunctions.java`
+writes decompiled C per function; the whole-ROM corpus in `build/decomp_all/` is the first place to
+grep. Findings go in the topic doc they belong to (engine, maps, sprites, scripts, ...); `docs/INDEX.md`
+says which.
 
-## Building the co-op ROM
+## Building
 
 `src/coop/` is compiled with `arm-none-eabi-gcc` (Thumb, arm7tdmi) into a blob linked at
-`0x08800000`, and `tools/patch_rom.py` pads the original to 16 MiB, drops the blob in, and rewrites
-the vtable slots that redirect into it:
+`0x08800000`; `tools/patch_rom.py` pads the original to 16 MiB, drops the blob in and applies the
+patches, the Hercule data (`data/hercule.json`, `data/story/`) and the new maps (`data/maps/`).
+Run `make` from Git Bash with the ARM toolchain and GnuWin32 make on the PATH (`CLAUDE.md` "Build"
+has the exact line; `make` does not run from PowerShell):
 
 ```
-make
+make                        # build/log2-coop.gba
+make WIDE=1                 # build/log2-wide.gba, the wide view for the WSL mGBA fork
+make DEBUG_MENU=1           # the title screen opens the game's leftover debug menu (Map Test)
 ```
 
-Output: `build/log2-coop.gba`. Run it in mGBA. For a boot smoke test over the GDB stub:
-`mgba-sdl -g build\log2-coop.gba`, then `arm-none-eabi-gdb -batch -x tools\gdb\check_boot.gdb`.
+The build flags (`PARTY_SLOTS`, `HERCULE`, test triggers, sprite ids) are listed in `CLAUDE.md`.
 
-## Playing two-player on one PC
+With `DEBUG_MENU=1`, leave the title screen alone: after 30 s with no key held (1800 frames) it opens
+the debug menu instead of the intro video, about 75 s after power-on since the logos and intro come
+first. Map Test loads any map with a level-40 party.
 
-1. Open `build\log2-coop.gba` in mGBA (the Qt `mGBA.exe`, not `mgba-sdl`).
+Debugging: the mGBA fork in WSL (`tools/fork/`, `tools\fork\runfork.ps1 <rom> -Slot n`) has a GDB stub
+on port 2345+n with a persistent GDB client, and a TCP pad on 7778+n. Recipes, the headless test
+runner (`tools/headless/`) and the Windows mGBA Lua helpers are in `docs/testing.md`.
+
+## Who player 2 is
+
+Player 2 is a party member other than player 1's character: one with party flag bits 0 (in the
+party) and 1 (available), Hercule first when he qualifies. The story's flag opcodes therefore pick
+and lock player 2, and with only one party member there is no player 2. Player 2 presses Select to
+switch to the next available member; the two players never share a character (if player 1 takes
+player 2's character at a save pad, player 2 gets player 1's old one). Player 2 appears once its pad
+sends anything; with no second pad the game plays as single-player.
+
+## Player 2's input
+
+A GBA game sees only its own 10 buttons, so player 2's pad reaches the ROM through an EWRAM word
+(`g_p2_remote`) that the emulator side writes:
+
+| transport | use | status |
+|---|---|---|
+| TCP bridge (`tools/p2_keys.py` + `tools/mgba/coop.lua`) | two players on one PC (Windows mGBA) | works |
+| lockstep netplay (`tools/mgba/netplay.lua` + `tools/netplay_relay.py`) | online, each player runs the ROM | works (tested on one PC, two instances) |
+| fork pad port (`MGBA_P2=1`, `tools/p2_keys.py --port`) | the WSL fork, wide view | works |
+| link cable (`P2_MODE` 0, a second GBA as pad) | real hardware | code in place; stalls under mGBA 0.10.5, untested on hardware |
+
+### Two players on one PC
+
+1. Open `build\log2-coop.gba` in mGBA (the Qt `mGBA.exe`).
 2. Tools > Scripting, type `dofile("F:/MeltyCreations/log2/tools/mgba/coop.lua")` and Run. That
    loads the player-2 bridge plus the console helpers `peek()`, `ents()` and `p2_force` (mGBA 0.10.5
    has no command-line script option, so this step is manual).
 3. Run `python tools\p2_keys.py` in a terminal. Player 1 uses mGBA's normal keys; player 2 uses
    IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. Two gamepads: bind one in mGBA,
-   adapt `KEYMAP` in `p2_keys.py` for the other. (A second player on another PC can also run
-   `p2_keys.py --host <your ip>` with TCP 7777 forwarded and watch a screen share, but see the next
-   section for real netplay.)
+   adapt `KEYMAP` in `p2_keys.py` for the other.
 
-Player 2 appears as soon as its pad sends anything, as Hercule (level 1) by default, with its own
-HUD panel on the right, its own damage and EXP (kills go to whoever made them). Player 2 presses
-Select to switch to another available party member; the two players never share a character (if
-player 1 picks player 2's character at a save pad, player 2 takes player 1's old one). With no second
-pad the game plays exactly as before. Testing tip: `make DEBUG_MENU=1`, idle ~75 s on the title for
-the debug menu's Map Test, and keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t
-build\log2-coop.ss1 build\log2-coop.gba` starts straight from it.
+Keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t build\log2-coop.ss1 build\log2-coop.gba`
+starts straight from it. Make savestates with the current build: player 2's vtable copies in EWRAM
+hold code addresses, so a state from an older build crashes (`Jumped to invalid address`) as soon as
+player 2 acts.
 
-## Playing online (lockstep netplay)
+### Playing online (lockstep netplay)
 
 Both players run the same `build\log2-coop.gba` in their own mGBA, and `tools/mgba/netplay.lua`
 keeps the two emulations identical: every frame each side sends its pad word and waits for the
@@ -96,15 +133,9 @@ frame N+delay, so the game never waits as long as one-way latency stays under (d
 (16.7 ms each). Use 2 on a LAN, 3-4 across the internet; the guest adopts the host's value.
 The host's snapshot includes its save data, so the guest's `.sav` is overwritten by the host's.
 Do not load `p2_input.lua`/`coop.lua` in the same mGBA as `netplay.lua`: both write player 2's pad.
+Both sides need a ROM from the same `make` flags (the handshake compares the ROM's CRC).
 
-Testing on one PC: start two mGBA instances, use `tools\mgba_script.ps1 '<lua>' -Window N` to type
-into each one's Scripting console (it opens Tools > Scripting itself), `tools\mgba_input.ps1` to
-drive each window, and `tools\mgba_shot.ps1 out.png -Title 'Scripting*' -Of N` for instance N's
-console. Make savestates with the current build: player 2's vtable copies in EWRAM hold code
-addresses, so a state from an older build crashes (`Jumped to invalid address`) as soon as
-player 2 acts.
-
-## Wide view on big screens (WSL fork)
+### Wide view on big screens (WSL fork)
 
 `make WIDE=1` builds `build\log2-wide.gba`, which widens the view up to 720 x 480 as the two
 players separate and shrinks it back when they rejoin. It needs the mGBA fork in `tools/mgba-wide`,
@@ -117,14 +148,17 @@ python tools\p2_keys.py --port 7778
 ```
 
 The window appears on the Windows desktop (WSLg). See `docs/widescreen.md` for the design and
-limits (the Lua helpers and netplay script do not run in the fork yet).
+limits (the Lua helpers and netplay script do not run in the fork).
 
 ## Layout
 
 ```
-asm/     disassembly / split pieces that still link as original binary
-src/     decompiled C
-tools/   ROM splitting, checking, asset extraction
-docs/    reverse-engineering notes (formats, memory map, findings)
-build/   build output (ignored)
+src/coop/   the C blob: co-op, bosses, story hooks, party, duels, waves, wide view (coop.ld pins its RAM)
+tools/      build steps (patch_rom.py, romdata.py, mapbuild.py, script_asm.py, sprite generators),
+            ROM readers and dumpers, mgba/ (Lua helpers), fork/ (WSL fork helpers), headless/
+            (headless test runner), mgba-wide/ (the fork's patches), ghidra/, gdb/
+data/       our story and data edits: hercule.json, story/ (chapter scripts), maps/ (new maps)
+docs/       design notes and reverse-engineering findings; docs/INDEX.md is the map
+roms/       your ROM dumps (ignored)
+build/      build output, decompile corpus, test states (ignored)
 ```

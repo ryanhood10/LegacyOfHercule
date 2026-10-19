@@ -15,9 +15,10 @@ Working notes. Addresses are ROM offsets unless prefixed `0x08`.
 ## IWRAM image (`0x7FD6BC`, 0xE7F bytes -> `0x03000000`)
 
 Starts with ARM code: a bitstream decoder loop (`adds r6,r6,r6 / bcs`, reloads a 32-bit word every
-31 bits via `ldrmi r6,[r1],#4; movmi sl,#31`, helper at `0x0300024C`). This is a custom
-LZ/Huffman-style decompressor kept in IWRAM for speed; almost certainly the "everything is
-compressed" codec. Later in the image: pointers `0x08020BD9` (Thumb fn), `0x083ED210`, `0x030022B8`,
+31 bits via `ldrmi r6,[r1],#4; movmi sl,#31`, helper at `0x0300024C`). This is the **JCALG1**
+decompressor, kept in IWRAM for speed; map chunks and sprite frames are JCALG1 streams (chunk
+unpacker `0x0801F394`: header word 0 = 0 plain copy, 1/2 JCALG1; `docs/widescreen.md` "Map streaming";
+our ports: `tools/mapchunks.py` and the fork's C decoder). Later in the image: pointers `0x08020BD9` (Thumb fn), `0x083ED210`, `0x030022B8`,
 a block of eight `0x04000000` and a run of `0x08020D25` entries (handler/jump table with a default).
 
 ## Language / toolchain
@@ -26,8 +27,10 @@ a block of eight `0x04000000` and a run of `0x08020D25` entries (handler/jump ta
   `K:\Source\ByteCodeInterpreter\ByteCodeFunctionList.cpp`, `...\ByteCodeVariableList.cpp`.
   Buu's Fury has the same files under `T:\Source\` plus `ByteCodeInterpreter.cpp`, `GameData.cpp`.
 - `"Assertion Failure!"` at `0x01F984`.
-- No `__rt_*` (ADS), no `GCC:`/libgcc/newlib, no scatter-load tables. Compiler still unidentified; a
-  non-matching (shiftable) decomp is the plan, so this is low priority.
+- No `__rt_*` (ADS), no `GCC:`/libgcc/newlib, no scatter-load tables. Compiler still unidentified.
+  It does not matter for this project: there is no matching or non-matching decomp to rebuild. The
+  mod is the stock ROM plus a compiled C blob (`src/coop/`) and patches that hook into it (vtable
+  slots, entry jumps, relocated literals, data records); see "Patched ROM layout" below.
 
 ## main
 
@@ -62,6 +65,10 @@ matching (Ghidra Version Tracking / BSim) rather than byte comparison.
 
 ## Functions (Ghidra, seeded)
 
+History (first pass, superseded): the numbers below describe the first seeded import. The working
+corpus is now `build/decomp_all/` (about 2,700 functions, one `<addr>_FUN_<addr>.c` file each, made
+with `tools/ghidra/DecompileFunctions.java <outdir> all`); grep it before guessing at engine behaviour.
+
 Ghidra's auto-discovery on the raw ROM is useless here (69k fake functions in data, 489 real ones), so
 `tools/ghidra_import.ps1` seeds it instead: `seed_functions.py` collects `bl` targets in the code
 region plus Thumb pointers found in literal pools and pointer tables, `SeedFunctions.java` creates
@@ -75,8 +82,33 @@ those functions with a small analyzer whitelist.
 - Thumb pointer tables into code live at `0x3C0000-0x440000` (~3,800 entries) and
   `0x6C0000-0x700000` (~1,500 entries): callback tables for the script/entity system.
 
+## Patched ROM layout (the build's 16 MiB output)
+
+`tools/patch_rom.py` pads the 8 MiB original to 16 MiB with `0xFF` and fills the upper half; file
+offsets (add `0x08000000` for the address):
+
+| file offset | content | owner |
+|---|---|---|
+| `0x000000 - 0x7FFFFF` | stock ROM with in-place patches: vtable slots and entry jumps into the blob, word/byte patches (heap cap at `0x1F20C`, display-row limit at `0x42D6`), relocated literals, party count bytes | `patch_rom.py` |
+| `0x800000` | code blob (`src/coop/`, linked at `0x08800000`, region 1 MiB in `coop.ld`): code, relocated display rows, sprite index, UI strings, portrait and status module tables, generated sprite data | `make`, `coop.ld` |
+| `0x900000` | data-patch region (`HERCULE=1`): the relocated, extended ability table first, then other new data | `tools/romdata.py` from `data/hercule.json` (`"free"`) |
+| `0xA00000` | default party table with `PARTY_SLOTS` entries, then the growth rows | `patch_rom.py` `build_party_table`, `romdata.PARTY_TABLE_AT` |
+| `0xA01000` | shadow pointer tables, 0x200 bytes each (`PARTY_SHADOWS`) | `patch_rom.py` |
+| `0xB00000 - 0xBFFFFF` | story data: assembled scripts and dialogue (`data/story/*`) | `tools/mapedit.py` `STORY_FREE` / `STORY_LIMIT`, `data/hercule.json` `"story_free"` |
+| `0xC00000` | `StoryTest` preset, read by `STORY_TEST=1` builds (`STORY_PRESET` in `coop.h`) | `tools/fork/st_preset.py` |
+| `0xD00000` | new maps (`data/maps/*.json`): their records, then the relocated `MapEntry` table (327 stock rows + the new ones; `0x08D0C084` with 331 rows in the merged build of 2026-10-19) | `tools/mapbuild.py`, `MAP_FREE` in the Makefile, `patch_rom.py --maps` |
+
+Word, byte, literal and party patches (and data records with an `"expect"` field) check the stock
+bytes they replace and stop the build if they differ; map data must land on unused `0xFF` padding.
+Vtable hooks and entry jumps are not checked. Ids and RAM addresses: `docs/ids.md`.
+
 ## Open questions
 
 - Which compiler (codegen idioms: division helper calling convention, prologue style, literal pools).
-- Bytecode script format (opcode table exists in Arefu/Legacy research repo).
-- Asset compression scheme(s).
+  Not needed by the hook/blob approach.
+
+Answered since (History):
+
+- Bytecode script format: decoded; `tools/script_dump.py` dumps the stock scripts (`build/scripts/`),
+  `tools/script_asm.py` assembles ours; `docs/scripts.md`.
+- Asset compression: JCALG1 (above), ported in `tools/mapchunks.py` and the fork.
