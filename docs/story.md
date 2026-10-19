@@ -526,9 +526,17 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   announcement; the game never shows Goku and Gohan coming out); Mr. Popo on the Lookout gets a line
   pointing the players to it; 10 rounds, enemies getting progressively harder (the enemy list per
   round to be mapped); the players can walk out the door at any time; after round 10 the spawning
-  stops and a caption says "Training completed!". Limit to respect: sprite memory, not a fixed
+  stops and a caption says "Training completed!". Repeatable as many times as the players want. Limit to respect: sprite memory, not a fixed
   count; in co-op every regular enemy brings a twin, so about 4 per wave (8 on screen) is the working
   number until it is measured. Open: round display between waves, and any reward beyond EXP.
+- **Android 16 side chapter (Ryan, idea, 2026-10-18):** a chapter in the wait with the players locked
+  to Android 16 and Krillin. Facts: the game never shows 16 repaired. Right before Cell's TV
+  announcement, Bulma and Dr. Briefs read his memory in Dr. Briefs' workshop (zone 6 area 5, quest
+  "Talk to Bulma in Dr. Briefs' workshop"); he is next seen standing at the Cell Games arena, and
+  Krillin reveals there that they removed his bomb while repairing him. So he is fixed some time in
+  the ten days, off screen. Where the players meet him and where the chapter goes: Ryan to decide.
+  Making 16 playable is a new party character like Krillin (player poses, row, abilities); his
+  portrait exists (speaker 26) and his fighting sprite (160) is enemy-grade.
 - **Broly side chapter (Ryan, 2026-10-18), in the wait:**
   - *Trigger:* right after Cell's TV announcement in the Briefs' residence (zone 6 area 16, where
     Bulma already hands over the Scouter Note), Bulma adds: tell Vegeta a ship is arriving for him in
