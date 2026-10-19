@@ -83,9 +83,10 @@ playable, Android 13 / 16 / Namekian models, zone-15 maps). Tested per chapter w
 runner (`tools/headless/`); the space duel was also played in the fork with a real final blow.
 Numbers chosen by Claude that Ryan may want to change: Kami's boost (+3 levels and a refill),
 the arctic 13 (stat 114, half health), the gym duos (also fought in single-player).
-Still open for Ryan: the ten-day wait is fully planned (section 4g; the Time Chamber waves and the dojo
-sparring are built on branch `lookout-training`, the rest in parallel sessions); next the Cell
-Games, the ending and the Buu phase. Android 13 returns after Cell (4g).
+The ten-day wait is built and merged (2026-10-19, section 4g): the Broly chapter, the Krillin + 16
+"Gero's computer" chapter, the Time Chamber training waves and Roshi's dojo sparring, each re-tested
+headless on the merged build. Still open for Ryan: the Cell Games, the ending and the Buu phase.
+Android 13 returns after Cell (4g).
 
 **Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
 and half-health boss rules in `enemies.c`; duplicate-actor suppression; single-pad world map; a
