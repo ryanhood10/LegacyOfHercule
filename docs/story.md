@@ -59,7 +59,7 @@ not used by any trigger (`docs/story-archive.md`).
 
 **Open (next to plan, Ryan in chat):**
 
-- The Cell Games: Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
+- The Cell Games (in planning, section 4h): Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
   old note; the stock script removes Goku after Cell's defeat and makes Hercule available). Stock
   flow in `docs/story-rom.md` section 9.
 - The ending of LoG2, and Android 13's return after the wish.
@@ -338,6 +338,23 @@ value fires its defeat action at that threshold instead of at zero HP.
 - **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate
   castle-defense game where waves of Cell Juniors try to steal it. The hunt appears to gate the Cell
   Games (`docs/story-rom.md` section 8); confirm in play before building on it.
+
+## 4h. The Cell Games (Ryan, 2026-10-19, in planning)
+
+Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` section 9. Decided so far:
+
+- **The ring scene stays.** Before fight 1 the game already shows Hercule's attack: he walks up, throws
+  a string of punches that do nothing, Cell: "Your ignorance is painful," Hercule's "finishing move,"
+  and one blow from Cell sends him gliding off the ring (Krillin: "I was rooting for Cell that time").
+- **Fight 1 (the ring): player 1 fights as Goku, 1 v 1** against Perfect Cell (no twin Cell, player 2
+  does not fight).
+- **Fight 2 (the desert): player 2 fights as Goku, 1 v 1** against Perfect Cell.
+- **The change starts at the end of fight 2.** Goku still says he is done fighting, but instead of
+  naming Gohan he subs in Mr. Satan (Hercule): "Get out here!" Hercule comes out to the ring instead
+  of Gohan.
+- Open (next decisions): what player 1 does during fight 2; what happens once Hercule is out there
+  (the stock continuation is Gohan's fight 3, Android 16's sacrifice, the Cell Juniors); how this fits
+  the standing rule that nothing reveals Hercule as the hero before the Buu phase.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
