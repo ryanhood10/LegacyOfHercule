@@ -524,8 +524,8 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   players can enter the Hyperbolic Time Chamber (zone 15 area 2) and fight waves of enemies to level
   up instead of grinding in the wild. Decided: it opens at the start of the ten-day wait (after Cell's
   announcement; the game never shows Goku and Gohan coming out); Mr. Popo on the Lookout gets a line
-  pointing the players to it; 10 rounds, enemies getting progressively harder (the enemy list per
-  round to be mapped); the players can walk out the door at any time; after round 10 the spawning
+  pointing the players to it; 10 rounds in fixed tiers, harder enemies as the rounds go up (Ryan;
+  the enemy list per round to be mapped); the players can walk out the door at any time; after round 10 the spawning
   stops and a caption says "Training completed!". Repeatable as many times as the players want. Limit to respect: sprite memory, not a fixed
   count; in co-op every regular enemy brings a twin, so about 4 per wave (8 on screen) is the working
   number until it is measured. Open: round display between waves, and any reward beyond EXP.
