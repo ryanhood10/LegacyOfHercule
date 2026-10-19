@@ -287,10 +287,11 @@ confined to this little ring," blows the ring apart, and the fight moves to the 
 3. Android 16 grabs Cell to self-destruct; Krillin: "Your bomb was removed!" Cell destroys 16.
 4. Cell spawns three Cell Juniors ("My children! Give them pain!"). **Fights 4-6: one Cell Junior
    each, in turn, as Piccolo, then Vegeta, then Trunks** (the script switches player 1 between them).
-5. **Fight 7: Gohan vs Cell (stat 24).** Mid-fight, Hercule carries 16's head to Gohan (16: "Take me
-   over to the boy!"); 16's last words; Cell crushes him; Gohan: "I won't watch this ANYMORE!!!",
-   becomes Super Saiyan 2 ("Gohan has entered Super Saiyan Rage!"), Cell: "NOW TASTE MY TRUE POWER."
-6. Gohan beats Cell down until he spits out Android 18 (back to Semi-Perfect, sprite 29), then Cell
+5. After the third Junior falls (still in its defeat scene), Gohan is player 1 again: Hercule carries
+   16's head to Gohan (16: "Take me over to the boy!"); 16's last words; Cell crushes him; Gohan: "I
+   won't watch this ANYMORE!!!", becomes Super Saiyan 2 ("Gohan has entered Super Saiyan Rage!"),
+   Cell: "NOW TASTE MY TRUE POWER." **Fight 7: Super Saiyan 2 Gohan vs Cell (stat 24).**
+6. Beaten (stat 24's defeat scene), Cell spits out Android 18 (back to Semi-Perfect, sprite 29), then Cell
    swells to self-destruct (sprite 27). Goku: "Goodbye friends," teleports Cell to King Kai's planet.
    Gohan: "DADDY!!!" Krillin consoles him, remembers 18 is alive.
 7. Cell returns as Perfect Cell (he regenerated from his core), kills Trunks, Vegeta attacks in rage.
