@@ -37,8 +37,8 @@ typedef struct ExtraStat {
 #define BOSS_RAGE    4
 
 // Broly's rage when Paragus falls first (docs/story.md 4g); our tuning
-#define BOSS_RAGE_MELEE    14     // added to the survivor's melee / ranged attack bytes (capped at 255)
-#define BOSS_RAGE_DEFENCE  8      // added to its defence byte
+#define BOSS_RAGE_MELEE    10     // added to the survivor's melee / ranged attack bytes (capped at 255)
+#define BOSS_RAGE_DEFENCE  6      // added to its defence byte
 #define BOSS_RAGE_SPEED_NUM 13    // chase speed x 13/10 from the rage on
 #define BOSS_RAGE_SPEED_DEN 10
 

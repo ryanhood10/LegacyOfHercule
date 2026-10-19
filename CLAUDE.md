@@ -57,7 +57,7 @@ the sprites converted from Buu's Fury (ids 158 Hercule, 159 Broly; `BUU_SPRITES`
 build). `A16_SPRITE` (160) is Android 16's boss sprite; `A16_TEST=1` = player 1's L+R+Down spawns the
 Android 16 boss (enemy stat 109) and enables the fight autopilot (`docs/testing.md`). `KRILLIN_SPRITE` (161) is Krillin's
 playable sprite; `KR_TEST=1` = Krillin / old Hercule test triggers on player 2's pad (`docs/testing.md` "Krillin"). `STORY_TEST=1` = chapter-test build (fork TCP pad drives player 1, ROM story-flag preset; `docs/testing.md`). `A13_SPRITE` (165) / `NAMEK_SPRITE` (166) are
-Android 13 and Cooler's Namekian servant (`tools/bossmodels.py`; boss rules in `src/coop/bosses.c`). `make` does not run from PowerShell
+Android 13 and Cooler's Namekian servant (`tools/bossmodels.py`; boss rules in `src/coop/bosses.c`). `PARAGUS_SPRITE` (170) / `SHIP_SPRITE` (171) / `PARAGUS_PORTRAIT` (120) are the Broly chapter's art (`tools/brolysprites.py`; Broly 159 and the ship need `roms/buu.gba`). `make` does not run from PowerShell
 (GnuWin32 make needs sh) and WSL has no ARM toolchain; use Git Bash with the PATH above.
 
 ## Test (see docs/testing.md for the full recipes)

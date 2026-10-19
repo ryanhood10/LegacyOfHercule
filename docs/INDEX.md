@@ -39,7 +39,7 @@ file and tool, and says where to look for a given question. Keep it current.
 | `exp.c` | EXP credited to the killing player |
 | `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` |
 | `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
-| `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler's Namekian) and per-boss rules (end_pct, partner model/stat, no twin); the both-down rule lives in `enemies.c` |
+| `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler's Namekian, 115 / 116 Broly / Paragus) and per-boss rules (end_pct, partner model/stat, no twin, pair, rage: `BOSS_RAGE`, Broly's once-only refill when Paragus falls first); the both-down and rage rules live in `enemies.c` |
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
 | `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2 (`docs/scripts.md` 2.2b) |
@@ -68,7 +68,7 @@ icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/kril
 `maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`, `broly_crater` (needs
 `roms/buu.gba`); format in
 `docs/maps.md`), built by `tools/mapbuild.py` and placed by `patch_rom.py --maps` (`MAPS=1`).
-`story/*.json` + `story/*.lscript` are the story chapters (map edits and scenes, `docs/scripts.md`), included by `hercule.json`. `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
+`story/broly.*` is the Broly side chapter (it also feeds `maps/broly_arena.json`). `story/*.json` + `story/*.lscript` are the story chapters (map edits and scenes, `docs/scripts.md`), included by `hercule.json`. `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
 Keep-Goku byte, included text records); `hercule-text.json` holds dialogue records written by
 `tools/script_dump.py`. Applied by `tools/romdata.py build` then `patch_rom.py --data-patch`.
 
@@ -88,6 +88,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group) and the projectile frames -> `build/gen/a16_sprites_data.c` |
 | `bossmodels.py` | Android 13 (id 165: 16's body + 17's fight frames, re-dressed per body part: cap, white hair, vest, jeans) and Cooler's Namekian servant (id 166: Piccolo's capeless set 104 recoloured) -> `build/gen/boss_models_data.c`, previews |
+| `brolysprites.py` | the Broly chapter's art: Paragus (id 170: Vegeta's set 137 with grey hair and a goatee, per frame), his dialogue portrait (id 120, via `krillinsprites.py --extra-portrait`), the Saiyan ship (id 171: Buu's Fury record 1) -> `build/gen/broly_sprites_data.c`, preview |
 | `krillinsprites.py` | Krillin's playable sprite (id 161: sprite 76 + Goku's fight groups re-headed), status portrait (73 in the menu BG palette), blue ki blast, Destructo Disc frames, HUD and status icons, the UI string table with per-slot blocks, the portrait module table -> `build/gen/krillin_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |

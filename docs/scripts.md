@@ -53,6 +53,9 @@ Useful action facts found on the way (decompiled):
 | 79 / 91 SetCharacterInPartyFlag / ClearCharacterInPartyFlag (slot) | party entry flags bit 0 |
 | 80 / 81 SetCharacterFlag_Bit1 / ClearCharacterFlag_Bit1 (slot) | bit 1 = available (switchable); stock chapters lock characters with it |
 | 90 DrawBossHealthBarRange (char, lo, hi) | `BossHealthBar_Create(0, entity, lo, hi)`: the bar draws the entity's HP over [lo, hi] % |
+| 86 SetPlayerVisible (b) | not the player's visibility: `0x080040AA` sets party flags +1 bit 1, the HUD meter shown; both players stay on screen in scenes (stock scenes spawn a character's actor only when the active character is someone else) |
+| 31 PanCameraToPosition (x, y, speed) | x, y is the view's **top-left** corner, not its centre (the camera starts at spawn - (112, 76)) |
+| 52 DespawnEntity (sprite) and the other sprite-addressed steps | no entity showing that sprite = a write through a null pointer (`0x0800E04C` appends to entity + 0x150): guard them as the spawns are guarded |
 | 38 / 39 WarpToMapWithEntities / NoEntities (zone, area, variation, x, y) | NoEntities loads the map without its records (the island's area 5 has no 16 after the stage-1 warp) |
 
 ### 2.2 Dialogue sequences and entries
@@ -102,6 +105,8 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 5 | P2Present -> 0 / 1 | is player 2 there: its entity or its pad (`p2_present()`, what the co-op twins spawn by; a warp without entities removes the entity until player 1 is free) |
 | 6 | P2Bind slot | player 2's entity plays that slot now (the entity survives warps with entities, so after a duel the story rebinds it); after a warp without entities player 2 is gone until player 1 is free again, and the respawn takes this slot when it is selectable |
 | 7 | PadSwap | the two pads trade players (`coop2.pad_swap` toggles, as when player 2 wins a duel with the swap flag): Perfect Cell, where the pad that played Vegeta takes Krillin and Trunks' pad becomes player 1 |
+| 9 | Stage op, b, c | Broly chapter staging: op 0 = `b` (seq:NAME) is the dialogue a `BOSS_RAGE` survivor runs when its partner falls (kept in `call_end_seq`, which a duel start overwrites); op 1 = player 2 stands at (b, c) px facing up |
+| 10 | PartyKeep op [-> slot] | op 0 keeps the party's selectable bits (slots 0-7), Gohan's in-party bit and who players 1 / 2 are in story flags 404-419; op 1 puts the bits back and pushes player 1's kept slot (follow with `Step SetActiveCharacter`); op 2 binds player 2 to its kept slot |
 | 8 | P2Slot -> slot / -1 | player 2's party slot (the last bound one while a warp has the entity despawned), -1 without player 2: Roshi's gym checks whether either player is Hercule or Krillin |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
@@ -122,6 +127,7 @@ payload}`, created at map load when the condition holds (so flags must be set be
 | 0x0800D7E1 / 0x0800D765 | dialogue, on entering the rect |
 | 0x0800C2C3 / 0x0800D765 or 0x0801087B / 0x0801087F | script, on entering the rect |
 | 0x0800C2C3 / 0x0800D839 | script, **A pressed inside the rect** (the island's area-5 exit) |
+| 0x0800D7E1 / 0x0800D765 via mapedit `"kind": "dialogue"` | a new dialogue trigger on a map that has none to copy (`add_triggers`) |
 | 0x08010AC7 / 0x0800D839 | save pad (16 bytes, no payload) |
 | 0x0800C233, 0x0800D9C3 | exits (door / walk-off); the map's always-on exits are the variation's (`docs/maps.md`) |
 
@@ -145,7 +151,11 @@ lock), and a stock chapter lock applies to player 2 too.
 
 Stock scripts use flags up to 306. Party_Init clears flags 0-399 at a new game; flags 400+ are
 never cleared, so new flags stay below 400. **360-379: story-scripts** (360 Krillin has visited,
-361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`).
+361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`). The ten-day
+wait's side chapters use 400-459 and `party.c` now clears flags 400-479 at a new game too:
+**400-419 the Broly chapter** (400 the ship has landed, 401 the trip is under way, 402 done, 403 the
+confrontation seen, 404-419 the party kept by CoopCall 10), 420-439 Android 16's, 440-459 the Lookout /
+dojo's.
 
 ## 3. lscript, the text form
 
@@ -230,6 +240,7 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 | `ch8_gym` | 175 (zone 6 area 70) | Roshi's sparring room as duos: Yamcha + Tien (stat 106 pairs with Tien's model and stat 98), then Krillin + Hercule (stat 64 pairs with Hercule's sprite 72), `BOSS_PAIR` rules so single-player gets the duos too; when either player is Hercule or Krillin (`CoopCall 8`) the second duo refuses ("Master Roshi says I can only fight duos with Krillin on my team right now... Come back with a different team!") and only the other of the pair stands (record condition scripts); the finale: Roshi's animal ninjas, eleven new enemy records (copies of Yamcha's: alligator, hawk, ladybug, pterodactyl, saber-toothed tiger, scorpion, snake, T-Rex, triceratops, two Ninjas; stats from the bestiary table 0x086F8E40, `{name, description, sprite, portrait, stat}` x 128) in three rounds (all at once ran out of OBJ tiles), flags 363-375, the last defeat pays Tien's +3 Endurance Capsule and flag 214 |
 | `ch8_cooler` | 172 (zone 6 area 61) | Cooler's fight: the three stock openings (Goku, Trunks, anyone else) meet at a co-op check (`stock @A -> 10`), where Cooler brings "a Namekian warrior my father took from Namek long ago" ("...As you command, Lord Cooler.") before the fight with his servant (bosses.c: sprite 166, stat 113); the Piccolo gates are unchanged (zone 4 area 50 needs flag 60 from chapter 2, area 62's barrier Piccolo) |
 | `ch8_arctic` | zone 15 area 1 (built by `tools/mapbuild.py` from `data/maps/arctic.json`, which names this file in `"sources"`) | Android 13 at the cave mouth once Vegeta has opened the barrier (flag 380, encounter flag 376 clear): he was meant to absorb 17 and 18, Cell stole his perfection, he would kill Cell himself; Vegeta: he won't get the chance; a half-health fight (stat 114, alone until Ryan picks his partner), 13 flies off, flag 376 for the post-Cell variant |
+| `broly` | 160, 165 (zone 6 areas 16, 21) and zone 15 area 3 (through `data/maps/broly_arena.json`'s `"sources"`) | the Broly side chapter (docs/story.md 4g): after Cell's broadcast (trigger 1's sequence restated with Bulma's entries appended as 9-11) Bulma walks in about the Saiyan ship (flag 400); the backyard's new ship actor (171) and a new dialogue trigger: without Vegeta as a player a hint, with him Paragus (actor 170, speaker 120), the trip's others walk in (each only when no player plays him), everyone boards, the ship lifts off, CoopCall 10 keeps the party, the five are selectable, warp to the landing zone; the rim trigger (once, flag 403, then straight to the fight): Paragus' betrayal, Broly, `DespawnCharacterAndRecordPosition 159, 2` (stat 115 + Paragus 116 as a `BOSS_PAIR`), CoopCall 9 sets the rage dialogue; the defeat: the explosion (19's effects), the warp home, the debrief, CoopCall 10 restores the party, `ReloadMap` |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 
 Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the

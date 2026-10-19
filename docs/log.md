@@ -2,6 +2,25 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-19
+
+- **Broly side chapter of the ten-day wait** (branch `broly-chapter`, worktree `F:\MeltyCreations\log2-broly`,
+  `data/story/broly`): Bulma walks in after Cell's broadcast with the news of a Saiyan ship (flag 400);
+  in Capsule Corp's backyard, with Vegeta as a player, Paragus steps out of the ship and offers New
+  Planet Vegeta, the trip's five board, the ship lifts off (flag 401; the party is kept in flags
+  404-419); New Planet Vegeta = zone 15 area 3 with a new landing zone (the ship, a save pad, any of the
+  five selectable); crossing the basin's rim brings everyone on screen, Paragus' betrayal, Broly
+  (sprite 159) attacks; players 1 and 2 fight Broly (stat 115) + Paragus (stat 116, sprite 170) as a
+  `BOSS_PAIR`; Paragus falling first makes Broly rage once (new `BOSS_RAGE`: full HP, +10 attack, +6
+  defence, chase x1.3, a rage dialogue); both down: the planet explodes, a Capsule Corp debrief, fade,
+  the party as before (flag 402). New art from `tools/brolysprites.py`: Paragus (Vegeta's 21-group set
+  with grey hair and goatee), his dialogue portrait (id 120), the ship (Buu's Fury record 1, sprite
+  171). Fixes on the way: `buu2log2` records now carry their real frame size (Broly's 64x64 frames had
+  the template's 0x400 VRAM slot), a new game clears story flags 400-479. Tested headless (every beat,
+  co-op and single-player, the rage numbers, a natural autopilot win) and the fight in fork slot 6.
+  Details: `docs/story.md` 4g, `docs/scripts.md` sections 2.2b / 2.5 / 5, `docs/sprites.md` "Paragus and
+  the Saiyan ship", `docs/maps.md` section 9, `docs/testing.md` "Broly chapter".
+
 ## 2026-10-18
 
 - **Boss models** (branch `boss-models`, worktree `F:\MeltyCreations\log2-bm`): Android 13 base form

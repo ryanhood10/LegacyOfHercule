@@ -21,9 +21,10 @@ const ExtraStat extra_stats[] = {
     // a Cell-saga boss's numbers; the fight ends at half health (rule below). Our tuning, untested in play.
     { 5, -1, 6000, -1, 30, 24, 22, 0 },
     // 115 Legendary Super Saiyan Broly (the Broly side chapter in the ten-day wait, data/story/broly.lscript):
-    // Cooler's melee boss AI set (21) and boss class, the strongest numbers of the wait: more HP than
-    // Cooler's 10200 split over a pair, well above Perfect Cell's attack (44/46/50). Our tuning.
-    { 29, -1, 9000, -1, 58, 60, 55, 0 },
+    // Cooler's melee boss AI set (21) and boss class, the strongest numbers of the wait: Cooler's HP
+    // class, hits about 1.3 x Perfect Cell's (44/46/50; 1.8 x once enraged). Our tuning: the test
+    // autopilot with the Map Test party lost to 58/60/55 + rage in about 20 s.
+    { 29, -1, 8000, -1, 52, 54, 50, 0 },
     // 116 Paragus beside him: the same AI set, a fraction of Broly's numbers (he is the weak one); when he
     // falls first Broly rages (BOSS_RAGE below).
     { 29, -1, 2000, -1, 24, 22, 20, 0 },
