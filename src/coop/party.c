@@ -24,6 +24,7 @@ ROM_FN(int, Modal_Run, (void), 0x0801F2F5);                                     
 #define SCRIPT_ENTITY_LIST (*(void **)0x083B5C80)   // the script module's entity list word (its table + 8)
 #define ITEM_TABLE         ((const u8 *)0x086ADE24)  // 0x38 bytes per item; +0 usable, +2 popup, +3 max count, +0x30 handler
 #define PARTY_FLAG_BANK_ZEROED 50     // Party_Init zeroes 25 halfwords of each bank
+#define PARTY_WAIT_FLAG_BYTES 10      // story flags 400-479 (the ten-day wait's side chapters) start clear too
 #define PARTY_COUNTER_BANK_START (0x12A + PARTY_TAIL_SHIFT)   // the stock DMA target 0x12B rounds down
 
 // Party_Init 0x08003C24: new-game defaults. The stock code DMAs 6 x 0x1C from the default table and
@@ -37,6 +38,7 @@ void party_init_hook(PartyState *p) {
     p->active_slot = 3;
     memcpy(p->chars, PARTY_DEFAULTS, PARTY_SLOTS * sizeof(CharacterEntry));
     memset(p->event_flags, 0, PARTY_FLAG_BANK_ZEROED);
+    memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // the wait's chapter flags 400-479
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
     const StoryTest *t = STORY_TEST_RAM;      // chapter-test preset (coop.h)
 #ifdef STORY_TEST

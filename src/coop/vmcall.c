@@ -17,6 +17,15 @@
 //   7 PadSwap ()                        the two pads trade players (coop2.pad_swap, as a duel won by player 2)
 //   8 P2Slot () -> slot / -1            player 2's party slot (the last bound one while a warp has the entity
 //                                       despawned), -1 without player 2
+//   9 Stage (op, b, c)                  the Broly chapter's helpers: op 0 = b is the dialogue a BOSS_RAGE survivor
+//                                       runs when it rages (enemies.c: Paragus falls first; kept in call_end_seq,
+//                                       which only a duel also uses, and a duel start overwrites it); op 1 =
+//                                       player 2 stands at (b, c) px, facing up (scene staging)
+//  10 PartyKeep (op) [-> slot]          the Broly chapter's trip: op 0 keeps the party's selectable bits
+//                                       (slots 0-7), Gohan's in-party bit and who player 1 / player 2 are in
+//                                       story flags 404-419; op 1 puts the bits back and pushes player 1's
+//                                       slot for a SetActiveCharacter step; op 2 (after that step) binds
+//                                       player 2 to its kept slot again
 #include "coop.h"
 
 void hercule_awaken(void);                 // ssj.c
@@ -39,7 +48,7 @@ static void vm_push(s32 *st, s32 v) { s32 n = st[0] + 1; st[0] = n; st[n] = v; }
 
 // Run a dialogue sequence the way an enemy's defeat dialogue starts: an event in the entity list's queue,
 // fired at the next list update, outside whatever code noticed the duel's end.
-static void run_sequence_soon(const void *seq) {
+void coop_run_sequence(const void *seq) {
     if (!seq) return;
     coop2.call_action[0] = ACTION_RUN_DIALOG;
     coop2.call_action[1] = (u32)seq;
@@ -55,12 +64,49 @@ static void run_sequence_soon(const void *seq) {
     list->events[list->event_count++] = (u32 *)ev;
 }
 
+// PartyKeep (CoopCall 10): story flags 404-411 = slots 0-7 selectable (party flags bit 1), 412-414 = player
+// 1's slot, 415-418 = player 2's slot + 1 (0 = none), 419 = Gohan (slot 0) in the party (bit 0). Flags
+// 400-419 are the Broly chapter's (docs/scripts.md 2.5).
+#define KEEP_BITS 404
+#define KEEP_P1 412
+#define KEEP_P2 415
+#define KEEP_GOHAN 419
+void flag_set_hook(PartyState *p, u32 id);
+void flag_clear_hook(PartyState *p, u32 id);
+int flag_test_hook(PartyState *p, u32 id);
+static void keep_flag(u32 id, int v) { if (v) flag_set_hook(g_Party, id); else flag_clear_hook(g_Party, id); }
+static void keep_field(u32 id, int bits, int v) { for (int i = 0; i < bits; i++) keep_flag(id + i, (v >> i) & 1); }
+static int kept_field(u32 id, int bits) { int v = 0; for (int i = 0; i < bits; i++) v |= flag_test_hook(g_Party, id + i) << i; return v; }
+
+static void party_keep(s32 *st, int op) {
+    int n = PARTY_SLOTS < 8 ? PARTY_SLOTS : 8;
+    if (op == 0) {
+        for (int s = 0; s < n; s++) keep_flag(KEEP_BITS + s, (g_Party->chars[s].flags >> 1) & 1);
+        keep_field(KEEP_P1, 3, g_Party->active_slot);
+        int p2 = (coop.p2 || p2_present()) ? coop.p2_slot + 1 : 0;
+        keep_field(KEEP_P2, 4, p2 > 8 ? 0 : p2);
+        keep_flag(KEEP_GOHAN, g_Party->chars[0].flags & 1);
+        return;
+    }
+    for (int s = 0; s < n; s++) {
+        if (flag_test_hook(g_Party, KEEP_BITS + s)) g_Party->chars[s].flags |= 2;
+        else g_Party->chars[s].flags &= ~2;
+    }
+    if (op == 2) {
+        int p2 = kept_field(KEEP_P2, 4);
+        if (p2) { if (coop.p2) p2_bind_slot(p2 - 1); else coop.p2_slot = (u8)(p2 - 1); }
+        return;
+    }
+    if (!flag_test_hook(g_Party, KEEP_GOHAN)) g_Party->chars[0].flags &= ~1;
+    vm_push(st, kept_field(KEEP_P1, 3));
+}
+
 static void call_duel_start(int slot, int flags, const void *end_seq) {
     coop2.call_end_seq = end_seq;
     if (!p2_present()) {                   // single-player: player 1 wins, the story goes on
         coop2.duel_winner = 1;
         coop2.call_state = 0;
-        run_sequence_soon(end_seq);
+        coop_run_sequence(end_seq);
         return;
     }
     if (slot < 0) {                        // the clone's slot exists before player 2 spawns into it
@@ -86,7 +132,12 @@ void vm_coop_call(s32 *st) {
         break;
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
-    default: (void)b; break;
+    case 9:
+        if (a == 0) coop2.call_end_seq = (const void *)b;
+        else if (a == 1 && coop.p2) { coop.p2->x = b << 8; coop.p2->y = c << 8; coop.p2->facing = 1; }
+        break;
+    case 10: party_keep(st, a); break;
+    default: break;
     }
 }
 
@@ -97,6 +148,6 @@ void coop_call_tick(void) {
         coop2.call_state = coop2.duel_active ? 2 : 0;
     } else if (coop2.call_state == 2 && !coop2.duel_active) {
         coop2.call_state = 0;
-        run_sequence_soon(coop2.call_end_seq);
+        coop_run_sequence(coop2.call_end_seq);
     }
 }

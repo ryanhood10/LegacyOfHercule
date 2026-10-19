@@ -23,7 +23,8 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "keep": ["decorations", "gates", "triggers", "exits"],  base objects kept (positions follow stack ops)
   "gates": [{"x":, "y":, "barrier": 0, "color": 3, "level": 50, "char": 2}],  replace/add level gates
   "triggers": [{"type": "flight", "rect": [x1,y1,x2,y2], "world": [x, y]}, {"type": "script", ...},
-               {"type": "dialogue", "rect": [...], "payload": "seq:NAME", "condition": COND}],
+               {"type": "dialogue", "rect": [...], "payload": "seq:NAME", "condition": COND},
+               {"type": "savepad", "rect": [...]}],   the save / switch-characters pad (press A; stamp its art)
   "sources": ["data/story/NAME.lscript"],  story scripts (tools/script_asm.py) named by payloads, record
                                      actions and conditions as seq:NAME / script:NAME; a COND is 0, "flag:N",
                                      "noflag:N", "script:NAME", "never" or a number
@@ -863,6 +864,8 @@ def emit(b, pk):
         elif t["type"] == "script":
             s = pk.put(bytes.fromhex(t["bytes"]), f"{spec['name']} script")
             d = struct.pack("<IIhhhhI", L.SCRIPT_CREATE, t.get("activation", ACT_PRESS), x1, y1, x2, y2, s)
+        elif t["type"] == "savepad":     # the stock save / switch-characters pad: 16 bytes, no payload
+            d = struct.pack("<IIhhhh", L.SAVEPAD_CREATE, ACT_PRESS, x1, y1, x2, y2)
         elif t["type"] == "dialogue":
             d = struct.pack("<IIhhhhI", TRIGGER_DIALOG_COND, TRIGGER_DIALOG_FN, x1, y1, x2, y2, refs.ref(t["payload"]))
         else:

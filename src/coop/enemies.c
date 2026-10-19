@@ -145,6 +145,25 @@ static void coop_enemy_update(Entity *e) {
     ((void (*)(Entity *))ENEMY_UPDATE)(e);
 }
 
+// BOSS_RAGE (bosses.h): the survivor of a pair whose partner just fell rages once: full HP, harder hits,
+// more defence, faster chase modules from now on (speed_module), and the rage dialogue a script set with
+// CoopCall 9 (vmcall.c). The mark lives in the record copy's spawn-condition word, which nothing reads
+// after the spawn (the pair rules use the BOSS_PAIR flag, not the "script-spawned" condition 1).
+#define RECORD_RAGED 0x80000000u
+static int is_raged(const Entity *e) { return is_coop_enemy(e) && (record_of_const(e)->flags & RECORD_RAGED); }
+static u8 add_cap(u8 v, int d) { int n = v + d; return (u8)(n > 255 ? 255 : n); }
+
+static void rage(Entity *b) {
+    EnemyRecord *r = record_of(b);
+    if (r->flags & RECORD_RAGED) return;
+    r->flags |= RECORD_RAGED;
+    b->hp = ((const EnemyStat *)b->behaviour)->max_hp;
+    b->stat_melee = add_cap(b->stat_melee, BOSS_RAGE_MELEE);
+    b->stat_ranged = add_cap(b->stat_ranged, BOSS_RAGE_MELEE);
+    b->defence = add_cap(b->defence, BOSS_RAGE_DEFENCE);
+    coop_run_sequence(coop2.call_end_seq);
+}
+
 static void go_down(Entity *e, const u8 *hit) {
     record_of(e)->action = (void *)no_action;
     e->action = (void *)no_action;
@@ -171,6 +190,8 @@ static int coop_enemy_onhit(Entity *e, const u8 *hit) {
     if (pr && is_boss(e) && dmg >= e->hp) {
         Entity *partner = pr->orig == e ? pr->twin : pr->orig;
         if (partner) {
+            const BossRule *rr = boss_rule(record_of(e)->stat_index);
+            if (rr && (rr->flags & BOSS_RAGE) && partner->hp > 0) rage(partner);
             if (pr->orig == e) {
                 // the original falls first: the twin becomes the original (action, script model)
                 record_of(partner)->action = e->action;
@@ -322,6 +343,15 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
 // Chapter tests (COOP_CMD_STORY_WIN, or player 1 L + R + Up in STORY_TEST builds): every boss on the map (story bosses, Android 16) takes a
 // blow worth its remaining HP from player 1 through its own OnHit (vtable slot 14), so pair rules,
 // end_pct stages and the defeat action all run as if the players had won the fight.
+static void lethal_hit(Entity *e) {
+    u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
+    memset(m, 0, sizeof m);
+    *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1
+    *(Entity **)(m + 0x30) = g_PlayerObject;
+    *(s32 *)(m + 0x2C) = e->hp;                 // the applied damage OnHit subtracts
+    ((int (*)(Entity *, const u8 *))((u32)e->vtable + e->vtable[14]))(e, m + 0x24);
+}
+
 void story_test_finish(void) {
     EntityList *l = g_EntityList;
     for (int i = 0; i < l->count; i++) {
@@ -330,12 +360,16 @@ void story_test_finish(void) {
         int boss = is_coop_enemy(e) ? is_boss(e) : ((const EnemyStat *)e->behaviour)->max_hp >= 1000;
         const u32 *act = (const u32 *)e->action;     // or any enemy whose death runs a story action
         if (!is_a16(e) && !boss && !(act && act[0] != ENEMY_ACTION_NONE)) continue;
-        u8 m[0x40];                                 // a hit message as player attacks send them (android16.c)
-        memset(m, 0, sizeof m);
-        *(Entity **)(m + 0x20) = g_PlayerObject;   // attacker / source: player 1
-        *(Entity **)(m + 0x30) = g_PlayerObject;
-        *(s32 *)(m + 0x2C) = e->hp;                 // the applied damage OnHit subtracts
-        ((int (*)(Entity *, const u8 *))((u32)e->vtable + e->vtable[14]))(e, m + 0x24);
+        lethal_hit(e);
+    }
+}
+
+// COOP_CMD_PARTNER_WIN (chapter tests): only the boss twins (partners) take a lethal blow, so the pair
+// rules for a partner falling first (both-down, BOSS_RAGE) can be tested without fighting.
+void story_test_partner_down(void) {
+    for (int i = 0; i < TWIN_MAX; i++) {
+        Entity *t = coop2.twins[i].twin;
+        if (t && coop2.twins[i].orig && t->hp > 0 && is_boss(t)) lethal_hit(t);
     }
 }
 
@@ -408,6 +442,7 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     m->vtable = (u32 *)vtable;
     m->speed = (s32)cls[3];
     if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * COOP_SPEED_NUM / COOP_SPEED_DEN;
+    if (is_raged(e)) m->speed = m->speed * BOSS_RAGE_SPEED_NUM / BOSS_RAGE_SPEED_DEN;
     return m;
 }
 SpeedModule *ai_speed8_create_hook(const u32 *cls, const Entity *e) { return speed_module(cls, e, AI_SPEED8_VTABLE); }

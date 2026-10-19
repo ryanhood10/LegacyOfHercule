@@ -1,5 +1,5 @@
 {
- "_": "Broly side-arc arena (docs/story.md 4f): a rocky wasteland crater. Northern Wastelands zone 3 area 6: its walled basin (cliff walls north and west, a pebble rim south and east; the basin's own collision) as the arena floor, the pod crater on the plain above it as scenery, the plain filled in around them. Only the basin is walkable. Two boulders from zone 3 area 2's BG2 dress the basin floor and block (the pod crater alone takes 652 of the 896 tile slots, so more props do not fit).",
+ "_": "Broly side-arc arena (docs/story.md 4f): a rocky wasteland crater. Northern Wastelands zone 3 area 6: its walled basin (cliff walls north and west, a pebble rim south and east; the basin's own collision) as the arena floor, the pod crater on the plain above it as scenery, the plain filled in around them. Only the basin is walkable. The pod crater alone takes 660 of the 896 tile slots; the two boulders that dressed the basin gave their 44 slots to the landing zone's save pad (51). Broly side chapter (docs/story.md 4g, data/story/broly.lscript): 224 px of plain added south of the basin as New Planet Vegeta's landing zone (the Saiyan ship, a save pad stamped from zone 3 area 3, the arrival spawn), walkable up into the basin over its pebble rim; Broly (sprite 159) waits in the basin; crossing the rim starts the confrontation and the fight (Broly stat 115 + Paragus stat 116, bosses.c). No flight spot: the players leave by the chapter's ending. No name banner (another planet).",
  "name": "broly_arena",
  "zone": 15,
  "area": 3,
@@ -10,7 +10,7 @@
  "tileset": "fresh",
  "layout": [
   640,
-  544
+  768
  ],
  "ops": [
   {
@@ -20,7 +20,7 @@
     0,
     0,
     80,
-    68
+    96
    ],
    "src": {
     "map": [
@@ -78,58 +78,36 @@
   {
    "op": "stamp",
    "at": [
-    20,
-    40
+    46,
+    78
    ],
    "src": {
     "map": [
      3,
-     2
+     3
     ],
     "rect": [
-     9,
-     37,
-     7,
-     5
-    ]
-   },
-   "layers": [
-    2
-   ],
-   "collision": true
-  },
-  {
-   "op": "stamp",
-   "at": [
-    58,
-    47
-   ],
-   "src": {
-    "map": [
-     3,
-     2
-    ],
-    "rect": [
-     4,
-     14,
      6,
-     5
+     15,
+     7,
+     8
     ]
    },
+   "collision": false,
+   "_": "the save pad (zone 3 area 3's Capsule Corp pad on wasteland sand)",
    "layers": [
     2
-   ],
-   "collision": false
+   ]
   },
   {
-   "op": "block",
+   "op": "walk",
    "rect": [
-    60,
-    48,
-    4,
-    3
+    3,
+    55,
+    74,
+    39
    ],
-   "mask": "walk"
+   "_": "the landing zone, open up to the basin's rim"
   },
   {
    "op": "border",
@@ -139,24 +117,70 @@
  ],
  "triggers": [
   {
-   "type": "flight",
+   "type": "savepad",
    "rect": [
-    264,
-    440,
-    312,
-    480
-   ],
-   "world": [
-    1670,
-    1192
+    368,
+    632,
+    417,
+    681
    ]
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    40,
+    400,
+    600,
+    472
+   ],
+   "payload": "seq:broly_rim",
+   "condition": "script:broly_trip_cond",
+   "_": "crossing the basin's rim: the confrontation (once, flag 403), then the fight"
   }
  ],
  "spawn": [
-  276,
-  354
+  320,
+  700
  ],
- "name_id": 223,
+ "name_id": 221,
  "music": 30,
- "flags": 1
+ "flags": 1,
+ "sources": [
+  "data/story/broly.lscript"
+ ],
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 171,
+   "x": 216,
+   "y": 640,
+   "facing": 0,
+   "condition": "script:broly_trip_cond",
+   "_": "0: the Saiyan ship (sprite 171) on the landing zone"
+  },
+  {
+   "kind": "actor",
+   "sprite": 159,
+   "x": 320,
+   "y": 344,
+   "facing": 0,
+   "condition": "script:broly_trip_cond",
+   "_": "1: Broly waiting in the basin (sprite 159; replaced by record 2 at the fight)"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    6,
+    61,
+    1
+   ],
+   "stat": 115,
+   "sprite": 159,
+   "x": 320,
+   "y": 344,
+   "condition": "never",
+   "action": "seq:broly_end",
+   "_": "2: Broly the boss (stat 115; bosses.c pairs him with Paragus, sprite 170 / stat 116)"
+  }
+ ]
 }

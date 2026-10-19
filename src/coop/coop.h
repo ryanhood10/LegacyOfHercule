@@ -141,6 +141,9 @@ void actors_tick(void);                             // actors.c: remove town NPC
 #define COOP_CMD_SPAWN_RECORD 8   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
 void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
+#define COOP_CMD_PARTNER_WIN  9   // chapter tests: only the boss twins (partners) fall (story_test_partner_down, input.c)
+void story_test_partner_down(void);   // enemies.c
+void coop_run_sequence(const void *seq);   // vmcall.c: run a dialogue sequence at the next entity-list update
 extern CoopExtra coop2;
 
 // Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin)
