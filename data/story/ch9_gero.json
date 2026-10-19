@@ -1,0 +1,72 @@
+{
+  "_": "Side chapter 'Gero's computer' in the ten-day wait (docs/story.md 4g): Krillin (P1) + Android 16 (P2, the last party slot, src/coop/a16player.c) back to Dr. Gero's lab: the workshop scene, the world map star, two generators, the rubble at the cave mouth, the bunker's two Android 19s (stat 120 + 121, BOSS_PAIR in src/coop/bosses.c), the Android 13 file, the birds, home as Krillin + Hercule. Flags 420-439. Scripts in ch9_gero.lscript.",
+  "sources": [
+    "data/story/ch9_gero.lscript"
+  ],
+  "maps": [
+    {
+      "map": {"zone": 6, "area": 5},
+      "_": "Dr. Briefs' workshop: 16 stands by Bulma's console from the wait until he joins; the scene once the TV announcement and the Scouter Note are done",
+      "add_records": [
+        {"kind": "actor", "sprite": 8, "x": 344, "y": 184, "facing": 0, "condition": "script:ch9_ws_a16_cond"}
+      ],
+      "add_triggers": [
+        {"like": 1, "rect": [25, 97, 312, 312], "payload": "seq:ch9_workshop", "condition": "script:ch9_ws_cond"}
+      ]
+    },
+    {
+      "map": {"zone": 6, "area": 99},
+      "_": "the world map: the zone 8 landing (icon at 213, 13) shows the star (sub_800ACAC) while the chapter runs",
+      "edits": [
+        {"at": "onload", "replace": [["JumpIfFalse L21", "StackTestStoryFlag 420\nStackTestStoryFlagNot 421\nAnd\nNot\nJumpIfFalse L21"]]}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 27},
+      "_": "the west generator (Gero's second stage)",
+      "add_triggers": [
+        {"like": 0, "rect": [448, 152, 505, 233], "payload": "seq:ch9_gen_west", "condition": "script:ch9_gen_west_cond"}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 40},
+      "_": "the east generator (Gero's third stage)",
+      "add_triggers": [
+        {"like": 0, "rect": [9, 241, 56, 368], "payload": "seq:ch9_gen_east", "condition": "script:ch9_gen_east_cond"}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 47},
+      "_": "stock fix: the top exit into the clearing (variation exit rect y 0-17) never fires, the player stops at y 20; a door exit reaching y 28 with the same target",
+      "add_triggers": [
+        {"kind": "exit", "rect": [160, 0, 185, 28], "exit": [1, 8, 48, 1, 552, 660], "condition": "always"}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 48},
+      "_": "outside the lab: the rubble from the self-destruct stays gone once 16 has punched through (flag 422)",
+      "onload": "script:ch9_a48_onload",
+      "add_triggers": [
+        {"like": 1, "rect": [81, 265, 200, 312], "payload": "seq:ch9_rubble", "condition": "script:ch9_rubble_cond"}
+      ]
+    },
+    {
+      "map": {"zone": 8, "area": 64},
+      "_": "the basement corridor: its door leads to the intact computer room (63) while the chapter runs",
+      "triggers": {
+        "1": {"condition": "script:ch9_door63_cond"},
+        "2": {"condition": "script:ch9_door65_cond"}
+      }
+    },
+    {
+      "map": {"zone": 8, "area": 63},
+      "_": "the bunker: two Android 19 spare bodies (record 1, stat 120: BOSS_PAIR with a second 19, stat 121)",
+      "add_records": [
+        {"kind": "enemy", "stat": 120, "sprite": 12, "x": 172, "y": 236, "facing": 0, "condition": "never", "action": "seq:ch9_bunker_won"}
+      ],
+      "add_triggers": [
+        {"like": 0, "rect": [145, 273, 256, 368], "payload": "seq:ch9_bunker", "condition": "script:ch9_active_cond"}
+      ]
+    }
+  ]
+}

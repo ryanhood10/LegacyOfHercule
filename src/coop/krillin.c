@@ -116,7 +116,15 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
 #endif
 };
 
-int status_title_hook(void *obj, int idx) { return UI_NAME + status_slot(obj, idx); }
+// The last slot is Android 16 on his row 25 (a16player.c) or a duel clone: a clone is named after the
+// character whose row it copies (player 1's when none matches).
+static int name_slot(int slot) {
+    if (slot != PARTY_SLOTS - 1 || row_of_slot(slot) == 25) return slot;
+    for (int s = 0; s < slot; s++) if (row_of_slot(s) == row_of_slot(slot)) return s;
+    return g_Party->active_slot;
+}
+
+int status_title_hook(void *obj, int idx) { return UI_NAME + name_slot(status_slot(obj, idx)); }
 
 int status_pages_hook(void *obj, int idx) {
     int slot = status_slot(obj, idx);

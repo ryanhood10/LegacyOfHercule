@@ -1,0 +1,356 @@
+; Chapter 9 side chapter "Gero's computer" (docs/story.md 4g): Krillin (player 1) and Android 16 (player 2,
+; the last party slot: src/coop/a16player.c, CoopCall 11 / 12) go back to Dr. Gero's lab during the ten-day
+; wait. Flags 420-439: 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down,
+; 425 bunker done, 430 + slot the selectable bits saved by the lock.
+; Opcode 0x05 (lscript "Not") is the VM's logical OR (decompiled 0x08008FE6; docs/scripts.md 2.1).
+
+; ---- conditions ----------------------------------------------------------------------------------
+
+; the workshop scene: after the memory scene (155), Cell's TV announcement (157) and the Scouter Note
+; (the note, the part or the Scouter in hand, or the Scouter given: 156); once
+script ch9_ws_cond
+    StackTestStoryFlag 155
+    StackTestStoryFlag 157
+    And
+    StackTestStoryFlagNot 420
+    And
+    StackGetItemCount 23
+    StackGetItemCount 24
+    Not
+    StackGetItemCount 22
+    Not
+    StackTestStoryFlag 156
+    Not
+    And
+    END
+end
+
+; 16 stands in the workshop from the ten-day wait (151) until he joins the players
+script ch9_ws_a16_cond
+    StackTestStoryFlag 151
+    StackTestStoryFlagNot 420
+    And
+    END
+end
+
+; the chapter runs (16 in the party, the bunker not done yet)
+script ch9_active_cond
+    StackTestStoryFlag 420
+    StackTestStoryFlagNot 425
+    And
+    END
+end
+
+script ch9_gen_west_cond
+    StackTestStoryFlag 420
+    StackTestStoryFlagNot 421
+    And
+    StackTestStoryFlagNot 423
+    And
+    END
+end
+
+script ch9_gen_east_cond
+    StackTestStoryFlag 420
+    StackTestStoryFlagNot 421
+    And
+    StackTestStoryFlagNot 424
+    And
+    END
+end
+
+script ch9_rubble_cond
+    StackTestStoryFlag 420
+    StackTestStoryFlagNot 421
+    And
+    StackTestStoryFlagNot 422
+    And
+    END
+end
+
+; zone 8 area 64: the door goes to the computer room (63) before the self-destruct (140) or while the
+; chapter runs, else to the wrecked room (65)
+script ch9_door63_cond
+    StackTestStoryFlagNot 140
+    StackTestStoryFlag 420
+    StackTestStoryFlagNot 425
+    And
+    Not
+    END
+end
+
+script ch9_door65_cond
+    StackTestStoryFlag 140
+    StackTestStoryFlagNot 420
+    StackTestStoryFlag 425
+    Not
+    And
+    END
+end
+
+; ---- zone 8 area 48: the stock on-load script, with the rubble at the cave mouth (layer 1 and the
+; blocked rect, both from the self-destruct, flag 141) left out once 16 has punched through (422) ----
+script ch9_a48_onload
+    DisableLayer 1
+    StackTestStoryFlag 127
+    JumpIfFalse L1
+    FindEntityByType 1
+  L1:
+    StackTestStoryFlag 136
+    JumpIfFalse L2
+    FindEntityByType 11
+    FindCharacterEntity 0
+  L2:
+    StackTestStoryFlag 140
+    JumpIfFalse L3
+    FindEntityByType 0
+  L3:
+    StackTestStoryFlag 141
+    JumpIfFalse L5
+    FindCharacterEntity 2
+    ClearCollisionRect 192, 456, 208, 464
+    StackTestStoryFlagNot 422
+    JumpIfFalse L4
+    FindCharacterEntity 10                   ; the boulders in the cave mouth
+    EnableLayer 1
+    ClearCollisionRect 128, 272, 192, 296
+    Jump L5
+  L4:
+    SetCollisionRect 136, 240, 168, 272      ; the cave mouth itself (stock: opened by the Only Trunks barrier)
+  L5:
+    END
+end
+
+; ---- zone 6 area 5: Dr. Briefs' workshop. 16 wakes, Gero's computer is running again ---------------
+
+sequence ch9_workshop
+  [0] script
+        SetPlayerVisible 0
+        PanCameraToPosition 216, 96, 3
+        PlayAudio 50
+        PushActiveCharIndex                  ; Krillin walks in unless a player already is Krillin
+        PushByte 6
+        CmpNe
+        CoopCall 8, 0, 0, 0
+        PushByte 6
+        CmpNe
+        And
+        JumpIfFalse L1
+        SpawnCharacterEntity 76, 224, 400
+        WalkToPosition 76, 288, 232
+        SetEntityFacing 76, 3
+      L1:
+        END
+  [1] text 48 "DR. BRIEFS: Ah, there you are!  Good news: Android 16 is all fixed up.\x0bAnd that nasty bomb Dr. Gero hid inside him?  Gone.  I took it out myself!"
+  [2] text 36 "BULMA: He hasn't moved since we closed him up, though.  Dad, are you sure you connected everything?"
+  [3] script
+        WaitFrames 40
+        PlayAudio 62
+        SetEntityFacing 8, 2
+        WaitFrames 30
+        SetEntityFacing 8, 0
+        END
+  [4] text 26 "ANDROID 16: ...Systems online."
+  [5] text 26 "ANDROID 16: I am receiving a signal.  It comes from Dr. Gero's laboratory in the Northern Mountains.\x0bHis computer is running again."
+  [6] text 36 "BULMA: The computer that made Cell?!  But Trunks blew it up!"
+  [7] text 26 "ANDROID 16: The bunker below the lab was not destroyed.  The computer is building something.\x0bI will stop it."
+  [8] text 73 "KRILLIN: Then you're not going alone.  I've been down there with Trunks.\x0bI know the way to that bunker."
+  [9] text 26 "ANDROID 16: ...Very well."
+  [10] text 0 "@^Krillin and Android 16 set out for Dr. Gero's lab in the Northern Mountains."
+  [11] script
+        CoopCall 11, 0, 0, 0
+        CoopCall 6, 7, 0, 0
+        SetActiveCharacterNoReset 6
+        FadeOut 30
+        WarpToMapWithEntities 6, 5, 1, 232, 296   ; the workshop again: 16's and Krillin's actors gone
+        SetEntityFacing 0, 1
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        END
+end
+
+; ---- zone 8 areas 27 and 40: Gero's generators under the waterfalls -------------------------------
+
+sequence ch9_gen_west
+  [0] script
+        SetPlayerVisible 0
+        PanCameraToPosition 270, 10, 3
+        PlayAudio 50
+        END
+  [1] text 0 "@^Behind the waterfall, one of Dr. Gero's generators is humming again."
+  [2] text 26 "ANDROID 16: This generator feeds the bunker's defences.  Stand back."
+  [3] script
+        PlayAudio 26
+        WaitFrames 20
+        WhiteFlash 10
+        ScreenShake 0, 20, 30
+        PlayAudio 20
+        WaitFrames 40
+        SetStoryFlag 423
+        StackTestStoryFlag 424
+        JumpIfFalse L1
+        PushByte 5
+        END
+      L1:
+        PushByte 4
+        END
+  [4] text 26 "ANDROID 16: One generator is down.  The other is under the waterfall east of the mountain pass." -> 6
+  [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
+  [6] script
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        END
+end
+
+sequence ch9_gen_east
+  [0] script
+        SetPlayerVisible 0
+        PanCameraToPosition 80, 60, 3
+        PlayAudio 50
+        END
+  [1] text 0 "@^Under the waterfall, one of Dr. Gero's generators is humming again."
+  [2] text 26 "ANDROID 16: This generator feeds the bunker's defences.  Stand back."
+  [3] script
+        PlayAudio 26
+        WaitFrames 20
+        WhiteFlash 10
+        ScreenShake 0, 20, 30
+        PlayAudio 20
+        WaitFrames 40
+        SetStoryFlag 424
+        StackTestStoryFlag 423
+        JumpIfFalse L1
+        PushByte 5
+        END
+      L1:
+        PushByte 4
+        END
+  [4] text 26 "ANDROID 16: One generator is down.  The other is under the waterfall west of the mountain pass." -> 6
+  [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
+  [6] script
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        END
+end
+
+; ---- zone 8 area 48: the sealed cave mouth -----------------------------------------------------------
+
+sequence ch9_rubble
+  [0] script
+        SetPlayerVisible 0
+        PanCameraToPosition 40, 170, 2
+        PlayAudio 50
+        StackTestStoryFlag 423
+        StackTestStoryFlag 424
+        And
+        JumpIfFalse L1
+        PushByte 1
+        END
+      L1:
+        PushByte 5
+        END
+  [1] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up.  We'll never dig through all that!"
+  [2] text 26 "ANDROID 16: Stand back."
+  [3] script
+        PlayAudio 26
+        WaitFrames 30
+        WhiteFlash 10
+        ScreenShake 0, 30, 40
+        PlayAudio 20
+        SpawnDustCloud 0, 152, 264
+        DisableLayer 1
+        SetCollisionRect 128, 272, 192, 296
+        SetCollisionRect 136, 240, 168, 272
+        SetStoryFlag 422
+        WaitFrames 50
+        END
+  [4] text 73 "KRILLIN: ...Remind me never to arm-wrestle you." -> 7
+  [5] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up." -> 6
+  [6] text 26 "ANDROID 16: The rubble is not the problem.  Two of Gero's generators feed the bunker's defences again:\x0bone under the waterfall west of the mountain pass, one under the waterfall to the east.\x0bWe shut them down first." -> 7
+  [7] script
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        END
+end
+
+; ---- zone 8 area 63: the bunker. Two Android 19s, the file on 13, the computer smashed -------------
+
+sequence ch9_bunker
+  [0] script
+        SetPlayerVisible 0
+        WalkToPosition 0, 216, 280
+        PanCameraToPosition 64, 96, 2
+        PlayAudio 50
+        END
+  [1] text 26 "ANDROID 16: Dr. Gero's computer.  It survived."
+  [2] text 0 "@^ASSEMBLY COMPLETE:  UNIT 19, SPARE BODY A.\x0bASSEMBLY COMPLETE:  UNIT 19, SPARE BODY B.\x0bACTIVATING..."
+  [3] text 73 "KRILLIN: TWO of them?!  Aw man, not those energy-sucking creeps!"
+  [4] text 26 "ANDROID 16: Do not let them grab you.  I will do the punching."
+  [5] script
+        TriggerMapEvent 1
+        SetPlayerVisible 1
+        DrawBossHealthBar 12
+        PlayMusic 35
+        SetActiveEntity 0
+        END
+end
+
+; both 19s are down (the record's defeat action runs when the last of the pair falls)
+sequence ch9_bunker_won
+  [0] script
+        SetPlayerVisible 0
+        StopMusic
+        WaitFrames 60
+        PanCameraToPosition 64, 96, 2
+        END
+  [1] text 73 "KRILLIN: Phew...  Okay.  Let's wreck this thing before it builds a third one."
+  [2] text 26 "ANDROID 16: Wait.  There is one more file.\x0bANDROID 13:  UNFINISHED.  FINAL STAGE ON HOLD."
+  [3] text 73 "KRILLIN: Android 13?  The guy who's been hanging around with Gero?  Unfinished?\x0bHe looked pretty finished to me!"
+  [4] text 26 "ANDROID 16: The file names his final stage: he takes in two other androids.\x0bThe rest has been erased."
+  [5] text 73 "KRILLIN: ...I don't like the sound of that.  Smash it!"
+  [6] script
+        SetStoryFlag 425
+        BeginCommandBatch
+        NPCFireKiBlast 0, 184, 192, 100
+        SpawnDustCloud 0, 184, 192
+        CommitCommandBatch
+        PlayAudio 20
+        FadeToWhite 10
+        WarpToMapNoEntities 8, 48, 1, 168, 330
+        SpawnCharacterEntity 8, 196, 326
+        SetEntityFacing 0, 3
+        SetEntityFacing 8, 1
+        SetPlayerVisible 0
+        PanCameraToPosition 56, 200, 10
+        WhiteFadeOut 30
+        WaitFrames 60
+        SpawnCharacterEntity 63, 70, 220          ; two hawks glide over the clearing and settle above him
+        SpawnCharacterEntity 64, 90, 236
+        BeginCommandBatch
+        FlyToPosition 63, 220, 250
+        FlyToPosition 64, 244, 262
+        CommitCommandBatch
+        WaitFrames 30
+        END
+  [7] text 73 "KRILLIN: Well, that's the last of Gero's toys.  ...16?  What are you looking at?"
+  [8] text 26 "ANDROID 16: The birds.\x0bDr. Gero built me to destroy Goku.  He did not build me to watch birds.\x0b...I like them."
+  [9] text 73 "KRILLIN: Heh.  You're full of surprises, big guy.  So what now?"
+  [10] text 26 "ANDROID 16: Cell will destroy everything on this planet.  The birds too.\x0bI will go to the Cell Games."
+  [11] text 73 "KRILLIN: Then I guess we'll see you there.  I'm heading back to Capsule Corp."
+  [12] script
+        FadeOut 60
+        CoopCall 12, 0, 0, 0
+        SetActiveCharacterNoReset 6
+        CoopCall 6, 5, 0, 0
+        WarpToMapWithEntities 6, 5, 1, 224, 300
+        SetEntityFacing 0, 1
+        SetPlayerVisible 0
+        END
+  [13] text 36 "BULMA: Krillin!  You're back!  So?  What happened with Gero's computer?"
+  [14] text 73 "KRILLIN: Scrap metal.  And 16 is coming to the Cell Games.  He's on our side."
+  [15] text 67 "HERCULE: Did somebody say the Cell Games?  Ha!  Don't worry, little buddy.\x0bThe world champion will handle that Cell personally!"
+  [16] script
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        END
+end

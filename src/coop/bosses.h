@@ -54,6 +54,11 @@ typedef struct BossRule {
 #define NAMEK_STAT 113      // Cooler's Namekian servant (New Namek bonus)
 #define A13_GERO_STAT 112   // Android 13 beside Dr. Gero at the lab door
 #define A13_ARCTIC_STAT 114 // Android 13 in the arctic (the ten-day wait), a half-health boss
+// "Gero's computer" (docs/story.md 4g) owns stats 120-124, kept in their own table (gero_stats[], bosses.c)
+// so other ranges can be added beside it without renumbering
+#define GERO_STAT_BASE 120
+#define BUNKER19_STAT 120   // the bunker's Android 19 spare body A (the record), BOSS_PAIR with B
+#define BUNKER19B_STAT 121  // spare body B (the pair's twin)
 
 extern const ExtraStat extra_stats[];
 extern const u32 extra_stat_count;

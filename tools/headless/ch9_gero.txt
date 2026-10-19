@@ -1,0 +1,125 @@
+# "Gero's computer" end to end (docs/testing.md "Gero's computer"): run from a debug-menu savestate of a
+# DEBUG_MENU=1 build:  python tools/headless/st_test.py tools/headless/ch9_gero.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Warps (COOP_CMD_WARP) stand in for the walks between the scenes; every scene fires from its own trigger.
+p2 0
+preset +151 +155 +156 +157
+maptest 149
+frames 150
+shot g01_workshop
+mash 1 80
+shot g02_briefs
+mash 4 90
+shot g03_wakes
+mash 8 90
+shot g04_krillin
+mash 6 90
+frames 300
+map
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+shot g05_party
+save g_ws.ss
+# story flags 0-191 (the lab chapters done, as in a real save at this point)
+poke32 0x0203F0EC 0xFFFFFFFF
+poke32 0x0203F0F0 0xFFFFFFFF
+poke32 0x0203F0F4 0xFFFFFFFF
+poke32 0x0203F0F8 0xFFFFFFFF
+poke32 0x0203F0FC 0xFFFFFFFF
+poke32 0x0203F100 0xFFFFFFFF
+# the world map near the zone 8 landing: the star
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x03E809C4
+poke32 0x0203FD08 5
+frames 240
+shot g06_worldmap
+# west generator (zone 8 area 27)
+poke32 0x0203FD0C 0x1B08
+poke32 0x0203FD54 0x00BE01DC
+poke32 0x0203FD08 5
+frames 200
+shot g07_gen_west
+mash 3 120
+frames 120
+mash 3 90
+# east generator (zone 8 area 40)
+poke32 0x0203FD0C 0x2808
+poke32 0x0203FD54 0x012C001E
+poke32 0x0203FD08 5
+frames 200
+mash 3 120
+frames 120
+shot g08_gen_east
+mash 3 90
+# area 47's top exit into the clearing (area 48)
+poke32 0x0203FD0C 0x2F08
+poke32 0x0203FD54 0x003C00AC
+poke32 0x0203FD08 5
+frames 200
+keys 0x40
+frames 150
+keys 0
+frames 200
+map
+# the rubble at the cave mouth
+poke32 0x0203FD0C 0x3008
+poke32 0x0203FD54 0x0122008C
+poke32 0x0203FD08 5
+frames 200
+shot g09_rubble
+mash 2 200
+frames 100
+shot g10_punched
+mash 2 90
+keys 0x40
+frames 150
+keys 0
+frames 150
+map
+# basement: 61 -> 64 -> 63
+poke32 0x0203FD0C 0x3D08
+poke32 0x0203FD54 0x00A50050
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 150
+map
+poke32 0x0203FD0C 0x4008
+poke32 0x0203FD54 0x00B400F0
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 200
+map
+shot g11_bunker
+mash 1 90
+shot g12_assembly
+mash 5 90
+frames 120
+shot g13_two_19s
+save g_fight.ss
+# COOP_CMD_STORY_WIN: both 19s down
+poke32 0x0203FD08 7
+frames 400
+mash 2 90
+shot g14_file13
+mash 4 90
+mash 1 500
+shot g15_birds
+mash 2 90
+shot g16_birds2
+mash 6 90
+mash 1 300
+map
+shot g17_home
+mash 10 90
+frames 300
+map
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+peek 0x0203F120 1
+shot g18_krillin_hercule
+save g_home.ss

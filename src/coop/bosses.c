@@ -23,6 +23,16 @@ const ExtraStat extra_stats[] = {
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 
+// 120-124: the "Gero's computer" side chapter (data/story/ch9_gero.*)
+static const ExtraStat gero_stats[] = {
+    // 120 / 121 the bunker's two Android 19 spare bodies against Krillin and Android 16 (Cell-saga numbers,
+    // each a little above the zone 7 19's 2970 HP, 21/14/11; fork autopilot at the debug party's level 40: see
+    // docs/coop-design.md "Gero's bunker")
+    { 5, -1, 3600, -1, 23, 17, 16, 0 },
+    { 5, -1, 3600, -1, 23, 17, 16, 0 },
+};
+#define GERO_STAT_COUNT (sizeof gero_stats / sizeof gero_stats[0])
+
 static const BossRule rules[] = {
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
@@ -52,6 +62,10 @@ static const BossRule rules[] = {
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
     { 78, 50, BOSS_NO_TWIN, 0, 0 },
     { 79, 50, BOSS_NO_TWIN, 0, 0 },
+    // Gero's bunker: two Android 19 spare bodies at once, single-player too (Ryan: two 19s on screen, no more
+    // in co-op): the record's 19 is a BOSS_PAIR whose twin is the second 19; both-down, one defeat dialogue
+    { BUNKER19_STAT,  0, BOSS_PAIR, 12, BUNKER19B_STAT },
+    { BUNKER19B_STAT, 0, BOSS_PAIR, 0, 0 },
     // Imperfect Cell (60) and Semi-Perfect Cell (76) use the default: a same-model Multi-Form twin
     { -1, 0, 0, 0, 0 },
 };
@@ -68,8 +82,13 @@ int resolve_stat(int stat_index, EnemyStat *out) {
         return 1;
     }
     int i = stat_index - EXTRA_STAT_BASE;
-    if (i < 0 || (u32)i >= extra_stat_count) return 0;
-    const ExtraStat *x = &extra_stats[i];
+    const ExtraStat *x;
+    if (stat_index >= GERO_STAT_BASE && (u32)(stat_index - GERO_STAT_BASE) < GERO_STAT_COUNT)
+        x = &gero_stats[stat_index - GERO_STAT_BASE];
+    else if (i >= 0 && (u32)i < extra_stat_count)
+        x = &extra_stats[i];
+    else
+        return 0;
     *out = ENEMY_STATS[x->base];
     if (x->ai_set >= 0) out->ai_set = x->ai_set;
     if (x->max_hp) out->max_hp = x->max_hp;

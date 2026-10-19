@@ -17,7 +17,11 @@
 //   7 PadSwap ()                        the two pads trade players (coop2.pad_swap, as a duel won by player 2)
 //   8 P2Slot () -> slot / -1            player 2's party slot (the last bound one while a warp has the entity
 //                                       despawned), -1 without player 2
+//  11 A16Join ()                        "Gero's computer": 16 joins in the last party slot, the party locks to
+//                                       Krillin + 16 (a16player.c; the script then sets player 1 and 2)
+//  12 A16Leave ()                       16 leaves the party for good, the lock is undone, Hercule available
 #include "coop.h"
+#include "a16player.h"
 
 void hercule_awaken(void);                 // ssj.c
 int p2_bind_slot(int slot);                // player.c
@@ -86,6 +90,8 @@ void vm_coop_call(s32 *st) {
         break;
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
+    case 11: a16_join(); break;
+    case 12: a16_leave(); break;
     default: (void)b; break;
     }
 }

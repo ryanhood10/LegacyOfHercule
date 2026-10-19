@@ -364,6 +364,8 @@ void coop_debug_tick(void) {
         if (a) EntityList_Add(g_SceneTable[1], a);
     } else if (cmd == COOP_CMD_A16) {
         a16_test_spawn();
+    } else if (cmd == COOP_CMD_A16_PARTY) {
+        a16_test_party();
     } else if (cmd == COOP_CMD_DUEL) {
         u32 a = coop2.cmd_arg;
         duel_start((int)(a & 0xFF) - 1, (int)((a >> 8) & 0xFF), (int)((a >> 16) & 0xFFFF) - 1);

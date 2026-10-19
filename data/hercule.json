@@ -35,6 +35,21 @@
     }
   },
   "growth": {
+    "7": {
+      "_": "Android 16 in the last slot during the Gero's computer chapter (src/coop/a16player.c): above Krillin's",
+      "str": [
+        400,
+        600
+      ],
+      "pow": [
+        300,
+        500
+      ],
+      "end": [
+        400,
+        600
+      ]
+    },
     "5": {
       "str": [
         360,
@@ -115,6 +130,13 @@
       ],
       "is_ready": "fn:krillin_disc_ready",
       "on_use": "fn:krillin_disc_use"
+    },
+    {
+      "name": "RocketPunch",
+      "_": "entry 22: Android 16 as a player (slot 7 in the Gero's computer chapter, src/coop/a16player.c)",
+      "icons": 6,
+      "is_ready": "fn:a16_rocket_ready",
+      "on_use": "fn:a16_rocket_use"
     }
   ],
   "patches": [
@@ -144,6 +166,7 @@
     "data/story/ch6_basement.json",
     "data/story/ch7_cell.json",
     "data/story/ch8_gym.json",
-    "data/story/ch8_cooler.json"
+    "data/story/ch8_cooler.json",
+    "data/story/ch9_gero.json"
   ]
 }
