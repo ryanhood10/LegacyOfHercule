@@ -538,6 +538,9 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   Making 16 playable is a new party character like Krillin (player poses, row, abilities); his
   portrait exists (speaker 26) and his fighting sprite (160) is enemy-grade.
   Pair confirmed (Ryan): Krillin player 1, Android 16 player 2, locked for the chapter.
+  Where 16 is: at Capsule Corporation for the whole wait (he asks for repairs on the island; the workshop
+  scene is about his memory). The workshop map (map 149) places no 16 actor (no sprite 8; only Bulma,
+  Dr. Briefs and staff), so the chapter would add him there.
 - **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate
   castle-defense game where waves of Cell Juniors try to steal it. Facts: the hunt appears to gate the
   Cell Games (the quest table puts "Return the Dragon Balls to Dende" right before "Enter the Cell
