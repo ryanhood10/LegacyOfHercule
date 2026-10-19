@@ -2,6 +2,19 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-19
+
+- **Ten-day wait: Time Chamber training waves and Roshi's dojo sparring** (branch `lookout-training`,
+  worktree `F:\MeltyCreations\log2-lookout`): `src/coop/waves.c` (ten fixed rounds of stock enemies,
+  spawned on a ring around the players, the next round when none stands, state in `.party.wv` 0x0203F874,
+  no coop2 bytes) behind `CoopCall 13` / `14`; `data/story/wait_chamber` (the Lookout's chamber door opens
+  from flag 157, Mr. Popo beside it with his line, "Round N" captions, "Training completed!"; the
+  chamber's door now returns to the chamber room) and `data/story/wait_spar` (Roshi's offer after flag
+  214, flag 440, the mat starts a players-only duel, winner by name, healed, back to the atrium).
+  Measured: OBJ VRAM >= 6.9 KB free in every round (two Destroyer pairs had left 2.2 KB, so they went),
+  at most 16 lag frames in 300. Tested headless end to end, round 3 in the fork. Per-round table and
+  reward ideas: `docs/story.md` 4g; recipe: `docs/testing.md` "Time Chamber waves".
+
 ## 2026-10-18
 
 - **Boss models** (branch `boss-models`, worktree `F:\MeltyCreations\log2-bm`): Android 13 base form

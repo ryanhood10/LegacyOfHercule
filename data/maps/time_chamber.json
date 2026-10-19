@@ -1,5 +1,5 @@
 {
-  "_": "Hyperbolic Time Chamber interior (docs/story.md 4e/4f, the Vegeta vs Trunks duel): a white void (generated floor tiles: white with faint speckles) with the living quarters at the top edge (Kami's Lookout palace facade, zone 9 area 1: BG1 building -> BG2, BG0 dome and entrance canopy -> BG1) and a flat walkable arena below. The door under the canopy's arch leads back to the Lookout.",
+  "_": "Hyperbolic Time Chamber interior (docs/story.md 4e/4f, the Vegeta vs Trunks duel): a white void (generated floor tiles: white with faint speckles) with the living quarters at the top edge (Kami's Lookout palace facade, zone 9 area 1: BG1 building -> BG2, BG0 dome and entrance canopy -> BG1) and a flat walkable arena below. The door under the canopy's arch leads back to the Lookout's chamber room (zone 9 area 3, in front of the chamber door; the training waves, data/story/wait_chamber.lscript, stop when the players leave).",
   "name": "time_chamber",
   "zone": 15, "area": 2,
   "base": [9, 1],
@@ -20,7 +20,7 @@
     {"op": "border", "width": 1, "mask": "both"}
   ],
   "exits": [
-    {"type": "door", "rect": [272, 200, 344, 216], "dir": "up", "to": [9, 1, 1], "at": [760, 480]}
+    {"type": "door", "rect": [272, 200, 344, 216], "dir": "up", "to": [9, 3, 1], "at": [96, 168]}
   ],
   "spawn": [312, 280],
   "name_id": 221,

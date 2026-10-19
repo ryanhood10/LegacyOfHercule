@@ -1,0 +1,77 @@
+; The Hyperbolic Time Chamber's training waves in the ten-day wait (docs/story.md 4g), applied by
+; wait_chamber.json. From Cell's TV announcement (story flag 157) the Lookout's chamber door (zone 9 area
+; 3, trigger 0: "You cannot enter the Hyperbolic Time Chamber.") lets the players in: fade, warp into the
+; chamber (zone 15 area 2) and WaveStart (CoopCall 13, src/coop/waves.c), which shows lk_tc_round before
+; every round: "Round N", then the round's enemies (CoopCall 14, 1); past round 10 "Training completed!".
+; The chamber's door (data/maps/time_chamber.json) leads back to this room at any time, which stops the
+; training; the door starts it again from round 1. Mr. Popo stands aside the door in the wait and points
+; the players to it. Speakers: 0 narration, 82 Mr. Popo.
+
+; ---- the door -------------------------------------------------------------------------------------
+
+sequence lk_tc_door
+  script                                 ; after Cell's announcement -> 3 (in), else 1 (stock refusal)
+        PlayAudio 50
+        StackTestStoryFlag 157
+        JumpIfFalse L1
+        PushByte 3
+        END
+      L1:
+        PushByte 1
+        END
+  stock @083dd604                        ; "You cannot enter the Hyperbolic Time Chamber."
+  stop
+  script
+        PlayAudio 10
+        FadeOut 60
+        WaitFrames 20
+        WarpToMapWithEntities 15, 2, 1, 312, 248
+        FadeFromWhite 60
+        CoopCall 13, seq:lk_tc_round, 1, 0
+end
+
+; ---- before every round (queued by waves.c) -------------------------------------------------------
+
+sequence lk_tc_round
+  script                                 ; past the last round -> 4, else 1
+        PlayAudio 50
+        CoopCall 14, 0, 0, 0
+        PushByte 11
+        CmpEq
+        JumpIfFalse L1
+        PushByte 4
+        END
+      L1:
+        PushByte 1
+        END
+  fmt 0 "@^Round %d"
+        CoopCall 14, 0, 0, 0
+  script
+        CoopCall 14, 1, 0, 0
+  stop
+  text 0 "@^Training completed!"
+  script
+        PlayAudio 27
+end
+
+; ---- Mr. Popo in the wait -------------------------------------------------------------------------
+
+; the stock Popo (record 0) until Cell's announcement; the new one (beside the door) after it
+script lk_popo_stock_cond
+        StackTestStoryFlag 143
+        StackTestStoryFlagNot 158
+        And
+        StackTestStoryFlagNot 157
+        And
+end
+
+script lk_popo_cond
+        StackTestStoryFlag 157
+        StackTestStoryFlagNot 158
+        And
+end
+
+sequence lk_popo
+  text 82 "MR. POPO: Goku and Gohan have finished their training.  The Hyperbolic Time Chamber is free now.\x0bMr. Popo has filled it with opponents for you: ten rounds, each one stronger than the last."
+  text 82 "Go through the door whenever you are ready.\x0bYou may walk out at any time, and come back as often as you like."
+end

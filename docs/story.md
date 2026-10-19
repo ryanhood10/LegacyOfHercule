@@ -83,7 +83,8 @@ playable, Android 13 / 16 / Namekian models, zone-15 maps). Tested per chapter w
 runner (`tools/headless/`); the space duel was also played in the fork with a real final blow.
 Numbers chosen by Claude that Ryan may want to change: Kami's boost (+3 levels and a refill),
 the arctic 13 (stat 114, half health), the gym duos (also fought in single-player).
-Still open for Ryan: the ten-day wait is fully planned (section 4g, not built yet); next the Cell
+Still open for Ryan: the ten-day wait is fully planned (section 4g; the Time Chamber waves and the dojo
+sparring are built on branch `lookout-training`, the rest in parallel sessions); next the Cell
 Games, the ending and the Buu phase. Android 13 returns after Cell (4g).
 
 **Mechanics the story needs (status above):** player-vs-player duel mode + pad swap; both-down
@@ -522,6 +523,13 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
 - **Roshi's dojo sparring (Ryan):** once the players have cleared all three dojo matches and Roshi
   has handed over the last +3 capsule, they can ask him to use the dojo to spar 1 v 1, players only
   (the duel mode, no story stakes, as many times as they like).
+  *Built (branch `lookout-training`, `data/story/wait_spar`):* after flag 214, talking to Roshi in the
+  Capsule Corp atrium ends with his offer ("the dojo is yours. One on one... no prizes, just pride!");
+  in co-op he books the dojo (flag 440) and walking onto the sparring mat starts a duel between the two
+  players as they are (`CoopCall 1` with player 2's own slot, no clone, no pad swap); the final blow
+  leaves the loser at 1 HP, a caption names the winner ("Piccolo wins the sparring match!"), both are
+  healed and the fade returns them to Capsule Corp; ask again for another. Alone, Roshi says you need a
+  partner. Tested headless (both outcomes, a real final blow each, the repeat, the single-player line).
 - **Dragon Ball race:** dropped (Ryan).
 - **Time Chamber training waves (Ryan: approved, to be scoped thoroughly):** at Kami's Lookout the
   players can enter the Hyperbolic Time Chamber (zone 15 area 2) and fight waves of enemies to level
@@ -532,6 +540,38 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
   stops and a caption says "Training completed!". Repeatable as many times as the players want. Limit to respect: sprite memory, not a fixed
   count; in co-op every regular enemy brings a twin, so about 4 per wave (8 on screen) is the working
   number until it is measured. Open: round display between waves, and any reward beyond EXP.
+  *Built (branch `lookout-training`, `data/story/wait_chamber`, `src/coop/waves.c`):* from flag 157 the
+  Lookout's chamber door (zone 9 area 3, A facing the door, the stock "You cannot enter" spot) fades
+  into the chamber and starts round 1; Mr. Popo stands beside the door in the wait ("Goku and Gohan
+  have finished their training... ten rounds, each one stronger than the last... You may walk out at
+  any time"). Before each round a caption "Round N" (A to start it); the round's four enemies (each
+  with its co-op twin: eight in co-op) spawn on a ring around the players; when none is left standing,
+  a short pause and the next caption. After round 10: "Training completed!" and nothing more spawns.
+  The chamber's door returns to the chamber room (in front of the chamber door) at any time and stops
+  the training; the Lookout door starts it again from round 1. Rewards: EXP from the kills only.
+  The rounds (stock stat / sprite, HP before the co-op x1.5; four records per round):
+
+  | round | enemies | HP |
+  |---|---|---|
+  | 1 | 2 wolves (57 / 148), 2 hawks (107 / 64) | 675, 700 |
+  | 2 | 2 sabre-toothed tigers (92 / 108), 2 Kuma mercenaries (70 / 91) | 750, 940 |
+  | 3 | 2 ninjas (75 / 96), 2 pterodactyls (80 / 105) | 900, 900 |
+  | 4 | 2 Warlord's henchmen (12 / 142), 2 warthogs (56 / 145) | 900, 900 |
+  | 5 | 2 hawks (84 / 65), 2 wolves (104 / 149) | 1000, 1000 |
+  | 6 | 2 Warlord's henchmen (51 / 143), 2 tiger bandits (10 / 19) | 1100, 1120 |
+  | 7 | 2 Eggbots (40 / 47), 2 pterodactyls (88 / 106) | 1130, 1200 |
+  | 8 | 2 ninjas (86 / 98), 2 Eggbots (39 / 46) | 1400, 1349 |
+  | 9 | sabre-toothed tiger (89 / 110), 2 scorpions (47 / 112), ninja (45 / 97) | 1750, 2000, 1600 |
+  | 10 | snake (48 / 117), 2 wolves (50 / 147), Destroyer (32 / 38) | 3530, 3980, 4200 |
+
+  Measured (wide build, co-op, all eight standing): the largest free OBJ VRAM block never fell below
+  6.9 KB (rounds 3 and 7, the pterodactyls); two Destroyers per round (four with twins) had left only
+  2.2 KB, so round 8 lost them and round 10 keeps one. Lag: at most 16 dropped frames in 300 (round 3),
+  6 in round 10, none in an empty chamber. Tested headless (Popo, the door, all ten rounds, the
+  completion caption, leaving and re-entering, single-player) and round 3 seen in the fork.
+  Reward ideas for Ryan (not built): a full HP / EP refill between rounds; a one-time +3 capsule (or
+  a Senzu bean) the first time "Training completed!" is reached; a bonus round 11 with a stock boss
+  model (Cell Junior, stat 26, already a regular-sized sprite).
 - **Android 16 side chapter: "Gero's computer" (Ryan, decided 2026-10-19).** Player 1 is Krillin and
   player 2 is Android 16, locked for the whole chapter; the other characters unlock when it ends.
   - *Facts it rests on:* the game never shows 16 repaired. On the island he asks for repairs; Bulma

@@ -17,7 +17,14 @@
 //   7 PadSwap ()                        the two pads trade players (coop2.pad_swap, as a duel won by player 2)
 //   8 P2Slot () -> slot / -1            player 2's party slot (the last bound one while a warp has the entity
 //                                       despawned), -1 without player 2
+//  13 WaveStart (seq, round)            Time Chamber training (waves.c): rounds from `round` (0/1 = the first),
+//                                       seq = the round sequence shown before each round and after the last
+//  14 Wave (op) -> ...                  op 0 -> the round (11 = completed); op 1 spawn the announced round
+//                                       (no result); op 2 -> player 2's character name (a %s argument)
 #include "coop.h"
+#include "krillin.h"
+
+extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
 void hercule_awaken(void);                 // ssj.c
 int p2_bind_slot(int slot);                // player.c
@@ -38,11 +45,12 @@ static s32 vm_pop(s32 *st) { s32 n = st[0]; st[0] = n - 1; return st[n]; }
 static void vm_push(s32 *st, s32 v) { s32 n = st[0] + 1; st[0] = n; st[n] = v; }
 
 // Run a dialogue sequence the way an enemy's defeat dialogue starts: an event in the entity list's queue,
-// fired at the next list update, outside whatever code noticed the duel's end.
-static void run_sequence_soon(const void *seq) {
+// fired at the next list update, outside whatever code noticed the duel's end. `action` (two words) must
+// live until the event fires.
+void coop_run_sequence(u32 *action, const void *seq) {
     if (!seq) return;
-    coop2.call_action[0] = ACTION_RUN_DIALOG;
-    coop2.call_action[1] = (u32)seq;
+    action[0] = ACTION_RUN_DIALOG;
+    action[1] = (u32)seq;
     ActionEvent *ev = Arena_Alloc(sizeof *ev);
     if (!ev) return;
     Entity *p1 = g_PlayerObject;
@@ -50,10 +58,11 @@ static void run_sequence_soon(const void *seq) {
     ev->ticks = 1;
     ev->x = p1 ? p1->x >> 8 : 0;
     ev->y = p1 ? p1->y >> 8 : 0;
-    ev->action = coop2.call_action;
+    ev->action = action;
     EntityList *list = g_EntityList;
     list->events[list->event_count++] = (u32 *)ev;
 }
+static void run_sequence_soon(const void *seq) { coop_run_sequence(coop2.call_action, seq); }
 
 static void call_duel_start(int slot, int flags, const void *end_seq) {
     coop2.call_end_seq = end_seq;
@@ -86,6 +95,12 @@ void vm_coop_call(s32 *st) {
         break;
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
+    case 13: wave_start((const void *)a, b); break;
+    case 14:
+        if (a == 0) vm_push(st, wave_round());
+        else if (a == 1) wave_spawn();
+        else if (a == 2) vm_push(st, (s32)ui_strings[UI_NAME + coop.p2_slot]);
+        break;
     default: (void)b; break;
     }
 }
@@ -99,4 +114,5 @@ void coop_call_tick(void) {
         coop2.call_state = 0;
         run_sequence_soon(coop2.call_end_seq);
     }
+    waves_tick();
 }

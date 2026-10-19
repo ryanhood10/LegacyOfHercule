@@ -1,0 +1,40 @@
+{
+  "_": "Roshi's dojo sparring (docs/story.md 4g): after the gym's last capsule (flag 214) Master Roshi books the dojo (flag 440) and the mat starts a 1 v 1 duel between the players (CoopCall 1). Scripts in wait_spar.lscript.",
+  "sources": [
+    "data/story/wait_spar.lscript"
+  ],
+  "maps": [
+    {
+      "map": {
+        "zone": 6,
+        "area": 3
+      },
+      "_": "the atrium: Master Roshi (record 2) talks through lk_roshi (the stock sequence plus the dojo offer)",
+      "records": {
+        "2": {
+          "talk": "seq:lk_roshi"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 6,
+        "area": 70
+      },
+      "_": "the sparring room: a new trigger on the matches' rect, while the dojo is booked (flags 214 and 440)",
+      "add_triggers": [
+        {
+          "like": 3,
+          "rect": [
+            104,
+            232,
+            161,
+            289
+          ],
+          "payload": "seq:lk_spar",
+          "condition": "script:lk_spar_cond"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+; Roshi's dojo sparring in the ten-day wait (docs/story.md 4g), applied by wait_spar.json. Once the three
+; matches of Roshi's gym (ch8_gym) are cleared and the last +3 capsule is paid (story flag 214), talking
+; to Master Roshi in the Capsule Corp atrium (zone 6 area 3, record 2) ends with his offer: in co-op he
+; books the dojo (flag 440), and walking onto the sparring mat (zone 6 area 70, the matches' rect) starts a
+; 1 v 1 duel between the two players as they are (CoopCall 1 DuelStart with player 2's own slot, no
+; flags: no clone, no pad swap, no stakes). The final blow leaves the loser at 1 HP (duel.c); a caption
+; names the winner, both players are healed and the fade returns them to the atrium, as the stock matches
+; do. Repeatable: ask Roshi again. Speakers: 0 narration, 80 Master Roshi.
+
+; ---- Master Roshi (the stock talk sequence restated so that entry 10, where every visit after the
+; Journal update ends, can branch to the offer; the returned indexes stay where they were) ----------------
+
+sequence lk_roshi
+  stockseq @083ce79c 0 9
+  [10] script                            ; gym cleared -> 32 (the dojo offer); else the stock choice: 6 or 8
+        StackTestStoryFlag 214
+        JumpIfFalse L0
+        PushByte 32
+        END
+      L0:
+        StackTestStoryFlag 157
+        PushActiveCharIndex
+        PushByte 4
+        CmpNe
+        And
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        And
+        JumpIfFalse L1
+        PushByte 6
+        END
+      L1:
+        PushByte 8
+        END
+  stockseq @083ce79c 11 30
+  [31] stop                              ; the stock end (entry 30's next)
+  [32] script                            ; player 2 there -> 33, else 37
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 33
+        END
+      L1:
+        PushByte 37
+        END
+  text 80 "MASTER ROSHI: Ho ho!  You two cleared every match in my dojo.\x0bIf you want to keep sharpening each other, the dojo is yours.  One on one...  no prizes, just pride!"
+  script
+        SetStoryFlag 440
+        PlayAudio 62
+  text 0 "@^The dojo is ready.  Step onto the mat to spar!"
+  stop
+  text 80 "MASTER ROSHI: The dojo is free for sparring...  but you'll need a partner first!"
+end
+
+; ---- the sparring room (zone 6 area 70) ------------------------------------------------------------
+
+script lk_spar_cond
+        StackTestStoryFlag 214
+        StackTestStoryFlag 440
+        And
+end
+
+sequence lk_spar
+  script
+        ClearStoryFlag 440
+        PlayAudio 50
+  text 0 "@^Sparring match!  One on one, until one of you falls."
+  script
+        PlayMusic 35
+        PushByte 1                       ; CoopCall 1 DuelStart (player 2's slot, flags 0, end sequence)
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        PushVarint seq:lk_spar_end
+        Step CoopCall
+end
+
+sequence lk_spar_end
+  script                                 ; 1 if player 1 won, 2 if player 2 did
+        WaitFrames 40
+        PlayAudio 50
+        CoopCall 3, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PushByte 1
+        END
+      L1:
+        PushByte 2
+        END
+  fmt 0 "@^%s wins the sparring match!" -> 3
+        PushActiveCharName
+  fmt 0 "@^%s wins the sparring match!" -> 3
+        CoopCall 14, 2, 0, 0
+  script
+        CoopCall 2, 0, 0, 0
+        PushActiveCharIndex
+        PushVarint 5000
+        Step SetCharHP
+        PushActiveCharIndex
+        PushVarint 5000
+        Step SetCharEP
+        CoopCall 8, 0, 0, 0
+        PushVarint 5000
+        Step SetCharHP
+        CoopCall 8, 0, 0, 0
+        PushVarint 5000
+        Step SetCharEP
+        WaitFrames 30
+        FadeOut 120
+        WarpToMapWithEntities 6, 3, 1, 272, 336
+end
