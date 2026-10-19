@@ -761,6 +761,31 @@ list now (player.c).
   (`0x08009A89`, stack `{5, zone, area, 1, x, y}`) from the entity-list hook. Offsets: `coop2` is
   at `0x0203FB00`, `cmd` +0x208, `cmd_arg` +0x20C.
 
+## Gero's bunker and Android 16 as a player (2026-10-19, branch `gero-computer`)
+
+**Two Android 19s.** Ryan wants two 19s on screen, in co-op and alone. The bunker's record (map 257,
+record 1) has stat **120** (19's stat 5 with overrides, in `gero_stats[]` of `bosses.c`, looked up
+before the main extra table so the 115-139 ranges of the other side chapters merge without
+renumbering); its rule is `BOSS_PAIR` with partner model 12 and partner stat **121** (the same
+numbers), so exactly one twin spawns whatever the player count, and both-down holds the first 19
+down until the second falls, when the record's defeat dialogue runs once. Numbers: 3600 HP, melee 23,
+ranged 17, defence 16 each (stock 19: 2970, 21/14/11).
+
+Fork tests (slot 5, `A16_TEST=1` autopilot, Krillin and 16 at the debug party's level 40: Krillin 625 HP,
+16 about 1000; `bossfight.sh 0x08B0DEA4`, the record address of that build): 4000 HP at 28/20/18: one
+19 down at 24 s, the other at 799 HP when Krillin died at 30 s; 25/18/16: Krillin died at 30 s;
+20/15/16: both down at 32 s, Krillin at 488; **23/17/16** (kept): both down at 32 s with Krillin at
+438 and at 326 in two boots. The twin goes for the other player (16), the original for Krillin. Runs
+started from a savestate taken right after the party switch sometimes stalled with every boss idle
+(the stock 19 + 13 pair too), never from a fresh boot: a test-state artefact, not seen headless.
+
+**Rocket Punch (ability 22).** A projectile of the ROM's class (like Krillin's disc) with the boss's fist
+frames, 5 px per frame for 40 frames, one hit on the first enemy it touches, then the fire explosion
+hits every other enemy within 20 px. Its attack must be the **melee kind** (`{0x0400, 0x500}`):
+**Android 19 absorbs ranged-kind hits** (a ranged fist landed four hits without damage), so ki blasts,
+the Destructo Disc and 16's Big Bang do nothing to the 19s, which suits the dialogue ("I will do the
+punching"). Measured: three punches, five hits, about 310 HP each against the 19s at level 40.
+
 ## Player-vs-player duel (2026-10-18, src/coop/duel.c)
 
 For the story's two duels (Vegeta vs his shadow clone in space, Vegeta vs Trunks in the Time Chamber).

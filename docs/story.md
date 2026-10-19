@@ -573,8 +573,15 @@ defeat action at that threshold instead of at zero HP and becomes untargetable).
     the cave mouth (16 punches through the rubble, a chapter flag) and send the basement door to the
     computer room (63) while the chapter runs. Area 47's top exit into 48 did not fire in the
     headless run (player stopped at y 20): recheck in play.
-  - *To build:* 16 as a player (poses, row, abilities; portrait speaker 26 exists; sprite 160 is
-    enemy-grade) and a party slot for him.
+  - *Built (2026-10-19, branch `gero-computer`, `data/story/ch9_gero`, `docs/scripts.md` section 5):*
+    16 is playable in the last party slot during the chapter (sprite 175, row 25, Rocket Punch;
+    `src/coop/a16player.c`); the workshop scene, the world-map star, the generators under the waterfalls
+    of areas 27 and 40, the rubble 16 punches through, the bunker's two 19s, the Android 13 file, the
+    birds and the way home are in. Area 47's top exit was broken in the stock game too and is fixed.
+    Tested headless end to end (`tools/headless/ch9_gero.txt`) and the bunker fight and Rocket Punch in
+    the fork. Choices Ryan may want to change: the generators are scenes on entering their areas (the
+    robots there are the stock ones), the 19s' numbers (3600 HP, 23/17/16 each), 16 at Krillin's level
+    with 1.5x his strength / endurance, and the home scene's lines (Bulma, Krillin, Hercule).
 - **The wait's story is complete (Ryan, 2026-10-19):** after the 16 chapter the players proceed to
   the Cell Games; no more story is planned for the wait.
 - **Castle defense (Ryan, idea for later, not MVP):** each Dragon Ball found cuts to a separate

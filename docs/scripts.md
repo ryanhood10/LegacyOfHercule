@@ -36,6 +36,9 @@ counter), 0x1C LoopOrJump, 0x1D PushMulti u8 count + varints.
   Jump and JumpIfFalse go **forward** to (address after the operand) + byte; LoopOrJump decrements
   the counter pushed by PushToAltStack and, unless it reached 0, goes **back** to (address after the
   operand) - byte. A script can continue past an END when a jump targets beyond it.
+- **0x05 is a binary OR** (decompiled 0x08008FE6: pops two values, pushes 1 when either is nonzero),
+  though the tools print it `Not` (the reference notes' name); stock conditions join cases with it
+  (`A; B; Not` = A or B). There is no unary NOT: use the `StackTestStoryFlagNot` form.
 - **Varints**: 7-bit groups MSB first, bit 7 = more; then u even -> u/2, u odd -> -(u/2). Every stock
   varint is minimal (the assembler can rely on it; the disassembler would print `.bytes` otherwise).
 - **Arguments**: actions pop their arguments; the stock scripts push them with PushByte (one value
@@ -103,6 +106,8 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 6 | P2Bind slot | player 2's entity plays that slot now (the entity survives warps with entities, so after a duel the story rebinds it); after a warp without entities player 2 is gone until player 1 is free again, and the respawn takes this slot when it is selectable |
 | 7 | PadSwap | the two pads trade players (`coop2.pad_swap` toggles, as when player 2 wins a duel with the swap flag): Perfect Cell, where the pad that played Vegeta takes Krillin and Trunks' pad becomes player 1 |
 | 8 | P2Slot -> slot / -1 | player 2's party slot (the last bound one while a warp has the entity despawned), -1 without player 2: Roshi's gym checks whether either player is Hercule or Krillin |
+| 11 | A16Join | "Gero's computer" (`a16player.c`): Android 16 joins in the last party slot (row 25, Krillin's EXP, stats scaled from Krillin's, abilities 22 / 19 / 0 / 2), every other slot but Krillin's loses its available bit (saved in flags 430 + slot), flag 420. The script then sets `SetActiveCharacterNoReset 6` and `CoopCall 6, 7` |
+| 12 | A16Leave | 16 leaves the party for good (slot flags 0), the saved bits come back, Krillin and Hercule in the party and available, flag 421. The script then sets Krillin player 1 and `CoopCall 6, 5` |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -145,7 +150,10 @@ lock), and a stock chapter lock applies to player 2 too.
 
 Stock scripts use flags up to 306. Party_Init clears flags 0-399 at a new game; flags 400+ are
 never cleared, so new flags stay below 400. **360-379: story-scripts** (360 Krillin has visited,
-361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`).
+361 inside Triceratops Jungle, 362 Hercule's deal); 380-399: new maps (`docs/maps.md`). The ten-day
+wait's side chapters use flags 400-459 (never cleared at a new game; each chapter sets its own):
+**420-439 "Gero's computer"**: 420 running (16 in the party), 421 over, 422 rubble punched, 423 / 424
+west / east generator down, 425 bunker done, 430-437 the available bits of slots 0-7 saved by the lock.
 
 ## 3. lscript, the text form
 
@@ -199,6 +207,10 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 }
 ```
 
+- `add_triggers` entries copy trigger N of the same map (`"like"`), or build a door exit from scratch:
+  `{"kind": "exit", "rect": [...], "exit": [DIR, ZONE, AREA, VAR, X, Y], "condition": ...}` (create
+  0x0800C233, activation 0x0800D8AF, the 8-byte payload inline; `docs/maps.md` 7). A map without
+  triggers gets its first one this way (area 47).
 - References: `seq:NAME`, `script:NAME` (assembled once, on first use), `@08xxxxxx`, `none`.
   Conditions: `always`, `never`, `flag:N`, `noflag:N`, `once:N`, `script:NAME`, a number.
 - Record fields: `condition`, `x`, `y`, `sprite`; enemies `stat`, `action` (a sequence = defeat
@@ -230,6 +242,7 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 | `ch8_gym` | 175 (zone 6 area 70) | Roshi's sparring room as duos: Yamcha + Tien (stat 106 pairs with Tien's model and stat 98), then Krillin + Hercule (stat 64 pairs with Hercule's sprite 72), `BOSS_PAIR` rules so single-player gets the duos too; when either player is Hercule or Krillin (`CoopCall 8`) the second duo refuses ("Master Roshi says I can only fight duos with Krillin on my team right now... Come back with a different team!") and only the other of the pair stands (record condition scripts); the finale: Roshi's animal ninjas, eleven new enemy records (copies of Yamcha's: alligator, hawk, ladybug, pterodactyl, saber-toothed tiger, scorpion, snake, T-Rex, triceratops, two Ninjas; stats from the bestiary table 0x086F8E40, `{name, description, sprite, portrait, stat}` x 128) in three rounds (all at once ran out of OBJ tiles), flags 363-375, the last defeat pays Tien's +3 Endurance Capsule and flag 214 |
 | `ch8_cooler` | 172 (zone 6 area 61) | Cooler's fight: the three stock openings (Goku, Trunks, anyone else) meet at a co-op check (`stock @A -> 10`), where Cooler brings "a Namekian warrior my father took from Namek long ago" ("...As you command, Lord Cooler.") before the fight with his servant (bosses.c: sprite 166, stat 113); the Piccolo gates are unchanged (zone 4 area 50 needs flag 60 from chapter 2, area 62's barrier Piccolo) |
 | `ch8_arctic` | zone 15 area 1 (built by `tools/mapbuild.py` from `data/maps/arctic.json`, which names this file in `"sources"`) | Android 13 at the cave mouth once Vegeta has opened the barrier (flag 380, encounter flag 376 clear): he was meant to absorb 17 and 18, Cell stole his perfection, he would kill Cell himself; Vegeta: he won't get the chance; a half-health fight (stat 114, alone until Ryan picks his partner), 13 flies off, flag 376 for the post-Cell variant |
+| `ch9_gero` | 149 (zone 6 area 5), 176 (world map), 229, 242, 249, 250, 257, 258 (zone 8 areas 27, 40, 47, 48, 63, 64) | "Gero's computer" (`docs/story.md` 4g): 16 stands in Dr. Briefs' workshop during the wait (new actor, sprite 8); after the memory scene, the TV announcement and the Scouter Note (155, 157, item 22 / 23 / 24 or flag 156) the workshop scene: Briefs (16 repaired, bomb out), 16 wakes and picks up the computer's signal, Krillin walks in unless a player is Krillin, `CoopCall 11`, Krillin player 1 and 16 player 2, a warp into the workshop clears the actors; the world-map star at the zone 8 landing; the two generators under the waterfalls of areas 27 / 40 (flags 423 / 424, robots back online are the stock records); area 47's top exit fixed; the rubble at the cave mouth (16 punches through once both generators are down, flag 422); the basement door to the intact computer room; the bunker: "assembly complete" captions, two Android 19 spare bodies (record 1, stat 120, `BOSS_PAIR` with stat 121, single-player too), both down: the Android 13 file ("UNFINISHED. FINAL STAGE ON HOLD", absorbing two androids), the computer smashed (flag 425), outside 16 watches two hawks (sprites 63 / 64) and says he will go to the Cell Games, `CoopCall 12`, the warp to the workshop with Krillin player 1 and Hercule player 2 |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 
 Engine support added with them: `A16_END_PCT` and bar-range HP slices (`android16.c`), the

@@ -240,6 +240,31 @@ right clockwise, 2 flame frames each), `a16_fist[8]` (the rocket fist drawn by h
 rotated to right / down / left / up, 2 flame frames each) and `a16_boom[4]` (the dust explosion
 with its colours mapped by brightness onto white / yellow / orange / dark orange / red).
 
+### Android 16 as a player (sprite 175, `a16p_record`, same generator, 2026-10-19)
+
+For the "Gero's computer" chapter (`docs/story.md` 4g) 16 plays as a party member (last party slot,
+display row 25, `src/coop/a16player.c`). `tools/a16sprites.py` also emits `a16p_record` (Makefile
+`A16P_SPRITE` = 175; preview `build/<dir>/a16_preview_player.png`): Goku's playable header (player
+collision boxes, sprite 60) with 21 groups filled the way Hercule's stock set is (9, 10, 14, 15, 16,
+18, 19 empty), every group taken from sprite 8 (by ROM address) or from the boss record above (by
+name), nothing new drawn:
+
+| player group | source |
+|---|---|
+| 0 idle, 1 walk, 2 run (= walk), 13 dash (= walk), 17 halo (= idle) | sprite 8 groups 0 / 1 |
+| 3 knock-down, 20 tumble | boss group 3 (17's knock-back re-headed) |
+| 4 shout | sprite 8 group 4 (looking up) |
+| 5 ki pose | boss group 13, **the rocket punch**: every ability animation that plays group 5 shows the forearm launched |
+| 6 punch combo, 7, 8 attacks | boss groups 6, 7, 8 |
+| 11 hurt | sprite 8 group 2 (hit-stun) |
+| 12 lying | sprite 8 group 12 |
+
+Display row 25 (`tools/spriteclone.py`, `--a16-sprite`): Gohan's standard row with sprite 175,
+dialogue portrait 26 and **status portrait 120**, his dialogue portrait remapped to the menu BG
+palette and appended to `portrait_module` by `tools/krillinsprites.py` (which also writes the
+slot-7 names "Android 16" / "ANDROID 16"). `CharacterData_FindBySprite`'s row limit is 26.
+Seen in the fork as player 2 beside Krillin: walking, punching, the rocket punch pose and fist.
+
 ## Krillin (sprite 161, `tools/krillinsprites.py`, 2026-10-18)
 
 Krillin's stock record (76) has groups 0-6 and 12 only (byte 2 says 13 groups; 7-11 are empty). A

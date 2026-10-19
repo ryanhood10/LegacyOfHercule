@@ -2,6 +2,21 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-19
+
+- **"Gero's computer" side chapter (branch `gero-computer`, worktree `F:\MeltyCreations\log2-gero`)**:
+  Android 16 playable in the last party slot for the chapter (sprite 175 from sprite 8 and the boss
+  record's groups, row 25, status portrait 120, Rocket Punch ability 22, `src/coop/a16player.c`, CoopCall
+  11 / 12); `data/story/ch9_gero`: the workshop scene (16 repaired, the computer's signal, Krillin goes
+  along, party Krillin + 16), the world-map star (actions 101 / 102 are the plain / star markers; opcode
+  0x05 is OR), the generators under the waterfalls, the rubble 16 punches through, the basement door to
+  the computer room, two Android 19s in the bunker (stats 120 / 121, `BOSS_PAIR`), the Android 13 file,
+  the birds, home as Krillin + Hercule. Stock fix: area 47's top exit never fired. Headless end to end
+  (`tools/headless/ch9_gero.txt`), bunker fight and Rocket Punch in the fork. IDs: flags 420-437,
+  CoopCall 11-12, COOP_CMD 11, stats 120-121, sprite 175, row 25, ability 22, portrait 120; no CoopExtra
+  bytes. Details: `docs/story.md` 4g, `docs/scripts.md`, `docs/maps.md` 9b, `docs/sprites.md`,
+  `docs/coop-design.md` "Gero's bunker", `docs/testing.md` "Gero's computer".
+
 ## 2026-10-18
 
 - **Boss models** (branch `boss-models`, worktree `F:\MeltyCreations\log2-bm`): Android 13 base form
