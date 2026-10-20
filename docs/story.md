@@ -347,6 +347,9 @@ Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` secti
 **Before fight 1 (unchanged):** the arena grounds, Hercule's ring scene (his punches do nothing,
 "Your ignorance is painful," one blow sends him gliding off the ring).
 
+**One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
+twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
+
 **Solo fights with a title card.** Fights 1 and 2, and the Cell Junior fights, are fought by one
 player alone; the other player watches (no entity on the field, no damage). A title card before each
 says who fights: "Player 1 fights" / "Player 2 fights". Ryan: this is one of the only times a player
@@ -356,12 +359,12 @@ fights alone.
 |---|---|---|---|---|
 | 1 | the ring | player 1 as Goku, alone | Perfect Cell, no twin | stock end: Cell destroys the ring |
 | 2 | the desert | player 2 as Goku, alone | Perfect Cell, no twin | new end: Goku subs in Hercule (below) |
-| 3 | the desert | player 1 Gohan + player 2 Hercule | Perfect Cell | stock end: 16's failed self-destruct, Cell kills him, Cell spawns the Juniors (four now) |
+| 3 | the desert | player 1 Gohan + player 2 Hercule | Perfect Cell, no twin | stock end: 16's failed self-destruct, Cell kills him, Cell spawns the Juniors (four now) |
 | J1 | the desert | player 1 as Krillin, alone | Cell Junior | new fight |
 | J2 | the desert | player 2 as Piccolo, alone | Cell Junior | |
 | J3 | the desert | player 1 as Vegeta, alone | Cell Junior | |
 | J4 | the desert | player 2 as Trunks, alone | Cell Junior | stock end: 16's head scene, Gohan turns Super Saiyan 2 |
-| 7 | the desert | player 1 Gohan (Super Saiyan 2) + player 2 Hercule | Perfect Cell | new end: two Cells come back (below) |
+| 7 | the desert | player 1 Gohan (Super Saiyan 2) + player 2 Hercule | Perfect Cell, no twin | new end: two Cells come back (below) |
 | 8 | the desert | player 1 Gohan + player 2 Hercule | **two Perfect Cells** (the final fight, both-down) | then the beam struggle |
 
 Fights 1-8 keep the stock numbering (J1-J4 replace the stock 4-6). Each player fights alone three
@@ -407,7 +410,6 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 **To settle before building:**
 - Hercule's firing pose for the beam struggle: Hercule's sprites have no beam pose; it needs art (a
   push-forward pose from his own frames) or a comic stand-in. To check in the sprite sheets.
-- Fights 3 and 7: one Cell, or a twin as co-op normally adds? (Fight 8 is the planned twin fight.)
 - Hercule is weaker by design; against Perfect Cell he needs a fair chance (tuning).
 - The standing rule says nothing reveals Hercule as the hero before the Buu phase; this plan puts him
   in the Cell fights by Ryan's choice.
