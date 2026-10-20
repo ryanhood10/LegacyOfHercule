@@ -473,6 +473,16 @@ epilogue, then the title screen; the talk-show bonus ending).
 - **No credits yet:** a star on the world map marks the arctic (zone 15 area 1); the players go there
   and fight Android 13.
 - **The real ending later:** the players return to the Lookout to end the game and start the credits.
+- **17 and 18 at the arctic (Ryan):** 18 flies off after the Lookout scene, looking for 17 and going to
+  check out the explosion, so 13, 17 and 18 are all there when the players arrive. The scene is set on
+  arrival: a struggle between them and 13, some dialogue, then 13 absorbs 17, then 18, and transforms
+  into Super 13.
+- **Super 13 (Ryan): new art, a big towering boss** with lots of health, like Cell. New sprite with
+  animations and fighting moves, a full AI strategy, slow-moving, attacking with combinations of
+  different ki blasts and large ki blasts; since he is slow, his blasts partly home in on the
+  players. (Base 13 is sprite 165; Super 13, the blue-skinned muscle form, is in neither ROM. The
+  Android 16 boss, `android16.c`, already has homing projectiles and a special-attack scheduler to
+  build on.)
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
