@@ -461,6 +461,9 @@ decision above is made.
   After the Games he joins as a separate, very strong party member; regular Gohan stays selectable.
   Needs a ninth party slot (`PARTY_SLOTS=9`; slots 0-7 are taken).
 
+**Levels (Ryan):** no level check and no level raise: Goku fights 1 and 2, and Krillin, Piccolo, Vegeta
+and Trunks fight the Juniors, at whatever level they have when the Games start.
+
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
 record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
@@ -548,6 +551,12 @@ epilogue, then the title screen; the talk-show bonus ending).
 - **The end of Super 13 (Ryan):** he explodes at the end, and 17 and 18 die with him. VEGETA: "*spits*
   At last. The end of those clankers."
 - **Difficulty (Ryan):** Super 13 is slightly harder than Cell; no extra reward.
+- **Defaults (Claude's, Ryan may change):** before Super 13 is beaten, Dende points the players north
+  ("That power in the Arctic... someone has to stop it!") and his Buu's Fury prompt only appears after
+  13; 18 is removed from any place that shows her once she is dead; the arrival scene plays in full the
+  first time and in short after a reload at the summit save pad; Super Saiyan 2 Gohan joins with
+  "Super Saiyan 2 Gohan is now an available character!" when the Games end; Super 13 is tuned a little
+  above the twin-Cell fight.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
