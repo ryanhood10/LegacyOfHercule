@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Scenes alone as someone else** (Ryan: Gohan missing from Frieza's landing while playing Krillin, and Krillin
+  saying "how does he know my father?"): a scene now runs with the story's lead as player 1 and your character
+  beside him, then puts you back (`companion.c`, the sequence start / end re-implemented). With two players the same:
+  a player 2 on the lead trades for the scene, another player 2 stays. `scene_swap.txt`, `scene_swap_2p.txt`.
 - **Ryan's test, round 3:** alone, the story's lead follows as a companion when you play someone else (Gohan with a
   player who switched to Krillin; the lead is noted by wrapping the VM's SetActiveCharacter steps, flags
   464-467); the companion never counts as a player for the rules. Frieza's landing (`ch1_frieza_landing`) has

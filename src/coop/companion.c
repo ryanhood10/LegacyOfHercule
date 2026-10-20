@@ -20,6 +20,7 @@
 
 static u16 stuck __attribute__((section(".party.cp")));
 static s32 last_d2 __attribute__((section(".party.cp")));
+static struct { u8 swapped, player, lead, p2; } sw __attribute__((section(".party.cp")));   // a scene's swap (p2: player 2's slot before it)
 
 // ---- the story's lead -------------------------------------------------------------------------------
 static int lead_slot(void) {
@@ -52,9 +53,11 @@ static int usable(int slot) {
     return (g_Party->chars[slot].flags & 3) == 3;              // in the party and available (not story-locked away)
 }
 
+static int alone(void) { return (players_one() || !p2_pad_present()) && !coop_solo() && !coop2.duel_active; }
+
 int companion_slot(void) {
-    if (!players_one() && p2_pad_present()) return -1;        // a second controller plays player 2
-    if (coop_solo() || coop2.duel_active) return -1;          // the Cell Games' solo fights, a duel
+    if (!alone()) return -1;                                   // a second controller plays player 2; a solo fight; a duel
+    if (sw.swapped && usable(sw.player)) return sw.player;     // a scene: the player's own character beside the lead
     const CharacterEntry *h = &g_Party->chars[HERCULE_SLOT];
     if ((h->flags & 1) && h->display_row == OLD_HERCULE_ROW && g_Party->active_slot != HERCULE_SLOT)
         return HERCULE_SLOT;                                   // the future prologue
@@ -63,6 +66,64 @@ int companion_slot(void) {
 }
 
 int companion_active(void) { return companion_slot() >= 0; }
+
+// ---- scenes: the lead plays them --------------------------------------------------------------------
+// Stock scenes give the player's lines and place to whoever plays (written for the story's lead: "GOHAN: how does
+// he know my father?"). So a dialogue sequence starts with the lead as player 1 when player 1 plays someone else:
+// alone, the player's own character becomes the companion (the co-op staging); with two players, a player 2 who
+// plays the lead trades with player 1 for the scene, and otherwise player 2 stays (only two characters can stand
+// in). The end puts everyone back (unless the scene itself changed who plays): coop_active_check trades player 2. The sequence start / end are
+// 0x0800B4AE / 0x0800B4FC, re-implemented here (entry jumps, tools/patch_rom.py) with the swap added.
+#define SCENE_STATE   ((volatile u32 *)0x03001FD8)   // +0 cleared at a start, +4 = a sequence runs
+
+static void set_active(int slot) { s32 st[2] = { 1, slot }; Step_SetActiveCharacter(st); }
+
+static void scene_swap_in(void) {
+    if (sw.swapped || coop_solo() || coop2.duel_active || !g_PlayerObject) return;   // alone or with player 2
+    int lead = lead_slot(), act = g_Party->active_slot;
+    if (lead < 0 || lead == act || !usable(lead)) return;
+    sw.player = (u8)act;
+    sw.lead = (u8)lead;
+    sw.p2 = coop.p2_slot;
+    sw.swapped = 1;
+    set_active(lead);
+    if (coop.p2 && (alone() || coop.p2_slot == lead)) p2_bind_slot(act);   // the companion, or player 2 who played the lead
+}
+
+static void scene_swap_out(void) {
+    if (!sw.swapped) return;
+    sw.swapped = 0;
+    if (g_Party->active_slot != sw.lead || !usable(sw.player)) return;   // the scene changed who plays
+    set_active(sw.player);
+    // player 2 back to its character (a map reload in the scene may have despawned it: then its respawn picks it)
+    if (sw.p2 < PARTY_SLOTS && sw.p2 != sw.player) {
+        if (coop.p2) p2_bind_slot(sw.p2);
+        else coop.p2_slot = sw.p2;
+    }
+}
+
+u32 *scene_begin_hook(u32 *r, const void *seq, u16 *idx, const u32 *pair, u32 arg) {
+    if (!r && !(r = Arena_Alloc(0x1C))) return r;
+    r[0] = (u32)seq;
+    r[1] = (u32)idx;
+    r[3] = pair[0];
+    r[4] = pair[1];
+    r[6] = 0;
+    r[5] = arg;
+    SCENE_STATE[0] = 0;
+    *(u16 *)(r + 2) = *idx;
+    SCENE_STATE[1] = 1;
+    scene_swap_in();
+    EntityList_Broadcast(g_EntityList, 0xD, 0);                // a cutscene starts
+    return r;
+}
+
+void scene_end_hook(u32 *r, int free_it) {
+    SCENE_STATE[1] = 0;
+    EntityList_Broadcast(g_EntityList, 0xE, 0);                // the cutscene ends
+    if (free_it) Arena_Free(r);
+    scene_swap_out();
+}
 
 int companion_is(const Entity *e) { return e && e == coop.p2 && companion_active(); }
 

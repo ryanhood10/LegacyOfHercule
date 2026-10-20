@@ -1,0 +1,74 @@
+# Scenes alone with someone else than the story's lead (src/coop/companion.c scene_begin_hook / scene_end_hook):
+# Frieza's landing played as Krillin with Gohan the lead (flags 464-467 = 1). The scene runs with Gohan as player 1
+# ("GOHAN: Weird, how does he know about my father?" on his own portrait) and Krillin beside him as the companion;
+# afterwards player 1 is Krillin again (slot 6) and Gohan (slot 0) follows. From a debug-menu savestate of a
+# DEBUG_MENU=1 build (--out = the folder holding menu.ss).
+p2 off
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 200
+shot k00
+key 1 6
+frames 110
+shot k01
+key 1 6
+frames 110
+shot k02
+key 1 6
+frames 110
+shot k03
+key 1 6
+frames 110
+shot k04
+mash 80 110
+key 1 6
+frames 110
+shot k05
+key 1 6
+frames 110
+shot k06
+key 1 6
+frames 110
+shot k07
+key 1 6
+frames 110
+shot k08
+key 1 6
+frames 110
+shot k09
+key 1 6
+frames 110
+shot k10
+key 1 6
+frames 110
+shot k11
+key 1 6
+frames 110
+shot k12
+key 1 6
+frames 110
+shot k13
+key 1 6
+frames 110
+shot k14
+key 1 6
+frames 110
+shot k15
+key 1 6
+frames 110
+shot k16
+frames 300
+echo == after: active slot (6 = Krillin), companion slot (0 = Gohan)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+peek 0x0203FF08 1
+shot kend
+key 0x20 60
+frames 30
+shot kwalk
+map

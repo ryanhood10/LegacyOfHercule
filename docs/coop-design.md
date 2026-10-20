@@ -1274,7 +1274,14 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   party slot 5 shows him (row 24, the future prologue). The companion is no player for the rules:
   `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him (`coop_target`), he takes no hits, the
   damage and speed multipliers and the revive see one player, CoopCall 5 reads 0 (scenes take the one-player
-  branches) and duels are skipped. Not in the Cell Games' solo fights or a duel. Old Hercule: spawned with a
+  branches) and duels are skipped. Not in the Cell Games' solo fights or a duel. **Scenes alone:** the dialogue
+  sequence start / end (`0x0800B4AE` / `0x0800B4FC`, re-implemented in `companion.c` as entry jumps) swap: when
+  player 1 is not the lead, a scene runs with the lead as player 1 (stock lines "#GOHAN: ..." are the active
+  character's). Alone, the player's own character is the companion beside him; with two players, a player 2 who
+  plays the lead trades with player 1 for the scene, and otherwise player 2 stays (only two can stand in). The end
+  puts everyone back, player 2 included (its slot is restored even when a map reload in the scene respawned it),
+  unless the scene changed who plays. Not in solo fights or duels. Tests: `tools/headless/scene_swap.txt`,
+  `scene_swap_2p.txt`. Old Hercule: spawned with a
   follower pad (walk toward player 1 beyond 28 px; jump beside him when walled off far
   behind); his HUD panel is hidden; a real second controller takes him over; when the present day drops him from
   the party he leaves (`p2_drop_out`). The Future Trunks visit already has him as an actor (sprite 158) in both
