@@ -347,6 +347,11 @@ Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` secti
 **Before fight 1 (unchanged):** the arena grounds, Hercule's ring scene (his punches do nothing,
 "Your ignorance is painful," one blow sends him gliding off the ring).
 
+**Hercule's strength (Ryan): kept as it is.** His growth (`docs/hercule.md` 2) already brings his
+toughness level with Gohan's around level 40 (less HP, more defence, a little more strength, less ki
+power, no beams), and as player 2 he cannot lose the fight: at 0 HP player 2 gets back up at half HP
+beside player 1. Only player 1 going down ends a fight.
+
 **One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
 twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
 
@@ -411,7 +416,6 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 - Hercule's beam pose. His sprite (72) has idle, walk, hit-stun, victory, two punches and a kick, no
   beam pose. Cheapest stand-in: hold his straight-punch pose (group 7) with the beam coming off his
   fists. Otherwise, new art.
-- Hercule's strength against Perfect Cell in fights 3, 7 and 8 (he stays weaker by rule).
 - The standing rule that nothing reveals Hercule as the hero before the Buu phase: this plan puts
   him in the Cell fights by Ryan's choice; the public credit stays the stock fake.
 - A lost solo fight (1, 2, J1-J4): what happens when the fighting player goes down.
