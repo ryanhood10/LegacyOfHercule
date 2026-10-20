@@ -37,7 +37,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-437 saved "available" bits of slots 0-7 |
 | 440-459 | Lookout / dojo (`wait_chamber`, `wait_spar`) | 440 Roshi's dojo booked for a spar |
-| 460-479 | free (still cleared at a new game) | |
+| 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
+| 462-479 | free (still cleared at a new game) | |
 | 480-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
 Stock flags the mod's scripts test (meanings from the script dump):
@@ -205,7 +206,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 7 | STORY_WIN | win every boss fight on the map |
 | 8 | SPAWN_RECORD | spawn the enemy record at address `arg` with a boss bar |
 | 9 | PARTNER_WIN | only the boss twins fall (Broly's rage test) |
-| 10 | free | |
+| 10 | DOWN | player `arg` (0 / 1) goes down as from a lethal hit (`revive.c`) |
 | 11 | A16_PARTY | Krillin player 1, Android 16 player 2 |
 | 12 | free | |
 | 13 | WAVE_CLEAR | every standing enemy dies |
@@ -256,7 +257,9 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
 | 0x0203F914 | 0x9C | `.party.wv` `waves` (Time Chamber; 0x0203F880 with 8 slots); moves when anything before it grows |
 | 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
-| 0x0203F9CC-0x0203FB00 | 0x134 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
+| 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |
+| 0x0203FA2C-0x0203FB00 | 0xD4 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |

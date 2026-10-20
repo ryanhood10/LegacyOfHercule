@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Revive and difficulty** (Ryan): a player at 0 HP goes down instead of dying; the partner holds A beside them
+  for 3 s (a yellow bar, the body glowing) to get them up with 30 % HP; a red countdown with the seconds runs
+  10 s on Normal, and running out (or both down) is a game over (`src/coop/revive.c`, `docs/coop-design.md`
+  "Revive"). Easy / Normal / Hard is asked at a new game's first scene (flags 460 / 461) and changes enemy HP,
+  damage, speed, twins, boss HP, the revive time and drop rolls (`src/coop/difficulty.c`, "Difficulty").
+  Tested headless (`revive.txt`, `difficulty.txt`, and the story tests). Test command 10 `DOWN`.
 - **Pre-play check fixes** (Ryan): the journal gets our chapters (`tools/gen_journal.py`, `docs/scripts.md` 2.6:
   Gero's computer, Broly's ship and trip, the Arctic, back to Dende, Dende's question; "Talk to Dende" ends with the
   wishes); Super 13's fight plays a boss track (music 30, Broly's) and the summit's own music after; Broly's

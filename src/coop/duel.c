@@ -11,6 +11,7 @@
 // (message handler 0x08008945) and slot 16 (player 1's take-damage 0x08008785); player 2's private
 // vtable uses the same slot 9 and its own slot 16 (player.c).
 #include "coop.h"
+#include "revive.h"
 
 #define PLAYER_MSG        0x08008945u   // player vtable slot 9 (entity, message id, message)
 #define P1_TAKE_DAMAGE    0x08008785u   // player vtable slot 16 (entity, hit): HP -= hit[+8], death at 0
@@ -67,6 +68,7 @@ int p1_take_damage_hook(Entity *e, u8 *hit) {
             return r;
         }
     }
+    if (revive_hit(e, hit, 0)) return 1;   // downed, getting up, or the body (revive.c): no hurt state
     return orig(e, hit);
 }
 

@@ -1,6 +1,7 @@
 // Replacement for Input_Poll (0x0801EEFC; its first 8 bytes are patched to jump here).
 // Same behaviour for player 1, plus player 2's InputSystem filled from the selected source.
 #include "coop.h"
+#include "revive.h"
 #include "wide.h"
 #include "android16.h"
 #include "ssj2gohan.h"
@@ -162,6 +163,7 @@ void input_poll_hook(InputSystem *in) {
     case 2: p1 = p2; p2 = 0; break;        // player 2 fights on player 1's entity, player 1 watches
     default: break;
     }
+    revive_input(&p1, &p2);                // revive.c: a downed player's pad, the partner's A beside the body
 #ifdef A16_TEST
     if (coop2.a16_bot && s13.boss && is_s13(s13.boss) && s13.boss->hp > 0) {   // Super Android 13
         if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, s13.boss, -1, &g_Party->chars[g_Party->active_slot]);

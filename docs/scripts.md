@@ -170,7 +170,7 @@ clears 400-479 (the ten-day wait's side chapters); flags 480+ survive a new game
 flags there. Chapter-specific notes: 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic
 route's world-map landing and star, `arctic_route`), 400-419 the Broly chapter (404-419
-the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar. The bank
+the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar, 460 / 461 the difficulty (Easy / Hard). The bank
 is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
 ### 2.6 The journal (quest table)
@@ -265,7 +265,7 @@ written again. **Committed lscript files restate no stock text**: unchanged line
 
 | spec | maps | what |
 |---|---|---|
-| `ch1_opening` | 0, 1, 3 (zone 1), 14, 19 (zone 2), 52, 54 (zone 3) | old Hercule (slot 5, row 24 / sprite 158) is player 2 in the future prologue with three comic lines and leaves the party at "Present day"; Krillin walks in instead of phoning (the stock call lines in person) and joins (slot 6); the forest spirit fight (the dream's clearing, Frieza + Cooler as a `BOSS_PAIR`), the warp to the armor cave and the voice's explanation; Krillin's actor and NPC gone from both landing-site scenes; old Hercule beside Trunks, two lines, leaves with him |
+| `ch1_opening` | 0, 1, 3 (zone 1), 14, 19 (zone 2), 52, 54 (zone 3) | old Hercule (slot 5, row 24 / sprite 158) is player 2 in the future prologue with three comic lines and leaves the party at "Present day"; Krillin walks in instead of phoning (the stock call lines in person) and joins (slot 6); the forest spirit fight (the dream's clearing, Frieza + Cooler as a `BOSS_PAIR`), the warp to the armor cave and the voice's explanation; Krillin's actor and NPC gone from both landing-site scenes; old Hercule beside Trunks, two lines, leaves with him ; the training scene (map 0 trigger 0) opens with the difficulty question (CoopCall 18 twice; flags 460 Easy / 461 Hard) |
 | `ch2_west_city` | 65, 97, 98, 105 (zone 4) | the mansion deal where Piccolo joins, Hercule joins; Triceratops Jungle locks Gohan and Krillin (flag 361) so player 2 is Hercule, restored at the entrance; Hercule claims the dinosaur peace |
 | `ch3_duels` | 143 (zone 5), 166, 168 (zone 6), 263 (zone 9) | Amenbo's "Meanwhile" also locks Goku, Hercule and Krillin; space: Vegeta vs his clone (actors 137 / 140, the monologue, the transformation), the shadow-clone duel (`CoopCall 1, -1, 15`), "I've won. I'm a Super Saiyan", the tutorial, the warp; the landing: Hercule meets Vegeta and becomes player 2's only choice; the Lookout: Vegeta and Trunks walk in, the chamber (zone 15 area 2) with both as Super Saiyans, the duel (`CoopCall 1, 3, 12`), the winner's line, back to the Lookout with Piccolo as player 1 and Hercule as player 2 (Krillin selectable too), Goku sends Piccolo off |
 | `ch3_zone7` | 7 (zone 2), 177, 191 (zone 7) | the three-year skip also raises Hercule (5) and Krillin (6) one level with a full refill; Android 13 (actor 165, speaker 0: no portrait) stands with 19 and 20 in the zone 7 cutaway with two lines and joins 19's fight ("Not by yourself, you don't"); 19 + 13 are a `BOSS_PAIR` (13 in single-player too); the defeat: 19 explodes as stock, 13 swears revenge and says not even the androids know Dr. Gero's true plan, flies off (by sprite 165, downed or last standing), then the stock Vegeta / 20 / Piccolo scene |

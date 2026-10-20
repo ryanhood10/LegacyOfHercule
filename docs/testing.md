@@ -640,6 +640,14 @@ settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
 the Cell Games test does it (`cg_state + 5`, stat + 1 = 146 for Super 13's 145; stepz) and FLAGS+47 bit 6 (382)
 is checked. `PanCameraToPosition` names the view's top-left corner, not its centre.
 
+## Revive and difficulty (headless, 2026-10-20)
+
+`tools/headless/revive.txt`: Map Test 261, test command 10 downs a player (`arg` 0 / 1); `key 1 200` is player 1
+holding A for one revive (a `key` releases for 4 frames afterwards, so two shorter holds never add up), `p2 1` ...
+`p2 0` player 2's. Checks `rv` (0x0203F9F8) and the revived HP (30 %), then lets a countdown run out into "You have
+died!". `tools/headless/difficulty.txt`: Map Test 0 plays the training scene with the question; B, B answers Hard
+(FLAGS+57 = 0x20).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

@@ -12,6 +12,8 @@
 // (base init 0x08013BC0: OBJ tiles, cull, OAM and DMA slots) with their own vtable copy inside the
 // object, so a projectile never points at memory the boss frees. docs/coop-design.md "Android 16 boss".
 #include "android16.h"
+#include "revive.h"
+#include "difficulty.h"
 
 typedef struct A16Desc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } A16Desc;
 extern const A16Desc a16_missile[16], a16_fist[8], a16_boom[4];   // build/gen/a16_sprites_data.c
@@ -93,7 +95,10 @@ typedef struct A16 {
     Proj *live[A16_LIVE];
 } A16;
 
-static Entity *real_player(int i) { return i == 0 ? coop2.p1_frame : coop.p2; }
+static Entity *real_player(int i) {   // a downed player (revive.c) is no target
+    Entity *p = i == 0 ? coop2.p1_frame : coop.p2;
+    return revive_is_down(p) ? 0 : p;
+}
 
 // ---- small helpers ------------------------------------------------------------------------------
 static u32 isqrt(u32 v) {
@@ -632,6 +637,7 @@ Entity *a16_spawn(const EnemyRecord *rec) {
     memset(a, 0, sizeof *a);
     *stat = a16_stat;
     if (!p2_present()) stat->max_hp = A16_HP * A16_SOLO_HP_PCT / 100;   // the [END, 100] slice
+    stat->max_hp = stat->max_hp * diff_boss_hp_pct() / 100;             // the difficulty (difficulty.h)
     a->lo = A16_END_PCT;
     a->hi = 100;
     memcpy(r, rec, 0x1C + 4 * (u32)rec->behaviour_count);

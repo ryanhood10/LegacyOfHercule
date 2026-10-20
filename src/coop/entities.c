@@ -3,6 +3,7 @@
 // nearest to it, so enemy AI, attacks and hit tests target player 2 when they should. coop.acting
 // records the player responsible for the current update (for EXP crediting, see exp.c).
 #include "coop.h"
+#include "revive.h"
 
 static inline void call_slot(void *obj, int slot) {
     ((void (*)(void *))vslot(obj, slot))(obj);
@@ -18,6 +19,7 @@ void entity_list_update_hook(EntityList *list) {
     coop.acting = g_PlayerObject;
     coop2.p1_frame = g_PlayerObject;
     coop_debug_tick();
+    revive_tick();
     actors_tick();
     for (int i = list->event_count - 1; i >= 0; i--) {
         u32 *ev = list->events[i];

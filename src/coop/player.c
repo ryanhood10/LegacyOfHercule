@@ -1,6 +1,7 @@
 // Player control states (idle / walk / diagonal) ported from the ROM with one change: input and the
 // party slot come from the entity instead of globals, so a second player entity can run them.
 #include "coop.h"
+#include "revive.h"
 #include "wide.h"
 
 // Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
@@ -23,6 +24,7 @@ static int is_p2(const Entity *e) { return e == coop.p2; }
 static const u32 PLAYER_CTRL_VTABLES[] = { IDLE_VTABLE, WALK_VTABLE, 0x080258DCu, 0x08025E20u, 0x080251F4u, 0x08025D70u, 0x08025B98u };
 
 int p1_controllable(void) {
+    if (revive_p1_down()) return 1;   // player 1 lies downed: player 2 plays on (revive.c)
     Entity *p1 = g_PlayerObject;
     if (!p1 || !p1->ctrl_state) return 0;
     u32 vt = *(u32 *)p1->ctrl_state;
@@ -221,10 +223,12 @@ static void p2_change_hp(Entity *e, int delta) {
 
 ROM_FN(void, Player_Knockback, (Entity *e, void *hit), 0x0800F833);
 
-// Returns 0 (survived) so OnHit plays the hurt animation; at 0 HP player 2 revives beside player 1.
+// Returns 0 (survived) so OnHit plays the hurt animation. A lethal hit downs player 2 (revive.c); where
+// that does not apply (a duel, no player 1) player 2 gets up at half HP beside player 1 as before.
 static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
+    if (revive_hit(e, (u8 *)hit, 1)) return 1;   // 1: no hurt state for the body
     Player_Knockback(e, (void *)hit);
     if (duel_p2_final_blow(e, dmg)) return 0;   // a duel's final blow: 1 HP, the duel ends
     CharacterEntry *c = &g_Party->chars[coop.p2_slot];

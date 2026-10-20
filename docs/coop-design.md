@@ -1149,3 +1149,63 @@ clears flag 440 as it starts, so each spar needs a new talk with Roshi.
 - **Test win (`COOP_CMD_WIN_STAT`, 16).** A queued stat wins its fight once an enemy of it stands and player 1
   is in a player-driven state for half a second; it matches coop enemies by their record copy's stat and stock
   enemies by their stat pointer.
+
+## Revive (2026-10-20, `src/coop/revive.c/.h`)
+
+Ryan: a downed partner is revived by holding A beside them, with a visible timer; too late is a game over.
+
+- **Going down:** both players' take-damage hooks (`p1_take_damage_hook` in `duel.c`, `p2_take_damage` in
+  `player.c`) ask `revive_hit` first. A lethal hit knocks back, sets HP 0 and plays the stock death state
+  (message 0x21, what player 1's own stock death plays: `FUN_08008784` sets `+0x168` = 0, message 0x21, and
+  queues the game-over event) without the event. The hook returns 1 ("died"), so OnHit (`FUN_08008806`) plays no
+  hurt state. The body takes no more hits; the partner's getting-up frames (`REVIVE_SAFE`, 90) take none either.
+- **While down:** the downed pad is zeroed (`revive_input`, in the input hook after the solo switch); enemies
+  turn to the partner (`coop_target`; Super 13 and Android 16 through their `real_player`); player 1 lying down
+  counts as controllable for player 2's input (`p1_controllable`). The countdown is the difficulty's
+  (`DIFF_REVIVE_S`: 20 / 10 / 6 s).
+- **Reviving:** the partner within `REVIVE_REACH` (28 px) holding A: the A is taken from the game (no punch)
+  and the progress counts to `REVIVE_HOLD` (180 frames); letting go, or a hit on the partner, starts it over.
+  Then HP = `REVIVE_HP_PCT` (30 %) of the maximum, message 0 (idle), and the bars go.
+- **Game over:** the countdown runs out, or the partner goes down too (player 1 last: its own stock death;
+  player 2 last: `game_over()` drops player 1 the stock way and queues the stock event, `{0x08023A50, 200}` on
+  the entity list's events, which shows "You have died!").
+- **Scenes:** a dialogue sequence sets `0x03001FDC` (`0x0800B4AE`, cleared by `0x0800B4FC`); while it is set the
+  countdown stops, and a downed player gets up at once (a boss's death scene, a trigger). A map change that
+  replaces the body (player 1's entity, player 2 respawned) puts the player back at 30 %.
+- **Not here:** duels (1 HP, `duel.c`), the Cell Games' solo fights, single-player (no player 2): the stock
+  death, and player 2's old half-HP respawn where the revive does not apply.
+- **Bars:** `revive_draw` from the HUD draw hook: 8bpp 32 x 8 sprites (the game draws its sprites 8bpp in one
+  OBJ palette: 1 black, 2 white, 5 red, 8 yellow, 14 dark grey) above the body, from the camera's view origin
+  (`CAMERA_CELL` +0x1C / +0x20): the countdown (red, the seconds in a 3 x 5 white font, blinking white for the
+  last 3 s) and, while the partner revives, a yellow bar under it. 0x200 bytes of OBJ VRAM while someone is down.
+  The body flashes bright while the revive runs: a remap toward white (entity +0x24, as the duel's shadow),
+  built 16 colours a frame into an arena block.
+- **Sounds:** going down 0x22 (an impact), getting up 55 (the transformations' power-up); change in `revive.c`.
+- **Test:** `tools/headless/revive.txt` (test command 10 `DOWN`): player 1 revives player 2 (30 %: 147 / 493),
+  player 2 revives player 1, the countdown runs out into the game over. Also checked beside Super 13 (he turns
+  to the standing player; the body's HP stays 0; "You have died!" at the end).
+- **State:** `.party.rv` `rv` (0x34 bytes, after `.party.s13`): bodies, countdowns, progress, getting-up frames,
+  the bars' VRAM, the glow table, counters (`downs`, `revives`, `timeouts`).
+
+## Difficulty (2026-10-20, `src/coop/difficulty.c/.h`)
+
+Picked once, at a new game's first scene (`data/story/ch1_opening` `ch1_training`: "Play on Normal?" then "Easy
+or Hard?", CoopCall 18 questions); story flags 460 Easy / 461 Hard, neither = Normal (older saves play Normal).
+Normal is exactly the co-op tuning from before.
+
+| | Easy | Normal | Hard |
+|---|---|---|---|
+| regular enemies' HP (with player 2) | x 1.0 | x 1.5 | x 2.0 |
+| damage enemies deal the players (with player 2) | x 0.75 | x 1.25 | x 1.5 |
+| regular enemies' walk speed (with player 2) | x 1.0 | x 1.2 | x 1.3 |
+| twin regular enemies | no | yes | yes |
+| boss HP (every boss, also Android 16 and Super 13; never below 1000 for a boss that had it) | x 0.8 | x 1.0 | x 1.25 |
+| revive countdown | 20 s | 10 s | 6 s |
+| drops | a second roll when the first gave nothing | as stock | one roll in three skipped |
+
+Drops: a regular enemy's record action is the bytecode action (`0x0801069B`) on one of five stock drop
+scripts (`StackRand 100` against thresholds, then `SpawnItem`: `0x083EE120`, `0x083EEDE4`, `0x083FEB28`,
+`0x083FFAF4`, `0x083FE538`; every map's defeat scripts classified, the rest are story scripts and stay as they
+are). `create_coop_enemy` points such a record copy at `drop_action`, which runs the same script once, twice
+(Easy, when the entity list did not grow) or not at all (Hard, 1 in 3). Single-player enemies keep the stock
+records. The table's numbers are the macros at the top of `difficulty.h`. Test: `tools/headless/difficulty.txt`.

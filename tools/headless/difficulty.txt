@@ -1,0 +1,22 @@
+# The difficulty question at a new game's first scene (data/story/ch1_opening ch1_training, src/coop/difficulty.h),
+# from a debug-menu savestate of a DEBUG_MENU=1 build:
+# python tools/headless/st_test.py tools/headless/difficulty.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Map Test 0 (zone 1 area 1) plays the training scene. Flags 460 Easy / 461 Hard: FLAGS+57 bits 4 / 5.
+p2 0
+maptest 0
+frames 400
+shot df1_intro
+key 1 6
+frames 60
+shot df2_normal_q
+key 2 6
+frames 60
+shot df3_easy_hard
+key 2 6
+frames 60
+shot df4_hard
+echo == Hard chosen: FLAGS+57 = 0x20 (461)
+peek8 0x0203F141 1
+key 1 6
+frames 120
+shot df5_scene_goes_on

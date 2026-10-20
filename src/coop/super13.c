@@ -21,6 +21,8 @@
 // blast, and he is gone (an empty pose; the entity stays for the script). docs/coop-design.md
 // "Super Android 13".
 #include "super13.h"
+#include "revive.h"
+#include "difficulty.h"
 
 typedef struct S13Desc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } S13Desc;
 extern const S13Desc s13_orb_s[3], s13_orb_m[2], s13_orb_l[2], s13_trail[2];   // build/gen/super13_sprites_data.c
@@ -100,7 +102,10 @@ typedef struct S13 {
     Proj *live[S13_LIVE];
 } S13;
 
-static Entity *real_player(int i) { return i == 0 ? coop2.p1_frame : coop.p2; }
+static Entity *real_player(int i) {   // a downed player (revive.c) is no target
+    Entity *p = i == 0 ? coop2.p1_frame : coop.p2;
+    return revive_is_down(p) ? 0 : p;
+}
 
 // ---- helpers ------------------------------------------------------------------------------------
 static u32 isqrt(u32 v) {
@@ -768,6 +773,7 @@ Entity *s13_spawn(const EnemyRecord *rec) {
     *stat = s13_stat;
     if (s13.hp_pct) stat->max_hp = stat->max_hp * s13.hp_pct / 100;
     if (!p2_present()) stat->max_hp = stat->max_hp * S13_SOLO_HP_PCT / 100;
+    stat->max_hp = stat->max_hp * diff_boss_hp_pct() / 100;   // the difficulty (difficulty.h)
     a->dmg_pct = s13.dmg_pct;
     memcpy(r, rec, 0x1C + 4 * (u32)rec->behaviour_count);
     Entity *e = Enemy_Create(block, r, stat);

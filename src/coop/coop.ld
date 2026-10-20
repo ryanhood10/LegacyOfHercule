@@ -57,6 +57,7 @@ SECTIONS
         KEEP(*(.party.wv))   /* waves.c state (Time Chamber training) */
         KEEP(*(.party.cg))   /* cellgames.c state (the Cell Games' solo fights) */
         KEEP(*(.party.s13))  /* super13.c state (Super Android 13) */
+        KEEP(*(.party.rv))   /* revive.c state (a downed partner) */
     } > partyram
 
     .bss (NOLOAD) : {

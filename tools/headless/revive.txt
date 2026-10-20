@@ -1,0 +1,54 @@
+# Reviving a downed partner (src/coop/revive.c, docs/coop-design.md "Revive"), from a debug-menu savestate of a
+# DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/revive.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# rv = 0x0203F9F8 (coop.sym): +4 / +8 bodies, +0xC / +0xE countdowns, +0x14 / +0x16 revive progress, +0x22 over,
+# +0x2C downs, +0x2E revives, +0x30 timeouts (u16). Party entries at 0x0203F00C + slot * 0x1C (hp +0, max +2).
+# Map Test 261 (the Lookout, no enemies): test command 10 downs a player; the partner beside it holds A.
+# `key` releases for 4 frames after its hold, so one revive is one `key 1 200` (player 1) or `p2 1` ... `p2 0`.
+p2 0
+maptest 261
+frames 300
+echo == player 2 present (coop.p2), its slot (coop.p2_slot)
+peek 0x0203FF08 1
+peek8 0x0203FF84 1
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 40
+echo == player 2 down: body at +8, countdown at +0xE (600 on Normal minus 40), downs = 1
+peek 0x0203F9F8 13
+shot rv1_p2_down
+key 1 200
+frames 10
+echo == player 2 up after player 1 held A: body +8 = 0, revives = 1 (+0x2E), player 2's HP 30 %
+peek 0x0203F9F8 13
+peek16 0x0203F098 2
+shot rv2_p2_up
+frames 120
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 10
+frames 40
+echo == player 1 down: body +4 set
+peek 0x0203F9F8 4
+shot rv3_p1_down
+p2 1
+frames 100
+echo == player 2 holds A: player 1's revive progress (+0x14) about 100
+peek16 0x0203FA0C 1
+shot rv4_reviving
+frames 100
+p2 0
+frames 10
+echo == player 1 up: revives = 2
+peek 0x0203F9F8 13
+shot rv5_p1_up
+frames 120
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 300
+shot rv6_waiting
+frames 340
+echo == the countdown ran out: over (+0x22) = 1, timeouts (+0x30) = 1
+peek 0x0203F9F8 13
+frames 30
+shot rv7_falls
+frames 400
+shot rv8_game_over

@@ -146,6 +146,7 @@ void duel_tick(void);
 void coop_call_tick(void);                           // vmcall.c, every input poll
 int duel_p2_final_blow(Entity *e, int dmg);
 void actors_tick(void);                             // actors.c: remove town NPCs that duplicate a player's character
+#define COOP_CMD_DOWN        10   // arg = 0 player 1 / 1 player 2: that player goes down (revive.c), as a lethal hit
 #define COOP_CMD_A16_PARTY   11   // "Gero's computer" test: CoopCall 11's party (Krillin player 1, Android 16 player 2; a16player.c)
 void a16_test_party(void);
 #define COOP_CMD_SPAWN_RECORD 8   // arg = enemy record address (any map's): spawn it 48 px right of player 1, plus its boss bar
@@ -170,7 +171,8 @@ void wave_clear_all(void);
 void wave_skip_to(int round);
 void waves_tick(void);
 
-// Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin)
+// Tuning (regular enemies while player 2 is present; bosses keep their stats and get a twin). Normal's numbers: the
+// live ones are per difficulty in difficulty.h (HP, damage, speed); these stay as the reference.
 #define COOP_HP_NUM 3        // HP x 1.5
 #define COOP_HP_DEN 2
 #define COOP_DMG_NUM 5       // damage dealt to players x 1.25

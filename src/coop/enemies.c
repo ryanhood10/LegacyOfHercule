@@ -7,6 +7,8 @@
 // calculation 0x0800F910, the two chase-module constructors (0x0801B332, 0x0801B15E) that carry the
 // walk speed, and BossHealthBar_Create 0x080104C0.
 #include "coop.h"
+#include "revive.h"
+#include "difficulty.h"
 #include "android16.h"
 #include "bosses.h"
 #include "super13.h"
@@ -84,6 +86,8 @@ static TwinPair *register_pair(Entity *orig, Entity *twin) {
 // Which player an enemy sees this frame (entities.c sets g_PlayerObject to it): the nearest, except
 // that a twin whose original is alive takes the player the original is not nearest to.
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2) {
+    if (revive_is_down(p1)) return p2;    // a downed player (revive.c) is no target
+    if (revive_is_down(p2)) return p1;
     Entity *near = nearest_player(e, p1, p2);
     if (!is_coop_enemy(e)) return near;
     TwinPair *pr = pair_of(e);
@@ -267,7 +271,7 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
     EnemyRecord *r = (EnemyRecord *)(block + ENEMY_SIZE + sizeof(EnemyStat));
     *stat = *st;
     if (scale && !(coop2.off & COOP_OFF_HP)) {
-        stat->max_hp = st->max_hp * COOP_HP_NUM / COOP_HP_DEN;
+        stat->max_hp = st->max_hp * diff_enemy_hp_pct() / 100;   // x 1.5 on Normal (difficulty.h)
         coop2.scaled++;
     }
     memcpy(r, rec, record_size(rec));
@@ -276,6 +280,7 @@ static Entity *create_coop_enemy(const EnemyRecord *rec, const EnemyStat *st, in
     if (sprite) r->sprite_id = sprite;
     if (stat_index >= 0) r->stat_index = stat_index;   // partner stat: rule lookups follow the twin's own stat
     if (twin) r->action = (void *)no_action;   // twins never fire the record's action
+    else if (scale) r->action = diff_drop_action(r->action);   // the drop roll, by the difficulty
     Entity *e = Enemy_Create(block, r, stat);
     if (!e) { Arena_Free(block); return 0; }
     e->vtable = coop2.enemy_vtable;
@@ -300,6 +305,12 @@ static const EnemyStat *spawn_stat(int stat_index, const BossRule *rule, EnemySt
     return st;
 }
 
+// The difficulty's boss HP; never below 1000 for a boss that had it (is_boss_rec counts a boss by 1000 HP).
+static s32 boss_hp(s32 hp) {
+    s32 v = hp * diff_boss_hp_pct() / 100;
+    return hp >= 1000 && v < 1000 ? 1000 : v;
+}
+
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
@@ -308,6 +319,10 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     EnemyStat buf;
     const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
     if (!st) return 0;
+    if (is_boss_rec(rec, st) && diff_boss_hp_pct() != 100) {   // the difficulty's boss HP (difficulty.h)
+        if (st != &buf) { buf = *st; st = &buf; }
+        buf.max_hp = boss_hp(buf.max_hp);
+    }
     int alone = rule && (rule->flags & BOSS_NO_TWIN);
     int pair = rule && (rule->flags & BOSS_PAIR);
     if (((!p2_present() || coop_solo()) && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
@@ -330,9 +345,13 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     int tstat = -1;
     if (boss && rule && rule->partner_stat && !(coop2.off & COOP_OFF_PARTNER)) {
         const EnemyStat *p = spawn_stat(rule->partner_stat, boss_rule(rule->partner_stat), &tbuf);
+        if (p && diff_boss_hp_pct() != 100) {
+            if (p != &tbuf) { tbuf = *p; p = &tbuf; }
+            tbuf.max_hp = boss_hp(tbuf.max_hp);
+        }
         if (p) { tst = p; tstat = rule->partner_stat; }
     }
-    Entity *twin = (coop2.off & COOP_OFF_TWINS) ? 0
+    Entity *twin = ((coop2.off & COOP_OFF_TWINS) || (!boss && !diff_regular_twins())) ? 0
                  : create_coop_enemy(rec, tst, !boss, dx, (boss && !(coop2.off & COOP_OFF_PARTNER)) ? partner_sprite(rec->stat_index) : 0, 1, tstat);
     if (twin) {
         EntityList_Add(g_SceneTable[1], twin);   // the loader adds the returned original itself
@@ -420,6 +439,8 @@ void coop_debug_tick(void) {
         if (a) EntityList_Add(g_SceneTable[1], a);
     } else if (cmd == COOP_CMD_A16) {
         a16_test_spawn();
+    } else if (cmd == COOP_CMD_DOWN) {
+        revive_test_down((int)coop2.cmd_arg & 1);
     } else if (cmd == COOP_CMD_S13) {
         s13_test_spawn();
     } else if (cmd == COOP_CMD_S13_DRIVE) {
@@ -479,7 +500,7 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     if (!m) return 0;
     m->vtable = (u32 *)vtable;
     m->speed = (s32)cls[3];
-    if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * COOP_SPEED_NUM / COOP_SPEED_DEN;
+    if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * diff_speed_pct() / 100;   // x 1.2 on Normal
     if (is_raged(e)) m->speed = m->speed * BOSS_RAGE_SPEED_NUM / BOSS_RAGE_SPEED_DEN;
     if (is_s13(e)) m->speed = m->speed * S13_SPEED_PCT / 100;   // Super 13 is slow (super13.h)
     return m;
@@ -515,7 +536,7 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
     int player = defender == g_PlayerObject || defender == coop.p2;
     if (player) coop2.dmg_player++;
     if (coop.p2 && is_enemy(attacker) && player && !(coop2.off & COOP_OFF_DAMAGE)) {
-        dmg = dmg * COOP_DMG_NUM / COOP_DMG_DEN;
+        dmg = dmg * diff_damage_pct() / 100;   // x 1.25 on Normal (difficulty.h)
         coop2.dmg_scaled++;
     }
     hit->dmg = dmg;

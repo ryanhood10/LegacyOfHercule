@@ -1,6 +1,7 @@
 // Second HUD panel for player 2, drawn right after player 1's by hooking the HUD object's vtable
 // (draw / update / destroy). The panel composition is a port of the original draw routine.
 #include "coop.h"
+#include "revive.h"
 #include "wide.h"
 
 static void dma_copy32(const void *src, void *dst, int words) {
@@ -85,6 +86,7 @@ static void hud2_ensure_tiles(void) {
 
 void hud_draw_hook(Hud *h, u32 **oam) {
     Hud_Draw(h, oam);
+    revive_draw(oam);   // revive.c: the countdown and revive bars over a downed player
     if (!coop.p2) return;
     hud2_ensure_tiles();
     coop.hud2.y = h->y;
@@ -98,6 +100,7 @@ void hud_update_hook(Hud *h) {
 }
 
 void hud_destroy_hook(Hud *h, int free_it, u32 a, u32 b) {
+    revive_hud_gone();
     if (coop.hud2.tile) {
         ObjVram_Free(g_ObjVramList, coop.hud2.tile);
         coop.hud2.tile = 0;

@@ -12,6 +12,38 @@
 
 ; map 0 (zone 1 area 1) trigger 0: Future Gohan's training, with old Hercule hanging back
 sequence ch1_training
+  text 0 "@^Choose the difficulty.  It can't be changed later."    ; [0] (src/coop/difficulty.h, flags 460 / 461)
+  script                                 ; [1] a yes / no question (CoopCall 18: A yes, B no)
+        CoopCall 18, 1, 0, 0
+  text 0 "@^Play on Normal?  (A: Yes  B: No)"
+  script                                 ; [3] yes: Normal (no flag); no: the next question
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PushByte 9
+        END
+      L1:
+        PushByte 4
+        END
+  script                                 ; [4]
+        CoopCall 18, 1, 0, 0
+  text 0 "@^Easy or Hard?  (A: Easy  B: Hard)"
+  script                                 ; [6]
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        SetStoryFlag 460
+        PushByte 7
+        END
+      L1:
+        SetStoryFlag 461
+        PushByte 8
+        END
+  text 0 "@^Easy difficulty." -> 10
+  text 0 "@^Hard difficulty." -> 10
+  text 0 "@^Normal difficulty."
   stockseq @083b6ec8 0 5                 ; Trunks' doubts, Gohan's answer, "I won't let you down"
   text 67 "#HERCULE: And don't you boys worry about me!\x0bI'll be guarding the rear.  From way back here."
   stockseq @083b6ec8 6 7                 ; Gohan: the melee practice, destroy that boulder

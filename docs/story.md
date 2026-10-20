@@ -590,6 +590,10 @@ drops HP / EP pickups, as in the stock game); the journal lists our chapters; Su
 stays reachable after the Games with lines that fit either way; losing to Super 13 replays the summit scene from
 the ridge pad (kept); fight 2 needs player 2's pad (kept: the game is played in co-op).
 
+**Mechanics (Ryan, 2026-10-20):** reviving a downed partner (hold A for 3 s beside them; 10 s on Normal before
+a game over) and a difficulty chosen once at a new game (Easy / Normal / Hard). Not wanted: prize money and a
+shop, a city-defence mission. Not decided: a 1 Player / 2 Players choice.
+
 ## 6. Buu's Fury (phase 2, separate ROM)
 
 - The aura from the Cell Games is real; when Goku needs a fusion partner against Buu, Hercule is
