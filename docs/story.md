@@ -361,6 +361,12 @@ the death animation and the game over. Player 2's solo fights (2, J2, J4) are bu
 2's pad the main character (the duels' pad swap), so their losses are the same game over; player 2's
 own entity would only get back up at half HP.
 
+**After the Games (Ryan):** Hercule's level is not touched (the stock `SetCharacterLevel 5, 40` and
+"Hercule is now an available character!" are removed). Goku stays playable ("Keep Goku", already
+applied) but now wears a halo, because he is dead: every one of his frames gets the halo of his stock
+"dead" pose (group 17 in every player record, two frames of standing), so he keeps his full moveset
+and transformations; Buu's Fury's Goku records are checked for a better halo set.
+
 **One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
 twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
 
@@ -421,18 +427,14 @@ side by side firing back. Goku encourages both. Draft, adapting the stock lines:
 - GOKU: "Now's your chance!"
 The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!", which is now half true.
 
-**To settle before building (Ryan's calls):**
-- Hercule's beam pose. His sprite (72) has idle, walk, hit-stun, victory, two punches and a kick, no
-  beam pose. Cheapest stand-in: hold his straight-punch pose (group 7) with the beam coming off his
-  fists. Otherwise, new art.
-- After the Games: Goku already stays in the party ("Keep Goku", `docs/hercule.md` 4); the stock
-  ending also sets Hercule to level 40 and announces him as a new character, which no longer fits
-  (he has been in the party since West City).
+**Hercule's beam pose (Ryan): new art**, copied from how Goku and Gohan look in their Kamehameha
+(in progress 2026-10-19 on branch `hercule-beam-pose`). Every other Cell Games decision above is made.
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
 record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
-carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene.
+carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene; the ending without Hercule's level set and message;
+Goku's haloed sprites (and display rows) swapped in when the Games end.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
