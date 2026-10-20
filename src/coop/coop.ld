@@ -54,6 +54,7 @@ SECTIONS
         KEEP(*(.party))
         KEEP(*(.party.kr))   /* krillin.c state, after the pinned party block */
         KEEP(*(.party.wv))   /* waves.c state (Time Chamber training) */
+        KEEP(*(.party.s13))  /* super13.c state (Super Android 13) */
     } > partyram
 
     .bss (NOLOAD) : {

@@ -54,12 +54,16 @@ PARAGUS_PORTRAIT ?= 120
 # built from the ROM), display rows 26 / 27; a script makes Goku (slot 4) dead with SetCharacterTransformation(4, 176)
 HALO_GOKU_SPRITE ?= 176
 HALO_SSJ_SPRITE ?= 177
+# S13_SPRITE / S13_PORTRAIT: Super Android 13, the post-game boss (tools/super13sprites.py: Buu's Fury Broly recoloured,
+# Perfect Cell's groups as a stand-in with BUU=0; his ki orbs; Android 16's portrait made Super 13); src/coop/super13.c
+S13_SPRITE ?= 180
+S13_PORTRAIT ?= 122
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DS13_SPRITE=$(S13_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/super13_sprites_data.o
 SSJ_TEST ?= 0
 
 # BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
@@ -74,7 +78,7 @@ BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72
-EXTRA_SPRITES := 72=herc_record $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record
+EXTRA_SPRITES := 72=herc_record $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
@@ -86,7 +90,7 @@ CLONE_FLAGS += --krillin-sprite $(KRILLIN_SPRITE) --old-hercule-sprite $(OLD_HER
 
 all: $(OUT)
 
-$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h src/coop/a16player.h
+$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h src/coop/a16player.h src/coop/super13.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
 
@@ -115,7 +119,7 @@ $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu
 # Krillin's playable sprite, status portrait, ki blast / Destructo Disc frames and icons, the relocated UI
 # string table and portrait module table (never committed)
 $(BUILD)/gen/krillin_sprites_data.c: tools/krillinsprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
-	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait
+	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait --extra-portrait $(S13_PORTRAIT)=s13_portrait
 
 $(BUILD)/obj/krillin_sprites_data.o: $(BUILD)/gen/krillin_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
@@ -155,6 +159,14 @@ $(BUILD)/gen/halo_sprites_data.c: tools/halosprites.py tools/brolysprites.py too
 	$(PYTHON) tools/halosprites.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/halo_sprites_data.o: $(BUILD)/gen/halo_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# Super Android 13 (sprite, ki orbs, dialogue portrait) for the post-game (never committed); preview beside it
+$(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	$(PYTHON) tools/super13sprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
+
+$(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

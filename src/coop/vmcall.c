@@ -33,9 +33,14 @@
 //  11 A16Join ()                        "Gero's computer": 16 joins in the last party slot, the party locks to
 //                                       Krillin + 16 (a16player.c; the script then sets player 1 and 2)
 //  12 A16Leave ()                       16 leaves the party for good, the lock is undone, Hercule available
+//  17 Super13 (op, a, b) [-> state]     the post-game boss (super13.c): op 0 tunes the next spawn (a = HP %, b = blast
+//                                       damage %, 0 = 100); op 1 pushes his state (0 none, 1 fighting, 2 exploding,
+//                                       3 gone: wait for 3 after his defeat before the scene goes on); op 2 spawns him
+//                                       beside player 1 with a boss bar
 #include "coop.h"
 #include "a16player.h"
 #include "krillin.h"
+#include "super13.h"
 
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
@@ -158,6 +163,10 @@ void vm_coop_call(s32 *st) {
     case 10: party_keep(st, a); break;
     case 11: a16_join(); break;
     case 12: a16_leave(); break;
+    case 17:
+        if (a == 1) vm_push(st, s13_call(1, 0, 0));
+        else s13_call(a, b, c);
+        break;
     default: break;
     }
 }

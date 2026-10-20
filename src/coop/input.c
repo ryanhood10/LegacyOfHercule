@@ -3,6 +3,7 @@
 #include "coop.h"
 #include "wide.h"
 #include "android16.h"
+#include "super13.h"
 
 #define CONTROLLER_WINDOW 600   // polls (~10 s) during which holding L+R turns this GBA into the P2 pad
 
@@ -103,12 +104,13 @@ static Entity *pair_target(int second) {
 // by the autopilot is a lower bound on what two people can do.
 static u16 bot_pad(const Entity *pl, const Entity *boss, int side, const CharacterEntry *c) {
     int low = c->hp * 100 < c->max_hp * 35;      // hurt: keep out of his reach and only dodge
-    s32 tx = (boss->x >> 8) + side * (low ? 70 : 20), ty = boss->y >> 8;
+    int big = is_s13(boss);                     // Super 13's hurt box is x - 6 .. x + 38: stand at its edges
+    s32 tx = (boss->x >> 8) + (big ? 8 : 0) + side * (low ? 80 : big ? 30 : 20), ty = boss->y >> 8;
     s32 ex = tx - (pl->x >> 8), ey = ty - (pl->y >> 8);
     u32 t = g_FrameCounter;
     u16 pad = 0;
     s32 rx, ry;
-    int threat = boss == coop2.a16 ? a16_threat(pl, &rx, &ry) : swing_threat(pl, boss, &rx, &ry);
+    int threat = boss == coop2.a16 ? a16_threat(pl, &rx, &ry) : is_s13(boss) ? s13_threat(pl, &rx, &ry) : swing_threat(pl, boss, &rx, &ry);
     if (threat) {                               // step out of a blast or a swing first, as a person would
         if (rx > 0) pad |= KEY_RIGHT; else pad |= KEY_LEFT;
         if (ry > 4) pad |= KEY_DOWN; else if (ry < -4) pad |= KEY_UP;
@@ -154,7 +156,10 @@ void input_poll_hook(InputSystem *in) {
     u16 p2 = p2_source(now, &p1);
     if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
 #ifdef A16_TEST
-    if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
+    if (coop2.a16_bot && s13.boss && is_s13(s13.boss) && s13.boss->hp > 0) {   // Super Android 13
+        if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, s13.boss, -1, &g_Party->chars[g_Party->active_slot]);
+        if (coop.p2) p2 = bot_pad(coop.p2, s13.boss, 1, &g_Party->chars[coop.p2_slot]);
+    } else if (coop2.a16_bot && coop2.a16 && coop2.a16->hp > 0) {
         if (g_PlayerObject) p1 = bot_pad(g_PlayerObject, coop2.a16, -1, &g_Party->chars[g_Party->active_slot]);
         if (coop.p2) p2 = bot_pad(coop.p2, coop2.a16, 1, &g_Party->chars[coop.p2_slot]);
     } else if (coop2.a16_bot) {             // any boss pair (COOP_CMD_SPAWN_RECORD tests)
