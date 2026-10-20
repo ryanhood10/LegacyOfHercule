@@ -467,8 +467,7 @@ epilogue, then the title screen; the talk-show bonus ending).
   (Yamcha) slips: "I wish we always had someone strong like Goku around," and Shenron answers "YOUR
   WISH IS GRANTED." What it did stays a mystery (it unlocks Hercule's potential; no game change yet,
   it pays off in the Buu phase).
-- **New lines for Krillin and Android 18** (Ryan wrote 16; 16 died at the Games, so 18 is assumed),
-  replacing the bomb wish and her "kind of nice of you" reaction.
+- **New lines for Krillin and Android 18** (confirmed by Ryan), replacing the bomb wish and her "kind of nice of you" reaction.
 - **The arctic explosion:** a screen shake and word of a big explosion in the arctic; 18 says she is
   going to check it out. This leads into the Android 13 post-game.
 - **No credits yet:** a star on the world map marks the arctic (zone 15 area 1); the players go there
