@@ -94,9 +94,9 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
 | `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
-| `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
+| `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder); `Sprites.frame_counts` (frames per descriptor array, by descriptor runs) is what every generator copies frames through; `--frame-diff` lists the stock arrays the old gap guess got wrong |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-27 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
-| `halosprites.py` | haloed Goku: Goku's (60) and Super Saiyan Goku's (61) records with the dead pose's halo on every frame -> `build/gen/halo_sprites_data.c` (`halo_goku_record` 176, `halo_ssj_record` 177; rows 26 / 27), preview `halo_goku_preview.png` (stock beside haloed); its `frame_counts` counts descriptor runs (the gap guess in `sprites.py` truncates some arrays) |
+| `halosprites.py` | haloed Goku: Goku's (60) and Super Saiyan Goku's (61) records with the dead pose's halo on every frame -> `build/gen/halo_sprites_data.c` (`halo_goku_record` 176, `halo_ssj_record` 177; rows 26 / 27), preview `halo_goku_preview.png` (stock beside haloed) |
 | `herculesprites.py` | Hercule's Kamehameha pose: record 72 (stock groups by ROM address) with group 18 built from his punch stance / idle frames and Goku's beam arms in his colours -> `build/gen/hercule_sprites_data.c` (`herc_record`, id 72 repointed), preview `hercule_beam_preview.png` beside Goku's and Gohan's beam frames |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group), his player record (id 175, `a16p_record`, row 25) and the projectile frames -> `build/gen/a16_sprites_data.c` |
@@ -130,7 +130,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | the party block, saves, the switch screen, slot counts | `docs/party-8-slots.md`, `src/coop/party.c`, `party_save.c`, `switch.c` |
 | how player 2 is spawned / bound / switched | `src/coop/player.c`, `docs/coop-design.md` "Character switching" |
 | why a build crashed with "Jumped to invalid address" | `docs/testing.md` GDB recipe; savestate from an older build? (vtable copies) |
-| sprite record layout, frame encoding | `docs/sprites.md`, `tools/sprites.py` |
+| sprite record layout, frame encoding, frames per array | `docs/sprites.md`, `tools/sprites.py` |
 | Buu's Fury sprites, converting them, which ids exist | `docs/sprites.md` "Buu's Fury", `tools/buu_sprites.py`, `tools/buu2log2.py` |
 | Hercule's Kamehameha pose, how NPCFireKamehameha plays a beam | `docs/sprites.md` "Hercule's beam pose", `tools/herculesprites.py`, `tools/headless/beam_hercule.txt` |
 | haloed (dead) Goku, his rows 26 / 27, the transform / detransform states | `docs/sprites.md` "Haloed Goku", `tools/halosprites.py`, `tools/headless/halo_goku.txt` |
