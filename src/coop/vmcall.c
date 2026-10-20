@@ -21,6 +21,8 @@
 //                                       2 player 2 fights alone on player 1's entity (the twins stay away)
 //  16 Beam (sprite, on)               the Cell Games: a Kamehameha held by that entity, the script does not wait;
 //                                       on 0 ends it
+//  18 Choice (op) [-> 1 / 2]          post-game: op 1 arms a yes / no question before its text entry (B closes
+//                                       the box and answers no); op 0 after it pushes 1 yes / 2 no
 //  13 WaveStart (seq, round)            Time Chamber training (waves.c): rounds from `round` (0/1 = the first),
 //                                       seq = the round sequence shown before each round and after the last
 //  14 Wave (op) -> ...                  op 0 -> the round (11 = completed); op 1 spawn the announced round
@@ -156,7 +158,8 @@ void vm_coop_call(s32 *st) {
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
     case 15: cg_set_solo(a); break;       // the Cell Games' solo fights (cellgames.c)
-    case 16: cg_beam(a, b); break;        // the beam struggle's held beams (cellgames.c)
+    case 16: cg_beam(a, b); break;
+    case 18: if (a) cg_choice_arm(); else vm_push(st, cg_choice_take()); break;   // yes / no (cellgames.c)        // the beam struggle's held beams (cellgames.c)
     case 13: wave_start((const void *)a, b); break;
     case 14:
         if (a == 0) vm_push(st, wave_round());

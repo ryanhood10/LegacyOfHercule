@@ -206,6 +206,7 @@
     "data/story/broly.json",
     "data/story/ch9_gero.json",
     "data/story/cell_games.json",
-    "data/story/arctic_route.json"
+    "data/story/arctic_route.json",
+    "data/story/postgame.json"
   ]
 }

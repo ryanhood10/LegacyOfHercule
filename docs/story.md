@@ -484,7 +484,7 @@ Hercule behind the rocks during the Junior fights; the Z fighters' blasts at the
 no co-op twin for the Juniors in the solo fights;
 Goku's haloed sprites (and display rows) swapped in when the Games end.
 
-## 4i. After the Cell Games: the wishes and the Android 13 post-game (Ryan, 2026-10-19, in planning)
+## 4i. After the Cell Games: the wishes and the Android 13 post-game (Ryan, 2026-10-19; the Lookout part built 2026-10-19)
 
 Stock flow: `docs/story-rom.md` section 9 (the wish scene, the fly-over, the credits, the Trunks
 epilogue, then the title screen; the talk-show bonus ending).
@@ -572,6 +572,14 @@ epilogue, then the title screen; the talk-show bonus ending).
   first time and in short after a reload at the summit save pad; Super Saiyan 2 Gohan joins with
   "Super Saiyan 2 Gohan is now an available character!" when the Games end; Super 13 is tuned a little
   above the twin-Cell fight.
+
+**Built so far (2026-10-19, `data/story/postgame`, tested headless end to end):** everything on the Lookout: the
+wishes, Hercule's tease at the TV studio, the explosion, 18 leaving, the Arctic opening on the world map, Dende's
+reminder, the finale, both questions, and the ending (talk show, credits, the new epilogue with old Hercule, the title
+screen). The arctic maps are merged (`arctic_route`). Still to build: the summit scene and the Super 13 fight, which
+wait for the Super 13 boss (its session is working); the summit's scene sets flag 382. Notes for Ryan: Dende's
+question answers with the button that closes its last page (A yes, B no); the epilogue's old Hercule uses the Buu's
+Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprite instead.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 

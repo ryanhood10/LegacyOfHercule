@@ -1,0 +1,749 @@
+# The post-game on the Lookout (docs/story.md 4i, docs/testing.md "Post-game"), from a debug-menu savestate of a
+# DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/postgame.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Dende (record 4 of map 261, at (760, 416)) is talked to from just below him after a test warp. Never warp while
+# a scene runs (a test warp mid-cutscene crashes): close each dialogue exactly once and let each stage settle.
+p2 0
+preset +195 +191
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+key 0x40 12
+frames 30
+key 1 6
+frames 90
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+shot pg01_wished
+echo == the wishes: 381 (FLAGS+47 = 0x20), 480 (FLAGS+60 bit 0)
+peek8 FLAGS+47 1
+peek8 FLAGS+60 1
+map
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+key 0x40 12
+frames 30
+key 1 6
+frames 90
+shot pg02_north
+key 1 6
+frames 300
+flags +382
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+key 0x40 12
+frames 30
+key 1 6
+frames 90
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+shot pg03_finale
+echo == the finale: 483 (FLAGS+60 = 0x09)
+peek8 FLAGS+47 1
+peek8 FLAGS+60 1
+map
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+key 0x40 12
+frames 30
+key 1 6
+frames 90
+frames 120
+key 1 6
+frames 120
+shot pg04_question
+key 2 6
+frames 150
+shot pg05_no
+key 1 6
+frames 120
+echo == after no: still on the Lookout
+map
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+key 0x40 12
+frames 30
+key 1 6
+frames 90
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 150
+shot pg06_sure
+key 1 6
+frames 300
+mashmap 1 2 400
+shot pg07_epilogue
+key 1 6
+frames 150
+shot pg08_0
+key 1 6
+frames 150
+shot pg08_1
+key 1 6
+frames 150
+shot pg08_2
+key 1 6
+frames 150
+shot pg08_3
+key 1 6
+frames 150
+shot pg08_4
+key 1 6
+frames 150
+shot pg08_5
+key 1 6
+frames 150
+shot pg08_6
+key 1 6
+frames 150
+shot pg08_7
+echo == the epilogue in the future city (zone 1 area 2)
+map

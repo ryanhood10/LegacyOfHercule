@@ -154,6 +154,7 @@ void input_poll_hook(InputSystem *in) {
     u16 p1 = now;
     u16 p2 = p2_source(now, &p1);
     if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
+    cg_choice_input(&p1, &p2);             // a yes / no question (CoopCall 18): B answers no and closes the box
     switch (coop_solo()) {                 // the Cell Games' solo fights (cellgames.c)
     case 1: p2 = 0; break;                 // player 1 fights alone, player 2 watches
     case 2: p1 = p2; p2 = 0; break;        // player 2 fights on player 1's entity, player 1 watches

@@ -570,6 +570,16 @@ script saves `cg_pre8.ss` before the final fight; filming the struggle from it: 
 - Savestates break whenever the chapter data or code changes (the enemies' record copies hold sequence
   addresses): rerun from the menu state.
 
+## Post-game on the Lookout (headless, 2026-10-19)
+
+`python tools/headless/st_test.py tools/headless/postgame.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl` (a
+`DEBUG_MENU=1` build): Map Test 261 with flags 191 and 195, a test warp to just below Dende's record 4 (760, 448), Up,
+A. Checks: after the wishes FLAGS+47 = 0x20 (381) and FLAGS+60 bit 0 (480); the reminder; `flags +382` stands in
+for the summit's fight; after the finale FLAGS+60 = 0x09 (483); the question answered B then A (No keeps the players
+on the Lookout), then A twice: `mashmap 1 2` reaches the epilogue's future city. Never send a test warp while a scene
+runs (a warp mid-cutscene crashes, r0 = player 2's vtable): close each dialogue page exactly once and let each stage
+settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

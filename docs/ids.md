@@ -17,7 +17,7 @@ Each piece takes numbers only from its own row; say in its report if it needs mo
 | Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
 | Arctic route maps | 381-389 (381, 382 used) | - | - | - | - | - | - | - | areas 5-9 (5-8 used); area 1 reworked; world-map landing; place name `ui_strings` 356 |
 | Super Saiyan 2 Gohan character | - | - | - (58 repointed) | 28 used, 29 unused | 124-125 unused (stock 61 / 12) | 23 used, 24 unused | 20 proposed | - | party slot 8 (`PARTY_SLOTS=9`) |
-| Post-game chapter (later) | 480-499 (extend the new-game clear to 499) | 150-154 | - | - | - | - | 18-19 | 19-20 | Lookout, ending, epilogue edits |
+| Post-game chapter (Lookout part built) | 480 the wishes made, 483 the finale seen (the new-game clear now covers 400-503) | 150-154 | - | - | - | - | 18 Choice used, 19 | 19-20 | Lookout (map 261 record 4), talk show, epilogue |
 
 ## Story flags (bank at 0x0203F108 + n / 8 with 9 party slots, 816 flags, saved)
 
@@ -173,7 +173,8 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |
 | 16 | Beam (sprite, on): a held Kamehameha the script does not wait for; on 0 ends it | Cell Games |
 | 17 | allocated: Super 13 boss | |
-| 18-19 | allocated: post-game chapter | |
+| 18 | Choice (op): op 1 arms a yes / no question before its text entry (B answers no and closes the box), op 0 pushes 1 yes / 2 no | post-game |
+| 19 | allocated: post-game chapter | |
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21+ | free | |
 
@@ -238,8 +239,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F8D4 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
 | 0x0203F914 | 0x9C | `.party.wv` `waves` (Time Chamber; 0x0203F880 with 8 slots); moves when anything before it grows |
-| 0x0203F9B0 | 0x18 | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams) |
-| 0x0203F9C8-0x0203FB00 | 0x138 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
+| 0x0203F9CC-0x0203FB00 | 0x134 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |

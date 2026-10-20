@@ -17,6 +17,9 @@ typedef struct CgState {
     u8 _pad[3];     // tests: [0] stat to win + 1, [1] frames ready, [2] who fought the last win
     Entity *owner[2];   // CoopCall 16: the entities holding a beam and their beam objects
     void *beam[2];
+    u8 choice_armed;    // CoopCall 18: a yes / no question is on screen
+    u8 choice;          // 1 yes (A), 2 no (B): the last A or B press on either pad while armed
+    u16 choice_prev;    // the A / B buttons held at the previous poll (presses are edges)
 } CgState;
 
 CgState cg_state __attribute__((section(".party.cg"), used));
@@ -81,6 +84,35 @@ void cg_beam(int id, int on) {
     cg_state.magic = CG_MAGIC;
     cg_state.owner[k] = e;
     cg_state.beam[k] = beam;
+}
+
+// CoopCall 18 Choice (op): a yes / no question in an ordinary text box. op 1 arms it right before the
+// question's text entry; while armed, input.c calls cg_choice_input every poll: the last A or B press on either
+// pad is the answer, and B is turned into A so either button closes the box. op 0 (after the text entry) pushes
+// the answer, 1 = yes, 2 = no, and disarms. (Post-game: Dende's "start the Buu's Fury campaign?", docs/story.md 4i.)
+void cg_choice_arm(void) {
+    (void)cg_test_slot();                    // the state's magic
+    cg_state.choice_armed = 1;
+    cg_state.choice = 0;
+    cg_state.choice_prev = 0xFFFF;           // a button still held from the last box is not a press
+}
+
+int cg_choice_take(void) {
+    int c = cg_state.choice ? cg_state.choice : 2;
+    cg_state.choice_armed = 0;
+    cg_state.choice = 0;
+    return c;
+}
+
+void cg_choice_input(u16 *p1, u16 *p2) {
+    if (cg_state.magic != CG_MAGIC || !cg_state.choice_armed) return;
+    u16 held = (u16)((*p1 | *p2) & (KEY_A | KEY_B));
+    u16 edge = (u16)(held & ~cg_state.choice_prev);
+    cg_state.choice_prev = held;
+    if (edge & KEY_B) cg_state.choice = 2;
+    else if (edge & KEY_A) cg_state.choice = 1;
+    if (*p1 & KEY_B) *p1 = (u16)((*p1 & ~KEY_B) | KEY_A);   // B closes the box too
+    if (*p2 & KEY_B) *p2 = (u16)((*p2 & ~KEY_B) | KEY_A);
 }
 
 void cg_set_solo(int mode) {
