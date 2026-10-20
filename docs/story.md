@@ -366,7 +366,8 @@ own entity would only get back up at half HP.
 "Hercule is now an available character!" are removed). Goku stays playable ("Keep Goku", already
 applied) but now wears a halo, because he is dead: every one of his frames gets the halo of his stock
 "dead" pose (group 17 in every player record, two frames of standing), so he keeps his full moveset
-and transformations; Buu's Fury's Goku records are checked for a better halo set.
+and transformations (built and merged 2026-10-19: sprites 176 / 177, rows 26 / 27,
+`tools/halosprites.py`; Buu's Fury has no haloed Goku).
 
 **One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
 twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
@@ -447,7 +448,8 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
   Tien and Yamcha blast the other (each a short line or shout), before Goku's "Now's your chance!"
 
 **Hercule's beam pose (Ryan): new art**, copied from how Goku and Gohan look in their Kamehameha
-(in progress 2026-10-19 on branch `hercule-beam-pose`). Every other Cell Games decision above is made.
+(built and merged 2026-10-19: sprite 72 group 18, `tools/herculesprites.py`). Every other Cell Games
+decision above is made.
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
@@ -467,7 +469,7 @@ epilogue, then the title screen; the talk-show bonus ending).
   (Yamcha) slips: "I wish we always had someone strong like Goku around," and Shenron answers "YOUR
   WISH IS GRANTED." What it did stays a mystery (it unlocks Hercule's potential; no game change yet,
   it pays off in the Buu phase).
-- **New lines for Krillin and Android 18** (confirmed by Ryan), replacing the bomb wish and her "kind of nice of you" reaction.
+- **The bomb wish and 18's reaction to it are gone** (see Krillin's interrupted wish below).
 - **The arctic explosion:** a screen shake and word of a big explosion in the arctic; 18 says she is
   going to check it out. This leads into the Android 13 post-game.
 - **No credits yet:** a star on the world map marks the arctic (zone 15 area 1); the players go there
