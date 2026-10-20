@@ -13,7 +13,7 @@ Each piece takes numbers only from its own row; say in its report if it needs mo
 
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | zone 15 / other |
 |---|---|---|---|---|---|---|---|---|---|
-| Cell Games chapter | 460-479 | 140-144 | - | - | - | - | 15-16 | 15-16 | maps 323-326 edits |
+| Cell Games chapter (built) | 460-479 (none used) | 140 used | 162 (a record copy of Perfect Cell 30) | - | - | - | 15 Solo, 16 Beam | 15 SOLO, 16 WIN_STAT | maps 323-326 and 176 edits; `.party.cg` 0x18 |
 | Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
 | Arctic route maps | 381-389 | - | - | - | - | - | - | - | areas 5-9; area 1 reworked; world-map landing |
 | Super Saiyan 2 Gohan character | - | - | - | 28-29 | 124-125 | 23-24 | - | - | party slot 8 (`PARTY_SLOTS=9`) |
@@ -70,7 +70,9 @@ sprite 72) for Roshi's gym.
 | 120 / 121 | the bunker's two Android 19s (`gero_stats[]`) | 5 | Gero's computer |
 | 122-124 | reserved for Gero's computer, unused | | |
 | 125-139 | allocated to the Lookout session, unused | | |
-| 140+ | free | | |
+| 140 | the second Perfect Cell of the final fight (copy of stat 25) | 25 | Cell Games |
+| 141-144 | reserved for the Cell Games, unused | | |
+| 145+ | see the allocations above | | |
 
 ## Sprite ids (relocated `sprite_index`, stock 0-156, gaps are 0)
 
@@ -82,7 +84,8 @@ sprite 72) for Roshi's gym.
 | 159 | Legendary Super Saiyan Broly (from Buu's Fury) | `tools/buu2log2.py` | `BUU_SPRITES` (hardcoded in `bosses.h`) |
 | 160 | Android 16 boss | `tools/a16sprites.py` | `A16_SPRITE` |
 | 161 | Krillin (playable) | `tools/krillinsprites.py` | `KRILLIN_SPRITE` |
-| 162-164 | free | | |
+| 162 | the second Perfect Cell: a copy of record 30 (header and group table; frames stay the ROM's) so scripts can address it apart | `tools/spriteclone.py` `@30` | `CELL2_SPRITE` |
+| 163-164 | free | | |
 | 165 | Android 13 | `tools/bossmodels.py` | `A13_SPRITE` |
 | 166 | Cooler's Namekian servant | `tools/bossmodels.py` | `NAMEK_SPRITE` |
 | 167-169 | free | | |
@@ -156,7 +159,9 @@ and a 16-slot build overflows it.
 | 12 | A16Leave () | Gero's computer |
 | 13 | WaveStart (seq, round) | Time Chamber |
 | 14 | Wave (op) | Time Chamber |
-| 15+ | free | |
+| 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |
+| 16 | Beam (sprite, on): a held Kamehameha the script does not wait for; on 0 ends it | Cell Games |
+| 17+ | free | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -178,7 +183,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 12 | free | |
 | 13 | WAVE_CLEAR | every standing enemy dies |
 | 14 | WAVE_SKIP | the next announced round is `arg` |
-| 15+ | free | |
+| 15 | SOLO | solo mode `arg` (Cell Games) |
+| 16 | WIN_STAT | the fight of stat `arg` wins itself once it stands and player 1 is free (tests write `cg_state + 5` directly: the command only runs between scenes) |
+| 17+ | free | |
 
 ## Zone 15 areas (new maps, `data/maps/*.json`, built by `tools/mapbuild.py`)
 
@@ -199,7 +206,8 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
-| 0x0203F91C-0x0203FB00 | ~0x1E4 | free in `partyram` |
+| 0x0203F91C | 0x18 | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams) |
+| 0x0203F934-0x0203FB00 | ~0x1CC | free in `partyram` |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |

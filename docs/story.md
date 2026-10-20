@@ -59,7 +59,7 @@ not used by any trigger (`docs/story-archive.md`).
 
 **Open (next to plan, Ryan in chat):**
 
-- The Cell Games (in planning, section 4h): Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
+- The Cell Games (built, section 4h): Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
   old note; the stock script removes Goku after Cell's defeat and makes Hercule available). Stock
   flow in `docs/story-rom.md` section 9.
 - After the Games (in planning, section 4i): the changed second wish, the Android 13 post-game in the
@@ -340,7 +340,7 @@ value fires its defeat action at that threshold instead of at zero HP.
   castle-defense game where waves of Cell Juniors try to steal it. The hunt appears to gate the Cell
   Games (`docs/story-rom.md` section 8); confirm in play before building on it.
 
-## 4h. The Cell Games (Ryan, 2026-10-19, in planning)
+## 4h. The Cell Games (Ryan, 2026-10-19; built 2026-10-19, `data/story/cell_games`)
 
 Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` section 9. Ryan's plan
 (2026-10-19). Draft lines below are Claude's, for Ryan to change.
@@ -463,6 +463,18 @@ decision above is made.
 
 **Levels (Ryan):** no level check and no level raise: Goku fights 1 and 2, and Krillin, Piccolo, Vegeta
 and Trunks fight the Juniors, at whatever level they have when the Games start.
+
+**Built (2026-10-19), and how it differs from the plan in small ways:** every fight plays with the fighters
+above, tested end to end headless (`docs/testing.md` "Cell Games"). Details for Ryan:
+- In player 2's solo fights player 1's pad is ignored, so the title card and the scene after the fight are
+  advanced by player 2's A (it reads as "your turn").
+- In the 16's-head scene player 2 is hidden and the stock Hercule actor carries the head (scripts cannot walk a
+  player's entity); player 2 is Hercule again for fight 7 right after "The champ is back!".
+- Gohan's power-up before Super Saiyan 2 no longer waits for its animation (it never ended in co-op tests).
+- In the beam struggle Hercule and the second Cell fire held beams (refreshed at each step, since a beam fades
+  on its own); the big clash spark stays between Gohan and the first Cell (it is part of the map).
+- Not wired yet: Super Saiyan 2 Gohan joining (his session has not run); the ring's statue for beating Cell is
+  the stock one.
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior

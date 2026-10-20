@@ -17,6 +17,7 @@
 //   keys MASK              player 1's held keys from now on (until the next keys / key)
 //   mashmap ZONE AREA MAX  press A once a second until that map is loaded
 //   waitnz ADDR MAX        run until the word at ADDR is nonzero (e.g. coop2.a16 0x0203FD34)
+//   stepz ADDR MAX         press A on both pads every 100 frames until the byte at ADDR is 0 (a pending win)
 //   mash N [F]             press A N times, F frames apart (50);  mashent NAME VTABLE MAX  ... until such an entity exists
 //   ents                   list the scene entities;  findent NAME VTABLE  NAME = first entity with that vtable
 //   map                    print the current map (zone, area, variation) and player 1's position
@@ -234,6 +235,17 @@ int main(int argc, char **argv) {
             unsigned a = num(tok[1]), mx = num(tok[2]), i;
             for (i = 0; i < mx && !r32(a); i++) run_frames(1);
             printf("waitnz %08x: %s after %u frames\n", a, i < mx ? "set" : "TIMEOUT", i);
+        }
+        else if (!strcmp(c, "stepz")) {   // stepz ADDR MAX: A on both pads every 100 frames until the byte at ADDR is 0
+            unsigned a = num(tok[1]), mx = num(tok[2]), k, was_on = p2_on, was = p2_word;
+            for (k = 0; k < mx && r8(a); k++) {
+                p2_on = 1; p2_word = was | 1;
+                press(1, 6);
+                p2_on = was_on; p2_word = was;
+                if (!p2_on) w16(0x0203FF00, 0);
+                run_frames(94);
+            }
+            printf("stepz %08x: %s after %u steps (frame %lu)\n", a, k < mx ? "zero" : "TIMEOUT", k, frame_no);
         }
         else if (!strcmp(c, "mash")) { unsigned k = num(tok[1]); for (unsigned i = 0; i < k; i++) { press(1, 6); run_frames(n > 2 ? (int)num(tok[2]) : 50); } }
         else if (!strcmp(c, "findent")) {   // findent NAME VTABLE: the first listed entity with that vtable

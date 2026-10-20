@@ -41,6 +41,13 @@ static const ExtraStat gero_stats[] = {
 };
 #define GERO_STAT_COUNT (sizeof gero_stats / sizeof gero_stats[0])
 
+// 140-144: the Cell Games (data/story/cell_games.*)
+static const ExtraStat cell_stats[] = {
+    // 140 the second Perfect Cell of the final fight: a copy of the stock final stage (stat 25)
+    { 25, -1, 0, -1, 0, 0, 0, 0 },
+};
+#define CELL_STAT_COUNT (sizeof cell_stats / sizeof cell_stats[0])
+
 static const BossRule rules[] = {
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
@@ -78,6 +85,16 @@ static const BossRule rules[] = {
     // in co-op): the record's 19 is a BOSS_PAIR whose twin is the second 19; both-down, one defeat dialogue
     { BUNKER19_STAT,  0, BOSS_PAIR, 12, BUNKER19B_STAT },
     { BUNKER19B_STAT, 0, BOSS_PAIR, 0, 0 },
+    // The Cell Games (docs/story.md 4h): one Perfect Cell per fight until the end (stats 21-24 alone, the
+    // Juniors (26) alone in their solo fights), then two Perfect Cells in the final fight (stat 25 always a
+    // pair with the copy 140, single-player too; both-down)
+    { 21, 0, BOSS_NO_TWIN, 0, 0 },
+    { 22, 0, BOSS_NO_TWIN, 0, 0 },
+    { 23, 0, BOSS_NO_TWIN, 0, 0 },
+    { 24, 0, BOSS_NO_TWIN, 0, 0 },
+    { 26, 0, BOSS_NO_TWIN, 0, 0 },
+    { 25, 0, BOSS_PAIR, CELL2_SPRITE, CELL2_STAT },
+    { CELL2_STAT, 0, BOSS_PAIR, 0, 0 },
     // Imperfect Cell (60) and Semi-Perfect Cell (76) use the default: a same-model Multi-Form twin
     { -1, 0, 0, 0, 0 },
 };
@@ -97,6 +114,8 @@ int resolve_stat(int stat_index, EnemyStat *out) {
     const ExtraStat *x;
     if (stat_index >= GERO_STAT_BASE && (u32)(stat_index - GERO_STAT_BASE) < GERO_STAT_COUNT)
         x = &gero_stats[stat_index - GERO_STAT_BASE];
+    else if (stat_index >= CELL_STAT_BASE && (u32)(stat_index - CELL_STAT_BASE) < CELL_STAT_COUNT)
+        x = &cell_stats[stat_index - CELL_STAT_BASE];
     else if (i >= 0 && (u32)i < extra_stat_count)
         x = &extra_stats[i];
     else

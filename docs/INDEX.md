@@ -50,6 +50,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
 | `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2, Broly's staging and PartyKeep (9 / 10), Android 16 joining and leaving (11 / 12), the training waves (13 / 14) (`docs/scripts.md` 2.2b) |
 | `waves.c` | the Time Chamber's training waves: ten fixed rounds of stock enemies spawned around the players, round captions through the chamber script, "Training completed!"; state `waves` in `.party.wv` (0x0203F880 in the merged build; it moves with `.party.kr`, check `coop.map`); `COOP_CMD_WAVE_CLEAR` / `_SKIP` tests (`docs/story.md` 4g, `docs/testing.md`) |
+| `cellgames.c` | the Cell Games: solo fights (CoopCall 15, `COOP_CMD_SOLO`), held beams (CoopCall 16), the test win `COOP_CMD_WIN_STAT`; state `.party.cg` |
 | `a16player.c/.h` | Android 16 as a player in "Gero's computer": CoopCall 11 / 12 (16 joins the last party slot and the party locks to Krillin + 16; he leaves for good), Rocket Punch (ability 22), `COOP_CMD_A16_PARTY`; ids and flags 420-437 in the header |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
 | `krillin.c/.h` | Krillin (slot 6, row 23, sprite 161) and old Hercule (row 24): status-screen title / pages / technique pages for PARTY_SLOTS, dialogue name opcodes, blue ki blast, Afterimage Rush / Shockwave Punch / Destructo Disc (abilities 19-21), old Hercule's weak combat bytes and `old_hercule_set`, `KR_TEST` triggers; ids in the header |
@@ -91,6 +92,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json`; `build --party-slots N` targets the relocated N-entry table |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
+| `gen_cell_games.py` | generates `data/story/cell_games.lscript` from the arena maps' stock dumps plus our edits (edit the chapter there) |
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
 | `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |

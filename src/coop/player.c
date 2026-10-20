@@ -53,7 +53,11 @@ void leash_p2(Entity *e) {
     // nothing beyond it; a wider view is an emulator feature, see docs)
     s32 right = left + wide_w() - 4, bottom = top + wide_h() - 2;
     s32 nx = x < left + 4 ? left + 4 : (x > right ? right : x);
-    s32 ny = y < top + 20 ? top + 20 : (y > bottom ? bottom : y);
+    // the 20 px head room only below a scrolled view: at the map's top edge (top 0) the players walk to
+    // y 0 as in single-player, or exits along the top edge (zone 14 area 1's ring door, (232, 0)-(281, 17);
+    // Gero's lab area 47) could never be reached in co-op
+    s32 min_y = top > 0 ? top + 20 : top;
+    s32 ny = y < min_y ? min_y : (y > bottom ? bottom : y);
     if (nx != x) e->x = nx << 8;
     if (ny != y) e->y = ny << 8;
 }
@@ -367,7 +371,7 @@ void p2_cycle(void) {
 }
 
 static void ensure_p2(Entity *p1) {
-    if (coop.p2 || !p2_present()) return;
+    if (coop.p2 || !p2_present() || coop_solo()) return;
     int slot = pick_p2_slot();
     if (slot < 0) return;
     coop.p2_slot = (u8)slot;

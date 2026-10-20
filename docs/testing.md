@@ -462,6 +462,30 @@ list words the same before and after, no CRASH line. Any other record and group:
 `rec+0x18C` with the address of that group's quad from `coop.sym` (with `paragus_record` group 20 the
 pre-fix build crashed with the party block overwritten; a 2-frame group must stop before counter 32).
 
+## Cell Games (headless, 2026-10-19)
+
+```
+make BUILD=build/cg DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/cg/log2-coop.gba --out build/cg/hl
+python tools/headless/st_test.py tools/headless/cell_games.txt build/cg/log2-coop.gba build/cg/hl/menu.ss --out build/cg/hl --cols 6
+```
+
+`tools/headless/cell_games.txt` plays the whole Games: Map Test 323 with flags 191 and 421, the barrier opened
+with A, both players walk up into the ring, then nine fights, each queued by writing its stat + 1 to
+`cg_state + 5` (0x0203F921 in the current build; read `$(BUILD)/coop.map` for `.party.cg`) and the magic
+0xCE11CA3E to `cg_state`; `stepz 0x0203F921 140` presses A on both pads every 100 frames until the fight has
+won itself (once that stat's enemy stands and player 1 is free to move, so never during a scene). After each
+win `cg_state + 7` holds who fought: player 1's slot | solo << 4 | 0x80 when player 2's entity stood (expected
+14, 24, 80, 16, 21, 12, 23, 80, 80). The end: `mashmap 6 99`, Goku (slot 4) on row 0x1a (26, the halo). The
+script saves `cg_pre8.ss` before the final fight; filming the struggle from it: queue stat 25 (write 26), stepz,
+`frames 1500` (the long white fade-in), then shots.
+
+- `COOP_CMD_STORY_WIN` (7) is not usable in the desert: every map reload respawns the always-present stat-22 Cell
+  (record 0) until the scene's `DespawnEntity 30`, and a win in that gap replays fight 2's end.
+- In a solo-2 fight player 1's pad is ignored, so the title card and the next scene are advanced by player 2's A.
+- Savestates break whenever the chapter data or code changes (the enemies' record copies hold sequence
+  addresses): rerun from the menu state.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

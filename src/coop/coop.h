@@ -39,6 +39,11 @@ _Static_assert(__builtin_offsetof(CoopState, exp_awards) == 0xD8, "CoopState lay
 
 #define P2_SOURCE_TIMEOUT 180   // frames without a source before player 2 is considered absent
 
+int coop_solo(void);         // cellgames.c: 0 both players, 1 player 1 fights alone, 2 player 2 alone (on player 1's entity)
+void cg_set_solo(int mode);
+void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehameha the script does not wait for (on 0 ends it)
+u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
+                              // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
 int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)
 
@@ -149,6 +154,8 @@ extern CoopExtra coop2;
 
 // Time Chamber training waves (waves.c; state `waves` in .party.wv, 0x9C bytes; 0x0203F880 in the merged build, see coop.map)
 #define COOP_CMD_WAVE_CLEAR 13    // every standing enemy on the map takes a blow worth its HP (wave tests)
+#define COOP_CMD_WIN_STAT  16    // arg = stat index (tests): its fight is won once it stands and player 1 is free (cellgames.c)
+#define COOP_CMD_SOLO      15    // arg = solo mode (cellgames.c): 0 both, 1 player 1 alone, 2 player 2 alone
 #define COOP_CMD_WAVE_SKIP  14    // arg = round: the next round announced is arg (wave tests; the training must be running)
 void coop_run_sequence(u32 *action, const void *seq);   // vmcall.c: queue a dialogue sequence (action = 2 live words)
 void wave_start(const void *seq, int first_round);

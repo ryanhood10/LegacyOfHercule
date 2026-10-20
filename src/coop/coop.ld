@@ -54,6 +54,7 @@ SECTIONS
         KEEP(*(.party))
         KEEP(*(.party.kr))   /* krillin.c state, after the pinned party block */
         KEEP(*(.party.wv))   /* waves.c state (Time Chamber training) */
+        KEEP(*(.party.cg))   /* cellgames.c state (the Cell Games' solo fights) */
     } > partyram
 
     .bss (NOLOAD) : {

@@ -308,7 +308,7 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     if (!st) return 0;
     int alone = rule && (rule->flags & BOSS_NO_TWIN);
     int pair = rule && (rule->flags & BOSS_PAIR);
-    if ((!p2_present() && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
+    if (((!p2_present() || coop_solo()) && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
         return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
 
     int boss = is_boss_rec(rec, st);
@@ -375,7 +375,27 @@ void story_test_partner_down(void) {
 
 // ---- test commands ------------------------------------------------------------------------------
 // enemies.lua writes coop2.cmd / cmd_arg; the entity-list hook runs them at the start of a frame.
+static void win_stat_tick(void) {
+    u8 *t = cg_test_slot();
+    if (!t[0]) return;
+    EntityList *l = g_EntityList;
+    Entity *hit = 0;
+    for (int i = 0; i < l->count && !hit; i++) {
+        Entity *e = l->items[i];
+        if (!is_enemy(e) || e->hp <= 0) continue;
+        int stat = t[0] - 1;
+        if (is_coop_enemy(e) ? record_of(e)->stat_index == stat
+                             : (stat < STOCK_STAT_COUNT && e->behaviour == (void *)&ENEMY_STATS[stat])) hit = e;
+    }
+    if (!hit || !p1_controllable()) { t[1] = 0; return; }
+    if (++t[1] < 30) return;          // half a second of real fighting first
+    t[0] = t[1] = 0;
+    t[2] = (u8)((g_Party->active_slot & 0xF) | (coop_solo() << 4) | (coop.p2 ? 0x80 : 0));   // who fought, for the test log
+    story_test_finish();
+}
+
 void coop_debug_tick(void) {
+    win_stat_tick();
     u32 cmd = coop2.cmd;
     if (!cmd) return;
     coop2.cmd = 0;
@@ -400,6 +420,12 @@ void coop_debug_tick(void) {
         a16_test_spawn();
     } else if (cmd == COOP_CMD_WAVE_CLEAR) {
         wave_clear_all();
+    } else if (cmd == COOP_CMD_WIN_STAT) {
+        u8 *t = cg_test_slot();
+        t[0] = (u8)(coop2.cmd_arg + 1);
+        t[1] = 0;
+    } else if (cmd == COOP_CMD_SOLO) {
+        cg_set_solo((int)coop2.cmd_arg);
     } else if (cmd == COOP_CMD_WAVE_SKIP) {
         wave_skip_to((int)coop2.cmd_arg);
     } else if (cmd == COOP_CMD_A16_PARTY) {
@@ -588,7 +614,7 @@ BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
     if (e) lo = is_a16(e) ? a16_bar_range(e, lo, hi) : bar_lo(e, lo);
     // single-player: the ROM object. Co-op goes by the pad, as the twins do: after a warp without entities
     // player 2's entity is gone until player 1 is free (Gingertown's bar is drawn right after one).
-    if (!coop.p2 && !p2_present()) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);
+    if (!coop.p2 && (!p2_present() || coop_solo())) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);
     TwinPair *pr = pair_of(e);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin
     BossBar *bar = bar_create(mem, e, lo, hi, coop2.bar_vtable, BAR_X_COOP, BAR_Y_TOP);

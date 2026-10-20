@@ -72,6 +72,12 @@ typedef struct BossRule {
 #endif
 // "Gero's computer" (docs/story.md 4g) owns stats 120-124, kept in their own table (gero_stats[], bosses.c)
 // so other ranges can be added beside it without renumbering
+// The Cell Games (docs/story.md 4h) own stats 140-144, in their own table (cell_stats[], bosses.c)
+#define CELL_STAT_BASE 140
+#ifndef CELL2_SPRITE
+#define CELL2_SPRITE 30     // the Makefile passes 162, an alias of record 30 (tools/spriteclone.py "@30")
+#endif
+#define CELL2_STAT 140      // the second Perfect Cell of the final fight (stat 25's twin: two pieces of Cell survived)
 #define GERO_STAT_BASE 120
 #define BUNKER19_STAT 120   // the bunker's Android 19 spare body A (the record), BOSS_PAIR with B
 #define BUNKER19B_STAT 121  // spare body B (the pair's twin)

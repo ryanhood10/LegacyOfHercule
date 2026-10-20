@@ -992,3 +992,29 @@ no stakes; duel mode as in "Player-vs-player duel"). The final blow leaves the l
 caption names the winner (`CoopCall 3` gives the winner, `CoopCall 14, 2` player 2's name), the duel
 is cleared (`CoopCall 2`), both players are healed and the fade returns them to the atrium. The match
 clears flag 440 as it starts, so each spar needs a new talk with Roshi.
+
+## The Cell Games: solo fights, held beams, the top-edge leash (2026-10-19, `src/coop/cellgames.c`)
+
+- **Solo fights (CoopCall 15, `COOP_CMD_SOLO`).** Mode 1: player 1 fights alone; mode 2: player 2 fights alone
+  on player 1's entity. While set, player 2's entity is removed (`EntityList_Remove`, its destroy clears
+  `coop.p2`) and `ensure_p2` does not respawn it, the twin spawner treats the pad as absent (one enemy, one boss
+  bar), and `input.c` routes the pads (mode 1 drops player 2's, mode 2 gives player 2's to player 1's entity).
+  So a solo-2 loss is the normal game over, as Ryan wanted. The mode lives in `.party.cg` with a magic word
+  (partyram is not cleared at boot) and is cleared whenever the map is not zone 14 areas 2-4.
+- **Held beams (CoopCall 16).** Step 137 `NPCFireKamehameha` appends a beam command to the entity's command
+  chain (entity +0x150, next pointer at +4), and the script then waits for it (or a batch's commit does, and a
+  commit waits for every pending command). A beam held through dialogue therefore cannot be a command:
+  `cg_beam` does the command's work directly (`Entity_GetBox` 0x080079B9, `Beam_Init` 0x0801D84D, the list add,
+  animation 30, `Entity_BeamPoint` 0x08007A27 plus the per-facing offsets at 0x08701DF0, `Beam_Fire`
+  0x08014479; `Beam_End` 0x0801451D to stop). A beam object fades on its own, so the struggle refires them.
+  The stock clash beam between Gohan and Cell is a decoration of map 326, not a beam.
+- **Entities by sprite.** The VM finds "the entity showing sprite N" by its record pointer (`0x08009370`:
+  0 = player 1, 1-6 = party slots, else `sprite_index[N]`, then message 5). A second actor of the same model
+  needs its own record: sprite 162 is a copy of Perfect Cell's record 30 (`tools/spriteclone.py` `162=@30`).
+- **The leash at a map's top edge.** `leash_p2` kept both players 20 px below the view's top, so at a map's top
+  edge (view top 0) a door whose rect ends above y 20 could never be reached in co-op (the Cell Games ring,
+  (232, 0)-(281, 17); Gero's lab area 47, which got a workaround exit). The head room now applies only when the
+  view is scrolled.
+- **Test win (`COOP_CMD_WIN_STAT`, 16).** A queued stat wins its fight once an enemy of it stands and player 1
+  is in a player-driven state for half a second; it matches coop enemies by their record copy's stat and stock
+  enemies by their stat pointer.

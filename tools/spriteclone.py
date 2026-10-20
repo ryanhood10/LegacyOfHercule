@@ -241,11 +241,26 @@ def main():
     # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
     idx_words = [struct.unpack_from("<I", rom, S.INDEX - S.ROM_BASE + i * 4)[0] for i in range(NEW_SPRITE)]
     # an extra id below 157 replaces that stock record (72 = herc_record, tools/herculesprites.py)
-    entries = [f"&{extra[i]}" if i in extra else f"(const void *)0x{v:08x}u" for i, v in enumerate(idx_words)] + ["&ssj_record"]
+    # "@N" copies stock record N (its 0x4C header and group pointer table; the frames stay the ROM's) under
+    # a new id: a record of its own, so the scripts can address it apart (the engine finds an entity by
+    # its record pointer: 162=@30 is a second Perfect Cell)
+    def ent(i):
+        v = extra[i]
+        if not v.startswith("@"):
+            return f"&{v}"
+        rec = idx_words[int(v[1:])] - S.ROM_BASE
+        n = 0x4C + rom[rec + 2] * 16
+        blob = bytes(rom[rec:rec + n]) + bytes(4)
+        name = f"copy_record_{i}"
+        lines.append(f"static const u8 {name}[{len(blob)}] __attribute__((aligned(4))) = "
+                     f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
+        return f"&{name}"
+    entries = [ent(i) if i in extra else f"(const void *)0x{v:08x}u" for i, v in enumerate(idx_words)] + ["&ssj_record"]
     for sid in range(NEW_SPRITE + 1, max(extra, default=NEW_SPRITE) + 1):
-        entries.append(f"&{extra[sid]}" if sid in extra else "0")
+        entries.append(ent(sid) if sid in extra else "0")
     for sym in extra.values():
-        lines.append(f"extern const char {sym}[];")
+        if not sym.startswith("@"):
+            lines.append(f"extern const char {sym}[];")
     lines.append("const void *const sprite_index[%d] __attribute__((aligned(4))) = {%s};" % (len(entries), ", ".join(entries)))
     # display rows: stock 22 rows then row 22 = Hercule's row with sprite 157, transformed flag, links
     rows = bytearray(rom[DISPLAY_DATA - S.ROM_BASE:DISPLAY_DATA - S.ROM_BASE + ROW_COUNT * 20])

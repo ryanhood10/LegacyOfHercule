@@ -47,6 +47,9 @@ A13_SPRITE ?= 165
 NAMEK_SPRITE ?= 166
 # PARAGUS_SPRITE / SHIP_SPRITE / PARAGUS_PORTRAIT: the Broly side chapter's art (tools/brolysprites.py, built from
 # the ROMs: Vegeta's set made old, Buu's Fury ship record 1, Vegeta's portrait made old); src/coop/bosses.c
+# CELL2_SPRITE: a copy of Perfect Cell's stock record 30 (tools/spriteclone.py "@30"), so the Cell Games'
+# scripts can address the second Cell apart
+CELL2_SPRITE ?= 162
 PARAGUS_SPRITE ?= 170
 SHIP_SPRITE ?= 171
 PARAGUS_PORTRAIT ?= 120
@@ -55,7 +58,7 @@ PARAGUS_PORTRAIT ?= 120
 HALO_GOKU_SPRITE ?= 176
 HALO_SSJ_SPRITE ?= 177
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DCELL2_SPRITE=$(CELL2_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
@@ -74,7 +77,7 @@ BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72
-EXTRA_SPRITES := 72=herc_record $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record
+EXTRA_SPRITES := 72=herc_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
