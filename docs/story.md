@@ -451,6 +451,16 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 (built and merged 2026-10-19: sprite 72 group 18, `tools/herculesprites.py`). Every other Cell Games
 decision above is made.
 
+**Triggers and side content around the Games (Ryan, 2026-10-19):**
+- **The arena stays locked until the Krillin + 16 chapter is done** (flag 421), on top of the stock
+  Dragon Ball gate (flag 191). The Broly chapter is optional: playable before or after the Games, and
+  it stays available any time after its trigger.
+- **Title cards for the team fights too:** "Players 1 & 2 fight!" before fights 3, 7 and 8.
+- **Super Saiyan 2 Gohan as his own character:** sprite 58 is a full playable set (the stock game
+  already gives player 1 a Super Saiyan 2 Gohan for fights 7 and 8, so a display row with it exists).
+  After the Games he joins as a separate, very strong party member; regular Gohan stays selectable.
+  Needs a ninth party slot (`PARTY_SLOTS=9`; slots 0-7 are taken).
+
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
 record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
@@ -523,6 +533,18 @@ epilogue, then the title screen; the talk-show bonus ending).
   a couple of areas of enemies climbing a mountain, a save pad at the top of the climb, then the next
   area: a big open clearing on the summit where the battle is. A flight spot back to the world map
   once there. (Zone 15 area 1 reworked plus new zone-15 areas; enemies for the climb to pick.)
+- **Hercule's tease after Yamcha's wish (Ryan):** cut to Hercule at the TV station: his stomach growls
+  for a second. HERCULE: "Huh? Must've been something I ate!"
+- **The Lookout scene keeps Gohan teasing Krillin about 18** and her "Not that easy" (Ryan).
+- **The whole party flies to the arctic:** PICCOLO: "We're all going." (Ryan)
+- **Pre-fight lines against Super 13:** a few characters get their own line when they are one of the
+  two players; everyone else uses one generic line (Ryan).
+- **The epilogue, rewritten (Ryan).** Stock: after the credits Future Trunks returns to his timeline,
+  destroys that timeline's 17 and 18, then its Cell, and "The End." New: Trunks returns, says he is
+  ready to take the Androids down, and old Hercule (the future timeline's Hercule from our prologue)
+  walks up: "Hey! I already beat them with my Megaton Punch while you were gone!" He doesn't know why,
+  but he feels stronger than he has ever been. A hint that our timeline's Hercule will one day be the
+  hero. Then "The End."
 - **The end of Super 13 (Ryan):** he explodes at the end, and 17 and 18 die with him. VEGETA: "*spits*
   At last. The end of those clankers."
 - **Difficulty (Ryan):** Super 13 is slightly harder than Cell; no extra reward.
