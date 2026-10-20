@@ -1,10 +1,10 @@
-# PARTY_SLOTS: a party of N entries (built 2026-10-17, default 8)
+# PARTY_SLOTS: a party of N entries (built 2026-10-17; default 9 since 2026-10-19)
 
 Ryan's decision: Krillin (and later others) are real party members with their own stats and saves,
 so the party grows. This page records what the build does, every ROM site that assumed six (found
 by decompiling every function, `build/decomp_all/`, and grepping), how each is patched, what was
-verified in mGBA and what is still placeholder. `make PARTY_SLOTS=N` (default 8, code written for
-6..16; see "Limits") builds it; `tools/patch_rom.py --party-slots N` applies the patches and asserts
+verified in mGBA and what is still placeholder. `make PARTY_SLOTS=N` (default 9: slot 8 is Super Saiyan
+2 Gohan, below; code written for 6..16, see "Limits") builds it; `tools/patch_rom.py --party-slots N` applies the patches and asserts
 every patched byte's stock value.
 
 ## The party block
@@ -33,7 +33,10 @@ offsets for N = 6, everything after the entries moves by `(N - 6) * 0x1C`):
 The region `partyram` (`coop.ld`, 0x0203F000..0x0203FB00) also holds, in link order: the save menu's
 slot store (`party_save.c`) and the switch screen's view party (`switch.c`) in `.party`; then
 `.party.kr` (`a16p` from `a16player.c`, `kr_state` from `krillin.c`); then `.party.wv` (`waves`, the
-Time Chamber state from `waves.c`, `0x0203F880` in the merged build). `coop2` keeps 0x0203FB00.
+Time Chamber state from `waves.c`: `0x0203F880` with 8 slots, `0x0203F914` with 9). `coop2` keeps 0x0203FB00.
+**Everything after the entries moves with `PARTY_SLOTS`**: the story-flag bank is at `0x0203F00C + N * 0x1C`
+(`0x0203F0EC` with 8 slots, **`0x0203F108` with 9**), the seen bits and counters after it; the headless
+runner's `FLAGS` variable follows the ROM (`docs/testing.md`), tests should never hardcode the bank.
 Addresses after the party block move with `PARTY_SLOTS` and with code changes; read the build's
 `coop.map`. (The three sites `0x0800831C/8330/833E`
 listed by the earlier inventory touch an Entity's resistance bytes, not the party.)
@@ -73,10 +76,14 @@ table (the Makefile passes it); `romdata.py party build/<dir>/log2-coop.gba` pri
 selectable), 0x08001A8A (active position), 0x08001AB8 (member sprite), 0x08001AE2 (start as member),
 0x08001B0E (erase), 0x0800180C (start game, returns 0 like the original or the menu falls through to
 the intro video). EEPROM layout: header 0x10 unchanged, slots of `SAVE_STRIDE = (sizeof PartyState +
-4 + 7) & ~7` bytes (0x1A0 for N = 8) at `0x10 + slot * stride`, block then u32 checksum
+4 + 7) & ~7` bytes (0x1A0 for N = 8, 0x1C0 for N = 9) at `0x10 + slot * stride`, block then u32 checksum
 (`0x0802153E`), written through the ROM's own mirror + EEPROM routines (`0x080214C4`, 8-byte
-blocks). Three slots use 0x4F0 of the 8 KiB (0x790 for N = 16). Old six-slot saves fail the checksum
-and read as empty. The menu's screen object keeps its stock size: the three 0x164-byte buffers inside
+blocks). Three slots use 0x4F0 of the 8 KiB (0x550 for N = 9, 0x790 for N = 16). Old six-slot saves fail
+the checksum and read as empty. **Eight-slot saves migrate** (N > 8, `party_save.c` `migrate_old`): a slot
+that fails the checksum at the N-slot layout is read at the eight-slot one (block 0x19C, stride 0x1A0); if
+that checksum holds, the tail moves up by `(N - 8) * 0x1C` and slots 8+ take their default entries (empty:
+Super Saiyan 2 Gohan has not joined). The save menu's read (`save_menu_load_hook`) then writes all three
+slots in the new layout at once, since a new-layout slot overlaps the next old one. The menu's screen object keeps its stock size: the three 0x164-byte buffers inside
 it are unused, the slots live in a private store (`SaveStore` in `.party`), and its six-wide portrait
 rows show a window of at most six members around the slot's active character (start-as-member picks
 among those). The menu has no slot-copy feature (start / erase only).
@@ -98,10 +105,21 @@ character per page set. In the pause menu **Right / Left step through the charac
 through a character's pages** (stats, then techniques); the corner arrows switch Journal / Status /
 Items. Per-slot titles, page counts and technique pages: "Krillin (slot 6)" below.
 
+**The tab strip above a pause-menu page** (0x0800233E, replaced 2026-10-19 by `status_tabs_hook`,
+`krillin.c`, entry jump): one 16 px tab per party member on a 192 x 16 canvas, the current one wide with
+the title. The stock code took the tab images by distance from two five-entry tables (module
+`0x081D8ED4`: `+0xC4` left tabs at distance 1-5, `+0xD8` right tabs 1-5; the next word, `+0xEC`, is
+`&g_InputSystem`) and wrote `15 - 2 * index` filler tiles after the highlight. With 7 members (main since
+Krillin) Gohan's page decompressed `+0xEC` (two grey "boxes" of garbage beside the title); with 8 (Android
+16's chapter, or Super Saiyan 2 Gohan) the garbage grew and stepping Left onto Gohan crashed ("Jumped to
+invalid address 696A6870", r14 `0x080027F1`; reproduced on main with `COOP_CMD_A16_PARTY`); an index of 8+
+would write filler tiles without end. The replacement draws the same strip with the distances clamped
+to 5 and a window of at most 8 tabs around the current member.
+
 **Co-op code**: `PartyState chars[PARTY_SLOTS]`, `player.c` slot loops and `p2_cycle`, `ssj.c`,
 `tools/mgba/peek.lua` / `enemies.lua` read the block through the `g_party_block` symbol.
 
-## Krillin (slot 6) and slot 7
+## Krillin (slot 6), slot 7 and slot 8
 
 Slot 6 is Krillin for real since 2026-10-18 (`docs/hercule.md` 5b, `src/coop/krillin.c`): display row
 23 (Gohan's standard row with sprite 161, dialogue portrait 73, status portrait 119), his own stats,
@@ -119,13 +137,28 @@ PARTY_SLOTS (16 rows in the generated tables, `UI_BLOCK`):
 | status portrait (row +3 -> `Portrait_Table`, ids 8-25) | appended to `portrait_module` (`tools/krillinsprites.py`): 119 Krillin's status portrait, 120 Paragus' dialogue portrait (`tools/brolysprites.py`), 121 Android 16's status portrait (row 25 +3) |
 | level-up victory poses (script `0x083B6524`, slots 0-5 by `PushActiveCharIndex`) | none for slot 6: he keeps standing (harmless) |
 
-Slot 7 is the duel clone's slot (`duel.c` copies player 1's entry into it for a clone duel) and,
+Slot 7 is the duel clone's slot (`DUEL_SLOT`, `rom.h`: fixed at 7 since slot 8 exists; it was
+`PARTY_SLOTS - 1`; `duel.c` copies player 1's entry into it for a clone duel) and,
 during the "Gero's computer" chapter only, **Android 16** (`src/coop/a16player.c`, 2026-10-19): no duel
 runs in that chapter, so `CoopCall 11` writes his entry there (row 25, Krillin's EXP, his stats, flags
 0x43, abilities 22 / 19 / 0 / 2) and `CoopCall 12` clears its flags when he leaves (a later clone duel
 overwrites the slot as before). Growing `PARTY_SLOTS` was not needed. Growth row 7 (`data/hercule.json`)
 is 16's level-up range. The status screen names slot 7 "Android 16" on row 25 and names a clone after
 the character whose row it copies (`krillin.c name_slot`).
+
+**Slot 8 is Super Saiyan 2 Gohan** (2026-10-19, `src/coop/ssj2gohan.c/.h`, `docs/hercule.md` 5d): empty
+(flags 0, not in the party) until `ssj2_join` (CoopCall 20, proposed) writes his entry at the end of the
+Cell Games: display row 28 (Gohan's row 3 with sprite 58 and the stock Super Saiyan 2 portraits 61 / 12),
+Gohan's EXP, Gohan's HP / EP x1.5 and str / pow / end x1.7, flags 0x7F, abilities 3 / 4 / 23 / 2; growth
+row 8 in `data/hercule.json`. His default entry stays zero so the debug party (Map Test) leaves him out.
+Per-slot tables for slot 8: `ui_strings` names "SSJ2 Gohan" / "SSJ2 GOHAN" (`tools/krillinsprites.py`);
+`status_module` icon pairs for slot 7 (none) and 8 (Gohan's: a slot with technique bits and no pair
+decompressed address 0); `status_pages_hook` 4 pages; `status_draw_hook` draws his technique pages as
+Gohan's (the stock pages read the slot for strings and icons and its flags for "learned", so they run as
+slot 0 with slot 8's flags for the call); dialogue `%s` names him "Gohan" (`speaker_slot`). PartyKeep
+(CoopCall 10, the Broly trip) keeps player 2 on slot 8 (four bits) but has no bit for slot 8's
+selectability (the trip leaves it as it is) and only three bits for player 1's slot (player 1 on slot 8
+comes back as slot 0). `a16_join` writes flag 438 for slot 8 (slot 8 is never in the party then).
 
 ## Level-ups (fixed 2026-10-18)
 
@@ -144,7 +177,8 @@ disassembly. Verified: level 40 -> 41 for Krillin as player 1, dialogue closed, 
 - `PARTY_SLOTS` 6..16 (static assert). The count patches are imm8; the object-size patches reach
   N = 16; the shadow tables and C code have no limit. `partyram` (region 0xB00) holds the party, the
   save store (3 slots + 8 bytes each), the view, `.party.kr` and `.party.wv`: 0x91C bytes for N = 8
-  (merged build, 2026-10-19). N = 16 does not fit: a test link on 2026-10-19 needed 0xDB4 bytes and
+  (merged build, 2026-10-19), **0x9B0 for N = 9** (0x150 free). `data/hercule.json`'s records for slots a
+  build lacks are skipped with a note (`romdata.py`), so `PARTY_SLOTS=8` still builds (without slot 8). N = 16 does not fit: a test link on 2026-10-19 needed 0xDB4 bytes and
   failed with "region `partyram' overflowed by 692 bytes". It needs the region start and the heap cap
   lowered by at least 0x2B4 (0x300 keeps alignment: region at 0x0203ED00, cap
   (0x0203ED00 - 0x02000808) / 4 = 0xF93E). (The earlier figures, 0x87C for N = 8 and 0xCC4 for N = 16
@@ -152,6 +186,20 @@ disassembly. Verified: level 40 -> 41 for Krillin as player 1, dialogue closed, 
 - The save menu shows at most six members per slot; the switch screen shows six at a time.
 - The debug party (Map Test) fills slots 0..defined-1 with level-40 characters (flags 0x3F for every
   slot but Hercule's, so Krillin shows both technique pages there).
+
+## Verified with 9 slots (headless + fork slot 9, 2026-10-19, `docs/testing.md` "Super Saiyan 2 Gohan")
+
+The join through CoopCall 20 from a script and its message; player 2 and player 1 as Super Saiyan 2
+Gohan (walk, the A combo, Kamehameha, Masenko, Super Saiyan 2 Burst, Ki Blast; also in the fork); the
+switch screen with 8 members (the window of six scrolls twice to him, A makes him player 1); the status
+screen with 8 members (Right / Left through all, his pages, no garbage); save at the pad, soft reset,
+Select Game, load (player 1 on slot 8, his entry and the flags intact); an eight-slot save (made on main)
+loaded twice in the nine-slot build (migrated, then read in the new layout; EEPROM checksum moved from
+0x10 + 0x19C to 0x10 + 0x1B8); a clone duel with him as player 1 (the clone in slot 7, slot 8 untouched);
+`tools/headless/ch9_gero.txt` (Android 16 in slot 7, whole chapter), `halo_goku.txt`, `ssj_tumble.txt`,
+old Hercule's toggle and Krillin as player 1 (KR_TEST). Not verified: the journal and items pages' tab
+strips with 8+ members (same code), a pause during a clone duel with 9 members in the party (the strip
+shows a window of 8).
 
 ## Verified (WSL fork, `build/party8`, PARTY_SLOTS=8, docs/testing.md "fork helpers")
 

@@ -1,0 +1,42 @@
+# A clone duel with Super Saiyan 2 Gohan in the party (SSJ2_TEST build, docs/testing.md "Super Saiyan 2 Gohan"):
+# the clone goes to slot 7 (DUEL_SLOT), never slot 8. He joins and becomes player 1, COOP_CMD_DUEL (6) starts a
+# clone duel (arg 0x300: clone, shadow), player 2's HP drops to 1 and player 1's combo ends it (winner 1).
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x01AE01F4
+poke32 0x0203FD08 5
+frames 200
+p2 0x304
+frames 2
+p2 0
+frames 20
+p2 0x308
+frames 2
+p2 0
+frames 30
+echo --- player 1 = slot 8; duel
+peek8 PARTY 1
+poke32 0x0203FD0C 0x300
+poke32 0x0203FD08 6
+frames 60
+echo --- player 2's slot (7), slot 7 (row 28 copy), slot 8, duel_active / winner
+peek8 0x0203FF84 1
+peek PARTY+0xD0 7
+peek PARTY+0xEC 7
+peek8 0x0203FD5C 2
+shot du_00_duel
+poke16 PARTY+0xD0 1
+key 0x20 6
+frames 4
+key 1 4
+frames 6
+key 1 4
+frames 6
+key 1 4
+frames 60
+shot du_01_end
+echo --- after the final blow: duel_active / winner, player 2's slot
+peek8 0x0203FD5C 2
+peek8 0x0203FF84 1

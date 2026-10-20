@@ -1,0 +1,27 @@
+{
+  "_": "Test only: CoopCall 20 (ssj2_join) and the join message on a dialogue trigger above the Map Test spawn in zone 2 area 1 (578, 602). Build: docs/testing.md 'Super Saiyan 2 Gohan'.",
+  "sources": [
+    "tools/headless/ssj2_join_test.lscript"
+  ],
+  "maps": [
+    {
+      "map": {
+        "zone": 2,
+        "area": 1
+      },
+      "add_triggers": [
+        {
+          "kind": "dialogue",
+          "rect": [
+            560,
+            560,
+            600,
+            585
+          ],
+          "payload": "seq:ssj2_join_test",
+          "condition": "always"
+        }
+      ]
+    }
+  ]
+}

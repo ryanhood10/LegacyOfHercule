@@ -1,0 +1,48 @@
+# Old saves, part 2: this build boots with the eight-slot build's cartridge save (its savestate, then reset),
+# loads slot 1 from Select Game (moved to the nine-slot layout: slot 8 empty, the tail shifted), resets and
+# loads it again (now the nine-slot layout is read; the mirror's checksum moved from 0x10 + 0x19C to 0x10 + 0x1B8).
+#   python tools/headless/st_test.py tools/headless/ssj2_oldsave2.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/old_saved.ss --out build/ssj2t/hl
+reset
+frames 10
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 120
+key 1 6
+frames 120
+frames 120
+shot old_01_select
+key 1 6
+frames 400
+map
+shot old_02_loaded
+echo --- migrated: head, Krillin, slot 8, the flags bank (now at FLAGS), EEPROM slot 0 head, new / old checksum words
+peek PARTY 3
+peek PARTY+0xB4 7
+peek PARTY+0xEC 7
+peek FLAGS 4
+deref m 0x03003898
+peek m+0x10 3
+peek m+0x1C8 1
+peek m+0x1AC 1
+key 0xF 6
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 120
+key 1 6
+frames 120
+shot old_03_select2
+key 1 6
+frames 400
+map
+echo --- second load (the nine-slot layout)
+peek PARTY 3
+peek PARTY+0xB4 7
+peek FLAGS 4

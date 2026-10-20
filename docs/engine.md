@@ -108,9 +108,11 @@ functions, which fooled a first pass):
 
 The same init also stores `0x08025684` / `0x08025EAC` at `0x030021FC` and `0x08025698` at `0x03002204`.
 
-Rows 22-27 exist only in the build (`tools/spriteclone.py`): 22 Super Saiyan Hercule and 24 old
+Rows 22-28 exist only in the build (`tools/spriteclone.py`): 22 Super Saiyan Hercule and 24 old
 Hercule are copies of Hercule's row 21, 23 Krillin and 25 Android 16 copies of Gohan's row 0, 26 / 27
-haloed Goku / Super Saiyan Goku copies of Goku's rows 19 / 20. Only bytes 0-5 (flags, sprite,
+haloed Goku / Super Saiyan Goku copies of Goku's rows 19 / 20, 28 Super Saiyan 2 Gohan a copy of Gohan's
+row 3 with row 4's sprite and portraits (row 4's class `0x030021E4`: combat bytes fixed at 100, the active
+slot's HP regenerated, an aura sound in slots 2 / 3). Only bytes 0-5 (flags, sprite,
 portraits, transformation links) change, so each keeps its source row's class (27 that of row 20).
 
 **Why static input searches failed:** the controller lives behind these RAM-resident vtable pointers,
@@ -119,18 +121,18 @@ so nothing in ROM references it by address.
 ## Characters
 
 - Party = 6 `CharacterEntry` slots in the stock game (hp/ep/stats/exp/flags/abilityList[4]); the
-  build has `PARTY_SLOTS` (default 8) in the relocated block (`docs/party-8-slots.md`). The active
+  build has `PARTY_SLOTS` (default 9) in the relocated block (`docs/party-8-slots.md`). The active
   slot's `displayDataIndex` selects a `CharacterDisplayData` row (stock `0x081D967C`, 22 rows, 20
   bytes) which carries sprite id, portrait, transform links and a behaviour vtable pointer. The build
-  moves the rows to `display_rows` in the code blob with **28 rows** (`patch_rom.py`
-  `LITERAL_RELOCATIONS`, 18 literals; `CharacterData_FindBySprite`'s limit byte at file `0x42D6` 22 -> 28).
+  moves the rows to `display_rows` in the code blob with **29 rows** (`patch_rom.py`
+  `LITERAL_RELOCATIONS`, 18 literals; `CharacterData_FindBySprite`'s limit byte at file `0x42D6` 22 -> 29).
 - `Character_GetSpriteId` `0x08009324`: 0 = player, 1..6 = party slots, >= 7 = `g_CharacterSpriteIndex`.
   The build relocates the sprite index to `sprite_index` in the blob (stock ids up to 156, new ones up
-  to 175; ids and owners in `docs/ids.md`).
+  to 177, and id 58 repointed to `ssj2_record`; ids and owners in `docs/ids.md`).
 - Abilities: `g_AbilityTable` stock `0x081D9900`, 14 x {readyIcon, coolingIcon, isReady fn, onUse fn}.
   `HERCULE=1` builds relocate it to `0x08900000` (start of the data-patch region; `tools/romdata.py`
-  from `data/hercule.json`, literals at file `0x8024` and `0x8E8C`) and extend it to ids 0-22: 14-17
+  from `data/hercule.json`, literals at file `0x8024` and `0x8E8C`) and extend it to ids 0-23: 14-17
   Hercule's four moves, 18 Super Hercule, 19-21 Krillin's Afterimage Rush, Shockwave Punch and
-  Destructo Disc, 22 Android 16's Rocket Punch. `python tools/romdata.py abilities <built rom>` prints it.
+  Destructo Disc, 22 Android 16's Rocket Punch, 23 Super Saiyan 2 Gohan's Burst. `python tools/romdata.py abilities <built rom>` prints it.
 - Map entities are spawned from `MapEntry.mapScripts[]` by handlers `0x0800B711` (town NPC),
   `0x0800D6DF` (script actor), `0x0800E77F` (enemy); behaviour lists ticked by `0x0800D156`.

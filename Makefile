@@ -42,6 +42,8 @@ A16P_SPRITE ?= 175
 # Fury Hercule, 72 without roms/buu.gba). KR_TEST=1: player 1's L+R+Up toggles old Hercule on slot 5,
 # L+R+Left sets Krillin's EXP one short of his next level (src/coop/krillin.c)
 KRILLIN_SPRITE ?= 161
+# SSJ2_TEST=1: player 2's pad L + R + Select joins Super Saiyan 2 Gohan (slot 8, src/coop/ssj2gohan.c), + Start makes
+# him player 1, + Up player 2, + Down sets his EXP one short of his next level
 # A13_SPRITE / NAMEK_SPRITE: Android 13 (base form) and Cooler's Namekian servant (tools/bossmodels.py,
 # built from the ROM); src/coop/bosses.c gives them to the co-op twins of 19, Dr. Gero and Cooler
 A13_SPRITE ?= 165

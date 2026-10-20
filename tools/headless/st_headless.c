@@ -22,7 +22,8 @@
 //   map                    print the current map (zone, area, variation) and player 1's position
 //   waitmap ZONE AREA MAX  run until that map is loaded (at most MAX frames)
 //   flags +N -N ...        story flags now (the bank at FLAGS)
-//   savedata-out FILE / savedata-in FILE   the cartridge save (EEPROM) to / from a file (old-save tests)
+//   reset                  power-cycle the ROM; the cartridge save stays (a savestate of another build
+//                          followed by reset boots this ROM with that build's EEPROM: old-save tests)
 // Predefined variables: PARTY = 0x0203F000 (the party block), FLAGS = its story-flag bank, which moves with
 // PARTY_SLOTS (0x0203F00C + slots * 0x1C: 0x0203F108 with 9 slots), SLOTS = the ROM's party slot count.
 //   preset +N -N ...       the StoryTest preset (coop.h, 0x0203FDC0) Party_Init applies at the next Map Test
@@ -258,20 +259,7 @@ int main(int argc, char **argv) {
             printf("waitmap %u %u: %s after %u frames\n", z, ar, i < mx ? "reached" : "TIMEOUT", i);
         }
         else if (!strcmp(c, "flags")) flag_ops(tok + 1, n - 1, num("FLAGS"), 0);
-        else if (!strcmp(c, "savedata-out") && n > 1) {
-            void *sram = 0;
-            size_t sz = core->savedataClone(core, &sram);
-            FILE *f = fopen(tok[1], "wb");
-            if (f) { fwrite(sram, 1, sz, f); fclose(f); }
-            printf("savedata-out %s: %zu bytes\n", tok[1], sz);
-            free(sram);
-        } else if (!strcmp(c, "savedata-in") && n > 1) {
-            FILE *f = fopen(tok[1], "rb");
-            static unsigned char buf[0x20000];
-            size_t sz = f ? fread(buf, 1, sizeof buf, f) : 0;
-            if (f) fclose(f);
-            printf("savedata-in %s: %zu bytes, %s\n", tok[1], sz, sz && core->savedataRestore(core, buf, sz, false) ? "ok" : "failed");
-        }
+        else if (!strcmp(c, "reset")) { core->reset(core); printf("reset (frame %lu)\n", frame_no); }
         else if (!strcmp(c, "preset")) flag_ops(tok + 1, n - 1, 0, 1);
         else if (!strcmp(c, "maptest")) {
             unsigned m = 0;

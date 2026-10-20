@@ -116,6 +116,7 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 12 | A16Leave | 16 leaves the party for good (slot flags 0), the saved bits come back, Krillin and Hercule in the party and available, flag 421. The script then sets Krillin player 1 and `CoopCall 6, 5` |
 | 13 | WaveStart seq:ROUND, first | the Time Chamber training (`waves.c`): from round `first` (0 / 1 = the first); ROUND = the sequence queued before every round and once after the last (it asks fn 14 which) |
 | 14 | Wave op | op 0 -> the round being announced / fought (11 = completed); op 1 spawns the announced round (no result); op 2 -> player 2's character name (a `%s` argument: "%s wins the sparring match!") |
+| 20 | Ssj2Join | **proposed number** (the Super Saiyan 2 Gohan piece; the main session assigns it): Super Saiyan 2 Gohan joins in party slot 8 (`ssj2gohan.c` `ssj2_join`: row 28, Gohan's EXP, Gohan's HP / EP x1.5 and str / pow / end x1.7, flags 0x7F, abilities 3 / 4 / 23 / 2; a second call does nothing). The script then shows the message: `CoopCall 20, 0, 0, 0` in a `script` entry, then `text 0 "@^Super Saiyan 2 Gohan is now an available character!"` (`tools/headless/ssj2_join_test.lscript`) |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -150,7 +151,8 @@ deleted (mapedit disables them) and new ones are appended.
 
 ### 2.4 Party flags and player 2
 
-Party entry +0x14 flags: bit 0 in the party, bit 1 available. Player 2 (`src/coop/player.c`) is any
+Party entry +0x14 flags: bit 0 in the party, bit 1 available, bit 2 the special melee page, bits 3 / 4 the
+two energy technique pages, bit 5 the charged A attack, 0x40 on every stock row. Player 2 (`src/coop/player.c`) is any
 party member with both bits other than player 1's character, keeping its previous choice, else
 Hercule, else the first; it is chosen when player 2's entity spawns (map load). So the story picks
 player 2 with the flag opcodes (old Hercule in the prologue, Krillin from his visit, the jungle
@@ -163,7 +165,8 @@ clears 400-479 (the ten-day wait's side chapters); flags 480+ survive a new game
 **The allocation by range and every flag's meaning are in `docs/ids.md` "Story flags"**; take new
 flags there. Chapter-specific notes: 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 380 the arctic barrier, 400-419 the Broly chapter (404-419
-the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar.
+the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar. The bank
+is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
 ## 3. lscript, the text form
 
