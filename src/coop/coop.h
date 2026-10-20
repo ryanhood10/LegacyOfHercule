@@ -49,6 +49,10 @@ void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehame
 u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
+void players_reset(void);    // players.c: the Select Game screen arms the 1 / 2 players question
+int players_one(void);       // players.c: one player chosen (player 2 kept out)
+int players_take(void);      // players.c: CoopCall 21, the answer
+void players_tick(void);     // players.c: ask once player 1 is free
 int p2_coming(void);         // player 2's entity, or a pad and a party member for it (player.c)
 void p2_drop_out(void);
 int p1_in_play(void);        // player 1 in a player-driven control state (player.c)

@@ -2,6 +2,7 @@
 # walking (the stock sit put him inside the desk's collision), and after the forest spirit the two stay in
 # the clearing (zone 2 area 3) with its way out west. Alone (`p2 off`); from a debug-menu savestate of a
 # DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/ch1_room_forest.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# (--out must be the folder holding menu.ss: the forest half reloads it with `load menu.ss`)
 p2 off
 preset +4
 maptest 19

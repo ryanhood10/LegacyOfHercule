@@ -16,6 +16,7 @@
 //   deref NAME ADDR        NAME = the word at ADDR
 //   keys MASK              player 1's held keys from now on (until the next keys / key)
 //   mashmap ZONE AREA MAX  press A once a second until that map is loaded
+//   stepnz ADDR MAX        A on player 1's pad every 100 frames until the byte at ADDR is nonzero
 //   waitnz ADDR MAX        run until the word at ADDR is nonzero (e.g. coop2.a16 0x0203FD34)
 //   stepz ADDR MAX         press A on both pads every 100 frames until the byte at ADDR is 0 (a pending win)
 //   mash N [F]             press A N times, F frames apart (50);  mashent NAME VTABLE MAX  ... until such an entity exists
@@ -312,6 +313,11 @@ int main(int argc, char **argv) {
                 run_frames(94);
             }
             printf("stepz %08x: %s after %u steps (frame %lu)\n", a, k < mx ? "zero" : "TIMEOUT", k, frame_no);
+        }
+        else if (!strcmp(c, "stepnz")) {   // stepnz ADDR MAX: A on player 1's pad every 100 frames until the byte at ADDR is set
+            unsigned a = num(tok[1]), mx = num(tok[2]), k;
+            for (k = 0; k < mx && !r8(a); k++) { press(1, 6); run_frames(94); }
+            printf("stepnz %08x: %s after %u steps (frame %lu)\n", a, k < mx ? "set" : "TIMEOUT", k, frame_no);
         }
         else if (!strcmp(c, "mash")) { unsigned k = num(tok[1]); for (unsigned i = 0; i < k; i++) { press(1, 6); run_frames(n > 2 ? (int)num(tok[2]) : 50); } }
         else if (!strcmp(c, "findent")) {   // findent NAME VTABLE: the first listed entity with that vtable

@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **1 Player / 2 Players at every game start** (Ryan): after Select Game, the first moment player 1 can move,
+  "How many players?" (A one, B two); one player keeps player 2 out even with a second controller connected.
+  `src/coop/players.c`, CoopCall 21; the runner gained `stepnz`. Tested on the play ROM both ways.
 - **Ryan's first test (alone), chapter 1:** after Krillin's visit Gohan was stuck in his chair (the stock "sits down"
   step puts him inside the desk's collision, and the stock dream used to warp him out); now he gets up and walks out
   with Krillin. After the forest spirit the two stay in the clearing: behind the white fade the scene moves to the

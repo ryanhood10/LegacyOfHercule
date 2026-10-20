@@ -1210,8 +1210,16 @@ records. The table's numbers are the macros at the top of `difficulty.h`. Test: 
 
 ## One player, and player 2 dropping in and out (2026-10-20)
 
-There is no player-count setting: player 2 exists while a second controller sends input (`p2_present()`, the
-3 s source timeout in the default `P2_MODE_SIO` build). Alone, the game is single-player. Audited 2026-10-20
+**Player count (Ryan, 2026-10-20): asked at every game start** (`src/coop/players.c`). The Select Game screen
+(`save_menu_load_hook`, which every new game and loaded save passes) arms it; the first moment player 1 can
+move, "How many players?  (A: 1 Player  B: 2 Players)" (a sequence built in C, CoopCall 18 + CoopCall 21).
+1 Player keeps player 2 out even with a second controller (`p2_present()` reads 0, so a player 2 already
+there drops out); 2 Players is the pad's rule below. Not saved. Before any Select Game (power-on, the debug
+menu's Map Test, every headless chapter test) nothing is asked and the pad decides. Tested on the play ROM
+with a second pad: A -> mode 1, no player 2; B -> mode 2, player 2 joins.
+
+With 2 Players, player 2 exists while a second controller sends input (`p2_present()`, the 3 s source timeout
+in the default `P2_MODE_SIO` build). Without one, the game is single-player. Audited 2026-10-20
 (every story scene and every co-op module); fixed:
 
 - **The Cell Games' player-2 fights** (fight 2, J2 Piccolo, J4 Trunks: solo mode 2 hands player 2's pad to player

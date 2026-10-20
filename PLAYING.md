@@ -32,12 +32,13 @@ gamepad, map it to those keys with a gamepad-to-keyboard tool.
 **Two PCs (online).** Use lockstep netplay; the steps are in `README.md` "Playing online". Both
 players must build with the same flags. The host's save is the one that counts.
 
-**Alone.** Just play. With no second controller the game is single-player. Player 2 joins whenever their
-controller starts sending input, and leaves a few seconds after it stops.
+**1 or 2 players.** Every time a game starts (new or loaded), the first thing it asks is "How many players?"
+(A: 1 Player, B: 2 Players). 1 Player keeps player 2 out even if a second controller is connected. With 2
+Players, player 2 joins whenever their controller sends input, and leaves a few seconds after it stops.
 
 ## 3. Starting a new game
 
-The first scene asks for the difficulty. It is set for the whole game.
+After the players question, a new game asks for the difficulty. It is set for the whole game.
 
 | | Easy | Normal | Hard |
 |---|---|---|---|

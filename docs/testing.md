@@ -655,6 +655,13 @@ player 2 (`stepz` presses only player 1's A then). `tools/headless/cell_games_1p
 `tools/headless/dropout.txt` player 2 leaving and returning. Any chapter test runs alone by changing its first
 `p2 0` to `p2 off` and dropping its other `p2` lines (the summit, post-game and Gero chapter pass that way).
 
+## The players question (headless, 2026-10-20)
+
+It only appears after a Select Game, so chapter tests (Map Test) never see it. On the play ROM: power on, Start,
+A, A (Select Game, new game), then `stepnz 0x0203FA49 40` (A until `players.asking` is set), then `key 1 6`
+(one player) or `key 2 6` (two). `players.mode` is 0x0203FA48; with `p2 0` (a second pad) mode 1 leaves
+`coop.p2` 0 and mode 2 brings player 2 in.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

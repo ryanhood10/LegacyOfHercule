@@ -187,7 +187,8 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 18 | Choice (op): op 1 arms a yes / no question before its text entry (B answers no and closes the box), op 0 pushes 1 yes / 2 no | post-game |
 | 19 | allocated: post-game chapter | |
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
-| 21+ | free | |
+| 21 | Players: the 1 / 2 players answer (`players.c`) | every game start |
+| 22+ | free | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -258,7 +259,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |
 | 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
-| 0x0203FA44-0x0203FB00 | 0xBC | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
+| 0x0203FA58-0x0203FB00 | 0xA8 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |

@@ -184,6 +184,7 @@ void vm_coop_call(s32 *st) {
 #if PARTY_SLOTS > SSJ2_SLOT
     case 20: ssj2_join(); break;
 #endif
+    case 21: vm_push(st, players_take()); break;   // the 1 / 2 players answer (players.c): pushes the next entry
     case 17:
         if (a == 1) vm_push(st, s13_call(1, 0, 0));
         else s13_call(a, b, c);

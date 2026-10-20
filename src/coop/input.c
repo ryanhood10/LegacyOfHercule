@@ -27,6 +27,7 @@ static void poll_into(InputSystem *in, u16 now) {
 // there: bit 15 = valid, bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
 
 int p2_present(void) {
+    if (players_one()) return 0;      // one player chosen at the game's start (players.c)
 #if P2_MODE == P2_MODE_SIO
     return coop.source_age < P2_SOURCE_TIMEOUT;
 #else
@@ -202,6 +203,7 @@ void input_poll_hook(InputSystem *in) {
     poll_into(&coop.input2, p2);
 
     coop_active_check();
+    players_tick();                        // players.c: the 1 / 2 players question after a Select Game
     if (coop.p2 && !p2_present() && !coop_solo() && p1_controllable() && !scene_running())
         p2_drop_out();                     // player.c: the second controller went away
     p2_sync_combat();

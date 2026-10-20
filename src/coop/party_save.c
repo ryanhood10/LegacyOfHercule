@@ -154,6 +154,7 @@ static CharacterEntry *view_member(int slot, int i) {
 
 // 0x08001960(handle): read the three slots and list their members.
 void *save_menu_load_hook(void *handle) {
+    players_reset();                  // a game is about to start: ask 1 / 2 players again (players.c)
     store.migrated = 0;
     for (int s = 0; s < SAVE_SLOTS; s++) {
         load_slot_hook(&store.slot[s].party, s);
