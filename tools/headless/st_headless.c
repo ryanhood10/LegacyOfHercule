@@ -32,6 +32,7 @@
 //   save FILE / load FILE  savestates
 //   reset                  power-cycle the GBA (the save data stays: test a Continue from the title)
 //   echo TEXT
+//   regs                   print the CPU registers (r0-r15, cpsr): where a hang sits
 #include <mgba/core/core.h>
 #include <mgba/core/log.h>
 #include <mgba/internal/arm/arm.h>
@@ -205,6 +206,12 @@ int main(int argc, char **argv) {
             for (unsigned i = 0; i < k; i++)
                 printf(sz == 1 ? " %02x" : sz == 2 ? " %04x" : " %08x", sz == 1 ? r8(a + i) : sz == 2 ? r16(a + 2 * i) : r32(a + 4 * i));
             printf("\n");
+        }
+        else if (!strcmp(c, "regs")) {   // where the CPU is (a hang: run a few frames and compare)
+            struct ARMCore *cpu = core->cpu;
+            printf("regs:");
+            for (int i = 0; i < 16; i++) printf(" r%d=%08x", i, cpu->gprs[i]);
+            printf(" cpsr=%08x\n", cpu->cpsr.packed);
         }
         else if (!strcmp(c, "poke8")) w8(num(tok[1]), num(tok[2]));
         else if (!strcmp(c, "poke16")) w16(num(tok[1]), num(tok[2]));

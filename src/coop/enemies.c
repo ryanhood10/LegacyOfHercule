@@ -9,6 +9,7 @@
 #include "coop.h"
 #include "android16.h"
 #include "bosses.h"
+#include "super13.h"
 
 ROM_FN(void, Enemy_UpdateStates, (Entity *e), 0x0800772B);   // aux + control state; the AI tick follows in 0x0800E5A5
 #define ENEMY_UPDATE 0x0800E5A5u
@@ -25,7 +26,7 @@ int is_coop_enemy(const Entity *e) { return e && e->vtable == coop2.enemy_vtable
 // A co-op enemy's record copy lives behind its stat copy in the entity block (create_coop_enemy).
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
-static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e)); }
+static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e)); }
 
 // Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
@@ -302,6 +303,7 @@ static const EnemyStat *spawn_stat(int stat_index, const BossRule *rule, EnemySt
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
+    if (rec->stat_index == S13_STAT) return s13_spawn(rec);   // Super Android 13: single boss, own AI (super13.c)
     const BossRule *rule = boss_rule(rec->stat_index);
     EnemyStat buf;
     const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
@@ -359,7 +361,7 @@ void story_test_finish(void) {
         if (!is_enemy(e) || e->hp <= 0) continue;
         int boss = is_coop_enemy(e) ? is_boss(e) : ((const EnemyStat *)e->behaviour)->max_hp >= 1000;
         const u32 *act = (const u32 *)e->action;     // or any enemy whose death runs a story action
-        if (!is_a16(e) && !boss && !(act && act[0] != ENEMY_ACTION_NONE)) continue;
+        if (!is_a16(e) && !is_s13(e) && !boss && !(act && act[0] != ENEMY_ACTION_NONE)) continue;
         lethal_hit(e);
     }
 }
@@ -418,6 +420,10 @@ void coop_debug_tick(void) {
         if (a) EntityList_Add(g_SceneTable[1], a);
     } else if (cmd == COOP_CMD_A16) {
         a16_test_spawn();
+    } else if (cmd == COOP_CMD_S13) {
+        s13_test_spawn();
+    } else if (cmd == COOP_CMD_S13_DRIVE) {
+        s13_test_drive(coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == COOP_CMD_WAVE_CLEAR) {
         wave_clear_all();
     } else if (cmd == COOP_CMD_WIN_STAT) {
@@ -475,6 +481,7 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     m->speed = (s32)cls[3];
     if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * COOP_SPEED_NUM / COOP_SPEED_DEN;
     if (is_raged(e)) m->speed = m->speed * BOSS_RAGE_SPEED_NUM / BOSS_RAGE_SPEED_DEN;
+    if (is_s13(e)) m->speed = m->speed * S13_SPEED_PCT / 100;   // Super 13 is slow (super13.h)
     return m;
 }
 SpeedModule *ai_speed8_create_hook(const u32 *cls, const Entity *e) { return speed_module(cls, e, AI_SPEED8_VTABLE); }

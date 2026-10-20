@@ -722,6 +722,102 @@ gets `A16_SOLO_HP_PCT` (70%) of his HP (not tested).
 - Resolved since: the island scripts now name 16 (`data/story/a16_island.*`); the player-2
   combat-byte bug and the Camera_Shake guard are fixed (see the notes above).
 
+## Super Android 13 (2026-10-19, branch `super13-boss`, `src/coop/super13.c/.h`)
+
+The post-game boss (`docs/story.md` 4i): after absorbing 17 and 18 at the arctic summit, players 1 and 2
+fight him alone. Ryan's spec: a big towering boss with lots of health, new art and fighting moves, a full AI
+strategy, slow, combinations of ki blasts and large ki blasts that partly home in on the players, a little
+above the twin Perfect Cells, no reward beyond EXP, and he explodes when beaten. Art: `docs/sprites.md`
+"Super Android 13" (sprite 180, portrait 122). Built on the Android 16 boss (section above): the same private
+vtable, control state, projectile class, hit messages and poise, in a module of its own.
+
+### How to place him (for the post-game chapter)
+
+- An enemy record (handler `0x0800E77F`) with **stat 145** and **sprite 180**: `enemy_spawn_hook` sends it to
+  `s13_spawn` (own stat row `s13_stat`, no co-op twin). TriggerMapEvent (opcode 84) spawns a condition-1
+  record for a scripted boss; `DrawBossHealthBarRange 180, 0, 100` draws his bar (one bar, plain range).
+- His **defeat action fires the moment his HP hits 0** (the boss death class), while he explodes for
+  `S13_DEATH_FRAMES` (96) frames: pose group 12 (light bursting out of him) under explosions, then a big blast
+  with debris and a strong shake, then an empty pose. The entity stays (scripts addressing sprite 180 still
+  find him; `DespawnEntity 180` is safe), invisible and inert. A defeat script waits with
+  `CoopCall 17, 1, 0, 0` (pushes his state: 0 none, 1 fighting, 2 exploding, **3 gone**) or about 2 s of
+  frames before it goes on (17 and 18 die with him: the scene's own lines).
+- `CoopCall 17, 0, hp%, dmg%` before the spawn scales his HP and every blast's damage for that fight (0 =
+  100); `CoopCall 17, 2, 0, 0` spawns him beside player 1 with a bar (a scene without a map record).
+- He is 64 px tall, drawn from his position to 32 px right (64 px frames from 16 px left), 48 px up and 16 px
+  down; leave that much room (his hurt box is x - 6 .. x + 38, y - 46 .. y + 16).
+- EXP: the stat row's EXP is 0, like every story boss's; the chapter awards EXP (Ryan: no other reward).
+
+### Moves (a special-attack scheduler between ticks of the stock melee boss AI set 21)
+
+| move | what happens | knobs |
+|---|---|---|
+| walking, melee | AI set 21 (Broly's, Cooler's): approach, punches, dash, at `S13_SPEED_PCT` (55 %) of the stock speed (`enemies.c` scales his chase modules) | `S13_MELEE`, `S13_SPEED_PCT` |
+| ki volley | wind-up, then a small orb from alternate fists every 10 frames, **alternately at each player**, each steering a fraction of the way to its player every frame (turn divisor 26: stepping aside works), 4 orbs (6 enraged) | `S13_VOLLEY_*` |
+| ki fan | a spread of 5 (7) small orbs at one player, weak homing | `S13_FAN_*` |
+| deadly bomber | hunched, then arms up while a giant orb grows over his head (32x32, then 64x64 when OBJ VRAM allows), thrown after the **farther** player: slow (0.75 px/frame), homing (divisor 18), 5.5 s fuse, the biggest blast (3 extra explosions, debris, shake); enraged, one per player | `S13_BOMB_*` |
+| ki wave | the crouching power-up with fire at his feet (48 frames, a rumble), then a slow beam head (32x32, 1.1 px/frame, partly homing) leaving a trail of ki orbs (one per 7 frames, 44 frames each) that burst on whoever touches them | `S13_WAVE_*`, `S13_TRAIL_*` |
+| ki nova | he spins into a ki shell; at the peak a blast all round him (46 px) and a ring of 8 orbs flying out; likely when both players crowd him (within 60 px) | `S13_NOVA_*`, `S13_CROWD` |
+| the roar | once, when he drops below a third of his HP: 48 frames of roaring with flames and a big shake, then **rage**: more orbs, sharper homing, cooldowns x 70 %, two bombers at once; it chains into a bomber | `S13_RAGE_*` |
+
+Choice: above 2/3 HP volley 35, fan 20, bomber 15, wave 20, nova 10 (+60 when crowded); middle 25 / 20 / 20 /
+25 / 10; below a third 20 / 15 / 25 / 30 / 10. **Combinations**: a special can chain into the next at once
+(volley -> fan 40 %, 60 % enraged; volley -> bomber 20 % enraged; fan -> wave 20 / 45 %; wave -> volley 15 /
+35 %), at most two links, the next one often at the other player. A special starts from idle or walking with
+a player within 230 px of his centre, after a cooldown of 130-200 frames; the target is the nearer player 65 %
+of the time. Specials cannot be interrupted, and a stun opens 60 frames of poise (hits only do damage), so two
+players cannot lock him. Every blast is a type-0 hit message (players only); orbs in flight when he dies
+fizzle without damage. Test command 18 forces a special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar).
+
+### Engine facts found for this
+
+- **Hurt box**: `Entity_GetBox` (`0x080079B8`) = position + `record + 0xC + facing * 0x10` ({x1, y1, x2, y2});
+  the enemy message handler (`0x0800E5B9`) tests the attack box against it and needs entity `+0x168` set.
+  A sprite's boxes must cover its drawn body in every facing: with Broly's side boxes (29 px, from x + 3) only
+  1 of 33 player attacks landed (counted with `s13.msgs` / `s13.landed`).
+- A 64x64 boss needs the record header's size word 0x1000 (`docs/sprites.md` "Paragus"). OBJ VRAM held up: the
+  least largest-free block seen was 8 KB in the wide fork and 3.5-16 KB headless with both players, two 64x64
+  bombers, orbs, a trail and explosions up (`s13.vram_min`); no projectile was ever skipped for want of VRAM.
+- No lag: 600 game frames (`g_FrameCounter`) in 600 emulated frames during the rage, with two bombers and
+  orbs up.
+
+### Tuning and test results (headless, `tools/headless/bossfight.py`, New Planet Vegeta, Piccolo + Hercule)
+
+The autopilot (`A16_TEST`) walks each player to a flank, punches, steps out of swings and orbs; no abilities,
+no items. `--strong` = a Cell Games-level pair (our estimate: Piccolo 1500 HP, 72 / 75 / 62; Hercule 900 HP,
+72 / 70 / 84; the debug party's level 40 dies to either fight in 15-30 s). `--refill` puts both back to full
+every second (the pair never falls; rates over the active seconds).
+
+| fight | refilled pair | strong pair, no refill |
+|---|---|---|
+| twin Perfect Cells (stat 25 x 2, both-down; 16460 HP) | 3 of 6 runs killed them in 22, 24 and 31 s by stun-locking them (players deal 530-740 HP/s, take 8-37/s); 3 stalled (below) | won once at full HP (24 s, locked); otherwise stalled, or KO at 26-27 s with the Cells at 74-88 % |
+| Super 13 first cut (19000 HP, 66 / 64 / 68, specials every 60-120 frames) | not dead in 150 s: players deal 100-131/s, take 73-96/s (est. kill 145-190 s) | - |
+| 15000 HP, melee 60, defence 62, blasts x 0.7, gaps 100-170 | killed in 90 and 131 s, take 54-76/s | - |
+| 12000 HP, poise 60, gaps 110-180 | killed in 89-123 s, take 59-68/s | KO in 22-31 s, him at 65-70 % |
+| 12000 HP, melee 52, defence 56, blasts x 0.6 more, gaps 130-200 | killed in 86-99 s, take 38-48/s | KO in 29-74 s, him at 29-65 % |
+| **current: 10000 HP, 48 / 64 / 56, blasts x 0.75 more** | **killed in 58-88 s** (4 runs; players deal 113-168/s, take 27-37/s) | **KO in 37-96 s with him at 4-35 %** (443-3525 HP left; 8 runs) |
+
+So the autopilot pair narrowly loses to him where it beats the twin Cells whenever it manages to lock them,
+which is how "a little above" was read. Its damage rate on him (about 140 HP/s) is a quarter of what it does
+to locked Cells: it spends most of the fight dodging his orbs, the fight Ryan described. People who dodge
+better and use abilities and items should beat him more often; `CoopCall 17, 0` adjusts a fight without a
+rebuild, and every number above is a knob in `super13.h`. HP 10000 is still more than one Perfect Cell
+(8230). Not measured: single-player (`S13_SOLO_HP_PCT`, 55 % of the HP) and real two-person play.
+
+**Found on the way (not this boss's):** twin-Cell autopilot runs often **stall**: every entity stops updating
+(damage popups frozen on screen), `g_FrameCounter` keeps counting, Start does nothing, and it never recovers.
+It happens on unmodified main too (a detached worktree of dc3c1fc) and once in a Super 13 run, so far only in
+runs whose player stats were poked by the test (never in six runs with the debug party's own stats). Not
+root-caused; `st_headless.c` gained a `regs` command while chasing it (the CPU sits in normal code and the BIOS
+wait). A downed Cell twin's pointer also clears, and the autopilot sometimes stops hurting the surviving Cell.
+
+### Open
+
+- Real two-player play; single-player; the fight on the real arctic summit (the arctic-route session's map),
+  his lines and the absorb scene (the post-game chapter).
+- Base Android 13 still has no portrait (123 is allocated for it).
+- The stall above.
+
 ## Boss rules and extra stats (2026-10-18, src/coop/bosses.c)
 
 Story bosses are configured in `src/coop/bosses.c` (declarations and field meanings in `bosses.h`):

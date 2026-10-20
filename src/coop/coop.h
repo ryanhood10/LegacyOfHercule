@@ -153,6 +153,8 @@ void coop_debug_tick(void);       // enemies.c, from the entity-list hook
 void story_test_finish(void);     // enemies.c: win every boss fight on the map (chapter tests)
 #define COOP_CMD_PARTNER_WIN  9   // chapter tests: only the boss twins (partners) fall (story_test_partner_down, input.c)
 void story_test_partner_down(void);   // enemies.c
+#define COOP_CMD_S13         17   // spawn Super Android 13 72 px right of player 1, with a boss bar (super13.c)
+#define COOP_CMD_S13_DRIVE   18   // arg = forced special | 0x100 set his HP to arg2 | 0x200 toggle the autopilot (super13.c)
 extern CoopExtra coop2;
 
 // Time Chamber training waves (waves.c; state `waves` in .party.wv, 0x9C bytes; 0x0203F880 in the merged build, see coop.map)

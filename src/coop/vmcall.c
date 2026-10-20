@@ -43,10 +43,15 @@
 //                                       the script then shows "Super Saiyan 2 Gohan is now an available
 //                                       character!" (number proposed by the SSJ2 Gohan piece; the Cell Games
 //                                       chapter calls it at the end of the Games)
+//  17 Super13 (op, a, b) [-> state]     the post-game boss (super13.c): op 0 tunes the next spawn (a = HP %, b = blast
+//                                       damage %, 0 = 100); op 1 pushes his state (0 none, 1 fighting, 2 exploding,
+//                                       3 gone: wait for 3 after his defeat before the scene goes on); op 2 spawns him
+//                                       beside player 1 with a boss bar
 #include "coop.h"
 #include "a16player.h"
 #include "krillin.h"
 #include "ssj2gohan.h"
+#include "super13.h"
 
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
@@ -176,6 +181,10 @@ void vm_coop_call(s32 *st) {
 #if PARTY_SLOTS > SSJ2_SLOT
     case 20: ssj2_join(); break;
 #endif
+    case 17:
+        if (a == 1) vm_push(st, s13_call(1, 0, 0));
+        else s13_call(a, b, c);
+        break;
     default: break;
     }
 }

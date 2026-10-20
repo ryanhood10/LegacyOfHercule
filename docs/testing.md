@@ -16,7 +16,7 @@ inspection goes through the GDB stub.
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
 | WSL fork (wide ROM), Fork helpers | real-time play, the wide view, gdb peeks, pad keys, teleport |
-| Boss pairs, Android 16 boss fight | fights with the autopilot and hit logs |
+| Boss pairs, Android 16 boss fight, Super Android 13 | fights with the autopilot and hit logs; Super 13's specials, rage, explosion, rates against the twin Cells |
 | Krillin / old Hercule tests | the playable-character test triggers |
 | New maps (zone 15) | building and warping to the new maps |
 | Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
@@ -232,6 +232,43 @@ Notes: the fork's p2pad writes 0 to the player-2 pad word while no sender is con
 write of 0x8000 does not keep player 2 present (use `p2hold.py`). P1's Select opens the Dragon Radar.
 `tools/fork/a16shots.sh` (pause, screenshot, continue) made the fork exit twice; plain
 `win_shot.ps1` captures while running work.
+
+## Super Android 13 (headless and fork; `docs/coop-design.md` "Super Android 13")
+
+```
+make BUILD=build/s13t DEBUG_MENU=1 A16_TEST=1                     # A16_TEST: the fight autopilot knows him
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/s13t/log2-coop.gba --out build/s13t/hl
+python tools/headless/st_test.py tools/headless/super13.txt build/s13t/log2-coop.gba build/s13t/hl/menu.ss --out build/s13t/hl --cols 6
+python tools/headless/bossfight.py build/s13t/log2-coop.gba build/s13t/hl/menu.ss s13 --strong --refill --delay 13 --delay 37 --secs 150 --out build/s13t/hl/fight
+python tools/headless/bossfight.py build/s13t/log2-coop.gba build/s13t/hl/menu.ss cell --strong --refill --delay 13 --secs 150   # the twin Perfect Cells
+```
+
+`super13.txt` (Map Test 147, warp to zone 15 area 3, both players at 9000 HP so standing still is safe)
+spawns him with test command 17, forces each special in turn with test command 18 (1 volley, 2 fan, 3
+bomber, 4 wave, 5 nova), sets his HP to 3000 of 10000 (`arg` 0x100, `cmd_arg2` 3000: the roar, then rage bombers),
+peeks `g_FrameCounter` across 600 frames of rage (equal = no lag), then gives him 1 HP and runs
+`COOP_CMD_STORY_WIN` (7): light bursts out of him, explosions, the big blast, then he is gone (`s13.state` 3,
+`gone_frame - dead_frame` = 96). The `s13` peek (11 words, found by its magic word 0x53313333 "S133";
+its address moves with the `partyram` sections before it): magic, boss, fired / explosion sprites, hits / skipped (OBJ VRAM), specials / combos, force / state / hp% /
+dmg%, spawn / dead / gone frames, player attacks received / landed, least largest-free OBJ VRAM block.
+
+`bossfight.py ROM STATE KIND` (KIND `s13`, `cell` = record 0x084090F8, or any record address) runs Map Test,
+warps (`--map Z,A,X,Y`, default New Planet Vegeta), spawns, puts player 2 on the boss's far side (the bot walks
+straight at its spot and a giant blocks it), turns on the autopilot and logs HP every second. `--strong` gives
+both players Cell Games-level stats (Piccolo 1500 HP, 72 / 75 / 62; Hercule 900 HP, 72 / 70 / 84),
+`--refill` puts them back to full after every reading (the autopilot never retreats or dies, so the fight
+runs on and the drops add up to the damage taken), and the summary is the rates over the active seconds:
+players' damage per second on the boss, the estimated time to kill, the boss's damage per second.
+`--delay` (frames idled before the spawn) varies the RNG between otherwise identical runs. Reads the `s13`
+address from the build's `coop.sym`.
+
+Known quirks: the twin-Cell autopilot fight freezes in many runs (on main as well: every entity stops, the
+frame counter runs, Start does nothing; `st_headless.c`'s new `regs` command shows the CPU in normal code) and
+a downed twin's pointer clears, so Cell runs need several delays and a look at the shots (`--shots`). Fork:
+`make BUILD=build/s13w WIDE=1 DEBUG_MENU=1 A16_TEST=1`, `runfork.ps1 ... -Slot n -Mute`, `p2hold.py --port
+7778+n`, `bootisland.sh 80` (island, level-30 pair), then `gdbsrv.sh cmd 'set *(unsigned*)0x0203FD08 = 17'`
+and `... 0x0203FD44 = 1` (autopilot); the level-30 pair dies to him in seconds (as to the twin Cells), so raise
+their stats for longer footage.
 
 ## GDB stub (fork, `-g`, port 2345) — the fastest way to a crash cause
 

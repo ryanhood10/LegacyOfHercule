@@ -19,7 +19,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `docs/coop-design.md` | co-op findings and status: movement, camera, EXP, switching, enemies, twins, netplay | co-op behaviour |
 | `docs/widescreen.md` | dynamic wide view design, map streaming, the mGBA fork | wide view / fork |
 | `docs/maps.md` | map format (MapEntry, variation, layers, tiles, palette, collision, triggers, exits, gates), the map tools, adding maps, the zone-15 maps, Buu's Fury maps | maps, warps, new areas |
-| `docs/sprites.md` | sprite record format, atlas, Super Saiyan Hercule, Buu's Fury conversion, Android 16 (boss and player), Krillin, Android 13 / Namekian, Paragus / ship, rules for new enemy models | sprites, new characters |
+| `docs/sprites.md` | sprite record format, atlas, Super Saiyan Hercule, Buu's Fury conversion, Android 16 (boss and player), Krillin, Android 13 / Namekian, Paragus / ship, Super Android 13, rules for new enemy models | sprites, new characters |
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the current story plan: status, standing rules, chapter table, Ryan's decisions per chapter, what is open | story work |
@@ -43,12 +43,15 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `wide.c/.h` | wide-view descriptor and dynamic size, `sprite_emit_hook` (OAM x/y high bits) |
 | `hud.c` | player 2's HUD panel |
 | `exp.c` | EXP credited to the killing player |
-| `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` |
+| `enemies.c` | co-op difficulty: scaled enemies, twins, twin bosses, second boss bar; routes enemy stat 109 to `android16.c` and 145 to `super13.c` (and slows Super 13's chase modules) |
 | `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
+| `super13.c/.h` | Super Android 13, the post-game boss (stat 145, sprite 180): ki volley / fan / deadly bomber / ki wave / ki nova / rage roar between ticks of the stock melee AI, partly homing orbs, combinations, poise, slow walk, the explosion on defeat; test commands 17 / 18, CoopCall 17; state `s13` in `.party.s13`; tuning knobs in the header (`docs/coop-design.md` "Super Android 13") |
 | `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler as the forest spirit, 113 Cooler's Namekian, 114 unused, 115 / 116 Broly / Paragus, 120 / 121 the bunker's two Android 19s; full list `docs/ids.md`) and per-boss rules (end_pct, partner model/stat, no twin, pair, rage: `BOSS_RAGE`, Broly's once-only refill when Paragus falls first); the both-down and rage rules live in `enemies.c` |
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in party slot 7 (`DUEL_SLOT`) |
 | `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2, Broly's staging and PartyKeep (9 / 10), Android 16 joining and leaving (11 / 12), the training waves (13 / 14) (`docs/scripts.md` 2.2b) |
+| `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
+| `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2, Broly's staging and PartyKeep (9 / 10), Android 16 joining and leaving (11 / 12), the training waves (13 / 14), Super 13 (17) (`docs/scripts.md` 2.2b) |
 | `waves.c` | the Time Chamber's training waves: ten fixed rounds of stock enemies spawned around the players, round captions through the chamber script, "Training completed!"; state `waves` in `.party.wv` (0x0203F880 in the merged build; it moves with `.party.kr`, check `coop.map`); `COOP_CMD_WAVE_CLEAR` / `_SKIP` tests (`docs/story.md` 4g, `docs/testing.md`) |
 | `cellgames.c` | the Cell Games: solo fights (CoopCall 15, `COOP_CMD_SOLO`), held beams (CoopCall 16), the test win `COOP_CMD_WIN_STAT`; state `.party.cg` |
 | `a16player.c/.h` | Android 16 as a player in "Gero's computer": CoopCall 11 / 12 (16 joins the last party slot and the party locks to Krillin + 16; he leaves for good), Rocket Punch (ability 22), `COOP_CMD_A16_PARTY`; ids and flags 420-437 in the header |
@@ -73,6 +76,7 @@ Generated at build time (never committed): `build/maps.patch.json` (the new maps
 (Paragus, his portrait, the ship, from `tools/brolysprites.py`), `build/gen/hercule_sprites_data.c` (`herc_record`:
 Hercule's record 72 plus the Kamehameha pose, group 18, from `tools/herculesprites.py`), `build/gen/halo_sprites_data.c`
 (haloed Goku and Super Saiyan Goku, sprites 176 / 177, from `tools/halosprites.py`), `build/gen/ssj2_sprites_data.c` (`ssj2_record`, id 58 repointed, from `tools/ssj2sprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
+(haloed Goku and Super Saiyan Goku, sprites 176 / 177, from `tools/halosprites.py`), `build/gen/super13_sprites_data.c` (Super Android 13's sprite 180, ki orbs, portrait 122, from `tools/super13sprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
 icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/krillinsprites.py`),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
@@ -98,6 +102,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `gen_cell_games.py` | generates `data/story/cell_games.lscript` from the arena maps' stock dumps plus our edits (edit the chapter there) |
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
 | `headless/` | `st_headless.c` (headless test runner on the fork's libmgba; `reset` keeps the save data), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `arctic_route.txt` (the arctic route: world-map landing, every exit, the pad) with `objfree.py` (OBJ VRAM free list from its peeks), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways); `cell_games.txt` (the whole Cell Games), `postgame.txt` (the Lookout after it); `stepz ADDR MAX` presses A on both pads until a byte clears |
+| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways), `super13.txt` (Super 13: every special, the rage, lag, the explosion), `bossfight.py` (a boss fight with the autopilot: Super 13, the twin Perfect Cells or any record; HP log, damage rates); `st_headless.c` `regs` prints the CPU registers |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder); `Sprites.frame_counts` (frames per descriptor array, by descriptor runs) is what every generator copies frames through; `--frame-diff` lists the stock arrays the old gap guess got wrong |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-28 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`, `--ssj2-sprite`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
@@ -107,6 +112,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group), his player record (id 175, `a16p_record`, row 25) and the projectile frames -> `build/gen/a16_sprites_data.c` |
 | `bossmodels.py` | Android 13 (id 165: 16's body + 17's fight frames, re-dressed per body part: cap, white hair, vest, jeans) and Cooler's Namekian servant (id 166: Piccolo's capeless set 104 recoloured) -> `build/gen/boss_models_data.c`, previews |
+| `super13sprites.py` | Super Android 13 (id 180: Buu's Fury Broly recoloured per body part, his special poses, one wide hurt box; Perfect Cell's groups with `BUU=0`), his ki orbs and portrait 122 (16's made Super 13) -> `build/gen/super13_sprites_data.c`, preview `super13_preview.png` |
 | `brolysprites.py` | the Broly chapter's art: Paragus (id 170: Vegeta's set 137 with grey hair and a goatee, per frame), his dialogue portrait (id 120, via `krillinsprites.py --extra-portrait`), the Saiyan ship (id 171: Buu's Fury record 1) -> `build/gen/broly_sprites_data.c`, preview |
 | `krillinsprites.py` | Krillin's playable sprite (id 161: sprite 76 + Goku's fight groups re-headed), status portrait (73 in the menu BG palette), blue ki blast, Destructo Disc frames, HUD and status icons, the UI string table with per-slot blocks, the portrait module table (status portraits 119 Krillin, 121 Android 16; `--extra-portrait ID=SYMBOL` for other generators' portraits, e.g. 120 Paragus; ids must be unique) -> `build/gen/krillin_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
@@ -150,6 +156,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | a new map's name (place names after the UI string blocks) | `docs/ids.md` "UI strings and place names", `tools/krillinsprites.py` `PLACE_NAMES` |
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |
 | the Android 16 boss, hit messages, projectiles, enemy control states | `src/coop/android16.c`, `docs/coop-design.md` "Android 16 boss", `docs/sprites.md` "Android 16 boss sprite" |
+| Super Android 13 (the post-game boss): placing him, his attacks, tuning, the explosion | `src/coop/super13.c/.h`, `docs/coop-design.md` "Super Android 13", `docs/sprites.md` "Super Android 13", `docs/testing.md` "Super Android 13" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |
 | a map's layout, collision, exits, tiles; adding or re-dressing a map | `docs/maps.md`, `tools/mapexport.py`, `tools/mapbuild.py`, `data/maps/` |
 | what Ryan decided / asked for | `docs/story.md` (current), `docs/log.md`, `docs/plan-legacy-of-hercule.md` section 4 "Rules we keep" |

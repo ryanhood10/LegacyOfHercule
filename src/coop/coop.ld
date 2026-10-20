@@ -56,6 +56,7 @@ SECTIONS
         KEEP(*(.party.kr))   /* krillin.c state, after the pinned party block */
         KEEP(*(.party.wv))   /* waves.c state (Time Chamber training) */
         KEEP(*(.party.cg))   /* cellgames.c state (the Cell Games' solo fights) */
+        KEEP(*(.party.s13))  /* super13.c state (Super Android 13) */
     } > partyram
 
     .bss (NOLOAD) : {

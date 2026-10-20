@@ -1,0 +1,99 @@
+# Super Android 13 (docs/testing.md "Super Android 13"): from the debug-menu state of an A16_TEST=1 DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/super13.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Map Test, warp to New Planet Vegeta (zone 15 area 3), test command 17 spawns him 72 px right of player 1;
+# each special forced in turn with test command 18 (arg = S13_ATK_*), then his HP set to a third (the roar and
+# rage), lag measured (g_FrameCounter against emulated frames) while two bombers and the orbs fly, and the
+# defeat: COOP_CMD_STORY_WIN (7) takes his last HP, he explodes and is gone (s13.state 3).
+# "peek s 11" = s13 (super13.h S13Global, found by its magic word 0x53313333 "S133"): magic, boss, fired/booms,
+# hits/skipped, specials/combos, force/state/hp%/dmg%, spawn/dead/gone frames, msgs/landed, least free OBJ VRAM.
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01620114
+poke32 0x0203FD08 5
+frames 300
+# both players get a deep HP pool so the test survives every special standing still
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+poke32 0x0203FD08 17
+frames 20
+find s 0x53313333
+deref b s+4
+deref q 0x0203FF08
+poke32 q+0x158 0x19800
+shot s00_spawn
+# 1 ki volley
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 18
+frames 110
+shot s01_volley
+frames 30
+shot s02_volley
+# 2 ki fan
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 18
+frames 150
+shot s03_fan
+frames 20
+shot s04_fan
+# 3 deadly bomber
+poke32 0x0203FD0C 3
+poke32 0x0203FD08 18
+frames 170
+shot s05_bomber_charge
+frames 40
+shot s06_bomber_thrown
+frames 60
+shot s07_bomber
+# 4 ki wave
+poke32 0x0203FD0C 4
+poke32 0x0203FD08 18
+frames 200
+shot s08_wave_charge
+frames 40
+shot s09_wave
+frames 40
+shot s10_wave
+# 5 ki nova (players crowd him)
+poke32 0x0203FD0C 5
+poke32 0x0203FD08 18
+frames 140
+shot s11_nova
+frames 20
+shot s12_nova
+# rage: HP to 3000 of 10000 (below a third), free choice: the roar, then two bombers
+poke32 0x0203FD0C 0x100
+poke32 0x0203FD54 3000
+poke32 0x0203FD08 18
+frames 200
+shot s13_roar
+frames 60
+shot s14_rage_bombers
+peek 0x03000E20
+frames 600
+peek 0x03000E20
+shot s15_rage
+peek s 11
+# the defeat: his last HP through his own OnHit, then the explosion
+poke32 0x0203FD0C 0x100
+poke32 0x0203FD54 1
+poke32 0x0203FD08 18
+frames 2
+poke32 0x0203FD08 7
+frames 20
+shot s16_dying
+frames 30
+shot s17_dying
+frames 30
+shot s18_dying
+frames 25
+shot s19_blast
+frames 20
+shot s20_gone
+frames 60
+shot s21_gone
+peek s 11
+peek b+0x188
