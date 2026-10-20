@@ -19,6 +19,7 @@ inspection goes through the GDB stub.
 | Boss pairs, Android 16 boss fight | fights with the autopilot and hit logs |
 | Krillin / old Hercule tests | the playable-character test triggers |
 | New maps (zone 15) | building and warping to the new maps |
+| Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
@@ -136,6 +137,34 @@ The debug Map Test lists zone 15 too (zone field: Right x14 from 1). A savestate
 menu (Shift+F1) loads on any rebuild with the same code, so map-data changes do not need a new boot.
 Offline check of a built ROM: `python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table
 <table address printed by patch_rom.py> --count 330`.
+
+## Arctic route (headless, 2026-10-19)
+
+```
+make BUILD=build/arc DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/arc/log2-coop.gba --out build/arc/hl
+python tools/headless/st_test.py tools/headless/arctic_route.txt build/arc/log2-coop.gba build/arc/hl/menu.ss --out build/arc/hl --cols 6 > build/arc/hl/route.out
+python tools/headless/objfree.py build/arc/hl/route.out
+```
+
+`arctic_route.txt` (co-op from the landing on): flag 381 clear, A on the arctic landing does nothing and
+the minimap has no icon there; flag 381 set, the star (shot with the flyer away from it), A lands on the
+flight spot of zone 15 area 1; then the cave, both climbs (`ents`: every record and its twin), the ridge's
+pad (Save / Switch Characters, "Game Saved!"), the summit, every exit back down, and both flight spots
+back to the world map at (1100, 800). Pass: each `waitmap` reached, the `map` lines at the arrival spots
+of `docs/maps.md` 9a, no CRASH line. `objfree.py` prints the OBJ VRAM free list (entity list + 0x694:
+10-byte nodes, +4 u16 size in 64-byte units, +8 next; head = byte 0 of 0x03001120, `0x08006D71` reads
+the same) for each dump: 15.6-15.9 KB and 18.2 KB largest free on the two climbs.
+
+- Warps: `COOP_CMD_WARP` into a field map shows the player about 300 frames later (a `map` line reads
+  -1, -1 until then); waiting less makes the next key press or warp go nowhere. The dim frames on
+  arrival are the fade under the map-name banner.
+- Press-A spots (pad, flight spots) after a warp: step into the rect first (`key 0x40 20`), then A.
+- The star with flag 382 set turns into the plain marker (`flags +382`, re-warp to the world map).
+- **Continue from the ridge save:** the runner's `reset` power-cycles and keeps the save data: after
+  "Game Saved!", `reset`, `key 8 6` twice (intro), Start, A on the slot (the Select Game screen names it
+  "THE ARCTIC"), A: the game resumes on the ridge's pad.
+- Map previews: `build/arc/maps/arctic*.png` (and `_walk.png`), written by every build.
 
 ## Fork helpers (`tools/fork/`, used for the party-slots work)
 

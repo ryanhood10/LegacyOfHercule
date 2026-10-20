@@ -1,0 +1,11 @@
+; The arctic route (docs/story.md 4i "The arctic, as a route"; maps in data/maps/arctic*.json, docs/maps.md 9).
+; The world map's landing in the far north (the snowy island at the top left of the minimap) appears once
+; flag 381 is set: the post-game chapter sets it with the arctic explosion. Its minimap icon is the star
+; while the quest is on (381 set, 382 clear) and the plain marker once 382 is set (Super 13 beaten, also
+; the post-game chapter's to set).
+
+; the landing: down to the foot of the mountain, onto the flight spot (zone 15 area 1)
+script arc_wm_land
+    WarpToMapWithEntities 15, 1, 1, 136, 264
+    END
+end

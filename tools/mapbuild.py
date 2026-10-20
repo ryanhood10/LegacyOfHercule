@@ -15,7 +15,9 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "tileset": "base" | "fresh",       start from the base map's slot table, or an empty one (only used tiles)
   "layout": "base" | [W, H],         copy the base map's layers/collision/objects, or a blank W x H px map
   "stack_ops": [...],                ops on every layer + collision + objects at once (insert_cols/rows, stamp, crop)
-  "layers": {"1": [ops], "2": [...], "3": [...]},   per-layer ops (fill, copy, clear, texture, solid, png)
+  "layers": {"1": [ops], "2": [...], "3": [...]},   per-layer ops (fill, copy, clear, texture, solid, png);
+                                     a fill with "anchor": "map" phases its block to the map origin (seamless)
+  a stamp with "recolor": false keeps its tiles out of the spec's recolour (e.g. a flight spot's grass)
   "collision": [ops],                walk / block rects and ellipses, "outside": "block" for the map border
   "projectile": "walk" | [ops],      projectile mask (default: same as walk collision)
   "recolor": {"rules": [...]},       remap every tile's colours (new tile banks); see recolor()
@@ -30,7 +32,8 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      "noflag:N", "script:NAME", "never" or a number
   "records": [{"kind": "actor", "sprite":, "x":, "y":, "facing": 0, "condition": COND},
               {"kind": "enemy", "like": [zone, area, record], "stat":, "sprite":, "x":, "y":, "condition": COND,
-               "action": "seq:NAME"}],   map script records; an enemy copies a stock record's behaviours
+               "action": "seq:NAME" | "like" | "none"}],   map script records; an enemy copies a stock record's
+                                     behaviours ("action": "like" also its defeat action, e.g. the random item drop)
   "exits": [{"type": "edge"|"door", "rect": [...], "dir": "down|up|left|right", "to": [z, a, v], "at": [x, y]}],
   "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [x1,y1,x2,y2], "decoration": 0, "dialogue_trigger": 0},
                                      a working level barrier on a kept decoration + gate (item, on-load, dialogue condition)
@@ -211,6 +214,7 @@ class Build:
             self.W, self.H = (lay[0] + 7) // 8, (lay[1] + 7) // 8
             self.layers = {bg: self.empty() for bg in (0, 1, 2, 3)}
             self.walk, self.proj = bytearray(8192), bytearray(8192)
+        self.keep_colors = set()      # slots a stamp with "recolor": false keeps in their own colours
         self.objects_from_base(spec.get("keep", []) if lay == "base" else [])
         self.spawn = list(bvar.spawn) if (bvar and lay == "base") else [self.W * 4, self.H * 4]
 
@@ -346,6 +350,8 @@ class Build:
                                 self.put(dbg, ac + x, ar + y, None)
                             continue
                         e2 = self.tr(src, e)
+                        if op.get("recolor", True) is False:
+                            self.keep_colors.add(e2 & 0x3FF)
                         if "h" in flip:
                             e2 ^= 0x400
                         if "v" in flip:
@@ -401,9 +407,12 @@ class Build:
                 c, r, w, h = op["rect"]
             else:
                 (c, r), w, h = op["at"], sw, sh
+            # "anchor": "map" phases the source block to the map's origin instead of the rect's, so fills
+            # over separate rects (or next to a stamp shifted by a multiple of the block) join seamlessly
+            ox, oy = (c, r) if op.get("anchor") == "map" else (0, 0)
             for y in range(h):
                 for x in range(w):
-                    e = sg[sr + y % sh][sc + x % sw]
+                    e = sg[sr + (oy + y) % sh][sc + (ox + x) % sw]
                     if e is None and k == "copy":
                         continue
                     self.put(bg, c + x, r + y, self.tr(src, e))
@@ -669,7 +678,9 @@ def emit_records(b, pk, refs):
             cnt, beh_arr = rom.u32(src + 0x18), rom.u32(src + 0x1C)
             beh = pk.put(rom.read(beh_arr, 4 * cnt), "enemy behaviours") if cnt else 0
             act = r.get("action", "none")
-            if act == "none":
+            if act == "like":       # the stock record's own action (e.g. its random item drop)
+                action = rom.u32(src + 0x14)
+            elif act == "none":
                 action = pk.put(struct.pack("<II", ACTION_NONE, 0), "enemy action")
             else:
                 fn = ACTION_SCRIPT if refs.kind(act) == "script" else ACTION_DIALOG
@@ -691,7 +702,7 @@ def emit(b, pk):
     if spec.get("recolor"):
         table = recolor_table(L.bg_palette(rom), spec["recolor"])
         for i in range(len(b.ts.slots)):
-            if i in b.ts.reserved:
+            if i in b.ts.reserved or i in b.keep_colors:
                 continue
             t = b.ts.tile(i)
             b.ts.slots[i] = ("raw", bytes(table[v] for v in t))

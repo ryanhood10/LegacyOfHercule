@@ -15,7 +15,7 @@ Each piece takes numbers only from its own row; say in its report if it needs mo
 |---|---|---|---|---|---|---|---|---|---|
 | Cell Games chapter | 460-479 | 140-144 | - | - | - | - | 15-16 | 15-16 | maps 323-326 edits |
 | Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
-| Arctic route maps | 381-389 | - | - | - | - | - | - | - | areas 5-9; area 1 reworked; world-map landing |
+| Arctic route maps | 381-389 (381, 382 used) | - | - | - | - | - | - | - | areas 5-9 (5-8 used); area 1 reworked; world-map landing; place name `ui_strings` 356 |
 | Super Saiyan 2 Gohan character | - | - | - | 28-29 | 124-125 | 23-24 | - | - | party slot 8 (`PARTY_SLOTS=9`) |
 | Post-game chapter (later) | 480-499 (extend the new-game clear to 499) | 150-154 | - | - | - | - | 18-19 | 19-20 | Lookout, ending, epilogue edits |
 
@@ -30,7 +30,7 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 363-375 | Roshi's gym (`ch8_gym`) | 363-375 |
 | 376 | the removed arctic Android 13 encounter | free since 2026-10-18 (`ch8_arctic.lscript` is not included) |
 | 377-379 | free | |
-| 380-399 | new maps (`data/maps/*.json`) | 380 the arctic's Vegeta barrier |
+| 380-399 | new maps (`data/maps/*.json`, `data/story/arctic_route.*`) | 380 free (the arctic's Vegeta barrier, removed 2026-10-19); **381 the arctic is open** (the world-map landing and its star; the post-game chapter sets it at the explosion); **382 Super 13 beaten** (the star turns into the plain marker; the post-game chapter sets it); 383-389 the arctic route's, free |
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-437 saved "available" bits of slots 0-7 |
 | 440-459 | Lookout / dojo (`wait_chamber`, `wait_spar`) | 440 Roshi's dojo booked for a spar |
@@ -184,11 +184,29 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
 | area | map | notes |
 |---|---|---|
-| 1 | `arctic.json` | Vegeta barrier (flag 380); the 13 encounter was removed |
+| 1 | `arctic.json` | the arctic landing at the foot of the mountain (post-game, world-map landing flag 381); barrier and the 13 encounter removed |
 | 2 | `time_chamber.json` | Hyperbolic Time Chamber; door back to zone 9 area 3 |
 | 3 | `broly_arena.json` | New Planet Vegeta (Broly chapter) |
 | 4 | `broly_crater.json` | needs `roms/buu.gba` |
-| 5-19 | free (5-9, 10-14, 15-19 were allocated to the three wait sessions, unused) | |
+| 5 | `arctic_climb1.json` | arctic route, first climb (7 enemies) |
+| 6 | `arctic_climb2.json` | arctic route, second climb (6 enemies) |
+| 7 | `arctic_ridge.json` | arctic route, the ridge: save pad |
+| 8 | `arctic_summit.json` | arctic route, the summit: Super 13's battle, flight spot |
+| 9 | free (the arctic route's) | |
+| 10-19 | free (10-14, 15-19 were allocated to two wait sessions, unused) | |
+
+## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
+
+The relocated UI string table: stock entries 0-259 (menu labels, names, technique texts, and the map
+names: a map name id is an index here), six per-slot blocks of 16 (`UI_ENERGY1` .. `UI_CAPS`, 260-355),
+then `PLACE_NAMES` from 356 (`UI_PLACES`): names for new maps (a MapEntry name, a world-map banner
+payload, the save menu's location; `party_save.c` reads this table). Adding a per-slot block moves the
+places: `krillinsprites.py` asserts the index.
+
+| id | text | used by |
+|---|---|---|
+| 356 | The Arctic | `data/maps/arctic*.json` (zone 15 areas 1, 5-8), the world-map banner (`data/story/arctic_route.json`) |
+| 357+ | free | |
 
 ## Memory (EWRAM; `src/coop/coop.ld`, exact layout in `$(BUILD)/coop.map`)
 

@@ -38,7 +38,8 @@ static SaveStore store __attribute__((section(".party"), aligned(4)));
 #define PARTY_MODULE_TABLE ((void *const *)0x081D952C)   // [0] EEPROM device, [2] party, [4] map state
 #define SAVE_MENU_TABLE    ((void *const *)0x081D4F14)   // [3] party, [4] map state
 #define g_SelectedSaveSlot (*(u8 *)0x03000E8C)
-#define LOCATION_NAMES     ((const char *const *)0x080E2840)
+extern const char *const ui_strings[];   // the relocated name table (krillin.c): stock names + UI_PLACES
+#define LOCATION_NAMES     ui_strings
 #define NEW_GAME_ENTRY     ((const u8 *)0x08409410)      // map entry: +0 zone, +1 area
 #define FADE_VTABLE        0x08023884u
 #define TIMER_VTABLE       0x08023990u

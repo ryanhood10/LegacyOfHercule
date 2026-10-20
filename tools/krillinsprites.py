@@ -32,7 +32,8 @@ Also emitted:
   * ui_strings: the UI string table (0x080E2840, 260 entries, 20 code literals repointed by
     patch_rom.py) copied with per-slot blocks appended for PARTY_SLOTS characters: the status
     screen's two energy-technique names and descriptions, and the mixed-case / capitals names
-    (UI_* indices, mirrored in src/coop/krillin.h). Stock rows point at the ROM's own strings.
+    (UI_* indices, mirrored in src/coop/krillin.h), then PLACE_NAMES (new map names from id 356).
+    Stock rows point at the ROM's own strings.
   * portrait_module: the portrait module table (0x083EC9D0: word 0 the party, word id + 1 =
     Portrait_Table[id]) copied with Krillin's status portrait appended as id KRILLIN_STATUS_PORTRAIT,
     and any --extra-portrait ID=SYMBOL (a compressed 64x64 portrait defined in another generated file,
@@ -88,6 +89,11 @@ NEW_STRINGS = {   # slot -> block -> text (ours, not ROM data)
         "name": "Krillin", "caps": "KRILLIN"},
     7: {"name": "Android 16", "caps": "ANDROID 16"},   # slot 7 while 16 plays it (src/coop/a16player.c)
 }
+# place names after the per-slot blocks (index UI_STOCK + len(UI_BLOCKS) * SLOTS + n = UI_PLACES + n in
+# src/coop/krillin.h): map name ids for the new maps, used as a MapEntry name, a world-map banner payload and
+# the save menu's location (docs/maps.md 9c)
+PLACE_NAMES = ["The Arctic"]
+PLACES_AT = 356                     # UI_PLACES; data/maps/arctic*.json and data/story/arctic_route.json use 356
 
 
 def hflip(px):
@@ -405,6 +411,8 @@ def ui_table(rom):
                 out.append(out[STOCK_BLOCK[b] + slot])
             else:
                 out.append(("str", NEW_STRINGS.get(slot, {}).get(b, "")))
+    assert len(out) == PLACES_AT, "UI blocks changed: move UI_PLACES (krillin.h) and the maps' name_id with them"
+    out += [("str", t) for t in PLACE_NAMES]
     return out
 
 

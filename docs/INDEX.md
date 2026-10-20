@@ -76,7 +76,8 @@ icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/kril
 
 ## Data (`data/`)
 
-`maps/*.json` are the new maps' specs (zone 15: `arctic`, `time_chamber`, `broly_arena`, `broly_crater` (needs
+`maps/*.json` are the new maps' specs (zone 15: `arctic` and the arctic route `arctic_climb1`, `arctic_climb2`,
+`arctic_ridge`, `arctic_summit`, `time_chamber`, `broly_arena`, `broly_crater` (needs
 `roms/buu.gba`); format in
 `docs/maps.md`), built by `tools/mapbuild.py` and placed by `patch_rom.py --maps` (`MAPS=1`).
 `story/broly.*` is the Broly side chapter (it also feeds `maps/broly_arena.json`). `story/*.json` + `story/*.lscript` are the story chapters (map edits and scenes, `docs/scripts.md`), included by `hercule.json`. `hercule.json` is the Legacy of Hercule data spec (party defaults, growth, ability table entries,
@@ -92,7 +93,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
-| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
+| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba; `reset` keeps the save data), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `arctic_route.txt` (the arctic route: world-map landing, every exit, the pad) with `objfree.py` (OBJ VRAM free list from its peeks), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder); `Sprites.frame_counts` (frames per descriptor array, by descriptor runs) is what every generator copies frames through; `--frame-diff` lists the stock arrays the old gap guess got wrong |
 | `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-27 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
@@ -107,7 +108,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
 | `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates (also reads Buu's Fury variations) |
 | `mapexport.py` | render any map from the ROM: per-layer PNGs, composite, walk / projectile overlays, summary; `--list`, `--all`, `--tileset`, `--table/--count` for a built ROM |
-| `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps (or Buu's Fury maps, palette-converted), generated tiles, recolour into new banks, effect overlays, collision ops, triggers, exits, gates -> `--maps` records + MapEntry rows |
+| `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps (or Buu's Fury maps, palette-converted; map-anchored fills), generated tiles, recolour into new banks (per-stamp opt-out), effect overlays, collision ops, triggers, exits, gates, records (enemies copied from stock records, with their item drop) -> `--maps` records + MapEntry rows |
 | `widerender.py` | offline reference render of the wide view from a savestate |
 | `savestate.py` | dump memory regions/words from an mGBA savestate |
 | `romcheck.py` | ROM header/hash check |
@@ -140,6 +141,8 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | dialogue text and scripts | `docs/scripts.md`, `tools/script_asm.py`, `tools/mapedit.py`, `data/story/` |
 | testing a story chapter | `docs/testing.md` "Story chapters, headless", `tools/headless/` (`ch9_gero.txt`: a whole chapter end to end) |
 | world-map markers (star / plain), Gero's lab re-entry | `docs/maps.md` 9b |
+| the arctic route (post-game maps, world-map landing, summit spots for the scene) | `docs/maps.md` 9a, 9c; `data/maps/arctic*.json`, `data/story/arctic_route.*` |
+| a new map's name (place names after the UI string blocks) | `docs/ids.md` "UI strings and place names", `tools/krillinsprites.py` `PLACE_NAMES` |
 | enemies, twins, boss bars | `src/coop/enemies.c`, `docs/coop-design.md` "Co-op difficulty" |
 | the Android 16 boss, hit messages, projectiles, enemy control states | `src/coop/android16.c`, `docs/coop-design.md` "Android 16 boss", `docs/sprites.md` "Android 16 boss sprite" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |

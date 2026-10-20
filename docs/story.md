@@ -536,6 +536,9 @@ epilogue, then the title screen; the talk-show bonus ending).
   a couple of areas of enemies climbing a mountain, a save pad at the top of the climb, then the next
   area: a big open clearing on the summit where the battle is. A flight spot back to the world map
   once there. (Zone 15 area 1 reworked plus new zone-15 areas; enemies for the climb to pick.)
+  **Built 2026-10-19 (maps and access only):** zone 15 areas 1 and 5-8, the far-north landing behind
+  flag 381 with the star until flag 382, Snowy Highlands' wolves, lions, birds, bandits and tiger
+  bandits on the climbs; the scenes are the post-game chapter's (spots in `docs/maps.md` 9a).
 - **Hercule's tease after Yamcha's wish (Ryan):** cut to Hercule at the TV station: his stomach growls
   for a second. HERCULE: "Huh? Must've been something I ate!"
 - **The Lookout scene keeps Gohan teasing Krillin about 18** and her "Not that easy" (Ryan).
