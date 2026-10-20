@@ -352,6 +352,10 @@ toughness level with Gohan's around level 40 (less HP, more defence, a little mo
 power, no beams), and as player 2 he cannot lose the fight: at 0 HP player 2 gets back up at half HP
 beside player 1. Only player 1 going down ends a fight.
 
+**The no-reveal rule (Ryan): fine as planned.** Hercule is pulled in as Gohan's sidekick and the world
+still believes his fake "single handedly" story; he is not revealed as the true hero until the Buu's
+Fury storyline.
+
 **One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
 twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
 
@@ -416,8 +420,6 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 - Hercule's beam pose. His sprite (72) has idle, walk, hit-stun, victory, two punches and a kick, no
   beam pose. Cheapest stand-in: hold his straight-punch pose (group 7) with the beam coming off his
   fists. Otherwise, new art.
-- The standing rule that nothing reveals Hercule as the hero before the Buu phase: this plan puts
-  him in the Cell fights by Ryan's choice; the public credit stays the stock fake.
 - A lost solo fight (1, 2, J1-J4): what happens when the fighting player goes down.
 - After the Games: Goku already stays in the party ("Keep Goku", `docs/hercule.md` 4); the stock
   ending also sets Hercule to level 40 and announces him as a new character, which no longer fits
