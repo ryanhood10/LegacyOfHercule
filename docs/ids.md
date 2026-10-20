@@ -5,6 +5,20 @@ ranges here and update this page in the same commit.** Before parallel sessions 
 its own range of every kind (`docs/howto.md` "Work in parallel sessions"). Last checked against
 the code on 2026-10-19 (main e45c765).
 
+## Allocations for the Cell Games and post-game build (2026-10-19)
+
+Each piece takes numbers only from its own row; say in its report if it needs more. RAM: nobody adds to
+`coop2` (about 0x24 bytes left); a piece that needs state takes its own `.party.<name>` section in
+`partyram` (about 0x1E4 free), at most 0x40 bytes each.
+
+| piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | zone 15 / other |
+|---|---|---|---|---|---|---|---|---|---|
+| Cell Games chapter | 460-479 | 140-144 | - | - | - | - | 15-16 | 15-16 | maps 323-326 edits |
+| Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
+| Arctic route maps | 381-389 | - | - | - | - | - | - | - | areas 5-9; area 1 reworked; world-map landing |
+| Super Saiyan 2 Gohan character | - | - | - | 28-29 | 124-125 | 23-24 | - | - | party slot 8 (`PARTY_SLOTS=9`) |
+| Post-game chapter (later) | 480-499 (extend the new-game clear to 499) | 150-154 | - | - | - | - | 18-19 | 19-20 | Lookout, ending, epilogue edits |
+
 ## Story flags (bank at 0x0203F0EC + n / 8, 816 flags, saved)
 
 Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and `party.c` also clears
