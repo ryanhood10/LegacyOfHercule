@@ -341,20 +341,79 @@ value fires its defeat action at that threshold instead of at zero HP.
 
 ## 4h. The Cell Games (Ryan, 2026-10-19, in planning)
 
-Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` section 9. Decided so far:
+Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` section 9. Ryan's plan
+(2026-10-19). Draft lines below are Claude's, for Ryan to change.
 
-- **The ring scene stays.** Before fight 1 the game already shows Hercule's attack: he walks up, throws
-  a string of punches that do nothing, Cell: "Your ignorance is painful," Hercule's "finishing move,"
-  and one blow from Cell sends him gliding off the ring (Krillin: "I was rooting for Cell that time").
-- **Fight 1 (the ring): player 1 fights as Goku, 1 v 1** against Perfect Cell (no twin Cell, player 2
-  does not fight).
-- **Fight 2 (the desert): player 2 fights as Goku, 1 v 1** against Perfect Cell.
-- **The change starts at the end of fight 2.** Goku still says he is done fighting, but instead of
-  naming Gohan he subs in Mr. Satan (Hercule): "Get out here!" Hercule comes out to the ring instead
-  of Gohan.
-- Open (next decisions): what player 1 does during fight 2; what happens once Hercule is out there
-  (the stock continuation is Gohan's fight 3, Android 16's sacrifice, the Cell Juniors); how this fits
-  the standing rule that nothing reveals Hercule as the hero before the Buu phase.
+**Before fight 1 (unchanged):** the arena grounds, Hercule's ring scene (his punches do nothing,
+"Your ignorance is painful," one blow sends him gliding off the ring).
+
+**Solo fights with a title card.** Fights 1 and 2, and the Cell Junior fights, are fought by one
+player alone; the other player watches (no entity on the field, no damage). A title card before each
+says who fights: "Player 1 fights" / "Player 2 fights". Ryan: this is one of the only times a player
+fights alone.
+
+| # | where | fights | against | notes |
+|---|---|---|---|---|
+| 1 | the ring | player 1 as Goku, alone | Perfect Cell, no twin | stock end: Cell destroys the ring |
+| 2 | the desert | player 2 as Goku, alone | Perfect Cell, no twin | new end: Goku subs in Hercule (below) |
+| 3 | the desert | player 1 Gohan + player 2 Hercule | Perfect Cell | stock end: 16's failed self-destruct, Cell kills him, Cell spawns the Juniors (four now) |
+| J1 | the desert | player 1 as Krillin, alone | Cell Junior | new fight |
+| J2 | the desert | player 2 as Piccolo, alone | Cell Junior | |
+| J3 | the desert | player 1 as Vegeta, alone | Cell Junior | |
+| J4 | the desert | player 2 as Trunks, alone | Cell Junior | stock end: 16's head scene, Gohan turns Super Saiyan 2 |
+| 7 | the desert | player 1 Gohan (Super Saiyan 2) + player 2 Hercule | Perfect Cell | new end: two Cells come back (below) |
+| 8 | the desert | player 1 Gohan + player 2 Hercule | **two Perfect Cells** (the final fight, both-down) | then the beam struggle |
+
+Fights 1-8 keep the stock numbering (J1-J4 replace the stock 4-6). Each player fights alone three
+times (player 1: Goku, Krillin, Vegeta; player 2: Goku, Piccolo, Trunks), two of them against
+Juniors, and the pair fights Cell together three times (3, 7, 8).
+
+**End of fight 2 (new).** Goku still gives up, but names Hercule instead of Gohan. Draft:
+- GOKU: "I give up, Cell. But the tournament isn't over. There's someone else who's going to fight
+  you... Hercule! Get out here!"
+- Hercule walks out to the ring, stops, clutches his stomach. HERCULE: "Ooh... ohhh, my stomach! Must
+  have been something I ate! The champ can't fight like this!"
+- CELL: "This is your replacement, Goku? The clown I threw out of the ring?"
+- Cut to GOHAN: "I can't let Hercule face Cell alone!" Gohan walks out beside him.
+- HERCULE (straightening up): "Well... since the kid insists... stand back, boy, and watch a
+  professional!"
+
+**The Cell Juniors.** Cell spawns four (stock three), one per fight; each falls before the next player
+steps in, with the title card between.
+
+**16's head scene (stock, kept).** Hercule is already on the field, so he is the one who carries 16's
+head over, as in the stock scene, played by player 2's Hercule rather than a separate actor.
+
+**End of fight 7 (new).** Stock until the explosion: Cell spits out 18, swells, Goku teleports him to
+King Kai's planet. Then, when he comes back: two separate pieces of Cell survived the explosion, so
+two Perfect Cells return, stronger. Draft:
+- CELL: "Did you miss me? When I exploded, two pieces of my core survived... and each one grew back
+  perfect!" CELL (the second): "Twice the perfection!"
+- Trunks is killed and Vegeta attacks as in the stock scene; Goku speaks to Gohan from the Other
+  World as in the stock scene.
+
+**The beam struggle (new staging).** The two Cells stand side by side firing; Gohan and Hercule stand
+side by side firing back. Goku encourages both. Draft, adapting the stock lines:
+- GOKU: "Dig deeper, Gohan! You too, Hercule!"
+- HERCULE: "Wh-who said that?!" (a callback to his line when 16's head speaks to him)
+- CELL: "These are your last minutes! Make them count!"
+- GOKU: "Gohan, raise it higher! Hercule, hold on! He needs you!"
+- HERCULE: "The champ... never... backs down!!!"
+- VEGETA: "ARGHHH!!!" (stock: his blast distracts the Cells)
+- GOKU: "Release it, both of you! Remember all the pain he's caused! NOW MAKE THAT YOUR POWER!"
+- GOKU: "Now's your chance!"
+The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!", which is now half true.
+
+**To settle before building:**
+- Hercule's firing pose for the beam struggle: Hercule's sprites have no beam pose; it needs art (a
+  push-forward pose from his own frames) or a comic stand-in. To check in the sprite sheets.
+- Fights 3 and 7: one Cell, or a twin as co-op normally adds? (Fight 8 is the planned twin fight.)
+- Hercule is weaker by design; against Perfect Cell he needs a fair chance (tuning).
+- The standing rule says nothing reveals Hercule as the hero before the Buu phase; this plan puts him
+  in the Cell fights by Ryan's choice.
+- Mechanics: hiding the watching player, the title cards, player 2 playing Goku (party slot 4) while
+  player 1 watches, a fourth Junior record, the twin Cell pair (a `BOSS_PAIR` rule), two Cells and two
+  beams in the struggle scene.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
