@@ -28,7 +28,14 @@ end
 ; ---- zone 7 area 15 (map 191): Vegeta arrives; 19 and 13 fight him and Hercule ----------------------
 
 sequence ch3_z7_battle
-  script
+  script                                 ; the stock scene needs Vegeta as player 1: a save-pad switch to Hercule
+        PushActiveCharIndex              ; (selectable since the landing) is undone first, Hercule back to player 2
+        PushByte 2
+        CmpNe
+        JumpIfFalse L1
+        SetActiveCharacter 2
+        CoopCall 6, 5, 0, 0
+      L1:
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
   stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
