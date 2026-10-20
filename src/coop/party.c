@@ -39,7 +39,7 @@ void party_init_hook(PartyState *p) {
     p->active_slot = 3;
     memcpy(p->chars, PARTY_DEFAULTS, PARTY_SLOTS * sizeof(CharacterEntry));
     memset(p->event_flags, 0, PARTY_FLAG_BANK_ZEROED);
-    memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // the wait's chapter flags 400-479
+    memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // our chapters' flags 400-503 (13 bytes)
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
     const StoryTest *t = STORY_TEST_RAM;      // chapter-test preset (coop.h)
 #ifdef STORY_TEST

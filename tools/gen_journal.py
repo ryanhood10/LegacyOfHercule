@@ -17,22 +17,24 @@ import sys
 sys.path.insert(0, "tools")
 import script_asm as S
 
-JOURNAL_COUNT = 49          # keep in step with the "cmp r6" patch in data/hercule.json (bytes "312e")
+JOURNAL_COUNT = 50          # keep in step with the "cmp r6" patch in data/hercule.json (bytes "322e")
 STORY, SIDE = 0, 1
 
 # Our entries, latest story first (the active page lists them above the stock ones). (icon, active condition, text)
 # Conditions: "+N" flag N set, "-N" flag N clear, all of them must hold. Text: at most about 62 characters.
 NEW = [
-    (STORY, "+483", "Talk to Dende when you're ready for the times of peace"),
+    (STORY, "+483", "Talk to Dende when you're ready to enter Peace Times"),
     (STORY, "+382 -483", "Return to Dende on the Lookout"),
     (STORY, "+381 -382", "Find the source of the power in the Arctic"),
     (SIDE, "+401 -402", "Defeat Broly on New Planet Vegeta"),
     (SIDE, "+400 -401", "Bring Vegeta to the ship behind Capsule Corporation"),
     (STORY, "+420 -421", "Go with Android 16 to Dr. Gero's lab and stop his computer"),
+    (STORY, "+157 -420", "See Dr. Briefs in his workshop at Capsule Corporation"),
 ]
 # Stock entries whose active test changes: quest 0 "Talk to Dende on the Lookout" (flag 195, Cell beaten) never
-# completes in the stock game; here it ends with the wishes (480), when the post-game's entries take over.
-STOCK_ACTIVE = {0: "+195 -480"}
+# completes in the stock game; here it ends with the wishes (480), when the post-game's entries take over. Quest 1
+# "Enter the Cell Games" waits for the Gero chapter too (421), as the arena's landing does.
+STOCK_ACTIVE = {0: "+195 -480", 1: "+191 +421"}
 
 
 def cond_bytes(spec):

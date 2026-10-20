@@ -12,7 +12,7 @@ mash 4 90
 shot g03_wakes
 mash 8 90
 shot g04_krillin
-mash 6 90
+mash 9 90
 frames 300
 map
 peek8 0x0203F000 1
@@ -40,7 +40,7 @@ frames 200
 shot g07_gen_west
 mash 3 120
 frames 120
-mash 3 90
+mash 4 90
 # east generator (zone 8 area 40)
 poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x012C001E
@@ -49,7 +49,7 @@ frames 200
 mash 3 120
 frames 120
 shot g08_gen_east
-mash 3 90
+mash 4 90
 # area 47's top exit into the clearing (area 48)
 poke32 0x0203FD0C 0x2F08
 poke32 0x0203FD54 0x003C00AC
@@ -66,10 +66,10 @@ poke32 0x0203FD54 0x0122008C
 poke32 0x0203FD08 5
 frames 200
 shot g09_rubble
-mash 2 200
+mash 3 200
 frames 100
 shot g10_punched
-mash 2 90
+mash 4 90
 keys 0x40
 frames 150
 keys 0

@@ -195,8 +195,8 @@
     {
       "offset": "0x4AE2",
       "expect": "2b2e",
-      "bytes": "312e",
-      "note": "the journal's loop: cmp r6, #43 -> #49 (gen_journal.py JOURNAL_COUNT)"
+      "bytes": "322e",
+      "note": "the journal's loop: cmp r6, #43 -> #50 (gen_journal.py JOURNAL_COUNT)"
     }
   ],
   "story_free": "0xB00000",

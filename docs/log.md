@@ -4,6 +4,16 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Polish pass** (Ryan: "a full pass and polish"): two read-only audits (every line of our dialogue; every
+  story flag, gate, star and journal condition). Fixed: the Broly trip asks first ("Someone is waiting by the
+  ship...  there may be no way back until it's over.  Go closer?"): its arena has a save pad and no way out
+  until Broly falls; the world map's arena star / marker and the journal's "Enter the Cell Games" wait for
+  the Gero chapter (421) like the landing; the Lookout's star is off during the Arctic quest; a journal line
+  points to Dr. Briefs' workshop at the wait's start (50 journal quests); dialogue: 18 was never dead (the
+  summit), 13's "Remember me?" to Piccolo, Krillin had not seen 13, the second Cell's "Twice the perfection!"
+  is his and not a double taunt, US spellings, punctuation and names; pages over 90 characters split (a box
+  holds four lines, about 100 characters); the docs on the flags a new game clears (400-503). Ryan's own
+  dictated lines are unchanged. Tests: `broly_ask.txt`, and the whole suite in both modes.
 - **One player and drop-in / drop-out** (Ryan: everything must work alone and together; story pairs stay alone):
   the Cell Games' player-2 fights play on player 1's pad alone with "<character> fights!" cards; player 2's
   entity leaves when its controller goes away and returns with it; story pairs at 70 % HP and two bars alone;

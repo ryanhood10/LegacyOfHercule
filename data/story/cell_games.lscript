@@ -356,8 +356,8 @@ sequence cg_fight7_end
         WalkToPosition 30, 428, 408
         END
   stock @083ead70    ; "Surprised to see me?"
-  text 40 "Did you miss me?  When I exploded, two pieces of my core survived...\x0b...and each one grew back perfect!"
-  text 40 "Twice the perfection!"
+  text 40 "When I exploded, two pieces of my core survived...\x0b...and each one grew back perfect!"
+  text 40 "SECOND CELL: Twice the perfection!"
   stockseq @083eb704 41 50    ; Vegeta, "part of my design", Trunks falls, Vegeta's attack
   script                                 ; stock entry 51: both Cells cleared, record 12 brings the pair
         FadeOut 120

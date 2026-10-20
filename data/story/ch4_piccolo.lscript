@@ -15,7 +15,7 @@ sequence ch4_gero_first
         SetStoryFlag 90
         WalkToPosition 14, 192, 240
   stock @083d5ddc                        ; Gero: you'll never get inside!
-  text 0 "@^ANDROID 13: Told ya I'd be back.\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
+  text 0 "@^ANDROID 13: Remember me?\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
   script                                 ; stock entry 2: Gero (and 13, his boss twin) fight
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 14, 1

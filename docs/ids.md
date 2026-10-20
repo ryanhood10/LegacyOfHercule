@@ -25,7 +25,7 @@ The bank sits after the party entries, so it moves with `PARTY_SLOTS`: `0x0203F0
 (0x0203F0EC with 8 slots). Headless scripts use the runner's `FLAGS` variable (`docs/testing.md`).
 
 Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and `party.c` also clears
-400-479. Each flag's meaning is in `docs/scripts.md` 2.5.
+400-503 (`PARTY_WAIT_FLAG_BYTES` 13). Each flag's meaning is in `docs/scripts.md` 2.5.
 
 | range | owner | in use |
 |---|---|---|
@@ -35,11 +35,12 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 377-379 | free | |
 | 380-399 | new maps (`data/maps/*.json`, `data/story/arctic_route.*`) | 380 free (the arctic's Vegeta barrier, removed 2026-10-19); **381 the arctic is open** (the world-map landing and its star; the post-game chapter sets it at the explosion); **382 Super 13 beaten** (the star turns into the plain marker; the post-game chapter sets it); 383-389 the arctic route's, free |
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
-| 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-437 saved "available" bits of slots 0-7 |
+| 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-438 saved "available" bits of slots 0-8 (all but 6 and 7) |
 | 440-459 | Lookout / dojo (`wait_chamber`, `wait_spar`) | 440 Roshi's dojo booked for a spar |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
-| 462-479 | free (still cleared at a new game) | |
-| 480-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
+| 462-479 | free (cleared at a new game) | |
+| 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
+| 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
 Stock flags the mod's scripts test (meanings from the script dump):
 

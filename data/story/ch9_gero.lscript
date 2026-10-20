@@ -177,7 +177,7 @@ sequence ch9_gen_west
         PanCameraToPosition 270, 10, 3
         PlayAudio 50
         END
-  [1] text 0 "@^Behind the waterfall, one of Dr. Gero's generators is humming again."
+  [1] text 0 "@^Under the waterfall, one of Dr. Gero's generators is humming again."
   [2] text 26 "ANDROID 16: This generator feeds the bunker's defenses.  Stand back."
   [3] script
         PlayAudio 26
@@ -249,7 +249,7 @@ sequence ch9_rubble
       L1:
         PushByte 5
         END
-  [1] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up.\x0bWe'll never dig through all that!"
+  [1] text 73 "KRILLIN: Aw, no...  The cave collapsed when the lab blew up.\x0bWe'll never dig through all that!"
   [2] text 26 "ANDROID 16: Stand back."
   [3] script
         PlayAudio 26
@@ -265,7 +265,7 @@ sequence ch9_rubble
         WaitFrames 50
         END
   [4] text 73 "KRILLIN: ...Remind me never to arm-wrestle you." -> 7
-  [5] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up." -> 6
+  [5] text 73 "KRILLIN: Aw, no...  The cave collapsed when the lab blew up." -> 6
   [6] text 26 "ANDROID 16: The rubble is not the problem.\x0bTwo of Gero's generators feed the bunker's defenses again:\x0bone under the waterfall west of the mountain pass, one under the waterfall to the east.\x0bWe shut them down first." -> 7
   [7] script
         SetActiveEntity 0
@@ -305,7 +305,7 @@ sequence ch9_bunker_won
         END
   [1] text 73 "KRILLIN: Phew...  Okay.  Let's wreck this thing before it builds a third one."
   [2] text 26 "ANDROID 16: Wait.  There is one more file.\x0bANDROID 13:  UNFINISHED.  FINAL STAGE ON HOLD."
-  [3] text 73 "KRILLIN: Android 13?  The guy who's been hanging around with Gero?  Unfinished?\x0bHe looked pretty finished to me!"
+  [3] text 73 "KRILLIN: Android 13?  The guy who's been hanging around with Gero?  Unfinished?\x0bFrom what Piccolo said, he sounded pretty finished to me!"
   [4] text 26 "ANDROID 16: The file names his final stage: he takes in two other androids.\x0bThe rest has been erased."
   [5] text 73 "KRILLIN: ...I don't like the sound of that.  Smash it!"
   [6] script

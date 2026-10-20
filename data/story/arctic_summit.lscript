@@ -113,7 +113,7 @@ sequence summit_scene
         SetEntityAnimation 165, 6
         PlayDamageEffect 9
         WaitFrames 30
-  text 0 "ANDROID 13: Ha!  The Dragon Balls brought you two back...\x0bjust for me!"
+  text 0 "ANDROID 13: Ha!  The Dragon Balls brought your brother back...\x0band you came along too.  Just for me!"
   text 28 "ANDROID 17: Sis, get out of here!"
   text 29 "ANDROID 18: Not a chance.  We finish him together!"
   script                                 ; 13 absorbs 17

@@ -39,15 +39,17 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-19): story planning, chapter by chapter
+## Current phase (2026-10-20): everything through the post-game is built; Ryan plays it next
 
-Built and merged: every chapter through the ten-day wait (chapters 1-8, the Broly chapter, the
-Krillin + Android 16 "Gero's computer" chapter, the Time Chamber training waves, Roshi's dojo
-sparring). Next: Ryan plans the Cell Games, the ending and the Buu phase in chat. He wants a slow
-pace, one decision at a time, answers from the player's point of view grounded in ROM facts, and no
-suggestions he did not ask for. Do not build a part of the story until he says its plan is done.
-Nothing may reveal Hercule as the hero before the Buu phase. Facts about the game come from the
-script dump (`build/scripts/`), the quest table (reference notes) and Ghidra.
+Built and merged: every chapter through the ten-day wait, the Cell Games, the post-game (wishes, the
+Arctic, Super 13, Peace Times, the ending), the journal entries, reviving a downed partner, the
+difficulty (Easy / Normal / Hard at a new game), one-player play and player 2 dropping in and out. All
+tested headless in both modes, none of it played by people yet. Next: Ryan's playthrough feedback, then
+the Buu's Fury phase, planned in chat. He wants a slow pace, one decision at a time, answers from the
+player's point of view grounded in ROM facts, and no suggestions he did not ask for. Do not build a part
+of the story until he says its plan is done. Nothing may reveal Hercule as the hero before the Buu phase.
+Lines Ryan dictated stay word for word. Facts about the game come from the script dump
+(`build/scripts/`), the quest table (reference notes) and Ghidra.
 
 ## Build (Windows, Git Bash)
 

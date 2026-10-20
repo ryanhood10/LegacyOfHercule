@@ -322,7 +322,8 @@ star). Each site's block computes a condition (story flags, item 45), `JumpIfFal
 when it is false, else the star. Opcode **0x05** (lscript `Not`) is the VM's **binary OR** (decompiled
 0x08008FE6: pops two, pushes `a | b != 0`), which is how the stock blocks join their cases. The zone 8
 landing (rect 2560,1000) is the icon at **(213, 13)**; the chapter ORs `flag 420 and not 421` into its
-condition (an `edits` replace of `JumpIfFalse L21`), and the headless run shows the star on the minimap
+condition (an `edits` replace of `JumpIfFalse L21`; the arena's star and marker add 421 the same way in
+`cell_games.json`, and the Lookout's star drops out during the Arctic quest in `postgame.json`), and the headless run shows the star on the minimap
 only while the chapter runs.
 
 **Lab re-entry after the self-destruct (flag 141), as the chapter changes it:**

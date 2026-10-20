@@ -165,7 +165,7 @@ lock), and a stock chapter lock applies to player 2 too.
 ### 2.5 Story flags
 
 Stock scripts use flags up to 306. `Party_Init` clears flags 0-399 at a new game and `party.c` also
-clears 400-479 (the ten-day wait's side chapters); flags 480+ survive a new game, so avoid them.
+clears 400-503 (our chapters and the post-game); flags 504+ survive a new game, so avoid them.
 **The allocation by range and every flag's meaning are in `docs/ids.md` "Story flags"**; take new
 flags there. Chapter-specific notes: 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic
@@ -184,9 +184,10 @@ the 43 stock ones), and `data/hercule.json` points the literal at 0x08004C80 at 
 `cmp r6, #43` (0x08004AE2) at the new count. **Our entries never complete** (no room on that page): each
 shows while its start flag is set and its end flag clear, then disappears. To add one, add a row to `NEW` in
 the generator (icon, `"+start -end"`, text of about 62 characters at most), then bump `JOURNAL_COUNT` and
-the patch's byte (`bytes` = count, `2e`). Ours now: the Gero chapter (420 / 421), Broly's ship and trip
-(400 / 401 / 402), the Arctic (381 / 382), back to Dende (382 / 483), Dende's question (483 on); stock
-quest 0 "Talk to Dende on the Lookout" now ends with the wishes (195, not 480). The check:
+the patch's byte (`bytes` = count, `2e`). Ours now: Dr. Briefs' workshop (157 / 420), the Gero chapter (420 / 421), Broly's ship and trip
+(400 / 401 / 402), the Arctic (381 / 382), back to Dende (382 / 483), Peace Times (483 on); stock
+quest 0 "Talk to Dende on the Lookout" now ends with the wishes (480), and stock quest 1 "Enter the Cell
+Games" waits for the Gero chapter (191 and 421), as the arena's landing and its world-map star do. The check:
 `tools/headless/journal.txt`.
 
 ## 3. lscript, the text form

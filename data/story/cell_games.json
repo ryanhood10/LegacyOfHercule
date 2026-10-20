@@ -1,32 +1,101 @@
 {
   "_": "The Cell Games (docs/story.md 4h): solo fights with title cards, Hercule subbed in for Gohan's first fight, Krillin's Junior fight, two Perfect Cells, the two-on-two beam struggle, Goku's halo, the ring barrier for anyone at level 30, the arena locked until Gero's computer is done.",
-  "sources": ["data/story/cell_games.lscript"],
+  "sources": [
+    "data/story/cell_games.lscript"
+  ],
   "maps": [
     {
-      "map": {"zone": 14, "area": 1},
-      "triggers": {"1": {"payload": "seq:cg_barrier", "condition": "script:cg_barrier_cond"}}
-    },
-    {
-      "map": {"zone": 14, "area": 2},
-      "triggers": {"0": {"payload": "seq:cg_ring"}},
-      "records": {"1": {"action": "seq:cg_fight1_end"}}
-    },
-    {
-      "map": {"zone": 14, "area": 3},
-      "records": {
-        "0": {"action": "seq:cg_fight2_end"},
-        "5": {"action": "seq:cg_fight3_end"},
-        "8": {"action": "seq:cg_j1_end"},
-        "9": {"action": "seq:cg_j2_end"},
-        "10": {"action": "seq:cg_j3_end"},
-        "11": {"action": "seq:cg_fight7_end"},
-        "12": {"action": "seq:cg_beam_struggle"}
+      "map": {
+        "zone": 14,
+        "area": 1
       },
-      "add_records": [{"like": 10, "action": "seq:cg_head_scene"}]
+      "triggers": {
+        "1": {
+          "payload": "seq:cg_barrier",
+          "condition": "script:cg_barrier_cond"
+        }
+      }
     },
     {
-      "map": {"zone": 6, "area": 99},
-      "triggers": {"25": {"condition": "script:cg_arena_open"}, "26": {"condition": "script:cg_arena_open"}}
+      "map": {
+        "zone": 14,
+        "area": 2
+      },
+      "triggers": {
+        "0": {
+          "payload": "seq:cg_ring"
+        }
+      },
+      "records": {
+        "1": {
+          "action": "seq:cg_fight1_end"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 14,
+        "area": 3
+      },
+      "records": {
+        "0": {
+          "action": "seq:cg_fight2_end"
+        },
+        "5": {
+          "action": "seq:cg_fight3_end"
+        },
+        "8": {
+          "action": "seq:cg_j1_end"
+        },
+        "9": {
+          "action": "seq:cg_j2_end"
+        },
+        "10": {
+          "action": "seq:cg_j3_end"
+        },
+        "11": {
+          "action": "seq:cg_fight7_end"
+        },
+        "12": {
+          "action": "seq:cg_beam_struggle"
+        }
+      },
+      "add_records": [
+        {
+          "like": 10,
+          "action": "seq:cg_head_scene"
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 6,
+        "area": 99
+      },
+      "triggers": {
+        "25": {
+          "condition": "script:cg_arena_open"
+        },
+        "26": {
+          "condition": "script:cg_arena_open"
+        }
+      },
+      "_": "the world map: the arena landing (triggers 25 / 26) and its star / marker (196, 13) need the Gero chapter done (421) as well as the Dragon Balls (191)",
+      "edits": [
+        {
+          "at": "onload",
+          "replace": [
+            [
+              "JumpIfFalse L36",
+              "StackTestStoryFlag 421\nAnd\nJumpIfFalse L36"
+            ],
+            [
+              "JumpIfFalse L37",
+              "StackTestStoryFlag 421\nAnd\nJumpIfFalse L37"
+            ]
+          ]
+        }
+      ]
     }
   ]
 }

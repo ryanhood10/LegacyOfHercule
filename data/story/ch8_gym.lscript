@@ -95,11 +95,11 @@ sequence ch8_gym_duo2
       L3:
         PushByte 7
         END
-  text 67 "HERCULE: Sorry, Master Roshi says I can only fight duos with Krillin on my team right now.\x0bCome back with a different team!"
+  text 67 "HERCULE: Sorry!  Master Roshi says I can only fight duos with Krillin on my team right now.\x0bCome back with a different team!"
   stop
   text 0 "@^Hercule and Krillin are the next sparring team.\x0bCome back with a different team!"
   stop
-  text 73 "KRILLIN: Sorry, Master Roshi says I can only fight duos with Hercule on my team right now.\x0bCome back with a different team!"
+  text 73 "KRILLIN: Sorry!  Master Roshi says I can only fight duos with Hercule on my team right now.\x0bCome back with a different team!"
   stop
   stock @083d2e04                        ; Krillin: "Go easy on me, okay?"
   text 67 "HERCULE: Ha ha ha!  Prepare to face the World Champion...  and his little buddy!"

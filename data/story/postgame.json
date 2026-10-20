@@ -1,10 +1,37 @@
 {
   "_": "The post-game on the Lookout (docs/story.md 4i): the wishes with Yamcha's slip, the Arctic explosion and 18 leaving (flags 480, 381), Dende pointing north until Super 13 is beaten (382), the finale (483), then his yes / no question (CoopCall 18) whose yes plays Hercule's talk show, the credits and the new epilogue.",
-  "sources": ["data/story/postgame.lscript"],
+  "sources": [
+    "data/story/postgame.lscript"
+  ],
   "maps": [
     {
-      "map": {"zone": 9, "area": 1},
-      "records": {"4": {"talk": "seq:pg_dende"}}
+      "map": {
+        "zone": 9,
+        "area": 1
+      },
+      "records": {
+        "4": {
+          "talk": "seq:pg_dende"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 6,
+        "area": 99
+      },
+      "_": "the world map: the Lookout's star (173, 22) is off during the Arctic quest (480 set, 382 clear)",
+      "edits": [
+        {
+          "at": "onload",
+          "replace": [
+            [
+              "JumpIfFalse L24",
+              "StackTestStoryFlagNot 480\nStackTestStoryFlag 382\nNot\nAnd\nJumpIfFalse L24"
+            ]
+          ]
+        }
+      ]
     }
   ]
 }

@@ -54,7 +54,7 @@ sequence ch3_space
         SpawnCharacterEntity 140, 312, 560
         SetEntityFacing 140, 2
         WaitFrames 40
-  text 106 "CLONE: A copy?  Look again, prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
+  text 106 "CLONE: A copy?  Look again, Prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
   script
         FlyToPosition 140, 272, 560
         SetEntityAnimation 140, 5

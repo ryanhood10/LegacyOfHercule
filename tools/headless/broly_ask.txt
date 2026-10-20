@@ -1,0 +1,47 @@
+# The Broly trip's question (data/story/broly.lscript broly_yard [21]-[24]): the arena has a save pad and no way out
+# until Broly falls, so the yard asks before the scene. From a debug-menu savestate of a DEBUG_MENU=1 build:
+# python tools/headless/st_test.py tools/headless/broly_ask.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Map Test 165 (the backyard) with flags 157 and 400; player 1 is made Vegeta (slot 2); test warps into the
+# trigger rect (64, 232)-(112, 312). A warning page, then the question: B answers no (401 stays clear: FLAGS+50
+# bit 1); walking in again and A starts Paragus' scene (shot ba5).
+p2 0
+preset +157 +400
+maptest 165
+frames 200
+poke8 0x0203F000 2
+poke32 0x0203FD0C 0x1506
+poke32 0x0203FD54 0x01400100
+poke32 0x0203FD08 5
+frames 200
+shot ba0_start
+poke32 0x0203FD0C 0x1506
+poke32 0x0203FD54 0x01180058
+poke32 0x0203FD08 5
+frames 120
+shot ba1_warning
+key 1 6
+frames 60
+shot ba2_question
+key 2 6
+frames 60
+shot ba3_answered_no
+key 1 6
+frames 60
+shot ba4_closed
+echo == after no: 401 clear (FLAGS+50 bit 1 = 0)
+peek8 0x0203F13A 1
+poke32 0x0203FD0C 0x1506
+poke32 0x0203FD54 0x01400100
+poke32 0x0203FD08 5
+frames 120
+poke32 0x0203FD0C 0x1506
+poke32 0x0203FD54 0x01180058
+poke32 0x0203FD08 5
+frames 120
+key 1 6
+frames 60
+key 1 6
+frames 60
+shot ba5_yes_paragus_scene
+mash 30 60
+shot ba6_scene_goes_on
