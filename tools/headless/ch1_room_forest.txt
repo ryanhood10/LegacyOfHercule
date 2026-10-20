@@ -1,0 +1,40 @@
+# Chapter 1's room and forest (data/story/ch1_opening): Krillin's visit ends with Gohan up from the desk and
+# walking (the stock sit put him inside the desk's collision), and after the forest spirit the two stay in
+# the clearing (zone 2 area 3) with its way out west. Alone (`p2 off`); from a debug-menu savestate of a
+# DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/ch1_room_forest.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 off
+preset +4
+maptest 19
+frames 300
+shot rf0_room
+mash 24 90
+frames 300
+shot rf1_after_visit
+echo == the visit is over: player 1 stands at (152, 132), off the desk
+map
+key 0x20 90
+frames 20
+echo == walking left: player 1 moved (x well below 152)
+map
+shot rf2_walked
+# the forest spirit: Map Test the fight's clearing (zone 2 area 8), win it, stay in the clearing
+load menu.ss
+preset +4 +360
+maptest 14
+frames 200
+mash 8 90
+frames 120
+shot rf3_fight
+poke32 0x0203FD08 7
+frames 300
+mash 14 90
+frames 200
+shot rf4_after
+echo == after the spirit: in zone 2 area 3 (the clearing), flag 9 set
+map
+peek8 0x0203F109 1
+key 0x20 150
+frames 120
+echo == walking west out of the clearing: zone 2 area 2 (the forest)
+map
+shot rf5_forest

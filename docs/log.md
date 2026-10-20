@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Ryan's first test (alone), chapter 1:** after Krillin's visit Gohan was stuck in his chair (the stock "sits down"
+  step puts him inside the desk's collision, and the stock dream used to warp him out); now he gets up and walks out
+  with Krillin. After the forest spirit the two stay in the clearing: behind the white fade the scene moves to the
+  real clearing (zone 2 area 3, the same layout as the fight's area 8, which has no way out) instead of the cave
+  mouth. Test: `tools/headless/ch1_room_forest.txt`.
 - **Final pass before the first playthrough** (Ryan: "clean it up with the team"): four reviewers (balance,
   bugs in the new mechanics, softlocks / save traps, docs) and the fixes: the Broly arena's save pad removed
   (Ryan; the boarding question is gone again); balance alone and together (`docs/coop-design.md` "One player":

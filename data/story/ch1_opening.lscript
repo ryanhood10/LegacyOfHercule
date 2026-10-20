@@ -99,7 +99,17 @@ sequence ch1_krillin_visit
         PlayAudio 62
   text 0 "@^Krillin is now available!"
   stock @083b9f82                        ; Journal Updated!
-  script
+  script                                 ; Gohan gets up from the desk (the stock sit puts him inside its collision)
+        SpawnCharacterEntity 76, 144, 108
+        SetEntityFacing 76, 2
+        SetEntityPositionInstant 0, 136, 104
+        WalkToPosition 0, 136, 120
+        BeginCommandBatch
+        WalkToPosition 76, 160, 120
+        WalkToPosition 0, 152, 132
+        CommitCommandBatch
+        WalkToPosition 76, 216, 148
+        DespawnEntity 76
         SetPlayerVisible 1
 end
 
@@ -114,7 +124,7 @@ sequence ch1_spirit
         PanCameraToPosition 0, 0, 2
         WaitFrames 40
         PlayAudio 50
-  text 1 "#GOHAN: The cave is just past this clearing...\x0bHuh?  The whole forest just went quiet."
+  text 1 "#GOHAN: Krillin, wait...\x0bHuh?  The whole forest just went quiet."
   text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us."
   script
         FadeToWhite 120
@@ -127,9 +137,10 @@ sequence ch1_spirit
   stock @083b958c                        ; boss bar, battle music, control back
 end
 
-; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade, Gohan and
-; Krillin come round at the cave's mouth and are told it was the forest's spirit (the stock dream
-; defeat likewise warps first and talks afterwards: the map change clears both bodies)
+; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade and Gohan and
+; Krillin are told it was the forest's spirit. They stay in the clearing: behind the white fade the scene
+; moves to the real clearing (zone 2 area 3: the fight's area 8 has the same layout but no way out), which
+; also clears both bodies
 sequence ch1_spirit_end
   script
         WhiteFlash 5
@@ -139,14 +150,14 @@ sequence ch1_spirit_end
         SetPlayerVisible 0
         SetStoryFlag 9
         FadeToWhite 120
-        WarpToMapWithEntities 2, 4, 1, 128, 244
+        WarpToMapWithEntities 2, 3, 0, 96, 176
         WhiteFadeOut 120
         PlayAudio 50
   text 0 "@^The two figures melted away into the mist..."
   text 1 "#GOHAN: They're gone...  Were they even real?"
   text 0 "@^VOICE: Do not be afraid, children.  You did not fight Frieza and Cooler...\x0b...but the spirit of the forest, wearing the faces of your fears."
   text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
-  text 1 "#Never mind, Krillin.  My armor is in this cave."
+  text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
   script
         SetPlayerVisible 1
 end
