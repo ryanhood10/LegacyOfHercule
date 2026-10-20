@@ -59,6 +59,7 @@ Useful action facts found on the way (decompiled):
 | 86 SetPlayerVisible (b) | not the player's visibility: `0x080040AA` sets party flags +1 bit 1, the HUD meter shown; both players stay on screen in scenes (stock scenes spawn a character's actor only when the active character is someone else) |
 | 31 PanCameraToPosition (x, y, speed) | x, y is the view's **top-left** corner, not its centre (the camera starts at spawn - (112, 76)) |
 | 52 DespawnEntity (sprite) and the other sprite-addressed steps | no entity showing that sprite = a write through a null pointer (`0x0800E04C` appends to entity + 0x150): guard them as the spawns are guarded |
+| 137 NPCFireKamehameha (char, frames) | the entity showing sprite `char` (0 = player 1) plays animation 30 (sprite group 18: frame 0 for 8 frames, then 1 / 2 every 8) and fires the Kamehameha beam 8 frames in from its position + a per-facing offset (left -9, +2; right +10, 0; up / down 0, 0) for `frames` frames; Hercule (sprite 72) has the pose since `tools/herculesprites.py` (`docs/sprites.md` "Hercule's beam pose") |
 | 38 / 39 WarpToMapWithEntities / NoEntities (zone, area, variation, x, y) | NoEntities loads the map without its records (the island's area 5 has no 16 after the stage-1 warp) |
 
 ### 2.2 Dialogue sequences and entries

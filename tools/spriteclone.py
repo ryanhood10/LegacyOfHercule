@@ -5,13 +5,16 @@ committed: the output lives in build/gen.
 usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ssj_preview.png]
                       [--extra 158=buu_record_158,159=buu_record_159] [--row-sprite 157]
                       [--krillin-sprite 161] [--old-hercule-sprite 158] [--a16-sprite 175]
+                      [--halo-sprites 176,177]
   --extra       more records (symbols defined in another generated file, e.g. tools/buu2log2.py's
-                build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids
+                build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids; an id
+                below 157 replaces the stock record (72=herc_record: Hercule with his beam pose)
   --row-sprite  the sprite id the Super Saiyan Hercule display row (22) uses (default 157; a test
                 build can point it at a converted Buu record to see it in game)
   --krillin-sprite      sprite of Krillin's row 23 (default 161, tools/krillinsprites.py; 76 = his NPC set)
   --old-hercule-sprite  sprite of old Hercule's row 24 (default 158, the Buu's Fury Hercule; 72 without it)
   --a16-sprite          sprite of Android 16's player row 25 (default 175, a16p_record from tools/a16sprites.py)
+  --halo-sprites        sprites of haloed Goku's rows 26 / 27 (default 176,177: tools/halosprites.py; 60,61 = unhaloed)
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -38,6 +41,9 @@ A16P_SPRITE = 175        # his player record (tools/a16sprites.py a16p_record)
 A16_PORTRAIT = 26        # his dialogue portrait (speaker 26)
 A16_STATUS_PORTRAIT = 121   # appended by tools/krillinsprites.py (portrait_module)
 OLD_HERCULE_SPRITE = 158 # Hercule in his Buu-saga gi (tools/buu2log2.py)
+GOKU_ROW, SSJ_GOKU_ROW = 19, 20
+HALO_ROW, HALO_SSJ_ROW = 26, 27   # haloed Goku after the Cell Games (docs/story.md 4h)
+HALO_SPRITES = (176, 177)         # halo_goku_record / halo_ssj_record (tools/halosprites.py)
 OLD_HERCULE_ROW = 24
 GOHAN_ROW = 0            # a standard ground/flight row (behaviour class 0x030021E0) to copy for Krillin
 DISPLAY_DATA = 0x081D967C
@@ -151,6 +157,8 @@ def main():
     krillin_sprite = int(sys.argv[sys.argv.index("--krillin-sprite") + 1]) if "--krillin-sprite" in sys.argv else KRILLIN_SPRITE
     old_sprite = int(sys.argv[sys.argv.index("--old-hercule-sprite") + 1]) if "--old-hercule-sprite" in sys.argv else OLD_HERCULE_SPRITE
     a16_sprite = int(sys.argv[sys.argv.index("--a16-sprite") + 1]) if "--a16-sprite" in sys.argv else A16P_SPRITE
+    halo_sprites = (tuple(int(v) for v in sys.argv[sys.argv.index("--halo-sprites") + 1].split(","))
+                    if "--halo-sprites" in sys.argv else HALO_SPRITES)
     sp = S.Sprites(rom)
     rec = sp.record(SRC_SPRITE)
     groups = sp.groups(rec)
@@ -232,7 +240,8 @@ def main():
     lines.append(f"const SpriteRecord ssj_record = {{{{{hdr}}}, {{{grp}}}, 0}};")
     # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
     idx_words = [struct.unpack_from("<I", rom, S.INDEX - S.ROM_BASE + i * 4)[0] for i in range(NEW_SPRITE)]
-    entries = [f"(const void *)0x{v:08x}u" for v in idx_words] + ["&ssj_record"]
+    # an extra id below 157 replaces that stock record (72 = herc_record, tools/herculesprites.py)
+    entries = [f"&{extra[i]}" if i in extra else f"(const void *)0x{v:08x}u" for i, v in enumerate(idx_words)] + ["&ssj_record"]
     for sid in range(NEW_SPRITE + 1, max(extra, default=NEW_SPRITE) + 1):
         entries.append(f"&{extra[sid]}" if sid in extra else "0")
     for sym in extra.values():
@@ -276,8 +285,19 @@ def main():
     a16[4] = A16_ROW
     a16[5] = A16_ROW
     rows += a16
+    # rows 26 / 27 = haloed Goku and haloed Super Saiyan Goku (dead after the Cell Games): copies of Goku's rows
+    # 19 / 20 with the haloed sprites, linked to each other the way 19 and 20 are, so his transformation
+    # abilities keep the halo; the story switches slot 4 with SetCharacterTransformation(4, 176) (back: 60)
+    for row, src, sprite, other in ((HALO_ROW, GOKU_ROW, halo_sprites[0], HALO_SSJ_ROW),
+                                    (HALO_SSJ_ROW, SSJ_GOKU_ROW, halo_sprites[1], HALO_ROW)):
+        r = bytearray(rows[src * 20:src * 20 + 20])
+        assert r[4] == r[5] == (SSJ_GOKU_ROW if src == GOKU_ROW else GOKU_ROW), "Goku's stock links changed?"
+        r[1] = sprite
+        r[4] = r[5] = other
+        rows += r
+    assert len(rows) == (ROW_COUNT + 6) * 20
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
-    lines.append(f"const u32 display_row_count = {ROW_COUNT + 4};")
+    lines.append(f"const u32 display_row_count = {ROW_COUNT + 6};")
     os.makedirs(os.path.dirname(out_c), exist_ok=True)
     open(out_c, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     total = sum(len(b) for (_, _), b in [((p, fi), fr[5]) for p, frs in arrays.items() for fi, fr in enumerate(frs) if fr[5]])

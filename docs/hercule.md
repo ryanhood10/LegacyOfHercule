@@ -66,7 +66,9 @@ str +529, pow +482, end +489 and HP +5.5 % (`build/hc6_levelup.png`).
 Abilities are {ready icon, cooling icon, isReady, onUse}; onUse spends EP and runs an *animation*,
 which is a control state from the table at `0x083B5268` that reads a fixed frame group of the
 character's sprite record. Hercule's sprite (72) has the group-5 "ki pose" frames but not the beam
-groups 18/19 or the fidget group 14, which decides what he can use. Tested on his sprite in mGBA:
+group 19 or the fidget group 14, which decides what he can use (group 18, the Kamehameha pose, was
+added for the Cell Games by `tools/herculesprites.py`, `docs/sprites.md` "Hercule's beam pose"; the
+table below predates it). Tested on his sprite in mGBA:
 animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to invalid address");
 48-51 and 14 are unsafe by the frame-group rule.
 

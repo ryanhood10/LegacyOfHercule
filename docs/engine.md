@@ -108,10 +108,10 @@ functions, which fooled a first pass):
 
 The same init also stores `0x08025684` / `0x08025EAC` at `0x030021FC` and `0x08025698` at `0x03002204`.
 
-Rows 22-25 exist only in the build (`tools/spriteclone.py`): 22 Super Saiyan Hercule and 24 old
-Hercule are copies of Hercule's row 21, 23 Krillin and 25 Android 16 copies of Gohan's row 0. Only
-bytes 0-5 (flags, sprite, portraits, transformation links) change, so all four keep the standard class
-`0x030021E0`.
+Rows 22-27 exist only in the build (`tools/spriteclone.py`): 22 Super Saiyan Hercule and 24 old
+Hercule are copies of Hercule's row 21, 23 Krillin and 25 Android 16 copies of Gohan's row 0, 26 / 27
+haloed Goku / Super Saiyan Goku copies of Goku's rows 19 / 20. Only bytes 0-5 (flags, sprite,
+portraits, transformation links) change, so each keeps its source row's class (27 that of row 20).
 
 **Why static input searches failed:** the controller lives behind these RAM-resident vtable pointers,
 so nothing in ROM references it by address.
@@ -122,8 +122,8 @@ so nothing in ROM references it by address.
   build has `PARTY_SLOTS` (default 8) in the relocated block (`docs/party-8-slots.md`). The active
   slot's `displayDataIndex` selects a `CharacterDisplayData` row (stock `0x081D967C`, 22 rows, 20
   bytes) which carries sprite id, portrait, transform links and a behaviour vtable pointer. The build
-  moves the rows to `display_rows` in the code blob with **26 rows** (`patch_rom.py`
-  `LITERAL_RELOCATIONS`, 18 literals; `CharacterData_FindBySprite`'s limit byte at file `0x42D6` 22 -> 26).
+  moves the rows to `display_rows` in the code blob with **28 rows** (`patch_rom.py`
+  `LITERAL_RELOCATIONS`, 18 literals; `CharacterData_FindBySprite`'s limit byte at file `0x42D6` 22 -> 28).
 - `Character_GetSpriteId` `0x08009324`: 0 = player, 1..6 = party slots, >= 7 = `g_CharacterSpriteIndex`.
   The build relocates the sprite index to `sprite_index` in the blob (stock ids up to 156, new ones up
   to 175; ids and owners in `docs/ids.md`).

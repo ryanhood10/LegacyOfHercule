@@ -62,6 +62,7 @@ sprite 72) for Roshi's gym.
 
 | id | what | source | Makefile variable |
 |---|---|---|---|
+| 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
 | 157 | Super Saiyan Hercule | `tools/spriteclone.py` | `SSJ_SPRITE` |
 | 158 | Hercule from Buu's Fury (old Hercule's body) | `tools/buu2log2.py` | `BUU_SPRITES` |
 | 159 | Legendary Super Saiyan Broly (from Buu's Fury) | `tools/buu2log2.py` | `BUU_SPRITES` (hardcoded in `bosses.h`) |
@@ -75,12 +76,14 @@ sprite 72) for Roshi's gym.
 | 171 | the Saiyan ship (from Buu's Fury) | `tools/brolysprites.py` | `SHIP_SPRITE` (hardcoded in `broly.lscript`) |
 | 172-174 | free | | |
 | 175 | Android 16 as a player | `tools/a16sprites.py` | `A16P_SPRITE` |
-| 176-184 | free (180-184 were allocated to the Lookout session, unused) | | |
+| 176 | haloed Goku (dead after the Cell Games), display row 26 | `tools/halosprites.py` | `HALO_GOKU_SPRITE` |
+| 177 | haloed Super Saiyan Goku, display row 27 | `tools/halosprites.py` | `HALO_SSJ_SPRITE` |
+| 178-184 | free (178-179 belong to the hercule-beam session's allocation, unused; 180-184 were allocated to the Lookout session, unused) | | |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
 
-## Display rows (`display_rows`, stock 0-21, 26 rows, row limit patched at file 0x42D6)
+## Display rows (`display_rows`, stock 0-21, 28 rows, row limit patched at file 0x42D6)
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
@@ -88,7 +91,9 @@ leaves copies out of step: grep for the number before moving one.
 | 23 | Krillin | 161 | 73 / 119 | `spriteclone.py`, `krillin.h` |
 | 24 | old Hercule | 158 (72 when `BUU=0`) | Hercule's | `spriteclone.py`, `krillin.h` |
 | 25 | Android 16 (player) | 175 | 26 / 121 | `spriteclone.py`, `a16player.h` |
-| 26+ | free (raise the limit in `patch_rom.py` and `ROW_COUNT` in `spriteclone.py`) | | | |
+| 26 | haloed Goku (links 27 / 27, as 19 / 20 do) | 176 | Goku's (63 / 14) | `spriteclone.py` `--halo-sprites` |
+| 27 | haloed Super Saiyan Goku (flags 1, links 26 / 26) | 177 | SSJ Goku's (65 / 15) | `spriteclone.py` `--halo-sprites` |
+| 28+ | free (raise the limit in `patch_rom.py` and the row count in `spriteclone.py`) | | | |
 
 ## Portraits (`portrait_module`, stock words 0-118 copied; word id + 1)
 

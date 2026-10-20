@@ -4,6 +4,26 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **Haloed Goku** (branch `hercule-beam`), for after the Cell Games (art and rows only; the swap belongs
+  to the chapter): `tools/halosprites.py` builds Goku (176) and Super Saiyan Goku (177) with the dead
+  pose's halo on every frame (white on gold hair), display rows 26 / 27 linked like 19 / 20 (row limit
+  now 28), `SetCharacterTransformation 4, 176` makes him dead. Buu's Fury has no haloed Goku (halos only
+  on Bubbles and Gregory). Found and fixed on the way: `sprites.frame_counts` truncates some arrays
+  (Super Saiyan Goku's group 21, the detransform, is 4 frames, not 1); the copy crashed the game on
+  detransform until frames were counted by descriptor runs. The same truncation sits in the last
+  array of SSJ Hercule, Paragus, the Namekian and Android 13 (follow-up). Seen headless: walk, attack,
+  hit-stun, transform and back (`tools/headless/halo_goku.txt`).
+- **Hercule's Kamehameha pose** (branch `hercule-beam`, worktree `F:\MeltyCreations\log2-beam`), for the
+  Cell Games beam struggle (art only; the chapter is not built): `tools/herculesprites.py` builds
+  `herc_record`, Hercule's record 72 with group 18 (the pose `NPCFireKamehameha` plays: charge, thrust,
+  hold, 4 facings, Goku's 7-frame layout) from his own punch stance and idle frames with Goku's beam
+  arms in his sleeve and skin colours; id 72 is repointed in the relocated sprite index, so every user
+  of sprite 72 has the pose (no new id). Decompiled the opcode (state 30, the beam's per-facing
+  offsets). Seen headless: the stock struggle with Hercule as player 1 (clash and Kamehameha, beam
+  from his palms) beside Gohan's run, right / down / up facings, player 2 in the pose in all four
+  facings, walking / punching / a sprite-72 actor unchanged. Found on the way: player 2 Hercule's
+  second A press on Map Test 323 crashes with the stock record too (`docs/testing.md`). Details:
+  `docs/sprites.md` "Hercule's beam pose".
 - **Docs pass for faster agents:** new `docs/ids.md` (every allocated flag, stat, sprite, row, portrait,
   ability, CoopCall, test command, zone-15 area and RAM region, with the free ranges) and `docs/howto.md`
   (recipes: chapter, CoopCall, boss, sprite, portrait, playable character, map, test, parallel sessions);
