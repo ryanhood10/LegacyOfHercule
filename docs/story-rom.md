@@ -350,4 +350,5 @@ them (a cutscene, not a fight); then he calls out that timeline's Cell: "I just 
 you'll never be able to absorb them," Cell plans to steal the time machine, Trunks: "THE NIGHTMARE IS
 OVER CELL!!!!!" Then "The End. Thanks for playing!" and **the game returns to the title screen**.
 Nothing saves on the way, so loading the file continues from the player's last save, before the
-ending. The maps that test flag 196 are the epilogue's stagings.
+ending. Thirteen maps test flag 196; the epilogue loads several of them (zones 1, 6), the rest are
+not checked yet.
