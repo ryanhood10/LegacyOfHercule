@@ -427,13 +427,33 @@ side by side firing back. Goku encourages both. Draft, adapting the stock lines:
 - GOKU: "Now's your chance!"
 The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!", which is now half true.
 
+**Additions (Ryan, 2026-10-19; draft lines Claude's):**
+- **No save pad** at the arena: as in the stock game, a game over sends the players back to their
+  last save before the Games.
+- **The ring barrier is loosened and lowered:** any character may pass (stock: Goku only, level 40),
+  at level 30 (Claude's number; Ryan may change it). The fight-1 script makes player 1 Goku.
+- **Hercule's excuse when Goku calls him out (before the stomach ache):** HERCULE: "Heh... I only
+  slipped last time, you know!"
+- **Hercule leaves after fight 3 and comes back changed.** When Cell spawns the Juniors: HERCULE: "Uh...
+  this fight is a little too much for the champ right now. I'll, uh... supervise from over there!"
+  and he runs behind the rocks (the watching player). He returns in the 16's-head scene, whose stock
+  lines already end with him changing his mind ("Enough! I will help you! It would be shameful for a
+  world champion to run away."), and after Gohan's Super Saiyan 2 he steps back in: HERCULE: "The
+  champ is back! Let's finish this together, kid!"
+- **16's last words, a short callback** to the birds he watched with Krillin, added to his stock
+  speech to Gohan: "The birds I watched with Krillin... protect them, Gohan."
+- **Everyone helps in the beam struggle:** Vegeta's stock blast hits one Cell, and Piccolo, Krillin,
+  Tien and Yamcha blast the other (each a short line or shout), before Goku's "Now's your chance!"
+
 **Hercule's beam pose (Ryan): new art**, copied from how Goku and Gohan look in their Kamehameha
 (in progress 2026-10-19 on branch `hercule-beam-pose`). Every other Cell Games decision above is made.
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
 record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
-carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene; the ending without Hercule's level set and message;
+carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene; the ending without Hercule's level set and message; the ring barrier (any character, level 30);
+Hercule behind the rocks during the Junior fights; the Z fighters' blasts at the second Cell;
+no co-op twin for the Juniors in the solo fights;
 Goku's haloed sprites (and display rows) swapped in when the Games end.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
