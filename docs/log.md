@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **The twin-Cell "stall" fixed** (`twin-cell-stall`): it was a crash, and it happened in real play. Player 2 holding A at
+  the end of a punch read player 1's special melee page, so Hercule (no pose group 16) played a null frame whose
+  garbage size DMA'd over both players and the HUD, and the next draw jumped through a zeroed vtable. `wrap.c` now
+  reimplements the attack end (`0x080085AD`) with each player's own slot and only for sprites with group 16
+  (`docs/coop-design.md` "The twin-Cell stall"). The Makefile's lost `ssj2_sprites_data.o` recipe is back (a clean build
+  failed to link). New: `tools/headless/p2_special.txt`, and the runner's `watch` / `breakpc` / `trace`. The twin Cells
+  die in 37-49 s in 6 of 6 autopilot runs; `cell_games.txt` passes.
 - **Super 13 merged and in the summit** (`super13-boss`): the summit scene swaps 13 for Super 13 (sprite 180) after the
   absorptions, his line uses portrait 122, and the fight is record 11 with stat 145. The win-stat test hook now also
   matches Android 16 and Super 13 (their own vtables), and the Makefile regenerates the portrait table when the

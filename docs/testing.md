@@ -262,13 +262,29 @@ players' damage per second on the boss, the estimated time to kill, the boss's d
 `--delay` (frames idled before the spawn) varies the RNG between otherwise identical runs. Reads the `s13`
 address from the build's `coop.sym`.
 
-Known quirks: the twin-Cell autopilot fight freezes in many runs (on main as well: every entity stops, the
-frame counter runs, Start does nothing; `st_headless.c`'s new `regs` command shows the CPU in normal code) and
-a downed twin's pointer clears, so Cell runs need several delays and a look at the shots (`--shots`). Fork:
+The twin-Cell autopilot fight used to hang in most runs: a crash, player 2 Hercule's held A playing the special
+melee he has no frames for (fixed 2026-10-19, `docs/coop-design.md` "The twin-Cell stall"; regression test
+`tools/headless/p2_special.txt` below). Since the fix the refilled pair kills the Cells in 37-49 s (6 delays). Fork:
 `make BUILD=build/s13w WIDE=1 DEBUG_MENU=1 A16_TEST=1`, `runfork.ps1 ... -Slot n -Mute`, `p2hold.py --port
 7778+n`, `bootisland.sh 80` (island, level-30 pair), then `gdbsrv.sh cmd 'set *(unsigned*)0x0203FD08 = 17'`
 and `... 0x0203FD44 = 1` (autopilot); the level-30 pair dies to him in seconds (as to the twin Cells), so raise
 their stats for longer footage.
+
+### Player 2's special melee (`tools/headless/p2_special.txt`, 2026-10-19)
+
+`python tools/headless/st_test.py tools/headless/p2_special.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl` (any
+`DEBUG_MENU=1` build): Map Test 147, player 2 (Hercule, no pose group 16) holds A for 600 frames beside player 1
+Piccolo (special melee page). Pass: three live entities (vtables `08025604`, `0802408c`, `0203fe00`), the frame
+counter +0x3C over 60 frames, player 2's group pointer never `record + 0x14C`, and player 1 holding A reaching it.
+Before the fix the game hung within 30 frames.
+
+### Finding a hang or a memory stomp headless (`st_headless.c`, 2026-10-19)
+
+The runner prints `CRASH at frame N regs: ...` and `Jumped to invalid address` when the CPU leaves mapped code; the
+game can look merely frozen after it (IRQs keep `g_FrameCounter` going). Save a state a few hundred frames before,
+then: `watch ADDR MAX` steps instructions until the word at ADDR changes and prints the pc, lr, registers and stack
+(who wrote it); `breakpc PC MAX [HITS]` prints the registers (and the 8 words at r4 + 0x20) each time PC runs; `trace N
+FILE` steps N instructions and writes every pc run with its count. Steps are instructions (about 100 000 per frame).
 
 ## GDB stub (fork, `-g`, port 2345) — the fastest way to a crash cause
 

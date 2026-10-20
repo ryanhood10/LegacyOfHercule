@@ -1,0 +1,37 @@
+# Player 2 holding A through a punch (docs/coop-design.md "The twin-Cell stall"). From a debug-menu savestate of a
+# DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/p2_special.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Debug party: player 1 Piccolo (flags 0x7F, the special melee page), player 2 Hercule (0x43, no page, no pose group 16).
+# Before the fix player 2's attack end read player 1's page, Hercule played group 16's null frame and the game hung
+# within 30 frames (entity vtables zeroed). Expect: 3 entities with vtables 08025604 / 0802408c / 0203fe00, the frame
+# counter +60 over 60 frames, and player 1 holding A reaching group 16 (record + 0x14C) while player 2 never does.
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x30f
+poke32 0x0203FD54 0x1620114
+poke32 0x0203FD08 5
+frames 300
+echo == flags: Piccolo 7f, Hercule 43
+peek8 0x0203F03C
+peek8 0x0203F0AC
+p2 1
+frames 600
+echo == player 2 held A for 600 frames: three live entities, the frame counter +0x3c
+ents
+peek 0x03000E20
+frames 60
+peek 0x03000E20
+deref q 0x0203FF08
+echo == player 2's sprite record and current group pointer (never record + 0x14C)
+peek q+0x48 2
+p2 0
+frames 60
+deref pl 0x03001FA8
+keys 1
+frames 40
+echo == player 1 holding A: sprite record and current group pointer (record + 0x14C, the special melee)
+peek pl+0x48 2
+keys 0
+frames 60
+ents
+shot p2_special

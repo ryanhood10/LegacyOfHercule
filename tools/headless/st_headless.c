@@ -33,6 +33,9 @@
 //   reset                  power-cycle the GBA (the save data stays: test a Continue from the title)
 //   echo TEXT
 //   regs                   print the CPU registers (r0-r15, cpsr): where a hang sits
+//   watch ADDR MAX         step instructions until the word at ADDR changes; print pc, lr, registers, stack
+//   breakpc PC MAX [HITS]  step until PC runs (HITS times); print the registers and the 8 words at r4 + 0x20
+//   trace N FILE           step N instructions; write "pc count" for every pc run
 #include <mgba/core/core.h>
 #include <mgba/core/log.h>
 #include <mgba/internal/arm/arm.h>
@@ -212,6 +215,50 @@ int main(int argc, char **argv) {
             printf("regs:");
             for (int i = 0; i < 16; i++) printf(" r%d=%08x", i, cpu->gprs[i]);
             printf(" cpsr=%08x\n", cpu->cpsr.packed);
+        }
+        else if (!strcmp(c, "trace")) {   // trace N FILE: step N instructions, write "pc count" for every pc run
+            static unsigned pcs[1 << 20], cnts[1 << 20];
+            unsigned np = 0, k = num(tok[1]);
+            struct ARMCore *cpu = core->cpu;
+            for (unsigned i = 0; i < k; i++) {
+                unsigned pc = cpu->gprs[15] - (cpu->cpsr.t ? 4 : 8), h = (pc * 2654435761u) >> 12, j;
+                for (j = h; cnts[j] && pcs[j] != pc; j = (j + 1) & ((1 << 20) - 1)) ;
+                if (!cnts[j]) { pcs[j] = pc; np++; }
+                cnts[j]++;
+                core->step(core);
+            }
+            FILE *tf = fopen(tok[2], "w");
+            for (unsigned j = 0; j < (1 << 20); j++) if (cnts[j]) { fprintf(tf, "%08x %u\n", pcs[j], cnts[j]); cnts[j] = 0; }
+            fclose(tf);
+            printf("trace %u steps: %u pcs -> %s\n", k, np, tok[2]);
+        }
+        else if (!strcmp(c, "watch")) {   // watch ADDR MAXSTEPS: step until the word at ADDR changes; print the writer
+            unsigned a = num(tok[1]), mx = num(tok[2]), v0 = r32(a), i;
+            struct ARMCore *cpu = core->cpu;
+            unsigned last = 0, lr = 0;
+            for (i = 0; i < mx && r32(a) == v0; i++) { last = cpu->gprs[15] - (cpu->cpsr.t ? 4 : 8); lr = cpu->gprs[14]; core->step(core); }
+            printf("watch %08x: %08x -> %08x after %u steps, at pc %08x lr %08x\n", a, v0, r32(a), i, last, lr);
+            printf("regs:");
+            for (int k = 0; k < 16; k++) printf(" r%d=%08x", k, cpu->gprs[k]);
+            printf("\nstack:");
+            for (int k = 0; k < 24; k++) printf(" %08x", r32(cpu->gprs[13] + 4 * k));
+            printf("\n");
+        }
+        else if (!strcmp(c, "breakpc")) {   // breakpc PC MAXSTEPS [HITS]: print the registers each time PC runs
+            unsigned bp = num(tok[1]), mx = num(tok[2]), hits = n > 3 ? num(tok[3]) : 1, h = 0, i;
+            struct ARMCore *cpu = core->cpu;
+            for (i = 0; i < mx && h < hits; i++) {
+                if (cpu->gprs[15] - (cpu->cpsr.t ? 4 : 8) == bp) {
+                    h++;
+                    printf("break %08x step %u:", bp, i);
+                    for (int k = 0; k < 16; k++) printf(" r%d=%08x", k, cpu->gprs[k]);
+                    printf(" [r4+0x20..]:");
+                    for (int k = 0; k < 8; k++) printf(" %08x", r32(cpu->gprs[4] + 0x20 + 4 * k));
+                    printf("\n");
+                }
+                core->step(core);
+            }
+            printf("breakpc %08x: %u hits in %u steps\n", bp, h, i);
         }
         else if (!strcmp(c, "poke8")) w8(num(tok[1]), num(tok[2]));
         else if (!strcmp(c, "poke16")) w16(num(tok[1]), num(tok[2]));
