@@ -4,6 +4,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **Haloed Goku** (branch `hercule-beam`), for after the Cell Games (art and rows only; the swap belongs
+  to the chapter): `tools/halosprites.py` builds Goku (176) and Super Saiyan Goku (177) with the dead
+  pose's halo on every frame (white on gold hair), display rows 26 / 27 linked like 19 / 20 (row limit
+  now 28), `SetCharacterTransformation 4, 176` makes him dead. Buu's Fury has no haloed Goku (halos only
+  on Bubbles and Gregory). Found and fixed on the way: `sprites.frame_counts` truncates some arrays
+  (Super Saiyan Goku's group 21, the detransform, is 4 frames, not 1); the copy crashed the game on
+  detransform until frames were counted by descriptor runs. The same truncation sits in the last
+  array of SSJ Hercule, Paragus, the Namekian and Android 13 (follow-up). Seen headless: walk, attack,
+  hit-stun, transform and back (`tools/headless/halo_goku.txt`).
 - **Hercule's Kamehameha pose** (branch `hercule-beam`, worktree `F:\MeltyCreations\log2-beam`), for the
   Cell Games beam struggle (art only; the chapter is not built): `tools/herculesprites.py` builds
   `herc_record`, Hercule's record 72 with group 18 (the pose `NPCFireKamehameha` plays: charge, thrust,

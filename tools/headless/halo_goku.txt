@@ -1,0 +1,95 @@
+# Haloed Goku (rows 26 / 27, sprites 176 / 177; docs/testing.md "Haloed Goku"). Map Test Roshi's island
+# (entry 147, zone 6 area 3), make Goku (slot 4) player 1 on row 26 (entry +8; a script does it with
+# SetCharacterTransformation 4, 176) and warp in place so the player entity is rebuilt from the row; then
+# walk, the A combo, the Super Saiyan transform (ability index 2 = Transformation B, B) -> row 27, walk and
+# punch as Super Saiyan, transform back -> row 26. The transformation abilities are ready only while the word
+# at 0x0300208C is nonzero (0 on a Map Test), so the script sets it before each B. "peek8 0x0203F084" is slot 4's row; "peek pl+0x48" the
+# player entity's sprite record (halo_goku_record / halo_ssj_record in coop.sym).
+# python tools/headless/st_test.py tools/headless/halo_goku.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+maptest 147
+frames 300
+poke8 0x0203F000 4
+poke8 0x0203F084 26
+poke32 0x0203FD0C 0x0306
+poke32 0x0203FD54 0x02F801F0
+poke32 0x0203FD08 5
+frames 200
+map
+peek8 0x0203F084
+findent pl 0x08025604
+peek pl+0x48
+shot hg_00_idle
+keys 0x20
+frames 12
+shot hg_01_walkL
+frames 12
+shot hg_02_walkL
+keys 0x80
+frames 12
+shot hg_03_walkD
+keys 0x40
+frames 12
+shot hg_04_walkU
+keys 0x10
+frames 12
+shot hg_05_walkR
+keys 0
+frames 20
+keys 1
+frames 4
+shot hg_06_punch1
+keys 0
+frames 8
+keys 1
+frames 4
+shot hg_07_punch2
+keys 0
+frames 8
+keys 1
+frames 4
+shot hg_08_punch3
+keys 0
+frames 8
+frames 60
+poke16 0x0203F080 20
+poke8 0x0203F085 2
+poke32 0x0300208C 1
+key 2 4
+frames 10
+shot hg_09_transform
+frames 30
+shot hg_10_transform
+frames 60
+shot hg_11_transform
+frames 120
+peek8 0x0203F084
+findent pl 0x08025604
+peek pl+0x48
+shot hg_12_ssj
+keys 0x20
+frames 12
+shot hg_13_ssj_walkL
+keys 0x40
+frames 12
+shot hg_14_ssj_walkU
+keys 0
+frames 10
+keys 1
+frames 4
+shot hg_15_ssj_punch1
+keys 0
+frames 8
+keys 1
+frames 4
+shot hg_16_ssj_punch2
+keys 0
+frames 8
+frames 60
+poke16 0x0203F080 20
+poke32 0x0300208C 1
+key 2 4
+frames 150
+peek8 0x0203F084
+findent pl 0x08025604
+peek pl+0x48
+shot hg_17_back

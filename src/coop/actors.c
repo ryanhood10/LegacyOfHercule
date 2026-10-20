@@ -15,6 +15,8 @@
 // NPC-only sprite ids of party characters (sprites that are not any display row's).
 static const struct { s16 sprite; s16 slot; } aliases[] = {
     { 76, 6 },   // Krillin's NPC set -> Krillin (slot 6)
+    { 60, 4 },   // Goku and Super Saiyan Goku -> Goku (slot 4) while he wears the halo (rows 26 / 27,
+    { 61, 4 },   //   which link to each other, not to his stock rows 19 / 20)
 };
 
 static int row_sprite(int row) { return DISPLAY_DATA[row * 0x14 + 1]; }

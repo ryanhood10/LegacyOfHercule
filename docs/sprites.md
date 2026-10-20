@@ -68,10 +68,10 @@ similar body and recoloured).
 upper half of each frame: interior -> gold 120, brown highlights -> yellow 46; eyes, moustache and
 outlines stay black), re-encodes every frame literal-only, and emits `build/gen/sprites_data.c`:
 `ssj_record` (all 21 groups, 144 frames, ~130 KB), `sprite_index[158]` at the time (stock 3..156 plus 157 ->
-`ssj_record`; it now runs to id 175, `docs/ids.md`) and `display_rows[23 x 20]` (now 26 rows) (stock rows; row 21 Hercule now links transformed -> 22;
+`ssj_record`; it now runs to id 177, `docs/ids.md`) and `display_rows[23 x 20]` (now 28 rows) (stock rows; row 21 Hercule now links transformed -> 22;
 row 22 = Hercule's row with flag bit0, sprite 157, detransformed -> 21). `patch_rom.py` repoints the
 18 display-row literals and the one sprite-index literal (`table + 0x1C`, file 0x959C) at the new
-tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6), first to 23, now 26. `src/coop/ssj.c`
+tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6), first to 23, now 28. `src/coop/ssj.c`
 transforms through the game's own opcode-73 handler `{2, slot, 157}` (EP cost 50) and re-binds
 player 2's entity when the slot is player 2's; `src/coop/rom.h` `DISPLAY_DATA` is the relocated
 table. The hercule-hero session wired it as ability 18 in Hercule's third slot (`docs/hercule.md`).
@@ -153,7 +153,7 @@ Pose indices differ between the games (read off the sheets of the playables):
   link and appends the records to the relocated sprite index (`spriteclone.py --extra`);
   `BUU_SPRITES="158=128 159=28"` picks them; `SSJ_SPRITE=158` makes the Super Saiyan Hercule row
   (22) use a converted sprite instead of 157 (test builds). `BUU=0` builds without the Buu ROM.
-  New ids need display rows of their own before a character can use them (rows 22-25 exist:
+  New ids need display rows of their own before a character can use them (rows 22-27 exist:
   `docs/ids.md` "Display rows").
 
 Colour report (`build/gen/buu_sprites_report.md`): Hercule keeps 24574 pixels exact and moves 2429
@@ -262,7 +262,7 @@ name), nothing new drawn:
 Display row 25 (`tools/spriteclone.py`, `--a16-sprite`): Gohan's standard row with sprite 175,
 dialogue portrait 26 and **status portrait 121** (120 at first; Paragus' dialogue portrait took 120 in the merge), his dialogue portrait remapped to the menu BG
 palette and appended to `portrait_module` by `tools/krillinsprites.py` (which also writes the
-slot-7 names "Android 16" / "ANDROID 16"). `CharacterData_FindBySprite`'s row limit is 26.
+slot-7 names "Android 16" / "ANDROID 16"). `CharacterData_FindBySprite`'s row limit is 28 (rows 26 / 27: haloed Goku).
 Seen in the fork as player 2 beside Krillin: walking, punching, the rocket punch pose and fist.
 
 ## Krillin (sprite 161, `tools/krillinsprites.py`, 2026-10-18)
@@ -444,6 +444,52 @@ group 18, Hercule's base frames; four facings x (charge, thrust, hold). Engine p
 (`docs/testing.md` "Hercule's beam pose"): the stock struggle with Hercule as player 1 (the clash and
 the Kamehameha, beam from his palms), the same run as Gohan side by side, right / down / up facings
 by holding the facing byte while the beam fires, and player 2 (row 21) in the pose in all four facings.
+
+## Haloed Goku (ids 176, 177; display rows 26, 27; `tools/halosprites.py`, 2026-10-19)
+
+After the Cell Games Goku stays playable but dead, so he wears a halo (`docs/story.md` 4h "After the
+Games"). Every LoG2 player record has the dead pose, group 17 (2 frames, front view in all four
+facings): the character standing with a pale yellow ring (palette 0x24 / 0x25 / 0x2C) round the top of
+the hair, its top arc one row above the hair, its front and side arcs over it; Goku's (60) ring is
+13 x 5 px and identical in both frames (only the hair moves). Super Saiyan Goku (61) has no group 17.
+
+**Buu's Fury has no haloed Goku**: its Goku records (ids 97-120; 105 / 107 base, 109 Super Saiyan,
+110 / 111 Super Saiyan 3) wear no halo in any animation, and LoG2's dead pose has no Buu animation
+(pose table above). Its only halos (found by scanning every frame of all 297 records for a top edge of
+halo-coloured pixels) float clear of the head on NPCs: **30 Bubbles** and **125 Gregory** (King Kai's
+monkey and cricket), an 11 x 3 ellipse with a gap above the head. Goku's frames have no room above the
+hair (it reaches the frame's top rows), so the generator keeps LoG2's own hugging ring.
+
+**The records.** `halo_goku_record` (id 176) = sprite 60 and `halo_ssj_record` (id 177) = sprite 61,
+every group and frame decoded, haloed and LZ-compressed (`buu2log2.compress`), headers, frame boxes,
+offsets and attributes unchanged (106 KB for both). Per frame the head is the hair: black, or Super
+Saiyan yellow (0x2E / 0x78; Goku's own group 9, the transformation, turns gold half way), taken as the
+8-connected hair component holding the topmost hair pixel; the ring goes on at its top row - 1 (row 0
+at least) centred on the hair's top four rows, as in the stock dead pose. On yellow hair the ring is
+white / 0x2C with a black line under the front arc. Group 17 keeps its stock halo. Preview:
+`build/<dir>/halo_goku_preview.png` (`_x3`): every group x 4 facings, stock beside haloed.
+
+**Frame counts.** `sprites.frame_counts` guesses a descriptor array's length from the gap to the next
+array or blob, which truncates the last array of a record to 1 frame (Goku's group 20 facing right: 4
+real frames) and all four arrays of Super Saiyan Goku's group 21 (4 frames each). The detransform plays
+group 21 frames 0-3, so a record built from the guess made the engine read three descriptors past the
+array and decompress garbage over EWRAM (entity list and party block overwritten, "Jumped to invalid
+address" from the entity pass `0x08006AD8`). `halosprites.frame_counts` counts the run of valid
+descriptors (GBA OBJ size, ROM blob of kind 0-2) up to the next array instead. Generators that copy
+frames through the guess have the same truncation in the last array of their source: Super Saiyan
+Hercule 157 (72 group 20 facing right), Paragus 170 (137 group 20), the Namekian 166 (104 group 22),
+Android 13 165 (8 / 9 group 12).
+
+**Rows and the swap.** Row 26 = Goku's row 19 with sprite 176, row 27 = Super Saiyan Goku's row 20
+with sprite 177; they link to each other as 19 / 20 do, so Goku's Transformation abilities (11 / 12:
+animation 0x25 transform, 0x24 detransform, both following the row's link) keep the halo.
+`CharacterData_FindBySprite`'s limit is 28. A script makes Goku (slot 4) dead with
+`SetCharacterTransformation 4, 176` (opcode 73 finds the row showing sprite 176) and alive again with
+`4, 60`; refresh player 2's entity when he plays slot 4 (`old_hercule_set` in `krillin.c` shows how).
+The duplicate-NPC rule (`actors.c`) treats sprites 60 / 61 as Goku's while he is on rows 26 / 27.
+Seen headless (`docs/testing.md` "Haloed Goku"): walking in four facings, the punch / kick combo and
+hit-stun with the halo, the transformation (halo through the gold-hair frames) to row 27, Super Saiyan
+walking and punching, and back to row 26.
 
 ## Making a new enemy model (generic)
 

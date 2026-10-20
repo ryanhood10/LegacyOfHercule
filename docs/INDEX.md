@@ -69,7 +69,8 @@ Generated at build time (never committed): `build/maps.patch.json` (the new maps
 (sprite ids 158 and 159 converted from Buu's Fury by `tools/buu2log2.py`, when `roms/buu.gba` is present),
 `build/gen/boss_models_data.c` (Android 13, the Namekian, from `tools/bossmodels.py`), `build/gen/broly_sprites_data.c`
 (Paragus, his portrait, the ship, from `tools/brolysprites.py`), `build/gen/hercule_sprites_data.c` (`herc_record`:
-Hercule's record 72 plus the Kamehameha pose, group 18, from `tools/herculesprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
+Hercule's record 72 plus the Kamehameha pose, group 18, from `tools/herculesprites.py`), `build/gen/halo_sprites_data.c`
+(haloed Goku and Super Saiyan Goku, sprites 176 / 177, from `tools/halosprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
 icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/krillinsprites.py`),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
@@ -91,10 +92,11 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
-| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing) |
+| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder) |
-| `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-25 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
+| `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-27 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
+| `halosprites.py` | haloed Goku: Goku's (60) and Super Saiyan Goku's (61) records with the dead pose's halo on every frame -> `build/gen/halo_sprites_data.c` (`halo_goku_record` 176, `halo_ssj_record` 177; rows 26 / 27), preview `halo_goku_preview.png` (stock beside haloed); its `frame_counts` counts descriptor runs (the gap guess in `sprites.py` truncates some arrays) |
 | `herculesprites.py` | Hercule's Kamehameha pose: record 72 (stock groups by ROM address) with group 18 built from his punch stance / idle frames and Goku's beam arms in his colours -> `build/gen/hercule_sprites_data.c` (`herc_record`, id 72 repointed), preview `hercule_beam_preview.png` beside Goku's and Gohan's beam frames |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |
 | `a16sprites.py` | Android 16 boss sprite (id 160: sprite 8's own groups + Android 17's fight frames recoloured and re-headed + a rocket-punch group), his player record (id 175, `a16p_record`, row 25) and the projectile frames -> `build/gen/a16_sprites_data.c` |
@@ -131,6 +133,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | sprite record layout, frame encoding | `docs/sprites.md`, `tools/sprites.py` |
 | Buu's Fury sprites, converting them, which ids exist | `docs/sprites.md` "Buu's Fury", `tools/buu_sprites.py`, `tools/buu2log2.py` |
 | Hercule's Kamehameha pose, how NPCFireKamehameha plays a beam | `docs/sprites.md` "Hercule's beam pose", `tools/herculesprites.py`, `tools/headless/beam_hercule.txt` |
+| haloed (dead) Goku, his rows 26 / 27, the transform / detransform states | `docs/sprites.md` "Haloed Goku", `tools/halosprites.py`, `tools/headless/halo_goku.txt` |
 | display rows, transformations | `docs/sprites.md` SSJ section, `src/coop/ssj.c`, `tools/spriteclone.py` |
 | Krillin, old Hercule, per-slot names / portraits / status pages | `docs/hercule.md` 5b / 5c, `src/coop/krillin.c`, `docs/party-8-slots.md` "Krillin", `docs/sprites.md` "Krillin" |
 | ability table, stats, growth | `docs/hercule.md`, `tools/romdata.py`, `data/hercule.json` |

@@ -425,6 +425,26 @@ action for record 0's Cell, `COOP_CMD_STORY_WIN`); the run ends on map 326.
   address 8B396A16", r14 `0x08006C05`) with the stock record 72 as well; use another map for player-2
   tests until that is understood.
 
+## Haloed Goku (headless, 2026-10-19)
+
+```
+make BUILD=build/hb DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/hb/log2-coop.gba --out build/hb/hl
+python tools/headless/st_test.py tools/headless/halo_goku.txt build/hb/log2-coop.gba build/hb/hl/menu.ss --out build/hb/hl --cols 6
+```
+
+`halo_goku.txt` Map Tests Roshi's island (entry 147), puts Goku (slot 4, entry at 0x0203F07C) on row 26
+(`poke8 0x0203F084 26`; the story does it with `SetCharacterTransformation 4, 176`), warps in place so
+the player entity is rebuilt, then walks, punches, transforms (ability index 2 = Transformation B, B)
+and transforms back, printing the row and the entity's sprite record (`halo_goku_record` /
+`halo_ssj_record` in `coop.sym`) after each. The run must read rows 1a, 1b, 1a with no CRASH line.
+
+- The transformation abilities are ready only while the word at **0x0300208C** is nonzero (0 on a Map
+  Test); the script sets it before each B. EP must be >= 10 (entry +4).
+- Island 147 is a town (A talks, no attacks) and its floor's bottom edge is an exit: attacks were seen
+  on the desert (Map Test 325, warp to (256, 320); Cell's beam interrupts after a few seconds).
+- Control: the same script with `poke8 0x0203F084 19` (Goku's stock rows 19 / 20).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)
