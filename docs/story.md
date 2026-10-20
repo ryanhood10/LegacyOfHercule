@@ -509,6 +509,21 @@ epilogue, then the title screen; the talk-show bonus ending).
   (room for a towering boss and the watchers on the sideline).
 - **Krillin in the wish scene (Ryan):** KRILLIN: "I have a wish..." and Yamcha blurts out his wish
   first. No Krillin and 18 moment: that is not part of our story.
+- **The explosion cue (Ryan), at the Lookout after the wishes:** a screen shake. BULMA: "What was that
+  explosion!? Don't tell me you guys didn't finish off Cell!" PICCOLO: "No, I told you I no longer
+  sense Cell! There was just a great pulse of power in the Arctic." ANDROID 18: "It must be my brother.
+  I'm going to go check on him." (It is really 17 and 13 fighting, which sets the stage.)
+- **Android 16 (Ryan):** the first wish brings him back too, but he stays out of the game and the story
+  from here on; he may return in the Buu's Fury part.
+- **Goku as an angel (Ryan):** Goku stays playable with his halo, including against Super 13; no
+  explanation needed.
+- **The arctic, as a route (Ryan):** a landing spot in the far north of the world map (with the star),
+  a couple of areas of enemies climbing a mountain, a save pad at the top of the climb, then the next
+  area: a big open clearing on the summit where the battle is. A flight spot back to the world map
+  once there. (Zone 15 area 1 reworked plus new zone-15 areas; enemies for the climb to pick.)
+- **The end of Super 13 (Ryan):** he explodes at the end, and 17 and 18 die with him. VEGETA: "*spits*
+  At last. The end of those clankers."
+- **Difficulty (Ryan):** Super 13 is slightly harder than Cell; no extra reward.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
