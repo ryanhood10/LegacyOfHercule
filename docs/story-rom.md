@@ -303,6 +303,38 @@ Trunks and 18; Vegeta's thoughts about Goku; then the announcer and Hercule: "I 
 SINGLE HANDEDLY!!!!!!" Flag 195 is set; Hercule joins the party at level 40 ("Hercule is now an
 available character!"), Goku leaves the party, and the game warps to the world map.
 
-**After.** At the Lookout: Dende heals Gohan, Shenron is summoned; the first wish revives everyone
-Cell killed, Goku cannot be revived and chooses to stay dead, and the second wish is debated (Krillin
-asks Shenron to make the Androids human, which is beyond its power, so he wishes the bombs out of them instead: "THERE - IT HAS BEEN DONE."). The world map script tests flags 195 and 196.
+**After the beam struggle (still map 326).** Piccolo: "Cell's energy completely vanished!"; Yamcha:
+saving the world took a lot out of Gohan; Krillin: they will take him to Dende; Tien takes Trunks,
+Krillin takes 18 ("she is a victim of Cell"); Gohan thanks Vegeta, who refuses help; Vegeta's thoughts
+about Goku. Then the announcer finds Hercule: "I DEFEATED CELL!!!! SINGLE HANDEDLY!!!!!!" ("I just got
+so irritated with the light shows and the tricks..."; the boy and his friends "thanked me kindly and
+went home"). Flag 195. **Hercule joins only if story flags 302, 303, 305 and 306 are all set**
+(entry 50: in party, level 40, "Hercule is now an available character!"); otherwise only "Journal
+Updated!" (entry 53). Goku leaves the party (our "Keep Goku" patch keeps him). Warp to the world map.
+
+**The five statues.** The Capsule Corp atrium (zone 6 area 3, map 147) has five stone pedestals around
+the fountain; flags 195, 302, 305, 303 and 306 each put a fighter's statue on one (seen in a headless
+run, 2026-10-19). No map script sets 302-306; where the game sets them (likely optional achievements)
+is not traced yet.
+
+**Talk to Dende (the main ending).** The journal's quest after flag 195 is "Talk to Dende on the
+Lookout". At the Lookout (zone 9 area 1): Dende: "Gohan! You're okay! I'm really sorry about your
+father." Gohan: Goku was with him the whole time; Piccolo: "You made us all proud"; 18: "Gohan beat
+Cell?"; Piccolo tells 18 to thank Krillin; Gohan teases Krillin about his crush; 18: "Not that easy."
+Shenron's first wish (Yamcha): revive everyone Cell killed. Goku cannot be revived (already wished
+back once); Goku speaks telepathically and chooses to stay dead (the villains came for him). The second
+wish: Yamcha jokes about getting rich; Krillin asks to make the Androids human, which is beyond
+Shenron's power, so he wishes the bombs out of them instead ("THERE - IT HAS BEEN DONE."). 18: "If you
+think you won my heart because of that lousy wish, you're mistaken! But it was kind of nice of
+you..."; she declines to join them and leaves; Yamcha: "That chick digs you." Tien and Yamcha leave
+(Tien: "You're the man of the house now!"), Piccolo stays on the Lookout, Gohan says goodbye. Flag 196,
+a warp to zone 2 area 1 (Gohan's home), the credits.
+
+**The bonus ending.** With flag 195 and all four of 302, 303, 305, 306, a building in zone 4 area 5
+(map 67) plays "Late Night with Rob Howard": Hercule, "hero of the Cell Games", is interviewed; asked
+about critics who say he did not defeat Cell and about "those strange fighters who could turn their
+hair gold" and the little boy, he calls it "parlor tricks... mirrors and laser lights"; the crowd
+chants "HERCULE!"; then the credits and flag 196.
+
+**After the credits.** Thirteen maps test flag 196 (names, music, actors change, e.g. Gero's lab
+area 47's name); not walked yet.
