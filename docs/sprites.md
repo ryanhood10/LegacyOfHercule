@@ -44,7 +44,7 @@ similar body and recoloured).
 | id | groups | looks like | playable-grade? |
 |---|---|---|---|
 | 53-56 | 9-10 | Gohan (base, SSJ, variants) | yes (stock) |
-| 57-59 | 9-10 | Trunks (base, SSJ) | yes (stock) |
+| 57-59 | 18-22 | teen Gohan (57, row 3, his party row), Super Saiyan 2 Gohan (58, row 4, purple gi), Super Saiyan teen Gohan (59, row 5); checked against the display rows 2026-10-19 (Trunks is 135, row 18) | yes (stock; 58 lacks hurt / lying / tumble, see "Super Saiyan 2 Gohan") |
 | 60-62 | 9-10 | Goku (base, SSJ) | yes (stock) |
 | 66-71 | 3 | Vegeta forms as NPC/enemy-grade sets | partly; 137-140 look like the playable Vegeta/Goku sets (9-10) |
 | 72 | 9 | Hercule | yes (stock) |
@@ -510,6 +510,24 @@ The duplicate-NPC rule (`actors.c`) treats sprites 60 / 61 as Goku's while he is
 Seen headless (`docs/testing.md` "Haloed Goku"): walking in four facings, the punch / kick combo and
 hit-stun with the halo, the transformation (halo through the gold-hair frames) to row 27, Super Saiyan
 walking and punching, and back to row 26.
+
+## Super Saiyan 2 Gohan (record 58 repointed, display row 28; `tools/ssj2sprites.py`, 2026-10-19)
+
+The stock game shows sprite 58 only as player 1 in the last two Cell Games fights (`SetCharacterTransformation
+0, 58` -> row 4). Its record has 19 groups with 9, 10, 11, 12, 14, 15 and 17 empty: no hurt pose (11), no
+lying pose (12, the knock-out) and no tumble (20, past the group count). Super Saiyan teen Gohan (59) wears
+the same purple gi on the same body and frame boxes, so `ssj2_record` (`build/gen/ssj2_sprites_data.c`) is
+record 58 with its own header (collision boxes) and group count 21, groups 0-8, 13, 16, 18 by ROM address,
+11, 12 and 20 from record 59 by ROM address (Super Saiyan 1 hair on those frames; they show for a few
+frames), and 9, 10, 14, 15, 17, 19 empty as in Super Saiyan Goku's 61 (no transformation, Spirit Bomb,
+fidget or halo poses). Nothing is copied or drawn. The Makefile repoints id 58 (`EXTRA_SPRITES`
+`58=ssj2_record`), so the stock Cell Games scenes get the filled groups too. Preview
+`build/<dir>/ssj2_gohan_preview.png` (first frame of every group per facing, ssj2_record above 59).
+
+Portraits: the stock ones fit. Dialogue / switch-screen portrait **61** and status portrait **12** (both
+on the stock row 4) are Super Saiyan 2 Gohan; row 28 uses them (portraits 124-125 were not needed).
+Seen in play (headless and fork): walk in four facings, the A combo, the Kamehameha (group 18), Masenko,
+the ki pose (Burst, Ki Blast), hurt frames from 59.
 
 ## Making a new enemy model (generic)
 

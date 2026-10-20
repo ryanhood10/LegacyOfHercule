@@ -1,0 +1,29 @@
+# Old saves, part 1 (docs/testing.md "Super Saiyan 2 Gohan"): on an eight-slot build (PARTY_SLOTS=8, e.g. main
+# before this change), save at the town's pad and keep a savestate whose cartridge save holds the old layout.
+#   python tools/headless/st_test.py tools/headless/ssj2_oldsave1.txt build/<8-slot>/log2-coop.gba build/<8-slot>/hl/menu.ss --out build/ssj2t/hl
+p2 0
+maptest 7
+frames 300
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 1 4
+frames 80
+shot old_00_saved
+key 1 4
+frames 60
+echo --- the eight-slot party: head, Krillin (slot 6), the flags bank, EEPROM slot 0 (mirror) head and checksum
+peek PARTY 3
+peek PARTY+0xB4 7
+peek FLAGS 4
+deref m 0x03003898
+peek m+0x10 3
+peek m+0x1AC 1
+save old_saved.ss

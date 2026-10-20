@@ -330,15 +330,20 @@ debug menu and saves `build/hl/menu.ss` (bare `shot` / `save` / `load` names lan
 `p2 MASK|off`, `mash N [F]`, `mashent NAME VTABLE MAX`, `mashmap ZONE AREA MAX`, `waitmap`,
 `waitnz ADDR MAX`, `maptest ENTRY` (with the debug menu open: points Map Test at a map entry index
 and presses A), `preset +N -N` (story flags Party_Init applies at that Map Test), `flags`, `peek`,
-`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `map`, `shot NAME`, `save` / `load`. The runner
-prints the registers of the first "Jumped to invalid address" (`CRASH regs`, `r14` = the caller).
+`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `map`, `shot NAME`, `save` / `load`, `reset`
+(power-cycle the ROM keeping the cartridge save: another build's savestate, then `reset`, boots this ROM
+with that build's EEPROM). Predefined variables: `PARTY` (0x0203F000), `SLOTS` (the ROM's party slot
+count, from the default-table literal) and **`FLAGS`** (the story-flag bank, `0x0203F00C + SLOTS * 0x1C`:
+0x0203F108 with 9 slots, 0x0203F0EC with 8); write `poke32 FLAGS+0x14 ...`, never the bank's address. The
+runner prints the registers and frame of the first "Jumped to invalid address" (`CRASH at frame N regs`,
+`r14` = the caller).
 `st_test.py` resolves bare shot names next to the script and tiles them into one PNG.
 
 Useful words: `coop2.cmd` 0x0203FD08 (7 = `COOP_CMD_STORY_WIN`: every boss fight and story enemy on
 the map is won through its own OnHit; 5 = warp, `cmd_arg` 0x0203FD0C = zone | area << 8,
 `cmd_arg2` 0x0203FD54 = x | y << 16), `coop2.a16` 0x0203FD34, `coop2.a16_bot` 0x0203FD44,
 `coop.p2_slot` 0x0203FF84, party block 0x0203F000 (active slot byte 0, entries at +0xC + 0x1C * slot,
-flags at entry +0x14), story flags 0x0203F0EC + n / 8. A Map Test party has everyone in it and
+flags at entry +0x14), story flags `FLAGS` + n / 8 (0x0203F108 with the default 9 slots). A Map Test party has everyone in it and
 player 1 is Piccolo (`poke8 0x0203F000 0` then a warp makes Gohan player 1). `STORY_TEST=1` builds
 (the fork's TCP pad drives player 1, `tools/fork/st_pad.py`; story-flag preset in ROM at 0xC00000,
 `tools/fork/st_preset.py`; player 1's L + R + Up wins the fights) are for interactive fork sessions;
@@ -355,7 +360,7 @@ Mr. Popo stands at (64, 128): test-warp player 1 to (64, 150) (`COOP_CMD_WARP`, 
 out; an extra A talks to him again). The door wants A while facing up inside (73, 113)-(120, 140): warp
 to (96, 160), hold Up, press A, `waitmap 15 2`. "Round 1" shows about 220 frames later; A spawns it.
 
-- `waves` (`src/coop/waves.c`; 0x0203F880 on main; it sits after `.party.kr` and moves when that grows, so read `$(BUILD)/coop.map`): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
+- `waves` (`src/coop/waves.c`; 0x0203F914 with 9 slots, 0x0203F880 with 8; it sits after `.party.kr` and moves when that grows, so read `$(BUILD)/coop.map`): +0 magic 0xC00B3A7E, +4 round sequence, +8 its action,
   +0x10 round / state (0 off, 1 pause, 2 caption, 3 fight, 4 done) / timer / standing enemies, +0x14
   records spawned, +0x16 the round's smallest largest-free OBJ VRAM block (32-byte units), +0x18
   input polls (game-loop iterations: against `g_FrameCounter`, which ticks in VBlank, they count lag),
@@ -386,7 +391,7 @@ python tools/headless/st_test.py tools/headless/mkmenu.txt build/broly/log2-coop
 
 - Broadcast: `preset +151 +156`, `maptest 160`; the Map Test spawns player 1 inside the broadcast's
   trigger rect, which fires only on entering: walk out and back in (`key 0x20 30`, `key 0x80 40`,
-  `key 0x10 30`), mash; Bulma's three pages follow Cell's last line; flag 400 is bit 0 of 0x0203F11E;
+  `key 0x10 30`), mash; Bulma's three pages follow Cell's last line; flag 400 is bit 0 of `FLAGS+0x32` (0x0203F13A with 9 slots, 0x0203F11E with 8);
   the stock jump to "Meanwhile..." follows.
 - Backyard: `p2 0`, `preset +151 +156 +157 +400`, `maptest 165`, walk right (the hint without Vegeta);
   for the scene make Vegeta player 1 (`poke8 0x0203F000 2`, then the test warp `poke32 0x0203FD0C
@@ -396,7 +401,7 @@ python tools/headless/st_test.py tools/headless/mkmenu.txt build/broly/log2-coop
   `key 0x40 ...`; player 1 alone stops at the co-op leash); about 14 presses through the
   confrontation. `deref B 0x0203FC24` = Broly (pair 0's original); `poke32 0x0203FD08 9` drops Paragus
   only (the rage: B+0x188 HP back to max, B+0x160 attack / defence bytes up), `7` wins the fight;
-  then flags 0x0203F11E = 0xff and the party as kept (player 1 0x0203F000, player 2 0x0203FF84).
+  then flags `FLAGS+0x32` = 0xff and the party as kept (player 1 0x0203F000, player 2 0x0203FF84).
 - Autopilot fight (A16_TEST build): from the fight state `poke16 0x0203FD44 1`; the autopilot never
   presses A, so each cycle pause it, tap A (dialogue), resume; top up the players' HP (slot 2 at
   0x0203F044, slot 3 at 0x0203F060) to see the whole fight. In the fork the same with
@@ -454,6 +459,56 @@ action for record 0's Cell, `COOP_CMD_STORY_WIN`); the run ends on map 326.
   address 8B396A16", r14 `0x08006C05`) with the stock record 72 as well; use another map for player-2
   tests until that is understood.
 
+## Super Saiyan 2 Gohan (headless + fork slot 9, 2026-10-19)
+
+```
+make BUILD=build/ssj2t DEBUG_MENU=1 SSJ2_TEST=1          # test triggers on player 2's pad (below)
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/ssj2t/log2-coop.gba --out build/ssj2t/hl
+python tools/headless/st_test.py tools/headless/ssj2_gohan.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/menu.ss --out build/ssj2t/hl --cols 6
+python tools/headless/st_test.py tools/headless/ssj2_save.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/menu.ss --out build/ssj2t/hl --cols 4
+python tools/headless/st_test.py tools/headless/ssj2_duel.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/menu.ss --out build/ssj2t/hl --cols 2
+```
+
+- `SSJ2_TEST=1`: player 2's pad (`p2 MASK`) holding L + R: **Select** = `ssj2_join` (what CoopCall 20 runs),
+  **Start** = he becomes player 1 (refused while player 2 plays him), **Up** = player 2 plays him, **Down** =
+  his EXP one short of his next level. His entry is at `PARTY+0xEC` (slot 8; ability index at `+0xF5`),
+  Gohan's at `PARTY+0x0C`. The ability gate word 0x0300208C is 0 on a Map Test: set it before each B.
+  The Kamehameha fires after 24 frames of B held (a tap cancels it); snakes and wolves interrupt
+  abilities (hurt state), so expect a missed one now and then in the wolves map.
+- `ssj2_gohan.txt`: Map Test 13 (zone 2 area 7) warped to the open path (500, 430), the join, player 2
+  then player 1 as him: walks, the A combo, all four abilities (EP drops 2 + 4 + 10 + 2, the held
+  Kamehameha drains more). `ssj2_save.txt`: the town's save pad (Map Test 7, zone 2 area 1, pad at 540,
+  256; its tutorial and a first save play first, the pad menu opens on the second A, Down = Switch),
+  Switch Characters scrolled to him (8 members: the six-wide window scrolls twice), A, Save, soft reset
+  (`key 0xF 6`), Select Game (two Starts, Start through the intro, A on START), load: active slot 8, his
+  entry and the flags intact. `ssj2_duel.txt`: a clone duel (`COOP_CMD_DUEL`, arg 0x300) with him as player
+  1: player 2's slot 7 holds a copy of slot 8, the final blow gives winner 1.
+- **CoopCall 20 from a script**: a build whose data patch adds the test-only
+  `tools/headless/ssj2_join_test.json` (a dialogue trigger above the Map Test spawn in zone 2 area 1: the
+  CoopCall, then the join message):
+  ```
+  python -c "import json; d=json.load(open('data/hercule.json')); d['include'].append('tools/headless/ssj2_join_test.json'); json.dump(d, open('build/hercule_jointest.json','w'), indent=2)"
+  python -I tools/romdata.py build build/hercule_jointest.json build/ssj2j.patch.json roms/log2.gba --party-slots 9
+  make BUILD=build/ssj2j DEBUG_MENU=1 DATA_PATCH=build/ssj2j.patch.json
+  python tools/headless/st_test.py tools/headless/ssj2_join.txt build/ssj2j/log2-coop.gba build/ssj2j/hl/menu.ss --out build/ssj2j/hl --cols 2
+  ```
+  (mkmenu for `build/ssj2j` first.) Slot 8 is zero before and filled after the message; player 2's Select
+  then cycles Hercule -> Krillin -> him.
+- **Old saves**: `ssj2_oldsave1.txt` on an eight-slot build (main before 2026-10-19, or `PARTY_SLOTS=8`)
+  saves at the pad and keeps `old_saved.ss`; `ssj2_oldsave2.txt` on the nine-slot build loads that state,
+  `reset`s and loads slot 1 twice. Pass: both loads land on the pad with Krillin's entry and the tutorial
+  flag (bit 13 of `FLAGS`) intact, slot 8 zero, and the EEPROM mirror (`deref m 0x03003898`) holds the new
+  checksum at `m+0x1C8` (0x10 + 0x1B8) while the old one at `m+0x1AC` is gone.
+- Status screen: Start opens it on player 1's page; Right / Left step through the members, Up / Down
+  through pages. With 8 members it showed garbage beside Gohan's title and crashed stepping onto him
+  (main too, with `COOP_CMD_A16_PARTY`) until `status_tabs_hook` (`docs/party-8-slots.md`).
+- Fork: `make BUILD=build/ssj2f WIDE=1 DEBUG_MENU=1 SSJ2_TEST=1`, a headless state of the wide ROM (Map
+  Test 13, the join), `tools\fork\runfork.ps1 /mnt/f/.../build/ssj2f/log2-wide.gba -Slot 9 -Mute -State
+  /mnt/f/.../f_joined.ss`, `p2hold.py --port 7787 --cmd build/ssj2f/p2cmd.txt` (write `MASK:SECONDS` steps
+  into the file), player 1 through `FORK_SLOT=9 /root/fork-s9/keys.sh`, the gate word and ability index
+  through `gdbsrv.sh pause` / `cmd 'set ...'` / `cmd continue`, `COOP_CMD_WAVE_CLEAR` (13) clears the
+  map's enemies first; `win_shot.ps1` needs an absolute output path.
+
 ## Haloed Goku (headless, 2026-10-19)
 
 ```
@@ -501,8 +556,8 @@ python tools/headless/st_test.py tools/headless/cell_games.txt build/cg/log2-coo
 
 `tools/headless/cell_games.txt` plays the whole Games: Map Test 323 with flags 191 and 421, the barrier opened
 with A, both players walk up into the ring, then nine fights, each queued by writing its stat + 1 to
-`cg_state + 5` (0x0203F921 in the current build; read `$(BUILD)/coop.map` for `.party.cg`) and the magic
-0xCE11CA3E to `cg_state`; `stepz 0x0203F921 140` presses A on both pads every 100 frames until the fight has
+`cg_state + 5` (0x0203F9B5 in the current build; read `$(BUILD)/coop.map` for `.party.cg`) and the magic
+0xCE11CA3E to `cg_state`; `stepz 0x0203F9B5 140` presses A on both pads every 100 frames until the fight has
 won itself (once that stat's enemy stands and player 1 is free to move, so never during a scene). After each
 win `cg_state + 7` holds who fought: player 1's slot | solo << 4 | 0x80 when player 2's entity stood (expected
 14, 24, 80, 16, 21, 12, 23, 80, 80). The end: `mashmap 6 99`, Goku (slot 4) on row 0x1a (26, the halo). The

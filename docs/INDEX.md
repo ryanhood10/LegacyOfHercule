@@ -47,19 +47,20 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `android16.c/.h` | the Android 16 boss (stat 109, sprite 160): rocket specials between ticks of the stock boss AI, poise, projectiles of the ROM's projectile class, `COOP_CMD_A16` test spawn; tuning knobs in the header |
 | `bosses.c/.h` | extra enemy stats (110+ = stock stat + overrides: 110 / 112 Android 13 beside 19 / Gero, 111 Cooler as the forest spirit, 113 Cooler's Namekian, 114 unused, 115 / 116 Broly / Paragus, 120 / 121 the bunker's two Android 19s; full list `docs/ids.md`) and per-boss rules (end_pct, partner model/stat, no twin, pair, rage: `BOSS_RAGE`, Broly's once-only refill when Paragus falls first); the both-down and rage rules live in `enemies.c` |
 | `actors.c` | duplicate-actor rule: town NPCs showing a character either player controls are removed |
-| `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in the last party slot |
+| `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in party slot 7 (`DUEL_SLOT`) |
 | `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2, Broly's staging and PartyKeep (9 / 10), Android 16 joining and leaving (11 / 12), the training waves (13 / 14) (`docs/scripts.md` 2.2b) |
 | `waves.c` | the Time Chamber's training waves: ten fixed rounds of stock enemies spawned around the players, round captions through the chamber script, "Training completed!"; state `waves` in `.party.wv` (0x0203F880 in the merged build; it moves with `.party.kr`, check `coop.map`); `COOP_CMD_WAVE_CLEAR` / `_SKIP` tests (`docs/story.md` 4g, `docs/testing.md`) |
 | `cellgames.c` | the Cell Games: solo fights (CoopCall 15, `COOP_CMD_SOLO`), held beams (CoopCall 16), the test win `COOP_CMD_WIN_STAT`; state `.party.cg` |
 | `a16player.c/.h` | Android 16 as a player in "Gero's computer": CoopCall 11 / 12 (16 joins the last party slot and the party locks to Krillin + 16; he leaves for good), Rocket Punch (ability 22), `COOP_CMD_A16_PARTY`; ids and flags 420-437 in the header |
 | `hercule.c` | Hercule's four abilities (table entries 14-17 via `data/hercule.json`) |
-| `krillin.c/.h` | Krillin (slot 6, row 23, sprite 161) and old Hercule (row 24): status-screen title / pages / technique pages for PARTY_SLOTS, dialogue name opcodes, blue ki blast, Afterimage Rush / Shockwave Punch / Destructo Disc (abilities 19-21), old Hercule's weak combat bytes and `old_hercule_set`, `KR_TEST` triggers; ids in the header |
+| `krillin.c/.h` | Krillin (slot 6, row 23, sprite 161) and old Hercule (row 24): status-screen title / pages / technique pages for PARTY_SLOTS, the pause menu's tab strip (`status_tabs_hook`), dialogue name opcodes, blue ki blast, Afterimage Rush / Shockwave Punch / Destructo Disc (abilities 19-21), old Hercule's weak combat bytes and `old_hercule_set`, `KR_TEST` triggers; ids in the header |
+| `ssj2gohan.c/.h` | Super Saiyan 2 Gohan (party slot 8, row 28, sprite 58): `ssj2_join` (CoopCall 20, proposed), Super Saiyan 2 Burst (ability 23), `SSJ2_TEST` triggers; ids and join numbers in the header |
 | `party.c` | the relocated party block (`g_party_block`) and the ROM's party functions re-implemented for `PARTY_SLOTS` entries: `Party_Init`, `Party_AddExp` (level-ups), flag accessors, VM counter / item / bestiary opcodes |
 | `party_save.c` | save path for N entries: `SaveGame`, `LoadSlot`, `WriteSlot`, the save menu's slot store and queries, start game; EEPROM slots of `SAVE_STRIDE` |
 | `switch.c` | Switch Characters screen: view party of six, scrolling window, edge indicators |
 | `ssj.c` | Super Saiyan Hercule ability pair (`ssj_ready` / `ssj_use`): row 22, sprite 157, EP cost 50 |
 | `controller.c` | "controller mode": this GBA becomes player 2's pad over the link cable |
-| `wrap.c` | run original ROM handlers for player 2 by swapping the input block |
+| `wrap.c` | run original ROM handlers for player 2 by swapping the input block (dash, the beam abilities' charge states) |
 | `util.c` | freestanding memcpy/memset helpers |
 | `coop.ld` | linker script: `.coop` sections, pinned EWRAM regions, `EXTERN` list of hook symbols |
 
@@ -71,7 +72,7 @@ Generated at build time (never committed): `build/maps.patch.json` (the new maps
 `build/gen/boss_models_data.c` (Android 13, the Namekian, from `tools/bossmodels.py`), `build/gen/broly_sprites_data.c`
 (Paragus, his portrait, the ship, from `tools/brolysprites.py`), `build/gen/hercule_sprites_data.c` (`herc_record`:
 Hercule's record 72 plus the Kamehameha pose, group 18, from `tools/herculesprites.py`), `build/gen/halo_sprites_data.c`
-(haloed Goku and Super Saiyan Goku, sprites 176 / 177, from `tools/halosprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
+(haloed Goku and Super Saiyan Goku, sprites 176 / 177, from `tools/halosprites.py`), `build/gen/ssj2_sprites_data.c` (`ssj2_record`, id 58 repointed, from `tools/ssj2sprites.py`), `build/gen/krillin_sprites_data.c` (Krillin's sprite 161, status portrait, ki blast / disc frames and
 icons, the relocated `ui_strings` and `portrait_module` tables, from `tools/krillinsprites.py`),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 
@@ -95,10 +96,11 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
 | `gen_cell_games.py` | generates `data/story/cell_games.lscript` from the arena maps' stock dumps plus our edits (edit the chapter there) |
 | `mapedit.py` | story specs (`data/story/*.json`): triggers, records, map scripts, line edits; run by `romdata.py` for specs in `data/hercule.json`'s include |
-| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba; `reset` keeps the save data), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `arctic_route.txt` (the arctic route: world-map landing, every exit, the pad) with `objfree.py` (OBJ VRAM free list from its peeks), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways) |
+| `headless/` | `st_headless.c` (headless test runner on the fork's libmgba; `reset` keeps the save data), `st_test.py` (run a script, tile the screenshots), `st_shots.py`, `mkmenu.txt` (debug-menu state per build), `ch9_gero.txt` (a whole chapter end to end), `arctic_route.txt` (the arctic route: world-map landing, every exit, the pad) with `objfree.py` (OBJ VRAM free list from its peeks), `beam_hercule.txt` (the stock Cell beam struggle with Hercule firing), `halo_goku.txt` (haloed Goku: walk, punch, transform both ways); `cell_games.txt` (the whole Cell Games); `stepz ADDR MAX` presses A on both pads until a byte clears |
 | `fork/st_*.ps1/.py` | `st_run.ps1` (fork without GDB), `st_place.ps1` (move a fork window), `st_pad.py` (TCP pad as player 1, `STORY_TEST` builds), `st_preset.py` (story-flag preset in a ROM) |
 | `sprites.py` | sprite atlas, per-sprite pose sheets, report (record format decoder); `Sprites.frame_counts` (frames per descriptor array, by descriptor runs) is what every generator copies frames through; `--frame-diff` lists the stock arrays the old gap guess got wrong |
-| `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-27 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
+| `spriteclone.py` | clones + recolours a record (SSJ Hercule), builds display rows 22-28 (`--row-sprite`, `--krillin-sprite`, `--old-hercule-sprite`, `--a16-sprite`, `--halo-sprites`, `--ssj2-sprite`) and emits the relocated `sprite_index` / `display_rows`; `--extra` appends more records to the index (an id below 157 replaces the stock record: `72=herc_record`) |
+| `ssj2sprites.py` | Super Saiyan 2 Gohan: record 58 with hurt / lying / tumble (groups 11, 12, 20) from record 59, by ROM address -> `build/gen/ssj2_sprites_data.c` (`ssj2_record`, id 58 repointed; row 28), preview `ssj2_gohan_preview.png` |
 | `halosprites.py` | haloed Goku: Goku's (60) and Super Saiyan Goku's (61) records with the dead pose's halo on every frame -> `build/gen/halo_sprites_data.c` (`halo_goku_record` 176, `halo_ssj_record` 177; rows 26 / 27), preview `halo_goku_preview.png` (stock beside haloed) |
 | `herculesprites.py` | Hercule's Kamehameha pose: record 72 (stock groups by ROM address) with group 18 built from his punch stance / idle frames and Goku's beam arms in his colours -> `build/gen/hercule_sprites_data.c` (`herc_record`, id 72 repointed), preview `hercule_beam_preview.png` beside Goku's and Gohan's beam frames |
 | `buu_sprites.py` | Buu's Fury ROM: sprite atlas, per-sprite sheets, report (its record format decoder) |

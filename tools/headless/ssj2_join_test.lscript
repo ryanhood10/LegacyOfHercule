@@ -1,0 +1,10 @@
+; Test only (never in data/hercule.json's include list): the join as the Cell Games chapter will script it,
+; on a dialogue trigger just above the Map Test spawn in zone 2 area 1 (tools/headless/ssj2_join_test.json,
+; docs/testing.md "Super Saiyan 2 Gohan").
+
+sequence ssj2_join_test
+  [0] script
+        CoopCall 20, 0, 0, 0
+        END
+  [1] text 0 "@^Super Saiyan 2 Gohan is now an available character!"
+end

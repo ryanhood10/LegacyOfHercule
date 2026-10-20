@@ -1,0 +1,81 @@
+# Super Saiyan 2 Gohan through the save pad and a reload (docs/testing.md "Super Saiyan 2 Gohan"), SSJ2_TEST
+# build, from the debug-menu state: join (player 2's pad L + R + Select), the town's save pad (zone 2 area 1,
+# Map Test entry 7, pad at 540,256; its tutorial plays first), Switch Characters scrolled to him (8 members:
+# the window of six scrolls twice), Save, then a soft reset, Select Game and the load: player 1 is him on the pad.
+#   python tools/headless/st_test.py tools/headless/ssj2_save.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/menu.ss --out build/ssj2t/hl --cols 5
+p2 0
+maptest 7
+frames 300
+p2 0x304
+frames 2
+p2 0
+frames 20
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 0x80 4
+frames 20
+key 1 4
+frames 80
+shot sv_00_switch
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+key 0x10 4
+frames 30
+shot sv_01_switch_end
+key 1 4
+frames 80
+echo --- switched: active slot
+peek8 PARTY 1
+shot sv_02_on_pad
+key 1 4
+frames 80
+shot sv_03_menu
+key 1 4
+frames 80
+shot sv_04_saved
+key 1 4
+frames 60
+echo --- saved: party block head, slot 8, flags bank
+peek PARTY 3
+peek PARTY+0xEC 7
+peek FLAGS 4
+echo --- soft reset, Select Game, load slot 1
+key 0xF 6
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 120
+key 1 6
+frames 120
+shot sv_05_select
+key 1 6
+frames 400
+map
+shot sv_06_loaded
+echo --- loaded: party block head, slot 8, flags bank
+peek PARTY 3
+peek PARTY+0xEC 7
+peek FLAGS 4
+findent pl 0x08025604
+peek pl+0x48

@@ -32,7 +32,7 @@ Majin Buu. Story frame decided 2026-10-17: "Canon plus Hercule" (see `docs/story
 | Co-op, wide view | Done (this repo). | done |
 
 Hard limits: party slots, first thought fixed at 6 by the save format, are now `PARTY_SLOTS` (6..16,
-default 8) with a rebuilt save layout (`docs/party-8-slots.md`); 128
+default 9 since Super Saiyan 2 Gohan) with a rebuilt save layout (`docs/party-8-slots.md`); 128
 sprites on screen, 240x160 native (the fork widens it), SRAM save layout (new flags must fit the
 existing story-flag bits or reuse spare ones).
 

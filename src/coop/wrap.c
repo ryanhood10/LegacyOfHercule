@@ -29,3 +29,14 @@ void dash_update_hook(void *state, Entity *e) { call_as_player(e, state, (CtrlFn
 void ctrl_8277_hook(void *state, Entity *e) { call_as_player(e, state, (CtrlFn)0x08008277); }
 // control state 0x08025D70 slot 5
 void ctrl_85ad_hook(void *state, Entity *e) { call_as_player(e, state, (CtrlFn)0x080085AD); }
+
+// The beam abilities' charge states (slot 2, the update) read B from the global block: Masenko, Big Bang
+// and Burning Attack fire on B released, Kamehameha, Special Beam Cannon and Spirit Bomb keep charging
+// while B is held. Unwrapped, player 2's beams followed player 1's B: the held ones stopped at once and
+// the released ones charged until player 1 let go of B (and a character switch in that state crashed).
+void masenko_update_hook(void *state, Entity *e)   { call_as_player(e, state, (CtrlFn)0x08014F89); }
+void bigbang_update_hook(void *state, Entity *e)   { call_as_player(e, state, (CtrlFn)0x08015079); }
+void burning_update_hook(void *state, Entity *e)   { call_as_player(e, state, (CtrlFn)0x08015177); }
+void kame_update_hook(void *state, Entity *e)      { call_as_player(e, state, (CtrlFn)0x08015249); }
+void sbc_update_hook(void *state, Entity *e)       { call_as_player(e, state, (CtrlFn)0x0801539B); }
+void spiritbomb_update_hook(void *state, Entity *e) { call_as_player(e, state, (CtrlFn)0x080156B7); }

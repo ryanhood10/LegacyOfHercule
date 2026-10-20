@@ -31,6 +31,22 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Not verified: the world-map name label (not seen for stock sites either), the wide view (the WIDE=1
   build builds, not run), real play and the balance of the climbs.
 
+- **Super Saiyan 2 Gohan as his own party member** (branch `ssj2-gohan`, worktree
+  `F:\MeltyCreations\log2-ssj2`; `docs/hercule.md` 5d, `docs/party-8-slots.md`): `PARTY_SLOTS=9` is the
+  default, slot 8 empty until `ssj2_join()` (CoopCall 20, proposed for the Cell Games chapter's end, then
+  the message line) writes him at Gohan's level with Gohan's HP / EP x1.5 and stats x1.7, growth row 8 about
+  twice Gohan's, abilities Kamehameha / Masenko / **Super Saiyan 2 Burst (23)** / Ki Blast. Display row 28
+  (Gohan's row 3 with sprite 58 and the stock portraits 61 / 12), sprite 58 repointed to `ssj2_record` (hurt,
+  lying, tumble from 59), status title "SSJ2 GOHAN" with Gohan's technique pages. Slot 7 stays the duel
+  clone's (`DUEL_SLOT` fixed). Eight-slot saves migrate to the nine-slot layout on the first Select Game.
+  The story-flag bank moved to 0x0203F108 (headless `FLAGS` variable; `ch9_gero.txt` and `peek.gdb`
+  updated). Fixed on the way, all also on main: the pause menu's tab strip read past its image tables
+  with 7+ members (garbage beside Gohan's title; with 8, Android 16's chapter included, a crash stepping
+  onto Gohan): `status_tabs_hook`; player 2's beam abilities followed player 1's B (Kamehameha never
+  fired, Masenko charged forever) and a Select switch in that state crashed: `wrap.c` hooks and a guard in
+  `p2_cycle`. Verified headless (join through a script, both players, switch and status screens with 8
+  members, save / reload, old-save migration, a clone duel, Gero's computer, haloed Goku, old Hercule)
+  and in fork slot 9 (both players' walk, combo and abilities).
 - **Sprite frame counts fixed for every generator** (branch `sprite-frame-counts`): `tools/sprites.py`
   `Sprites.frame_counts` now counts the run of valid descriptors (OBJ size, ROM blob of kind 0-2) up to
   the next array start of any stock record, replacing the gap guess that cut each record's

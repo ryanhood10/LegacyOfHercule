@@ -195,8 +195,22 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   rows map onto five cells by behaviour *type* (rows 0-3 = the base forms share one), so
   `install_behaviour` for player 2 re-initialises a type singleton of the same type, which is
   benign. Rows of another type (4, 5, 7, 10, 11, 14, 16, 17, 20) use their own cells. (The build has
-  28 rows; the added rows 22-26 are copies of standard rows and use the base-form cell, 27 is a copy of
-  Super Saiyan Goku's row 20 and uses its cell, see `docs/engine.md`.)
+  29 rows; the added rows 22-26 and 28 are copies of standard rows and use the base-form cell, 27 is a copy
+  of Super Saiyan Goku's row 20 and uses its cell, see `docs/engine.md`.)
+
+## Player 2's beam abilities (2026-10-19)
+
+- The six beam abilities' charge states read B from the global input block in their update (slot 2):
+  Masenko (anim 45, vtable `0x08025D5C`, `0x08014F88`), Big Bang (46, `0x080258B4`, `0x08015078`) and
+  Burning Attack (47, `0x08025E48`, `0x08015176`) fire on **B released**; Kamehameha (48, `0x08025CB8`,
+  `0x08015248`, fires after 24 frames), Special Beam Cannon (49, `0x08025F70`, `0x0801539A`) and Spirit
+  Bomb (51, `0x08025CCC`, `0x080156B6`) keep charging **while B is held**. For player 2 that was player
+  1's B: its held beams stopped at once and its Masenko charged until player 1 let go of B. `wrap.c`
+  (`masenko_update_hook` .. `spiritbomb_update_hook`, `VTABLE_HOOKS`) runs them with player 2's input.
+- Player 2's Select (`p2_cycle`) switched characters in any state; in the Masenko charge it freed the
+  held ball (the state's leave) while the scene list still held it, and the next flush jumped to garbage
+  (r14 `0x08006ACF`). `p2_cycle` now refuses (the "can't" sound) unless player 2 stands, walks or moves
+  diagonally. Seen with Super Saiyan 2 Gohan as player 2 (Masenko, then Select).
 
 ## Character switching (2026-10-17)
 
@@ -905,7 +919,7 @@ For the story's two duels (Vegeta vs his shadow clone in space, Vegeta vs Trunks
   is set (`coop2.pad_swap`, applied in `input_poll_hook` while a player-2 source exists), and the
   duel's end script (a mapScripts index, TriggerMapEvent style) runs.
 - **Clone**: `duel_start(-1, flags, end_script)` copies player 1's party entry into the last party
-  slot (`DUEL_SLOT` = `PARTY_SLOTS - 1`, so slot 7 is reserved for duels; during the "Gero's computer"
+  slot (`DUEL_SLOT`, fixed at 7 in `rom.h` since slot 8 is Super Saiyan 2 Gohan; slot 7 is reserved for duels; during the "Gero's computer"
   chapter it also holds Android 16 as a player, `A16_SLOT` in `a16player.h`, since no duel runs
   there) and binds player 2 to it;
   `DUEL_SHADOW` draws player 2 through a 256-entry colour remap toward darker violet palette colours

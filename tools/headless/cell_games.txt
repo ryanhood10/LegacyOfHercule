@@ -20,78 +20,78 @@ key 0x40 160
 p2 0
 waitmap 14 2 300
 frames 60
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 22
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 22
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == fight 1: Goku (4) alone, solo 1 -> expect 14
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg02_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 23
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 23
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == fight 2: Goku on player 2's pad -> expect 24
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg03_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 24
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 24
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == fight 3: Gohan + Hercule -> expect 80
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg04_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 27
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == J1: Krillin -> expect 16
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg05_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 27
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == J2: Piccolo -> expect 21
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg06_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 27
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == J3: Vegeta -> expect 12
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg07_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 27
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == J4: Trunks -> expect 23
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg08_won
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 25
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 25
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == fight 7: Gohan + Hercule -> expect 80
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg09_won
-poke32 0x0203F91C 0xCE11CA3E
+poke32 0x0203F9B0 0xCE11CA3E
 save cg_pre8.ss
-poke32 0x0203F91C 0xCE11CA3E
-poke8 0x0203F921 26
-poke8 0x0203F922 0
-stepz 0x0203F921 140
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 26
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
 echo == fight 8: two Cells -> expect 80
-peek8 0x0203F923 1
+peek8 0x0203F9B7 1
 map
 shot cg10_won
 mash 10 100

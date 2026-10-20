@@ -10,6 +10,7 @@
 // docs/hercule.md "Krillin" / "Old Hercule", docs/party-8-slots.md, docs/sprites.md "Krillin".
 #include "coop.h"
 #include "krillin.h"
+#include "ssj2gohan.h"
 
 typedef struct KrDesc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } KrDesc;
 extern const KrDesc kr_kiblast[16], kr_disc[4];     // build/gen/krillin_sprites_data.c
@@ -114,12 +115,19 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
 #if PARTY_SLOTS > KRILLIN_SLOT
     (u32)kr_status_icon_disc, (u32)kr_status_icon_ki,                       // slot 6: Krillin
 #endif
+#if PARTY_SLOTS > SSJ2_SLOT
+    // slot 7: none (Android 16 and the clones have no technique bits); slot 8: Super Saiyan 2 Gohan shows
+    // Gohan's icons. Every slot whose flags hold technique bits (3, 4) needs a pair: the stats page
+    // decompresses them, and a zero word decompressed the BIOS over memory (garbage tiles, then a crash)
+    0, 0,
+    0x086FF6D0, 0x086FF68C,
+#endif
 };
 
-// The last slot is Android 16 on his row 25 (a16player.c) or a duel clone: a clone is named after the
+// Slot 7 is Android 16 on his row 25 (a16player.c) or a duel clone: a clone is named after the
 // character whose row it copies (player 1's when none matches).
 static int name_slot(int slot) {
-    if (slot != PARTY_SLOTS - 1 || row_of_slot(slot) == 25) return slot;
+    if (slot != DUEL_SLOT || row_of_slot(slot) == 25) return slot;
     for (int s = 0; s < slot; s++) if (row_of_slot(s) == row_of_slot(slot)) return s;
     return g_Party->active_slot;
 }
@@ -130,16 +138,97 @@ int status_pages_hook(void *obj, int idx) {
     int slot = status_slot(obj, idx);
     if (slot < HERCULE_SLOT) return 4;     // stats, special melee, two energy techniques
     if (slot == KRILLIN_SLOT) return 3;    // stats, Destructo Disc, Ki Blast
+    if (slot == SSJ2_SLOT) return 4;       // Gohan's pages
     return 1;
 }
 
 void status_draw_hook(void *obj, int idx, int page) {
     int slot = status_slot(obj, idx);
     if (page == 0) StatusPage_Stats(obj, idx);
-    else if (slot < HERCULE_SLOT) {
+    else if (slot == SSJ2_SLOT && page <= 3) {
+        // Super Saiyan 2 Gohan's technique pages are Gohan's (special melee, Masenko, Kamehameha): the stock
+        // pages read the slot from the screen's list (+0x158) for the strings and icons and the slot's flags
+        // for "learned", so they are drawn as slot 0 with slot 8's flags for the duration of the call
+        s32 *list = (s32 *)((u8 *)obj + 0x158 + idx * 4);
+        u32 *gohan = &g_Party->chars[GOHAN_SLOT].flags, kept = *gohan;
+        *list = GOHAN_SLOT;
+        *gohan = g_Party->chars[SSJ2_SLOT].flags;
+        if (page == 1) StatusPage_Melee(obj, idx);
+        else StatusPage_Energy(obj, idx, page - 2);
+        *gohan = kept;
+        *list = SSJ2_SLOT;
+    } else if (slot < HERCULE_SLOT) {
         if (page == 1) StatusPage_Melee(obj, idx);
         else StatusPage_Energy(obj, idx, page - 2);
     } else if (slot == KRILLIN_SLOT && page <= 2) StatusPage_Energy(obj, idx, page - 1);
+}
+
+// Tab strip above a pause-menu page (0x0800233E, entry jump): one 16 px tab per member on a 192 x 16
+// canvas, the current one wide with the title. The stock code takes the tab images by distance from two
+// five-entry tables (module 0x081D8ED4 +0xC4 left, +0xD8 right) and writes 15 - 2 * index filler tiles
+// after the highlight, so a member more than five tabs right of the current one decompressed the word
+// after the table (g_InputSystem's address) into the canvas (garbage, then a crash; seen with 8 members:
+// Android 16's chapter, Super Saiyan 2 Gohan) and an index of 8 or more wrote tiles without end. Same
+// drawing with the distances clamped and a window of at most 8 tabs around the current member.
+ROM_FN(void, Gfx_Decompress, (const void *src, void *dst), 0x0801F395);
+ROM_FN(void, Canvas_Blit, (void *canvas, const void *img, const s32 *rect), 0x080211C9);
+ROM_FN(void, Canvas_Text, (void *canvas, const char *s), 0x0801F637);
+ROM_FN(void, Canvas_Upload, (void *canvas, void *vram), 0x080236B5);
+ROM_FN(void *, Mem_Fill, (void *p, int v, unsigned n), 0x08021F19);
+#define TAB_MODULE   ((const void *const *)0x081D8ED4)   // [0x30 + d] left tab at distance d, [0x36 + k] right tab k + 1 away
+#define TAB_CURRENT_L ((const void *)0x081D948C)
+#define TAB_CURRENT_R ((const void *)0x081D944C)
+#define TAB_TILEMAP  ((u16 *)0x0600E0C6)
+#define TAB_VRAM     ((void *)0x06004B40)
+#define TABS_MAX     8
+void status_tabs_hook(s32 *o) {
+    const u32 *vt = *(const u32 **)o;
+    int idx = o[0x45];
+    const char *title = ui_strings[((s32 (*)(void *, s32))((u32)vt + vt[13]))(o, idx)];
+    int n = ((s32 (*)(void *))((u32)vt + vt[12]))(o);
+    int first = 0;
+    if (n > TABS_MAX) {
+        first = idx - (TABS_MAX - 1);
+        if (first < 0) first = 0;
+        if (first > n - TABS_MAX) first = n - TABS_MAX;
+        n = TABS_MAX;
+    }
+    int cur = idx - first;
+    void *canvas = o + 0x1F, *buf = (void *)o[0xC];
+    u32 *px = (u32 *)o[0x28];
+    Mem_Fill(px, 0, (unsigned)o[0x2C]);
+    s32 r[4] = { 0, 3, 0, 0x10 };
+    for (int i = 0; i < cur; i++) {
+        int d = cur - i;
+        r[0] = i * 16; r[2] = r[0] + 0x20;
+        Gfx_Decompress(TAB_MODULE[0x30 + (d > 5 ? 5 : d)], buf);
+        Canvas_Blit(canvas, buf, r);
+    }
+    for (int k = n - cur - 2; k >= 0; k--) {
+        r[0] = k * 16 + cur * 16 + 0x40; r[2] = r[0] + 0x20;
+        Gfx_Decompress(TAB_MODULE[0x36 + (k > 4 ? 4 : k)], buf);
+        Canvas_Blit(canvas, buf, r);
+    }
+    r[0] = cur * 16; r[1] = 0; r[2] = r[0] + 0x14;
+    Gfx_Decompress(TAB_CURRENT_L, buf);
+    Canvas_Blit(canvas, buf, r);
+    r[2] = r[0] + 0x50; r[0] += 0x3C;
+    Gfx_Decompress(TAB_CURRENT_R, buf);
+    Canvas_Blit(canvas, buf, r);
+    u32 *p = px + cur * 4;                                   // the current tab's fill (canvas rows of 0xC0 bytes)
+    for (int i = 0; i < 10; i++) { p[5 + i] = 0x86868686u; p[53 + i] = 0x8E8E8E8Eu; }
+    for (int row = 0; row < 14; row++)
+        for (int i = 0; i < 10; i++) p[101 + row * 48 + i] = 0x95959595u;
+    o[0x20] = cur * 16 + 0x28;                               // title position on the canvas
+    o[0x21] = 0xE;
+    Canvas_Text(canvas, title);
+    u16 *map = TAB_TILEMAP;
+    for (int i = 0; i < cur * 2; i++) *map++ = 0x10A;
+    *map++ = 0x118;
+    for (int i = 0; i < 8; i++) *map++ = 0x11A;
+    *map++ = 0x119;
+    for (int i = 15 - cur * 2; i > 0; i--) *map++ = 0x10A;
+    Canvas_Upload(canvas, TAB_VRAM);
 }
 
 // ---- dialogue names (VM opcodes 0x080094B0 / 0x080094CC: push a string pointer) --------------------
@@ -148,8 +237,10 @@ static void vm_push(s32 *stack, s32 v) {
     stack[0] = n + 1;
     stack[1 + n] = v;
 }
-void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + g_Party->active_slot]); }
-void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + g_Party->active_slot]); }
+// (Super Saiyan 2 Gohan is "Gohan" in dialogue; "SSJ2 Gohan" is his status-screen title)
+static int speaker_slot(void) { int s = g_Party->active_slot; return s == SSJ2_SLOT ? GOHAN_SLOT : s; }
+void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + speaker_slot()]); }
+void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + speaker_slot()]); }
 
 // ---- ki blast (0x0800EAD8): the stock spawn, Krillin's blasts get the blue frames --------------------
 void kiblast_spawn_hook(const s32 *xy, Entity *owner) {
@@ -178,7 +269,7 @@ static void hit_msg(HitMsg *m, Entity *attacker, void *source, s32 x0, s32 y0, s
     m->source = source;
 }
 
-static void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack) {
+void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack) {
     HitMsg m;
     hit_msg(&m, e, e, cx - rx, cy - ry, cx + rx, cy + ry, attack);
     EntityList_Broadcast(g_SceneTable[1], 0, &m);

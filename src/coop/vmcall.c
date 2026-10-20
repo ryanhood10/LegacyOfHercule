@@ -37,9 +37,14 @@
 //  11 A16Join ()                        "Gero's computer": 16 joins in the last party slot, the party locks to
 //                                       Krillin + 16 (a16player.c; the script then sets player 1 and 2)
 //  12 A16Leave ()                       16 leaves the party for good, the lock is undone, Hercule available
+//  20 Ssj2Join ()                       Super Saiyan 2 Gohan joins (party slot 8, ssj2gohan.c) at Gohan's level;
+//                                       the script then shows "Super Saiyan 2 Gohan is now an available
+//                                       character!" (number proposed by the SSJ2 Gohan piece; the Cell Games
+//                                       chapter calls it at the end of the Games)
 #include "coop.h"
 #include "a16player.h"
 #include "krillin.h"
+#include "ssj2gohan.h"
 
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
@@ -47,7 +52,6 @@ void hercule_awaken(void);                 // ssj.c
 int p2_bind_slot(int slot);                // player.c
 void *memcpy(void *dst, const void *src, unsigned n);
 
-#define DUEL_SLOT          (PARTY_SLOTS - 1)
 #define DEATH_EVENT_VTABLE 0x080238FCu     // the enemy-death event: its fire slot runs action->func(action)
 #define ACTION_RUN_DIALOG  0x080106B3u     // EnemyAction_RunDialog {func, sequence}: runs a dialogue modally
 
@@ -83,7 +87,9 @@ static void run_sequence_soon(const void *seq) { coop_run_sequence(coop2.call_ac
 
 // PartyKeep (CoopCall 10): story flags 404-411 = slots 0-7 selectable (party flags bit 1), 412-414 = player
 // 1's slot, 415-418 = player 2's slot + 1 (0 = none), 419 = Gohan (slot 0) in the party (bit 0). Flags
-// 400-419 are the Broly chapter's (docs/scripts.md 2.5).
+// 400-419 are the Broly chapter's (docs/scripts.md 2.5). Slot 8 (Super Saiyan 2 Gohan) has no kept bit (the
+// trip leaves it as it is) and player 1 on slot 8 comes back as slot 0 (three bits); player 2's four bits
+// hold it.
 #define KEEP_BITS 404
 #define KEEP_P1 412
 #define KEEP_P2 415
@@ -101,7 +107,7 @@ static void party_keep(s32 *st, int op) {
         for (int s = 0; s < n; s++) keep_flag(KEEP_BITS + s, (g_Party->chars[s].flags >> 1) & 1);
         keep_field(KEEP_P1, 3, g_Party->active_slot);
         int p2 = (coop.p2 || p2_present()) ? coop.p2_slot + 1 : 0;
-        keep_field(KEEP_P2, 4, p2 > 8 ? 0 : p2);
+        keep_field(KEEP_P2, 4, p2 > 15 ? 0 : p2);
         keep_flag(KEEP_GOHAN, g_Party->chars[0].flags & 1);
         return;
     }
@@ -164,6 +170,9 @@ void vm_coop_call(s32 *st) {
     case 10: party_keep(st, a); break;
     case 11: a16_join(); break;
     case 12: a16_leave(); break;
+#if PARTY_SLOTS > SSJ2_SLOT
+    case 20: ssj2_join(); break;
+#endif
     default: break;
     }
 }

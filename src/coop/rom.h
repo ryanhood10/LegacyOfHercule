@@ -136,6 +136,9 @@ _Static_assert(sizeof(CharacterEntry) == 0x1C, "CharacterEntry size");
 _Static_assert(PARTY_SLOTS >= 6 && PARTY_SLOTS <= 16, "PARTY_SLOTS range");
 #define PARTY_SLOTS_STOCK 6
 #define PARTY_TAIL_SHIFT ((PARTY_SLOTS - PARTY_SLOTS_STOCK) * 0x1C)
+// Slot 7 is the duel clone's (duel.c; Android 16 borrows it during his chapter, a16player.c); slots after
+// it are real party members (8 = Super Saiyan 2 Gohan, ssj2gohan.h). Builds of fewer than 8 slots use the last.
+#define DUEL_SLOT (PARTY_SLOTS < 8 ? PARTY_SLOTS - 1 : 7)
 typedef struct PartyState {
     u8 active_slot;               // +0x00
     u8 flags;                     // +0x01  bit0 saved once, bit1 meter shown (0x080040AA), bit2 debug party

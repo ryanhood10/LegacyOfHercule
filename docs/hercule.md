@@ -192,6 +192,41 @@ while slot 5 shows row 24, `krillin_frame` (every input poll) divides his entity
 fork as player 2: row 21 -> 24, entity sprite record -> `buu_record_158`, combat bytes 85/73 -> 28/24,
 Super Hercule refused (row and EP unchanged), and back to row 21 with the stock record.
 
+## 5d. Super Saiyan 2 Gohan (party slot 8, display row 28, sprite 58; `src/coop/ssj2gohan.c`, 2026-10-19)
+
+Ryan (`docs/story.md` 4h): after the Cell Games Super Saiyan 2 Gohan joins as his own, "super overpowered"
+party member; regular Gohan (slot 0) stays selectable. `PARTY_SLOTS=9` (`docs/party-8-slots.md`).
+
+- **Join** `void ssj2_join(void)` (CoopCall 20, proposed; the Cell Games chapter calls it at the end of
+  the Games, then shows `text 0 "@^Super Saiyan 2 Gohan is now an available character!"`): slot 8 gets
+  row 28, Gohan's EXP (his level), Gohan's max HP / EP x1.5 (full), str / pow / end x1.7
+  (`SSJ2_*_PCT`, `ssj2gohan.h`), flags 0x7F (in party, available, the charged attack and every technique
+  page), abilities 3 / 4 / 23 / 2, ability index 0. A second call does nothing (his own growth is kept).
+  Until then slot 8 is empty (not in the party, not in Map Test parties).
+- **Growth** row 8 (`data/hercule.json`): str 600-800, pow 600-800, end 520-720 per level (/256), about
+  twice Gohan's (318-518 / 302-502 / 256-456). At Map Test level 40 he joins with 88 / 117 / 74 against
+  Gohan's 52 / 69 / 44 (the status bars are scaled to 100: "117/100"); HP 1314, EP 210.
+- **Display row 28**: a copy of Gohan's row 3 (behaviour class `0x030021E0`: combat bytes from his own
+  stats, regeneration) with sprite 58 and portraits 61 / 12; a base form linking to itself (flags 0). The
+  stock row 4 is not used: its class `0x030021E4` fixes the combat bytes at 100, regenerates the active
+  slot's HP and plays an aura loop, and as a transformed row (flags 3, links to row 2) it would be turned
+  back by `Party_DetransformOthers` whenever he is not player 1.
+- **Abilities**: Kamehameha (3), Masenko (4), **Super Saiyan 2 Burst (23)**, Ki Blast (2): Gohan's list
+  without Transformation B (sprite 58 has no transformation groups). The Burst (`ssj2_burst_ready /
+  _use`, `BURST_*` in the header): 10 EP, the ki pose (animation 5), one melee hit `{0, 4, 0x900}` over
+  +-48 x +-40 px around him (Krillin's `melee_burst`), a 16-frame camera shake, explosion and impact
+  sounds; HUD icons of the Transformation ability. Seen: 745-877 damage per hit at level 40.
+- **Names and pages**: status title "SSJ2 GOHAN" (`ui_strings` slot 8, `tools/krillinsprites.py`; the
+  title font draws the 2 small), dialogue `%s` "Gohan" (`krillin.c speaker_slot`), four status pages:
+  stats and Gohan's Super Kick, Masenko Ball and Kamehameha pages (drawn as slot 0 with slot 8's flags).
+- **Player 2's beams** (fixed with him, any character): the six beam abilities' charge states read B from
+  the global block, so player 2's Kamehameha / Special Beam Cannon / Spirit Bomb stopped at once and its
+  Masenko / Big Bang / Burning Attack charged until player 1 let go of B; `wrap.c` now runs them with
+  player 2's input, and player 2's Select switch waits until player 2 stands or walks (switching in a
+  charge crashed). `docs/coop-design.md` "Player 2's beam abilities".
+- **Test build** `SSJ2_TEST=1`: player 2's pad holding L + R: Select = join, Start = he becomes player 1,
+  Up = player 2 plays him, Down = his EXP one short of the next level.
+
 ## 6. Verification log
 
 | stage | result |

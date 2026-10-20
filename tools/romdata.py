@@ -238,6 +238,9 @@ def build(rom, spec, party_slots=None):
 
     for slot_s, edits in spec.get("party", {}).items():
         slot = int(slot_s)
+        if slot >= party_slots >= 8:   # a smaller test build (e.g. PARTY_SLOTS=8 without Super Saiyan 2 Gohan)
+            print(f"party slot {slot}: skipped, the build has {party_slots} slots (PARTY_SLOTS)", file=sys.stderr)
+            continue
         if not 0 <= slot < party_slots:
             sys.exit(f"party slot {slot}: the build has {party_slots} slots (PARTY_SLOTS)")
         e = read_entry(rom, slot, src_ent)
@@ -262,6 +265,9 @@ def build(rom, spec, party_slots=None):
 
     for slot_s, g in spec.get("growth", {}).items():
         slot = int(slot_s)
+        if slot >= party_slots >= 8:
+            print(f"growth slot {slot}: skipped, the build has {party_slots} slots (PARTY_SLOTS)", file=sys.stderr)
+            continue
         if not 0 <= slot < party_slots:
             sys.exit(f"growth slot {slot}: the build has {party_slots} slots (PARTY_SLOTS)")
         cur = read_growth(rom, slot, src_grow)

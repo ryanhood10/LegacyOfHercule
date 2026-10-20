@@ -39,6 +39,13 @@ VTABLE_HOOKS = [
     (0x08025E20, 2, "dash_update_hook"),   # dash / transformation charge control state
     (0x080251F4, 2, "ctrl_8277_hook"),     # control state reading the d-pad
     (0x08025D70, 5, "ctrl_85ad_hook"),     # control state reading A
+    # the beam abilities' charge states read B (src/coop/wrap.c): animations 45, 46, 47, 48, 49, 51
+    (0x08025D5C, 2, "masenko_update_hook"),
+    (0x080258B4, 2, "bigbang_update_hook"),
+    (0x08025E48, 2, "burning_update_hook"),
+    (0x08025CB8, 2, "kame_update_hook"),
+    (0x08025F70, 2, "sbc_update_hook"),
+    (0x08025CCC, 2, "spiritbomb_update_hook"),
     (0x08025A6C, 0, "camera_follow_hook"), # camera-follow object update
     (0x0802408C, 0, "hud_destroy_hook"),   # HUD object
     (0x0802408C, 2, "hud_update_hook"),
@@ -67,6 +74,7 @@ R3_ARG_JUMPS = {0x080104C0}   # BossHealthBar_Create(mem, entity, lo, hi): hi ar
 
 ENTRY_JUMPS = [
     (0x0801EEFC, "input_poll_hook"),         # Input_Poll
+    (0x0800233E, "status_tabs_hook"),        # pause-menu tab strip: tab images by distance, at most 8 tabs (krillin.c)
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
     (0x0800E4D2, "exp_award_hook"),          # enemy death -> EXP event
     (0x0800E77E, "enemy_spawn_hook"),        # MapScript_CreateEnemy (map loader record handler)
@@ -118,11 +126,12 @@ LITERAL_RELOCATIONS = [
     (0x081D94D0, "status_module", 0, [0x377C]),
     (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 28
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 29
 # (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule, row 25 = Android 16, rows 26 / 27 =
-# haloed Goku / Super Saiyan Goku; tools/spriteclone.py)
+# haloed Goku / Super Saiyan Goku, row 28 = Super Saiyan 2 Gohan; tools/spriteclone.py). The search runs
+# from row 0, so SetCharacterTransformation(slot, 58) still finds the stock row 4 before row 28.
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x1C),
+    (0x42D6, 0x16, 0x1D),
 ]
 
 

@@ -9,17 +9,20 @@ the code on 2026-10-19 (main e45c765).
 
 Each piece takes numbers only from its own row; say in its report if it needs more. RAM: nobody adds to
 `coop2` (about 0x24 bytes left); a piece that needs state takes its own `.party.<name>` section in
-`partyram` (about 0x1E4 free), at most 0x40 bytes each.
+`partyram` (about 0x1E4 free with 8 slots; 0x150 with 9, after Super Saiyan 2 Gohan), at most 0x40 bytes each.
 
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | zone 15 / other |
 |---|---|---|---|---|---|---|---|---|---|
 | Cell Games chapter (built) | 460-479 (none used) | 140 used | 162 (a record copy of Perfect Cell 30) | - | - | - | 15 Solo, 16 Beam | 15 SOLO, 16 WIN_STAT | maps 323-326 and 176 edits; `.party.cg` 0x18 |
 | Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
 | Arctic route maps | 381-389 (381, 382 used) | - | - | - | - | - | - | - | areas 5-9 (5-8 used); area 1 reworked; world-map landing; place name `ui_strings` 356 |
-| Super Saiyan 2 Gohan character | - | - | - | 28-29 | 124-125 | 23-24 | - | - | party slot 8 (`PARTY_SLOTS=9`) |
+| Super Saiyan 2 Gohan character | - | - | - (58 repointed) | 28 used, 29 unused | 124-125 unused (stock 61 / 12) | 23 used, 24 unused | 20 proposed | - | party slot 8 (`PARTY_SLOTS=9`) |
 | Post-game chapter (later) | 480-499 (extend the new-game clear to 499) | 150-154 | - | - | - | - | 18-19 | 19-20 | Lookout, ending, epilogue edits |
 
-## Story flags (bank at 0x0203F0EC + n / 8, 816 flags, saved)
+## Story flags (bank at 0x0203F108 + n / 8 with 9 party slots, 816 flags, saved)
+
+The bank sits after the party entries, so it moves with `PARTY_SLOTS`: `0x0203F00C + N * 0x1C`
+(0x0203F0EC with 8 slots). Headless scripts use the runner's `FLAGS` variable (`docs/testing.md`).
 
 Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and `party.c` also clears
 400-479. Each flag's meaning is in `docs/scripts.md` 2.5.
@@ -78,6 +81,7 @@ sprite 72) for Roshi's gym.
 
 | id | what | source | Makefile variable |
 |---|---|---|---|
+| 58 | Super Saiyan 2 Gohan, **repointed**: `ssj2_record` = the stock record 58 (ROM groups) with hurt 11, lying 12 and tumble 20 from record 59 (party slot 8, row 28; the Cell Games' stock row 4 too) | `tools/ssj2sprites.py` | `EXTRA_SPRITES` `58=ssj2_record` |
 | 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
 | 157 | Super Saiyan Hercule | `tools/spriteclone.py` | `SSJ_SPRITE` |
 | 158 | Hercule from Buu's Fury (old Hercule's body) | `tools/buu2log2.py` | `BUU_SPRITES` |
@@ -100,7 +104,7 @@ sprite 72) for Roshi's gym.
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
 
-## Display rows (`display_rows`, stock 0-21, 28 rows, row limit patched at file 0x42D6)
+## Display rows (`display_rows`, stock 0-21, 29 rows, row limit patched at file 0x42D6)
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
@@ -110,7 +114,12 @@ leaves copies out of step: grep for the number before moving one.
 | 25 | Android 16 (player) | 175 | 26 / 121 | `spriteclone.py`, `a16player.h` |
 | 26 | haloed Goku (links 27 / 27, as 19 / 20 do) | 176 | Goku's (63 / 14) | `spriteclone.py` `--halo-sprites` |
 | 27 | haloed Super Saiyan Goku (flags 1, links 26 / 26) | 177 | SSJ Goku's (65 / 15) | `spriteclone.py` `--halo-sprites` |
-| 28+ | free (raise the limit in `patch_rom.py` and the row count in `spriteclone.py`) | | | |
+| 28 | Super Saiyan 2 Gohan (party slot 8): Gohan's row 3 (standard class), a base form linking to itself | 58 | 61 / 12 (the stock Super Saiyan 2 Gohan's, from row 4) | `spriteclone.py` `SSJ2_ROW`, `ssj2gohan.h` |
+| 29+ | free (29 was allocated to Super Saiyan 2 Gohan, unused; raise the limit in `patch_rom.py` and `EXTRA_ROWS` in `spriteclone.py`) | | | |
+
+The stock row 4 (sprite 58, class `0x030021E4`: fixed combat bytes 100, HP regeneration, an aura sound
+loop; flags 3, links to row 2) stays the Cell Games' transformation (`SetCharacterTransformation 0, 58`
+finds row 4 first).
 
 ## Portraits (`portrait_module`, stock words 0-118 copied; word id + 1)
 
@@ -119,7 +128,7 @@ leaves copies out of step: grep for the number before moving one.
 | 119 | Krillin's status portrait | `krillinsprites.py` `KRILLIN_STATUS_PORTRAIT`, `krillin.h` |
 | 120 | Paragus' dialogue portrait | Makefile `PARAGUS_PORTRAIT`, `--extra-portrait`; `text 120` in `broly.lscript` |
 | 121 | Android 16's status portrait | `krillinsprites.py` / `spriteclone.py` `A16_STATUS_PORTRAIT` |
-| 122+ | free | `krillinsprites.py` asserts ids are unique |
+| 122+ | free (122-123 allocated to the Super 13 boss; 124-125 to Super Saiyan 2 Gohan, unused: his row uses the stock 61 / 12) | `krillinsprites.py` asserts ids are unique |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).
@@ -132,14 +141,16 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | 18 | Super Hercule (transform) | `ssj.c` |
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
-| 23+ | free | |
+| 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
+| 24+ | free (24 allocated to Super Saiyan 2 Gohan, unused) | |
 
-## Party slots (`PARTY_SLOTS` = 8)
+## Party slots (`PARTY_SLOTS` = 9)
 
 0 Gohan, 1 Piccolo, 2 Vegeta, 3 Trunks, 4 Goku, 5 Hercule (old Hercule shares this slot on row 24),
-6 Krillin, 7 the duel clone (borrowed by Android 16 during Gero's computer). A ninth character needs
-`PARTY_SLOTS=9` or a borrowed slot (`docs/party-8-slots.md`); `partyram` holds 0x91C of 0xB00 bytes at 8 slots,
-and a 16-slot build overflows it.
+6 Krillin, 7 the duel clone (`DUEL_SLOT`; borrowed by Android 16 during Gero's computer), 8 Super Saiyan 2
+Gohan (empty until `ssj2_join`). A tenth character needs `PARTY_SLOTS=10` (`docs/party-8-slots.md`: the
+pause menu's tab strip shows a window of 8, the save layout changes again, every test address after the
+entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot build overflows it.
 
 ## CoopCall functions (game action 59, `src/coop/vmcall.c`; lscript `CoopCall N, a, b, c`)
 
@@ -161,7 +172,10 @@ and a 16-slot build overflows it.
 | 14 | Wave (op) | Time Chamber |
 | 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |
 | 16 | Beam (sprite, on): a held Kamehameha the script does not wait for; on 0 ends it | Cell Games |
-| 17+ | free | |
+| 17 | allocated: Super 13 boss | |
+| 18-19 | allocated: post-game chapter | |
+| 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
+| 21+ | free | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -220,12 +234,12 @@ places: `krillinsprites.py` asserts the index.
 | address | size | what |
 |---|---|---|
 | 0x02000000-0x0203F000 | | the game's heap (capped by `patch_rom.py`) |
-| 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
-| 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
-| 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |
-| 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
-| 0x0203F91C | 0x18 | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams) |
-| 0x0203F934-0x0203FB00 | ~0x1CC | free in `partyram` |
+| 0x0203F000 | 0xB00 region | `partyram` (9 slots): `g_party_block` (party, flags at +0x108, 0x1B8), `party_save` store (0x564), `switch` (0x1B8) |
+| 0x0203F8D4 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
+| 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
+| 0x0203F914 | 0x9C | `.party.wv` `waves` (Time Chamber; 0x0203F880 with 8 slots); moves when anything before it grows |
+| 0x0203F9B0 | 0x18 | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams) |
+| 0x0203F9C8-0x0203FB00 | 0x138 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |

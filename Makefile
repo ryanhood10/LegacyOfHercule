@@ -15,8 +15,9 @@ P2_MODE ?= 0
 # DEBUG_MENU=1 patches the title screen to open the game's leftover debug menu (Map Test) after 30 s idle
 DEBUG_MENU ?= 0
 # PARTY_SLOTS: party entries (stock 6). The block is relocated to EWRAM whatever the value; > 6 also
-# grows the save layout and patches every ROM site that assumed six (tools/patch_rom.py --party-slots)
-PARTY_SLOTS ?= 8
+# grows the save layout and patches every ROM site that assumed six (tools/patch_rom.py --party-slots).
+# 9 (default): slot 6 Krillin, 7 the duel clone's (Android 16's in his chapter), 8 Super Saiyan 2 Gohan
+PARTY_SLOTS ?= 9
 # HERCULE=1 (default) applies the Legacy of Hercule data edits (data/hercule.json via tools/romdata.py)
 HERCULE ?= 1
 DATA_PATCH := $(if $(filter 1,$(HERCULE)),$(BUILD)/hercule.patch.json,)
@@ -41,6 +42,8 @@ A16P_SPRITE ?= 175
 # Fury Hercule, 72 without roms/buu.gba). KR_TEST=1: player 1's L+R+Up toggles old Hercule on slot 5,
 # L+R+Left sets Krillin's EXP one short of his next level (src/coop/krillin.c)
 KRILLIN_SPRITE ?= 161
+# SSJ2_TEST=1: player 2's pad L + R + Select joins Super Saiyan 2 Gohan (slot 8, src/coop/ssj2gohan.c), + Start makes
+# him player 1, + Up player 2, + Down sets his EXP one short of his next level
 # A13_SPRITE / NAMEK_SPRITE: Android 13 (base form) and Cooler's Namekian servant (tools/bossmodels.py,
 # built from the ROM); src/coop/bosses.c gives them to the co-op twins of 19, Dr. Gero and Cooler
 A13_SPRITE ?= 165
@@ -58,11 +61,11 @@ PARAGUS_PORTRAIT ?= 120
 HALO_GOKU_SPRITE ?= 176
 HALO_SSJ_SPRITE ?= 177
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
-           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DCELL2_SPRITE=$(CELL2_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
+           -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DCELL2_SPRITE=$(CELL2_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(filter 1,$(SSJ2_TEST)),-DSSJ2_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o
 SSJ_TEST ?= 0
 
 # BUU=1 (default when roms/buu.gba is present): sprites converted from Buu's Fury by tools/buu2log2.py,
@@ -76,8 +79,9 @@ BUU_ROM ?= roms/buu.gba
 BUU ?= $(if $(wildcard $(BUU_ROM)),1,0)
 BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
-# 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72
-EXTRA_SPRITES := 72=herc_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record
+# 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72;
+# 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
+EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
@@ -89,7 +93,7 @@ CLONE_FLAGS += --krillin-sprite $(KRILLIN_SPRITE) --old-hercule-sprite $(OLD_HER
 
 all: $(OUT)
 
-$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h src/coop/a16player.h
+$(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h src/coop/a16player.h src/coop/ssj2gohan.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
 
@@ -158,6 +162,15 @@ $(BUILD)/gen/halo_sprites_data.c: tools/halosprites.py tools/brolysprites.py too
 	$(PYTHON) tools/halosprites.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/halo_sprites_data.o: $(BUILD)/gen/halo_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# Super Saiyan 2 Gohan's record 58 with the hurt / lying / tumble groups from record 59 (party slot 8, display
+# row 28; never committed); preview beside it
+$(BUILD)/gen/ssj2_sprites_data.c: tools/ssj2sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
+	$(PYTHON) tools/ssj2sprites.py $(ROM) $@ --preview-dir $(BUILD)
+
+$(BUILD)/obj/ssj2_sprites_data.o: $(BUILD)/gen/ssj2_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

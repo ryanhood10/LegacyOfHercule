@@ -15,6 +15,8 @@ usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ss
   --old-hercule-sprite  sprite of old Hercule's row 24 (default 158, the Buu's Fury Hercule; 72 without it)
   --a16-sprite          sprite of Android 16's player row 25 (default 175, a16p_record from tools/a16sprites.py)
   --halo-sprites        sprites of haloed Goku's rows 26 / 27 (default 176,177: tools/halosprites.py; 60,61 = unhaloed)
+  --ssj2-sprite         sprite of Super Saiyan 2 Gohan's row 28 (default 58: the stock record, repointed by
+                        tools/ssj2sprites.py to ssj2_record with the hurt / lying / tumble groups filled)
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -46,6 +48,11 @@ HALO_ROW, HALO_SSJ_ROW = 26, 27   # haloed Goku after the Cell Games (docs/story
 HALO_SPRITES = (176, 177)         # halo_goku_record / halo_ssj_record (tools/halosprites.py)
 OLD_HERCULE_ROW = 24
 GOHAN_ROW = 0            # a standard ground/flight row (behaviour class 0x030021E0) to copy for Krillin
+TEEN_GOHAN_ROW = 3       # Gohan's party row (slot 0, standard class): copied for Super Saiyan 2 Gohan
+STOCK_SSJ2_ROW = 4       # the Cell Games' Super Saiyan 2 Gohan (sprite 58, portraits 61 / 12, class 0x030021E4)
+SSJ2_ROW = 28            # Super Saiyan 2 Gohan as his own party member (slot 8, src/coop/ssj2gohan.h)
+SSJ2_SPRITE = 58
+EXTRA_ROWS = 7           # rows 22-28
 DISPLAY_DATA = 0x081D967C
 HAIR_GOLD, HAIR_SHADE, HAIR_LIGHT, HAIR_BRIGHT = 120, 20, 46, 8   # SSJ Goku's hair indices
 BLACK = 1
@@ -159,6 +166,7 @@ def main():
     a16_sprite = int(sys.argv[sys.argv.index("--a16-sprite") + 1]) if "--a16-sprite" in sys.argv else A16P_SPRITE
     halo_sprites = (tuple(int(v) for v in sys.argv[sys.argv.index("--halo-sprites") + 1].split(","))
                     if "--halo-sprites" in sys.argv else HALO_SPRITES)
+    ssj2_sprite = int(sys.argv[sys.argv.index("--ssj2-sprite") + 1]) if "--ssj2-sprite" in sys.argv else SSJ2_SPRITE
     sp = S.Sprites(rom)
     rec = sp.record(SRC_SPRITE)
     groups = sp.groups(rec)
@@ -310,9 +318,23 @@ def main():
         r[1] = sprite
         r[4] = r[5] = other
         rows += r
-    assert len(rows) == (ROW_COUNT + 6) * 20
+    # row 28 = Super Saiyan 2 Gohan as his own party member (slot 8, docs/story.md 4h): Gohan's row 3 (the
+    # standard class 0x030021E0: combat bytes from his own stats, regeneration) with the stock Super Saiyan 2
+    # row's sprite and portraits. A base form (flags 0, links to itself): the stock row 4 is a transformed
+    # form with its own class (fixed combat bytes 100, HP regeneration, an aura loop) that
+    # Party_DetransformOthers would turn back into row 2 whenever he is not player 1.
+    ssj2 = bytearray(rows[TEEN_GOHAN_ROW * 20:TEEN_GOHAN_ROW * 20 + 20])
+    stock = rows[STOCK_SSJ2_ROW * 20:STOCK_SSJ2_ROW * 20 + 20]
+    assert stock[1] == SSJ2_SPRITE and ssj2[6:16] == stock[6:16], "stock Super Saiyan 2 Gohan row changed?"
+    ssj2[0] = 0
+    ssj2[1] = ssj2_sprite
+    ssj2[2] = stock[2]     # dialogue / switch-screen portrait 61
+    ssj2[3] = stock[3]     # status portrait 12
+    ssj2[4] = ssj2[5] = SSJ2_ROW
+    rows += ssj2
+    assert len(rows) == (ROW_COUNT + EXTRA_ROWS) * 20
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
-    lines.append(f"const u32 display_row_count = {ROW_COUNT + 6};")
+    lines.append(f"const u32 display_row_count = {ROW_COUNT + EXTRA_ROWS};")
     os.makedirs(os.path.dirname(out_c), exist_ok=True)
     open(out_c, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     total = sum(len(b) for (_, _), b in [((p, fi), fr[5]) for p, frs in arrays.items() for fi, fr in enumerate(frs) if fr[5]])

@@ -1,0 +1,32 @@
+# CoopCall 20 from a script (docs/testing.md "Super Saiyan 2 Gohan"): a build whose data patch includes the
+# test-only tools/headless/ssj2_join_test.json (a dialogue trigger above the Map Test spawn in zone 2 area 1:
+# CoopCall 20, then "Super Saiyan 2 Gohan is now an available character!"). Slot 8 is empty before, joined after;
+# player 2's Select then cycles Hercule -> Krillin -> him.
+p2 0
+maptest 7
+frames 300
+map
+echo --- before: slot 8, Gohan
+peek PARTY+0xEC 7
+peek PARTY+0x0C 7
+keys 0x40
+frames 30
+keys 0
+frames 30
+shot jn_00_message
+map
+echo --- after the CoopCall: slot 8
+peek PARTY+0xEC 7
+mash 2 40
+frames 60
+peek8 0x0203FF84 1
+p2 4
+frames 2
+p2 0
+frames 30
+p2 4
+frames 2
+p2 0
+frames 30
+peek8 0x0203FF84 1
+shot jn_01_p2

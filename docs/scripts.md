@@ -118,6 +118,7 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 14 | Wave op | op 0 -> the round being announced / fought (11 = completed); op 1 spawns the announced round (no result); op 2 -> player 2's character name (a `%s` argument: "%s wins the sparring match!") |
 | 15 | Solo mode | the Cell Games (`cellgames.c`): 0 both players; 1 player 1 fights alone (player 2's entity is removed and not respawned, no co-op twins, one boss bar); 2 player 2 fights alone on player 1's entity (player 2's pad drives it, so a loss is the normal game over; dialogue is then advanced by player 2's A). Only holds in zone 14 areas 2-4, cleared anywhere else |
 | 16 | Beam sprite, on | the Cell Games: the entity showing that sprite holds a Kamehameha, driven from C the way step 137's beam command drives it but outside the command chain, so the script does not wait (step 137 and a batch's commit wait for entity commands); on 0 ends it. A beam object fades on its own, so the struggle refires them at every step |
+| 20 | Ssj2Join | Super Saiyan 2 Gohan joins in party slot 8 (`ssj2gohan.c` `ssj2_join`: row 28, Gohan's EXP, Gohan's HP / EP x1.5 and str / pow / end x1.7, flags 0x7F, abilities 3 / 4 / 23 / 2; a second call does nothing). The script then shows the message: `CoopCall 20, 0, 0, 0` in a `script` entry, then `text 0 "@^Super Saiyan 2 Gohan is now an available character!"` (`tools/headless/ssj2_join_test.lscript`) |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 
@@ -152,7 +153,8 @@ deleted (mapedit disables them) and new ones are appended.
 
 ### 2.4 Party flags and player 2
 
-Party entry +0x14 flags: bit 0 in the party, bit 1 available. Player 2 (`src/coop/player.c`) is any
+Party entry +0x14 flags: bit 0 in the party, bit 1 available, bit 2 the special melee page, bits 3 / 4 the
+two energy technique pages, bit 5 the charged A attack, 0x40 on every stock row. Player 2 (`src/coop/player.c`) is any
 party member with both bits other than player 1's character, keeping its previous choice, else
 Hercule, else the first; it is chosen when player 2's entity spawns (map load). So the story picks
 player 2 with the flag opcodes (old Hercule in the prologue, Krillin from his visit, the jungle
@@ -166,7 +168,8 @@ clears 400-479 (the ten-day wait's side chapters); flags 480+ survive a new game
 flags there. Chapter-specific notes: 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic
 route's world-map landing and star, `arctic_route`), 400-419 the Broly chapter (404-419
-the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar.
+the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar. The bank
+is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
 ## 3. lscript, the text form
 

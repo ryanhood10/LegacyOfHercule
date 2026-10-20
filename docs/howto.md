@@ -73,12 +73,14 @@ its own with `--extra-portrait ID=SYMBOL` (see the Makefile's Paragus line). Tak
 
 ## Add a playable character
 
-References: Krillin (`src/coop/krillin.c`, `tools/krillinsprites.py`, `docs/hercule.md` 5b) and
+References: Super Saiyan 2 Gohan (`src/coop/ssj2gohan.c`, `docs/hercule.md` 5d: a stock sprite, a new slot,
+a join function; every per-slot table it needed is listed in `docs/party-8-slots.md`), Krillin
+(`src/coop/krillin.c`, `tools/krillinsprites.py`, `docs/hercule.md` 5b) and
 Android 16 (`src/coop/a16player.c`, `tools/a16sprites.py` `a16p_record`, `docs/coop-design.md` "Gero's
 bunker and Android 16 as a player").
 
 1. A player-grade sprite (all player pose groups), a display row (`tools/spriteclone.py`), a party
-   slot (`PARTY_SLOTS` is 8; slot 6 Krillin, slot 7 is the duel clone's, borrowed by 16 for his
+   slot (`PARTY_SLOTS` is 9; slot 6 Krillin, slot 8 Super Saiyan 2 Gohan, slot 7 is the duel clone's, borrowed by 16 for his
    chapter), a status portrait, the name in `ui_strings`.
 2. Abilities: append to `abilities` in `data/hercule.json` (entries are numbered from 14 in order)
    with `is_ready` / `on_use` C functions.
