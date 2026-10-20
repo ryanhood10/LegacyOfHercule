@@ -6,7 +6,8 @@ usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ss
                       [--extra 158=buu_record_158,159=buu_record_159] [--row-sprite 157]
                       [--krillin-sprite 161] [--old-hercule-sprite 158] [--a16-sprite 175]
   --extra       more records (symbols defined in another generated file, e.g. tools/buu2log2.py's
-                build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids
+                build/gen/buu_sprites_data.c) appended to the relocated sprite index at those ids; an id
+                below 157 replaces the stock record (72=herc_record: Hercule with his beam pose)
   --row-sprite  the sprite id the Super Saiyan Hercule display row (22) uses (default 157; a test
                 build can point it at a converted Buu record to see it in game)
   --krillin-sprite      sprite of Krillin's row 23 (default 161, tools/krillinsprites.py; 76 = his NPC set)
@@ -232,7 +233,8 @@ def main():
     lines.append(f"const SpriteRecord ssj_record = {{{{{hdr}}}, {{{grp}}}, 0}};")
     # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
     idx_words = [struct.unpack_from("<I", rom, S.INDEX - S.ROM_BASE + i * 4)[0] for i in range(NEW_SPRITE)]
-    entries = [f"(const void *)0x{v:08x}u" for v in idx_words] + ["&ssj_record"]
+    # an extra id below 157 replaces that stock record (72 = herc_record, tools/herculesprites.py)
+    entries = [f"&{extra[i]}" if i in extra else f"(const void *)0x{v:08x}u" for i, v in enumerate(idx_words)] + ["&ssj_record"]
     for sid in range(NEW_SPRITE + 1, max(extra, default=NEW_SPRITE) + 1):
         entries.append(f"&{extra[sid]}" if sid in extra else "0")
     for sym in extra.values():

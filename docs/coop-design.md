@@ -14,6 +14,7 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
   | 1 | `0x03001F44` | `0x080256C4` | `0x0800811F` | walk: moves `+0x158/+0x15C` (8.8 fixed) by speed `+0x188` along facing `+0x10`; collision via `0x08006366(ctx[4], &pos)`; wall -> sound 8, anim 0x1F |
   | ? | - | `0x080258DC` | `0x08008031` | diagonal/8-way variant (`0x08007D24` step helper, facing lookup `ctx+0x9C`) |
   | 0xD | `0x03001F48` | `0x08025E20` | `0x080083C3` | dash / flight (EP drain against display row byte +7) |
+  | 30 | `0x03002268` | `0x08025038` | `0x0801CB24` (slot 1) | NPC beam pose (`NPCFireKamehameha`): sprite group 18, frame 0 for 8 frames, then 1 / 2 every 8; never leaves by itself |
   | ? | - | `0x080251F4` | `0x08008277` | |
   | ? | - | `0x08025D70` | `0x080085AD` (slot 5) | |
 

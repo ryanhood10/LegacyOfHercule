@@ -388,6 +388,63 @@ into a two-group actor record (header from Bulma's 23 with the size 0x800). With
 record points at stock sprite 43's groups (a stand-in; the chapter needs Broly from that ROM anyway).
 Preview: `build/<dir>/paragus_preview.png` (every group, both portraits).
 
+## Hercule's beam pose (group 18 of sprite 72, `tools/herculesprites.py`, 2026-10-19)
+
+For the Cell Games beam struggle (`docs/story.md` 4h: Gohan and Hercule side by side firing at the
+twin Perfect Cells) Hercule needs a Kamehameha pose; his stock record 72 (21 groups) leaves group 18
+empty.
+
+**How the engine plays a beam (decompiled).** Script step 137 `NPCFireKamehameha (char, frames)`
+(`0x0800A3A2`; the struggle runs `NPCFireKamehameha 0, 140` on player 1, map 287 runs it on
+Imperfect Cell 28) finds the entity showing sprite `char` (0 = player 1) and appends a 0x14-byte
+command object (vtable `0x0802521C`: {vt, 0, beam, frames, frames - 8}) to it:
+
+- start (slot 1, `0x0801D788`): creates the beam object (`0x0801D84C`, 0x50 bytes, the player
+  Kamehameha's beam class `0x080143A8`) at the centre of the entity's box, adds it to the entity
+  list, and calls the entity's `SetAnimation(30)` (vtable slot 10);
+- update (slot 2, `0x0801D7DC`): counts `frames` down; at `frames - 8` (8 frames in) fires the beam
+  (`0x08014478`) from the entity's position plus a per-facing offset (table `0x08701DEC + 4`: down
+  0, 0; up 0, 0; **left -9, +2; right +10, 0**); at 0 ends it (`0x0801451C`); slot 3 = done when 0.
+
+Animation 30 is the control state `0x03002268` (vtable `0x08025038`): enter (`0x0801CB10`) points
+the entity's frame group at record + 0x16C = **group 18** and frame 0; its frame logic (`0x0801CB24`)
+shows **frame 0 for 8 frames (the charge), then frames 1 and 2 alternating every 8 frames** for as
+long as the state lasts. The beam clash earlier in the same scene plays group 18 too. Goku (60),
+Gohan (53, 56, 59) and Goku SSJ (61) all hold 7 frames per facing in group 18 but only three
+images: 0 the charge (hands cupped at the back hip), 1 the thrust, 2-6 one repeated hold image (the
+hair blown up); 16x32 front / back at (0, -24), 32x32 sides at (-8, -24), right = the left blob
+h-flipped (attr `0x90002000`).
+
+**The record (`herc_record`).** Record 72's header and all 21 group pointers (ROM addresses, nothing
+copied), with group 18 filled by the generator. The Makefile repoints **id 72** at it in the
+relocated sprite index (`EXTRA_SPRITES` `72=herc_record`; `spriteclone.py --extra` now lets an id
+below 157 replace a stock record), so everything that shows sprite 72 (Hercule as player 1 or 2 on
+display row 21, his actors in cutscenes) gains the pose and is otherwise unchanged (checked: only
+group 18 differs from the stock record in the built ROM). No new sprite id was taken (176-179 stay
+free). Super Saiyan Hercule (157) and old Hercule (158) do not have the pose.
+
+**The frames** (Goku's frame boxes, offsets and attributes; 9 unique frames, 2.4 KB LZ-compressed with
+`buu2log2.compress`), all Hercule's own body and colours:
+
+| facing | charge (0) | thrust (1) / hold (2-6) |
+|---|---|---|
+| left / right | his punch stance (group 7 frame 0: the same lunge and ground line as Goku's beam stance) with the chambered back arm and the front fist removed; Goku's charge arms pasted at the back hip | the same stance with Goku's beam arms (both straight out, open palms) pasted 3 px nearer the body |
+| front | idle (group 0) with the hands at the sides removed; drawn: the far arm across the belly and both hands cupped at the hip on the viewer's left | drawn: elbows out in brown sleeves, both open palms over the belt |
+| back | idle with the arms trimmed; Goku's back-view hands at the hip | arms out of sight (as Goku's) |
+
+Pasted arms are recoloured: Goku's skin left of the wrist band becomes Hercule's skin ramp (11-14,
+outline 17), the band and everything up to the shoulder his gi sleeve (6F / 70 / 71); edges opened
+by the erase get the gi or skin outline. The hold image is the thrust with the afro bristling (a
+ragged black fringe on every other column of its top and back edge, as Goku's hair rises). The front
+arms are drawn because Goku's front beam arms are foreshortened skin over his chest that reads as a tan
+block in Hercule's colours.
+
+Preview: `build/<dir>/hercule_beam_preview.png` (and `_x4`): rows Goku 60, Gohan 59, Hercule's new
+group 18, Hercule's base frames; four facings x (charge, thrust, hold). Engine proof
+(`docs/testing.md` "Hercule's beam pose"): the stock struggle with Hercule as player 1 (the clash and
+the Kamehameha, beam from his palms), the same run as Gohan side by side, right / down / up facings
+by holding the facing byte while the beam fires, and player 2 (row 21) in the pose in all four facings.
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control

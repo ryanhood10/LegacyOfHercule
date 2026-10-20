@@ -13,6 +13,7 @@ inspection goes through the GDB stub.
 |---|---|
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
+| Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
 | WSL fork (wide ROM), Fork helpers | real-time play, the wide view, gdb peeks, pad keys, teleport |
 | Boss pairs, Android 16 boss fight | fights with the autopilot and hit logs |
@@ -396,6 +397,33 @@ the chapter's party without its scene) and `bossfight.sh <bunker record> 120 4 0
 `build/<dir>/hercule.patch.json`. Player 2's B (p2hold `--cmd` file, e.g. `0x20:0.2 0:0.2 2:0.1`) fires
 the Rocket Punch; `a16p` (coop.sym) counts punches (+8) and hits (+10). Boot fresh for each build: a
 state saved after the party switch sometimes left every boss idle.
+
+## Hercule's beam pose (headless, 2026-10-19)
+
+```
+make BUILD=build/hb DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/hb/log2-coop.gba --out build/hb/hl
+python tools/headless/st_test.py tools/headless/beam_hercule.txt build/hb/log2-coop.gba build/hb/hl/menu.ss --out build/hb/hl --cols 8
+```
+
+`beam_hercule.txt` replays the stock struggle (map 325's record 12 defeat sequence) with Hercule as
+player 1 (no player 2): the beam clash (shots 05-08) and `NPCFireKamehameha 0, 140` (41-42); with
+`poke8 0x0203F000 0` instead of 5 it is Gohan, for a side-by-side. How the scene is reached without
+the earlier fights is in the script's header (spawn record 12 with `COOP_CMD_SPAWN_SCRIPT`, a no-op death
+action for record 0's Cell, `COOP_CMD_STORY_WIN`); the run ends on map 326.
+
+- **Other facings with the real opcode:** cut the script after `shot herc_40`, then `findent pl
+  0x08025604`, `mash 1` and about 70 x (`poke8 pl+0x10 F`, `frames 1`): the facing byte is read when
+  the beam fires 8 frames in (right fires from the palms; down / up fire from the body centre for
+  Gohan too: the engine's offset there is 0, 0).
+- **Any entity in the pose without a script** (player 2 here; `p2 0`, Map Test 147): `findent p2e
+  0x0203FE00` (player 2's vtable copy), `deref rec p2e+0x48`, then `poke8 p2e+0x10 F`, `poke16 p2e+0x12
+  0`, `poke16 p2e+0x14 0`, `poke8 p2e+0x8 0x28`, `poke32 p2e+0x4C rec+0x16C`, `poke32 p2e+0x18
+  0x03002268` (state 30's enter, by hand); shots 4, 16 and 24 frames later show charge, thrust, hold.
+  Move the entity first (`poke32 p2e+0x158 X<<8`, `+0x15C`) if the BG draws over it.
+- Map Test 323 (zone 14 area 1): player 2 Hercule's second A press crashes the game ("Jumped to invalid
+  address 8B396A16", r14 `0x08006C05`) with the stock record 72 as well; use another map for player-2
+  tests until that is understood.
 
 ## Reading screenshots
 

@@ -1,0 +1,212 @@
+# Hercule's Kamehameha pose in the stock Cell beam struggle (docs/testing.md "Hercule's beam pose").
+# Map Test the Cell Games desert (map 325, zone 14 area 3), make Hercule (slot 5) player 1 and warp in
+# place (COOP_CMD_WARP) so the player entity is rebuilt with his row; give the always-present first Cell
+# (record 0, stat 22) a no-op death action (a {ENEMY_ACTION_NONE, 0} pair written at 0x0203FA00, free
+# partyram) and win it so its scene does not run; spawn record 12 (stat 25, fight 8; COOP_CMD_SPAWN_SCRIPT)
+# and win it (COOP_CMD_STORY_WIN): its defeat sequence is the beam clash and the struggle, whose
+# NPCFireKamehameha 0, 140 fires from player 1. Then A once per 40 frames with a shot each time (shots
+# 05-08: the clash, 41-42: the Kamehameha). Change "poke8 0x0203F000 5" to 0 for Gohan (the stock look).
+# python tools/headless/st_test.py tools/headless/beam_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+maptest 325
+frames 300
+poke8 0x0203F000 5
+poke32 0x0203FD0C 0x030E
+poke32 0x0203FD54 0x01880190
+poke32 0x0203FD08 5
+frames 300
+map
+findent c22 0x080252a4
+poke32 0x0203FA00 0x08010699
+poke32 0x0203FA04 0
+poke32 c22+0x184 0x0203FA00
+poke32 0x0203FD08 7
+frames 200
+ents
+poke32 0x0203FD0C 12
+poke32 0x0203FD08 1
+frames 200
+shot herc_00
+poke32 0x0203FD08 7
+frames 60
+mash 1
+frames 40
+shot herc_01
+mash 1
+frames 40
+shot herc_02
+mash 1
+frames 40
+shot herc_03
+mash 1
+frames 40
+shot herc_04
+mash 1
+frames 40
+shot herc_05
+mash 1
+frames 40
+shot herc_06
+mash 1
+frames 40
+shot herc_07
+mash 1
+frames 40
+shot herc_08
+mash 1
+frames 40
+shot herc_09
+mash 1
+frames 40
+shot herc_10
+mash 1
+frames 40
+shot herc_11
+mash 1
+frames 40
+shot herc_12
+mash 1
+frames 40
+shot herc_13
+mash 1
+frames 40
+shot herc_14
+mash 1
+frames 40
+shot herc_15
+mash 1
+frames 40
+shot herc_16
+mash 1
+frames 40
+shot herc_17
+mash 1
+frames 40
+shot herc_18
+mash 1
+frames 40
+shot herc_19
+mash 1
+frames 40
+shot herc_20
+mash 1
+frames 40
+shot herc_21
+mash 1
+frames 40
+shot herc_22
+mash 1
+frames 40
+shot herc_23
+mash 1
+frames 40
+shot herc_24
+mash 1
+frames 40
+shot herc_25
+mash 1
+frames 40
+shot herc_26
+mash 1
+frames 40
+shot herc_27
+mash 1
+frames 40
+shot herc_28
+mash 1
+frames 40
+shot herc_29
+mash 1
+frames 40
+shot herc_30
+mash 1
+frames 40
+shot herc_31
+mash 1
+frames 40
+shot herc_32
+mash 1
+frames 40
+shot herc_33
+mash 1
+frames 40
+shot herc_34
+mash 1
+frames 40
+shot herc_35
+mash 1
+frames 40
+shot herc_36
+mash 1
+frames 40
+shot herc_37
+mash 1
+frames 40
+shot herc_38
+mash 1
+frames 40
+shot herc_39
+mash 1
+frames 40
+shot herc_40
+mash 1
+frames 40
+shot herc_41
+mash 1
+frames 40
+shot herc_42
+mash 1
+frames 40
+shot herc_43
+mash 1
+frames 40
+shot herc_44
+mash 1
+frames 40
+shot herc_45
+mash 1
+frames 40
+shot herc_46
+mash 1
+frames 40
+shot herc_47
+mash 1
+frames 40
+shot herc_48
+mash 1
+frames 40
+shot herc_49
+mash 1
+frames 40
+shot herc_50
+mash 1
+frames 40
+shot herc_51
+mash 1
+frames 40
+shot herc_52
+mash 1
+frames 40
+shot herc_53
+mash 1
+frames 40
+shot herc_54
+mash 1
+frames 40
+shot herc_55
+mash 1
+frames 40
+shot herc_56
+mash 1
+frames 40
+shot herc_57
+mash 1
+frames 40
+shot herc_58
+mash 1
+frames 40
+shot herc_59
+mash 1
+frames 40
+shot herc_60
+map
+ents
