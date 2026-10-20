@@ -407,15 +407,22 @@ side by side firing back. Goku encourages both. Draft, adapting the stock lines:
 - GOKU: "Now's your chance!"
 The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!", which is now half true.
 
-**To settle before building:**
-- Hercule's firing pose for the beam struggle: Hercule's sprites have no beam pose; it needs art (a
-  push-forward pose from his own frames) or a comic stand-in. To check in the sprite sheets.
-- Hercule is weaker by design; against Perfect Cell he needs a fair chance (tuning).
-- The standing rule says nothing reveals Hercule as the hero before the Buu phase; this plan puts him
-  in the Cell fights by Ryan's choice.
-- Mechanics: hiding the watching player, the title cards, player 2 playing Goku (party slot 4) while
-  player 1 watches, a fourth Junior record, the twin Cell pair (a `BOSS_PAIR` rule), two Cells and two
-  beams in the struggle scene.
+**To settle before building (Ryan's calls):**
+- Hercule's beam pose. His sprite (72) has idle, walk, hit-stun, victory, two punches and a kick, no
+  beam pose. Cheapest stand-in: hold his straight-punch pose (group 7) with the beam coming off his
+  fists. Otherwise, new art.
+- Hercule's strength against Perfect Cell in fights 3, 7 and 8 (he stays weaker by rule).
+- The standing rule that nothing reveals Hercule as the hero before the Buu phase: this plan puts
+  him in the Cell fights by Ryan's choice; the public credit stays the stock fake.
+- A lost solo fight (1, 2, J1-J4): what happens when the fighting player goes down.
+- After the Games: Goku already stays in the party ("Keep Goku", `docs/hercule.md` 4); the stock
+  ending also sets Hercule to level 40 and announces him as a new character, which no longer fits
+  (he has been in the party since West City).
+
+**Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
+cards; player 2 playing Goku (party slot 4) while player 1 watches; Krillin and the fourth Junior
+record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
+carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
