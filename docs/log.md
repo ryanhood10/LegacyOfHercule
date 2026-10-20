@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Scene-ending sweep** (Ryan: find more like the chair lock): every scene we edited compared with the stock steps
+  it cut (a reviewer expanded every `stock` / `stockseq` line). Fixed: the forest spirit fight kept the camera
+  panned to the clearing's top (now `SetActiveEntity 0` after the fight starts); the wishes left Gohan as player
+  1 (stock entry 0's `SetActiveCharacter 0`): the party and players are kept with CoopCall 10 and restored after
+  the scene. Everything else read clean; two play testers run the edited scenes headless.
 - **1 Player / 2 Players at every game start** (Ryan): after Select Game, the first moment player 1 can move,
   "How many players?" (A one, B two); one player keeps player 2 out even with a second controller connected.
   `src/coop/players.c`, CoopCall 21; the runner gained `stepnz`. Tested on the play ROM both ways.

@@ -4,7 +4,7 @@
 ; 382 Super 13 beaten (set by the arctic summit's scene), 483 the finale seen (Dende asks about Buu's Fury).
 
 sequence pg_dende
-  script                                 ; which part of the post-game
+  script                                 ; which part of the post-game (the wishes keep the party: CoopCall 10)
         StackTestStoryFlag 483
         JumpIfFalse L1
         PushByte 83
@@ -20,6 +20,7 @@ sequence pg_dende
         PushByte 63
         END
       L3:
+        CoopCall 10, 0, 0, 0
         PushByte 1
         END
   stock @083dbf38    ; the scene moves to the Lookout's edge (zone 9 area 7)
@@ -85,6 +86,9 @@ sequence pg_dende
         SetStoryFlag 381
         FadeOut 120
         WarpToMapWithEntities 9, 1, 1, 792, 544
+        CoopCall 10, 1, 0, 0
+        Step SetActiveCharacter
+        CoopCall 10, 2, 0, 0
         SetPlayerVisible 1
         PlayAudio 62
   text 0 "@^Journal Updated!"

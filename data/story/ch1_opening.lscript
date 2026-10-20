@@ -135,6 +135,8 @@ sequence ch1_spirit
   text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
   text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
   stock @083b958c                        ; boss bar, battle music, control back
+  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
+        SetActiveEntity 0
 end
 
 ; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade and Gohan and

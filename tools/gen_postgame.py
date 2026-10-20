@@ -107,7 +107,7 @@ for pass_no in (1, 2):
     script([f"StackTestStoryFlag {F_FINALE}", "JumpIfFalse L1", f"PushByte {L('prompt')}", "END", "L1:",
             f"StackTestStoryFlag {F_13_BEATEN}", "JumpIfFalse L2", f"PushByte {L('finale')}", "END", "L2:",
             f"StackTestStoryFlag {F_WISHED}", "JumpIfFalse L3", f"PushByte {L('north')}", "END", "L3:",
-            f"PushByte {L('wish')}", "END"], "which part of the post-game")
+            "CoopCall 10, 0, 0, 0", f"PushByte {L('wish')}", "END"], "which part of the post-game (the wishes keep the party: CoopCall 10)")
     # ---- the wishes -----------------------------------------------------------------------------------
     label("wish")
     stock(WISH, 0, "the scene moves to the Lookout's edge (zone 9 area 7)")
@@ -133,7 +133,9 @@ for pass_no in (1, 2):
     script(["PlayAudio 26", "FlyToPosition 11, 272, 136", "DespawnEntity 11"], "18 flies north (stock entry 72's flight)")
     text(90, "PICCOLO: We're all going.")
     script([f"SetStoryFlag {F_WISHED}", f"SetStoryFlag {F_ARCTIC_OPEN}", "FadeOut 120",
-            "WarpToMapWithEntities 9, 1, 1, 792, 544", "SetPlayerVisible 1", "PlayAudio 62"], "the Arctic opens on the world map (its star)")
+            "WarpToMapWithEntities 9, 1, 1, 792, 544",
+            "CoopCall 10, 1, 0, 0", "Step SetActiveCharacter", "CoopCall 10, 2, 0, 0",   # the party and players as before (stock entry 0 made Gohan player 1)
+            "SetPlayerVisible 1", "PlayAudio 62"], "the Arctic opens on the world map (its star)")
     text(0, "@^Journal Updated!")
     stop()
     # ---- until Super 13 is beaten --------------------------------------------------------------------
