@@ -184,6 +184,8 @@ $(BUILD)/gen/ssj2_sprites_data.c: tools/ssj2sprites.py tools/sprites.py tools/ma
 	$(PYTHON) tools/ssj2sprites.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/ssj2_sprites_data.o: $(BUILD)/gen/ssj2_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # Super Android 13 (sprite, ki orbs, dialogue portrait) for the post-game (never committed); preview beside it
 $(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
