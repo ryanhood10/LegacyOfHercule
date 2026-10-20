@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Older saves:** no lead noted yet reads Gohan (Ryan's save from before the lead was noted showed no Gohan and
+  Krillin's portrait on Gohan's line); a downed player 1 whose player 2 leaves for a companion is a game over.
 - **Scenes alone as someone else** (Ryan: Gohan missing from Frieza's landing while playing Krillin, and Krillin
   saying "how does he know my father?"): a scene now runs with the story's lead as player 1 and your character
   beside him, then puts you back (`companion.c`, the sequence start / end re-implemented). With two players the same:

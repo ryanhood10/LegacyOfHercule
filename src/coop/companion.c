@@ -27,7 +27,10 @@ static int lead_slot(void) {
     const u8 *f = g_Party->event_flags;
     int v = 0;
     for (int i = 0; i < 4; i++) v |= ((f[(LEAD_FLAG + i) >> 3] >> ((LEAD_FLAG + i) & 7)) & 1) << i;
-    return v ? v - 1 : -1;
+    if (v) return v - 1;
+    // none noted yet (a save from before the lead was noted): Gohan, the stock game's lead, while he is in the party;
+    // the next SetActiveCharacter of the story notes the real one
+    return (g_Party->chars[0].flags & 3) == 3 ? 0 : -1;
 }
 
 static void lead_set(s32 slot) {

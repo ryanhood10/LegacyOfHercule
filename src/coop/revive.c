@@ -217,6 +217,7 @@ void revive_tick(void) {
             continue;
         }
         if (rv.over) continue;                     // the game over is queued: they stay down
+        if (k == 0 && companion_active()) { game_over(); continue; }   // player 2 left for a companion: nobody revives
         if (SCENE_RUNNING || !allowed()) { get_up(k); continue; }   // a scene (or a solo fight) begins
         if (rv.glow_n < 256 && rv.glow) build_glow();
         if (rv.a_held[!k] && rv.reaching[!k] && !rv.body[!k]) {

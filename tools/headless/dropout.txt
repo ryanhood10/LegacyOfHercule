@@ -5,6 +5,8 @@
 p2 0
 maptest 261
 frames 300
+# the story's lead = player 1 (Piccolo, slot 1: flags 464-467 = 2), so no companion stands in for player 2
+poke8 0x0203F142 2
 echo == two players: coop.p2 set
 peek 0x0203FF08 1
 p2 off

@@ -1270,7 +1270,8 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   2 is still spawned for one character with a follower pad: **the story's lead when player 1 plays someone else**
   (the lead = the character the story scripts last made active: VM steps 70 SetActiveCharacter and 115
   ...NoReset are repointed to `vm_set_active_hook` / `vm_set_active_noreset_hook`, which note the slot in flags
-  464-467, saved with the game; so Gohan walks with a player who switched to Krillin), and **old Hercule** while
+  464-467, saved with the game; none noted yet, as in a save from before this, reads Gohan while he is in the
+  party; so Gohan walks with a player who switched to Krillin), and **old Hercule** while
   party slot 5 shows him (row 24, the future prologue). The companion is no player for the rules:
   `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him (`coop_target`), he takes no hits, the
   damage and speed multipliers and the revive see one player, CoopCall 5 reads 0 (scenes take the one-player
