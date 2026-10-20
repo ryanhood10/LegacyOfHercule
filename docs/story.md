@@ -62,7 +62,8 @@ not used by any trigger (`docs/story-archive.md`).
 - The Cell Games (in planning, section 4h): Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
   old note; the stock script removes Goku after Cell's defeat and makes Hercule available). Stock
   flow in `docs/story-rom.md` section 9.
-- The ending of LoG2, and Android 13's return after the wish.
+- After the Games (in planning, section 4i): the changed second wish, the Android 13 post-game in the
+  arctic, the real ending back at the Lookout.
 - The Buu's Fury phase (section 6). Also section 7.
 
 **Numbers Ryan may want to change (our tuning, not his):** Kami's boost (+3 levels and a full
@@ -455,6 +456,24 @@ carrying 16's head instead of the Hercule actor; two Cells and two beams in the 
 Hercule behind the rocks during the Junior fights; the Z fighters' blasts at the second Cell;
 no co-op twin for the Juniors in the solo fights;
 Goku's haloed sprites (and display rows) swapped in when the Games end.
+
+## 4i. After the Cell Games: the wishes and the Android 13 post-game (Ryan, 2026-10-19, in planning)
+
+Stock flow: `docs/story-rom.md` section 9 (the wish scene, the fly-over, the credits, the Trunks
+epilogue, then the title screen; the talk-show bonus ending).
+
+- **Wish 1 unchanged:** everyone Cell killed comes back; Goku cannot return and chooses to stay dead.
+- **Wish 2 changed (Ryan):** instead of Krillin's wish to take the bombs out of the Androids, someone
+  (Yamcha) slips: "I wish we always had someone strong like Goku around," and Shenron answers "YOUR
+  WISH IS GRANTED." What it did stays a mystery (it unlocks Hercule's potential; no game change yet,
+  it pays off in the Buu phase).
+- **New lines for Krillin and Android 18** (Ryan wrote 16; 16 died at the Games, so 18 is assumed),
+  replacing the bomb wish and her "kind of nice of you" reaction.
+- **The arctic explosion:** a screen shake and word of a big explosion in the arctic; 18 says she is
+  going to check it out. This leads into the Android 13 post-game.
+- **No credits yet:** a star on the world map marks the arctic (zone 15 area 1); the players go there
+  and fight Android 13.
+- **The real ending later:** the players return to the Lookout to end the game and start the credits.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
