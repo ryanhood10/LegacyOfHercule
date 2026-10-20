@@ -483,6 +483,28 @@ epilogue, then the title screen; the talk-show bonus ending).
   players. (Base 13 is sprite 165; Super 13, the blue-skinned muscle form, is in neither ROM. The
   Android 16 boss, `android16.c`, already has homing projectiles and a special-attack scheduler to
   build on.)
+- **One fight (Ryan):** players 1 and 2 against Super 13, after he has absorbed 17 and 18 (no fight
+  against base 13).
+- **Anyone can fight (Ryan):** the players arrive as whoever they are and fight as them. Those two
+  characters say they have to stop this; the rest of the party watches from the sideline, so open
+  dialogue still works (lines written per speaker or with the player's name; the duplicate-NPC rule
+  keeps the two players' characters off the sideline).
+- **After 13 (Ryan):** back to Dende's Lookout. The players' characters say they are happy to finally
+  have time to relax with no enemies to fight. Dende's last line: "Talk to me if you want to discuss
+  our times of peace!"
+- **Dende's prompt (Ryan), from then on whenever he is talked to:** "Enter Peace Times and start
+  'Dragon Ball Z: Buu's Fury' co-op?" Yes / No.
+  - No: DENDE: "Okay. Come talk to me when you're ready!"
+  - Yes: a second prompt, "Are you sure you want to start the new campaign?" Yes / No; Yes plays the
+    ending and the game ends.
+  - To build: stock dialogue has no yes/no choice (a search of every map script found none); the
+    closest UI is the save pad's two-option menu (Save / Switch Characters).
+- **The ending (Ryan):** the credits that originally followed the Dragon Ball wishes, and the bonus
+  ending (Hercule's "Late Night with Rob Howard") always plays too, no statues or level 50 needed.
+  Draft order (Claude's): the talk show, the credits, the Trunks epilogue, "The End". This is where
+  the game will later hand over to the Buu's Fury campaign (not planned yet).
+- **Still open:** the arctic's Vegeta barrier (keep, lower or remove; it was added with our first
+  arctic plan, the original game has no arctic); Krillin's new lines in the wish scene.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
