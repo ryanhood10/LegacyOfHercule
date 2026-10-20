@@ -356,6 +356,11 @@ beside player 1. Only player 1 going down ends a fight.
 still believes his fake "single handedly" story; he is not revealed as the true hero until the Buu's
 Fury storyline.
 
+**A lost solo fight (Ryan): normal game over, as now.** When player 1 reaches 0 HP the stock game plays
+the death animation and the game over. Player 2's solo fights (2, J2, J4) are built by handing player
+2's pad the main character (the duels' pad swap), so their losses are the same game over; player 2's
+own entity would only get back up at half HP.
+
 **One Cell until the end (Ryan):** every Cell fight before the last has a single Perfect Cell, no co-op
 twin (stats 21-24 get `BOSS_NO_TWIN`); the twin Cells are saved for the final fight.
 
@@ -420,13 +425,12 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 - Hercule's beam pose. His sprite (72) has idle, walk, hit-stun, victory, two punches and a kick, no
   beam pose. Cheapest stand-in: hold his straight-punch pose (group 7) with the beam coming off his
   fists. Otherwise, new art.
-- A lost solo fight (1, 2, J1-J4): what happens when the fighting player goes down.
 - After the Games: Goku already stays in the party ("Keep Goku", `docs/hercule.md` 4); the stock
   ending also sets Hercule to level 40 and announces him as a new character, which no longer fits
   (he has been in the party since West City).
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
-cards; player 2 playing Goku (party slot 4) while player 1 watches; Krillin and the fourth Junior
+cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior
 record; `BOSS_NO_TWIN` on stats 21-24 and a `BOSS_PAIR` rule for the twin Cells; player 2's Hercule
 carrying 16's head instead of the Hercule actor; two Cells and two beams in the struggle scene.
 
