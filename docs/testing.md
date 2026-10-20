@@ -580,6 +580,13 @@ on the Lookout), then A twice: `mashmap 1 2` reaches the epilogue's future city.
 runs (a warp mid-cutscene crashes, r0 = player 2's vtable): close each dialogue page exactly once and let each stage
 settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
 
+## The Arctic summit (headless, 2026-10-19)
+
+`tools/headless/arctic_summit.txt`: Map Test 261 with flags 191, 195, 480 and 381, a test warp to the summit's arrival
+(15/8, (336, 464)), both pads walk up into the scene's rect, A through the scene, then the boss stat is queued the way
+the Cell Games test does it (`cg_state + 5`, stat + 1 = 115 for the stand-in 114; stepz) and FLAGS+47 bit 6 (382)
+is checked. `PanCameraToPosition` names the view's top-left corner, not its centre.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

@@ -1,320 +1,451 @@
 {
- "_": "Arctic route, the summit (Super 13's battle, docs/story.md 4i): Snowy Highlands zone 13 area 10's clearing stretched to 720 x 592 (a crown of cliffs and snowy trees at the back, rims of rock on the sides, the path up at the bottom). Open ground x 64-632, y 192-472. Spots for the post-game chapter (docs/maps.md 9): arrival (336, 464), the fight's centre (348, 300), sidelines x 96-160 and 560-600 at y 260-440. Flight spot on the grass patch (Snowy Highlands zone 13 area 1's).",
- "name": "arctic_summit",
- "zone": 15,
- "area": 8,
- "base": [
-  13,
-  10
- ],
- "tileset": "base",
- "layout": "base",
- "ops": [
-  {
-   "op": "insert_rows",
-   "at": 29,
-   "src": [
-    27,
-    29
-   ],
-   "times": 16
-  },
-  {
-   "op": "insert_cols",
-   "at": 28,
-   "src": [
-    26,
-    28
-   ],
-   "times": 12
-  },
-  {
-   "op": "insert_cols",
-   "at": 10,
-   "src": [
-    9,
-    11
-   ],
-   "times": 12
-  },
-  {
-   "op": "fill",
-   "bg": 3,
-   "rect": [
-    0,
-    25,
-    90,
-    49
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "bg": 3,
-    "rect": [
-     0,
-     0,
-     8,
-     8
-    ]
-   },
-   "anchor": "map"
-  },
-  {
-   "op": "fill",
-   "bg": 3,
-   "rect": [
-    6,
-    16,
-    78,
-    9
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "bg": 3,
-    "rect": [
-     0,
-     0,
-     8,
-     8
-    ]
-   },
-   "anchor": "map"
-  },
-  {
-   "op": "clear",
-   "bg": 1,
-   "rect": [
-    5,
-    6,
-    75,
-    20
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 2,
-   "rect": [
-    5,
-    6,
-    75,
-    20
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 2,
-   "rect": [
-    36,
-    24,
-    12,
-    37
-   ]
-  },
-  {
-   "op": "stamp",
-   "at": [
-    5,
-    9
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "rect": [
-     4,
-     9,
-     29,
-     17
-    ]
-   },
-   "layers": [
-    1,
-    2
-   ],
-   "collision": false
-  },
-  {
-   "op": "stamp",
-   "at": [
-    31,
-    9
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "rect": [
-     4,
-     9,
-     29,
-     17
-    ]
-   },
-   "layers": [
-    1,
-    2
-   ],
-   "collision": false
-  },
-  {
-   "op": "stamp",
-   "at": [
-    56,
-    9
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "rect": [
-     4,
-     9,
-     25,
-     17
-    ]
-   },
-   "layers": [
-    1,
-    2
-   ],
-   "collision": false
-  },
-  {
-   "op": "clear",
-   "bg": 2,
-   "rect": [
-    36,
-    61,
-    12,
-    13
-   ]
-  },
-  {
-   "op": "stamp",
-   "at": [
-    36,
-    61
-   ],
-   "src": {
-    "map": [
-     13,
-     10
-    ],
-    "rect": [
-     12,
-     29,
-     12,
-     13
-    ]
-   },
-   "layers": [
-    2
-   ],
-   "to_layers": [
-    3
-   ],
-   "collision": false
-  },
-  {
-   "op": "stamp",
-   "at": [
-    26,
-    51
-   ],
-   "src": {
-    "map": [
-     13,
-     1
-    ],
-    "rect": [
-     10,
-     15,
-     8,
-     10
-    ]
-   },
-   "collision": false
-  },
-  {
-   "op": "block",
-   "rect": [
-    0,
-    0,
-    90,
-    24
-   ]
-  },
-  {
-   "op": "walk",
-   "rect": [
-    8,
-    24,
-    71,
-    35
-   ]
-  },
-  {
-   "op": "block",
-   "rect": [
-    79,
-    24,
-    11,
-    35
-   ]
-  }
- ],
- "triggers": [
-  {
-   "type": "flight",
-   "rect": [
-    212,
-    412,
-    268,
-    476
-   ],
-   "world": [
-    1100,
-    800
-   ],
-   "_": "back to the world map, onto the arctic landing"
-  }
- ],
- "exits": [
-  {
-   "type": "door",
-   "rect": [
-    320,
-    552,
-    352,
-    592
-   ],
-   "dir": "down",
-   "to": [
-    15,
-    7,
-    1
-   ],
-   "at": [
-    144,
-    112
-   ],
-   "facing": 0,
-   "_": "down to the ridge, in front of its cave"
-  }
- ],
- "spawn": [
-  336,
-  464
- ],
- "name_id": 356,
- "music": 5,
- "flags": 1
+  "_": "Arctic route, the summit (Super 13's battle, docs/story.md 4i): Snowy Highlands zone 13 area 10's clearing stretched to 720 x 592 (a crown of cliffs and snowy trees at the back, rims of rock on the sides, the path up at the bottom). Open ground x 64-632, y 192-472. Spots for the post-game chapter (docs/maps.md 9): arrival (336, 464), the fight's centre (348, 300), sidelines x 96-160 and 560-600 at y 260-440. Flight spot on the grass patch (Snowy Highlands zone 13 area 1's).",
+  "name": "arctic_summit",
+  "zone": 15,
+  "area": 8,
+  "base": [
+    13,
+    10
+  ],
+  "tileset": "base",
+  "layout": "base",
+  "ops": [
+    {
+      "op": "insert_rows",
+      "at": 29,
+      "src": [
+        27,
+        29
+      ],
+      "times": 16
+    },
+    {
+      "op": "insert_cols",
+      "at": 28,
+      "src": [
+        26,
+        28
+      ],
+      "times": 12
+    },
+    {
+      "op": "insert_cols",
+      "at": 10,
+      "src": [
+        9,
+        11
+      ],
+      "times": 12
+    },
+    {
+      "op": "fill",
+      "bg": 3,
+      "rect": [
+        0,
+        25,
+        90,
+        49
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "bg": 3,
+        "rect": [
+          0,
+          0,
+          8,
+          8
+        ]
+      },
+      "anchor": "map"
+    },
+    {
+      "op": "fill",
+      "bg": 3,
+      "rect": [
+        6,
+        16,
+        78,
+        9
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "bg": 3,
+        "rect": [
+          0,
+          0,
+          8,
+          8
+        ]
+      },
+      "anchor": "map"
+    },
+    {
+      "op": "clear",
+      "bg": 1,
+      "rect": [
+        5,
+        6,
+        75,
+        20
+      ]
+    },
+    {
+      "op": "clear",
+      "bg": 2,
+      "rect": [
+        5,
+        6,
+        75,
+        20
+      ]
+    },
+    {
+      "op": "clear",
+      "bg": 2,
+      "rect": [
+        36,
+        24,
+        12,
+        37
+      ]
+    },
+    {
+      "op": "stamp",
+      "at": [
+        5,
+        9
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "rect": [
+          4,
+          9,
+          29,
+          17
+        ]
+      },
+      "layers": [
+        1,
+        2
+      ],
+      "collision": false
+    },
+    {
+      "op": "stamp",
+      "at": [
+        31,
+        9
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "rect": [
+          4,
+          9,
+          29,
+          17
+        ]
+      },
+      "layers": [
+        1,
+        2
+      ],
+      "collision": false
+    },
+    {
+      "op": "stamp",
+      "at": [
+        56,
+        9
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "rect": [
+          4,
+          9,
+          25,
+          17
+        ]
+      },
+      "layers": [
+        1,
+        2
+      ],
+      "collision": false
+    },
+    {
+      "op": "clear",
+      "bg": 2,
+      "rect": [
+        36,
+        61,
+        12,
+        13
+      ]
+    },
+    {
+      "op": "stamp",
+      "at": [
+        36,
+        61
+      ],
+      "src": {
+        "map": [
+          13,
+          10
+        ],
+        "rect": [
+          12,
+          29,
+          12,
+          13
+        ]
+      },
+      "layers": [
+        2
+      ],
+      "to_layers": [
+        3
+      ],
+      "collision": false
+    },
+    {
+      "op": "stamp",
+      "at": [
+        26,
+        51
+      ],
+      "src": {
+        "map": [
+          13,
+          1
+        ],
+        "rect": [
+          10,
+          15,
+          8,
+          10
+        ]
+      },
+      "collision": false
+    },
+    {
+      "op": "block",
+      "rect": [
+        0,
+        0,
+        90,
+        24
+      ]
+    },
+    {
+      "op": "walk",
+      "rect": [
+        8,
+        24,
+        71,
+        35
+      ]
+    },
+    {
+      "op": "block",
+      "rect": [
+        79,
+        24,
+        11,
+        35
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "type": "flight",
+      "rect": [
+        212,
+        412,
+        268,
+        476
+      ],
+      "world": [
+        1100,
+        800
+      ],
+      "_": "back to the world map, onto the arctic landing"
+    },
+    {
+      "type": "dialogue",
+      "rect": [
+        64,
+        392,
+        632,
+        440
+      ],
+      "payload": "seq:summit_scene",
+      "condition": "script:summit_on",
+      "_": "walking up from the arrival: 13, 17 and 18, the absorption, Super 13, the fight (docs/story.md 4i)"
+    }
+  ],
+  "exits": [
+    {
+      "type": "door",
+      "rect": [
+        320,
+        552,
+        352,
+        592
+      ],
+      "dir": "down",
+      "to": [
+        15,
+        7,
+        1
+      ],
+      "at": [
+        144,
+        112
+      ],
+      "facing": 0,
+      "_": "down to the ridge, in front of its cave"
+    }
+  ],
+  "spawn": [
+    336,
+    464
+  ],
+  "name_id": 356,
+  "music": 5,
+  "flags": 1,
+  "sources": [
+    "data/story/arctic_summit.lscript"
+  ],
+  "records": [
+    {
+      "kind": "actor",
+      "sprite": 165,
+      "x": 348,
+      "y": 300,
+      "facing": 0,
+      "condition": "script:summit_on",
+      "_": "0: Android 13 (a stand-in for the Super 13 model until the boss lands)"
+    },
+    {
+      "kind": "actor",
+      "sprite": 9,
+      "x": 300,
+      "y": 320,
+      "facing": 3,
+      "condition": "script:summit_on",
+      "_": "1: Android 17"
+    },
+    {
+      "kind": "actor",
+      "sprite": 11,
+      "x": 400,
+      "y": 320,
+      "facing": 2,
+      "condition": "script:summit_on",
+      "_": "2: Android 18"
+    },
+    {
+      "kind": "actor",
+      "sprite": 103,
+      "x": 128,
+      "y": 280,
+      "facing": 3,
+      "condition": "script:watch_piccolo",
+      "_": "3: Piccolo on the left rim"
+    },
+    {
+      "kind": "actor",
+      "sprite": 56,
+      "x": 128,
+      "y": 330,
+      "facing": 3,
+      "condition": "script:watch_gohan",
+      "_": "4: Gohan"
+    },
+    {
+      "kind": "actor",
+      "sprite": 76,
+      "x": 128,
+      "y": 380,
+      "facing": 3,
+      "condition": "script:watch_krillin",
+      "_": "5: Krillin"
+    },
+    {
+      "kind": "actor",
+      "sprite": 72,
+      "x": 128,
+      "y": 430,
+      "facing": 3,
+      "condition": "script:watch_hercule",
+      "_": "6: Hercule"
+    },
+    {
+      "kind": "actor",
+      "sprite": 137,
+      "x": 580,
+      "y": 280,
+      "facing": 2,
+      "condition": "script:watch_vegeta",
+      "_": "7: Vegeta on the right rim"
+    },
+    {
+      "kind": "actor",
+      "sprite": 132,
+      "x": 580,
+      "y": 330,
+      "facing": 2,
+      "condition": "script:watch_trunks",
+      "_": "8: Trunks"
+    },
+    {
+      "kind": "actor",
+      "sprite": 121,
+      "x": 580,
+      "y": 380,
+      "facing": 2,
+      "condition": "script:summit_on",
+      "_": "9: Tien"
+    },
+    {
+      "kind": "actor",
+      "sprite": 156,
+      "x": 580,
+      "y": 430,
+      "facing": 2,
+      "condition": "script:summit_on",
+      "_": "10: Yamcha"
+    },
+    {
+      "kind": "enemy",
+      "like": [
+        6,
+        61,
+        1
+      ],
+      "stat": 114,
+      "sprite": 165,
+      "x": 348,
+      "y": 300,
+      "condition": "never",
+      "action": "seq:summit_13_end",
+      "_": "11: Super 13 the boss (stand-ins: stat 114 and sprite 165 until the Super 13 boss lands)"
+    }
+  ]
 }

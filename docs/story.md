@@ -576,8 +576,12 @@ epilogue, then the title screen; the talk-show bonus ending).
 **Built so far (2026-10-19, `data/story/postgame`, tested headless end to end):** everything on the Lookout: the
 wishes, Hercule's tease at the TV studio, the explosion, 18 leaving, the Arctic opening on the world map, Dende's
 reminder, the finale, both questions, and the ending (talk show, credits, the new epilogue with old Hercule, the title
-screen). The arctic maps are merged (`arctic_route`). Still to build: the summit scene and the Super 13 fight, which
-wait for the Super 13 boss (its session is working); the summit's scene sets flag 382. Notes for Ryan: Dende's
+screen). The arctic maps are merged (`arctic_route`). The summit is built too (`data/story/arctic_summit`, through
+`data/maps/arctic_summit.json`): 13 against 17 and 18, the absorptions, "I am complete!", a line from player 1's
+character (Vegeta, Hercule, Krillin and Piccolo have their own; the rest share "We have to stop this!") and one
+naming player 2, the fight, the explosion, Vegeta's "clankers", flag 382; the sideline watchers stand only when
+neither player plays them. Super 13 is still a stand-in there (base 13's sprite 165 and stat 114) until the Super
+13 boss lands; the full scene plays again after a reload at the ridge pad (a flag saved after the pad cannot tell). Notes for Ryan: Dende's
 question answers with the button that closes its last page (A yes, B no); the epilogue's old Hercule uses the Buu's
 Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprite instead.
 

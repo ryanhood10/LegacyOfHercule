@@ -1,0 +1,205 @@
+; The Arctic summit (zone 15 area 8, docs/story.md 4i): Android 13, 17 and 18 fighting when the players arrive, 13
+; absorbs 17 then 18 and becomes Super 13, the players say they have to stop him, the fight, the explosion, Vegeta's
+; "clankers". Built into the map by tools/mapbuild.py from data/maps/arctic_summit.json ("sources").
+; Speakers: 0 narration (13 has no portrait), 1 player 1's character, 28 Android 17, 29 Android 18, 106 Vegeta.
+; Super 13 is a stand-in until the Super 13 boss lands: base 13's sprite (165) and stat 114 (the unused arctic 13).
+
+; ---- conditions --------------------------------------------------------------------------------------
+script summit_on                                 ; the post-game's Arctic is open and Super 13 still stands
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+end
+
+; a sideline watcher stands only while neither player plays that character (party slot)
+script watch_gohan
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 0
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 0
+    CmpNe
+    And
+    PushActiveCharIndex
+    PushByte 8
+    CmpNe
+    And
+end
+
+script watch_piccolo
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 1
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 1
+    CmpNe
+    And
+end
+
+script watch_vegeta
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 2
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 2
+    CmpNe
+    And
+end
+
+script watch_trunks
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 3
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 3
+    CmpNe
+    And
+end
+
+script watch_hercule
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 5
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 5
+    CmpNe
+    And
+end
+
+script watch_krillin
+    StackTestStoryFlag 381
+    StackTestStoryFlagNot 382
+    And
+    PushActiveCharIndex
+    PushByte 6
+    CmpNe
+    And
+    CoopCall 8, 0, 0, 0
+    PushByte 6
+    CmpNe
+    And
+end
+
+; ---- the scene ---------------------------------------------------------------------------------------
+sequence summit_scene
+  script                                 ; 13 against 17 and 18 at the centre of the clearing
+        SetPlayerVisible 1
+        PanCameraToPosition 228, 220, 3        ; the pan names the view's top-left corner
+        BeginCommandBatch
+        SetEntityAnimation 9, 6
+        NPCFireKiBlastAtEntity 11, 165, 100
+        CommitCommandBatch
+        PlayDamageEffect 165
+        SetEntityAnimation 165, 6
+        PlayDamageEffect 9
+        WaitFrames 30
+  text 0 "ANDROID 13: Ha!  The Dragon Balls brought you two back...\x0bjust for me!"
+  text 28 "ANDROID 17: Sis, get out of here!"
+  text 29 "ANDROID 18: Not a chance.  We finish him together!"
+  script                                 ; 13 absorbs 17
+        WalkToPosition 165, 316, 316
+        WhiteFlash 20
+        PlayAudio 61
+        DespawnEntity 9
+        ScreenShake 0, 10, 30
+        WaitFrames 40
+  text 0 "ANDROID 13: Your power is mine!"
+  script                                 ; then 18
+        WalkToPosition 165, 384, 316
+        WhiteFlash 20
+        PlayAudio 61
+        DespawnEntity 11
+        ScreenShake 0, 10, 30
+        WaitFrames 40
+        WalkToPosition 165, 348, 300
+        FadeToWhite 20
+        PlayAudio 55
+        WaitFrames 30
+        WhiteFadeOut 30
+        ScreenShake 0, 20, 60
+  text 0 "SUPER 13: Now...  I am complete!"
+  script                                 ; who speaks for the players: some characters have their own line
+        PanCameraToPosition 216, 300, 3
+        PushActiveCharIndex
+        PushByte 2
+        CmpEq
+        JumpIfFalse L1
+        PushByte 9
+        END
+      L1:
+        PushActiveCharIndex
+        PushByte 5
+        CmpEq
+        JumpIfFalse L2
+        PushByte 10
+        END
+      L2:
+        PushActiveCharIndex
+        PushByte 6
+        CmpEq
+        JumpIfFalse L3
+        PushByte 11
+        END
+      L3:
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse L4
+        PushByte 12
+        END
+      L4:
+        PushByte 13
+        END
+  text 1 "Hmph.  Another tin can to scrap." -> 14
+  text 1 "Uh...  is it too late to go home?" -> 14
+  text 1 "18...  You'll pay for this!" -> 14
+  text 1 "Careful.  He's stronger than Cell was." -> 14
+  text 1 "We have to stop this!"
+  fmt 0 "%s: Let's take him down together!"
+        CoopCall 14, 2, 0, 0
+        END
+  script                                 ; the fight: the boss record (stat 114, a stand-in for Super 13)
+        DespawnEntity 165
+        TriggerMapEvent 11
+        DrawBossHealthBar 165
+        SetActiveEntity 0
+end
+
+sequence summit_13_end
+  script                                 ; Super 13 explodes, and 17 and 18 with him
+        FindPlayerEntity
+        SetPlayerVisible 1
+        WhiteFlash 30
+        PlayAudio 21
+        ScreenShake 0, 30, 90
+        PlayAudio 20
+        WaitFrames 60
+        FadeToWhite 30
+        WaitFrames 30
+        WhiteFadeOut 60
+  text 106 "VEGETA: *spits*  At last.  The end of those clankers."
+  script
+        SetStoryFlag 382
+        PlayAudio 62
+  text 0 "@^Journal Updated!"
+end

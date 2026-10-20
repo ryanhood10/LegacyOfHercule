@@ -1,0 +1,125 @@
+# The Arctic summit (docs/story.md 4i): the scene, the Super 13 fight, the explosion, flag 382. From a debug-menu
+# savestate of a DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/arctic_summit.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 0
+preset +195 +191 +480 +381
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01D00150
+poke32 0x0203FD08 5
+frames 240
+map
+shot sm00_arrival
+p2 0x40
+key 0x40 40
+p2 0
+frames 30
+shot sm01_scene
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm01
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm02
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm03
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm04
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm05
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm06
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm07
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm08
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm09
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm10
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm11
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm12
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm13
+p2 1
+key 1 6
+p2 0
+frames 100
+shot sm14
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 115
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 60
+shot sm20_won
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se01
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se02
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se03
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se04
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se05
+p2 1
+key 1 6
+p2 0
+frames 100
+shot se06
+echo == Super 13 beaten: 382 = FLAGS+47 bit 6 (0x40)
+peek8 FLAGS+47 1
+map
