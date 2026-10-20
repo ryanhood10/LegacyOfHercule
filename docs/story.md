@@ -495,7 +495,7 @@ epilogue, then the title screen; the talk-show bonus ending).
 - **Dende's prompt (Ryan), from then on whenever he is talked to:** "Enter Peace Times and start
   'Dragon Ball Z: Buu's Fury' co-op?" Yes / No.
   - No: DENDE: "Okay. Come talk to me when you're ready!"
-  - Yes: a second prompt, "Are you sure you want to start the new campaign?" Yes / No; Yes plays the
+  - Yes: a second prompt, "Are you sure you want to start the Buu's Fury campaign?" Yes / No; Yes plays the
     ending and the game ends.
   - To build: stock dialogue has no yes/no choice (a search of every map script found none); the
     closest UI is the save pad's two-option menu (Save / Switch Characters).
@@ -503,8 +503,12 @@ epilogue, then the title screen; the talk-show bonus ending).
   ending (Hercule's "Late Night with Rob Howard") always plays too, no statues or level 50 needed.
   Draft order (Claude's): the talk show, the credits, the Trunks epilogue, "The End". This is where
   the game will later hand over to the Buu's Fury campaign (not planned yet).
-- **Still open:** the arctic's Vegeta barrier (keep, lower or remove; it was added with our first
-  arctic plan, the original game has no arctic); Krillin's new lines in the wish scene.
+- **The arctic (Ryan):** the Vegeta barrier is removed. The arctic is reachable only in this post-game
+  (today nothing in normal play leads there: it needs a world-map landing that appears with the
+  explosion, plus the star), and it is reworked into a slightly new map with a somewhat different size
+  (room for a towering boss and the watchers on the sideline).
+- **Krillin in the wish scene (Ryan):** KRILLIN: "I have a wish..." and Yamcha blurts out his wish
+  first. No Krillin and 18 moment: that is not part of our story.
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 
