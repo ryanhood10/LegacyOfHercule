@@ -30,6 +30,10 @@
 // slot shows OLD_HERCULE_ROW
 #define OLD_HERCULE_WEAKNESS 3
 
+// The melee hit of Krillin's abilities, shared with ssj2gohan.c: one hit message {kind, reaction, power} over
+// the box (cx +- rx, cy +- ry) to every entity of the scene list
+void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack);
+
 // Destructo Disc (ability 22)
 #define DISC_EP          12
 #define DISC_COOLDOWN    150     // frames between throws (per slot)

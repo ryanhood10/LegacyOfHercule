@@ -87,6 +87,8 @@ NEW_STRINGS = {   # slot -> block -> text (ours, not ROM data)
         "desc2": "A quick blast of blue energy. Holding down the B Button will keep firing.",
         "name": "Krillin", "caps": "KRILLIN"},
     7: {"name": "Android 16", "caps": "ANDROID 16"},   # slot 7 while 16 plays it (src/coop/a16player.c)
+    8: {"name": "SSJ2 Gohan", "caps": "SSJ2 GOHAN"},   # Super Saiyan 2 Gohan (src/coop/ssj2gohan.c; his
+                                                       # technique pages are Gohan's, krillin.c status_draw_hook)
 }
 
 

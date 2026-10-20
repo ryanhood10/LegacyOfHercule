@@ -9,7 +9,8 @@
 // with a new EEPROM layout (slots of SAVE_STRIDE bytes) and a private slot store in the .party
 // region. The menu's screen object keeps its stock size: its embedded array is unused, and its
 // six-wide portrait rows show a window of at most six members (SAVE_MENU_MEMBERS) around the slot's
-// active character. Old (six-slot) saves fail the checksum and show as empty.
+// active character. Old six-slot saves fail the checksum and show as empty; saves of the eight-slot
+// builds (2026-10-17 .. 2026-10-19) are read at their own layout and moved to this one (migrate_old).
 #include "coop.h"
 
 #define SAVE_HEADER       0x10                                   // options + checksum (0x08001E4A), untouched
@@ -31,6 +32,7 @@ typedef struct SaveStore {
     u8 members[SAVE_SLOTS][PARTY_SLOTS];   // in-party slots in order
     u8 count[SAVE_SLOTS];                  // their number
     u8 first[SAVE_SLOTS];                  // first member shown (window of SAVE_MENU_MEMBERS around the active one)
+    u8 migrated;                           // bit per slot: read from the eight-slot layout (written back once)
 } SaveStore;
 static SaveStore store __attribute__((section(".party"), aligned(4)));
 
@@ -56,6 +58,33 @@ ROM_FN(void, Scene_Transition, (void), 0x0801F2CF);
 ROM_FN(int, Scene_Run, (void), 0x0801F2F5);
 
 void party_init_hook(PartyState *p);   // party.c
+const CharacterEntry *party_default_entries(void);   // party.c: the N-entry default table
+
+// Saves of the eight-slot builds: the same block with eight entries (0x19C bytes), slots of 0x1A0 at
+// 0x10 + slot * 0x1A0. A slot that fails the checksum at this layout is read at that one and moved over:
+// the entries' tail (save position, flag banks, counters) shifts up, slots 8+ take their defaults (empty:
+// Super Saiyan 2 Gohan has not joined). save_menu_load_hook then writes all three slots in this layout,
+// because a slot of this layout overlaps the next old one.
+#define OLD_SLOTS        8
+#define OLD_BLOCK        (sizeof(PartyState) - (PARTY_SLOTS - OLD_SLOTS) * sizeof(CharacterEntry))
+#define OLD_STRIDE       ((OLD_BLOCK + 4 + 7) & ~7u)
+#define ENTRIES_END(n)   (__builtin_offsetof(PartyState, chars) + (n) * sizeof(CharacterEntry))
+#if PARTY_SLOTS > OLD_SLOTS
+_Static_assert(OLD_BLOCK == 0x19C && OLD_STRIDE == 0x1A0, "the eight-slot save layout");
+static int migrate_old(SaveSlot *s, int slot) {
+    u8 *raw = (u8 *)s;
+    Eeprom_Read(PARTY_MODULE_TABLE[0], raw, SAVE_HEADER + slot * OLD_STRIDE, OLD_STRIDE);
+    u32 sum;
+    memcpy(&sum, raw + OLD_BLOCK, 4);
+    if (Save_Checksum(raw, OLD_BLOCK) != sum) return 0;
+    const unsigned from = ENTRIES_END(OLD_SLOTS), to = ENTRIES_END(PARTY_SLOTS);
+    for (unsigned i = OLD_BLOCK - from; i-- > 0;) raw[to + i] = raw[from + i];   // overlapping: from the end
+    memcpy(raw + from, party_default_entries() + OLD_SLOTS, to - from);
+    return 1;
+}
+#else
+static int migrate_old(SaveSlot *s, int slot) { (void)s; (void)slot; return 0; }
+#endif
 
 // ---- party module ------------------------------------------------------------------------------
 
@@ -76,7 +105,10 @@ void load_slot_hook(PartyState *dst, int slot) {
     SaveSlot *s = &store.slot[slot];
     party_init_hook(&s->party);
     Eeprom_Read(PARTY_MODULE_TABLE[0], s, SAVE_HEADER + slot * SAVE_STRIDE, SAVE_STRIDE);
-    if (Save_Checksum(&s->party, sizeof(PartyState)) != s->checksum) party_init_hook(&s->party);
+    if (Save_Checksum(&s->party, sizeof(PartyState)) != s->checksum) {
+        if (migrate_old(s, slot)) store.migrated |= (u8)(1 << slot);
+        else party_init_hook(&s->party);
+    }
     if (dst != &s->party) memcpy(dst, &s->party, sizeof(PartyState));
 }
 
@@ -121,9 +153,14 @@ static CharacterEntry *view_member(int slot, int i) {
 
 // 0x08001960(handle): read the three slots and list their members.
 void *save_menu_load_hook(void *handle) {
+    store.migrated = 0;
     for (int s = 0; s < SAVE_SLOTS; s++) {
         load_slot_hook(&store.slot[s].party, s);
         build_view(s);
+    }
+    if (store.migrated) {             // eight-slot saves: all three slots move to this layout at once
+        for (int s = 0; s < SAVE_SLOTS; s++) write_slot(&store.slot[s], s);
+        store.migrated = 0;
     }
     return handle;
 }

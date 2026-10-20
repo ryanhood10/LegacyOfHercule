@@ -21,7 +21,10 @@
 //   ents                   list the scene entities;  findent NAME VTABLE  NAME = first entity with that vtable
 //   map                    print the current map (zone, area, variation) and player 1's position
 //   waitmap ZONE AREA MAX  run until that map is loaded (at most MAX frames)
-//   flags +N -N ...        story flags now (PARTY_SLOTS=8 bank at 0x0203F0EC)
+//   flags +N -N ...        story flags now (the bank at FLAGS)
+//   savedata-out FILE / savedata-in FILE   the cartridge save (EEPROM) to / from a file (old-save tests)
+// Predefined variables: PARTY = 0x0203F000 (the party block), FLAGS = its story-flag bank, which moves with
+// PARTY_SLOTS (0x0203F00C + slots * 0x1C: 0x0203F108 with 9 slots), SLOTS = the ROM's party slot count.
 //   preset +N -N ...       the StoryTest preset (coop.h, 0x0203FDC0) Party_Init applies at the next Map Test
 //   maptest ENTRY [VAR]    with the debug menu open: point Map Test at map entry ENTRY and press A
 //   save FILE / load FILE  savestates
@@ -45,7 +48,7 @@ static int p2_on;
 static unsigned p2_word;
 static unsigned long frame_no;
 
-#define MAX_VARS 16
+#define MAX_VARS 24
 static char var_name[MAX_VARS][32];
 static unsigned var_val[MAX_VARS];
 static int nvars;
@@ -145,7 +148,7 @@ static void quiet_log(struct mLogger *l, int category, enum mLogLevel level, con
     (void)l; (void)category;
     if ((level & (mLOG_FATAL | mLOG_ERROR)) && strstr(fmt, "invalid address") && crashes++ < 1 && core) {
         struct ARMCore *cpu = core->cpu;   // the first jump to nowhere: who jumped
-        fprintf(stderr, "CRASH regs:");
+        fprintf(stderr, "CRASH at frame %lu regs:", frame_no);
         for (int i = 0; i < 16; i++) fprintf(stderr, " r%d=%08x", i, cpu->gprs[i]);
         fputc(10, stderr);
     }
@@ -165,6 +168,13 @@ int main(int argc, char **argv) {
     core->setVideoBuffer(core, video, vw);
     if (!mCoreLoadFile(core, argv[1])) { fprintf(stderr, "cannot load %s\n", argv[1]); return 1; }
     core->reset(core);
+    {   // the party's slot count from the default-table literal (tools/romdata.py party_slots_of)
+        unsigned lit = r32(0x08003EA0), slots = lit >= 0x08A00000 ? (lit + 0xA8 - 0x08A00000) / 0x1C : 6;
+        set_var("PARTY", 0x0203F000);
+        set_var("SLOTS", slots);
+        set_var("FLAGS", 0x0203F00C + slots * 0x1C);
+        printf("party slots %u, story flags at %08x\n", slots, 0x0203F00C + slots * 0x1C);
+    }
     if (argc > 3) {
         struct VFile *vf = VFileOpen(argv[3], O_RDONLY);
         if (!vf || !mCoreLoadStateNamed(core, vf, SAVESTATE_SAVEDATA)) { fprintf(stderr, "cannot load state %s\n", argv[3]); return 1; }
@@ -247,7 +257,21 @@ int main(int argc, char **argv) {
             for (i = 0; i < mx; i++) { unsigned m = map_state(); if (r8(m) == z && r8(m + 1) == ar) break; run_frames(1); }
             printf("waitmap %u %u: %s after %u frames\n", z, ar, i < mx ? "reached" : "TIMEOUT", i);
         }
-        else if (!strcmp(c, "flags")) flag_ops(tok + 1, n - 1, 0x0203F0EC, 0);
+        else if (!strcmp(c, "flags")) flag_ops(tok + 1, n - 1, num("FLAGS"), 0);
+        else if (!strcmp(c, "savedata-out") && n > 1) {
+            void *sram = 0;
+            size_t sz = core->savedataClone(core, &sram);
+            FILE *f = fopen(tok[1], "wb");
+            if (f) { fwrite(sram, 1, sz, f); fclose(f); }
+            printf("savedata-out %s: %zu bytes\n", tok[1], sz);
+            free(sram);
+        } else if (!strcmp(c, "savedata-in") && n > 1) {
+            FILE *f = fopen(tok[1], "rb");
+            static unsigned char buf[0x20000];
+            size_t sz = f ? fread(buf, 1, sizeof buf, f) : 0;
+            if (f) fclose(f);
+            printf("savedata-in %s: %zu bytes, %s\n", tok[1], sz, sz && core->savedataRestore(core, buf, sz, false) ? "ok" : "failed");
+        }
         else if (!strcmp(c, "preset")) flag_ops(tok + 1, n - 1, 0, 1);
         else if (!strcmp(c, "maptest")) {
             unsigned m = 0;

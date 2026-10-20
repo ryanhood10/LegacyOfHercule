@@ -6,7 +6,7 @@
 // is recorded, the pads swap when player 2 won and the duel asked for it, and the duel's end script
 // (a mapScripts index, TriggerMapEvent style) runs.
 //
-// Clone duels: player 2 plays a copy of player 1's character kept in the last party slot (DUEL_SLOT),
+// Clone duels: player 2 plays a copy of player 1's character kept in party slot 7 (DUEL_SLOT, rom.h),
 // drawn as a shadow (a darkening colour remap on the entity). Hooks: player vtable 0x08025604 slot 9
 // (message handler 0x08008945) and slot 16 (player 1's take-damage 0x08008785); player 2's private
 // vtable uses the same slot 9 and its own slot 16 (player.c).
@@ -14,7 +14,6 @@
 
 #define PLAYER_MSG        0x08008945u   // player vtable slot 9 (entity, message id, message)
 #define P1_TAKE_DAMAGE    0x08008785u   // player vtable slot 16 (entity, hit): HP -= hit[+8], death at 0
-#define DUEL_SLOT         (PARTY_SLOTS - 1)
 #define OBJ_PALETTE       ((volatile const u16 *)0x05000200)
 
 void *memcpy(void *dst, const void *src, unsigned n);

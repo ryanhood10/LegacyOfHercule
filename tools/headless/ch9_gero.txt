@@ -20,12 +20,12 @@ peek8 0x0203FF84 1
 shot g05_party
 save g_ws.ss
 # story flags 0-191 (the lab chapters done, as in a real save at this point)
-poke32 0x0203F0EC 0xFFFFFFFF
-poke32 0x0203F0F0 0xFFFFFFFF
-poke32 0x0203F0F4 0xFFFFFFFF
-poke32 0x0203F0F8 0xFFFFFFFF
-poke32 0x0203F0FC 0xFFFFFFFF
-poke32 0x0203F100 0xFFFFFFFF
+poke32 FLAGS+0x00 0xFFFFFFFF
+poke32 FLAGS+0x04 0xFFFFFFFF
+poke32 FLAGS+0x08 0xFFFFFFFF
+poke32 FLAGS+0x0C 0xFFFFFFFF
+poke32 FLAGS+0x10 0xFFFFFFFF
+poke32 FLAGS+0x14 0xFFFFFFFF
 # the world map near the zone 8 landing: the star
 poke32 0x0203FD0C 0x6306
 poke32 0x0203FD54 0x03E809C4
@@ -120,6 +120,6 @@ frames 300
 map
 peek8 0x0203F000 1
 peek8 0x0203FF84 1
-peek 0x0203F120 1
+peek FLAGS+0x34 1
 shot g18_krillin_hercule
 save g_home.ss

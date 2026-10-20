@@ -15,6 +15,7 @@ PartyState g_party_block __attribute__((section(".party"), aligned(4)));
 #define PARTY_DEFAULTS_LITERAL (*(const u32 *)0x08003EA0)
 #define PARTY_GROWTH_ROWS      ((const u8 *)(PARTY_DEFAULTS_LITERAL + 0xA8))
 #define PARTY_DEFAULTS         ((const CharacterEntry *)(PARTY_GROWTH_ROWS - PARTY_SLOTS * sizeof(CharacterEntry)))
+const CharacterEntry *party_default_entries(void) { return PARTY_DEFAULTS; }   // party_save.c (old saves)
 
 ROM_FN(void, VM_RunCondition, (u32 *ctx, const void *code, void *extra), 0x080092E5);   // bytecode condition -> ctx[1]
 ROM_FN(int, EntityList_CountKind, (void *list, int kind), 0x08006E65);                // live entities of a kind

@@ -356,9 +356,16 @@ void coop_active_check(void) {
     if (ns >= 0) p2_bind(coop.p2, ns);
 }
 
-// Player 2's own switch: next available party member after the current one, never player 1's.
+// Player 2's own switch: next available party member after the current one, never player 1's. Only
+// while player 2 stands or walks: leaving an ability's state by force (the idle reset of p2_bind)
+// freed a held Masenko ball that the scene list still held, and the game jumped to garbage.
+static int p2_switchable(void) {
+    u32 vt = coop.p2->ctrl_state ? *(u32 *)coop.p2->ctrl_state : 0;
+    return vt == IDLE_VTABLE || vt == WALK_VTABLE || vt == 0x080258DCu;
+}
 void p2_cycle(void) {
     if (!coop.p2) return;
+    if (!p2_switchable()) { play_cant_sfx(); return; }
     for (int k = 1; k < PARTY_SLOTS; k++) {
         int s = (coop.p2_slot + k) % PARTY_SLOTS;
         if (slot_ok(s, 1)) { p2_bind(coop.p2, s); return; }

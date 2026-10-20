@@ -3,10 +3,10 @@
 // tools/krillinsprites.py status portrait 121 and slot-7 names) and data/story/ch9_gero.*.
 #pragma once
 
-// Party slot: the last one (7 with PARTY_SLOTS 8), which is the duel clone's slot (duel.c DUEL_SLOT).
+// Party slot 7, the duel clone's slot (DUEL_SLOT, rom.h; slot 8 is Super Saiyan 2 Gohan's).
 // No duel runs during the chapter, so 16 borrows it: CoopCall 11 writes his entry there when the chapter
 // starts and CoopCall 12 takes him out of the party when it ends (any later duel overwrites the slot).
-#define A16_SLOT            (PARTY_SLOTS - 1)
+#define A16_SLOT            DUEL_SLOT
 #define A16_ROW             25      // display row (tools/spriteclone.py)
 #ifndef A16P_SPRITE
 #define A16P_SPRITE         175     // Makefile A16P_SPRITE: a16p_record

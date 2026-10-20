@@ -10,6 +10,7 @@
 // docs/hercule.md "Krillin" / "Old Hercule", docs/party-8-slots.md, docs/sprites.md "Krillin".
 #include "coop.h"
 #include "krillin.h"
+#include "ssj2gohan.h"
 
 typedef struct KrDesc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } KrDesc;
 extern const KrDesc kr_kiblast[16], kr_disc[4];     // build/gen/krillin_sprites_data.c
@@ -116,10 +117,10 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
 #endif
 };
 
-// The last slot is Android 16 on his row 25 (a16player.c) or a duel clone: a clone is named after the
+// Slot 7 is Android 16 on his row 25 (a16player.c) or a duel clone: a clone is named after the
 // character whose row it copies (player 1's when none matches).
 static int name_slot(int slot) {
-    if (slot != PARTY_SLOTS - 1 || row_of_slot(slot) == 25) return slot;
+    if (slot != DUEL_SLOT || row_of_slot(slot) == 25) return slot;
     for (int s = 0; s < slot; s++) if (row_of_slot(s) == row_of_slot(slot)) return s;
     return g_Party->active_slot;
 }
@@ -130,13 +131,26 @@ int status_pages_hook(void *obj, int idx) {
     int slot = status_slot(obj, idx);
     if (slot < HERCULE_SLOT) return 4;     // stats, special melee, two energy techniques
     if (slot == KRILLIN_SLOT) return 3;    // stats, Destructo Disc, Ki Blast
+    if (slot == SSJ2_SLOT) return 4;       // Gohan's pages
     return 1;
 }
 
 void status_draw_hook(void *obj, int idx, int page) {
     int slot = status_slot(obj, idx);
     if (page == 0) StatusPage_Stats(obj, idx);
-    else if (slot < HERCULE_SLOT) {
+    else if (slot == SSJ2_SLOT && page <= 3) {
+        // Super Saiyan 2 Gohan's technique pages are Gohan's (special melee, Masenko, Kamehameha): the stock
+        // pages read the slot from the screen's list (+0x158) for the strings and icons and the slot's flags
+        // for "learned", so they are drawn as slot 0 with slot 8's flags for the duration of the call
+        s32 *list = (s32 *)((u8 *)obj + 0x158 + idx * 4);
+        u32 *gohan = &g_Party->chars[GOHAN_SLOT].flags, kept = *gohan;
+        *list = GOHAN_SLOT;
+        *gohan = g_Party->chars[SSJ2_SLOT].flags;
+        if (page == 1) StatusPage_Melee(obj, idx);
+        else StatusPage_Energy(obj, idx, page - 2);
+        *gohan = kept;
+        *list = SSJ2_SLOT;
+    } else if (slot < HERCULE_SLOT) {
         if (page == 1) StatusPage_Melee(obj, idx);
         else StatusPage_Energy(obj, idx, page - 2);
     } else if (slot == KRILLIN_SLOT && page <= 2) StatusPage_Energy(obj, idx, page - 1);
@@ -148,8 +162,10 @@ static void vm_push(s32 *stack, s32 v) {
     stack[0] = n + 1;
     stack[1 + n] = v;
 }
-void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + g_Party->active_slot]); }
-void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + g_Party->active_slot]); }
+// (Super Saiyan 2 Gohan is "Gohan" in dialogue; "SSJ2 Gohan" is his status-screen title)
+static int speaker_slot(void) { int s = g_Party->active_slot; return s == SSJ2_SLOT ? GOHAN_SLOT : s; }
+void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + speaker_slot()]); }
+void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + speaker_slot()]); }
 
 // ---- ki blast (0x0800EAD8): the stock spawn, Krillin's blasts get the blue frames --------------------
 void kiblast_spawn_hook(const s32 *xy, Entity *owner) {
@@ -178,7 +194,7 @@ static void hit_msg(HitMsg *m, Entity *attacker, void *source, s32 x0, s32 y0, s
     m->source = source;
 }
 
-static void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack) {
+void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack) {
     HitMsg m;
     hit_msg(&m, e, e, cx - rx, cy - ry, cx + rx, cy + ry, attack);
     EntityList_Broadcast(g_SceneTable[1], 0, &m);

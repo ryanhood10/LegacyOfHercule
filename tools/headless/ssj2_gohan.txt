@@ -1,0 +1,174 @@
+# Super Saiyan 2 Gohan (party slot 8, display row 28; docs/testing.md "Super Saiyan 2 Gohan"). SSJ2_TEST=1 build,
+# from the debug-menu state:
+#   make BUILD=build/ssj2t DEBUG_MENU=1 SSJ2_TEST=1
+#   python tools/headless/st_test.py tools/headless/mkmenu.txt build/ssj2t/log2-coop.gba --out build/ssj2t/hl
+#   python tools/headless/st_test.py tools/headless/ssj2_gohan.txt build/ssj2t/log2-coop.gba build/ssj2t/hl/menu.ss --out build/ssj2t/hl --cols 6
+# Map Test zone 2 area 7 (wolves), player 2 present. Slot 8 is empty until the join (player 2's pad L + R +
+# Select = ssj2_join, the function CoopCall 20 runs); then player 2 plays him (L + R + Up), walks, punches and
+# uses his four abilities; then player 1 (L + R + Start). The entry is at PARTY+0xEC (slot 8), Gohan's at
+# PARTY+0x0C; the Kamehameha fires after 24 frames of B held; the ability gate word 0x0300208C is 0 on a Map Test, so the script sets it before each B.
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x01AE01F4
+poke32 0x0203FD08 5
+frames 200
+map
+echo --- before the join: Gohan, slot 8, active slot, player 2's slot
+peek PARTY+0x0C 7
+peek PARTY+0xEC 7
+peek8 PARTY 1
+peek8 0x0203FF84 1
+shot s2_00_before
+echo --- join (player 2's pad L + R + Select)
+p2 0x304
+frames 2
+p2 0
+frames 30
+peek PARTY+0xEC 7
+peek8 0x0203FF84 1
+echo --- player 2 plays him (L + R + Up)
+p2 0x340
+frames 2
+p2 0
+frames 60
+peek8 0x0203FF84 1
+findent pl 0x08025604
+ents
+shot s2_01_p2
+p2 0x20
+frames 16
+shot s2_02_p2_walkL
+p2 0x80
+frames 16
+shot s2_03_p2_walkD
+p2 0x10
+frames 16
+shot s2_04_p2_walkR
+p2 0
+frames 10
+p2 1
+frames 3
+p2 0
+frames 4
+shot s2_05_p2_punch1
+p2 1
+frames 3
+p2 0
+frames 4
+shot s2_06_p2_punch2
+p2 1
+frames 3
+p2 0
+frames 4
+shot s2_07_p2_punch3
+frames 40
+echo --- player 2's abilities: 0 Kamehameha, 1 Masenko, 2 Burst, 3 Ki Blast
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 0
+p2 2
+frames 40
+shot s2_08_p2_kame
+frames 20
+shot s2_09_p2_kame2
+p2 0
+frames 60
+peek PARTY+0xEC 2
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 1
+p2 2
+frames 3
+p2 0
+frames 14
+shot s2_10_p2_masenko
+frames 60
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 2
+p2 2
+frames 3
+p2 0
+frames 6
+shot s2_11_p2_burst
+frames 60
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 3
+p2 2
+frames 3
+p2 0
+frames 8
+shot s2_12_p2_kiblast
+frames 60
+peek PARTY+0xEC 2
+echo --- player 2 away (Select), player 1 becomes him (L + R + Start)
+p2 4
+frames 2
+p2 0
+frames 30
+peek8 0x0203FF84 1
+p2 0x308
+frames 2
+p2 0
+frames 30
+peek8 PARTY 1
+findent pl 0x08025604
+peek pl+0x48
+shot s2_13_p1
+keys 0x20
+frames 16
+shot s2_14_p1_walkL
+keys 0x80
+frames 16
+shot s2_15_p1_walkD
+keys 0x40
+frames 16
+shot s2_16_p1_walkU
+keys 0x20
+frames 6
+keys 0
+frames 10
+keys 1
+frames 3
+keys 0
+frames 4
+shot s2_17_p1_punch1
+keys 1
+frames 3
+keys 0
+frames 4
+shot s2_18_p1_punch2
+keys 1
+frames 3
+keys 0
+frames 4
+shot s2_19_p1_punch3
+frames 40
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 0
+keys 2
+frames 40
+shot s2_20_p1_kame
+frames 20
+keys 0
+frames 60
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 1
+key 2 3
+frames 12
+shot s2_21_p1_masenko
+frames 60
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 2
+key 2 3
+frames 4
+shot s2_22_p1_burst
+frames 60
+poke32 0x0300208C 1
+poke8 PARTY+0xF5 3
+key 2 3
+frames 8
+shot s2_23_p1_kiblast
+frames 60
+peek PARTY+0xEC 7
+ents
+save s2_p1.ss

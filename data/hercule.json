@@ -35,6 +35,21 @@
     }
   },
   "growth": {
+    "8": {
+      "_": "Super Saiyan 2 Gohan (slot 8, src/coop/ssj2gohan.c): he joins at Gohan's level with Gohan's numbers x1.7 and grows about twice as fast as Gohan (318-518 / 302-502 / 256-456)",
+      "str": [
+        600,
+        800
+      ],
+      "pow": [
+        600,
+        800
+      ],
+      "end": [
+        520,
+        720
+      ]
+    },
     "7": {
       "_": "Android 16 in the last slot during the Gero's computer chapter (src/coop/a16player.c): above Krillin's",
       "str": [
@@ -137,6 +152,13 @@
       "icons": 6,
       "is_ready": "fn:a16_rocket_ready",
       "on_use": "fn:a16_rocket_use"
+    },
+    {
+      "name": "SuperSaiyan2Burst",
+      "_": "entry 23: Super Saiyan 2 Gohan (slot 8, src/coop/ssj2gohan.c): the ki pose and a wide blast of aura around him",
+      "icons": 11,
+      "is_ready": "fn:ssj2_burst_ready",
+      "on_use": "fn:ssj2_burst_use"
     }
   ],
   "patches": [
