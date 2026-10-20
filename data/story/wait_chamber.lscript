@@ -72,6 +72,6 @@ script lk_popo_cond
 end
 
 sequence lk_popo
-  text 82 "MR. POPO: Goku and Gohan have finished their training.  The Hyperbolic Time Chamber is free now.\x0bMr. Popo has filled it with opponents for you: ten rounds, each one stronger than the last."
+  text 82 "MR. POPO: Goku and Gohan have finished their training.\x0bThe Hyperbolic Time Chamber is free now.\x0bMr. Popo has filled it with opponents for you: ten rounds, each one stronger than the last."
   text 82 "Go through the door whenever you are ready.\x0bYou may walk out at any time, and come back as often as you like."
 end

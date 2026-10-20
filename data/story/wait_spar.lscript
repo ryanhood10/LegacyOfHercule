@@ -43,7 +43,7 @@ sequence lk_roshi
       L1:
         PushByte 37
         END
-  text 80 "MASTER ROSHI: Ho ho!  You two cleared every match in my dojo.\x0bIf you want to keep sharpening each other, the dojo is yours.  One on one...  no prizes, just pride!"
+  text 80 "MASTER ROSHI: Ho ho!  You two cleared every match in my dojo.\x0bIf you want to keep sharpening each other, the dojo is yours.\x0bOne on one...  no prizes, just pride!"
   script
         SetStoryFlag 440
         PlayAudio 62
@@ -54,9 +54,11 @@ end
 
 ; ---- the sparring room (zone 6 area 70) ------------------------------------------------------------
 
-script lk_spar_cond
+script lk_spar_cond                     ; booked, and a second player to spar with (alone the mat does nothing)
         StackTestStoryFlag 214
         StackTestStoryFlag 440
+        And
+        CoopCall 5, 0, 0, 0
         And
 end
 

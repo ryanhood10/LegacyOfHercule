@@ -47,7 +47,9 @@ sequence cg_ring
         PlayAudio 50
         END
   stockseq @083e8d98 1 26    ; "I'll fight Cell first", Hercule's ring scene, "Let's do this!"
-  text 0 "@^Player 1 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 0, 0
+        END
   script                                 ; stock entry 27: fight 1
         SetPlayerVisible 1
         DespawnEntity 16
@@ -61,7 +63,9 @@ sequence cg_fight1_end
   stockseq @083e8f50 0 3    ; Cell destroys the ring, "the whole desert is our ring"
   script                                 ; player 2's pad takes Goku
         CoopCall 15, 2, 0, 0
-  text 0 "@^Player 2 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 1, 0
+        END
   script                                 ; stock entry 4: fight 2
         DrawBossHealthBarRange 30, 50, 75
         SetActiveEntity 0
@@ -112,7 +116,9 @@ sequence cg_fight2_end
         WaitFrames 60
         SetActiveEntity 0
         SetPlayerVisible 1
-  text 0 "@^Players 1 & 2 fight!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 2, 0
+        END
   script                                 ; fight 3
         DrawBossHealthBarRange 30, 60, 100
         SetStoryFlag 192
@@ -167,7 +173,9 @@ sequence cg_fight3_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
-  text 0 "@^Player 1 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 0, 0
+        END
   script
         SetPlayerVisible 1
         DrawBossHealthBar 31
@@ -192,7 +200,9 @@ sequence cg_j1_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
-  text 0 "@^Player 2 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 1, 0
+        END
   script
         SetPlayerVisible 1
         DrawBossHealthBar 31
@@ -217,7 +227,9 @@ sequence cg_j2_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
-  text 0 "@^Player 1 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 0, 0
+        END
   script
         SetPlayerVisible 1
         DrawBossHealthBar 31
@@ -242,7 +254,9 @@ sequence cg_j3_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
-  text 0 "@^Player 2 fights!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 1, 0
+        END
   script
         SetPlayerVisible 1
         DrawBossHealthBar 31
@@ -300,7 +314,9 @@ sequence cg_head_scene
         DespawnEntity 72
         CoopCall 15, 0, 0, 0
         CoopCall 6, 5, 0, 0
-  text 0 "@^Players 1 & 2 fight!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 2, 0
+        END
   script                                 ; stock entry 31: fight 7
         SetActiveEntity 0
         SetPlayerVisible 1
@@ -363,7 +379,9 @@ sequence cg_fight7_end
   stockseq @083eb704 52 63    ; "ultimate perfection", Goku from the Other World, "I will!"
   script
         SetEntityFacing 0, 3
-  text 0 "@^Players 1 & 2 fight!"
+  fmt 0 "%s"
+        CoopCall 14, 3, 2, 0
+        END
   script                                 ; fight 8: two Perfect Cells (stat 25 + its pair, both-down)
         DrawBossHealthBarRange 30, 20, 100
         SetPlayerVisible 1

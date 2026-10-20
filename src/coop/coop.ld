@@ -58,6 +58,7 @@ SECTIONS
         KEEP(*(.party.cg))   /* cellgames.c state (the Cell Games' solo fights) */
         KEEP(*(.party.s13))  /* super13.c state (Super Android 13) */
         KEEP(*(.party.rv))   /* revive.c state (a downed partner) */
+        KEEP(*(.party.ui))   /* small text buffers (the Cell Games' one-player title card) */
     } > partyram
 
     .bss (NOLOAD) : {

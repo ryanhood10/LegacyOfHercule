@@ -1209,3 +1209,41 @@ scripts (`StackRand 100` against thresholds, then `SpawnItem`: `0x083EE120`, `0x
 are). `create_coop_enemy` points such a record copy at `drop_action`, which runs the same script once, twice
 (Easy, when the entity list did not grow) or not at all (Hard, 1 in 3). Single-player enemies keep the stock
 records. The table's numbers are the macros at the top of `difficulty.h`. Test: `tools/headless/difficulty.txt`.
+
+## One player, and player 2 dropping in and out (2026-10-20)
+
+There is no player-count setting: player 2 exists while a second controller sends input (`p2_present()`, the
+3 s source timeout in the default `P2_MODE_SIO` build). Alone, the game is single-player. Audited 2026-10-20
+(every story scene and every co-op module); fixed:
+
+- **The Cell Games' player-2 fights** (fight 2, J2 Piccolo, J4 Trunks: solo mode 2 hands player 2's pad to player
+  1's entity): alone, player 1's pad plays them (`input.c`). The title cards are CoopCall 14 op 3 (`cg_card`):
+  "Player 1 fights!" / "Player 2 fights!" / "Players 1 & 2 fight!" with two players, "<character> fights!" alone
+  (built in `.party.ui`).
+- **Drop-out:** when player 2's pad goes away, its entity leaves at the next free moment (`p2_drop_out`: player 1
+  controllable, no scene, no solo fight) instead of standing frozen; `ensure_p2` brings it back with the pad. A
+  player 1 lying downed when player 2 leaves gets the game over (nobody can revive); a downed player 2 just goes.
+  A queued game over keeps the body down (`revive_tick` checks `over` before the scene / no-partner get-up).
+- **`p2_coming()`** (player 2's entity, or a live pad and a party member it can play) decides twins, enemy
+  scaling, the boss bars and Android 16's / Super 13's solo HP. The pad alone counted before, so a pad with no
+  playable member (one-member party) got twins.
+- **Story pairs alone** (Ryan: keep them): the `BOSS_PAIR` fights spawn both bosses in single-player too, now at
+  `SOLO_PAIR_HP_PCT` (70 %) each, and with two bars as in co-op (one bar before, for the first boss only).
+  `BOSS_PARTNER_ONLY` marks the rows of a pair's second boss (13 beside 19 / Gero, Cooler, Tien 98, Paragus, the
+  second bunker 19, the second Cell) so a record of that stat on its own is not paired with a copy of itself.
+- **CoopCall 14 op 2** (player 2's name) reads player 1's when there is no player 2 or no valid slot (the slot is
+  0xFF after a fresh boot: it read past the name table).
+- **Duels** (CoopCall 1) that cannot start after all (player 2 left, no slot) take the single-player path: player
+  1 wins and the end sequence runs. Alone, the space duel and the chamber duel play a short flash and shake in
+  place of the fight (`ch3_duels`).
+- **Scenes:** the summit's "%s: Let's take him down together!" plays only with player 2 (`arctic_summit` [14]);
+  the dojo mat needs a second player (`lk_spar_cond`); the gym's "Two against two!", "Good teamwork" and "You make a
+  fine team" now read for one player or two.
+- Already fine alone (checked): every `CoopCall 5` branch in chapters 4-8, the sideline / watcher guards, PartyKeep,
+  Stage, the held beams, Choice, revive (stock death without player 2), Android 16 and Super 13 targeting.
+- **Known, kept:** speakers who are player 2 in co-op talk off screen alone (old Hercule in the prologue, Krillin,
+  Hercule, Android 16 in "Gero's computer", who is only in the party). The test runner's `stepz` no longer presses
+  player 2's pad after `p2 off`, so one-player runs stay one-player.
+- Tests: `tools/headless/cell_games_1p.txt` (the whole Games alone: every fight won, "Goku fights!", player 1's A
+  punching as Goku in fight 2), `tools/headless/dropout.txt` (leave after 4 s, come back, a downed player 1 when
+  player 2 leaves = game over); the summit, post-game and Gero chapter runs pass with `p2 off` too.

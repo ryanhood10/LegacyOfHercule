@@ -142,7 +142,7 @@ sequence ch9_workshop
       L1:
         END
   [1] text 48 "DR. BRIEFS: Ah, there you are!  Good news: Android 16 is all fixed up.\x0bAnd that nasty bomb Dr. Gero hid inside him?  Gone.  I took it out myself!"
-  [2] text 36 "BULMA: He hasn't moved since we closed him up, though.  Dad, are you sure you connected everything?"
+  [2] text 36 "BULMA: He hasn't moved since we closed him up, though.\x0bDad, are you sure you connected everything?"
   [3] script
         WaitFrames 40
         PlayAudio 62
@@ -151,9 +151,9 @@ sequence ch9_workshop
         SetEntityFacing 8, 0
         END
   [4] text 26 "ANDROID 16: ...Systems online."
-  [5] text 26 "ANDROID 16: I am receiving a signal.  It comes from Dr. Gero's laboratory in the Northern Mountains.\x0bHis computer is running again."
+  [5] text 26 "ANDROID 16: I am receiving a signal.\x0bIt comes from Dr. Gero's laboratory in the Northern Mountains.\x0bHis computer is running again."
   [6] text 36 "BULMA: The computer that made Cell?!  But Trunks blew it up!"
-  [7] text 26 "ANDROID 16: The bunker below the lab was not destroyed.  The computer is building something.\x0bI will stop it."
+  [7] text 26 "ANDROID 16: The bunker below the lab was not destroyed.\x0bThe computer is building something.\x0bI will stop it."
   [8] text 73 "KRILLIN: Then you're not going alone.  I've been down there with Trunks.\x0bI know the way to that bunker."
   [9] text 26 "ANDROID 16: ...Very well."
   [10] text 0 "@^Krillin and Android 16 set out for Dr. Gero's lab in the Northern Mountains."
@@ -178,7 +178,7 @@ sequence ch9_gen_west
         PlayAudio 50
         END
   [1] text 0 "@^Behind the waterfall, one of Dr. Gero's generators is humming again."
-  [2] text 26 "ANDROID 16: This generator feeds the bunker's defences.  Stand back."
+  [2] text 26 "ANDROID 16: This generator feeds the bunker's defenses.  Stand back."
   [3] script
         PlayAudio 26
         WaitFrames 20
@@ -194,7 +194,7 @@ sequence ch9_gen_west
       L1:
         PushByte 4
         END
-  [4] text 26 "ANDROID 16: One generator is down.  The other is under the waterfall east of the mountain pass." -> 6
+  [4] text 26 "ANDROID 16: One generator is down.\x0bThe other is under the waterfall east of the mountain pass." -> 6
   [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
   [6] script
         SetActiveEntity 0
@@ -209,7 +209,7 @@ sequence ch9_gen_east
         PlayAudio 50
         END
   [1] text 0 "@^Under the waterfall, one of Dr. Gero's generators is humming again."
-  [2] text 26 "ANDROID 16: This generator feeds the bunker's defences.  Stand back."
+  [2] text 26 "ANDROID 16: This generator feeds the bunker's defenses.  Stand back."
   [3] script
         PlayAudio 26
         WaitFrames 20
@@ -225,7 +225,7 @@ sequence ch9_gen_east
       L1:
         PushByte 4
         END
-  [4] text 26 "ANDROID 16: One generator is down.  The other is under the waterfall west of the mountain pass." -> 6
+  [4] text 26 "ANDROID 16: One generator is down.\x0bThe other is under the waterfall west of the mountain pass." -> 6
   [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
   [6] script
         SetActiveEntity 0
@@ -249,7 +249,7 @@ sequence ch9_rubble
       L1:
         PushByte 5
         END
-  [1] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up.  We'll never dig through all that!"
+  [1] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up.\x0bWe'll never dig through all that!"
   [2] text 26 "ANDROID 16: Stand back."
   [3] script
         PlayAudio 26
@@ -266,7 +266,7 @@ sequence ch9_rubble
         END
   [4] text 73 "KRILLIN: ...Remind me never to arm-wrestle you." -> 7
   [5] text 73 "KRILLIN: Aw, no...  The cave caved in when the lab blew up." -> 6
-  [6] text 26 "ANDROID 16: The rubble is not the problem.  Two of Gero's generators feed the bunker's defences again:\x0bone under the waterfall west of the mountain pass, one under the waterfall to the east.\x0bWe shut them down first." -> 7
+  [6] text 26 "ANDROID 16: The rubble is not the problem.\x0bTwo of Gero's generators feed the bunker's defenses again:\x0bone under the waterfall west of the mountain pass, one under the waterfall to the east.\x0bWe shut them down first." -> 7
   [7] script
         SetActiveEntity 0
         SetPlayerVisible 1

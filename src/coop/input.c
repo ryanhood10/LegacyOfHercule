@@ -160,7 +160,10 @@ void input_poll_hook(InputSystem *in) {
     cg_choice_input(&p1, &p2);             // a yes / no question (CoopCall 18): B answers no and closes the box
     switch (coop_solo()) {                 // the Cell Games' solo fights (cellgames.c)
     case 1: p2 = 0; break;                 // player 1 fights alone, player 2 watches
-    case 2: p1 = p2; p2 = 0; break;        // player 2 fights on player 1's entity, player 1 watches
+    case 2:                                // player 2 fights on player 1's entity, player 1 watches;
+        if (p2_present()) p1 = p2;         // alone, player 1 plays these fights too
+        p2 = 0;
+        break;
     default: break;
     }
     revive_input(&p1, &p2);                // revive.c: a downed player's pad, the partner's A beside the body
@@ -199,6 +202,8 @@ void input_poll_hook(InputSystem *in) {
     poll_into(&coop.input2, p2);
 
     coop_active_check();
+    if (coop.p2 && !p2_present() && !coop_solo() && p1_controllable() && !scene_running())
+        p2_drop_out();                     // player.c: the second controller went away
     p2_sync_combat();
     duel_tick();
     coop_call_tick();

@@ -51,8 +51,8 @@ sequence ch5_fusion
         SetEntityFacing 73, 3
   text 69 "KAMI: But first...  Hercule.  Come here."
   text 67 "HERCULE: M-me?  Uh, sure thing, Mr. Kami, sir!"
-  text 69 "KAMI: You took Piccolo into your home and stood beside him, though you had every reason to fear him.\x0bFew have ever shown him such kindness."
-  text 69 "Every living being carries a hidden potential.\x0bAllow me to draw out a little of yours, as the Grand Elder of Namek once did for Gohan and Krillin."
+  text 69 "KAMI: You took Piccolo into your home and stood beside him...\x0bthough you had every reason to fear him.\x0bFew have ever shown him such kindness."
+  text 69 "Every living being carries a hidden potential.\x0bAllow me to draw out a little of yours...\x0bas the Grand Elder of Namek once did for Gohan and Krillin."
   script
         WhiteFlash 20
         PlayAudio 27

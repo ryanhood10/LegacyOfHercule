@@ -10,16 +10,18 @@ ROM_FN(int, Sprite_Emit, (Entity *e, u32 **cursor), 0x08007773);   // base entit
 // written attr0/attr1, add x bit 9 and y bit 8 (OAM attr1 bits 9/10, read by the mGBA fork) for
 // non-affine sprites, from the entity's full screen coordinates (+0x40/+0x44).
 int sprite_emit_hook(Entity *e, u32 **cursor) {
+#if WIDE_VIEW
     u32 *entry = *cursor;
     int r = Sprite_Emit(e, cursor);
-#if WIDE_VIEW
     if (*cursor == entry + 2 && !(entry[0] & 0x100)) {
         s32 sx = *(s32 *)((u8 *)e + 0x40), sy = *(s32 *)((u8 *)e + 0x44);
         entry[0] |= (((u32)sx >> 9) & 1) << 25;
         entry[0] |= (((u32)sy >> 8) & 1) << 26;
     }
-#endif
     return r;
+#else
+    return Sprite_Emit(e, cursor);
+#endif
 }
 
 

@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **One player and drop-in / drop-out** (Ryan: everything must work alone and together; story pairs stay alone):
+  the Cell Games' player-2 fights play on player 1's pad alone with "<character> fights!" cards; player 2's
+  entity leaves when its controller goes away and returns with it; story pairs at 70 % HP and two bars alone;
+  the summit's partner line, the dojo mat, the gym's team lines and the skipped duels read right for one
+  player; CoopCall 14 op 2 no longer reads past the name table. `docs/coop-design.md` "One player".
 - **Revive and difficulty** (Ryan): a player at 0 HP goes down instead of dying; the partner holds A beside them
   for 3 s (a yellow bar, the body glowing) to get them up with 30 % HP; a red countdown with the seconds runs
   10 s on Normal, and running out (or both down) is a game over (`src/coop/revive.c`, `docs/coop-design.md`

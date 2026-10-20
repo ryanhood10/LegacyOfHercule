@@ -41,6 +41,7 @@ _Static_assert(__builtin_offsetof(CoopState, exp_awards) == 0xD8, "CoopState lay
 
 int coop_solo(void);         // cellgames.c: 0 both players, 1 player 1 fights alone, 2 player 2 alone (on player 1's entity)
 void cg_set_solo(int mode);
+const char *cg_card(int kind);     // cellgames.c: CoopCall 14 op 3, a title card ("Player 1 fights!", alone "Goku fights!")
 void cg_choice_arm(void);            // cellgames.c: CoopCall 18 op 1
 int cg_choice_take(void);            // cellgames.c: CoopCall 18 op 0 -> 1 yes / 2 no
 void cg_choice_input(u16 *p1, u16 *p2);   // input.c, every poll while a question is armed
@@ -48,6 +49,8 @@ void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehame
 u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
+int p2_coming(void);         // player 2's entity, or a pad and a party member for it (player.c)
+void p2_drop_out(void);      // the second pad went away: player 2's entity leaves (player.c)
 int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)
 
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232

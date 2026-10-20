@@ -19,7 +19,7 @@ sequence ch2_piccolo_deal
         PlayAudio 50
   text 67 "HERCULE: Hold it right there, Green Bean!\x0bI saw you fly in this morning.  What's the secret?  Wires?  Mirrors?"
   text 90 "PICCOLO: It's no trick.  Get lost."
-  text 67 "HERCULE: Teach me that flying act and the crowds will go wild!\x0bTell you what: you can stay at my mansion while you train.  Forty rooms, a pool, room service!"
+  text 67 "HERCULE: Teach me that flying act and the crowds will go wild!\x0bTell you what: you can stay at my mansion while you train.\x0bForty rooms, a pool, room service!"
   text 90 "PICCOLO: (A roof over my head for three years...)\x0b...Fine.  But you train with us, and you do as I say."
   text 67 "HERCULE: Ha ha ha!  You've got yourself a deal, Green Bean!"
   script
@@ -46,7 +46,7 @@ end
 ; map 105 (zone 4 area 58) record 0 defeat: King Triceratops gives up, Hercule takes the credit
 sequence ch2_triceratops_end
   stockseq @083c9bf8 0 3                 ; "OK OK!  I give up!", the Triceratops of honor
-  text 67 "HERCULE: Ha ha ha!  Another peace treaty, brought to you by the World Martial Arts Champion!"
+  text 67 "HERCULE: Ha ha ha!\x0bAnother peace treaty, brought to you by the World Martial Arts Champion!"
   text 3 "!PICCOLO: You hid behind a rock the whole fight."
   stockseq @083c9bf8 4                   ; flag 60, back to the farmers
 end

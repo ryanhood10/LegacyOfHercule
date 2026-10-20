@@ -259,7 +259,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |
-| 0x0203FA2C-0x0203FB00 | 0xD4 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
+| 0x0203FA44-0x0203FB00 | 0xBC | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |

@@ -178,6 +178,14 @@ sequence summit_scene
   text 1 "18...  You'll pay for this!" -> 14
   text 1 "Careful.  He's stronger than Cell was." -> 14
   text 1 "We have to stop this!"
+  script                                 ; [14] player 2 answers when there is one; alone, straight to the fight
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 15
+        END
+      L1:
+        PushByte 16
+        END
   fmt 0 "%s: Let's take him down together!"
         CoopCall 14, 2, 0, 0
         END

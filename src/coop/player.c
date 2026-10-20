@@ -211,6 +211,19 @@ static void p2_destroy(Entity *e, int free_it, u32 a, u32 b) {
     if (free_it) Arena_Free(e);
 }
 
+// Player 2's controller went away (no input for the source timeout): its entity leaves, as in the Cell Games'
+// solo fights; it comes back through ensure_p2 when the pad does. A downed player is settled first (revive.c).
+void p2_drop_out(void) {
+    if (!coop.p2) return;
+    revive_p2_gone();
+    EntityList_Remove(g_SceneTable[1], coop.p2, 0);   // its destroy clears coop.p2
+}
+
+// Player 2 is there or about to be: its entity, or a live pad and a party member it can play. Twins, scaling and
+// bars go by this (a warp despawns the entity until player 1 is free, so the pad counts).
+static int pick_p2_slot(void);
+int p2_coming(void) { return coop.p2 || (p2_present() && pick_p2_slot() >= 0); }
+
 // ---- player 2 damage routing (private vtable slots 15 / 16) ---------------------------------
 static void p2_change_hp(Entity *e, int delta) {
     (void)e;

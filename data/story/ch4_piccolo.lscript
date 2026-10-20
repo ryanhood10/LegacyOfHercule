@@ -107,7 +107,7 @@ sequence ch4_lab
         SetEntityFacing 165, 1
         WaitFrames 20
   text 0 "@^ANDROID 13: (Heh...  You built 'em too well, Doc.)"
-  text 0 "@^(Don't you worry.  Whatever they do to you, I'll fulfil my destiny.\x0bGoku is mine.)"
+  text 0 "@^(Don't you worry.  Whatever they do to you, I'll fulfill my destiny.\x0bGoku is mine.)"
   script
         WalkToPosition 165, 336, 296
         DespawnEntity 165
@@ -126,7 +126,7 @@ sequence ch4_road
       L1:
         PushByte 29
         END
-  text 67 "HERCULE: Uh...  Hey, look at the time!  I'd love to stay, but I promised I'd guard the...  the road!"
+  text 67 "HERCULE: Uh...  Hey, look at the time!\x0bI'd love to stay, but I promised I'd guard the...  the road!"
   text 4 "!VEGETA: Out of my way, clown.\x0bThe machines are mine.  Namek, try to keep up."
   script                                 ; player 2 plays Vegeta for the fight; Hercule steps back
         FadeOut 30

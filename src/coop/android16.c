@@ -636,7 +636,7 @@ Entity *a16_spawn(const EnemyRecord *rec) {
     A16 *a = (A16 *)((u8 *)r + rs);
     memset(a, 0, sizeof *a);
     *stat = a16_stat;
-    if (!p2_present()) stat->max_hp = A16_HP * A16_SOLO_HP_PCT / 100;   // the [END, 100] slice
+    if (!p2_coming()) stat->max_hp = A16_HP * A16_SOLO_HP_PCT / 100;   // the [END, 100] slice
     stat->max_hp = stat->max_hp * diff_boss_hp_pct() / 100;             // the difficulty (difficulty.h)
     a->lo = A16_END_PCT;
     a->hi = 100;

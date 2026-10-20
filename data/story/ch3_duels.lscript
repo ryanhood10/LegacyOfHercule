@@ -88,6 +88,22 @@ end
 
 ; the duel is over: the winner is Vegeta (player 1's entity; the pads swapped if player 2 won)
 sequence ch3_space_end
+  script                                 ; [0] two players dueled: on to 2; alone: the flash at 1
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 2
+        END
+      L1:
+        PushByte 1
+        END
+  script                                 ; [1] alone (no duel): the fight happens in a flash
+        WhiteFlash 20
+        PlayAudio 20
+        ScreenShake 0, 20, 50
+        WaitFrames 30
+        WhiteFlash 20
+        PlayAudio 21
+        WaitFrames 50
   script
         WaitFrames 40
         PlayMusic 39
@@ -177,20 +193,36 @@ end
 
 ; the winner's pad plays Piccolo next, the loser's Hercule (the pads swapped if Trunks won)
 sequence ch6_chamber_end
-  script                                 ; next entry: 1 if Vegeta won, 2 if Trunks did
+  script                                 ; [0] two players dueled: on to 2; alone: the flash at 1
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 2
+        END
+      L1:
+        PushByte 1
+        END
+  script                                 ; [1] alone (no duel): the fight happens in a flash
+        WhiteFlash 20
+        PlayAudio 20
+        ScreenShake 0, 20, 50
+        WaitFrames 30
+        WhiteFlash 20
+        PlayAudio 21
+        WaitFrames 50
+  script                                 ; [2] next entry: 3 if Vegeta won, 4 if Trunks did
         WaitFrames 40
         PlayAudio 50
         CoopCall 3, 0, 0, 0
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 1
+        PushByte 3
         END
       L1:
-        PushByte 2
+        PushByte 4
         END
-  text 106 "VEGETA: Hmph.  That is how a prince fights.\x0bNow get up.  We have a year of training ahead of us." -> 3
-  text 99 "TRUNKS: I won, father...\x0bNow let's train.  Cell won't wait for us." -> 3
+  text 106 "VEGETA: Hmph.  That is how a prince fights.\x0bNow get up.  We have a year of training ahead of us." -> 5
+  text 99 "TRUNKS: I won, father...\x0bNow let's train.  Cell won't wait for us." -> 5
   script
         CoopCall 2, 0, 0, 0
         SetCharacterTransformation 2, 137

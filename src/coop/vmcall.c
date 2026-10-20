@@ -169,7 +169,10 @@ void vm_coop_call(s32 *st) {
     case 14:
         if (a == 0) vm_push(st, wave_round());
         else if (a == 1) wave_spawn();
-        else if (a == 2) vm_push(st, (s32)ui_strings[UI_NAME + coop.p2_slot]);
+        else if (a == 2) {                 // player 2's name; alone (or no valid slot) player 1's
+            int s = (coop.p2 || p2_present()) && coop.p2_slot < PARTY_SLOTS ? coop.p2_slot : g_Party->active_slot;
+            vm_push(st, (s32)ui_strings[UI_NAME + s]);
+        } else if (a == 3) vm_push(st, (s32)cg_card(b));   // the Cell Games' title card (cellgames.c)
         break;
     case 9:
         if (a == 0) coop2.call_end_seq = (const void *)b;
@@ -193,7 +196,13 @@ void vm_coop_call(s32 *st) {
 void coop_call_tick(void) {
     if (coop2.call_state == 1 && coop.p2) {
         duel_start(coop2.call_slot, coop2.call_flags, -1);
-        coop2.call_state = coop2.duel_active ? 2 : 0;
+        coop2.call_state = coop2.duel_active ? 2 : 1;
+        if (coop2.call_state == 1) coop2.call_state = 3;   // no duel after all: skip it below
+    }
+    if ((coop2.call_state == 1 && !p2_coming()) || coop2.call_state == 3) {   // player 2 left before the duel
+        coop2.duel_winner = 1;
+        coop2.call_state = 0;
+        run_sequence_soon(coop2.call_end_seq);
     } else if (coop2.call_state == 2 && !coop2.duel_active) {
         coop2.call_state = 0;
         run_sequence_soon(coop2.call_end_seq);

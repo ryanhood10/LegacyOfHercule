@@ -1,0 +1,29 @@
+# Player 2 drops out and back in (src/coop/player.c p2_drop_out, input.c), from a debug-menu savestate of a
+# DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/dropout.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# coop.p2 = 0x0203FF08. `p2 off` stops player 2's pad; after the 3 s source timeout its entity leaves; `p2 0` brings it back.
+# Then player 1 lies downed (test command 10) when player 2 leaves: a game over (rv + 0x22 over = 1).
+p2 0
+maptest 261
+frames 300
+echo == two players: coop.p2 set
+peek 0x0203FF08 1
+p2 off
+frames 240
+echo == player 2's pad gone for 4 s: coop.p2 = 0
+peek 0x0203FF08 1
+shot do1_alone
+p2 0
+frames 120
+echo == back: coop.p2 set again
+peek 0x0203FF08 1
+shot do2_back
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 10
+frames 30
+p2 off
+frames 240
+echo == player 1 was down when player 2 left: over (+0x22) = 1
+peek 0x0203F9F8 13
+peek 0x0203FF08 1
+frames 400
+shot do3_game_over

@@ -1,0 +1,113 @@
+# The Cell Games played ALONE (no player 2: `p2 off`): the same run as cell_games.txt; after each win cg_state + 7
+# has no 0x80 (no player 2), and fight 2 / J2 / J4 (player 2's solo fights) are played on player 1's pad.
+# Fight 2: the title card reads "Goku fights!" and player 1's A punches as Goku (shots cg02b / cg02c).
+p2 off
+preset +191 +421
+maptest 323
+frames 200
+poke32 0x0203FD0C 0x010E
+poke32 0x0203FD54 0x00700108
+poke32 0x0203FD08 5
+frames 200
+key 0x40 20
+key 1 6
+frames 120
+shot cg01_barrier_open
+key 0x40 160
+waitmap 14 2 300
+frames 60
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 22
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 1: Goku (4) alone, solo 1 -> expect 14
+peek8 0x0203F9B7 1
+map
+shot cg02_won
+mash 9 70
+shot cg02b_card_goku_fights
+mash 2 70
+shot cg02c_goku_fighting_on_p1_pad
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 23
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 2: Goku on player 1's pad (alone) -> expect 24
+peek8 0x0203F9B7 1
+map
+shot cg03_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 24
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 3: Gohan + Hercule -> expect 00 (Gohan alone)
+peek8 0x0203F9B7 1
+map
+shot cg04_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J1: Krillin -> expect 16
+peek8 0x0203F9B7 1
+map
+shot cg05_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J2: Piccolo -> expect 21
+peek8 0x0203F9B7 1
+map
+shot cg06_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J3: Vegeta -> expect 12
+peek8 0x0203F9B7 1
+map
+shot cg07_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J4: Trunks -> expect 23
+peek8 0x0203F9B7 1
+map
+shot cg08_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 25
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 7: Gohan + Hercule -> expect 00 (Gohan alone)
+peek8 0x0203F9B7 1
+map
+shot cg09_won
+poke32 0x0203F9B0 0xCE11CA3E
+save cg_pre8.ss
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 26
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 8: two Cells -> expect 00 (Gohan alone)
+peek8 0x0203F9B7 1
+map
+shot cg10_won
+mash 10 100
+shot cg21_struggle
+mash 10 100
+shot cg22_struggle
+mash 10 100
+shot cg23_after
+mash 10 100
+shot cg24_after
+mashmap 6 99 200
+frames 120
+shot cg25_world
+echo == after the Games: on the world map, Goku (slot 4) on row 26 (0x1a)
+map
+peek8 0x0203F000 1
+peek8 0x0203F084 1
+echo == Super Saiyan 2 Gohan in the party: slot 8 flags (bits 0 and 1)
+peek8 0x0203F100 1

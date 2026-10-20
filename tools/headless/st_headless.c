@@ -302,10 +302,10 @@ int main(int argc, char **argv) {
             for (i = 0; i < mx && !r32(a); i++) run_frames(1);
             printf("waitnz %08x: %s after %u frames\n", a, i < mx ? "set" : "TIMEOUT", i);
         }
-        else if (!strcmp(c, "stepz")) {   // stepz ADDR MAX: A on both pads every 100 frames until the byte at ADDR is 0
+        else if (!strcmp(c, "stepz")) {   // stepz ADDR MAX: A on both pads (player 1's only after `p2 off`) every 100 frames until the byte at ADDR is 0
             unsigned a = num(tok[1]), mx = num(tok[2]), k, was_on = p2_on, was = p2_word;
             for (k = 0; k < mx && r8(a); k++) {
-                p2_on = 1; p2_word = was | 1;
+                if (was_on) p2_word = was | 1;   // after `p2 off` (one-player tests) player 2's pad stays away
                 press(1, 6);
                 p2_on = was_on; p2_word = was;
                 if (!p2_on) w16(0x0203FF00, 0);

@@ -772,7 +772,7 @@ Entity *s13_spawn(const EnemyRecord *rec) {
     memset(a, 0, sizeof *a);
     *stat = s13_stat;
     if (s13.hp_pct) stat->max_hp = stat->max_hp * s13.hp_pct / 100;
-    if (!p2_present()) stat->max_hp = stat->max_hp * S13_SOLO_HP_PCT / 100;
+    if (!p2_coming()) stat->max_hp = stat->max_hp * S13_SOLO_HP_PCT / 100;
     stat->max_hp = stat->max_hp * diff_boss_hp_pct() / 100;   // the difficulty (difficulty.h)
     a->dmg_pct = s13.dmg_pct;
     memcpy(r, rec, 0x1C + 4 * (u32)rec->behaviour_count);

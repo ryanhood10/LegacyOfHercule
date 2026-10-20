@@ -648,6 +648,13 @@ holding A for one revive (a `key` releases for 4 frames afterwards, so two short
 died!". `tools/headless/difficulty.txt`: Map Test 0 plays the training scene with the question; B, B answers Hard
 (FLAGS+57 = 0x20).
 
+## One player (headless, 2026-10-20)
+
+`p2 off` at the top of a script plays alone: player 2's pad never speaks, so after the 3 s timeout there is no
+player 2 (`stepz` presses only player 1's A then). `tools/headless/cell_games_1p.txt` is the Cell Games alone,
+`tools/headless/dropout.txt` player 2 leaving and returning. Any chapter test runs alone by changing its first
+`p2 0` to `p2 off` and dropping its other `p2` lines (the summit, post-game and Gero chapter pass that way).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

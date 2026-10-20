@@ -35,6 +35,8 @@ typedef struct ExtraStat {
 #define BOSS_NO_TWIN 1
 #define BOSS_PAIR    2
 #define BOSS_RAGE    4
+#define BOSS_PARTNER_ONLY 8   // the rule of a pair's second boss: a record of this stat on its own is not a pair
+#define SOLO_PAIR_HP_PCT 70   // a story pair (BOSS_PAIR) against one player: both bosses' HP, percent
 
 // Broly's rage when Paragus falls first (docs/story.md 4g); our tuning
 #define BOSS_RAGE_MELEE    10     // added to the survivor's melee / ranged attack bytes (capped at 255)

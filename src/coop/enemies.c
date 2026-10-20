@@ -324,8 +324,13 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         buf.max_hp = boss_hp(buf.max_hp);
     }
     int alone = rule && (rule->flags & BOSS_NO_TWIN);
-    int pair = rule && (rule->flags & BOSS_PAIR);
-    if (((!p2_present() || coop_solo()) && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
+    int pair = rule && (rule->flags & BOSS_PAIR) && !(rule->flags & BOSS_PARTNER_ONLY);
+    int solo_pair = pair && !p2_coming();     // a story pair against one player: both lighter
+    if (solo_pair) {
+        if (st != &buf) { buf = *st; st = &buf; }
+        buf.max_hp = buf.max_hp * SOLO_PAIR_HP_PCT / 100;
+    }
+    if (((!p2_coming() || coop_solo()) && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
         return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
 
     int boss = is_boss_rec(rec, st);
@@ -348,6 +353,10 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (p && diff_boss_hp_pct() != 100) {
             if (p != &tbuf) { tbuf = *p; p = &tbuf; }
             tbuf.max_hp = boss_hp(tbuf.max_hp);
+        }
+        if (p && solo_pair) {
+            if (p != &tbuf) { tbuf = *p; p = &tbuf; }
+            tbuf.max_hp = tbuf.max_hp * SOLO_PAIR_HP_PCT / 100;
         }
         if (p) { tst = p; tstat = rule->partner_stat; }
     }
@@ -642,8 +651,10 @@ BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi) {
     if (e) lo = is_a16(e) ? a16_bar_range(e, lo, hi) : bar_lo(e, lo);
     // single-player: the ROM object. Co-op goes by the pad, as the twins do: after a warp without entities
     // player 2's entity is gone until player 1 is free (Gingertown's bar is drawn right after one).
-    if (!coop.p2 && (!p2_present() || coop_solo())) return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);
     TwinPair *pr = pair_of(e);
+    // ... and a story pair (BOSS_PAIR, single-player too) gets two bars like co-op
+    if (!coop.p2 && (!p2_coming() || coop_solo()) && !(pr && pr->orig && pr->twin))
+        return bar_create(mem, e, lo, hi, (u32 *)BOSSBAR_VTABLE, 160, BAR_Y_TOP);
     if (pr && pr->orig && pr->twin) e = pr->orig;   // FindCharacterEntity searches from the end: it finds the twin
     BossBar *bar = bar_create(mem, e, lo, hi, coop2.bar_vtable, BAR_X_COOP, BAR_Y_TOP);
     if (bar && pr && pr->orig && pr->twin) {

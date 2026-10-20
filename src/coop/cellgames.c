@@ -7,6 +7,8 @@
 // normal game over. The mode only holds in the arena (zone 14 areas 2-4): anywhere else it reads 0
 // and is cleared, so a game over or a reload never leaves a player hidden.
 #include "coop.h"
+#include "krillin.h"
+extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
 #define CG_MAGIC 0xCE11CA3Eu
 #define CG_ZONE  14
@@ -113,6 +115,23 @@ void cg_choice_input(u16 *p1, u16 *p2) {
     else if (edge & KEY_A) cg_state.choice = 1;
     if (*p1 & KEY_B) *p1 = (u16)((*p1 & ~KEY_B) | KEY_A);   // B closes the box too
     if (*p2 & KEY_B) *p2 = (u16)((*p2 & ~KEY_B) | KEY_A);
+}
+
+// Title cards (CoopCall 14 op 3, kind 0 player 1 / 1 player 2 / 2 both): with two players they say who fights;
+// alone, the one player fights them all, so the card names the character ("Goku fights!").
+static char card_buf[24] __attribute__((section(".party.ui")));
+const char *cg_card(int kind) {
+    static const char *const two[3] = { "@^Player 1 fights!", "@^Player 2 fights!", "@^Players 1 & 2 fight!" };
+    if (kind < 0 || kind > 2) kind = 0;
+    if (p2_coming() || (kind == 1 && coop_solo() == 2 && p2_present())) return two[kind];
+    const char *name = ui_strings[UI_NAME + g_Party->active_slot];
+    char *o = card_buf;
+    *o++ = '@'; *o++ = '^';
+    while (*name && o < card_buf + 14) *o++ = *name++;
+    const char *tail = " fights!";
+    while (*tail) *o++ = *tail++;
+    *o = 0;
+    return card_buf;
 }
 
 void cg_set_solo(int mode) {

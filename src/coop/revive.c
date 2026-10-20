@@ -127,6 +127,15 @@ int revive_hit(Entity *e, u8 *hit, int k) {
     return 1;
 }
 
+int scene_running(void) { return SCENE_RUNNING != 0; }
+
+void revive_p2_gone(void) {
+    if (rv.magic != REVIVE_MAGIC) return;
+    if (rv.body[0] && !rv.over) game_over();      // nobody left to revive player 1
+    if (rv.body[1]) { set_tint(rv.body[1], 0); rv.body[1] = 0; rv.hold[1] = 0; }
+    rv.hold[0] = 0;
+}
+
 void revive_test_down(int k) {
     init();
     Entity *e = player(k);
@@ -190,8 +199,8 @@ void revive_tick(void) {
             if (!c->hp) c->hp = (u16)(c->max_hp * REVIVE_HP_PCT / 100 ? c->max_hp * REVIVE_HP_PCT / 100 : 1);
             continue;
         }
+        if (rv.over) continue;                     // the game over is queued: they stay down
         if (SCENE_RUNNING || !allowed()) { get_up(k); continue; }   // a scene (or a solo fight) begins
-        if (rv.over) continue;
         if (rv.glow_n < 256 && rv.glow) build_glow();
         if (rv.a_held[!k] && rv.reaching[!k] && !rv.body[!k]) {
             if (++rv.hold[k] >= REVIVE_HOLD) { get_up(k); continue; }

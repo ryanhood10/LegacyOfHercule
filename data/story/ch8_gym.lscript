@@ -13,7 +13,7 @@
 sequence ch8_gym_duo1
   stock @083d2ce4                        ; sound
   stock @083d2cf0                        ; Yamcha: "This is going to be good, %s!"
-  text 95 "TIEN: Master Roshi wants us to fight as a team today.  Two against two!"
+  text 95 "TIEN: Master Roshi wants us to fight as a team today.  Show us what you've got!"
   script
         DespawnEntity 121
         DespawnCharacterAndRecordPosition 156, 3
@@ -22,7 +22,7 @@ end
 
 sequence ch8_gym_duo1_end
   stockseq @083d2de4 0 1                 ; Yamcha: "Whoa... You sure showed me!"
-  text 95 "TIEN: Good teamwork.  Thanks for the fight."
+  text 95 "TIEN: Good fight.  You've gotten stronger."
   stockseq @083d2de4 2 4                 ; the +3 Power Capsule, back to the atrium, flag 212
 end
 
@@ -133,7 +133,7 @@ sequence ch8_gym_animals
         ClearStoryFlag 373
         ClearStoryFlag 374
         ClearStoryFlag 375
-  text 80 "MASTER ROSHI: Ho ho!  You make a fine team!  For your last lesson, I've hired some special animal ninjas.\x0bA different kind of training!  Ready...  begin!"
+  text 80 "MASTER ROSHI: Ho ho!  Not bad at all!\x0bFor your last lesson, I've hired some special animal ninjas.\x0bA different kind of training!  Ready...  begin!"
   script                                 ; the first round (the next ones start from the defeats below)
         PlayMusic 35
         TriggerMapEvent 8
