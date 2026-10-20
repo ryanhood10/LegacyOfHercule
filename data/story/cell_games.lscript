@@ -756,6 +756,10 @@ sequence cg_beam_struggle
         ClearCharacterInPartyFlag 4
         PlayAudio 62
         END
+  script                                 ; Super Saiyan 2 Gohan joins (ssj2gohan.c, party slot 8)
+        CoopCall 20, 0, 0, 0
+        PlayAudio 40
+  text 0 "@^Super Saiyan 2 Gohan is now an available character!"
   stock @083ec73e    ; "Journal Updated!"
 end
 

@@ -473,8 +473,8 @@ above, tested end to end headless (`docs/testing.md` "Cell Games"). Details for 
 - Gohan's power-up before Super Saiyan 2 no longer waits for its animation (it never ended in co-op tests).
 - In the beam struggle Hercule and the second Cell fire held beams (refreshed at each step, since a beam fades
   on its own); the big clash spark stays between Gohan and the first Cell (it is part of the map).
-- Not wired yet: Super Saiyan 2 Gohan joining (his session has not run); the ring's statue for beating Cell is
-  the stock one.
+- Super Saiyan 2 Gohan joins at the very end with "Super Saiyan 2 Gohan is now an available character!"
+  (CoopCall 20); the statue for beating Cell is the stock one.
 
 **Build list (mechanics, no decision needed):** hide the watching player during solo fights; the title
 cards; player 2's pad driving the main character (Goku, then Piccolo and Trunks) while player 1 watches; Krillin and the fourth Junior

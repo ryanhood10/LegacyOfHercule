@@ -109,3 +109,5 @@ echo == after the Games: on the world map, Goku (slot 4) on row 26 (0x1a)
 map
 peek8 0x0203F000 1
 peek8 0x0203F084 1
+echo == Super Saiyan 2 Gohan in the party: slot 8 flags (bits 0 and 1)
+peek8 0x0203F100 1

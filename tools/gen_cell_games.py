@@ -264,6 +264,8 @@ b = body(A3, "m325_r12_defeat", 53)
 k = b.index("WarpToMapWithEntities 6, 99, 1, 1832, 1088")
 b = b[:k + 1] + ["SetCharacterTransformation 4, 176"] + b[k + 1:]
 script(b, "stock entry 53: Goku stays in the party (Keep Goku) and wears his halo (sprite 176, row 26)")
+script(["CoopCall 20, 0, 0, 0", "PlayAudio 40"], "Super Saiyan 2 Gohan joins (ssj2gohan.c, party slot 8)")
+text(0, "@^Super Saiyan 2 Gohan is now an available character!")
 emit(f"  stock @{A3['m325_r12_defeat']['entries'][54]['head'].split('@')[1].split()[0]}    ; \"Journal Updated!\"")
 emit("end")
 emit("")
