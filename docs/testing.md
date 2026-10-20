@@ -383,7 +383,7 @@ debug menu and saves `build/hl/menu.ss` (bare `shot` / `save` / `load` names lan
 `p2 MASK|off`, `mash N [F]`, `mashent NAME VTABLE MAX`, `mashmap ZONE AREA MAX`, `waitmap`,
 `waitnz ADDR MAX`, `maptest ENTRY` (with the debug menu open: points Map Test at a map entry index
 and presses A), `preset +N -N` (story flags Party_Init applies at that Map Test), `flags`, `peek`,
-`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `entrec RECORD` (how many entities on a sprite record: an actor's sprite id N has its record at the table `*0x0800959C` entry N - 7; sprite 55 = `0x0828FF38`), `map`, `shot NAME`, `save` / `load`, `reset`
+`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `ssave NAME` (a savestate without the cartridge save), `cart PATH` / `cartout PATH` (a .sav into the cartridge, then a reset / the cartridge save out), `entrec RECORD` (how many entities on a sprite record: an actor's sprite id N has its record at the table `*0x0800959C` entry N - 7; sprite 55 = `0x0828FF38`), `map`, `shot NAME`, `save` / `load`, `reset`
 (power-cycle the ROM keeping the cartridge save: another build's savestate, then `reset`, boots this ROM
 with that build's EEPROM). Predefined variables: `PARTY` (0x0203F000), `SLOTS` (the ROM's party slot
 count, from the default-table literal) and **`FLAGS`** (the story-flag bank, `0x0203F00C + SLOTS * 0x1C`:
@@ -678,3 +678,13 @@ $env:JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
 Output lands in `build/decomp/<addr>_FUN_<addr>.c`. `FindRefs.java` lists references to an address.
 Literal pools: search the ROM for a 32-bit value to find every code literal that loads a table
 (that is how the 18 display-row literals and the one sprite-index literal were found).
+
+## Drop-in savestates for Ryan (2026-10-20)
+
+`python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss6` next to the play
+ROM: mGBA loads slot n with Fn (Shift+Fn saves over it). F1 his save on the Northern Wastelands save pad (Krillin),
+F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path, F5 the Arctic, F6 the
+post-game Lookout. F3-F6 are made by Map Test on the DEBUG_MENU=1 build (the same code but for the 4-byte title
+patch) and re-saved on the play ROM. The states hold no cartridge save, so loading one leaves the .sav alone (an
+in-game save inside one still writes it). Savestates break with every rebuild: rerun after each, with mGBA closed.
+`build/play/DROP-INS.txt` lists the keys for Ryan.

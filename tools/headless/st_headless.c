@@ -26,6 +26,9 @@
 //   map                    print the current map (zone, area, variation) and player 1's position
 //   waitmap ZONE AREA MAX  run until that map is loaded (at most MAX frames)
 //   flags +N -N ...        story flags now (the bank at FLAGS)
+//   ssave NAME             a savestate without the cartridge save (a drop-in for mGBA's F1-F9 slots)
+//   cart PATH              a battery save (.sav) into the cartridge (read-only copy), then reset
+//   cartout PATH           write the cartridge's battery save to PATH
 //   reset                  power-cycle the ROM; the cartridge save stays (a savestate of another build
 //                          followed by reset boots this ROM with that build's EEPROM: old-save tests)
 // Predefined variables: PARTY = 0x0203F000 (the party block), FLAGS = its story-flag bank, which moves with
@@ -359,6 +362,25 @@ int main(int argc, char **argv) {
             int ok = vf && (c[0] == 's' ? mCoreSaveStateNamed(core, vf, SAVESTATE_SAVEDATA) : mCoreLoadStateNamed(core, vf, SAVESTATE_SAVEDATA));
             if (vf) vf->close(vf);
             printf("%s %s: %s\n", c, tok[1], ok ? "ok" : "FAILED");
+        }
+        else if (!strcmp(c, "ssave")) {     // ssave NAME: a savestate without the cartridge save (mGBA's F1-F9 slots: never touches the .sav)
+            struct VFile *vf = VFileOpen(tok[1], O_CREAT | O_TRUNC | O_RDWR);
+            int ok = vf && mCoreSaveStateNamed(core, vf, 0);
+            if (vf) vf->close(vf);
+            printf("ssave %s: %s\n", tok[1], ok ? "ok" : "FAILED");
+        }
+        else if (!strcmp(c, "cart")) {      // cart PATH: a battery save (.sav, read-only copy) into the cartridge, then reset
+            int ok = mCoreLoadSaveFile(core, tok[1], true);
+            core->reset(core); p2_on = 0;
+            printf("cart %s: %s (frame %lu)\n", tok[1], ok ? "ok" : "FAILED", frame_no);
+        }
+        else if (!strcmp(c, "cartout")) {   // cartout PATH: the cartridge's battery save as a .sav file
+            void *buf = 0; size_t sz = core->savedataClone(core, &buf);
+            struct VFile *vf = sz ? VFileOpen(tok[1], O_CREAT | O_TRUNC | O_RDWR) : 0;
+            int ok = vf && vf->write(vf, buf, sz) == (ssize_t)sz;
+            if (vf) vf->close(vf);
+            free(buf);
+            printf("cartout %s: %zu bytes %s\n", tok[1], sz, ok ? "ok" : "FAILED");
         }
         else if (!strcmp(c, "reset")) { core->reset(core); p2_on = 0; printf("reset (frame %lu)\n", frame_no); }
         else if (!strcmp(c, "echo")) { for (int i = 1; i < n; i++) printf("%s ", tok[i]); printf("\n"); }
