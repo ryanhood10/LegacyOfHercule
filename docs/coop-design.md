@@ -813,8 +813,8 @@ wait). A downed Cell twin's pointer also clears, and the autopilot sometimes sto
 
 ### Open
 
-- Real two-player play; single-player; the fight on the real arctic summit (the arctic-route session's map),
-  his lines and the absorb scene (the post-game chapter).
+- Real two-player play; single-player. The summit scene (`data/story/arctic_summit`) uses him since 2026-10-19:
+  record 11 is stat 145 / sprite 180 and his line has portrait 122; tested headless only (scene, then a queued win).
 - Base Android 13 still has no portrait (123 is allocated for it).
 - The stall above.
 

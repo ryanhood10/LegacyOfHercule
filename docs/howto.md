@@ -68,7 +68,8 @@ from several sprites), `tools/buu2log2.py` (convert from Buu's Fury).
 ## Add a dialogue or status portrait
 
 Portraits go through `tools/krillinsprites.py`'s `portrait_module` table. Another generator passes
-its own with `--extra-portrait ID=SYMBOL` (see the Makefile's Paragus line). Take the id from
+its own with `--extra-portrait ID=SYMBOL` (add it to the Makefile's `EXTRA_PORTRAITS`; a change there regenerates the table through
+`$(BUILD)/gen/portraits.stamp`, while a stale table shows a garbage portrait). Take the id from
 `docs/ids.md`; the generator asserts that no two portraits share an id.
 
 ## Add a playable character

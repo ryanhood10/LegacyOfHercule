@@ -2,7 +2,7 @@
 ; absorbs 17 then 18 and becomes Super 13, the players say they have to stop him, the fight, the explosion, Vegeta's
 ; "clankers". Built into the map by tools/mapbuild.py from data/maps/arctic_summit.json ("sources").
 ; Speakers: 0 narration (13 has no portrait), 1 player 1's character, 28 Android 17, 29 Android 18, 106 Vegeta.
-; Super 13 is a stand-in until the Super 13 boss lands: base 13's sprite (165) and stat 114 (the unused arctic 13).
+; Super 13: sprite 180, stat 145, portrait 122 (src/coop/super13.c, tools/super13sprites.py).
 
 ; ---- conditions --------------------------------------------------------------------------------------
 script summit_on                                 ; the post-game's Arctic is open and Super 13 still stands
@@ -134,10 +134,13 @@ sequence summit_scene
         WalkToPosition 165, 348, 300
         FadeToWhite 20
         PlayAudio 55
+        DespawnEntity 165
+        SpawnCharacterEntity 180, 348, 300
+        SetEntityFacing 180, 0
         WaitFrames 30
         WhiteFadeOut 30
         ScreenShake 0, 20, 60
-  text 0 "SUPER 13: Now...  I am complete!"
+  text 122 "SUPER 13: Now...  I am complete!"
   script                                 ; who speaks for the players: some characters have their own line
         PanCameraToPosition 216, 300, 3
         PushActiveCharIndex
@@ -178,15 +181,16 @@ sequence summit_scene
   fmt 0 "%s: Let's take him down together!"
         CoopCall 14, 2, 0, 0
         END
-  script                                 ; the fight: the boss record (stat 114, a stand-in for Super 13)
-        DespawnEntity 165
+  script                                 ; the fight: the boss record (stat 145, sprite 180)
+        DespawnEntity 180
         TriggerMapEvent 11
-        DrawBossHealthBar 165
+        DrawBossHealthBar 180
         SetActiveEntity 0
 end
 
 sequence summit_13_end
-  script                                 ; Super 13 explodes, and 17 and 18 with him
+  script                                 ; Super 13 explodes, and 17 and 18 with him (his own 96-frame explosion first)
+        WaitFrames 100
         FindPlayerEntity
         SetPlayerVisible 1
         WhiteFlash 30

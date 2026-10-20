@@ -386,7 +386,7 @@ static void win_stat_tick(void) {
         Entity *e = l->items[i];
         if (!is_enemy(e) || e->hp <= 0) continue;
         int stat = t[0] - 1;
-        if (is_coop_enemy(e) ? record_of(e)->stat_index == stat
+        if (is_coop_enemy(e) || is_a16(e) || is_s13(e) ? record_of(e)->stat_index == stat
                              : (stat < STOCK_STAT_COUNT && e->behaviour == (void *)&ENEMY_STATS[stat])) hit = e;
     }
     if (!hit || !p1_controllable()) { t[1] = 0; return; }

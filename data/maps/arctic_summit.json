@@ -340,7 +340,7 @@
       "y": 300,
       "facing": 0,
       "condition": "script:summit_on",
-      "_": "0: Android 13 (a stand-in for the Super 13 model until the boss lands)"
+      "_": "0: Android 13 before the absorption (sprite 165; the scene swaps in Super 13, sprite 180)"
     },
     {
       "kind": "actor",
@@ -439,13 +439,13 @@
         61,
         1
       ],
-      "stat": 114,
-      "sprite": 165,
+      "stat": 145,
+      "sprite": 180,
       "x": 348,
       "y": 300,
       "condition": "never",
       "action": "seq:summit_13_end",
-      "_": "11: Super 13 the boss (stand-ins: stat 114 and sprite 165 until the Super 13 boss lands)"
+      "_": "11: Super 13 the boss (stat 145, sprite 180: src/coop/super13.c)"
     }
   ]
 }

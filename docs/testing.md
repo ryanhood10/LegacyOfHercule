@@ -621,7 +621,7 @@ settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
 
 `tools/headless/arctic_summit.txt`: Map Test 261 with flags 191, 195, 480 and 381, a test warp to the summit's arrival
 (15/8, (336, 464)), both pads walk up into the scene's rect, A through the scene, then the boss stat is queued the way
-the Cell Games test does it (`cg_state + 5`, stat + 1 = 115 for the stand-in 114; stepz) and FLAGS+47 bit 6 (382)
+the Cell Games test does it (`cg_state + 5`, stat + 1 = 146 for Super 13's 145; stepz) and FLAGS+47 bit 6 (382)
 is checked. `PanCameraToPosition` names the view's top-left corner, not its centre.
 
 ## Reading screenshots

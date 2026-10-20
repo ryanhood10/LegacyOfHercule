@@ -86,7 +86,7 @@ p2 0
 frames 100
 shot sm14
 poke32 0x0203F9B0 0xCE11CA3E
-poke8 0x0203F9B5 115
+poke8 0x0203F9B5 146
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 60
 shot sm20_won

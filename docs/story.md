@@ -580,8 +580,8 @@ screen). The arctic maps are merged (`arctic_route`). The summit is built too (`
 `data/maps/arctic_summit.json`): 13 against 17 and 18, the absorptions, "I am complete!", a line from player 1's
 character (Vegeta, Hercule, Krillin and Piccolo have their own; the rest share "We have to stop this!") and one
 naming player 2, the fight, the explosion, Vegeta's "clankers", flag 382; the sideline watchers stand only when
-neither player plays them. Super 13 is still a stand-in there (base 13's sprite 165 and stat 114) until the Super
-13 boss lands; the full scene plays again after a reload at the ridge pad (a flag saved after the pad cannot tell). Notes for Ryan: Dende's
+neither player plays them. 13 turns into Super 13 (sprite 180, portrait 122) in the scene, and the fight is the Super
+13 boss (stat 145, `src/coop/super13.c`); the full scene plays again after a reload at the ridge pad (a flag saved after the pad cannot tell). Notes for Ryan: Dende's
 question answers with the button that closes its last page (A yes, B no); the epilogue's old Hercule uses the Buu's
 Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprite instead.
 

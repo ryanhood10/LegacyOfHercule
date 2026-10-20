@@ -128,8 +128,14 @@ $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu
 
 # Krillin's playable sprite, status portrait, ki blast / Destructo Disc frames and icons, the relocated UI
 # string table and portrait module table (never committed)
-$(BUILD)/gen/krillin_sprites_data.c: tools/krillinsprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
-	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait --extra-portrait $(S13_PORTRAIT)=s13_portrait
+EXTRA_PORTRAITS := --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait --extra-portrait $(S13_PORTRAIT)=s13_portrait
+# the portrait list as a stamp: the table is regenerated when an extra portrait is added or renumbered
+$(BUILD)/gen/portraits.stamp: FORCE
+	@mkdir -p $(BUILD)/gen
+	@echo '$(EXTRA_PORTRAITS)' | cmp -s - $@ || echo '$(EXTRA_PORTRAITS)' > $@
+
+$(BUILD)/gen/krillin_sprites_data.c: tools/krillinsprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp
+	$(PYTHON) tools/krillinsprites.py $(ROM) $@ --preview $(BUILD)/krillin_preview.png $(EXTRA_PORTRAITS)
 
 $(BUILD)/obj/krillin_sprites_data.o: $(BUILD)/gen/krillin_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
