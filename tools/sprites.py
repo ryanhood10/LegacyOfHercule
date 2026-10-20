@@ -7,7 +7,7 @@ Facts used: index at 0x083B4E74 (ids 3..156), record = 0x4C header + 16-byte gro
 pointers (ends at the first word that is not a ROM pointer), descriptor = {s8 xoff, s8 yoff, u8 w, u8 h,
 u32 attr0|attr1<<16, u32 blob}, blob = {u32 kind, u32 size, stream} decoded by the game's IWRAM
 decompressor (tools/mapchunks.py port), frames are 8-bit 1D-mapped OBJ tiles, shared OBJ palette at
-0x081DA6C8.  usage: sprites.py roms/log2.gba [outdir]
+0x081DA6C8.  usage: sprites.py roms/log2.gba [outdir]  |  sprites.py roms/log2.gba --frame-diff
 """
 import os
 import struct
@@ -68,6 +68,7 @@ class Sprites:
         self.rom = rom
         self.pal = [self.rgb(struct.unpack_from("<H", rom, PALETTE - ROM_BASE + i * 2)[0]) for i in range(256)]
         self.blobs = {}
+        self._starts = None
 
     @staticmethod
     def rgb(c):
@@ -98,9 +99,37 @@ class Sprites:
             a += 16
         return out
 
+    def array_starts(self):
+        """Every descriptor array of every stock record (ids 3..156), cached: the bounds a run of
+        descriptors must stop at, whichever record the caller looks at."""
+        if self._starts is None:
+            self._starts = {p for sid in range(3, 157) if self.record(sid)
+                            for g in self.groups(self.record(sid)) for p in g if p}
+        return self._starts
+
+    def valid_descriptor(self, arr, fi):
+        """A GBA OBJ size and a blob that is a ROM pointer to a header of kind 0-2."""
+        _, _, w, h, _, blob = self.descriptor(arr, fi)
+        return (w in (8, 16, 32, 64) and h in (8, 16, 32, 64) and self.is_ptr(blob)
+                and blob + 4 <= ROM_BASE + len(self.rom) and self.u32(blob) <= 2)
+
     def frame_counts(self, groups):
-        """Each group's four descriptor arrays sit back to back and its frame blobs follow them, so
-        an array's length is the gap to the next array OR the next blob (whichever comes first)."""
+        """Frames per descriptor array: the run of valid descriptors up to the next array start (of
+        these groups or of any stock record), at most 32. Every stock array was checked against the
+        old guess (gap to the next array or blob, `gap_counts`), which truncates the last array of a
+        record and some others; a copy built from the guess made the engine play descriptors past
+        the copied array and decompress garbage over EWRAM (docs/sprites.md "Frame counts")."""
+        starts = self.array_starts() | {p for g in groups for p in g if p}
+        out = {}
+        for arr in {p for g in groups for p in g if p}:
+            n = 0
+            while n < 32 and (n == 0 or arr + 12 * n not in starts) and self.valid_descriptor(arr, n):
+                n += 1
+            out[arr] = max(1, n)
+        return out
+
+    def gap_counts(self, groups):
+        """The old guess (gap to the next array or blob, 1..16), kept only for `--frame-diff`."""
         arrs = sorted({p for g in groups for p in g if p})
         bounds = set(arrs)
         for a in arrs:
@@ -155,8 +184,28 @@ class Sprites:
                     canvas.put(x + xx, y + yy, self.pal[ci])
 
 
+def frame_diff(sp):
+    """Print every stock descriptor array whose frame count differs between the run counter and the
+    old gap guess (each array once, under the first record that uses it)."""
+    seen = set()
+    for sid in range(3, 157):
+        if not sp.record(sid):
+            continue
+        g = sp.groups(sp.record(sid))
+        new, old = sp.frame_counts(g), sp.gap_counts(g)
+        for gi, grp in enumerate(g):
+            for d, p in enumerate(grp):
+                if p and p not in seen and new[p] != old[p]:
+                    seen.add(p)
+                    print(f"sprite {sid} group {gi} facing {d} ({p:#x}): {new[p]} frames (gap guess {old[p]})")
+    print(f"{len(seen)} arrays changed")
+
+
 def main():
     rom = open(sys.argv[1], "rb").read()
+    if "--frame-diff" in sys.argv:
+        frame_diff(Sprites(rom))
+        return
     out = sys.argv[2] if len(sys.argv) > 2 else "build/sprites"
     os.makedirs(out, exist_ok=True)
     sp = Sprites(rom)

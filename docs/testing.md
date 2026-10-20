@@ -445,6 +445,23 @@ and transforms back, printing the row and the entity's sprite record (`halo_goku
   on the desert (Map Test 325, warp to (256, 320); Cell's beam interrupts after a few seconds).
 - Control: the same script with `poke8 0x0203F084 19` (Goku's stock rows 19 / 20).
 
+## Frame counts (headless, 2026-10-19)
+
+```
+make BUILD=build/frames DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/frames/log2-coop.gba --out build/frames/hl
+python tools/headless/st_test.py tools/headless/ssj_tumble.txt build/frames/log2-coop.gba build/frames/hl/menu.ss --out build/frames/hl --cols 6
+```
+
+`ssj_tumble.txt` makes Super Saiyan Hercule (slot 5 on row 22) player 1 on Roshi's island and plays
+group 20 (tumble) facing right through the detransform state (anim 0x24, state `0x03002180`: frame =
+counter / 16 for 64 frames of whatever group quad +0x4C points at, then the row's link back to
+Hercule): poke `+0x10` facing, `+0x12` counter, `+0x14` frame, `+0x8` anim, `+0x4C` group quad
+(record + 0x4C + 16 * group), `+0x18` state object. Pass: four tumble frames, the party block and entity
+list words the same before and after, no CRASH line. Any other record and group: replace
+`rec+0x18C` with the address of that group's quad from `coop.sym` (with `paragus_record` group 20 the
+pre-fix build crashed with the party block overwritten; a 2-frame group must stop before counter 32).
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

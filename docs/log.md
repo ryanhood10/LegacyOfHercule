@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **Sprite frame counts fixed for every generator** (branch `sprite-frame-counts`): `tools/sprites.py`
+  `Sprites.frame_counts` now counts the run of valid descriptors (OBJ size, ROM blob of kind 0-2) up to
+  the next array start of any stock record, replacing the gap guess that cut each record's
+  highest-addressed array to 1 frame (100 stock arrays; `sprites.py --frame-diff` lists them);
+  `halosprites.py` uses it instead of its own copy. Regenerated records: Super Saiyan Hercule 157
+  (group 20 facing right 1 -> 4), Paragus 170 (group 20 facing right 1 -> 4), Android 13 165 (group 12
+  facing right 1 -> 4), the Namekian 166 (group 22 facing right 1 -> 2); every other generator's output is
+  byte-identical. Seen headless (`tools/headless/ssj_tumble.txt`, `docs/testing.md` "Frame counts"): on
+  main, Paragus' tumble facing right overwrote the party block and jumped to an invalid address (SSJ
+  Hercule's overflow happened to land on his facing-left array: wrong frames, no crash); with the fix all
+  four records play every frame with the party block and entity list intact.
 - **Haloed Goku** (branch `hercule-beam`), for after the Cell Games (art and rows only; the swap belongs
   to the chapter): `tools/halosprites.py` builds Goku (176) and Super Saiyan Goku (177) with the dead
   pose's halo on every frame (white on gold hair), display rows 26 / 27 linked like 19 / 20 (row limit

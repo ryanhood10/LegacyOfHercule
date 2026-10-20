@@ -1,0 +1,46 @@
+# Super Saiyan Hercule's tumble facing right (sprite 157 group 20 facing 3, 4 frames; docs/sprites.md
+# "Frame counts"). Before the fix the generated array held 1 frame (the gap guess), so frames 1-3 read
+# descriptors past it and decompressed garbage over EWRAM. Map Test Roshi's island (147), Hercule (slot 5,
+# entry 0x0203F098) on row 22 (Super Saiyan Hercule), warp in place to rebuild the player entity, then put
+# the entity in the detransform state (anim 0x24, state object 0x03002180: frame = counter / 16 for 64
+# frames of the group at +0x4C, then the row's link) on group 20 (record + 0x18C) facing right.
+# Pass: shots tumble_01..04 show the four tumble frames, the party block and entity list words read the
+# same before and after, and no CRASH line. Facing left (poke8 pl+0x10 2) is the control.
+# python tools/headless/st_test.py tools/headless/ssj_tumble.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+maptest 147
+frames 300
+poke8 0x0203F000 5
+poke8 0x0203F0A0 22
+poke32 0x0203FD0C 0x0306
+poke32 0x0203FD54 0x02F801F0
+poke32 0x0203FD08 5
+frames 200
+map
+peek8 0x0203F0A0
+findent pl 0x08025604
+deref rec pl+0x48
+peek pl+0x48
+peek 0x0203F000 8
+peek 0x03001120 4
+shot tumble_00_idle
+poke8 pl+0x10 3
+poke16 pl+0x12 0
+poke16 pl+0x14 0
+poke8 pl+0x8 0x24
+poke32 pl+0x4C rec+0x18C
+poke32 pl+0x18 0x03002180
+frames 8
+shot tumble_01
+frames 16
+shot tumble_02
+frames 16
+shot tumble_03
+frames 16
+shot tumble_04
+frames 60
+peek8 0x0203F0A0
+peek 0x0203F000 8
+peek 0x03001120 4
+findent pl 0x08025604
+peek pl+0x48
+shot tumble_05_after

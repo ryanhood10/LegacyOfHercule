@@ -98,34 +98,10 @@ def add_halo(px, ring):
     return out, True
 
 
-def frame_counts(sp, groups):
-    """Frames per descriptor array: the run of valid descriptors (a GBA OBJ size and a ROM blob whose
-    header kind is 0-2) up to the next array of the record. sprites.frame_counts guesses from the gap to
-    the next array or blob, which cuts Super Saiyan Goku's group 21 (4 frames, the detransformation
-    the engine plays with animation 0x24) to 1 frame: a copy built from that guess makes the engine read
-    descriptors past the array and decompress garbage over EWRAM."""
-    starts = {p for g in groups for p in g if p}
-    out = {}
-    for arr in starts:
-        n = 0
-        while n < 32 and (n == 0 or arr + 12 * n not in starts):
-            xo, yo, w, h, attr, blob = sp.descriptor(arr, n)
-            if w not in (8, 16, 32, 64) or h not in (8, 16, 32, 64) or not sp.is_ptr(blob) or sp.u32(blob) > 2:
-                break
-            n += 1
-        out[arr] = n
-    return out
-
-
 def build(sp, sid, ring):
     rec = sp.record(sid)
     g = sp.groups(rec)
-    counts = frame_counts(sp, g)
-    guess = sp.frame_counts(g)
-    for gi, grp in enumerate(g):
-        for d, arr in enumerate(grp):
-            if arr and counts[arr] != guess[arr]:
-                print(f"  sprite {sid} group {gi} facing {d}: {counts[arr]} frames (gap guess {guess[arr]})")
+    counts = sp.frame_counts(g)
     header = bytearray(sp.rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C])
     groups, done, haloed = [], {}, 0
     for gi, grp in enumerate(g):

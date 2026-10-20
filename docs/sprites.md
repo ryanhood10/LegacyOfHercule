@@ -20,8 +20,10 @@ frames compressed with the game's decompressor, one shared 256-colour OBJ palett
                         (idle 0, walk 1, ..., fidget 14, beam groups 18/19), checking for 0.
 ```
 
-Each group's four descriptor arrays are back to back and the group's frame blobs follow them, so an
-array's frame count = (next array or next blob address - array) / 12. Frames are
+Each group's four descriptor arrays usually sit back to back with the frame blobs after them, but the
+record does not store a frame count: `Sprites.frame_counts` counts the run of valid descriptors (a GBA
+OBJ size and a ROM blob whose header kind is 0-2) up to the next array start of any stock record (see
+"Frame counts" below; the gap to the next array or blob is wrong for 100 stock arrays). Frames are
 `{s8 xoff, s8 yoff, u8 w, u8 h, u32 attr, u32 blob}`; blob = `{u32 kind, u32 size, stream}` decoded
 by the IWRAM decompressor with r3 = kind (1 or 2; 0 = plain copy). A literal-only stream (kind 1,
 starts with the literal-width op, 9 bits per byte) is accepted by the game, so re-encoding recoloured
@@ -469,16 +471,34 @@ at least) centred on the hair's top four rows, as in the stock dead pose. On yel
 white / 0x2C with a black line under the front arc. Group 17 keeps its stock halo. Preview:
 `build/<dir>/halo_goku_preview.png` (`_x3`): every group x 4 facings, stock beside haloed.
 
-**Frame counts.** `sprites.frame_counts` guesses a descriptor array's length from the gap to the next
-array or blob, which truncates the last array of a record to 1 frame (Goku's group 20 facing right: 4
-real frames) and all four arrays of Super Saiyan Goku's group 21 (4 frames each). The detransform plays
-group 21 frames 0-3, so a record built from the guess made the engine read three descriptors past the
-array and decompress garbage over EWRAM (entity list and party block overwritten, "Jumped to invalid
-address" from the entity pass `0x08006AD8`). `halosprites.frame_counts` counts the run of valid
-descriptors (GBA OBJ size, ROM blob of kind 0-2) up to the next array instead. Generators that copy
-frames through the guess have the same truncation in the last array of their source: Super Saiyan
-Hercule 157 (72 group 20 facing right), Paragus 170 (137 group 20), the Namekian 166 (104 group 22),
-Android 13 165 (8 / 9 group 12).
+**Frame counts** (fixed for every generator 2026-10-19, branch `sprite-frame-counts`). The engine
+plays a fixed number of frames per pose (the detransform frames 0-3 of group 21, the tumble 0-3 of
+group 20) and reads descriptors past a short array without a check, so a generated array must hold
+every frame of its source. `sprites.frame_counts` used to guess an array's length from the gap to the
+next array or blob, which has no bound for the record's highest-addressed array and cut it to 1 frame
+(Goku's group 20 facing right, Super Saiyan Goku's group 21 facing down: 4 frames each, guessed 1);
+the haloed Goku crashed on detransform until frames were counted by descriptor runs.
+`Sprites.frame_counts` now counts the run of valid
+descriptors (OBJ size 8/16/32/64 each way, blob a ROM pointer to a header of kind 0-2) up to the next
+array start of these groups or of any stock record (ids 3..156, cached), at most 32. Checked on the
+stock ROM: 100 of 2254 arrays change, every one upward (1 -> 2, 3, 4 or 7) and every one the
+highest-addressed array of its record (mostly the last group facing right; group 21 / 22 facing down
+where those are stored last), and with the run counter all four facings of each of the 898 non-empty
+stock groups have the same count (with the gap guess they differed in 131);
+`python tools\sprites.py roms\log2.gba --frame-diff` lists them. Generated records that changed:
+
+| record | array | frames (was) | old build |
+|---|---|---|---|
+| Super Saiyan Hercule 157 (`spriteclone.py`) | 72 group 20 facing right | 4 (1) | overflow read the facing-left array placed after it by the linker: wrong frames, no crash |
+| Paragus 170 (`brolysprites.py`) | 137 group 20 facing right | 4 (1) | overflow read blob bytes: party block overwritten, "Jumped to invalid address 0B026920" (r14 `0x08006C05`) |
+| Android 13 165 (`bossmodels.py`) | 8 / 9 group 12 facing right | 4 (1) | read neighbouring descriptors: wrong frames |
+| Namekian 166 (`bossmodels.py`) | 104 group 22 facing right | 2 (1) | read a neighbouring descriptor: wrong frame |
+
+Unchanged output: `a16sprites.py`, `krillinsprites.py` and `herculesprites.py` (their copied groups
+were not truncated; stock groups are referenced by ROM address), `halosprites.py` (it had its own run
+counter, now the shared one) and `buu2log2.py` (template 72's facing-down counts were right; the
+template layout takes facing-down counts for all four facings, which now always agree). The a16 and
+Krillin previews now show every frame of their stock groups. Test: `docs/testing.md` "Frame counts".
 
 **Rows and the swap.** Row 26 = Goku's row 19 with sprite 176, row 27 = Super Saiyan Goku's row 20
 with sprite 177; they link to each other as 19 / 20 do, so Goku's Transformation abilities (11 / 12:
