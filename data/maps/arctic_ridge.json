@@ -1,0 +1,221 @@
+{
+ "_": "Arctic route, the ridge at the top of the climb: Snowy Highlands zone 13 area 9 (a plateau under a cliff arc with a cave), its right-hand way out closed, a path up from below (zone 13 area 10's dip and path), the save / switch-characters pad (zone 13 area 7's). No enemies. The cave leads to the summit.",
+ "name": "arctic_ridge",
+ "zone": 15,
+ "area": 7,
+ "base": [
+  13,
+  9
+ ],
+ "tileset": "base",
+ "layout": "base",
+ "ops": [
+  {
+   "op": "clear",
+   "bg": 1,
+   "rect": [
+    14,
+    34,
+    12,
+    6
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    14,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     12,
+     31,
+     12,
+     11
+    ]
+   },
+   "layers": [
+    1
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    14,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     12,
+     31,
+     12,
+     11
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    18,
+    45
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     16,
+     38,
+     4,
+     4
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    18,
+    46
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     16,
+     38,
+     4,
+     4
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    23,
+    21
+   ],
+   "src": {
+    "map": [
+     13,
+     7
+    ],
+    "rect": [
+     7,
+     13,
+     8,
+     8
+    ]
+   },
+   "collision": false
+  },
+  {
+   "op": "walk",
+   "rect": [
+    18,
+    36,
+    4,
+    14
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    31,
+    35,
+    5,
+    6
+   ]
+  }
+ ],
+ "triggers": [
+  {
+   "type": "savepad",
+   "rect": [
+    184,
+    176,
+    233,
+    217
+   ]
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    144,
+    360,
+    176,
+    400
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    6,
+    1
+   ],
+   "at": [
+    308,
+    120
+   ],
+   "facing": 0,
+   "_": "down to the second climb, in front of its cave"
+  },
+  {
+   "type": "door",
+   "rect": [
+    128,
+    64,
+    160,
+    104
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    8,
+    1
+   ],
+   "at": [
+    336,
+    464
+   ],
+   "facing": 1,
+   "_": "the cave: up to the summit"
+  }
+ ],
+ "spawn": [
+  160,
+  276
+ ],
+ "name_id": 356,
+ "music": 5,
+ "flags": 1
+}

@@ -1,0 +1,586 @@
+{
+ "_": "Arctic route, first climb (docs/story.md 4i): a snowy trail up the mountain between walls of snowy trees (Snowy Highlands zone 13 area 1), past two cliff tiers (zone 13 area 3's cliff band) with a pass at alternate ends, pines (area 3) and round trees (area 5). Wolves, lions and birds from the Snowy Highlands (stock records copied: behaviours and item drop). Enter from the landing's cave at the bottom, leave by the top edge.",
+ "name": "arctic_climb1",
+ "zone": 15,
+ "area": 5,
+ "base": [
+  13,
+  3
+ ],
+ "tileset": "fresh",
+ "layout": [
+  480,
+  720
+ ],
+ "ops": [
+  {
+   "op": "fill",
+   "bg": 3,
+   "rect": [
+    0,
+    0,
+    60,
+    90
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "bg": 3,
+    "rect": [
+     0,
+     0,
+     8,
+     8
+    ]
+   },
+   "anchor": "map"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    0,
+    0,
+    60,
+    90
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    0
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    68
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     22
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    68
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     22
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    8,
+    62
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    24,
+    62
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    34,
+    61
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    44,
+    56
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     37,
+     1,
+     8,
+     22
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    20,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    36,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    15,
+    33
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    10,
+    6
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     37,
+     1,
+     8,
+     22
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    40,
+    2
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     37,
+     1,
+     8,
+     22
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    40,
+    76
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    10,
+    78
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    8,
+    62,
+    32,
+    11
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    20,
+    34,
+    32,
+    11
+   ]
+  },
+  {
+   "op": "border",
+   "width": 1,
+   "mask": "both"
+  }
+ ],
+ "effect": {
+  "from": [
+   13,
+   1
+  ]
+ },
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    200,
+    680,
+    280,
+    720
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    1,
+    1
+   ],
+   "at": [
+    352,
+    80
+   ],
+   "facing": 0,
+   "_": "down to the landing, in front of the cave"
+  },
+  {
+   "type": "door",
+   "rect": [
+    200,
+    0,
+    280,
+    40
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    6,
+    1
+   ],
+   "at": [
+    240,
+    630
+   ],
+   "facing": 1,
+   "_": "up to the second climb"
+  }
+ ],
+ "records": [
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    0
+   ],
+   "stat": 104,
+   "sprite": 149,
+   "x": 300,
+   "y": 640,
+   "action": "like",
+   "_": "wolf"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    1
+   ],
+   "stat": 55,
+   "sprite": 109,
+   "x": 200,
+   "y": 420,
+   "action": "like",
+   "_": "lion"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    0
+   ],
+   "stat": 104,
+   "sprite": 149,
+   "x": 330,
+   "y": 400,
+   "action": "like",
+   "_": "wolf"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    6,
+    0
+   ],
+   "stat": 67,
+   "sprite": 79,
+   "x": 120,
+   "y": 470,
+   "action": "like",
+   "_": "bird"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    6,
+    0
+   ],
+   "stat": 67,
+   "sprite": 79,
+   "x": 260,
+   "y": 200,
+   "action": "like",
+   "_": "bird"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    0
+   ],
+   "stat": 104,
+   "sprite": 149,
+   "x": 150,
+   "y": 120,
+   "action": "like",
+   "_": "wolf"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    1
+   ],
+   "stat": 55,
+   "sprite": 109,
+   "x": 330,
+   "y": 150,
+   "action": "like",
+   "_": "lion"
+  }
+ ],
+ "spawn": [
+  240,
+  672
+ ],
+ "name_id": 356,
+ "music": 5,
+ "flags": 1
+}

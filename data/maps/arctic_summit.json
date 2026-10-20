@@ -1,0 +1,320 @@
+{
+ "_": "Arctic route, the summit (Super 13's battle, docs/story.md 4i): Snowy Highlands zone 13 area 10's clearing stretched to 720 x 592 (a crown of cliffs and snowy trees at the back, rims of rock on the sides, the path up at the bottom). Open ground x 64-632, y 192-472. Spots for the post-game chapter (docs/maps.md 9): arrival (336, 464), the fight's centre (348, 300), sidelines x 96-160 and 560-600 at y 260-440. Flight spot on the grass patch (Snowy Highlands zone 13 area 1's).",
+ "name": "arctic_summit",
+ "zone": 15,
+ "area": 8,
+ "base": [
+  13,
+  10
+ ],
+ "tileset": "base",
+ "layout": "base",
+ "ops": [
+  {
+   "op": "insert_rows",
+   "at": 29,
+   "src": [
+    27,
+    29
+   ],
+   "times": 16
+  },
+  {
+   "op": "insert_cols",
+   "at": 28,
+   "src": [
+    26,
+    28
+   ],
+   "times": 12
+  },
+  {
+   "op": "insert_cols",
+   "at": 10,
+   "src": [
+    9,
+    11
+   ],
+   "times": 12
+  },
+  {
+   "op": "fill",
+   "bg": 3,
+   "rect": [
+    0,
+    25,
+    90,
+    49
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "bg": 3,
+    "rect": [
+     0,
+     0,
+     8,
+     8
+    ]
+   },
+   "anchor": "map"
+  },
+  {
+   "op": "fill",
+   "bg": 3,
+   "rect": [
+    6,
+    16,
+    78,
+    9
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "bg": 3,
+    "rect": [
+     0,
+     0,
+     8,
+     8
+    ]
+   },
+   "anchor": "map"
+  },
+  {
+   "op": "clear",
+   "bg": 1,
+   "rect": [
+    5,
+    6,
+    75,
+    20
+   ]
+  },
+  {
+   "op": "clear",
+   "bg": 2,
+   "rect": [
+    5,
+    6,
+    75,
+    20
+   ]
+  },
+  {
+   "op": "clear",
+   "bg": 2,
+   "rect": [
+    36,
+    24,
+    12,
+    37
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    5,
+    9
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     4,
+     9,
+     29,
+     17
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    31,
+    9
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     4,
+     9,
+     29,
+     17
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    56,
+    9
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     4,
+     9,
+     25,
+     17
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ],
+   "collision": false
+  },
+  {
+   "op": "clear",
+   "bg": 2,
+   "rect": [
+    36,
+    61,
+    12,
+    13
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    36,
+    61
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "rect": [
+     12,
+     29,
+     12,
+     13
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    3
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    26,
+    51
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     10,
+     15,
+     8,
+     10
+    ]
+   },
+   "collision": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    0,
+    0,
+    90,
+    24
+   ]
+  },
+  {
+   "op": "walk",
+   "rect": [
+    8,
+    24,
+    71,
+    35
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    79,
+    24,
+    11,
+    35
+   ]
+  }
+ ],
+ "triggers": [
+  {
+   "type": "flight",
+   "rect": [
+    212,
+    412,
+    268,
+    476
+   ],
+   "world": [
+    1100,
+    800
+   ],
+   "_": "back to the world map, onto the arctic landing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    320,
+    552,
+    352,
+    592
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    7,
+    1
+   ],
+   "at": [
+    144,
+    112
+   ],
+   "facing": 0,
+   "_": "down to the ridge, in front of its cave"
+  }
+ ],
+ "spawn": [
+  336,
+  464
+ ],
+ "name_id": 356,
+ "music": 5,
+ "flags": 1
+}

@@ -1,0 +1,178 @@
+# The arctic route (zone 15 areas 1, 5-8; docs/maps.md 9, docs/testing.md "Arctic route"), headless, co-op.
+# python tools/headless/st_test.py tools/headless/arctic_route.txt build/arc/log2-coop.gba build/arc/hl/menu.ss --out build/arc/hl --cols 6
+# Warps are COOP_CMD_WARP (cmd 5 at 0x0203FD08, arg zone | area << 8, arg2 x | y << 16); a field map's player
+# appears about 300 frames after the warp. The OBJ VRAM free list (entity list + 0x694, 10-byte nodes,
+# head = byte 0 of 0x03001120) is dumped on the enemy areas: tools/headless/objfree.py OUTPUT reads it.
+maptest 176
+waitmap 6 99 2000
+frames 60
+# 1. flag 381 clear: no landing in the far north (A does nothing, no minimap icon)
+flags -381 -382
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x03200460
+poke32 0x0203FD08 5
+frames 150
+key 1 10
+frames 120
+map
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x067C07F8
+poke32 0x0203FD08 5
+frames 150
+shot ar01_wm_noflag
+# 2. flag 381 set: the star on the minimap (flyer away from it), then land
+flags +381
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x067C07F8
+poke32 0x0203FD08 5
+frames 150
+shot ar02_wm_star
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x03200460
+poke32 0x0203FD08 5
+frames 150
+key 1 10
+waitmap 15 1 600
+frames 120
+map
+shot ar03_landing
+p2 0
+# 3. the cave mouth (door, hold Up) -> first climb
+poke32 0x0203FD0C 0x010F
+poke32 0x0203FD54 0x00500160
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 5 300
+keys 0
+frames 300
+map
+shot ar04_climb1
+ents
+peek8 0x03001120 8
+peek 0x030017B4 330
+# 4. first climb, top (hold Up) -> second climb
+poke16 0x0203F028 999
+poke16 0x0203F098 999
+poke32 0x0203FD0C 0x050F
+poke32 0x0203FD54 0x003000F0
+poke32 0x0203FD08 5
+frames 300
+shot ar05_climb1_top
+keys 0x40
+waitmap 15 6 300
+keys 0
+frames 300
+map
+shot ar06_climb2
+ents
+peek8 0x03001120 8
+peek 0x030017B4 330
+# 5. second climb, the cave (hold Up) -> the ridge
+poke16 0x0203F028 999
+poke16 0x0203F098 999
+poke32 0x0203FD0C 0x060F
+poke32 0x0203FD54 0x00780134
+poke32 0x0203FD08 5
+frames 300
+shot ar07_climb2_cave
+keys 0x40
+waitmap 15 7 300
+keys 0
+frames 300
+map
+shot ar08_ridge
+# 6. the save pad: walk onto it, A: Save / Switch Characters, A: saved
+poke32 0x0203FD0C 0x070F
+poke32 0x0203FD54 0x00F000D0
+poke32 0x0203FD08 5
+frames 300
+key 0x40 20
+key 1 10
+frames 120
+shot ar09_pad_menu
+key 1 10
+frames 120
+shot ar10_pad_saved
+key 1 10
+frames 60
+# 7. the ridge cave (hold Up) -> the summit
+poke32 0x0203FD0C 0x070F
+poke32 0x0203FD54 0x00700090
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 8 300
+keys 0
+frames 300
+map
+shot ar11_summit
+# 8. back down every exit: summit -> ridge -> second climb -> first climb -> landing
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x023C0150
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 7 300
+keys 0
+frames 300
+map
+shot ar12_down_ridge
+poke32 0x0203FD0C 0x070F
+poke32 0x0203FD54 0x017400A0
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 6 300
+keys 0
+frames 300
+map
+shot ar13_down_climb2
+poke16 0x0203F028 999
+poke16 0x0203F098 999
+poke32 0x0203FD0C 0x060F
+poke32 0x0203FD54 0x028E00F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 5 300
+keys 0
+frames 300
+map
+shot ar14_down_climb1
+poke16 0x0203F028 999
+poke16 0x0203F098 999
+poke32 0x0203FD0C 0x050F
+poke32 0x0203FD54 0x02BC00F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 1 300
+keys 0
+frames 300
+map
+shot ar15_down_landing
+# 9. the landing's flight spot -> the world map at the arctic landing
+poke32 0x0203FD0C 0x010F
+poke32 0x0203FD54 0x01300088
+poke32 0x0203FD08 5
+frames 300
+key 0x40 10
+key 1 10
+waitmap 6 99 600
+frames 120
+map
+shot ar16_wm_from_landing
+# 10. the summit's flight spot -> the world map
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01E800F0
+poke32 0x0203FD08 5
+frames 300
+key 0x40 20
+map
+shot ar17_summit_flight
+key 1 10
+waitmap 6 99 600
+frames 120
+map
+shot ar18_wm_from_summit

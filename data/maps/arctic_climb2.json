@@ -1,0 +1,564 @@
+{
+ "_": "Arctic route, second climb: the same trail higher up, ending under the Snowy Highlands' upper cliffs (zone 13 area 5's top band and cave tier) with the cave that leads on to the ridge. Bandits, tigers and lions from the Snowy Highlands.",
+ "name": "arctic_climb2",
+ "zone": 15,
+ "area": 6,
+ "base": [
+  13,
+  5
+ ],
+ "tileset": "fresh",
+ "layout": [
+  480,
+  672
+ ],
+ "ops": [
+  {
+   "op": "fill",
+   "bg": 3,
+   "rect": [
+    0,
+    0,
+    60,
+    84
+   ],
+   "src": {
+    "map": [
+     13,
+     10
+    ],
+    "bg": 3,
+    "rect": [
+     0,
+     0,
+     8,
+     8
+    ]
+   },
+   "anchor": "map"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    0,
+    0,
+    60,
+    84
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    0
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    34
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     34
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    68
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     16
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    52,
+    68
+   ],
+   "src": {
+    "map": [
+     13,
+     1
+    ],
+    "rect": [
+     0,
+     0,
+     8,
+     16
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    8,
+    0
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     12,
+     0,
+     40,
+     16
+    ]
+   }
+  },
+  {
+   "op": "block",
+   "rect": [
+    8,
+    0,
+    44,
+    4
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    8,
+    56
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    24,
+    56
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   }
+  },
+  {
+   "op": "stamp",
+   "at": [
+    34,
+    55
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    20,
+    30
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    36,
+    30
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     0,
+     1,
+     16,
+     12
+    ]
+   },
+   "flip": "h"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    14,
+    29
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    44,
+    46
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     37,
+     1,
+     8,
+     22
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    9,
+    15
+   ],
+   "src": {
+    "map": [
+     13,
+     3
+    ],
+    "rect": [
+     37,
+     1,
+     8,
+     22
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    42,
+    70
+   ],
+   "src": {
+    "map": [
+     13,
+     5
+    ],
+    "rect": [
+     15,
+     22,
+     10,
+     13
+    ]
+   },
+   "layers": [
+    1,
+    2
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    8,
+    56,
+    32,
+    11
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    20,
+    30,
+    32,
+    11
+   ]
+  },
+  {
+   "op": "walk",
+   "rect": [
+    36,
+    9,
+    6,
+    5
+   ],
+   "_": "the cave"
+  },
+  {
+   "op": "border",
+   "width": 1,
+   "mask": "both"
+  }
+ ],
+ "effect": {
+  "from": [
+   13,
+   1
+  ]
+ },
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    200,
+    632,
+    280,
+    672
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    5,
+    1
+   ],
+   "at": [
+    240,
+    56
+   ],
+   "facing": 0,
+   "_": "down to the first climb"
+  },
+  {
+   "type": "door",
+   "rect": [
+    288,
+    64,
+    328,
+    104
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    7,
+    1
+   ],
+   "at": [
+    160,
+    276
+   ],
+   "facing": 1,
+   "_": "the cave: up to the ridge"
+  }
+ ],
+ "records": [
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    5,
+    0
+   ],
+   "stat": 70,
+   "sprite": 91,
+   "x": 200,
+   "y": 600,
+   "action": "like",
+   "_": "bandit"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    3,
+    0
+   ],
+   "stat": 10,
+   "sprite": 19,
+   "x": 300,
+   "y": 580,
+   "action": "like",
+   "_": "tiger"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    5,
+    0
+   ],
+   "stat": 70,
+   "sprite": 91,
+   "x": 300,
+   "y": 390,
+   "action": "like",
+   "_": "bandit"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    8,
+    1
+   ],
+   "stat": 55,
+   "sprite": 109,
+   "x": 150,
+   "y": 400,
+   "action": "like",
+   "_": "lion"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    3,
+    0
+   ],
+   "stat": 10,
+   "sprite": 19,
+   "x": 250,
+   "y": 180,
+   "action": "like",
+   "_": "tiger"
+  },
+  {
+   "kind": "enemy",
+   "like": [
+    13,
+    5,
+    0
+   ],
+   "stat": 70,
+   "sprite": 91,
+   "x": 380,
+   "y": 160,
+   "action": "like",
+   "_": "bandit"
+  }
+ ],
+ "spawn": [
+  240,
+  630
+ ],
+ "name_id": 356,
+ "music": 5,
+ "flags": 1
+}

@@ -1,0 +1,18 @@
+{
+  "_": "The arctic route's world-map landing (docs/story.md 4i, docs/maps.md 9): a landing site in the far north (the snowy island, world (1043, 739)-(1156, 860)) with its name banner 'The Arctic' (ui_strings 356), both only while flag 381 is set (the post-game chapter sets it at the arctic explosion); its minimap icon at (178, 8) is the star while 382 is clear (Super 13 not yet beaten) and the plain marker after. The maps themselves are data/maps/arctic*.json (zone 15 areas 1, 5-8).",
+  "sources": [
+    "data/story/arctic_route.lscript"
+  ],
+  "maps": [
+    {
+      "map": {"zone": 6, "area": 99},
+      "add_triggers": [
+        {"like": 21, "rect": [1043, 739, 1156, 860], "payload": "script:arc_wm_land", "condition": "flag:381"},
+        {"like": 22, "rect": [1043, 739, 1156, 860], "payload": 356, "condition": "flag:381"}
+      ],
+      "edits": [
+        {"at": "onload", "replace": [["END", "StackTestStoryFlag 381\nJumpIfFalse arc_wm_done\nStackTestStoryFlagNot 382\nJumpIfFalse arc_wm_plain\nsub_800ACAC 178, 8\nJump arc_wm_done\narc_wm_plain:\nsub_800AC5C 178, 8\narc_wm_done:\nEND"]]}
+      ]
+    }
+  ]
+}

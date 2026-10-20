@@ -4,7 +4,8 @@ Everything a Legacy of Goku II map needs, decoded from the ROM (Ghidra corpus `b
 checked against savestates and by rendering every map), and the tools that read and write it:
 `tools/maplib.py` (format library), `tools/mapexport.py` (render any map from the ROM),
 `tools/mapbuild.py` (build new maps from `data/maps/*.json`), `tools/patch_rom.py --maps` (place
-them and relocate the map table). The new maps (zone 15) are in section 9; world-map markers in 9b.
+them and relocate the map table). The new maps (zone 15) are in section 9 (the arctic route 9a);
+world-map markers in 9b, the arctic landing on the world map in 9c.
 
 Addresses are GBA addresses (file offset + 0x08000000). "Resource" means the loader format of
 `Resource_LoadOrDecompress` 0x0801F394: `{u32 mode, u32 size}` then data; mode 0 = stored, 1/2 =
@@ -214,18 +215,25 @@ for layout and collision, pixels for objects):
 - `ops`, in order: `insert_cols` / `insert_rows` (repeat a band of the whole map: layers, collision,
   objects), `crop`, `stamp` (copy a rect of another map's layers and collision; `layers` /
   `to_layers` route BGs, `flip` "h"/"v"), per-layer `fill` (tile a source block over a rect),
-  `copy`, `clear`, `solid` / `texture` (generated tiles in palette colours: our art, no ROM data),
+  `copy`, `clear`, `solid` / `texture` (generated tiles in palette colours: our art, no ROM data;
+  a `fill` with `"anchor": "map"` phases its block to the map origin, so separate fills and stamps
+  shifted by a multiple of the block join without seams),
   `png` (an image cut into tiles, matched against the tileset with flips, new tiles otherwise), and
   collision `walk` / `block` (rects), `walk_ellipse` / `block_ellipse`, `border`, `from_layer`;
   `"mask": "proj"` or `"both"` picks the bitmap.
 - `recolor`: rules by hue range, saturation and luminance mapping each palette colour onto a colour
   ramp, quantised to the nearest palette entry; every tile (and animated frame) becomes a new tile in
-  new banks appended to a copy of the bank table.
+  new banks appended to a copy of the bank table. A stamp with `"recolor": false` keeps its tiles out
+  (the arctic landing's grass flight spot).
 - `effect` {from: [zone, area]}: that map's BG0 overlay, its animated tiles and blend; the base
   map's own animations move out of the way when their slots collide.
 - `triggers` (flight / warp / script / dialogue / savepad: the stock save and switch-characters pad,
-  16 bytes, stamp its art from a map that has one), `exits` (edge / door), `gates`, `onload` (the barrier
-  pattern with a flag), `spawn`, `name_id`, `music`, `flags`, `priorities`.
+  16 bytes, stamp its art from a map that has one), `exits` (edge / door; **use door exits at a
+  bordered edge**: an edge exit's rect must be reached, and a 1-tile `border` stops the player about
+  20 px short, the same trap as area 47's top exit in 9b), `gates`, `onload` (the barrier pattern with a
+  flag), `records` (an enemy with `"action": "like"` keeps the stock record's defeat action, e.g. the
+  random item drop), `spawn`, `name_id` (an id from 356 up is one of ours, `docs/ids.md` "UI strings"),
+  `music`, `flags`, `priorities`.
 - Foreign maps: a `src.map` of `{"rom": "buu", "variation": "0x0822229C"}` reads a Buu's Fury
   variation record (`--buu-rom`, default `roms/buu.gba`); its tiles are converted to LoG2's palette
   (nearest colour) as new tiles. A spec with `"requires": "buu"` is skipped when that ROM is absent
@@ -244,18 +252,55 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 
 | zone / area | spec | what | size | spawn |
 |---|---|---|---|---|
-| 15 / 1 | `data/maps/arctic.json` | Arctic: zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth behind the stock **Vegeta barrier** (level 50), a frozen pond, two outcrops, a flight spot | 432 x 368 | (216, 200) |
+| 15 / 1 | `data/maps/arctic.json` | The arctic landing (post-game only, 9c): zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth (a door up the mountain since the Vegeta barrier was removed, 2026-10-19), a frozen pond, two outcrops, the flight spot on a grass patch (Snowy Highlands' landing art, not recoloured) | 432 x 368 | (136, 264) |
 | 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout's chamber room (zone 9 area 3 at (96, 168), in front of the chamber door; until 2026-10-19 it led outside to zone 9 area 1) | 640 x 480 | (312, 280) |
 | 15 / 3 | `data/maps/broly_arena.json` | Broly's arena, New Planet Vegeta in the Broly chapter: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery; a 224 px landing zone south of the basin (walkable up to the rim) with zone 3 area 3's save pad, the Saiyan ship and Broly actors, the rim trigger and Broly's boss record (`data/story/broly.lscript`); the two boulders and the flight spot were removed (the pad needed their 44 of the 896 tile slots; the players leave by the story) | 640 x 768 | (320, 700) |
 | 15 / 4 | `data/maps/broly_crater.json` | Optional (built when `roms/buu.gba` is present): Buu's Fury's walled wasteland crater (variation 0x0822229C there) imported whole, tiles converted to LoG2's palette, its own collision | 480 x 400 | (240, 340) |
+| 15 / 5 | `data/maps/arctic_climb1.json` | The arctic route's first climb: a trail between walls of snowy trees (Snowy Highlands area 1), two cliff tiers (area 3's cliff band) with the pass at alternate ends, pines and round trees; 7 enemies | 480 x 720 | (240, 672) |
+| 15 / 6 | `data/maps/arctic_climb2.json` | The second climb: the same trail higher up, ending under area 5's upper cliffs with the cave on to the ridge; 6 enemies | 480 x 672 | (240, 630) |
+| 15 / 7 | `data/maps/arctic_ridge.json` | The ridge: Snowy Highlands area 9 (plateau under a cliff arc with a cave), a path up from below (area 10's dip), area 7's save pad; no enemies | 288 x 400 | (160, 276) |
+| 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch | 720 x 592 | (336, 464) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an
-exit record `{dir, 15, AREA, 1, x, y}`; the debug Map Test lists zone 15 too. The arctic's cave door
-(rect (336, 0)-(353, 57) after the stretch) has no exit yet: Android 13's interior or encounter
-attaches there. The arctic's barrier is a working copy of the stock one with its own story flag
-**380** (the highest stock flag is 306; flags 0-399 are cleared at a new game): Vegeta (party slot
-2) at level 50 or more, active when entering the map, presses A at it to open it for good.
+exit record `{dir, 15, AREA, 1, x, y}`; the debug Map Test lists zone 15 too. (Until 2026-10-19 the
+arctic's cave sat behind a working copy of the stock Vegeta barrier with story flag 380; the
+`barrier` block in `mapbuild.py` still builds one for any character, level and flag.)
+
+### 9a. The arctic route (zone 15 areas 1, 5-8; `docs/story.md` 4i, built 2026-10-19)
+
+The Android 13 post-game's way up the mountain, reachable only once flag 381 is set (9c):
+
+| from | exit (door: hold the direction inside the rect) | to (arrives at) |
+|---|---|---|
+| world map (6 / 99), rect (1043, 739)-(1156, 860), flag 381 | press A | landing 15 / 1 (136, 264), on the flight spot |
+| landing 15 / 1 | cave mouth (336, 8)-(368, 56), Up | first climb 15 / 5 (240, 672) |
+| first climb 15 / 5 | bottom (200, 680)-(280, 720), Down / top (200, 0)-(280, 40), Up | landing (352, 80) / second climb (240, 630) |
+| second climb 15 / 6 | bottom (200, 632)-(280, 672), Down / cave (288, 64)-(328, 104), Up | first climb (240, 56) / ridge (160, 276) |
+| ridge 15 / 7 | path down (144, 360)-(176, 400), Down / cave (128, 64)-(160, 104), Up | second climb (308, 120) / summit (336, 464) |
+| summit 15 / 8 | path down (320, 552)-(352, 592), Down | ridge (144, 112) |
+| landing, summit | flight spots (104, 232)-(168, 296) and (212, 412)-(268, 476), press A | world map (1100, 800), the arctic landing |
+
+- **Save pad:** the ridge, rect (184, 176)-(233, 217) (Save / Switch Characters; a save there loads back on
+  the ridge and the Select Game screen names it "The Arctic").
+- **Enemies** (stock Snowy Highlands records copied with `"like"`: behaviours and item drop; co-op
+  adds a twin to each, HP x1.5): first climb 3 wolves (stat 104, sprite 149), 2 lions (55, 109), 2 birds
+  (67, 79); second climb 3 bandits (70, 91), 2 tiger bandits (10, 19), a lion. With every twin standing the
+  largest free OBJ VRAM block was 15.6-15.9 KB (first climb) and 18.2 KB (second).
+- **Name:** every arctic map is "The Arctic" (`ui_strings` 356), shown in the map banner and the save menu.
+- **Summit spots for the post-game chapter** (open ground x 64-632, y 192-472): the players arrive at
+  (336, 464) facing up; the struggle and the fight in the middle, Super 13 around (348, 300) (a towering
+  sprite has 100 px of open ground above that and 170 px below); 17 and 18 beside him, e.g. (300, 320) and
+  (400, 320); the sideline watchers along the rims, x 96-160 (left) and 560-600 (right), y 260-440
+  (e.g. four a side at y 280, 330, 380, 430), clear of the fight. The crown of trees at the back (y < 192)
+  and the rims are blocked. No records or triggers are placed there yet: the scene, the absorption and
+  the fight are the post-game chapter's (`docs/story.md` 4i).
+- **How they are built:** `data/maps/arctic_*.json` were written by a one-off generator (not kept); edit
+  the JSON directly. The climbs are fresh layouts (Snowy Highlands' waves as ground, `"anchor": "map"`
+  fills, stamps shifted by multiples of 8 tiles so the waves stay in phase); the ridge and the summit
+  are stock layouts (areas 9 and 10), the summit stretched with `insert_rows` / `insert_cols` and its
+  trees re-stamped whole; the paths below the ridge and the summit sit on BG3 so they do not hide the
+  players (zone 13's BG2 has priority 1, above sprites).
 
 **Verified in the WSL fork** (slot 4, `make BUILD=build/maps3 WIDE=1 DEBUG_MENU=1`, 2026-10-18):
 the debug Map Test lists zone 15 and loads area 1; the co-op test warp (the WarpToMap opcode handler)
@@ -293,6 +338,28 @@ Area 61's doors are unchanged (flag 138 set: to 64). Areas 27 and 40 (the genera
 stages) get one dialogue trigger each on the stock trigger's rect. A `WarpToMapNoEntities` into 48
 also runs the on-load script (the bunker's ending lands there with the cave open).
 
+## 9c. The arctic landing on the world map (`data/story/arctic_route.*`, 2026-10-19)
+
+The far north of the world map has a snowy island with no stock landing (the minimap's small island at the
+top left; snow from about (950, 760) to (1450, 870), mountains south of it). The route adds, through
+`mapedit` on map 176: a landing trigger (`like` 21: create 0x0800C2C3, press A) whose script warps to
+zone 15 area 1, and a banner trigger (`like` 22: create 0x0801A6B3, payload name id 356), both on rect
+(1043, 739)-(1156, 860) with condition flag 381; and an on-load edit that appends the minimap icon at
+(178, 8): `sub_800ACAC` (star) while 382 is clear, `sub_800AC5C` (plain) once it is set. The arctic maps'
+flight spots land at (1100, 800), the rect's centre.
+
+- **Minimap icon position:** from the stock sites, icon (x, y) is about (153 + wx / 45, wy / 45 - 9) for
+  a site centred at world (wx, wy), within 3 px (the minimap is drawn by hand). The headless runs show the
+  star on the island while the quest is on and the plain marker after.
+- **The banner trigger** sends message 0x16 with the name id (`FUN_0801A6A0`); the receiver reads the
+  name through literal 0x0801A688 (one of `ui_strings`' repointed literals). Flying into a stock site in
+  the headless runner showed no text label either, so the label's look is unverified for every site.
+- **No ground marker:** the stock sites also show a landmark on the 3D ground (at zone 3's site a rock and
+  a purple cone, world-map decorations); the on-load's `FindCharacterEntity N` lines (N 2-12, one per
+  site, each behind its site's flag) look like the switches for those. The arctic site has none.
+- **Test position:** `COOP_CMD_WARP` with zone 6 area 99 (`cmd_arg` 0x6306) puts the flyer anywhere,
+  e.g. `cmd_arg2` 0x03200460 = (1120, 800); moving the flyer's entity position does not stick.
+
 ## 10. Buu's Fury maps (decoded; one imported)
 
 Buu's Fury uses the same map engine: the tiled layer header (create fn 0x08008087, 1374 layers), the
@@ -315,13 +382,14 @@ animated tiles (frame 0 only), exits and scripts. Finding the map table (through
 
 ## Open
 
-- Story flags: maps own 380-399 (380 the arctic barrier); the full allocation is `docs/ids.md`
-  "Story flags".
+- Story flags: maps own 380-399 (381 / 382 the arctic route; 380 free since the barrier went); the full
+  allocation is `docs/ids.md` "Story flags".
 - **Story content in a built map (story-scripts, 2026-10-18):** `tools/mapedit.py` edits the stock map
   table before the new maps exist, so a zone-15 map carries its story itself: `"sources"` (lscript
   files), `"triggers"` of type `"dialogue"` (`payload` seq:NAME, `condition` 0 / "flag:N" / "noflag:N" /
   "script:NAME"), and `"records"` (actors, and enemies copied from a stock record's behaviours with
   `"like": [zone, area, record]`, `"action"` seq:NAME). mapbuild assembles the referenced blocks into
-  the map's free space (`StoryRefs`). The arctic uses it for Android 13 (`data/story/ch8_arctic.lscript`).
+  the map's free space (`StoryRefs`). Broly's arena uses it; the arctic used it for the removed Android 13 encounter
+  (`data/story/ch8_arctic.lscript`, no longer named by `arctic.json`).
 - The activation objects (0x0300209x) are named by use, not decoded.
 - Decoration records beyond the barrier pattern, item and chest record layouts: not needed yet.

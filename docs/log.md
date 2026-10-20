@@ -13,6 +13,24 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Fixed on the way: the co-op leash kept players 20 px under a map's top edge, so top-edge doors (the ring,
   Gero's lab area 47) could not be reached in co-op. Tested end to end headless (`tools/headless/cell_games.txt`,
   new runner command `stepz`, test command `COOP_CMD_WIN_STAT`).
+- **The arctic route** (branch `arctic-route`, worktree `F:\MeltyCreations\log2-arctic`; `docs/story.md` 4i,
+  maps and access only): the arctic landing (zone 15 area 1) lost its Vegeta barrier and the old
+  Android 13 encounter's sources; its cave is now a door up the mountain and its flight spot sits on a
+  grass patch (Snowy Highlands' landing art). New maps from Snowy Highlands pieces: two climbs (15 / 5,
+  15 / 6; wolves, lions, birds, bandits, tiger bandits copied from the stock records with their item drop),
+  the ridge with the save pad (15 / 7), and the summit (15 / 8), a 720 x 592 clearing for Super 13's battle
+  with sideline room (spots in `docs/maps.md` 9a). The world map has a new landing on the snowy island in
+  the far north (`data/story/arctic_route.*`), there only while flag 381 is set, with the minimap star while
+  382 is clear (both flags are the post-game chapter's to set: the explosion, Super 13 beaten). Every arctic
+  map is named "The Arctic": `ui_strings` gained a place-name block (id 356, `tools/krillinsprites.py`
+  `PLACE_NAMES`), which the save menu now reads too (`party_save.c`). Tools: `mapbuild.py` fills with
+  `"anchor": "map"`, stamps with `"recolor": false`, enemies with `"action": "like"`; the headless runner's
+  `reset`; `tools/headless/arctic_route.txt` and `objfree.py`. Verified headless (`docs/testing.md` "Arctic
+  route"): no landing without 381; star and plain marker; landing, every exit both ways, twins on both
+  climbs, OBJ VRAM >= 15.6 KB free, a save on the ridge pad and a Continue back to it, both flight spots.
+  Not verified: the world-map name label (not seen for stock sites either), the wide view (the WIDE=1
+  build builds, not run), real play and the balance of the climbs.
+
 - **Sprite frame counts fixed for every generator** (branch `sprite-frame-counts`): `tools/sprites.py`
   `Sprites.frame_counts` now counts the run of valid descriptors (OBJ size, ROM blob of kind 0-2) up to
   the next array start of any stock record, replacing the gap guess that cut each record's

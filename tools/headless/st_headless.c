@@ -26,6 +26,7 @@
 //   preset +N -N ...       the StoryTest preset (coop.h, 0x0203FDC0) Party_Init applies at the next Map Test
 //   maptest ENTRY [VAR]    with the debug menu open: point Map Test at map entry ENTRY and press A
 //   save FILE / load FILE  savestates
+//   reset                  power-cycle the GBA (the save data stays: test a Continue from the title)
 //   echo TEXT
 #include <mgba/core/core.h>
 #include <mgba/core/log.h>
@@ -277,6 +278,7 @@ int main(int argc, char **argv) {
             if (vf) vf->close(vf);
             printf("%s %s: %s\n", c, tok[1], ok ? "ok" : "FAILED");
         }
+        else if (!strcmp(c, "reset")) { core->reset(core); p2_on = 0; printf("reset (frame %lu)\n", frame_no); }
         else if (!strcmp(c, "echo")) { for (int i = 1; i < n; i++) printf("%s ", tok[i]); printf("\n"); }
         else fprintf(stderr, "unknown command %s\n", c);
         fflush(stdout);
