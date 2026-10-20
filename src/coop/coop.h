@@ -50,7 +50,9 @@ u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WI
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
 int p2_coming(void);         // player 2's entity, or a pad and a party member for it (player.c)
-void p2_drop_out(void);      // the second pad went away: player 2's entity leaves (player.c)
+void p2_drop_out(void);
+int p1_in_play(void);        // player 1 in a player-driven control state (player.c)
+void duel_p2_left(void);     // duel.c: player 2 left during a duel: player 1 wins      // the second pad went away: player 2's entity leaves (player.c)
 int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)
 
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232

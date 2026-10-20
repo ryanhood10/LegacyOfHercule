@@ -44,7 +44,10 @@ static void init(void) {
 static Entity *player(int k) { return k ? coop.p2 : g_PlayerObject; }
 static CharacterEntry *entry(int k) { return &g_Party->chars[k ? coop.p2_slot : g_Party->active_slot]; }
 static void sfx(int id) { Sfx_Play(g_AudioMixer + 0x5C4, SFX_TABLE + id * 12, 0x40, 0); }
-static void set_tint(Entity *e, const u8 *t) { *(const u8 **)((u8 *)e + 0x24) = t; }
+static void set_tint(Entity *e, const u8 *t) {
+    *(const u8 **)((u8 *)e + 0x24) = t;
+    *(u32 *)((u8 *)e + 0x20) = 0;              // drop the cached frame so the next one goes through the remap
+}
 
 static int allowed(void) {
     return coop.p2 && g_PlayerObject && !coop2.duel_active && !coop_solo();
@@ -117,7 +120,7 @@ int revive_hit(Entity *e, u8 *hit, int k) {
     if (!allowed()) return 0;
     if (dmg < entry(k)->hp) return 0;
     if (rv.body[!k]) {                             // the partner is already down: game over
-        if (k == 0) return 0;                      // player 1's own stock death does it
+        if (k == 0) { rv.over = 1; rv.timeouts++; return 0; }   // player 1's own stock death does it
         Player_Knockback(e, hit);
         entry(1)->hp = 0;
         game_over();
@@ -132,8 +135,21 @@ int scene_running(void) { return SCENE_RUNNING != 0; }
 void revive_p2_gone(void) {
     if (rv.magic != REVIVE_MAGIC) return;
     if (rv.body[0] && !rv.over) game_over();      // nobody left to revive player 1
-    if (rv.body[1]) { set_tint(rv.body[1], 0); rv.body[1] = 0; rv.hold[1] = 0; }
+    if (rv.body[1]) {
+        set_tint(rv.body[1], 0);
+        rv.body[1] = 0;
+        rv.hold[1] = 0;
+        CharacterEntry *c = entry(1);
+        if (!c->hp) c->hp = (u16)(c->max_hp * REVIVE_HP_PCT / 100 ? c->max_hp * REVIVE_HP_PCT / 100 : 1);
+    }
     rv.hold[0] = 0;
+    if (!rv.body[0] && rv.glow) { Arena_Free(rv.glow); rv.glow = 0; }
+}
+
+// Player 1 takes player 2's character at a save pad (player.c coop_active_check) while player 2 is down: it gets up
+// first, so the slot changing hands is not one at 0 HP.
+void revive_p2_up(void) {
+    if (rv.magic == REVIVE_MAGIC && rv.body[1]) get_up(1);
 }
 
 void revive_test_down(int k) {
@@ -155,6 +171,7 @@ void revive_input(u16 *p1, u16 *p2) {
         if (rv.body[k]) { *pad[k] = 0; continue; }             // a downed player's pad does nothing
         Entity *me = player(k), *body = rv.body[!k];
         if (!me || !body || rv.over || SCENE_RUNNING) continue;
+        if (k == 0 && !p1_in_play()) continue;               // a menu (pause, save pad): its A stays its own
         if (dist2(me, body) > REVIVE_REACH * REVIVE_REACH) continue;
         rv.reaching[k] = 1;
         if (*pad[k] & KEY_A) {

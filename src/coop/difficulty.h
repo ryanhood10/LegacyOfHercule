@@ -17,13 +17,16 @@
 #define DIFF_SPEED      { 100,  120,  130 }   // regular enemies' walk speed, percent, while player 2 is there
 #define DIFF_BOSS_HP    {  80,  100,  125 }   // bosses' HP, percent (every boss: stock, ours, Android 16, Super 13)
 #define DIFF_REVIVE_S   {  20,   10,    6 }   // seconds a downed player waits for a revive (revive.c)
-// Drops: on Easy a regular enemy's drop roll (the five stock drop scripts) runs again when the first roll gave
+// Alone (no player 2) Normal is the stock game; Easy and Hard still change these:
+#define DIFF_SOLO_ENEMY_HP { 100, 100, 130 }  // regular enemies' HP, percent, alone
+#define DIFF_SOLO_DAMAGE   {  75, 100, 120 }  // damage enemies deal the player, percent, alone
+// Drops (alone too): on Easy a regular enemy's drop roll (the five stock drop scripts) runs again when the first roll gave
 // nothing; on Hard one roll in three is skipped. Story defeat scripts are never touched.
 #define DIFF_HARD_SKIP 3
 
 int difficulty(void);
-int diff_enemy_hp_pct(void);
-int diff_damage_pct(void);
+int diff_enemy_hp_pct(void);                        // co-op or alone, by p2_coming()
+int diff_damage_pct(void);                          // co-op or alone, by coop.p2
 int diff_speed_pct(void);
 int diff_boss_hp_pct(void);
 int diff_revive_frames(void);

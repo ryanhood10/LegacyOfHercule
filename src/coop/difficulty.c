@@ -11,9 +11,10 @@ int difficulty(void) {
 
 static const u8 enemy_hp[3] = DIFF_ENEMY_HP, damage[3] = DIFF_DAMAGE, speed[3] = DIFF_SPEED;
 static const u8 boss_hp[3] = DIFF_BOSS_HP, revive_s[3] = DIFF_REVIVE_S;
+static const u8 solo_hp[3] = DIFF_SOLO_ENEMY_HP, solo_damage[3] = DIFF_SOLO_DAMAGE;
 
-int diff_enemy_hp_pct(void) { return enemy_hp[difficulty()]; }
-int diff_damage_pct(void) { return damage[difficulty()]; }
+int diff_enemy_hp_pct(void) { return (p2_coming() ? enemy_hp : solo_hp)[difficulty()]; }
+int diff_damage_pct(void) { return (coop.p2 ? damage : solo_damage)[difficulty()]; }
 int diff_speed_pct(void) { return speed[difficulty()]; }
 int diff_boss_hp_pct(void) { return boss_hp[difficulty()]; }
 int diff_revive_frames(void) { return revive_s[difficulty()] * 60; }

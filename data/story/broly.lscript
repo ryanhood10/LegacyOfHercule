@@ -8,8 +8,8 @@
 ; (flag 400). In the backyard (zone 6 area 21), with Vegeta as a player, Paragus steps out of the ship
 ; and offers him New Planet Vegeta; Vegeta boards, Trunks follows with Krillin, Gohan and Piccolo, the
 ; ship leaves (flag 401; the party's state is kept in flags 404-419 by CoopCall 10 and the trip's five
-; are selectable, Hercule stays home). The arena (zone 15 area 3) has the landing zone with the ship and
-; a save pad; crossing the basin's rim brings everyone on screen for Paragus' betrayal and Broly
+; are selectable, Hercule stays home). The arena (zone 15 area 3) has the landing zone with the ship (no
+; save pad: there is no way back until Broly falls); crossing the basin's rim brings everyone on screen for Paragus' betrayal and Broly
 ; (sprite 159, waiting in the basin), then players 1 and 2 fight Broly (stat 115) and Paragus (stat
 ; 116, sprite 170) as a pair (bosses.c): if Paragus falls first Broly rages once (full HP, stronger,
 ; faster; the rage dialogue set by CoopCall 9). Both down: the planet explodes, Capsule Corp's backyard,
@@ -60,7 +60,7 @@ end
 ; ---- zone 6 area 21: the backyard ----------------------------------------------------------------
 
 sequence broly_yard
-  script                                 ; Vegeta is player 1 or player 2: the question (21), else a hint (1)
+  script                                 ; Vegeta is player 1 or player 2: the scene (3), else a hint (1)
         PushActiveCharIndex
         PushByte 2
         CmpEq
@@ -69,7 +69,7 @@ sequence broly_yard
         CmpEq
         Add
         JumpIfFalse L1
-        PushByte 21
+        PushByte 3
         END
       L1:
         PushByte 1
@@ -220,7 +220,7 @@ sequence broly_yard
         SetEntityFacing 170, 0
         FadeFromWhite 60
         PlayAudio 50
-  text 120 "PARAGUS: Welcome to New Planet Vegeta, my king.\x0bYour people await you beyond that ridge.  Rest, if you need to.  Then come."
+  text 120 "PARAGUS: Welcome to New Planet Vegeta, my king.\x0bYour people await you beyond that ridge.  Come."
   text 4 "VEGETA: Hmph.  Lead the way, old man."
   script
         WalkToPosition 170, 248, 600
@@ -228,23 +228,6 @@ sequence broly_yard
         DespawnEntity 170
         SetPlayerVisible 1
         SetActiveEntity 0
-  text 0 "@^Any of the five can be chosen on the save pad before going on."
-  stop 0x0                              ; [20] the scene ends at the arrival; the question follows
-  text 0 "@^Someone is waiting by the ship.\x0bWhatever happens next, there may be no way back until it's over."    ; [21]
-  script                                 ; [22] the trip cannot be left until Broly falls: ask first
-        CoopCall 18, 1, 0, 0
-  text 0 "@^Go closer?  (A: Yes  B: No)"
-  script                                 ; [24] yes: the scene (3); no: [25]
-        CoopCall 18, 0, 0, 0
-        PushByte 1
-        CmpEq
-        JumpIfFalse L1
-        PushByte 3
-        END
-      L1:
-        PushByte 25
-        END
-  text 0 "@^Come back when you're ready."
 end
 
 ; ---- zone 15 area 3: New Planet Vegeta ------------------------------------------------------------

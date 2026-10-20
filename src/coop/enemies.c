@@ -330,8 +330,16 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = buf.max_hp * SOLO_PAIR_HP_PCT / 100;
     }
-    if (((!p2_coming() || coop_solo()) && !pair) || !twinnable(rec, st) || alone)   // a private copy when the stat is not the ROM's
-        return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);
+    if (alone && p2_coming() && !coop_solo()) {   // one boss against two players: more HP (bosses.h)
+        if (st != &buf) { buf = *st; st = &buf; }
+        buf.max_hp = buf.max_hp * COOP_LONE_BOSS_HP_PCT / 100;
+    }
+    if (((!p2_coming() || coop_solo()) && !pair) || !twinnable(rec, st) || alone) {
+        // alone on Easy / Hard a regular enemy gets the difficulty's HP and drop roll (a private copy)
+        if (!alone && twinnable(rec, st) && difficulty() != DIFF_NORMAL && !is_boss_rec(rec, st))
+            return create_coop_enemy(rec, st, 1, 0, 0, 0, -1);
+        return st == &buf ? create_coop_enemy(rec, st, 0, 0, 0, 0, -1) : Enemy_Create(0, rec, st);   // a private copy when the stat is not the ROM's
+    }
 
     int boss = is_boss_rec(rec, st);
     Entity *orig = create_coop_enemy(rec, st, !boss, 0, 0, 0, -1);
@@ -544,8 +552,8 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
     coop2.dmg_calls++;
     int player = defender == g_PlayerObject || defender == coop.p2;
     if (player) coop2.dmg_player++;
-    if (coop.p2 && is_enemy(attacker) && player && !(coop2.off & COOP_OFF_DAMAGE)) {
-        dmg = dmg * diff_damage_pct() / 100;   // x 1.25 on Normal (difficulty.h)
+    if (is_enemy(attacker) && player && !(coop2.off & COOP_OFF_DAMAGE) && diff_damage_pct() != 100) {
+        dmg = dmg * diff_damage_pct() / 100;   // co-op x 1.25 on Normal; alone by the difficulty (difficulty.h)
         coop2.dmg_scaled++;
     }
     hit->dmg = dmg;

@@ -262,7 +262,7 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   Trunks and respawns on him at the landing spot. Player 2 spawns 12 px left of player 1 when that
   spot is walkable, else exactly on player 1 (overlap beats leaving the map).
 
-## Plan: co-op difficulty, twin bosses (stages 1-4 done, see the next section; stage 5 tuning open)
+## Plan: co-op difficulty, twin bosses (historical, 2026-10-17; today's rules are in "Difficulty" below)
 
 History (2026-10-17, superseded by "Co-op difficulty: enemy object map, twins and scaling" and "Boss
 rules and extra stats" below, which are authoritative): the spawn hook turned out to be the map
@@ -835,9 +835,7 @@ with the page and group 16 (Gohan beside Hercule) now gets its own special melee
 
 ### Open
 
-- Real two-player play; single-player. The summit scene (`data/story/arctic_summit`) uses him since 2026-10-19:
-  record 11 is stat 145 / sprite 180 and his line has portrait 122; tested headless only (scene, then a queued win).
-- Base Android 13 still has no portrait (123 is allocated for it).
+- Real two-player play.
 
 ## Boss rules and extra stats (2026-10-18, src/coop/bosses.c)
 
@@ -1241,6 +1239,21 @@ There is no player-count setting: player 2 exists while a second controller send
   fine team" now read for one player or two.
 - Already fine alone (checked): every `CoopCall 5` branch in chapters 4-8, the sideline / watcher guards, PartyKeep,
   Stage, the held beams, Choice, revive (stock death without player 2), Android 16 and Super 13 targeting.
+- **Balance (2026-10-20, a review of the numbers):** alone, a story pair fights at `SOLO_PAIR_HP_PCT` 50 % each
+  (70 % made the final twin Cells about 2.2x the co-op load, with no healing) and Android 16 at
+  `A16_SOLO_HP_PCT` 45 %; with two players a lone boss (`BOSS_NO_TWIN`: the Cell Games' fights 3 / 7, Cell vs
+  Trunks + Krillin) has `COOP_LONE_BOSS_HP_PCT` 180 % (stock HP made the pair's fight half as long). Alone the
+  difficulty has its own numbers (`DIFF_SOLO_ENEMY_HP` 100 / 100 / 130, `DIFF_SOLO_DAMAGE` 75 / 100 / 120; Normal
+  alone is the stock game) and Easy / Hard enemies alone get the drop roll. Halving the players' damage in
+  co-op (Ryan asked) was rejected: it doubles every co-op fight (twins at x1.5: 3x a one-player fight) and the
+  bosses were tuned against two full-strength players (Android 16, Super 13, the twin Cells).
+- **Revive fixes (2026-10-20 bug review):** player 2 leaving while down gets its HP back (30 %) and the glow table
+  freed; player 1's own death with player 2 down marks the game over (no second event); a save-pad trade onto a
+  downed player 2's slot gets it up first; a duel in progress when player 2 leaves ends as player 1's win
+  (`duel_p2_left`); the revive's A is taken only while player 1 is in play (`p1_in_play`: menus keep it); the
+  glow clears the cached frame (+0x20) so the remap shows; a downed player 2's form change keeps the pose.
+  Untested: going down while charging a held beam (the forced exit that once crashed `p2_cycle`).
+- Base Android 13 has no dialogue portrait yet (123 is allocated); he speaks as narration.
 - **Known, kept:** speakers who are player 2 in co-op talk off screen alone (old Hercule in the prologue, Krillin,
   Hercule, Android 16 in "Gero's computer", who is only in the party). The test runner's `stepz` no longer presses
   player 2's pad after `p2 off`, so one-player runs stay one-player.

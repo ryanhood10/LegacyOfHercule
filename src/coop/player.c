@@ -23,14 +23,18 @@ static int is_p2(const Entity *e) { return e == coop.p2; }
 // whenever a boss pair was hitting player 1 (found in the Android 19 + 13 tests).
 static const u32 PLAYER_CTRL_VTABLES[] = { IDLE_VTABLE, WALK_VTABLE, 0x080258DCu, 0x08025E20u, 0x080251F4u, 0x08025D70u, 0x08025B98u };
 
-int p1_controllable(void) {
-    if (revive_p1_down()) return 1;   // player 1 lies downed: player 2 plays on (revive.c)
+// Player 1's entity is in a player-driven control state (not a cutscene, menu or scripted walk).
+int p1_in_play(void) {
     Entity *p1 = g_PlayerObject;
     if (!p1 || !p1->ctrl_state) return 0;
     u32 vt = *(u32 *)p1->ctrl_state;
     for (unsigned i = 0; i < sizeof PLAYER_CTRL_VTABLES / sizeof PLAYER_CTRL_VTABLES[0]; i++)
         if (vt == PLAYER_CTRL_VTABLES[i]) return 1;
     return 0;
+}
+
+int p1_controllable(void) {
+    return revive_p1_down() || p1_in_play();   // a downed player 1: player 2 plays on (revive.c)
 }
 
 static InputSystem no_input;   // what player 2 sees during cutscenes
@@ -130,7 +134,7 @@ void p2_sync_combat(void) {
     int slot = coop.p2_slot;
     const CharacterEntry *c = &g_Party->chars[slot];
     u32 key = (u32)c->str ^ ((u32)c->pow << 8) ^ ((u32)c->end << 16) ^ ((u32)c->display_row << 24) ^ (u32)slot;
-    if (key == coop2.p2_class_key) return;
+    if (key == coop2.p2_class_key || revive_is_down(p2)) return;   // a downed body keeps its pose
     // a script changed the form (SetCharacterTransformation only refreshes the active player's
     // entity): take the new row's sprite too; otherwise only the class (stats, speeds) is re-run
     if (c->display_row != coop2.p2_class_row) p2_bind(p2, slot);
@@ -216,6 +220,7 @@ static void p2_destroy(Entity *e, int free_it, u32 a, u32 b) {
 void p2_drop_out(void) {
     if (!coop.p2) return;
     revive_p2_gone();
+    duel_p2_left();                       // duel.c: a duel in progress ends as player 1's win
     EntityList_Remove(g_SceneTable[1], coop.p2, 0);   // its destroy clears coop.p2
 }
 
@@ -371,6 +376,7 @@ void coop_active_check(void) {
     int old = coop.last_active;
     coop.last_active = (u8)active;
     if (!coop.p2 || active != coop.p2_slot) return;
+    revive_p2_up();                       // a downed player 2's slot changes hands: up first (revive.c)
     int ns = slot_ok(old, 0) ? old : -1;
     for (int i = 0; ns < 0 && i < PARTY_SLOTS; i++)
         if (slot_ok(i, 0)) ns = i;

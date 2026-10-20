@@ -197,7 +197,7 @@ Super Hercule refused (row and EP unchanged), and back to row 21 with the stock 
 Ryan (`docs/story.md` 4h): after the Cell Games Super Saiyan 2 Gohan joins as his own, "super overpowered"
 party member; regular Gohan (slot 0) stays selectable. `PARTY_SLOTS=9` (`docs/party-8-slots.md`).
 
-- **Join** `void ssj2_join(void)` (CoopCall 20, proposed; the Cell Games chapter calls it at the end of
+- **Join** `void ssj2_join(void)` (CoopCall 20; `data/story/cell_games.lscript` calls it at the end of
   the Games, then shows `text 0 "@^Super Saiyan 2 Gohan is now an available character!"`): slot 8 gets
   row 28, Gohan's EXP (his level), Gohan's max HP / EP x1.5 (full), str / pow / end x1.7
   (`SSJ2_*_PCT`, `ssj2gohan.h`), flags 0x7F (in party, available, the charged attack and every technique

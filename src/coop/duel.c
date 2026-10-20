@@ -72,6 +72,9 @@ int p1_take_damage_hook(Entity *e, u8 *hit) {
     return orig(e, hit);
 }
 
+// Player 2's pad went away during a duel (player.c p2_drop_out): player 1 wins, the end script runs.
+void duel_p2_left(void) { duel_end(2); }
+
 // Player 2's side (player.c p2_take_damage asks first): returns 1 when the duel took the hit.
 int duel_p2_final_blow(Entity *e, int dmg) {
     (void)e;

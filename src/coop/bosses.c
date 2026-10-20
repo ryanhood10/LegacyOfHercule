@@ -17,7 +17,7 @@ const ExtraStat extra_stats[] = {
     // but 6000 HP of his 10200 (75/85/79), so the pair is one fight's worth for two players. (At 68/60/64
     // he barely scratched a level-30 Hercule in the fork while Cooler shredded Piccolo.)
     { 29, -1, 6000, -1, 74, 70, 68, 0 },
-    // 114 Android 13 in the arctic (the ten-day wait, data/story/ch8_arctic.lscript): 19's AI set and class,
+    // 114 Android 13 in the arctic (the ten-day wait, data/archive/ch8_arctic.lscript): 19's AI set and class,
     // a Cell-saga boss's numbers; the fight ends at half health (rule below). Our tuning, untested in play.
     { 5, -1, 6000, -1, 30, 24, 22, 0 },
     // 115 Legendary Super Saiyan Broly (the Broly side chapter in the ten-day wait, data/story/broly.lscript):

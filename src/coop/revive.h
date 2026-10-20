@@ -35,6 +35,7 @@ int revive_hit(Entity *e, u8 *hit, int k);    // the players' take-damage hooks:
 void revive_draw(u32 **oam);                  // hud.c: the countdown and revive bars
 void revive_hud_gone(void);                   // hud.c: the HUD is destroyed (its VRAM goes with the map)
 int revive_is_down(const Entity *e);
+void revive_p2_up(void);                      // player 2 gets up now (a save-pad trade of its slot)
 void revive_p2_gone(void);                    // player 2 leaves: a downed player 1 is a game over
 int scene_running(void);                      // a dialogue sequence runs (0x03001FDC)
 void revive_test_down(int k);                 // test command 10: player k goes down

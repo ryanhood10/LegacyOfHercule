@@ -164,7 +164,7 @@ void vm_coop_call(s32 *st) {
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
     case 15: cg_set_solo(a); break;       // the Cell Games' solo fights (cellgames.c)
     case 16: cg_beam(a, b); break;
-    case 18: if (a) cg_choice_arm(); else vm_push(st, cg_choice_take()); break;   // yes / no (cellgames.c)        // the beam struggle's held beams (cellgames.c)
+    case 18: if (a) cg_choice_arm(); else vm_push(st, cg_choice_take()); break;   // yes / no (cellgames.c)
     case 13: wave_start((const void *)a, b); break;
     case 14:
         if (a == 0) vm_push(st, wave_round());

@@ -30,6 +30,6 @@
 #define BURST_SHAKE         16      // camera shake frames
 
 #if PARTY_SLOTS > SSJ2_SLOT
-void ssj2_join(void);           // the join (CoopCall 20, proposed): slot 8 enters the party
+void ssj2_join(void);           // the join (CoopCall 20): slot 8 enters the party
 #endif
 void ssj2_frame(void);          // every input poll (SSJ2_TEST triggers)

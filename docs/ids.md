@@ -16,7 +16,7 @@ Each piece takes numbers only from its own row; say in its report if it needs mo
 | Cell Games chapter (built) | 460-479 (none used) | 140 used | 162 (a record copy of Perfect Cell 30) | - | - | - | 15 Solo, 16 Beam | 15 SOLO, 16 WIN_STAT | maps 323-326 and 176 edits; `.party.cg` 0x18 |
 | Super 13 boss (art, stats, AI) | - | 145-149 | 180-184 | - | 122-123 | - | 17 | 17-18 | - |
 | Arctic route maps | 381-389 (381, 382 used) | - | - | - | - | - | - | - | areas 5-9 (5-8 used); area 1 reworked; world-map landing; place name `ui_strings` 356 |
-| Super Saiyan 2 Gohan character | - | - | - (58 repointed) | 28 used, 29 unused | 124-125 unused (stock 61 / 12) | 23 used, 24 unused | 20 proposed | - | party slot 8 (`PARTY_SLOTS=9`) |
+| Super Saiyan 2 Gohan character | - | - | - (58 repointed) | 28 used, 29 unused | 124-125 unused (stock 61 / 12) | 23 used, 24 unused | 20 Ssj2Join used | - | party slot 8 (`PARTY_SLOTS=9`) |
 | Post-game chapter (Lookout part built) | 480 the wishes made, 483 the finale seen (the new-game clear now covers 400-503) | 150-154 | - | - | - | - | 18 Choice used, 19 | 19-20 | Lookout (map 261 record 4), talk show, epilogue |
 
 ## Story flags (bank at 0x0203F108 + n / 8 with 9 party slots, 816 flags, saved)
@@ -31,7 +31,7 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 |---|---|---|
 | 360-362 | story chapters 1-7 | 360 Krillin has visited, 361 inside Triceratops Jungle, 362 Hercule's deal |
 | 363-375 | Roshi's gym (`ch8_gym`) | 363-375 |
-| 376 | the removed arctic Android 13 encounter | free since 2026-10-18 (`ch8_arctic.lscript` is not included) |
+| 376 | the removed arctic Android 13 encounter | free since 2026-10-18 (the scene is kept in `data/archive/ch8_arctic.lscript`, not built) |
 | 377-379 | free | |
 | 380-399 | new maps (`data/maps/*.json`, `data/story/arctic_route.*`) | 380 free (the arctic's Vegeta barrier, removed 2026-10-19); **381 the arctic is open** (the world-map landing and its star; the post-game chapter sets it at the explosion); **382 Super 13 beaten** (the star turns into the plain marker; the post-game chapter sets it); 383-389 the arctic route's, free |
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
@@ -183,14 +183,11 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 14 | Wave (op) | Time Chamber |
 | 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |
 | 16 | Beam (sprite, on): a held Kamehameha the script does not wait for; on 0 ends it | Cell Games |
-| 17 | allocated: Super 13 boss | |
+| 17 | Super13 (op, a, b): op 0 tune the next spawn (HP %, blast damage %), op 1 -> state (3 = exploded), op 2 spawn beside player 1 | Super 13 (`super13.c`) |
 | 18 | Choice (op): op 1 arms a yes / no question before its text entry (B answers no and closes the box), op 0 pushes 1 yes / 2 no | post-game |
 | 19 | allocated: post-game chapter | |
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21+ | free | |
-| 15-16 | allocated to the Cell Games chapter | |
-| 17 | Super13 (op, a, b): op 0 tune the next spawn (HP %, blast damage %), op 1 -> state (3 = exploded), op 2 spawn beside player 1 | Super 13 (`super13.c`) |
-| 18+ | 18-19 allocated to the post-game chapter; 20+ free | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 

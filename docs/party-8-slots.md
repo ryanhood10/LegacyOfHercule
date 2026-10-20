@@ -147,7 +147,7 @@ is 16's level-up range. The status screen names slot 7 "Android 16" on row 25 an
 the character whose row it copies (`krillin.c name_slot`).
 
 **Slot 8 is Super Saiyan 2 Gohan** (2026-10-19, `src/coop/ssj2gohan.c/.h`, `docs/hercule.md` 5d): empty
-(flags 0, not in the party) until `ssj2_join` (CoopCall 20, proposed) writes his entry at the end of the
+(flags 0, not in the party) until `ssj2_join` (CoopCall 20) writes his entry at the end of the
 Cell Games: display row 28 (Gohan's row 3 with sprite 58 and the stock Super Saiyan 2 portraits 61 / 12),
 Gohan's EXP, Gohan's HP / EP x1.5 and str / pow / end x1.7, flags 0x7F, abilities 3 / 4 / 23 / 2; growth
 row 8 in `data/hercule.json`. His default entry stays zero so the debug party (Map Test) leaves him out.

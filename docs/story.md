@@ -7,13 +7,13 @@ and `*.lscript` (format in `docs/scripts.md`, applied in the order listed in `da
 "story"). Game facts come from the script dump (`python tools/script_dump.py map ZONE AREA`, all
 maps in `build/scripts/` after a full dump), the quest table and Ghidra.
 
-## 0. Status and how to resume (2026-10-19)
+## 0. Status and how to resume (2026-10-20)
 
-**Mode: story planning.** Ryan plans the story chapter by chapter in chat, at a slow pace, one
-decision at a time, answered from the player's point of view and grounded in ROM facts, with no
-suggestions he did not ask for. Record each decision in this file the same turn. Build a part of the
-story only after Ryan says its plan is done. Everything decided through the ten-day wait is built
-and merged; what comes next is under "Open" below.
+**Mode: playtest.** Everything through the post-game is built and tested headless, in co-op and with
+one player; nobody has played it yet. Next: Ryan's playthrough and his feedback, then the Buu's Fury
+phase (section 6), planned in chat. Ryan plans at a slow pace, one decision at a time, answered from the
+player's point of view and grounded in ROM facts, with no suggestions he did not ask for. Record each
+decision in this file the same turn. Build a part of the story only after Ryan says its plan is done.
 
 **Standing rules (Ryan):**
 
@@ -53,17 +53,17 @@ and merged; what comes next is under "Open" below.
 | 8 | Time Chamber training waves, ten rounds (4g) | any | `wait_chamber` | merged 2026-10-19 |
 | 8 | Broly side chapter (4g) | Vegeta / Trunks on arrival, any of the trip's five | `broly` | merged 2026-10-19 |
 | 8 | "Gero's computer": Krillin + 16 back to the lab, two 19s, ends as Krillin + Hercule (4g) | Krillin / Android 16 | `ch9_gero` | merged 2026-10-19 |
+| 9 | The Cell Games: solo fights, the Cell Juniors, Goku names Hercule, the beam struggle, Super Saiyan 2 Gohan joins (4h) | per fight, each player alone (4h) | `cell_games` | built 2026-10-19 |
+| 10 | Post-game on the Lookout: the wishes, the arctic explosion, the finale, the Buu's Fury question, the ending (4i) | any | `postgame` | built 2026-10-19 |
+| 10 | The arctic route: the world-map landing and its star, the climb, the ridge pad (4i) | any | `arctic_route` | built 2026-10-19 |
+| 10 | The arctic summit: 13 absorbs 17 and 18, the Super 13 fight, the explosion (4i) | the two players, as anyone | `arctic_summit` | built 2026-10-19 |
 
-`data/story/ch8_arctic.lscript` is the removed arctic Android 13 encounter, kept for his return and
-not used by any trigger (`docs/story-archive.md`).
+`data/archive/ch8_arctic.lscript` is the removed arctic Android 13 encounter, kept as a record and not
+built (`docs/story-archive.md`).
 
-**Open (next to plan, Ryan in chat):**
+**Open (next, Ryan in chat):**
 
-- The Cell Games (built, section 4h): Hercule's stock public "victory", the Cell Juniors, Gohan's win, "Keep Goku" (an
-  old note; the stock script removes Goku after Cell's defeat and makes Hercule available). Stock
-  flow in `docs/story-rom.md` section 9.
-- After the Games (in planning, section 4i): the changed second wish, the Android 13 post-game in the
-  arctic, the real ending back at the Lookout.
+- Ryan's playthrough: what he wants changed once he has played it (the numbers below are ours).
 - The Buu's Fury phase (section 6). Also section 7.
 
 **Numbers Ryan may want to change (our tuning, not his):** Kami's boost (+3 levels and a full
@@ -588,11 +588,12 @@ Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprit
 **Pre-play check (Ryan, 2026-10-20):** no healing between the Cell Games fights (the arena's breakable rubble
 drops HP / EP pickups, as in the stock game); the journal lists our chapters; Super 13 gets a boss track; Broly
 stays reachable after the Games with lines that fit either way; losing to Super 13 replays the summit scene from
-the ridge pad (kept); fight 2 needs player 2's pad (kept: the game is played in co-op).
+the ridge pad (kept); fight 2 is player 2's in co-op, and alone player 1 plays it.
 
 **Mechanics (Ryan, 2026-10-20):** reviving a downed partner (hold A for 3 s beside them; 10 s on Normal before
 a game over) and a difficulty chosen once at a new game (Easy / Normal / Hard). Not wanted: prize money and a
-shop, a city-defence mission. Not decided: a 1 Player / 2 Players choice.
+shop, a city-defence mission. No player-count setting: one player is playing without the second controller
+(built 2026-10-20, `docs/coop-design.md` "One player").
 
 ## 6. Buu's Fury (phase 2, separate ROM)
 

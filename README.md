@@ -97,8 +97,9 @@ A GBA game sees only its own 10 buttons, so player 2's pad reaches the ROM throu
    loads the player-2 bridge plus the console helpers `peek()`, `ents()` and `p2_force` (mGBA 0.10.5
    has no command-line script option, so this step is manual).
 3. Run `python tools\p2_keys.py` in a terminal. Player 1 uses mGBA's normal keys; player 2 uses
-   IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. Two gamepads: bind one in mGBA,
-   adapt `KEYMAP` in `p2_keys.py` for the other.
+   IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. `p2_keys.py` reads the keyboard
+   globally (`GetAsyncKeyState`), not a gamepad: change player 2's keys in its `KEYMAP`. A gamepad can
+   be player 1's, bound in mGBA.
 
 Keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t build\log2-coop.ss1 build\log2-coop.gba`
 starts straight from it. Make savestates with the current build: player 2's vtable copies in EWRAM

@@ -16,7 +16,7 @@
 // of the nominal health, so the island's two stages (75-100 in area 4, 50-75 in area 6) end at half.
 #define A16_HP            4000
 #define A16_END_PCT       50
-#define A16_SOLO_HP_PCT   70
+#define A16_SOLO_HP_PCT   45
 #define A16_MELEE         12      // stock 17: 32 melee, 39 ranged, 34 defence (tuned down: see docs)
 #define A16_RANGED        28
 #define A16_DEFENCE       38

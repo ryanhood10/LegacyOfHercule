@@ -20,7 +20,7 @@
     {"op": "border", "width": 1, "mask": "both"}
   ],
   "exits": [
-    {"type": "door", "rect": [272, 200, 344, 216], "dir": "up", "to": [9, 3, 1], "at": [96, 168]}
+    {"type": "door", "rect": [272, 200, 344, 232], "dir": "up", "to": [9, 3, 1], "at": [96, 168]}
   ],
   "spawn": [312, 280],
   "name_id": 221,

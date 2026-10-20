@@ -6,7 +6,8 @@ local PORT = 7777
 local REMOTE_ADDR = nil   -- filled in from build/coop.sym (g_p2_remote) below, or set by hand
 local VALID = 0x8000
 
--- Try to read the address from the symbol file next to the ROM, else fall back to a literal.
+-- Try to read the address from the symbol file next to the ROM, else fall back to g_p2_remote's
+-- pinned address 0x0203FF00 (docs/ids.md "Memory"; tools/mgba/netplay.lua uses the same).
 local function readSymbol()
   local f = io.open("coop.sym", "r") or io.open("F:/MeltyCreations/log2/build/coop.sym", "r")
   if not f then return nil end
@@ -17,7 +18,7 @@ local function readSymbol()
   f:close()
   return nil
 end
-REMOTE_ADDR = REMOTE_ADDR or readSymbol() or 0x0203FF98
+REMOTE_ADDR = REMOTE_ADDR or readSymbol() or 0x0203FF00
 
 local latest = 0
 local connected = false

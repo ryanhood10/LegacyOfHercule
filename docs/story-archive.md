@@ -184,16 +184,17 @@ partner was never decided.
 
 **Built (2026-10-18):** the map, zone 15 area 1 (`data/maps/arctic.json`, `docs/maps.md`): Northern
 Mountains zone 8 area 28 re-dressed in snow and ice with falling snow, a cave behind a working "Only
-Vegeta" barrier (level 50, story flag 380). The encounter, `data/story/ch8_arctic.lscript`: 13 meets
+Vegeta" barrier (level 50, story flag 380). The encounter, `ch8_arctic.lscript` (now `data/archive/`): 13 meets
 Vegeta at the cave mouth, a half-health fight alone (new stat 114 and a rule in `bosses.c`), he flies
 off, flag 376 for the post-Cell variant. Tested headless to the end of the fight.
 
 **Removed (2026-10-18):** the cave-mouth trigger and the boss record were taken out of the map
 (`data/maps/arctic.json` note "_arctic_13"); `data/hercule.json` has no `ch8_arctic.json`. What is
-left: the arctic map itself (an empty cave behind the barrier); `ch8_arctic.lscript`, still named in
-the map's `"sources"` but called by nothing; stat 114 and its half-health rule in `src/coop/bosses.c`,
-unused. The file's own header still says the partner is undecided, and the `bosses.c` comment on the
-rule still cites "docs/story.md 4f".
+left: the arctic map itself (an empty cave behind the barrier); `ch8_arctic.lscript`, in no map's
+`"sources"` since 2026-10-19 and called by nothing (the file now lives at
+`data/archive/ch8_arctic.lscript`, as a record); stat 114 and its half-health rule in
+`src/coop/bosses.c`, unused. The file's own header still says the partner is undecided, and the
+`bosses.c` comment on the rule still cites "docs/story.md 4f".
 
 ## I. Broly maps wanted (old 4f, 2026-10-18)
 
