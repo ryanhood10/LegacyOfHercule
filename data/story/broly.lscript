@@ -93,7 +93,7 @@ sequence broly_yard
   text 4 "VEGETA: That armor...  You're a Saiyan!  Who are you?"
   text 120 "PARAGUS: My name is Paragus.  I served your father, King Vegeta, before Frieza destroyed our world."
   text 120 "PARAGUS: I have found a new home for our people, my prince.  A New Planet Vegeta.\x0bIt has everything a Saiyan could want...  except a king."
-  text 4 "VEGETA: A planet of my own...  Hmph.\x0bLet Kakarot have his little tournament.  A prince belongs on a throne."
+  text 4 "VEGETA: A planet of my own...  Hmph.\x0bA prince belongs on a throne, not guarding this mud ball."
   script
         PushActiveCharIndex
         PushByte 3
@@ -144,7 +144,7 @@ sequence broly_yard
         SetEntityFacing 76, 3
       N4:
         WaitFrames 20
-  text 5 "TRUNKS: Father, wait!  You can't just fly off with a stranger!\x0bCell's tournament is only days away!"
+  text 5 "TRUNKS: Father, wait!  You can't just fly off with a stranger!\x0bWe don't know anything about this man!"
   text 73 "KRILLIN: A brand-new Planet Vegeta, out of nowhere?  This smells like a trap to me..."
   text 3 "PICCOLO: Then we all go.  If it's a trap, we spring it together."
   text 2 "GOHAN: I'm coming too!"
@@ -500,8 +500,8 @@ sequence broly_end
   text 36 "BULMA: You're back!  And where's that ship?  What happened out there?"
   text 73 "KRILLIN: Long story.  The new Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
   text 2 "GOHAN: He kept calling me Kakarot.  He really hated my dad."
-  text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...  Cell won't be any easier."
-  text 3 "PICCOLO: Then we use the days we have left.  Train."
+  text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...  I hope we never meet another one."
+  text 3 "PICCOLO: Then we keep training.  Something worse is always coming."
   text 4 "VEGETA: Hmph.  A Legendary Super Saiyan...  and I sent him to the grave.  Remember that."
   script
         FadeOut 120

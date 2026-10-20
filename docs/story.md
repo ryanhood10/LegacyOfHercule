@@ -585,6 +585,11 @@ neither player plays them. 13 turns into Super 13 (sprite 180, portrait 122) in 
 question answers with the button that closes its last page (A yes, B no); the epilogue's old Hercule uses the Buu's
 Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprite instead.
 
+**Pre-play check (Ryan, 2026-10-20):** no healing between the Cell Games fights (the arena's breakable rubble
+drops HP / EP pickups, as in the stock game); the journal lists our chapters; Super 13 gets a boss track; Broly
+stays reachable after the Games with lines that fit either way; losing to Super 13 replays the summit scene from
+the ridge pad (kept); fight 2 needs player 2's pad (kept: the game is played in co-op).
+
 ## 6. Buu's Fury (phase 2, separate ROM)
 
 - The aura from the Cell Games is real; when Goku needs a fusion partner against Buu, Hercule is

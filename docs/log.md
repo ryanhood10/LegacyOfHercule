@@ -2,6 +2,16 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-20
+
+- **Pre-play check fixes** (Ryan): the journal gets our chapters (`tools/gen_journal.py`, `docs/scripts.md` 2.6:
+  Gero's computer, Broly's ship and trip, the Arctic, back to Dende, Dende's question; "Talk to Dende" ends with the
+  wishes); Super 13's fight plays a boss track (music 30, Broly's) and the summit's own music after; Broly's
+  lines that assumed the Games were ahead (Vegeta's "little tournament", Trunks' "only days away", "Cell won't be
+  any easier", Piccolo's "days we have left") now fit before or after them. No refills between the Cell Games
+  fights (Ryan: harder is better): the arena's rubble already drops HP / EP pickups (`083EE6A8`, items on maps
+  324-326). The coop ELF relinks when the Makefile changes.
+
 ## 2026-10-19
 
 - **The twin-Cell "stall" fixed** (`twin-cell-stall`): it was a crash, and it happened in real play. Player 2 holding A at

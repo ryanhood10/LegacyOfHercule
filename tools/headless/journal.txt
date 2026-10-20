@@ -1,0 +1,13 @@
+# The journal (tools/gen_journal.py, docs/scripts.md "The journal"): flags for the post-game's Arctic quest and an
+# untaken Broly trip, Start, L to the journal tab. Expect: "Find the source of the power in the Arctic" (story star),
+# "Bring Vegeta to the ship behind Capsule Corporation" (side star), and no "Talk to Dende" (it ends with 480).
+# python tools/headless/st_test.py tools/headless/journal.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 0
+preset +195 +191 +480 +381 +400
+maptest 261
+frames 300
+key 8 6
+frames 60
+key 0x200 6
+frames 60
+shot journal_page

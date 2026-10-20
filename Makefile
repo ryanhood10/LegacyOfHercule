@@ -66,10 +66,10 @@ S13_SPRITE ?= 180
 S13_PORTRAIT ?= 122
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
            -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DCELL2_SPRITE=$(CELL2_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(filter 1,$(SSJ2_TEST)),-DSSJ2_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA) -DS13_SPRITE=$(S13_SPRITE)
-LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-Map,$(BUILD)/coop.map
+LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o
 
 SSJ_TEST ?= 0
 
@@ -195,11 +195,20 @@ $(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coo
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
+# the journal's quest table: the stock quests plus our chapters' (tools/gen_journal.py; never committed)
+$(BUILD)/gen/journal_data.c: tools/gen_journal.py tools/script_asm.py $(ROM)
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/gen_journal.py $(ROM) $@
+
+$(BUILD)/obj/journal_data.o: $(BUILD)/gen/journal_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
 $(BUILD)/obj/sprites_data.o: $(BUILD)/gen/sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
-$(BUILD)/coop.elf: $(OBJS) src/coop/coop.ld
+$(BUILD)/coop.elf: $(OBJS) src/coop/coop.ld Makefile
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -lgcc -o $@
 
 $(BUILD)/coop.bin: $(BUILD)/coop.elf

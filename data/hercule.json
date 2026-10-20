@@ -185,6 +185,18 @@
       "expect": "020b00040b0004021600270d0400c302140411",
       "bytes": "020b0216001d0d00c302140411111111111111",
       "note": "the ring barrier's condition (map 323 item): (player 1 is Goku and level > 39) and not 195 -> (player 1's level > 29) and not 195"
+    },
+    {
+      "offset": "0x4C80",
+      "expect": "dc686d08",
+      "word": "sym:journal_quests",
+      "note": "the journal's quest table -> journal_quests (tools/gen_journal.py: the stock quests plus our chapters')"
+    },
+    {
+      "offset": "0x4AE2",
+      "expect": "2b2e",
+      "bytes": "312e",
+      "note": "the journal's loop: cmp r6, #43 -> #49 (gen_journal.py JOURNAL_COUNT)"
     }
   ],
   "story_free": "0xB00000",

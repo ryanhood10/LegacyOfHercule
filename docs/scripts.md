@@ -173,6 +173,22 @@ route's world-map landing and star, `arctic_route`), 400-419 the Broly chapter (
 the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar. The bank
 is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
+### 2.6 The journal (quest table)
+
+The pause menu's journal (`FUN_080049FC`) walks one table of 16-byte quests: +0 the icon (0 story, 1 / 2 side
+quests), +4 a "completed" condition script, +8 an "active" one, +0xC the text. Completed quests go to the
+completed page; otherwise active ones go to the active page, in table order (the first entry is the top line).
+Each page holds 43 lines, and the stock quests already fill the completed page. The table is ours since
+2026-10-20: `tools/gen_journal.py` writes `build/gen/journal_data.c` (`journal_quests`: our entries first, then
+the 43 stock ones), and `data/hercule.json` points the literal at 0x08004C80 at it and the loop's
+`cmp r6, #43` (0x08004AE2) at the new count. **Our entries never complete** (no room on that page): each
+shows while its start flag is set and its end flag clear, then disappears. To add one, add a row to `NEW` in
+the generator (icon, `"+start -end"`, text of about 62 characters at most), then bump `JOURNAL_COUNT` and
+the patch's byte (`bytes` = count, `2e`). Ours now: the Gero chapter (420 / 421), Broly's ship and trip
+(400 / 401 / 402), the Arctic (381 / 382), back to Dende (382 / 483), Dende's question (483 on); stock
+quest 0 "Talk to Dende on the Lookout" now ends with the wishes (195, not 480). The check:
+`tools/headless/journal.txt`.
+
 ## 3. lscript, the text form
 
 ```
