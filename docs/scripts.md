@@ -116,6 +116,7 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 12 | A16Leave | 16 leaves the party for good (slot flags 0), the saved bits come back, Krillin and Hercule in the party and available, flag 421. The script then sets Krillin player 1 and `CoopCall 6, 5` |
 | 13 | WaveStart seq:ROUND, first | the Time Chamber training (`waves.c`): from round `first` (0 / 1 = the first); ROUND = the sequence queued before every round and once after the last (it asks fn 14 which) |
 | 14 | Wave op | op 0 -> the round being announced / fought (11 = completed); op 1 spawns the announced round (no result); op 2 -> player 2's character name (a `%s` argument: "%s wins the sparring match!") |
+| 17 | Super13 op, a, b [-> state] | the post-game boss (`super13.c`): op 0 tunes the next spawn (a = HP %, b = blast damage %, 0 = 100); op 1 pushes his state (0 none, 1 fighting, 2 exploding, 3 gone: a defeat script waits for 3 before it goes on); op 2 spawns him beside player 1 with a boss bar. Place him with a record of stat 145, sprite 180 (`docs/coop-design.md` "Super Android 13") |
 
 ### 2.3 Map records and triggers (`Map_LoadInternal` 0x0800C390)
 

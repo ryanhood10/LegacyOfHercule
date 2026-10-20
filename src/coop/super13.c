@@ -670,6 +670,8 @@ static void s13_update(Entity *e) {
         return;
     }
     Entity_BaseUpdate(e);
+    int vram = ObjVram_Largest(g_EntityList);
+    if (vram < s13.vram_min) s13.vram_min = (u16)vram;
     if (a->poise > 0) a->poise--;
     if (a->attack) {
         if (e->ctrl_state != &a->ctrl) { a->attack = S13_ATK_NONE; a->chain = 0; a->cooldown = 40; }
@@ -792,6 +794,8 @@ Entity *s13_spawn(const EnemyRecord *rec) {
     s13.spawn_frame = g_FrameCounter;
     s13.dead_frame = s13.gone_frame = 0;
     s13.fired = s13.booms = s13.hits = s13.skipped = s13.specials = s13.combos = 0;
+    s13.msgs = s13.landed = 0;
+    s13.vram_min = 0xFFFF;
     return e;
 }
 
@@ -822,12 +826,14 @@ void s13_test_spawn(void) {
     if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
 }
 
-// Test command 18: arg low byte = forced special (S13_ATK_*, 0 = his own choice); arg bit 8 = set his HP to
+// Test command 18: arg low byte = forced special (S13_ATK_*, 0 = his own choice; a forced one starts as soon as
+// he is free); arg bit 8 = set his HP to
 // arg2 (rage and death tests); arg bit 9 = toggle the test autopilot (A16_TEST builds' coop2.a16_bot).
 void s13_test_drive(u32 arg, u32 arg2) {
     s13_globals();
     s13.force = (u8)(arg & 0xFF) <= S13_ATK_ROAR ? (u8)(arg & 0xFF) : 0;
     Entity *e = s13.boss;
+    if (s13.force && is_s13(e) && e->hp > 0) state_of(e)->cooldown = 0;   // the forced special starts at once
     if ((arg & 0x100) && is_s13(e) && e->hp > 0) e->hp = (s32)arg2 > 0 ? (s32)arg2 : 1;
     if (arg & 0x200) coop2.a16_bot ^= 1;
 }

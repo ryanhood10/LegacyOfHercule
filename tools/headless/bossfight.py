@@ -12,6 +12,8 @@ usage: python tools/headless/bossfight.py ROM MENU_STATE KIND [--delay N ...] [-
   --delay      one fight per value (default 0)
   --hp N       with --strong: both players' HP (a deep pool, so the autopilot lives long enough for a
                time-to-kill; damage taken per second is the boss's damage rate)
+  --refill     with --strong: both players back to full HP after every one-second reading (the pair never
+               falls, so the fight runs to a time-to-kill; the drops add up to the damage the boss dealt)
   --strong     a Cell Games-level pair (STRONG below) for the Cell-tier comparison
   --level30    the level-30 stats of the Android 16 tests (Piccolo 554 HP, Hercule 245) instead of the debug
                party's level 40
@@ -25,7 +27,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 P1E, P2E = 0x0203F028, 0x0203F098          # Piccolo, Hercule party entries (hp u16 at +0)
 CELL_RECORD = 0x084090F8
-S13 = 0x0203F91C                            # super13.c `s13` (.party.s13; check coop.map after layout changes)
+S13 = 0x0203F91C                            # super13.c `s13` (.party.s13); read from the build's coop.sym when there
 TWINS = 0x0203FC24                          # coop2.twins[0].orig / .twin
 
 
@@ -44,7 +46,7 @@ def stats(p1, p2):
 STRONG = ((1500, 72 << 8, 75 << 8, 62 << 8), (900, 72 << 8, 70 << 8, 84 << 8))
 
 
-def script(kind, delay, secs, mp, level30, shots, strong=False, hp=0):
+def script(kind, delay, secs, mp, level30, shots, strong=False, hp=0, refill=False):
     z, a, x, y = mp
     L = ["p2 0", "maptest 147", "frames 300",
          f"poke32 0x0203FD0C {z | a << 8:#x}", f"poke32 0x0203FD54 {x | y << 16:#x}", "poke32 0x0203FD08 5",
@@ -63,7 +65,7 @@ def script(kind, delay, secs, mp, level30, shots, strong=False, hp=0):
         L += stats(p1, p2)
     L.append(f"frames {delay + 1}")
     if kind == "s13":
-        L += ["poke32 0x0203FD08 17", "frames 30", f"deref b {S13:#x}"]
+        L += ["poke32 0x0203FD08 17", "frames 30", f"deref b {S13 + 4:#x}"]
     else:
         rec = CELL_RECORD if kind == "cell" else int(kind, 0)
         L += [f"poke32 0x0203FD0C {rec:#x}", "poke32 0x0203FD08 8", "frames 30",
@@ -83,17 +85,19 @@ def script(kind, delay, secs, mp, level30, shots, strong=False, hp=0):
             L += [f"deref b {TWINS:#x}", f"deref w {TWINS + 4:#x}", "peek b+0x188", "peek w+0x188"]
         L.append(f"peek16 {P1E:#x}")
         L.append(f"peek16 {P2E:#x}")
+        if refill:   # back to full after each reading: the drops add up to the damage taken
+            L += [f"poke16 {P1E:#x} {STRONG[0][0]}", f"poke16 {P2E:#x} {STRONG[1][0]}"]
         if shots and t % 5 == 0:
             L.append(f"shot f_{t:03d}")
     if kind == "s13":
-        L.append(f"peek {S13:#x} 10")
+        L.append(f"peek {S13:#x} 11")
     return "\n".join(L) + "\n"
 
 
-def run(rom, state, kind, delay, secs, mp, level30, out, shots, strong=False, hp=0):
+def run(rom, state, kind, delay, secs, mp, level30, out, shots, strong=False, hp=0, refill=False):
     os.makedirs(out, exist_ok=True)
     path = os.path.join(out, f"fight_{kind}_{delay}.txt")
-    open(path, "w", newline="\n").write(script(kind, delay, secs, mp, level30, shots, strong, hp))
+    open(path, "w", newline="\n").write(script(kind, delay, secs, mp, level30, shots, strong, hp, refill))
     r = subprocess.run([sys.executable, os.path.join(HERE, "st_test.py"), path, rom, state, "--out", out, "--cols", "6"],
                        capture_output=True, text=True)
     t, rows = 0, []
@@ -132,7 +136,7 @@ def run(rom, state, kind, delay, secs, mp, level30, out, shots, strong=False, hp
     if not result and rows:
         t, v = rows[-1]
         result = ("time", t, v[:-2], v[-2], v[-1])
-    tail = [ln for ln in r.stdout.splitlines() if ln.startswith("0203f91c")]
+    tail = [ln for ln in r.stdout.splitlines() if ln.startswith(f"{S13:08x}")]
     return result, rows, tail
 
 
@@ -153,11 +157,40 @@ def main():
     verbose = bool(opt("--verbose", False))
     strong = bool(opt("--strong", False))
     hp = int(opt("--hp", 0))
+    refill = bool(opt("--refill", False))
     out = opt("--out", "build/hl/fight")
     rom, state, kind = a[0], a[1], a[2]
+    global S13
+    sym = os.path.join(os.path.dirname(os.path.abspath(rom)), "coop.sym")
+    if os.path.exists(sym):
+        for ln in open(sym):
+            f = ln.split()
+            if len(f) == 3 and f[2] == "s13":
+                S13 = int(f[0], 16)
     for d in delays:
-        result, rows, tail = run(rom, state, kind, d, secs, mp, level30, out, shots, strong, hp)
-        print(f"{kind} delay={d}: {result}  {' '.join(tail)}")
+        result, rows, tail = run(rom, state, kind, d, secs, mp, level30, out, shots, strong, hp, refill)
+        if refill and result:
+            # rates over the active seconds only: a second counts while some HP changed within the last
+            # 10 s (the Cell pair sometimes stalls under the autopilot: everyone stands, nothing changes)
+            n = [r for r in rows if r[0] <= result[1]]
+            active, dealt, taken, last, prev = 0, 0, 0, 0, None
+            for t, v in n:
+                hit = (STRONG[0][0] - v[-2]) + (STRONG[1][0] - v[-1])
+                boss = sum(max(0, b) for b in v[:-2])
+                done = (prev - boss) if prev is not None else 0
+                prev = boss
+                if hit or done:
+                    last = t
+                if t - last <= 10:
+                    active += 1
+                    taken += hit
+                    dealt += done
+            start = sum(max(0, b) for b in n[0][1][:-2]) if n else 0
+            pd, bd = dealt / max(1, active), taken / max(1, active)
+            print(f"{kind} delay={d}: {result[0]} t={result[1]} boss={result[2]} active {active} s: players deal {pd:.0f}/s "
+                  f"(est. kill {start / max(1, pd):.0f} s of {start} HP), take {bd:.0f}/s  {' '.join(tail)}")
+        else:
+            print(f"{kind} delay={d}: {result}  {' '.join(tail)}")
         if verbose:
             for t, v in rows[:result[1] if result else None:5]:
                 print(f"   t={t:3d} boss={v[:-2]} p1={v[-2]} p2={v[-1]}")

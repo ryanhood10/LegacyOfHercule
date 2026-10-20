@@ -511,6 +511,68 @@ Seen headless (`docs/testing.md` "Haloed Goku"): walking in four facings, the pu
 hit-stun with the halo, the transformation (halo through the gold-hair frames) to row 27, Super Saiyan
 walking and punching, and back to row 26.
 
+## Super Android 13 (id 180, portrait 122; `tools/super13sprites.py`, 2026-10-19)
+
+The post-game boss (`docs/story.md` 4i): blue skin, white hair, huge muscles, red-brown trousers, much
+larger than a normal fighter. Neither ROM has him (`docs/sprites.md` "Buu's Fury": no Super 13), so the
+body is **Legendary Super Saiyan Broly from Buu's Fury (Buu record 28)**: a 64 px tall muscle giant (a LoG2
+fighter is about 32 px; Perfect Cell 30 about 40), frames 32x64 / 64x64, with a full fight set and the
+cutscene poses his specials need. `tools/super13sprites.py` converts it with `buu2log2`'s converter
+(`S13Converter` overrides only the colour step) into **sprite id 180** (`s13_record`, Makefile
+`S13_SPRITE`), preview `build/<dir>/super13_preview.png` (and `_x2`: every group x 4 facings x every frame,
+the orbs and both portraits).
+
+**Recolour per frame, by body part from geometry** (Buu indices after Broly's own remap table):
+
+| part | how it is found | Super 13 |
+|---|---|---|
+| skin | Broly's tan ramp (200-205, 16, 18, 66, 67) | blue ramp (LoG2 184 / 186 / 189 / 187 / 76 / 193 / 192) |
+| hair | yellow components (28, 110, 5, 29, 30 with their white / orange shading) whose centroid is above the skin's | white and greys (2, 9-12); the skin-ramp strands inside it (pixels with 9+ hair pixels in their 5x5 window, grown three times) grey, its dark outline 14 |
+| trousers | yellow components below the skin's centroid of 30+ pixels: the pixels with no transparent 4-neighbour and their 8-neighbours | red-brown (117 / 110 / 111 / 112); the rest of such a component is a swing arc touching the leg: white |
+| necklace, arm cuffs | small yellow components below the skin's centroid; silver and gem pixels above the trousers' centroid | blue skin (bare chest and forearms) |
+| sash | the largest red component and any red within 6 rows of it | charcoal belt (14 / 15 / 1) |
+| boots | silver and gem pixels below the trousers' centroid; red below them (soles) | black boots |
+| light, sparks, fire, mouth | anything else (and in the death frames, yellow patches above the belt: light bursting out) | nearest LoG2 colour; Broly's brown swing arcs (210 / 211) light grey |
+
+**Groups.** Hercule's 21-group template layout (as `buu2log2`'s Broly 159), so the melee boss AI set 21
+finds idle 0, walk 1, hit-stun 2, charge 5 and attacks 6-8, plus the poses `src/coop/super13.c` plays itself
+(`S13_G_*` in `super13.h`); 27 groups:
+
+| group | Buu animation (frames) | used for |
+|---|---|---|
+| 0 idle, 1 walk | 0 (2), 1 (4) | AI set 21 |
+| 2 hit-stun, 3 knock-back, 11 hurt | 9 (shout with shock lines, recoil, crouch) | the stock hurt states |
+| 5 charge, 6-8 attacks, 4 / 13 / 14 / 16 / 17 / 18 / 19 / 20 | `buu2log2.GROUP_MAP`, cycled to the template's frame counts | AI set 21, unused fillers |
+| 12 | 17 (8): light bursting out of him | the death (S13_G_DEATH) |
+| 21 | 3 (3): wind-up, thrust, thrust | ki volley / fan, the beam's release (S13_G_KI) |
+| 22 | 18 frames 0-1 (hunch, arms up), 3 frame 1 (throw) | deadly bomber (S13_G_BOMB) |
+| 23 | 20 (6): crouching power-up, fire at his feet | ki wave charge (S13_G_POWER) |
+| 24 | 21 (6): the roar with flames | the rage roar (S13_G_ROAR) |
+| 25 | 19 (8): spinning into a ki shell and out | ki nova (S13_G_NOVA) |
+| 26 | an empty 8x8 frame | after the explosion (S13_G_BLANK) |
+
+Buu animations 17-21 draw one front view for every facing. Header: Hercule's template with the group count
+27, the largest frame 0x1000 (64x64) and byte 3 = 0x18 (`docs/sprites.md` "Paragus": the entity's OBJ VRAM
+slot is sized from it) and **one hurt box for every facing, (-6, -46, 38, 16)** around his position
+(`Entity_GetBox` 0x080079B8 adds the position to `record + 0xC + facing * 0x10`): Broly's side-facing boxes
+are only 29 px wide, starting 3 px right of the position, so fists landing on his drawn body missed (1 hit
+in 33 landed, counted headless, until the box was widened). 80 frame blobs, about 100 KB LZ-compressed.
+
+**Without `roms/buu.gba` (`BUU=0`)** the record aliases Perfect Cell's stock groups (sprite 30, which has
+0-3, 5-8, 12, 18) with Cell's groups standing in for the special poses: the build links and the AI runs,
+but he looks like Cell.
+
+**Ki orbs** (raw 8-bit tiles, the ROM projectile class's format as `a16sprites.py`): red-pink orbs drawn
+procedurally (white core, pink, red, dark red, a flickering spiky rim): `s13_orb_s` 16x16 x 3 frames,
+`s13_orb_m` 32x32 x 2, `s13_orb_l` 64x64 x 2 (the deadly bomber over his head), `s13_trail` 16x16 x 2 (the
+ki wave's trail). His explosions reuse `a16_boom` (Android 16's fire, `a16_sprites_data.c`).
+
+**Portrait 122** (`s13_portrait`, through `krillinsprites.py --extra-portrait 122=s13_portrait`, Makefile
+`S13_PORTRAIT`): Android 16's dialogue portrait (Portrait_Table 26, the square-jawed android face) with the
+skin blue, the orange hair white and grey (its outline dark grey), the green armour bare blue shoulders, the
+earring gone and the eyes red. Dialogue: `text 122 "SUPER 13: ..."` (speakers >= 8 read
+`portrait_module[id + 1]`). Base Android 13 still has no portrait (123 is allocated for it, unused).
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control

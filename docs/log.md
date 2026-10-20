@@ -4,6 +4,21 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-19
 
+- **Super Android 13, the post-game boss** (branch `super13-boss`, worktree `F:\MeltyCreations\log2-s13`;
+  `docs/story.md` 4i; ready for the post-game chapter to place): sprite **180** (`tools/super13sprites.py`:
+  Buu's Fury's 64 px Legendary Super Saiyan Broly recoloured per body part, per frame: blue skin, white hair,
+  red-brown trousers, bare chest and forearms, black boots; his special poses as groups 21-25, the death in
+  12; one wide hurt box), red-pink ki orbs (16 / 32 / 64 px), dialogue portrait **122** (Android 16's made
+  Super 13); stat **145** and `src/coop/super13.c`: ki volley (alternating players), ki fan, deadly bomber
+  (a giant orb over his head, slow and homing), ki wave (a slow beam head with a ki trail), ki nova (a shell
+  blast when crowded), a once-only rage roar, combinations, partly homing orbs, poise, 55 % walking speed,
+  and an explosion on defeat (96 frames, then gone; `CoopCall 17, 1` -> 3). Test commands **17** (spawn) and
+  **18** (force a special, set his HP, toggle the autopilot); CoopCall **17** (tune, state, spawn). Measured
+  headless (`tools/headless/bossfight.py`, `super13.txt`) against the twin Perfect Cells with a Cell Games-level
+  autopilot pair: the pair stun-locks the stock Cells (22-31 s, at full HP) but narrowly loses to him (KO with
+  him at 4-35 % in 8 runs; with HP refills it kills him in 58-88 s): 10000 HP, 48 / 64 / 56. No lag; OBJ VRAM
+  never ran short. Seen in the wide fork (slot 7) against both players. Found: twin-Cell autopilot runs stall
+  (entities stop, the frame counter runs) on main too (`docs/coop-design.md` "Super Android 13").
 - **Sprite frame counts fixed for every generator** (branch `sprite-frame-counts`): `tools/sprites.py`
   `Sprites.frame_counts` now counts the run of valid descriptors (OBJ size, ROM blob of kind 0-2) up to
   the next array start of any stock record, replacing the gap guess that cut each record's
