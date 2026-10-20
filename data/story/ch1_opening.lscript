@@ -4,7 +4,7 @@
 ;  - present day: Krillin visits Gohan instead of phoning and joins (slot 6, player 2);
 ;  - the forest "spirit" (Frieza + Cooler, the stock dream's clearing zone 2 area 8) replaces the dream;
 ;  - Krillin's NPC is gone from the Frieza landing site (zone 3 areas 4 and 6).
-; Speakers: 1 Gohan/Trunks box, 3 Piccolo, 44 Cooler, 49 Frieza, 57 Future Gohan, 67 Hercule,
+; Speakers: 1 Gohan/Trunks box, 3 Piccolo, 44 Cooler, 49 Frieza, 57 Future Gohan, 67 Hercule, 126 old Hercule (Buu's Fury portrait),
 ; 73 Krillin, 98 Trunks. Sprites: 48 Frieza (dream), 34 Cooler, 76 Krillin, 128 Trunks, 158 old Hercule.
 ; Story flags of this chapter: 360 = Krillin has visited.
 
@@ -45,16 +45,16 @@ sequence ch1_training
   text 0 "@^Hard difficulty." -> 10
   text 0 "@^Normal difficulty."
   stockseq @083b6ec8 0 5                 ; Trunks' doubts, Gohan's answer, "I won't let you down"
-  text 67 "#HERCULE: And don't you boys worry about me!\x0bI'll be guarding the rear.  From way back here."
+  text 126 "#HERCULE: And don't you boys worry about me!\x0bI'll be guarding the rear.  From way back here."
   stockseq @083b6ec8 6 7                 ; Gohan: the melee practice, destroy that boulder
-  text 67 "#A boulder?  Ha!  I've chopped bigger rocks than that in my sleep!\x0b...You go first, kid."
+  text 126 "#A boulder?  Ha!  I've chopped bigger rocks than that in my sleep!\x0b...You go first, kid."
   stockseq @083b6ec8 8                   ; Gohan walks off, control back
 end
 
 ; map 1 (zone 1 area 2) trigger 0: Gohan's death and the jump to the present
 sequence ch1_future_end
   stockseq @083b7adc 0 3                 ; the androids' attack, Trunks finds Gohan
-  text 67 "#T-Trunks...  They're gone.\x0bLet's get out of here before those two come back!"
+  text 126 "#T-Trunks...  They're gone.\x0bLet's get out of here before those two come back!"
   stockseq @083b7adc 4                   ; "Present day Earth...", Gohan's chapter begins
 end
 
@@ -168,7 +168,7 @@ end
 
 sequence ch1_trunks_talk
   stockseq @083bfddc 0 77                ; the whole stock conversation up to Trunks' secret
-  text 67 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bThat Frieza fellow isn't coming back, is he?"
+  text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bThat Frieza fellow isn't coming back, is he?"
   text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
   stockseq @083bfddc 78                  ; everyone gathers, the warning retold, home
 end

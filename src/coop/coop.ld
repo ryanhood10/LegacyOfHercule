@@ -59,6 +59,7 @@ SECTIONS
         KEEP(*(.party.s13))  /* super13.c state (Super Android 13) */
         KEEP(*(.party.rv))   /* revive.c state (a downed partner) */
         KEEP(*(.party.ui))   /* small text buffers (the Cell Games' one-player title card) */
+        KEEP(*(.party.cp))   /* companion.c state (old Hercule following player 1 in the prologue) */
     } > partyram
 
     .bss (NOLOAD) : {

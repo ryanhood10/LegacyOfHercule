@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Ryan's test, round 2:** the sprint bumped on open ground (our 4-way walk port passed no box to the collision
+  check; the sprint is the only user of that state); old Hercule now walks with Trunks in the prologue alone
+  (`companion.c`: player 2 with a follower pad, HUD hidden) and talks with Buu's Fury's Hercule portrait (126) in
+  the prologue, at Future Trunks' visit and in the epilogue. Our notes' state table had the sprint and the walk
+  states mixed up; corrected.
 - **Scene-ending sweep** (Ryan: find more like the chair lock): every scene we edited compared with the stock steps
   it cut (a reviewer expanded every `stock` / `stockseq` line). Fixed: the forest spirit fight kept the camera
   panned to the clearing's top (now `SetActiveEntity 0` after the fight starts); the wishes left Gohan as player

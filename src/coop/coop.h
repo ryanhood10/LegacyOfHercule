@@ -48,6 +48,9 @@ void cg_choice_input(u16 *p1, u16 *p2);   // input.c, every poll while a questio
 void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehameha the script does not wait for (on 0 ends it)
 u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
+int p2_pad_present(void);    // a second controller sends input (input.c)
+int companion_active(void);  // companion.c: old Hercule follows player 1 in the prologue alone
+u16 companion_pad(void);     // companion.c: his pad
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
 void players_reset(void);    // players.c: the Select Game screen arms the 1 / 2 players question
 int players_one(void);       // players.c: one player chosen (player 2 kept out)

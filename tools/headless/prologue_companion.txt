@@ -1,0 +1,102 @@
+# The prologue alone (src/coop/companion.c): on the PLAY ROM (`make`, not DEBUG_MENU), power on, Select Game,
+# new game, answer 1 Player; old Hercule (party slot 5, sprite 158, portrait 126) is player 2 driven by the
+# follower: coop.p2 is set, his lines show the Buu's Fury portrait, he follows Trunks (shots c3 / c4), and only
+# player 1's HUD panel shows. python tools/headless/st_test.py tools/headless/prologue_companion.txt build/log2-coop.gba --out build/<dir>
+frames 1500
+key 8 6
+frames 200
+key 1 6
+frames 300
+key 1 6
+frames 600
+stepnz 0x0203FA49 40
+frames 60
+key 1 6
+frames 120
+shot c0_answered
+key 1 6
+frames 120
+shot c1_00
+key 1 6
+frames 120
+shot c1_01
+key 1 6
+frames 120
+shot c1_02
+key 1 6
+frames 120
+shot c1_03
+key 1 6
+frames 120
+shot c1_04
+key 1 6
+frames 120
+shot c1_05
+key 1 6
+frames 120
+shot c1_06
+key 1 6
+frames 120
+shot c1_07
+key 1 6
+frames 120
+shot c1_08
+key 1 6
+frames 120
+shot c1_09
+key 1 6
+frames 120
+shot c1_10
+key 1 6
+frames 120
+shot c1_11
+key 1 6
+frames 120
+shot c1_12
+key 1 6
+frames 120
+shot c1_13
+key 1 6
+frames 120
+shot c1_14
+key 1 6
+frames 120
+shot c1_15
+key 1 6
+frames 120
+shot c1_16
+key 1 6
+frames 120
+shot c1_17
+key 1 6
+frames 120
+shot c1_18
+key 1 6
+frames 120
+shot c1_19
+key 1 6
+frames 120
+shot c1_20
+key 1 6
+frames 120
+shot c1_21
+frames 120
+echo == coop.p2 (the companion: nonzero)
+peek 0x0203FF08 1
+deref p2 0x0203FF08
+shot c2_free
+keys 0x10
+frames 120
+keys 0
+frames 90
+shot c3_walked_right
+map
+deref p2x p2+0x158
+keys 0x80
+frames 90
+keys 0
+frames 90
+shot c4_walked_down
+map
+deref p2x p2+0x158
+deref p2y p2+0x15C

@@ -139,7 +139,9 @@ finds row 4 first).
 | 122+ | free (122-123 allocated to the Super 13 boss; 124-125 to Super Saiyan 2 Gohan, unused: his row uses the stock 61 / 12) | `krillinsprites.py` asserts ids are unique |
 | 122 | Super Android 13's dialogue portrait (Android 16's made blue, white-haired) | Makefile `S13_PORTRAIT`, `--extra-portrait`; dialogue `text 122 "SUPER 13: ..."` |
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
-| 124+ | 124-125 allocated to Super Saiyan 2 Gohan; 126+ free | `krillinsprites.py` asserts ids are unique |
+| 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
+| 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
+| 127+ | free | `krillinsprites.py` asserts ids are unique |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).
@@ -259,6 +261,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |
 | 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
+| 0x0203FA54 | 0x8 | `.party.cp` companion state (`companion.c`) |
 | 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
 | 0x0203FA58-0x0203FB00 | 0xA8 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |

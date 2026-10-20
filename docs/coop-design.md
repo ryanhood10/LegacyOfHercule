@@ -11,9 +11,10 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
   | anim | state object | vtable | update (slot 2) | meaning |
   |---|---|---|---|---|
   | 0 | `0x03001F64` | `0x08025A84` | `0x08007F35` | idle: D-pad press -> facing + anim 1; same direction twice within 20 frames -> anim 0xD; fidget anim 0xE after 0x400 frames |
-  | 1 | `0x03001F44` | `0x080256C4` | `0x0800811F` | walk: moves `+0x158/+0x15C` (8.8 fixed) by speed `+0x188` along facing `+0x10`; collision via `0x08006366(ctx[4], &pos)`; wall -> sound 8, anim 0x1F |
+  | 1 | `0x03001F44` | `0x080258DC` | `0x08008031` | walk (all directions): the diagonal / 8-way state; plain walking runs here (corrected 2026-10-20) |
+  | 0xD | `0x03001F48` | `0x080256C4` | `0x0800811F` | **sprint** (a direction twice within 20 frames; corrected 2026-10-20: the anim table at `0x083B5278` maps 0xD to this 4-way walk state, not to `0x08025E20`): moves `+0x158/+0x15C` (8.8 fixed) by speed `+0x188` along facing `+0x10`; collision via `0x08006366(ctx[4], &pos)`; wall -> sound 8, anim 0x1F |
   | ? | - | `0x080258DC` | `0x08008031` | diagonal/8-way variant (`0x08007D24` step helper, facing lookup `ctx+0x9C`) |
-  | 0xD | `0x03001F48` | `0x08025E20` | `0x080083C3` | dash / flight (EP drain against display row byte +7) |
+  | ? | - | `0x08025E20` | `0x080083C3` | flight / charge (EP drain against display row byte +7) |
   | 0x24 | `0x03002180` | `0x080256AC` | `0x0801358C` (slot 1) | detransform (abilities 11 / 12 when the row's flag bit 0 is set): group 21 of the current record (record + 0x19C), frame = counter / 16 for 64 frames, then back through the row's link |
   | 0x25 | `0x03002188` | `0x08025CE0` | `0x0801560E` (slot 1) | transform (bit 0 clear): plays group 9, then the row's link |
   | 30 | `0x03002268` | `0x08025038` | `0x0801CB24` (slot 1) | NPC beam pose (`NPCFireKamehameha`): sprite group 18, frame 0 for 8 frames, then 1 / 2 every 8; never leaves by itself |
@@ -1262,6 +1263,16 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   glow clears the cached frame (+0x20) so the remap shows; a downed player 2's form change keeps the pose.
   Untested: going down while charging a held beam (the forced exit that once crashed `p2_cycle`).
 - Base Android 13 has no dialogue portrait yet (123 is allocated); he speaks as narration.
+- **The sprint bump (fixed 2026-10-20, Ryan's report):** our port of the 4-way walk (`player.c` `walk_update`,
+  which only the sprint uses) passed 0 as the collision check's box where the stock passes the entity's box
+  (+0x154, `r2` at 0x0800816E): `0x08006366` read a box from address 0 and the sprint bumped on open ground.
+- **Old Hercule in the prologue alone (2026-10-20, `src/coop/companion.c`):** while party slot 5 shows old
+  Hercule (row 24, the future prologue) and no second controller plays (1 Player, or no pad), player 2 is still
+  spawned for him with a follower pad (walk toward player 1 beyond 28 px; jump beside him when walled off far
+  behind); his HUD panel is hidden; a real second controller takes him over; when the present day drops him from
+  the party he leaves (`p2_drop_out`). The Future Trunks visit already has him as an actor (sprite 158) in both
+  modes. His lines there, in the prologue and in the epilogue use portrait 126 (Buu's Fury's Hercule,
+  `tools/oldherculeportrait.py`). Test: `tools/headless/prologue_companion.txt` (the play ROM).
 - **Known, kept:** speakers who are player 2 in co-op talk off screen alone (old Hercule in the prologue, Krillin,
   Hercule, Android 16 in "Gero's computer", who is only in the party). The test runner's `stepz` no longer presses
   player 2's pad after `p2 off`, so one-player runs stay one-player.

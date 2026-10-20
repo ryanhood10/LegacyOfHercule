@@ -141,7 +141,8 @@ void p2_sync_combat(void) {
     else install_behaviour(p2, slot);
 }
 
-// ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F) ------------------------------------
+// ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F): the 4-way walk the sprint uses (anim 0xD,
+// state 0x03001F48); plain walking is the diagonal state below (anim 1, 0x03001F44) ----------------
 void walk_update(void *st, Entity *e) {
     (void)st;
     InputSystem *in = input_for(e);
@@ -151,7 +152,8 @@ void walk_update(void *st, Entity *e) {
         s32 nx = e->x + v->dx * e->speed;
         s32 ny = e->y + v->dy * e->speed;
         s32 px[2] = { nx >> 8, ny >> 8 };
-        if (!Collision_Check(COLLISION_MAP, px, 0)) {
+        if (!Collision_Check(COLLISION_MAP, px, (u8 *)e + 0x154)) {   // the stock passes the entity's box (+0x154)
+                                                                    // here too: 0 read a box from address 0 and the sprint bumped
             camera_shake_safe(8, 100);
             Entity_SetAnimation(e, ANIM_BUMP);
             play_cant_sfx();

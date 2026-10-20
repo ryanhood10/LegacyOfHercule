@@ -52,6 +52,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `duel.c` | player-vs-player duel: opponent hits, final blow to 1 HP, winner, pad swap, shadow clone in party slot 7 (`DUEL_SLOT`) |
 | `vmcall.c` | `CoopCall` (game action 59), the script -> C bridge: duels, winner, Hercule's awakening, player 2, Broly's staging and PartyKeep (9 / 10), Android 16 joining and leaving (11 / 12), the training waves (13 / 14), the Cell Games' solo fights and held beams (15 / 16), Super 13 (17), the yes / no question (18), Super Saiyan 2 Gohan joining (20) (`docs/scripts.md` 2.2b) |
 | `waves.c` | the Time Chamber's training waves: ten fixed rounds of stock enemies spawned around the players, round captions through the chamber script, "Training completed!"; state `waves` in `.party.wv` (0x0203F880 in the merged build; it moves with `.party.kr`, check `coop.map`); `COOP_CMD_WAVE_CLEAR` / `_SKIP` tests (`docs/story.md` 4g, `docs/testing.md`) |
+| `companion.c` | old Hercule follows player 1 in the future prologue when nobody plays player 2 (player 2 with a follower pad) |
 | `players.c` | the 1 / 2 players question at every game start (Select Game arms it; CoopCall 21; one player keeps player 2 out) |
 | `revive.c` | reviving a downed partner: going down, the countdown, holding A beside the body, the bars, game over (`docs/coop-design.md` "Revive"); state `.party.rv`, test command 10 |
 | `difficulty.c` | Easy / Normal / Hard: enemy HP, damage, speed, twins, boss HP, revive time, drop rolls (`difficulty.h`, flags 460 / 461) |
@@ -102,6 +103,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `romdata.py` | reads/writes the character tables (party, growth, abilities, EXP) and compiles `data/*.json`; `build --party-slots N` targets the relocated N-entry table |
 | `script_dump.py` | dumps a map's dialogue sequences and bytecode scripts; writes text records |
 | `script_asm.py` | lscript text form of scripts and dialogue: dump, assemble into free ROM, round trip over every stock script (`docs/scripts.md`) |
+| `oldherculeportrait.py` | old Hercule's dialogue portrait (126) from Buu's Fury's Hercule portrait (module 0x086F393C id 76) -> `build/gen/oldherc_portrait_data.c` |
 | `gen_journal.py` | generates `build/gen/journal_data.c`, the journal's quest table: the stock quests plus our chapters' entries (`docs/scripts.md` 2.6) |
 | `gen_postgame.py` | generates `data/story/postgame.lscript` (the Lookout after the Cell Games: wishes, finale, the Buu's Fury question, the ending) from the stock dumps plus our edits |
 | `gen_cell_games.py` | generates `data/story/cell_games.lscript` from the arena maps' stock dumps plus our edits (edit the chapter there) |

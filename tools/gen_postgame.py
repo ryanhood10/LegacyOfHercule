@@ -180,9 +180,9 @@ for pass_no in (1, 2):
     b = b[:-1] + ["SpawnCharacterEntity 158, 640, 520", "WalkToPosition 158, 560, 504", "SetEntityFacing 158, 2"] + b[-1:]
     script(b, "the epilogue's staging (stock entry 0): Trunks back in his time; no Androids; old Hercule walks up")
     text(101, "TRUNKS: I'm back.\\x0bNow I'm ready to take the Androids down!")
-    text(67, "OLD HERCULE: Hey, Trunks!  You're too late!\\x0bI already beat them with my Megaton Punch while you were gone!")
+    text(126, "OLD HERCULE: Hey, Trunks!  You're too late!\\x0bI already beat them with my Megaton Punch while you were gone!")
     text(101, "TRUNKS: You...  what?!")
-    text(67, "OLD HERCULE: I don't know what it is...\\x0bbut lately I feel stronger than I've ever been!")
+    text(126, "OLD HERCULE: I don't know what it is...\\x0bbut lately I feel stronger than I've ever been!")
     text(0, "@^The End.\\x0bThanks for playing!")
     script(["ReturnToTitleScreen"])
     emit("end")

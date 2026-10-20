@@ -26,13 +26,19 @@ static void poll_into(InputSystem *in, u16 now) {
 // g_p2_remote (coop.h): an emulator-side script (tools/mgba/p2_input.lua) writes player 2's buttons
 // there: bit 15 = valid, bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
 
-int p2_present(void) {
-    if (players_one()) return 0;      // one player chosen at the game's start (players.c)
+// a second controller is sending input (or a test mode implies one)
+int p2_pad_present(void) {
 #if P2_MODE == P2_MODE_SIO
     return coop.source_age < P2_SOURCE_TIMEOUT;
 #else
     return 1;
 #endif
+}
+
+int p2_present(void) {
+    if (companion_active()) return 1;  // old Hercule walks with Trunks in the prologue alone (companion.c)
+    if (players_one()) return 0;      // one player chosen at the game's start (players.c)
+    return p2_pad_present();
 }
 
 #if P2_MODE == P2_MODE_SIO
@@ -167,6 +173,7 @@ void input_poll_hook(InputSystem *in) {
         break;
     default: break;
     }
+    if (companion_active()) p2 = companion_pad();   // companion.c: old Hercule follows player 1
     revive_input(&p1, &p2);                // revive.c: a downed player's pad, the partner's A beside the body
 #ifdef A16_TEST
     if (coop2.a16_bot && s13.boss && is_s13(s13.boss) && s13.boss->hp > 0) {   // Super Android 13

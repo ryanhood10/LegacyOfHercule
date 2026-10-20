@@ -87,7 +87,7 @@ static void hud2_ensure_tiles(void) {
 void hud_draw_hook(Hud *h, u32 **oam) {
     Hud_Draw(h, oam);
     revive_draw(oam);   // revive.c: the countdown and revive bars over a downed player
-    if (!coop.p2) return;
+    if (!coop.p2 || companion_active()) return;   // no panel for the prologue's companion (companion.c)
     hud2_ensure_tiles();
     coop.hud2.y = h->y;
     emit_sprites(&coop.hud2, oam, wide_w() - 96);   // 144 at 240 wide (HUD2_X_OFFSET)
