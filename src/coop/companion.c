@@ -1,15 +1,18 @@
-// A companion for one player (Ryan, 2026-10-20; docs/coop-design.md "One player"): when nobody plays player 2
-// (1 Player chosen, or no second controller), player 2 is still spawned for one character, its pad driven by a
-// simple follower (walk toward player 1 beyond COMPANION_NEAR px; jump beside him when walled off far behind):
-//   * the story's lead, when player 1 plays someone else: the lead is the character the story scripts last made
-//     active (SetActiveCharacter / ...NoReset, wrapped below; flags 464-467 hold slot + 1, saved with the game),
-//     so Gohan walks with a player who switched to Krillin, and his scenes have him;
-//   * old Hercule in the future prologue (party slot 5 on his old look, display row OLD_HERCULE_ROW), who is player
-//     2 there in co-op.
-// The companion is not a player for the rules: no twins or co-op scaling (p2_coming), no revive, enemies ignore
-// him and he takes no damage, scenes see one player (CoopCall 5) and duels are skipped. His HUD panel is hidden.
-// A real second controller takes over (2 Players); when the reason ends (player 1 plays the lead again, the
-// prologue drops old Hercule) he leaves (p2_drop_out).
+// Companions and the story's lead (Ryan, 2026-10-20; docs/coop-design.md "One player").
+//
+// The lead: the character the story scripts last made active (VM steps 70 SetActiveCharacter / 115 ...NoReset,
+// wrapped below; flags 464-467 hold slot + 1, saved with the game; none noted yet reads Gohan while he is in the
+// party). Stock scenes are written for the lead: their "player" lines (speaker 1, the active character's box) are
+// the lead's ("#GOHAN: how does he know about my father?"). So:
+//   * speaker 1 shows the lead's portrait when someone else plays (the portrait getter, below), alone or in co-op;
+//   * alone, playing someone else, the lead walks in for the scenes that give him lines: player 2 is spawned for
+//     him at the scene's start (again after a map change inside it) and leaves at its end. Nobody is swapped and he
+//     does not follow in free play.
+// Old Hercule in the future prologue (party slot 5 on his old look, display row OLD_HERCULE_ROW) is player 2 there
+// in co-op; alone he walks along with player 1 (a follower pad).
+// A companion is not a player for the rules: no twins or co-op scaling (p2_coming), no revive, enemies ignore him
+// and he takes no damage, scenes see one player (CoopCall 5) and duels are skipped. His HUD panel is hidden. A real
+// second controller takes over (2 Players).
 #include "coop.h"
 #include "krillin.h"
 
@@ -20,7 +23,7 @@
 
 static u16 stuck __attribute__((section(".party.cp")));
 static s32 last_d2 __attribute__((section(".party.cp")));
-static struct { u8 swapped, player, lead, p2; } sw __attribute__((section(".party.cp")));   // a scene's swap (p2: player 2's slot before it)
+static struct { u8 standin, lead, _pad[2]; } sc __attribute__((section(".party.cp")));   // a scene's stand-in lead
 
 // ---- the story's lead -------------------------------------------------------------------------------
 static int lead_slot(void) {
@@ -50,59 +53,64 @@ ROM_FN(void, Step_SetActiveCharacterNoReset, (s32 *st), 0x0800A681);
 void vm_set_active_hook(s32 *st) { lead_set(st[st[0]]); Step_SetActiveCharacter(st); }
 void vm_set_active_noreset_hook(s32 *st) { lead_set(st[st[0]]); Step_SetActiveCharacterNoReset(st); }
 
-// ---- who follows -------------------------------------------------------------------------------------
 static int usable(int slot) {
     if (slot < 0 || slot >= PARTY_SLOTS || slot == g_Party->active_slot) return 0;
     return (g_Party->chars[slot].flags & 3) == 3;              // in the party and available (not story-locked away)
 }
 
+// the lead when someone else plays (and he is in the party), else -1
+static int other_lead(void) {
+    int lead = lead_slot();
+    return lead >= 0 && lead != g_Party->active_slot && (g_Party->chars[lead].flags & 1) ? lead : -1;
+}
+
+// ---- the portrait getter (0x0800BDCC, re-implemented: an entry jump) ----------------------------------
+// id 0 none; 1 the active character's (the lead's when someone else plays); 2-7 party slot id - 2; 8+ the
+// portrait module table (the getter's literal at 0x0800BE10: word 0 the party, word id + 1 a portrait)
+ROM_FN(int, Character_Portrait, (const CharacterEntry *c), 0x08026441);
+int portrait_get_hook(int id) {
+    if (!id) return 0;
+    if (id == 1) {
+        int lead = other_lead();
+        return Character_Portrait(&g_Party->chars[lead >= 0 ? lead : g_Party->active_slot]);
+    }
+    if (id < 8) return Character_Portrait(&g_Party->chars[id - 2]);
+    return (*(const s32 *const *)0x0800BE10)[id + 1];
+}
+
+// ---- who walks along ---------------------------------------------------------------------------------
 static int alone(void) { return (players_one() || !p2_pad_present()) && !coop_solo() && !coop2.duel_active; }
 
 int companion_slot(void) {
     if (!alone()) return -1;                                   // a second controller plays player 2; a solo fight; a duel
-    if (sw.swapped && usable(sw.player)) return sw.player;     // a scene: the player's own character beside the lead
+    if (sc.standin && usable(sc.lead)) return sc.lead;         // a scene: the lead walks in
     const CharacterEntry *h = &g_Party->chars[HERCULE_SLOT];
     if ((h->flags & 1) && h->display_row == OLD_HERCULE_ROW && g_Party->active_slot != HERCULE_SLOT)
         return HERCULE_SLOT;                                   // the future prologue
-    int lead = lead_slot();
-    return usable(lead) ? lead : -1;
+    return -1;
 }
 
 int companion_active(void) { return companion_slot() >= 0; }
 
-// ---- scenes: the lead plays them --------------------------------------------------------------------
-// Stock scenes give the player's lines and place to whoever plays (written for the story's lead: "GOHAN: how does
-// he know my father?"). So a dialogue sequence starts with the lead as player 1 when player 1 plays someone else:
-// alone, the player's own character becomes the companion (the co-op staging); with two players, a player 2 who
-// plays the lead trades with player 1 for the scene, and otherwise player 2 stays (only two characters can stand
-// in). The end puts everyone back (unless the scene itself changed who plays): coop_active_check trades player 2. The sequence start / end are
-// 0x0800B4AE / 0x0800B4FC, re-implemented here (entry jumps, tools/patch_rom.py) with the swap added.
+int companion_is(const Entity *e) { return e && e == coop.p2 && companion_active(); }
+
+// ---- scenes: the lead walks in -----------------------------------------------------------------------
+// The dialogue sequence start / end (0x0800B4AE / 0x0800B4FC) are re-implemented here (entry jumps,
+// tools/patch_rom.py): alone, playing someone else, a sequence with a speaker-1 line spawns player 2 for the lead
+// beside player 1 for its length.
 #define SCENE_STATE   ((volatile u32 *)0x03001FD8)   // +0 cleared at a start, +4 = a sequence runs
 
-static void set_active(int slot) { s32 st[2] = { 1, slot }; Step_SetActiveCharacter(st); }
-
-static void scene_swap_in(void) {
-    if (sw.swapped || coop_solo() || coop2.duel_active || !g_PlayerObject) return;   // alone or with player 2
-    int lead = lead_slot(), act = g_Party->active_slot;
-    if (lead < 0 || lead == act || !usable(lead)) return;
-    sw.player = (u8)act;
-    sw.lead = (u8)lead;
-    sw.p2 = coop.p2_slot;
-    sw.swapped = 1;
-    set_active(lead);
-    if (coop.p2 && (alone() || coop.p2_slot == lead)) p2_bind_slot(act);   // the companion, or player 2 who played the lead
-}
-
-static void scene_swap_out(void) {
-    if (!sw.swapped) return;
-    sw.swapped = 0;
-    if (g_Party->active_slot != sw.lead || !usable(sw.player)) return;   // the scene changed who plays
-    set_active(sw.player);
-    // player 2 back to its character (a map reload in the scene may have despawned it: then its respawn picks it)
-    if (sw.p2 < PARTY_SLOTS && sw.p2 != sw.player) {
-        if (coop.p2) p2_bind_slot(sw.p2);
-        else coop.p2_slot = sw.p2;
+// does the sequence give the player (speaker 1) a line? (entries: u16 next, u8 mode, u8 speaker for text modes 1-4;
+// a word whose top 16 bits are 0 stops the scan)
+static int has_player_lines(const void *seq) {
+    const u32 *e = seq;
+    for (int i = 0; i < 160; i++) {
+        u32 w = e[i];
+        if (!(w >> 16)) return 0;
+        const u8 *ent = (const u8 *)w;
+        if (ent[2] >= 1 && ent[2] <= 4 && ent[3] == 1) return 1;
     }
+    return 0;
 }
 
 u32 *scene_begin_hook(u32 *r, const void *seq, u16 *idx, const u32 *pair, u32 arg) {
@@ -116,7 +124,12 @@ u32 *scene_begin_hook(u32 *r, const void *seq, u16 *idx, const u32 *pair, u32 ar
     SCENE_STATE[0] = 0;
     *(u16 *)(r + 2) = *idx;
     SCENE_STATE[1] = 1;
-    scene_swap_in();
+    int lead = other_lead();
+    if (alone() && !sc.standin && lead >= 0 && usable(lead) && !coop.p2 && has_player_lines(seq)) {
+        sc.lead = (u8)lead;
+        sc.standin = 1;
+        p2_spawn_now();                                        // the lead walks in beside player 1
+    }
     EntityList_Broadcast(g_EntityList, 0xD, 0);                // a cutscene starts
     return r;
 }
@@ -125,15 +138,23 @@ void scene_end_hook(u32 *r, int free_it) {
     SCENE_STATE[1] = 0;
     EntityList_Broadcast(g_EntityList, 0xE, 0);                // the cutscene ends
     if (free_it) Arena_Free(r);
-    scene_swap_out();
+    if (sc.standin) {
+        sc.standin = 0;
+        if (coop.p2 && !companion_active()) p2_drop_out();     // the stand-in leaves with the scene
+    }
 }
 
-int companion_is(const Entity *e) { return e && e == coop.p2 && companion_active(); }
+// every input poll: a map change inside the scene removed the stand-in: bring him back
+void companion_tick(void) {
+    if (sc.standin && SCENE_STATE[1] && !coop.p2) p2_spawn_now();
+    if (sc.standin && !SCENE_STATE[1]) sc.standin = 0;        // a scene that ended without its end call
+}
 
-// player 2's pad while the companion walks: toward player 1 (both axes, so diagonals work)
+// player 2's pad while a companion walks: toward player 1 (both axes, so diagonals work); a scene's stand-in
+// stands still (the scene stages everyone)
 u16 companion_pad(void) {
     Entity *p1 = g_PlayerObject, *p2 = coop.p2;
-    if (!p1 || !p2 || !p1_in_play()) { stuck = 0; return 0; }
+    if (!p1 || !p2 || !p1_in_play() || sc.standin) { stuck = 0; return 0; }
     int slot = companion_slot();
     if (slot >= 0 && coop.p2_slot != slot) p2_bind_slot(slot);   // the companion is this character now
     s32 dx = (p1->x - p2->x) >> 8, dy = (p1->y - p2->y) >> 8;

@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Cutscenes cleaned up** (Ryan: the swap made scenes jumpy; the lead should only walk in for cutscenes): no
+  more swapping and no follower in free play. Speaker-1 lines show the story's lead's portrait when someone
+  else plays (the portrait getter re-implemented); alone, the lead walks in as player 2 for the scenes that give
+  him lines and leaves at their end. The summit's per-character lines got their own speaker ids.
 - **Older saves:** no lead noted yet reads Gohan (Ryan's save from before the lead was noted showed no Gohan and
   Krillin's portrait on Gohan's line); a downed player 1 whose player 2 leaves for a companion is a game over.
 - **Scenes alone as someone else** (Ryan: Gohan missing from Frieza's landing while playing Krillin, and Krillin

@@ -1,7 +1,6 @@
-# Scenes with two players and a pair other than the story's lead (companion.c scene swap), Frieza's landing with
-# Gohan the lead (flags 464-467 = 1) and player 1 Krillin: case A, player 2 Gohan (they trade for the scene: player 1
-# Gohan, player 2 Krillin; after it Krillin / Gohan again); case B, player 2 Hercule (player 1 Gohan for the scene,
-# Hercule stays; after it Krillin / Hercule). From a debug-menu savestate (--out = the folder holding menu.ss).
+# Scenes with two players and a pair other than the story's lead (companion.c), Frieza's landing with Gohan the lead
+# (flags 464-467 = 1) and player 1 Krillin: nobody is swapped (case A player 2 Gohan, case B player 2 Hercule stay as
+# they are through the scene); speaker-1 lines show the lead's portrait. From a debug-menu savestate (--out = the folder holding menu.ss).
 p2 0
 maptest 52
 frames 200
@@ -17,7 +16,7 @@ peek8 0x0203F000 1
 peek8 0x0203FF84 1
 key 1 6
 frames 60
-echo == case A in the scene: p1 slot (0 Gohan), p2 slot
+echo == case A in the scene: p1 slot (6, unchanged), p2 slot (unchanged)
 peek8 0x0203F000 1
 peek8 0x0203FF84 1
 shot sA_in
@@ -43,7 +42,7 @@ peek8 0x0203F000 1
 peek8 0x0203FF84 1
 key 1 6
 frames 60
-echo == case B in the scene: p1 slot (0 Gohan), p2 slot
+echo == case B in the scene: p1 slot (6, unchanged), p2 slot (unchanged)
 peek8 0x0203F000 1
 peek8 0x0203FF84 1
 shot sB_in

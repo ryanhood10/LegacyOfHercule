@@ -428,6 +428,9 @@ static void ensure_p2(Entity *p1) {
     coop.spawns++;
 }
 
+// Player 2 now, outside player 1's idle update (a scene's stand-in, companion.c)
+void p2_spawn_now(void) { if (g_PlayerObject) ensure_p2(g_PlayerObject); }
+
 // Entry hook kept on the idle slot so P2 is (re)created whenever P1 stands on a map.
 void idle_update_hook(IdleState *st, Entity *e) {
     coop_init_once();

@@ -173,10 +173,10 @@ sequence summit_scene
       L4:
         PushByte 13
         END
-  text 1 "Hmph.  Another tin can to scrap." -> 14
-  text 1 "Uh...  is it too late to go home?" -> 14
-  text 1 "18...  You'll pay for this!" -> 14
-  text 1 "Careful.  He's stronger than Cell was." -> 14
+  text 106 "VEGETA: Hmph.  Another tin can to scrap." -> 14
+  text 67 "HERCULE: Uh...  is it too late to go home?" -> 14
+  text 73 "KRILLIN: 18...  You'll pay for this!" -> 14
+  text 90 "PICCOLO: Careful.  He's stronger than Cell was." -> 14
   text 1 "We have to stop this!"
   script                                 ; [14] player 2 answers when there is one; alone, straight to the fight
         CoopCall 5, 0, 0, 0
