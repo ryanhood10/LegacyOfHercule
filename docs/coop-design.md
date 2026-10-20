@@ -1273,18 +1273,23 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   scenes are written for the lead: their speaker-1 lines (the active character's box) are his. So:
   * **portraits:** the portrait getter (`0x0800BDCC`, re-implemented as `portrait_get_hook`) gives speaker 1 the
     lead's portrait when someone else plays (alone and in co-op); speakers 2-7 stay party slot id - 2;
-  * **the lead walks in (alone):** the dialogue sequence start / end (`0x0800B4AE` / `0x0800B4FC`,
-    re-implemented) spawn player 2 for the lead beside player 1 when a sequence gives speaker 1 a line and
-    someone else plays, again after a map change inside the scene (`companion_tick`), and remove him at its
-    end. Nobody is swapped; he does not follow in free play;
+  * **the lead as an actor (Ryan: walk or fly in like the others, never pop in):** when nobody plays the lead,
+    our scene scripts stage him as an ordinary actor who walks and flies in with the rest of the cast. The steps
+    are guarded by CoopCall 22 (op 1 slot: in the party and played by neither player, player 2 counting while a
+    second player is in even before his entity respawns after a warp; op 2 sprite: such an actor stands on the
+    map; op 3: the lead's name in capitals for "%s: Hey dad!"). Done for the Frieza stretch (`ch1_opening`):
+    kid Gohan in armour (sprite 55) walks up with the Z fighters at the landing (map 52), stands with them on the
+    return, flies in with the group at the Goku-arrival site (map 54), walks up to Trunks for "how do you know my
+    dad?", kneels beside the others when Goku lands and turns to him. Nobody is swapped; nobody follows in free
+    play; the sequence start / end are stock again;
   * **old Hercule (alone):** while party slot 5 shows him (row 24, the future prologue) he walks along with player
     1 (player 2 with a follower pad: toward player 1 beyond 28 px, a jump beside him when walled off far behind).
   A companion is no player for the rules: `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him
   (`coop_target`), he takes no hits, the damage and speed multipliers and the revive see one player, CoopCall 5
   reads 0 and duels are skipped; his HUD panel is hidden; a real second controller takes over (2 Players). A
   downed player 1 whose player 2 leaves for a companion is a game over. Our scripts' per-character player lines
-  (the summit) use their own speaker ids, not 1. Tests: `tools/headless/scene_swap.txt`, `scene_swap_2p.txt`,
-  `prologue_companion.txt` (the play ROM). Old Hercule's lines use portrait 126 (Buu's Fury's Hercule,
+  (the summit) use their own speaker ids, not 1. Tests: `tools/headless/scene_actor.txt` (the landing in four pairings and the
+  arrival alone: the actor's count by `entrec`), `prologue_companion.txt` (the play ROM). Old Hercule's lines use portrait 126 (Buu's Fury's Hercule,
   `tools/oldherculeportrait.py`).
 - **Known, kept:** speakers who are player 2 in co-op talk off screen alone (old Hercule in the prologue, Krillin,
   Hercule, Android 16 in "Gero's computer", who is only in the party). The test runner's `stepz` no longer presses

@@ -76,8 +76,6 @@ ENTRY_JUMPS = [
     (0x0801EEFC, "input_poll_hook"),         # Input_Poll
     (0x0800233E, "status_tabs_hook"),        # pause-menu tab strip: tab images by distance, at most 8 tabs (krillin.c)
     (0x080069A4, "entity_list_update_hook"), # EntityList_Update
-    (0x0800B4AE, "scene_begin_hook"),       # dialogue sequence start: alone, the lead walks in (companion.c)
-    (0x0800B4FC, "scene_end_hook"),         # dialogue sequence end: the stand-in leaves
     (0x0800BDCC, "portrait_get_hook"),      # text portraits: speaker 1 is the story's lead when someone else plays (companion.c)
     (0x0800E4D2, "exp_award_hook"),          # enemy death -> EXP event
     (0x0800E77E, "enemy_spawn_hook"),        # MapScript_CreateEnemy (map loader record handler)

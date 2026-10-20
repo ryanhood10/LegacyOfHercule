@@ -107,8 +107,17 @@
         "zone": 3,
         "area": 6
       },
-      "_": "waiting for Goku: no Krillin NPC; old Hercule (sprite 158) stands beside Trunks and leaves with him",
+      "_": "waiting for Goku: no Krillin NPC; old Hercule (sprite 158) stands beside Trunks and leaves with him; when nobody plays Gohan his actor (sprite 55) flies in with the group, walks up to Trunks and stands with the others (CoopCall 22 guards)",
       "pre_edits": [
+        {
+          "at": "record:6/talk/entry:0",
+          "replace": [
+            [
+              "SetPlayerVisible 0",
+              "SetPlayerVisible 0\nCoopCall 22, 2, 55, 0\nJumpIfFalse G1\nWalkToPosition 55, 192, 488\nWalkToPosition 55, 192, 472\nSetEntityFollow 55, 128\nG1:"
+            ]
+          ]
+        },
         {
           "at": "record:6/talk/entry:18",
           "replace": [
@@ -119,6 +128,14 @@
             [
               "SetEntityAnimation 76, 4",
               ""
+            ],
+            [
+              "WalkToPosition 0, 376, 456",
+              "WalkToPosition 0, 376, 456\nCoopCall 22, 2, 55, 0\nJumpIfFalse G1\nWalkToPosition 55, 400, 472\nSetEntityFacing 55, 1\nG1:"
+            ],
+            [
+              "SetEntityAnimation 0, 4",
+              "SetEntityAnimation 0, 4\nCoopCall 22, 2, 55, 0\nJumpIfFalse G2\nSetEntityAnimation 55, 4\nG2:"
             ]
           ]
         },
@@ -127,7 +144,7 @@
           "replace": [
             [
               "SetEntityFollow 0, 62",
-              "SetEntityFollow 0, 62\nSetEntityFollow 158, 128"
+              "SetEntityFollow 0, 62\nSetEntityFollow 158, 128\nCoopCall 22, 2, 55, 0\nJumpIfFalse G1\nSetEntityFollow 55, 62\nG1:"
             ]
           ]
         },
@@ -137,6 +154,15 @@
             [
               "SetEntityAnimation 76, 4",
               ""
+            ]
+          ]
+        },
+        {
+          "at": "record:6/talk/entry:19",
+          "replace": [
+            [
+              "PushActiveCharNameUpper",
+              "CoopCall 22, 3, 0, 0"
             ]
           ]
         }
@@ -163,11 +189,11 @@
           "replace": [
             [
               "SetEntityPositionInstant 76, 592, 520",
-              ""
+              "CoopCall 22, 1, 0, 0\nJumpIfFalse G1\nSpawnCharacterEntity 55, 592, 520\nG1:"
             ],
             [
               "FlyToPosition 76, 456, 488",
-              ""
+              "CoopCall 22, 2, 55, 0\nJumpIfFalse G2\nFlyToPosition 55, 456, 488\nSetEntityFacing 55, 2\nG2:"
             ]
           ]
         }

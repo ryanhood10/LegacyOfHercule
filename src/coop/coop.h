@@ -53,7 +53,7 @@ int companion_active(void);  // companion.c: a follower plays player 2 (one play
 int companion_slot(void);    // companion.c: its party slot, -1 none
 int p2_bind_slot(int slot);  // player.c
 u16 companion_pad(void);     // companion.c: his pad
-void companion_tick(void);   // companion.c: a scene's stand-in lead
+s32 companion_call(int op, int a);   // companion.c: CoopCall 22, the lead's actor in scenes
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
 void players_reset(void);    // players.c: the Select Game screen arms the 1 / 2 players question
 int players_one(void);       // players.c: one player chosen (player 2 kept out)
@@ -61,7 +61,6 @@ int players_take(void);      // players.c: CoopCall 21, the answer
 void players_tick(void);     // players.c: ask once player 1 is free
 int p2_coming(void);         // player 2's entity, or a pad and a party member for it (player.c)
 void p2_drop_out(void);
-void p2_spawn_now(void);     // player 2 now, outside player 1's idle update (player.c)
 int p1_in_play(void);        // player 1 in a player-driven control state (player.c)
 void duel_p2_left(void);     // duel.c: player 2 left during a duel: player 1 wins      // the second pad went away: player 2's entity leaves (player.c)
 int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)

@@ -1,0 +1,116 @@
+# Gohan's actor in the Frieza stretch (data/story/ch1_opening, CoopCall 22): when nobody plays Gohan he walks and
+# flies in with the others as an actor (sprite 55, record 0x0828FF38); when a player is Gohan there is none. Frieza's
+# landing in four pairings, then the Goku-arrival site alone as Krillin (the fly-in). Nobody is swapped (p1 / p2 slots
+# unchanged). Runner: entrec (st_headless.c). From a debug-menu savestate (--out = the folder holding menu.ss).
+echo setup
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+echo == alone as Krillin: the gathering, Gohan's actor (1)
+entrec 0x0828FF38
+shot k1_in
+mash 130 110
+frames 300
+echo == alone as Krillin: after the landing scenes, no actor left (0)
+entrec 0x0828FF38
+shot k1_after
+echo == alone as Krillin: p1 slot, p2 slot (unchanged)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+echo == alone as Gohan: the gathering, Gohan's actor (0)
+entrec 0x0828FF38
+shot g1_in
+mash 130 110
+frames 300
+echo == alone as Gohan: after the landing scenes, no actor left (0)
+entrec 0x0828FF38
+shot g1_after
+echo == alone as Gohan: p1 slot, p2 slot (unchanged)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 0
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 6
+poke8 0x0203FF84 0
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+echo == Krillin and player 2 Gohan: the gathering, Gohan's actor (0)
+entrec 0x0828FF38
+shot kg_in
+mash 130 110
+frames 300
+echo == Krillin and player 2 Gohan: after the landing scenes, no actor left (0)
+entrec 0x0828FF38
+shot kg_after
+echo == Krillin and player 2 Gohan: p1 slot, p2 slot (unchanged)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 0
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 6
+poke8 0x0203FF84 5
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+echo == Krillin and player 2 Hercule: the gathering, Gohan's actor (1)
+entrec 0x0828FF38
+shot kh_in
+mash 130 110
+frames 300
+echo == Krillin and player 2 Hercule: after the landing scenes, no actor left (0)
+entrec 0x0828FF38
+shot kh_after
+echo == Krillin and player 2 Hercule: p1 slot, p2 slot (unchanged)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 off
+preset +4 +360 +21 +22
+maptest 54
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0603
+poke32 0x0203FD54 0x01C801A0
+poke32 0x0203FD08 5
+frames 500
+echo == the Goku-arrival site alone as Krillin: Gohan flew in with the group (1)
+entrec 0x0828FF38
+shot ar_in
+keys 0x20
+frames 200
+keys 0
+key 0x01 4
+frames 400
+echo == the talk: Gohan walked up to Trunks (1)
+entrec 0x0828FF38
+shot ar_talk

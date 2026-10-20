@@ -21,6 +21,8 @@
 //   stepz ADDR MAX         press A on both pads every 100 frames until the byte at ADDR is 0 (a pending win)
 //   mash N [F]             press A N times, F frames apart (50);  mashent NAME VTABLE MAX  ... until such an entity exists
 //   ents                   list the scene entities;  findent NAME VTABLE  NAME = first entity with that vtable
+//   entrec RECORD          count the entities on that sprite record (+0x48; an actor's sprite id -> record:
+//                          the table at *0x0800959C, entry id - 7)
 //   map                    print the current map (zone, area, variation) and player 1's position
 //   waitmap ZONE AREA MAX  run until that map is loaded (at most MAX frames)
 //   flags +N -N ...        story flags now (the bank at FLAGS)
@@ -281,6 +283,14 @@ int main(int argc, char **argv) {
                 printf("  ent %2u %08x vt %08x x %d y %d w180 %08x hp %d\n", i, e, r32(e), (int)r32(e + 0x158) >> 8,
                        (int)r32(e + 0x15C) >> 8, r32(e + 0x180), (int)r32(e + 0x188));
             }
+        }
+        else if (!strcmp(c, "entrec")) {    // entrec RECORD: how many entities use that sprite record (+0x48)
+            unsigned rec = num(tok[1]), cnt = r32(0x03001124), n = 0;
+            for (unsigned i = 0; i < cnt && i < 64; i++) {
+                unsigned e = r32(0x03001128 + 4 * i);
+                if (e && r32(e + 0x48) == rec) n++;
+            }
+            printf("entrec %08x: %u\n", rec, n);
         }
         else if (!strcmp(c, "mashent")) {   // mashent NAME VTABLE MAX: press A once a second until such an entity exists
             unsigned v = num(tok[2]), mx = num(tok[3]), at = 0, k;

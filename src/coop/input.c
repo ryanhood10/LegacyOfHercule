@@ -173,7 +173,6 @@ void input_poll_hook(InputSystem *in) {
         break;
     default: break;
     }
-    companion_tick();                                 // companion.c: a scene's stand-in lead
     if (companion_active()) p2 = companion_pad();   // companion.c: old Hercule follows player 1
     revive_input(&p1, &p2);                // revive.c: a downed player's pad, the partner's A beside the body
 #ifdef A16_TEST

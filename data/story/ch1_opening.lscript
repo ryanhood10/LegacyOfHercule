@@ -169,7 +169,7 @@ end
 ; Trunks knows him, he knocks out one of Frieza's soldiers (66) himself, and leaves with Trunks. Krillin's
 ; actor stays out (Krillin is in the party by now). Entries 0, 15, 37, 48 and 52 are restated from the stock.
 sequence ch1_frieza_landing
-  script                                 ; stock 0 without Krillin's actor: the Z fighters gather, Frieza and King Cold land
+  script                                 ; stock 0 without Krillin's actor: the Z fighters gather (Gohan's actor when nobody plays him), Frieza and King Cold land
         SetPlayerVisible 0
         PlayMusic 14
         PlayAudioBlocking 30, 120
@@ -182,6 +182,10 @@ sequence ch1_frieza_landing
         SpawnCharacterEntity 107, 240, 224
         SpawnCharacterEntity 23, 240, 216
         SpawnCharacterEntity 103, 216, 232
+        CoopCall 22, 1, 0, 0                  ; nobody plays Gohan: he walks in with the others (sprite 55)
+        JumpIfFalse G1
+        SpawnCharacterEntity 55, 248, 200
+      G1:
         BeginCommandBatch
         WalkToPosition 137, 152, 112
         SetEntityFacing 137, 1
@@ -196,6 +200,12 @@ sequence ch1_frieza_landing
         SetEntityAnimation 121, 4
         WalkToPosition 107, 208, 120
         SetEntityFacing 107, 1
+        CoopCall 22, 2, 55, 0
+        JumpIfFalse G2
+        WalkToPosition 55, 216, 112
+        SetEntityFacing 55, 1
+        SetEntityAnimation 55, 4
+      G2:
         CommitCommandBatch
         BeginCommandBatch
         WalkToPosition 23, 224, 120
@@ -314,10 +324,15 @@ sequence ch1_frieza_landing
         SetEntityFacing 134, 1
         END
   stockseq @083be798 38 47    ; Frieza falls, King Cold's offer, King Cold falls
-  script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule catches up
+  script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule runs up; Gohan's actor when nobody plays him
         SetStoryFlag 21
         WarpToMapWithEntities 3, 4, 1, 192, 88
         SetActiveEntity 0
+        CoopCall 22, 1, 0, 0                  ; Gohan with the others (Krillin's spot)
+        JumpIfFalse G1
+        SpawnCharacterEntity 55, 208, 112
+        SetEntityFacing 55, 0
+      G1:
         SetEntityFacing 103, 0
         WaitFrames 15
         WaitFrames 10
@@ -335,13 +350,19 @@ sequence ch1_frieza_landing
         SetEntityFollow 121, 128
         SetEntityFollow 23, 128
         SetEntityFollow 156, 128
+        CoopCall 22, 2, 55, 0
+        JumpIfFalse G2
+        SetEntityFollow 55, 128
+      G2:
         PanCameraToPosition 8, 96, 2
         FlyToPosition 128, 88, 200
         FlyToPosition 128, 136, 184
         SetActiveEntity 128
         WalkToPosition 128, 192, 136
-        SpawnCharacterEntity 158, 160, 152
-        SetEntityFacing 158, 1
+        SpawnCharacterEntity 158, 364, 248             ; old Hercule runs up the path from below, off screen
+        WalkToPosition 158, 300, 200
+        WalkToPosition 158, 168, 152
+        SetEntityFollow 158, 128
         WaitFrames 30
         PlayAudio 50
         END
@@ -362,8 +383,13 @@ sequence ch1_frieza_landing
         Negate
         FlyToPosition 192
         DespawnEntity 128
-        WalkToPosition 158, 128, 176
+        WalkToPosition 158, 300, 200             ; old Hercule runs off down the path he came by
+        WalkToPosition 158, 364, 248
         DespawnEntity 158
+        CoopCall 22, 2, 55, 0
+        JumpIfFalse G1
+        DespawnEntity 55
+      G1:
         SetActiveEntity 0
         ReloadMap
         SetPlayerVisible 1

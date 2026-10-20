@@ -4,10 +4,16 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Gohan walks and flies in for his scenes** (Ryan: he appeared out of thin air): the pop-in stand-in is gone.
+  When nobody plays Gohan, `ch1_opening` stages him as an actor (sprite 55) guarded by the new CoopCall 22: he
+  walks up with the Z fighters at Frieza's landing, stands with them on the return, flies in with the group to
+  meet Trunks, walks up to Trunks for "how do you know my dad?" and kneels for Goku's landing; "Hey dad!" names
+  the lead. With a player on Gohan (alone or as player 2) there is no actor. `scene_actor.txt`; the runner's
+  `entrec`.
 - **Cutscenes cleaned up** (Ryan: the swap made scenes jumpy; the lead should only walk in for cutscenes): no
   more swapping and no follower in free play. Speaker-1 lines show the story's lead's portrait when someone
-  else plays (the portrait getter re-implemented); alone, the lead walks in as player 2 for the scenes that give
-  him lines and leaves at their end. The summit's per-character lines got their own speaker ids.
+  else plays (the portrait getter re-implemented); alone, the lead first popped in as player 2 for the scenes
+  that give him lines (replaced the same day by the scene actor above). The summit's per-character lines got their own speaker ids.
 - **Older saves:** no lead noted yet reads Gohan (Ryan's save from before the lead was noted showed no Gohan and
   Krillin's portrait on Gohan's line); a downed player 1 whose player 2 leaves for a companion is a game over.
 - **Scenes alone as someone else** (Ryan: Gohan missing from Frieza's landing while playing Krillin, and Krillin

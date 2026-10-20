@@ -383,7 +383,7 @@ debug menu and saves `build/hl/menu.ss` (bare `shot` / `save` / `load` names lan
 `p2 MASK|off`, `mash N [F]`, `mashent NAME VTABLE MAX`, `mashmap ZONE AREA MAX`, `waitmap`,
 `waitnz ADDR MAX`, `maptest ENTRY` (with the debug menu open: points Map Test at a map entry index
 and presses A), `preset +N -N` (story flags Party_Init applies at that Map Test), `flags`, `peek`,
-`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `map`, `shot NAME`, `save` / `load`, `reset`
+`poke8/16/32`, `find`, `findent`, `deref`, `ents`, `entrec RECORD` (how many entities on a sprite record: an actor's sprite id N has its record at the table `*0x0800959C` entry N - 7; sprite 55 = `0x0828FF38`), `map`, `shot NAME`, `save` / `load`, `reset`
 (power-cycle the ROM keeping the cartridge save: another build's savestate, then `reset`, boots this ROM
 with that build's EEPROM). Predefined variables: `PARTY` (0x0203F000), `SLOTS` (the ROM's party slot
 count, from the default-table literal) and **`FLAGS`** (the story-flag bank, `0x0203F00C + SLOTS * 0x1C`:
