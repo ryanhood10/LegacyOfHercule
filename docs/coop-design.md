@@ -18,7 +18,7 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
   | 0x25 | `0x03002188` | `0x08025CE0` | `0x0801560E` (slot 1) | transform (bit 0 clear): plays group 9, then the row's link |
   | 30 | `0x03002268` | `0x08025038` | `0x0801CB24` (slot 1) | NPC beam pose (`NPCFireKamehameha`): sprite group 18, frame 0 for 8 frames, then 1 / 2 every 8; never leaves by itself |
   | ? | - | `0x080251F4` | `0x08008277` | |
-  | ? | - | `0x08025D70` | `0x080085AD` (slot 5) | |
+  | ? | - | `0x08025D70` | `0x080085AD` (slot 5) | end of an attack: A held + the active slot's flags bit 2 (special melee page) -> anim 0x27 (group 16), else 0; replaced by `wrap.c` `attack_end` (each player's own slot, only with group 16) |
 
   Slot 0 = enter(state, entity), slot 3 = leave; `0x0800763C` performs the transition.
   All handlers end with: new press A -> `0x08007DE9` (attack), B -> `Player_UseAbility 0x08007EDB`.
@@ -99,6 +99,8 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
 - Dash/charge (`0x08025E20`), `0x080251F4` and `0x08025D70` control states run the *original* code
   for player 2 through `src/coop/wrap.c`, which swaps player 2's `InputSystem` contents into the
   global block (and the last-direction globals) around the call.
+  `0x080085AD` (the end of an attack) is reimplemented instead (`attack_end`): it reads the party flags
+  of the active slot, which for player 2 is player 1's ("The twin-Cell stall" under Super Android 13).
 - `make DEBUG_MENU=1` applies the documented title-screen patch: the title's idle timeout, which
   normally starts the intro video, opens the debug menu instead. The title waits 1800 frames (30 s)
   with no key held (`0x08000434` compares `g_FrameCounter` with 0x708); counted from power-on it is
@@ -790,7 +792,7 @@ every second (the pair never falls; rates over the active seconds).
 
 | fight | refilled pair | strong pair, no refill |
 |---|---|---|
-| twin Perfect Cells (stat 25 x 2, both-down; 16460 HP) | 3 of 6 runs killed them in 22, 24 and 31 s by stun-locking them (players deal 530-740 HP/s, take 8-37/s); 3 stalled (below) | won once at full HP (24 s, locked); otherwise stalled, or KO at 26-27 s with the Cells at 74-88 % |
+| twin Perfect Cells (stat 25 x 2, both-down; 16460 HP) | 3 of 6 runs killed them in 22, 24 and 31 s by stun-locking them (players deal 530-740 HP/s, take 8-37/s); 3 hung (the crash below, fixed since) | won once at full HP (24 s, locked); otherwise hung, or KO at 26-27 s with the Cells at 74-88 % |
 | Super 13 first cut (19000 HP, 66 / 64 / 68, specials every 60-120 frames) | not dead in 150 s: players deal 100-131/s, take 73-96/s (est. kill 145-190 s) | - |
 | 15000 HP, melee 60, defence 62, blasts x 0.7, gaps 100-170 | killed in 90 and 131 s, take 54-76/s | - |
 | 12000 HP, poise 60, gaps 110-180 | killed in 89-123 s, take 59-68/s | KO in 22-31 s, him at 65-70 % |
@@ -804,19 +806,38 @@ better and use abilities and items should beat him more often; `CoopCall 17, 0` 
 rebuild, and every number above is a knob in `super13.h`. HP 10000 is still more than one Perfect Cell
 (8230). Not measured: single-player (`S13_SOLO_HP_PCT`, 55 % of the HP) and real two-person play.
 
-**Found on the way (not this boss's):** twin-Cell autopilot runs often **stall**: every entity stops updating
-(damage popups frozen on screen), `g_FrameCounter` keeps counting, Start does nothing, and it never recovers.
-It happens on unmodified main too (a detached worktree of dc3c1fc) and once in a Super 13 run, so far only in
-runs whose player stats were poked by the test (never in six runs with the debug party's own stats). Not
-root-caused; `st_headless.c` gained a `regs` command while chasing it (the CPU sits in normal code and the BIOS
-wait). A downed Cell twin's pointer also clears, and the autopilot sometimes stops hurting the surviving Cell.
+**The twin-Cell "stall" was a crash, fixed 2026-10-19 (`src/coop/wrap.c` `attack_end`; it happens in real play).**
+Every entity stopping, frozen popups, a running `g_FrameCounter` and a dead Start were the game after a jump through a
+zeroed vtable (the headless runner prints `CRASH ... Jumped to invalid address`, LR `0x08006C05`); IRQs still run, so
+the frame counter does. Traced with `st_headless.c`'s `watch` / `breakpc` / `trace` (2026-10-19):
+
+1. The end of an attack (control state `0x08025D70`, slot 5, ROM `0x080085AD`) sends message 0x27, the special melee
+   (pose group 16, `record + 0x14C`), when the state's +8 is set, A is held and **the active party slot's** flags have
+   bit 2 (the special melee page); otherwise message 0 (idle). Player 2's call went through `call_as_player`, which swaps
+   in player 2's input but not the active slot, so player 2 read **player 1's** page.
+2. Hercule (slot 5, flags 0x43) has no group 16 (all four facings 0). Beside a player 1 with the page (the debug party's
+   Piccolo, 0x7F; Super Saiyan 2 Gohan joins with 0x7F) his held A gave him group 16, and his frame pointer
+   (`entity + 0x3C`) became 0.
+3. The draw (`0x08007772`) decodes a changed frame into the staging buffer and DMA3s `w * h` bytes (frame bytes 2 and 3)
+   to the entity's tile buffer (`+0x30`, sized from the record header: 0x400 for Hercule, at `0x0202E35C`, just below his
+   entity). Frame 0 reads its size from BIOS address 0: 0x5416 bytes. The copy zeroed player 2, the HUD and player 1.
+4. The next frame's draw pass (`0x08006AD8`: slot 3 on each entity, then slot 4 on the kept ones) called player 1's slot 4
+   through the zeroed vtable (`0xE55EC002`).
+
+Reproduced without the test's stat pokes and without enemies: the debug party in Map Test 147, player 2 holding A,
+hangs in 26 frames (`tools/headless/p2_special.txt`). The poked runs were only where it was noticed (the autopilot
+holds A through its punches). The fix reimplements `0x080085AD` for both players: it reads the attacking player's own
+slot (`coop.p2_slot` for player 2) and gives message 0x27 only to a sprite with group 16 in all four facings. After it
+the twin Cells died in 37-49 s in 6 of 6 refilled autopilot runs (delays 0, 13, 37, 51, 77, 99; 4 of 4 hung before),
+player 1's held A still reaches group 16, and `cell_games.txt` passes. The "downed twin's pointer clears" and "the
+autopilot stops hurting the survivor" readings were the same hang (HP frozen, pointers read after the wipe). A player 2
+with the page and group 16 (Gohan beside Hercule) now gets its own special melee, which it never did before.
 
 ### Open
 
 - Real two-player play; single-player. The summit scene (`data/story/arctic_summit`) uses him since 2026-10-19:
   record 11 is stat 145 / sprite 180 and his line has portrait 122; tested headless only (scene, then a queued win).
 - Base Android 13 still has no portrait (123 is allocated for it).
-- The stall above.
 
 ## Boss rules and extra stats (2026-10-18, src/coop/bosses.c)
 
