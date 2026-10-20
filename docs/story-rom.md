@@ -330,11 +330,24 @@ you..."; she declines to join them and leaves; Yamcha: "That chick digs you." Ti
 (Tien: "You're the man of the house now!"), Piccolo stays on the Lookout, Gohan says goodbye. Flag 196,
 a warp to zone 2 area 1 (Gohan's home), the credits.
 
-**The bonus ending.** With flag 195 and all four of 302, 303, 305, 306, a building in zone 4 area 5
-(map 67) plays "Late Night with Rob Howard": Hercule, "hero of the Cell Games", is interviewed; asked
-about critics who say he did not defeat Cell and about "those strange fighters who could turn their
-hair gold" and the little boy, he calls it "parlor tricks... mirrors and laser lights"; the crowd
-chants "HERCULE!"; then the credits and flag 196.
+**The bonus ending.** The door of a building in West City (zone 4 area 5, map 67) shows an "Only
+Hercule is allowed to pass through this barrier" barrier once flag 195 and all four of 302, 303, 305,
+306 are set; it opens only for Hercule as player 1 at level 50 or more. Walking in fades to a TV studio
+(zone 4 area 20, an empty map) for "Late Night with Rob Howard": Hercule, "hero of the Cell Games",
+is interviewed; asked about critics who say he did not defeat Cell and about "those strange fighters who
+could turn their hair gold" and the little boy, he calls it "parlor tricks... mirrors and laser
+lights"; the crowd chants "HERCULE!"; then the credits and flag 196. So in the stock game it is an
+alternative to the Lookout ending, not an extra: both end the game.
 
-**After the credits.** Thirteen maps test flag 196 (names, music, actors change, e.g. Gero's lab
-area 47's name); not walked yet.
+**The closing fly-over and the credits.** After the goodbyes at the Lookout, Gohan flies home over
+West City, the Northern Mountains, Gero's lab and Kame House, lands at his house (zone 2 area 1) and
+the credits play. Both endings then run the same epilogue (sequence 0x083B8140).
+
+**The epilogue, then the title screen.** Future Trunks returns to his timeline (Capsule Corp, then
+the future city): Android 17: "Hey, it's Gohan's little friend!"; 18: "I guess he wants to die like
+everyone else"; Trunks turns Super Saiyan: "The name's Trunks... and this is for Gohan!!!" and destroys
+them (a cutscene, not a fight); then he calls out that timeline's Cell: "I just destroyed them. Now
+you'll never be able to absorb them," Cell plans to steal the time machine, Trunks: "THE NIGHTMARE IS
+OVER CELL!!!!!" Then "The End. Thanks for playing!" and **the game returns to the title screen**.
+Nothing saves on the way, so loading the file continues from the player's last save, before the
+ending. The maps that test flag 196 are the epilogue's stagings.
