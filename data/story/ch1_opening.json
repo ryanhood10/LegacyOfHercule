@@ -1,88 +1,176 @@
 {
   "_": "Chapter 1, the opening (docs/story.md section 0 item 1): old Hercule in the future prologue, Krillin's visit, the forest spirit fight, Krillin's NPC gone from the landing site. Scripts in ch1_opening.lscript; see docs/scripts.md. SetCharacterTransformation takes a sprite id and looks up the display row showing it: map 3 switches slot 5 to old Hercule's sprite 158 (row 24, src/coop/krillin.c), map 1 back to Hercule's 72.",
-  "sources": ["data/story/ch1_opening.lscript"],
+  "sources": [
+    "data/story/ch1_opening.lscript"
+  ],
   "maps": [
     {
-      "map": {"zone": 1, "area": 4},
+      "map": {
+        "zone": 1,
+        "area": 4
+      },
       "_": "the opening captions: old Hercule (slot 5) joins Trunks' party as player 2",
       "edits": [
-        {"at": "trigger:0/entry:4", "replace": [
-          ["SetActiveCharacter 3", "SetActiveCharacter 3\nSetCharacterInPartyFlag 5\nSetCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 158"]
-        ]}
+        {
+          "at": "trigger:0/entry:4",
+          "replace": [
+            [
+              "SetActiveCharacter 3",
+              "SetActiveCharacter 3\nSetCharacterInPartyFlag 5\nSetCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 158"
+            ]
+          ]
+        }
       ]
     },
     {
-      "map": {"zone": 1, "area": 1},
-      "triggers": {"0": {"payload": "seq:ch1_training"}}
-    },
-    {
-      "map": {"zone": 1, "area": 2},
-      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits)",
-      "triggers": {"0": {"payload": "seq:ch1_future_end"}},
-      "edits": [
-        {"at": "trigger:0/entry:9", "replace": [
-          ["ClearCharacterInPartyFlag 3", "ClearCharacterInPartyFlag 3\nClearCharacterInPartyFlag 5\nClearCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 72"]
-        ]}
-      ]
-    },
-    {
-      "map": {"zone": 2, "area": 22},
-      "_": "Gohan's room: Krillin's visit replaces the nap, the dream and the phone call (map 17's phone triggers need flag 10, which nothing sets now)",
-      "triggers": {"0": {"payload": "seq:ch1_krillin_visit", "condition": "script:ch1_room_cond"}}
-    },
-    {
-      "map": {"zone": 2, "area": 8},
-      "_": "the stock dream's clearing, reached from the forest (zone 2 area 2) while flag 9 is clear: the spirit fight; Goku's dream actor is not spawned",
-      "triggers": {"0": {"payload": "seq:ch1_spirit"}},
-      "records": {
-        "0": "disable",
-        "1": {"action": "seq:ch1_spirit_end"}
+      "map": {
+        "zone": 1,
+        "area": 1
+      },
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_training"
+        }
       }
     },
     {
-      "map": {"zone": 3, "area": 4},
-      "_": "Frieza's landing: Krillin is player 2, so no Krillin actor or NPC (his line stays, spoken by the player)",
-      "records": {"4": "disable"},
+      "map": {
+        "zone": 1,
+        "area": 2
+      },
+      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits)",
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_future_end"
+        }
+      },
       "edits": [
-        {"at": "trigger:0/entry:0", "replace": [
-          ["SpawnCharacterEntity 76, 248, 200", ""],
-          ["WalkToPosition 76, 216, 112", ""],
-          ["SetEntityFacing 76, 1", ""],
-          ["SetEntityAnimation 76, 4", ""]
-        ]},
-        {"at": "trigger:0/entry:48", "replace": [
-          ["SetEntityFacing 76, 0", ""],
-          ["SetEntityFollow 76, 128", ""]
-        ]}
+        {
+          "at": "trigger:0/entry:9",
+          "replace": [
+            [
+              "ClearCharacterInPartyFlag 3",
+              "ClearCharacterInPartyFlag 3\nClearCharacterInPartyFlag 5\nClearCharacterFlag_Bit1 5\nSetCharacterTransformation 5, 72"
+            ]
+          ]
+        }
       ]
     },
     {
-      "map": {"zone": 3, "area": 6},
+      "map": {
+        "zone": 2,
+        "area": 22
+      },
+      "_": "Gohan's room: Krillin's visit replaces the nap, the dream and the phone call (map 17's phone triggers need flag 10, which nothing sets now)",
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_krillin_visit",
+          "condition": "script:ch1_room_cond"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 2,
+        "area": 8
+      },
+      "_": "the stock dream's clearing, reached from the forest (zone 2 area 2) while flag 9 is clear: the spirit fight; Goku's dream actor is not spawned",
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_spirit"
+        }
+      },
+      "records": {
+        "0": "disable",
+        "1": {
+          "action": "seq:ch1_spirit_end"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 3,
+        "area": 4
+      },
+      "_": "Frieza's landing: the scene is ch1_frieza_landing (old Hercule with Trunks, one soldier his; no Krillin actor: Krillin is in the party)",
+      "records": {
+        "4": "disable"
+      },
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_frieza_landing"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 3,
+        "area": 6
+      },
       "_": "waiting for Goku: no Krillin NPC; old Hercule (sprite 158) stands beside Trunks and leaves with him",
       "pre_edits": [
-        {"at": "record:6/talk/entry:18", "replace": [
-          ["SetEntityFacing 76, 1", ""],
-          ["SetEntityAnimation 76, 4", ""]
-        ]},
-        {"at": "record:6/talk/entry:78", "replace": [
-          ["SetEntityFollow 0, 62", "SetEntityFollow 0, 62\nSetEntityFollow 158, 128"]
-        ]},
-        {"at": "record:6/talk/entry:82", "replace": [
-          ["SetEntityAnimation 76, 4", ""]
-        ]}
+        {
+          "at": "record:6/talk/entry:18",
+          "replace": [
+            [
+              "SetEntityFacing 76, 1",
+              ""
+            ],
+            [
+              "SetEntityAnimation 76, 4",
+              ""
+            ]
+          ]
+        },
+        {
+          "at": "record:6/talk/entry:78",
+          "replace": [
+            [
+              "SetEntityFollow 0, 62",
+              "SetEntityFollow 0, 62\nSetEntityFollow 158, 128"
+            ]
+          ]
+        },
+        {
+          "at": "record:6/talk/entry:82",
+          "replace": [
+            [
+              "SetEntityAnimation 76, 4",
+              ""
+            ]
+          ]
+        }
       ],
       "records": {
         "4": "disable",
-        "6": {"talk": "seq:ch1_trunks_talk"}
+        "6": {
+          "talk": "seq:ch1_trunks_talk"
+        }
       },
       "add_records": [
-        {"kind": "actor", "sprite": 158, "x": 240, "y": 456, "facing": 0, "condition": "noflag:26"}
+        {
+          "kind": "actor",
+          "sprite": 158,
+          "x": 240,
+          "y": 456,
+          "facing": 0,
+          "condition": "noflag:26"
+        }
       ],
       "edits": [
-        {"at": "trigger:0/entry:0", "replace": [
-          ["SetEntityPositionInstant 76, 592, 520", ""],
-          ["FlyToPosition 76, 456, 488", ""]
-        ]}
+        {
+          "at": "trigger:0/entry:0",
+          "replace": [
+            [
+              "SetEntityPositionInstant 76, 592, 520",
+              ""
+            ],
+            [
+              "FlyToPosition 76, 456, 488",
+              ""
+            ]
+          ]
+        }
       ]
     }
   ]

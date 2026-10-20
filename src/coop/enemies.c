@@ -86,6 +86,7 @@ static TwinPair *register_pair(Entity *orig, Entity *twin) {
 // Which player an enemy sees this frame (entities.c sets g_PlayerObject to it): the nearest, except
 // that a twin whose original is alive takes the player the original is not nearest to.
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2) {
+    if (companion_active()) return p1;    // enemies ignore the companion (companion.c)
     if (revive_is_down(p1)) return p2;    // a downed player (revive.c) is no target
     if (revive_is_down(p2)) return p1;
     Entity *near = nearest_player(e, p1, p2);
@@ -517,7 +518,7 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     if (!m) return 0;
     m->vtable = (u32 *)vtable;
     m->speed = (s32)cls[3];
-    if (coop.p2 && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * diff_speed_pct() / 100;   // x 1.2 on Normal
+    if (coop.p2 && !companion_active() && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * diff_speed_pct() / 100;   // x 1.2 on Normal
     if (is_raged(e)) m->speed = m->speed * BOSS_RAGE_SPEED_NUM / BOSS_RAGE_SPEED_DEN;
     if (is_s13(e)) m->speed = m->speed * S13_SPEED_PCT / 100;   // Super 13 is slow (super13.h)
     return m;

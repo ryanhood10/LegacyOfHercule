@@ -38,7 +38,9 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-438 saved "available" bits of slots 0-8 (all but 6 and 7) |
 | 440-459 | Lookout / dojo (`wait_chamber`, `wait_spar`) | 440 Roshi's dojo booked for a spar |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
-| 462-479 | free (cleared at a new game) | |
+| 462-463 | free | |
+| 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
+| 468-479 | free (cleared at a new game) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
 | 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 

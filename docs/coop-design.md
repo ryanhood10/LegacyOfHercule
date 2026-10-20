@@ -1266,9 +1266,16 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
 - **The sprint bump (fixed 2026-10-20, Ryan's report):** our port of the 4-way walk (`player.c` `walk_update`,
   which only the sprint uses) passed 0 as the collision check's box where the stock passes the entity's box
   (+0x154, `r2` at 0x0800816E): `0x08006366` read a box from address 0 and the sprint bumped on open ground.
-- **Old Hercule in the prologue alone (2026-10-20, `src/coop/companion.c`):** while party slot 5 shows old
-  Hercule (row 24, the future prologue) and no second controller plays (1 Player, or no pad), player 2 is still
-  spawned for him with a follower pad (walk toward player 1 beyond 28 px; jump beside him when walled off far
+- **The companion (2026-10-20, `src/coop/companion.c`):** with no second controller (1 Player, or no pad), player
+  2 is still spawned for one character with a follower pad: **the story's lead when player 1 plays someone else**
+  (the lead = the character the story scripts last made active: VM steps 70 SetActiveCharacter and 115
+  ...NoReset are repointed to `vm_set_active_hook` / `vm_set_active_noreset_hook`, which note the slot in flags
+  464-467, saved with the game; so Gohan walks with a player who switched to Krillin), and **old Hercule** while
+  party slot 5 shows him (row 24, the future prologue). The companion is no player for the rules:
+  `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him (`coop_target`), he takes no hits, the
+  damage and speed multipliers and the revive see one player, CoopCall 5 reads 0 (scenes take the one-player
+  branches) and duels are skipped. Not in the Cell Games' solo fights or a duel. Old Hercule: spawned with a
+  follower pad (walk toward player 1 beyond 28 px; jump beside him when walled off far
   behind); his HUD panel is hidden; a real second controller takes him over; when the present day drops him from
   the party he leaves (`p2_drop_out`). The Future Trunks visit already has him as an actor (sprite 158) in both
   modes. His lines there, in the prologue and in the epilogue use portrait 126 (Buu's Fury's Hercule,

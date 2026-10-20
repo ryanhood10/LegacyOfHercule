@@ -197,6 +197,18 @@
       "expect": "2b2e",
       "bytes": "322e",
       "note": "the journal's loop: cmp r6, #43 -> #50 (gen_journal.py JOURNAL_COUNT)"
+    },
+    {
+      "offset": "0x3B5E40",
+      "expect": "85a70008",
+      "word": "fn:vm_set_active_hook",
+      "note": "VM step 70 SetActiveCharacter -> note the story's lead first (src/coop/companion.c)"
+    },
+    {
+      "offset": "0x3B5EF4",
+      "expect": "81a60008",
+      "word": "fn:vm_set_active_noreset_hook",
+      "note": "VM step 115 SetActiveCharacterNoReset -> the same"
     }
   ],
   "story_free": "0xB00000",

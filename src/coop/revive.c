@@ -50,7 +50,7 @@ static void set_tint(Entity *e, const u8 *t) {
 }
 
 static int allowed(void) {
-    return coop.p2 && g_PlayerObject && !coop2.duel_active && !coop_solo();
+    return coop.p2 && g_PlayerObject && !coop2.duel_active && !coop_solo() && !companion_active();
 }
 
 int revive_is_down(const Entity *e) {

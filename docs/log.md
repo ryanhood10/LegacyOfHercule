@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Ryan's test, round 3:** alone, the story's lead follows as a companion when you play someone else (Gohan with a
+  player who switched to Krillin; the lead is noted by wrapping the VM's SetActiveCharacter steps, flags
+  464-467); the companion never counts as a player for the rules. Frieza's landing (`ch1_frieza_landing`) has
+  old Hercule with Future Trunks: he arrives with him, King Cold and Krillin do not know him ("who's that old guy
+  with the afro?"), he knocks out one of Frieza's soldiers himself, catches up at the landing site ("I can't
+  fly, remember?") and leaves with Trunks.
 - **Ryan's test, round 2:** the sprint bumped on open ground (our 4-way walk port passed no box to the collision
   check; the sprint is the only user of that state); old Hercule now walks with Trunks in the prologue alone
   (`companion.c`: player 2 with a follower pad, HUD hidden) and talks with Buu's Fury's Hercule portrait (126) in

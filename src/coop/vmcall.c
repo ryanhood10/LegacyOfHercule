@@ -133,7 +133,7 @@ static void party_keep(s32 *st, int op) {
 
 static void call_duel_start(int slot, int flags, const void *end_seq) {
     coop2.call_end_seq = end_seq;
-    if (!p2_present()) {                   // single-player: player 1 wins, the story goes on
+    if (!p2_present() || companion_active()) {   // single-player (or a companion): player 1 wins, the story goes on
         coop2.duel_winner = 1;
         coop2.call_state = 0;
         run_sequence_soon(end_seq);
@@ -156,7 +156,7 @@ void vm_coop_call(s32 *st) {
     case 2: duel_clear(); coop2.call_state = 0; break;
     case 3: vm_push(st, coop2.duel_winner); break;
     case 4: hercule_awaken(); break;
-    case 5: vm_push(st, coop.p2 != 0 || p2_present()); break;   // the pad: a warp despawns the entity until player 1 is free
+    case 5: vm_push(st, (coop.p2 != 0 || p2_present()) && !companion_active()); break;   // a companion: one player   // the pad: a warp despawns the entity until player 1 is free
     case 6:   // without an entity (a warp despawned it until player 1 is free again) the respawn picks the slot
         if (a >= 0 && a < PARTY_SLOTS) { if (coop.p2) p2_bind_slot(a); else coop.p2_slot = (u8)a; }
         break;

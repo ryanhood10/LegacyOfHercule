@@ -229,7 +229,10 @@ void p2_drop_out(void) {
 // Player 2 is there or about to be: its entity, or a live pad and a party member it can play. Twins, scaling and
 // bars go by this (a warp despawns the entity until player 1 is free, so the pad counts).
 static int pick_p2_slot(void);
-int p2_coming(void) { return coop.p2 || (p2_present() && pick_p2_slot() >= 0); }
+int p2_coming(void) {
+    if (companion_active()) return 0;     // a companion (companion.c) is not a player for the rules
+    return coop.p2 || (p2_present() && pick_p2_slot() >= 0);
+}
 
 // ---- player 2 damage routing (private vtable slots 15 / 16) ---------------------------------
 static void p2_change_hp(Entity *e, int delta) {
@@ -248,6 +251,7 @@ ROM_FN(void, Player_Knockback, (Entity *e, void *hit), 0x0800F833);
 static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
+    if (companion_active()) return 1;            // the companion takes no hits (companion.c)
     if (revive_hit(e, (u8 *)hit, 1)) return 1;   // 1: no hurt state for the body
     Player_Knockback(e, (void *)hit);
     if (duel_p2_final_blow(e, dmg)) return 0;   // a duel's final blow: 1 HP, the duel ends
@@ -324,6 +328,8 @@ static int slot_ok(int s, int avail) {
 // members count (bit 1, what the stock scripts clear to lock a chapter to some characters), so the
 // story's locks apply to player 2 at the next map load.
 static int pick_p2_slot(void) {
+    int cs = companion_slot();            // one player: the companion's character (companion.c)
+    if (cs >= 0) return cs;
     if (slot_ok(coop.p2_slot, 1)) return coop.p2_slot;
     if (slot_ok(HERCULE_SLOT, 1)) return HERCULE_SLOT;
     for (int i = 0; i < PARTY_SLOTS; i++)

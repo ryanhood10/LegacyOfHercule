@@ -164,6 +164,212 @@ sequence ch1_spirit_end
         SetPlayerVisible 1
 end
 
+; ---- Frieza's landing (zone 3 area 4, map 52, trigger 0): Future Trunks with old Hercule ------------
+; The stock scene restated around old Hercule (sprite 158, portrait 126): he arrives with Trunks, nobody but
+; Trunks knows him, he knocks out one of Frieza's soldiers (66) himself, and leaves with Trunks. Krillin's
+; actor stays out (Krillin is in the party by now). Entries 0, 15, 37, 48 and 52 are restated from the stock.
+sequence ch1_frieza_landing
+  script                                 ; stock 0 without Krillin's actor: the Z fighters gather, Frieza and King Cold land
+        SetPlayerVisible 0
+        PlayMusic 14
+        PlayAudioBlocking 30, 120
+        WalkToPosition 0, 192, 136
+        WalkToPosition 0, 192, 88
+        SpawnCharacterEntity 137, 144, 202
+        SpawnCharacterEntity 121, 176, 208
+        SpawnCharacterEntity 32, 192, 216
+        SpawnCharacterEntity 156, 216, 208
+        SpawnCharacterEntity 107, 240, 224
+        SpawnCharacterEntity 23, 240, 216
+        SpawnCharacterEntity 103, 216, 232
+        BeginCommandBatch
+        WalkToPosition 137, 152, 112
+        SetEntityFacing 137, 1
+        WalkToPosition 121, 184, 104
+        SetEntityFacing 121, 1
+        WalkToPosition 32, 192, 120
+        SetEntityFacing 32, 1
+        CommitCommandBatch
+        BeginCommandBatch
+        WalkToPosition 156, 208, 104
+        SetEntityFacing 156, 1
+        SetEntityAnimation 121, 4
+        WalkToPosition 107, 208, 120
+        SetEntityFacing 107, 1
+        CommitCommandBatch
+        BeginCommandBatch
+        WalkToPosition 23, 224, 120
+        SetEntityFacing 23, 1
+        WalkToPosition 103, 272, 136
+        SetEntityAnimation 137, 4
+        SetEntityFacing 103, 1
+        CommitCommandBatch
+        WaitFrames 40
+        SetEntityAnimation 23, 4
+        LoadMapWithEntities 3, 5, 1, 8, 16
+        RegisterScouterEntry 74
+        RegisterScouterEntry 48
+        BeginCommandBatch
+        WalkToPosition 74, 72, 88
+        WalkToPosition 49, 144, 96
+        CommitCommandBatch
+        WaitFrames 100
+        PlayAudio 50
+        END
+  stockseq @083be798 1 14    ; Frieza and King Cold, the soldiers march out
+  script                                 ; stock 15: Trunks appears, old Hercule with him
+        PlayMusic 38
+        WaitFrames 80
+        FadeToWhite 10
+        SpawnCharacterEntity 128, 120, 448
+        SetEntityFacing 128, 1
+        SpawnCharacterEntity 158, 92, 440
+        SetEntityFacing 158, 1
+        WhiteFadeOut 10
+        WaitFrames 60
+        END
+  stockseq @083be798 16 16    ; "Not so fast!  You must be Frieza!"
+  text 126 "OLD HERCULE: Yeah!  What he said!"
+  text 70 "!We have guests!\x0b...And what is that thing with the hair?"
+  stockseq @083be798 18 27    ; Trunks and Frieza, the Z fighters sense Trunks' power
+  text 73 "!KRILLIN: And who's that old guy with the afro?\x0bHis power level is...  um...  barely there."
+  stockseq @083be798 28 36    ; the Super Saiyan
+  script                                 ; stock 37, first half: Trunks cuts down five soldiers; old Hercule knocks out the sixth
+        SetEntityFacing 67, 0
+        WaitFrames 15
+        SetEntityFacing 70, 0
+        WalkToPosition 134, 104, 432
+        BeginCommandBatch
+        SetEntityFacing 71, 2
+        SetEntityAnimation 134, 6
+        EntityWaitTouchPlayer 68
+        PlaySFX 68, 34
+        EntitySetVelocity 68, 0, 0
+        PlayDamageEffect 68
+        SetEntityAnimation 68, 2
+        DespawnEntity 68
+        CommitCommandBatch
+        BeginCommandBatch
+        WalkToPosition 134, 120, 424
+        SetEntityFacing 134, 1
+        WalkToPosition 71, 136, 424
+        SetEntityAnimation 134, 7
+        EntityWaitTouchPlayer 71
+        PlaySFX 71, 35
+        EntitySetVelocity 71, 0, 0
+        PlayDamageEffect 71
+        SetEntityAnimation 71, 2
+        DespawnEntity 71
+        WalkToPosition 70, 136, 416
+        SetEntityAnimation 134, 6
+        EntityWaitTouchPlayer 70
+        PlaySFX 70, 36
+        EntitySetVelocity 70, 0, 0
+        PlayDamageEffect 70
+        SetEntityAnimation 70, 2
+        DespawnEntity 70
+        NPCFireKiBlastAtEntity 134, 67, 100
+        EntityWaitTouchPlayer 67
+        PlaySFX 67, 36
+        EntitySetVelocity 67, 0, 0
+        PlayDamageEffect 67
+        SetEntityAnimation 67, 2
+        DespawnEntity 67
+        CommitCommandBatch
+        BeginCommandBatch
+        WalkToPosition 69, 136, 392
+        NPCFireKiBlastAtEntity 134, 69, 100
+        EntityWaitTouchPlayer 69
+        PlaySFX 69, 35
+        EntitySetVelocity 69, 0, 0
+        PlayDamageEffect 69
+        SetEntityAnimation 69, 2
+        DespawnEntity 69
+        CommitCommandBatch
+        SetEntityFacing 158, 1
+        WalkToPosition 66, 96, 432
+        SetEntityFacing 66, 0
+        WaitFrames 20
+        SetEntityAnimation 158, 6
+        PlaySFX 66, 34
+        EntitySetVelocity 66, 0, 0
+        PlayDamageEffect 66
+        SetEntityAnimation 66, 2
+        WaitFrames 30
+        DespawnEntity 66
+        SetEntityAnimation 158, 0
+  text 126 "OLD HERCULE: Ha!  Did you see that, Trunks?\x0bOne punch!  That's the power of the World Champion!"
+  text 98 "TRUNKS: ...Stay behind me, Hercule."
+  script                                 ; stock 37, second half: Frieza
+        WaitFrames 120
+        WalkToPosition 134, 120, 384
+        BeginCommandBatch
+        SetEntityAnimation 134, 16
+        EntityWaitTouchPlayer 49
+        PlaySFX 49, 59
+        PlayDamageEffect 49
+        FlashScreenColor 49, 255, 0, 0, 10
+        CommitCommandBatch
+        WalkToPosition 134, 160, 424
+        SetEntityFacing 134, 1
+        END
+  stockseq @083be798 38 47    ; Frieza falls, King Cold's offer, King Cold falls
+  script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule catches up
+        SetStoryFlag 21
+        WarpToMapWithEntities 3, 4, 1, 192, 88
+        SetActiveEntity 0
+        SetEntityFacing 103, 0
+        WaitFrames 15
+        WaitFrames 10
+        SetEntityFacing 23, 0
+        SetEntityFacing 121, 0
+        WaitFrames 5
+        SetEntityFacing 156, 0
+        WaitFrames 10
+        SetEntityFacing 0, 0
+        SpawnCharacterEntity 128, 80, 288
+        SetEntityFollow 107, 128
+        SetEntityFollow 32, 128
+        SetEntityFollow 103, 128
+        SetEntityFollow 137, 128
+        SetEntityFollow 121, 128
+        SetEntityFollow 23, 128
+        SetEntityFollow 156, 128
+        PanCameraToPosition 8, 96, 2
+        FlyToPosition 128, 88, 200
+        FlyToPosition 128, 136, 184
+        SetActiveEntity 128
+        WalkToPosition 128, 192, 136
+        SpawnCharacterEntity 158, 160, 152
+        SetEntityFacing 158, 1
+        WaitFrames 30
+        PlayAudio 50
+        END
+  text 126 "OLD HERCULE: *huff*  *huff*\x0bTrunks...  wait up...  I can't fly, remember?"
+  text 73 "!KRILLIN: Uh...  who's your friend?"
+  text 126 "OLD HERCULE: Friend?  I'm his bodyguard!"
+  text 98 "TRUNKS: He's...  with me.  Don't worry about him."
+  stockseq @083be798 49 51    ; "I'm heading off to meet Goku", "Just follow me."
+  script                                 ; stock 52: Trunks flies off, old Hercule runs after him
+        PlayAudio 47
+        FindCharacterEntity 0
+        SetStoryFlag 22
+        ClearStoryFlag 21
+        WalkToPosition 128, 128, 160
+        WaitFrames 20
+        PlayAudio 26
+        PushMulti 128, 24
+        Negate
+        FlyToPosition 192
+        DespawnEntity 128
+        WalkToPosition 158, 128, 176
+        DespawnEntity 158
+        SetActiveEntity 0
+        ReloadMap
+        SetPlayerVisible 1
+        END
+end
+
 ; ---- the Goku-arrival scene (zone 3 area 6, map 54): old Hercule leaves with Trunks --------------
 
 sequence ch1_trunks_talk

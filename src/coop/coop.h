@@ -49,7 +49,9 @@ void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehame
 u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO
 int p2_pad_present(void);    // a second controller sends input (input.c)
-int companion_active(void);  // companion.c: old Hercule follows player 1 in the prologue alone
+int companion_active(void);  // companion.c: a follower plays player 2 (one player: the story's lead, or old Hercule)
+int companion_slot(void);    // companion.c: its party slot, -1 none
+int p2_bind_slot(int slot);  // player.c
 u16 companion_pad(void);     // companion.c: his pad
 int p2_present(void);        // a second pad is connected (or a test mode is compiled in)
 void players_reset(void);    // players.c: the Select Game screen arms the 1 / 2 players question
