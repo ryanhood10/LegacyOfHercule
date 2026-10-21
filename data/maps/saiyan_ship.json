@@ -1,0 +1,130 @@
+{
+ "_": "Inside the Saiyan ship (the Broly chapter, data/story/broly.lscript; Ryan, 2026-10-20): Buu's Fury's round room (variation 0x082546A0 in that ROM) imported whole, its Capsule Corp pad (BG2) cleared to the floor beneath, the side and bottom openings closed, the top doorway opened: walking into it (once the ship has landed, flag 378) leads out onto New Planet Vegeta. The flights there and back shake this room while nobody moves.",
+ "name": "saiyan_ship",
+ "zone": 15,
+ "area": 9,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  240,
+  240
+ ],
+ "priorities": [
+  2,
+  3,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082546A0"
+    },
+    "rect": [
+     0,
+     0,
+     30,
+     30
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "layers": {
+  "2": [
+   {
+    "op": "clear",
+    "rect": [
+     5,
+     19,
+     9,
+     7
+    ],
+    "_": "the Capsule Corp pad"
+   }
+  ]
+ },
+ "collision": [
+  {
+   "op": "block",
+   "rect": [
+    0,
+    17,
+    4,
+    6
+   ],
+   "_": "the left opening"
+  },
+  {
+   "op": "block",
+   "rect": [
+    26,
+    17,
+    4,
+    6
+   ],
+   "_": "the right opening"
+  },
+  {
+   "op": "block",
+   "rect": [
+    12,
+    28,
+    6,
+    2
+   ],
+   "_": "the bottom opening"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    13,
+    6,
+    4,
+    3
+   ],
+   "_": "the doorway"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    104,
+    56,
+    136,
+    80
+   ],
+   "payload": "seq:broly_ship_out",
+   "condition": "script:broly_trip_cond",
+   "_": "the door: out onto New Planet Vegeta (the trip under way; a trigger's condition is tested when the map loads, so it cannot wait for the landing flag: the flight holds the players until then)"
+  }
+ ],
+ "spawn": [
+  96,
+  192
+ ],
+ "name_id": 221,
+ "flags": 1,
+ "sources": [
+  "data/story/broly.lscript"
+ ]
+}

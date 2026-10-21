@@ -55,6 +55,7 @@ NAMEK_SPRITE ?= 166
 CELL2_SPRITE ?= 162
 PARAGUS_SPRITE ?= 170
 SHIP_SPRITE ?= 171
+SHIP2_SPRITE ?= 172
 PARAGUS_PORTRAIT ?= 120
 # HALO_GOKU_SPRITE / HALO_SSJ_SPRITE: Goku and Super Saiyan Goku with a halo on every frame (tools/halosprites.py,
 # built from the ROM), display rows 26 / 27; a script makes Goku (slot 4) dead with SetCharacterTransformation(4, 176)
@@ -88,7 +89,7 @@ BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72;
 # 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
-EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(SHIP2_SPRITE)=ship2_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
 
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o

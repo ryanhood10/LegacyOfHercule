@@ -260,6 +260,7 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 | 15 / 6 | `data/maps/arctic_climb2.json` | The second climb: the same trail higher up, ending under area 5's upper cliffs with the cave on to the ridge; 6 enemies | 480 x 672 | (240, 630) |
 | 15 / 7 | `data/maps/arctic_ridge.json` | The ridge: Snowy Highlands area 9 (plateau under a cliff arc with a cave), a path up from below (area 10's dip), area 7's save pad; no enemies | 288 x 400 | (160, 276) |
 | 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch, four breakable rocks (Ryan, 2026-10-20: zone 13 area 2's large rock, 3 hits, the stock large-rock drop) | 720 x 592 | (336, 464) |
+| 15 / 9 | `data/maps/saiyan_ship.json` | Inside the Saiyan ship (the Broly chapter): Buu's Fury's round room (variation 0x082546A0) imported whole, its Capsule Corp pad (BG2) cleared, the side and bottom openings closed, the top doorway opened; its door trigger (the trip under way: a trigger's condition is tested when the map loads) leads out onto New Planet Vegeta | 240 x 240 | (96, 192) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an

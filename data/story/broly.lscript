@@ -6,15 +6,16 @@
 ;
 ; Right after Cell's TV broadcast Bulma walks in: a Saiyan ship has landed in the backyard for Vegeta
 ; (flag 400). In the backyard (zone 6 area 21), with Vegeta as a player, Paragus steps out of the ship
-; and offers him New Planet Vegeta; Vegeta boards, Trunks follows with Krillin, Gohan and Piccolo, the
-; ship leaves (flag 401; the party's state is kept in flags 404-419 by CoopCall 10 and the trip's five
+; and offers him New Planet Vegeta; Trunks, Krillin, Gohan and Piccolo come along; everyone boards through the
+; ship's door, the ship shakes through the flight and lands (flag 401; the party's state is kept in flags 404-419 by CoopCall 10 and the trip's five
 ; are selectable, Hercule stays home). The arena (zone 15 area 3) has the landing zone with the ship (no
 ; save pad: there is no way back until Broly falls); crossing the basin's rim brings everyone on screen for Paragus' betrayal and Broly
 ; (sprite 159, waiting in the basin), then players 1 and 2 fight Broly (stat 115) and Paragus (stat
 ; 116, sprite 170) as a pair (bosses.c): if Paragus falls first Broly rages once (full HP, stronger,
 ; faster; the rage dialogue set by CoopCall 9). Both down: the planet explodes, Capsule Corp's backyard,
 ; everyone talks it over, fade to black, the party as before the trip (flag 402).
-; Flags: 400 ship arrived, 401 trip under way, 402 chapter done, 403 confrontation seen, 404-419 the kept
+; Flags: 377 aboard allowed (Paragus' offer taken), 378 landed on New Planet Vegeta, 400 ship arrived, 401 trip
+; under way, 402 chapter done, 403 confrontation seen, 404-419 the kept
 ; party (vmcall.c PartyKeep). Speakers: 0 narration (Broly has no portrait), 2 Gohan, 3 Piccolo,
 ; 4 Vegeta, 5 Trunks (party slots 0-3: their current portraits), 36 Bulma, 73 Krillin, 120 Paragus
 ; (tools/brolysprites.py).
@@ -152,7 +153,6 @@ sequence broly_yard
   script
         WalkToPosition 170, 368, 248
         DespawnEntity 170
-        WalkToPosition 0, 368, 256
         PushActiveCharIndex
         PushByte 3
         CmpNe
@@ -197,11 +197,39 @@ sequence broly_yard
         WalkToPosition 76, 368, 256
         DespawnEntity 76
       N8:
-        PlayAudio 26
-        PanCameraToPosition 216, 0, 1
-        FlyToPosition 171, 368, 40
-        FadeOut 120
-        WaitFrames 30
+        SetStoryFlag 377                 ; the players board through the ship's door themselves (broly_board)
+        SetPlayerVisible 1
+        SetActiveEntity 0
+end
+
+; ---- the ship (Ryan, 2026-10-20): board through its door, the flight inside it, the landing ---------------
+; The ship is twice its art's size, a left and a right half (sprites 171 / 172, tools/brolysprites.py) on one
+; spot. Its door (the backyard's trigger at the ship's foot, flags 377 and not 401) takes the players inside
+; (zone 15 area 9, data/maps/saiyan_ship.json: Buu's Fury's round room, its Capsule Corp pad cleared) for the
+; flight: the ship shakes for a few seconds while nobody moves, then lands (flag 378); the room's door then
+; leads out onto New Planet Vegeta. After Broly the ride home plays in the same room (broly_end).
+
+; the ship stands in the backyard from Bulma's news on, except while it is away (it flew the players home)
+script broly_ship_shown_cond
+    StackTestStoryFlag 400
+    StackTestStoryFlagNot 401
+    StackTestStoryFlag 402
+    Not
+    And
+    END
+end
+
+script broly_board_cond
+    StackTestStoryFlag 377
+    StackTestStoryFlagNot 401
+    And
+    END
+end
+
+sequence broly_board
+  script                                 ; aboard: the trip's party, then inside the ship
+        SetPlayerVisible 0
+        FadeOut 60
         SetStoryFlag 401
         CoopCall 10, 0, 0, 0             ; keep the party as it is (flags 404-419) for the way home
         SetCharacterInPartyFlag 0
@@ -214,8 +242,34 @@ sequence broly_yard
         ClearCharacterFlag_Bit1 5
         ClearCharacterFlag_Bit1 7
         SetActiveCharacter 2
-        WarpToMapWithEntities 15, 3, 1, 280, 680
+        WarpToMapWithEntities 15, 9, 1, 96, 192
         CoopCall 6, 3, 0, 0                ; player 2 (kept across the warp) plays Trunks
+        SetEntityFacing 0, 0
+        SetPlayerVisible 1
+        WaitFrames 40
+        PlayAudio 26
+        ScreenShake 0, 8, 200
+        WaitFrames 60
+  text 0 "@^The ship blasts off for New Planet Vegeta..."
+  script                                 ; the flight: nobody moves while it shakes
+        PlayAudio 26
+        ScreenShake 0, 12, 200
+        WaitFrames 170
+        ScreenShake 0, 5, 60
+        WaitFrames 70
+        PlayAudio 50
+        SetStoryFlag 378
+  text 0 "@^The ship lands."
+  script
+        SetActiveEntity 0
+end
+
+sequence broly_ship_out
+  script                                 ; out through the door: New Planet Vegeta, beside the landed ship
+        SetPlayerVisible 0
+        FadeOut 60
+        WarpToMapWithEntities 15, 3, 1, 280, 680
+        CoopCall 6, 3, 0, 0
         SpawnCharacterEntity 170, 248, 664
         SetEntityFacing 170, 0
         FadeFromWhite 60
@@ -434,6 +488,23 @@ sequence broly_end
         FadeToWhite 10
         WhiteFadeOut 20
         WaitFrames 60
+        WarpToMapWithEntities 15, 9, 1, 96, 192   ; back aboard: the ride home (Ryan)
+        SetEntityFacing 0, 0
+        SetPlayerVisible 1
+        WaitFrames 30
+        PlayAudio 26
+        ScreenShake 0, 12, 200
+        WaitFrames 60
+  text 0 "@^The ship escapes the exploding planet and heads home..."
+  script
+        PlayAudio 26
+        ScreenShake 0, 8, 160
+        WaitFrames 150
+        PlayAudio 50
+  text 0 "@^The ship lands back at Capsule Corp."
+  script
+        SetPlayerVisible 0
+        FadeOut 60
         WarpToMapWithEntities 6, 21, 1, 240, 272
         SetEntityFacing 0, 3
         CoopCall 9, 1, 240, 304
@@ -496,7 +567,7 @@ sequence broly_end
       N23:
         PlayMusic 41
         FadeFromWhite 60
-  text 36 "BULMA: You're back!  And where's that ship?  What happened out there?"
+  text 36 "BULMA: You're back!  What happened out there?"
   text 73 "KRILLIN: Long story.  New Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
   text 2 "GOHAN: He kept calling me Kakarot.  He really hated my dad."
   text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...\x0bI hope we never meet another one."

@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **The Broly ship ride (Ryan):** the ship doubled (128 x 64 as two 64 x 64 halves, sprites 171 / 172; 8bpp attr bit
+  set, the stock collision box kept so the walks into it still finish); the players board through its door, the
+  flight shakes a new interior (zone 15 area 9, Buu's Fury's round room without its Capsule Corp pad) and lands,
+  its door leads out to New Planet Vegeta; the ride home after Broly; the ship stays parked. `broly_ride.txt`.
 - **Ryan's F4 batch:** tougher Cells and Juniors (`hp_pct` / `speed_pct` boss rules), six Juniors with two each for
   Vegeta and Trunks, fight 8 drawn to 0, the beam struggle restaged (helpers behind, beams capped at the clash,
   the second Cell explodes, Hercule stays), Super Saiyan 2 Gohan on the Super Saiyan 2 class, Roshi's dojo tougher

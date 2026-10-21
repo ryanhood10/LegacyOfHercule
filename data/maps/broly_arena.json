@@ -123,7 +123,7 @@
    "y": 640,
    "facing": 0,
    "condition": "script:broly_trip_cond",
-   "_": "0: the Saiyan ship (sprite 171) on the landing zone"
+   "_": "0: the Saiyan ship's left half (sprite 171) on the landing zone; record 3 is its right half"
   },
   {
    "kind": "actor",
@@ -148,6 +148,15 @@
    "condition": "never",
    "action": "seq:broly_end",
    "_": "2: Broly the boss (stat 115; bosses.c pairs him with Paragus, sprite 170 / stat 116)"
+  },
+  {
+   "kind": "actor",
+   "sprite": 172,
+   "x": 216,
+   "y": 640,
+   "facing": 0,
+   "condition": "script:broly_trip_cond",
+   "_": "3: the ship's right half (sprite 172)"
   }
  ]
 }

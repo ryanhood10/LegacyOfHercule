@@ -318,6 +318,14 @@ value fires its defeat action at that threshold instead of at zero HP.
     it. With Vegeta, Paragus steps out and says he has found a New Planet Vegeta for him to rule as
     king. Vegeta goes aboard; Trunks follows with Krillin, Gohan and Piccolo; the ship leaves. Those
     five are the only selectable characters until the way home (Hercule stays home).
+  - *The ship ride (Ryan, 2026-10-20):* the ship is twice its art's size (128 x 64, sprites 171 + 172, a left
+    and a right half on one spot). After Paragus' offer the others go aboard and the players walk to the
+    door at the ship's foot themselves (flag 377); inside (zone 15 area 9, Buu's Fury's round room, its
+    Capsule Corp pad cleared) the ship shakes for a few seconds while nobody moves ("The ship blasts off
+    for New Planet Vegeta..." / "The ship lands.", flag 378), then the room's door leads out beside the
+    landed ship and Paragus' welcome. After Broly the ride home plays in the same room ("The ship escapes
+    the exploding planet and heads home..." / "The ship lands back at Capsule Corp."), and the ship stays
+    parked in the backyard. Narration lines Claude's drafts.
   - *Arrival:* New Planet Vegeta is the Broly arena (zone 15 area 3) with a landing zone added south
     of the basin, the ship and a save pad where the players can switch to anyone of the five; Vegeta
     is player 1 and Trunks player 2 on arrival.

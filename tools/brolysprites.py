@@ -19,9 +19,10 @@ Paragus' dialogue portrait (paragus_portrait, portrait id 120 through krillinspr
 the black outside the face box) and a grey moustache and chin beard drawn over the skin around the
 mouth.
 
-The Saiyan ship (ship_record, sprite id 171): Buu's Fury record 1 (a purple Saiyan-style ship, 64x32,
-two animations of two frames x 4 facings) converted to LoG2's palette by tools/buu2log2.py's converter,
-as a two-group actor record (idle, walk). Without the Buu ROM the ship falls back to stock sprite 43's
+The Saiyan ship (ship_record, sprite id 171, and ship2_record, 172): Buu's Fury record 1 (a purple
+Saiyan-style ship, 64x32, two animations of two frames x 4 facings) converted to LoG2's palette by
+tools/buu2log2.py's converter, doubled to 128 x 64 and split into a left and a right 64 x 64 half (two actor
+records, idle and walk; the story places both on one spot). Without the Buu ROM the ship falls back to stock sprite 43's
 groups (a stand-in so the chapter still loads; the chapter needs the Buu ROM for Broly anyway).
 """
 import os
@@ -230,31 +231,47 @@ def build_portrait(rom):
 
 # ---- the ship ---------------------------------------------------------------------------------------
 def build_ship(sp, buu_rom):
-    """Returns (header, groups) with groups as [[frames x 4]] of (xo, yo, w, h, attr, px or None, blob)."""
+    """The ship at twice the size (Ryan, 2026-10-20: "like 4x that size"): every frame composited, doubled and
+    split into a left and a right 64 x 64 half (an OBJ is at most 64 x 64). Returns [(header, groups)] for the
+    left (ship_record, sprite 171) and the right half (ship2_record, sprite 172): both actors stand on the same
+    spot, the right half's frames 64 px further right. Groups are [[frames x 4]] of (xo, yo, w, h, attr, blob)."""
     if buu_rom is None:
         return None
     import buu2log2 as BL
     conv = BL.Converter(sp.rom, buu_rom, 23)
     rec = conv.bu.record(BUU_SHIP)
     anims = [conv.bu.anim(a) if a else [] for a in rec["anims"]]
-    groups = []
+    shape, size = BL.OBJ_SHAPES[(64, 64)]
+    halves = [[], []]
     for ai in range(2):
         frames = anims[ai] if ai < len(anims) and anims[ai] else anims[0]
-        dirs = []
+        dirs = [[], []]
         for d in range(4):
-            fl = []
+            fl = [[], []]
             for fi in range(len(frames)):
-                xo, yo, w, h, attr, blob, raw = conv.convert_frame(frames[fi][d], rec["remap"], BUU_SHIP)
-                fl.append((xo, yo, w, h, attr, blob))
-            dirs.append(fl)
-        groups.append(dirs)
-    size = max(f[2] * f[3] for g in groups for dl in g for f in dl)
-    header = bytearray(conv.t_header)
-    struct.pack_into("<H", header, 0, size)
-    header[2] = len(groups)
-    for k in range(4):
-        header[0x0C + 16 * k:0x1C + 16 * k] = struct.pack("<iiii", *rec["boxes"][k])
-    return header, groups
+                desc = frames[fi][d]
+                (x0, y0, w, h), px = conv.bu.frame_pixels(desc)
+                box, parts = conv.bu.descriptor(desc)
+                attr = (parts[0][4] & 0x0FFF0FFF & ~0xC000) | 0x2000 | (shape << 14) | (size << 30)   # 8bpp tiles
+                big = [[px[y // 2][x // 2] for x in range(2 * w)] for y in range(2 * h)]
+                for k in range(2):
+                    cut = [row[64 * k:64 * k + 64] for row in big[:64]]
+                    cut = [r + [0] * (64 - len(r)) for r in cut] + [[0] * 64] * (64 - len(cut))
+                    ow, oh, blob, raw = conv.encode(cut, 64, 64, 64, 64, rec["remap"])
+                    fl[k].append((2 * x0 + 64 * k, 2 * y0, ow, oh, attr, blob))
+            dirs[0].append(fl[0])
+            dirs[1].append(fl[1])
+        halves[0].append(dirs[0])
+        halves[1].append(dirs[1])
+    out = []
+    for groups in halves:
+        header = bytearray(conv.t_header)
+        struct.pack_into("<H", header, 0, 64 * 64)
+        header[2] = len(groups)
+        for k in range(4):
+            header[0x0C + 16 * k:0x1C + 16 * k] = struct.pack("<iiii", *rec["boxes"][k])   # the stock box: the walks into it stay as they were
+        out.append((header, groups))
+    return out
 
 
 # ---- output -----------------------------------------------------------------------------------------
@@ -376,12 +393,13 @@ def main():
                    f"{{{', '.join(f'0x{b:02x}' for b in pblob)}}};")
     ship = build_ship(sp, buu)
     if ship:
-        hs, gs = ship
-        w.record("ship", hs, gs, precompressed=True)
+        for name, (hs, gs) in zip(("ship", "ship2"), ship):
+            w.record(name, hs, gs, precompressed=True)
     else:
         rec = sp.record(FALLBACK_SHIP)
         g = sp.groups(rec)
-        w.alias_record("ship", (rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C], g), len(g))
+        for name in ("ship", "ship2"):   # without the Buu ROM both halves are the stand-in, on one spot
+            w.alias_record(name, (rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C], g), len(g))
     w.save(out_c)
     if pdir:
         os.makedirs(pdir, exist_ok=True)
