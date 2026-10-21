@@ -1,9 +1,14 @@
-# The Broly chapter's ship ride (docs/story.md 4g, data/story/broly.lscript, data/maps/saiyan_ship.json): alone as
-# Vegeta from Map Test 165 (the backyard, flag 400): Paragus' scene (flag 377 set at its end), the ship's door at its
-# foot boards (zone 15 area 9, flag 401), the flight shakes and lands (378), the room's door leads out to New Planet
-# Vegeta (zone 15 area 3) and Paragus' welcome; the rim's confrontation, test command 7 wins the fight, the ride home
-# in the same room, the backyard debrief (402; the ship stays parked there). Expect the map lines in that order and
-# FLAGS+50 = ff at the end. From a debug-menu savestate (--out = the folder holding menu.ss).
+# The Broly chapter's ship ride (docs/story.md 4g, data/story/broly.lscript): alone as Vegeta from Map Test 165 (the
+# backyard, flag 400; the backyard shows the parked ship: data/maps/yard_ship.json via src/coop/shipyard.c). Paragus
+# steps out of the ship's door for his scene (flag 377 at its end: FLAGS+47 = 02); up the ramp into the doorway
+# boards (zone 15 area 9, flag 401) with Paragus and the others in the room; the flight shakes and lands (378), they
+# get off first, then the room's door leads out of the ship's door onto New Planet Vegeta (zone 15 area 3, at
+# 320,680 after walking down the ramp), the others waiting at its foot for Paragus' welcome, then walking ahead;
+# around the ship to the rim's confrontation, test command 7 wins the fight, the ride home in the same room (the
+# others get off first), out of the backyard ship's door (flag 379, at 344,412 then down the ramp to 344,456) into
+# the debrief (402; the ship stays parked). Expect the map lines in that order, FLAGS+47 = 0e (377-379) and
+# FLAGS+50 = ff (400-407) at the end. Two players: the same with "p2 0" and player 2's pad following player 1's
+# walks (the co-op leash keeps them on one screen). From a debug-menu savestate (--out = the folder holding menu.ss).
 p2 off
 preset +151 +155 +156 +157 +400
 maptest 165
@@ -16,87 +21,33 @@ frames 200
 keys 0x20
 frames 80
 keys 0
+frames 240
+map
 key 1 6
 frames 70
 key 1 6
 frames 70
 key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
+frames 200
 stepnz FLAGS+47 80
 frames 60
 map
-poke32 0x0203FD0C 0x1506
-poke32 0x0203FD54 0x013C0170
-poke32 0x0203FD08 5
-frames 120
-keys 0x40
-frames 30
+peek8 FLAGS+47 1
+echo == Paragus seen: FLAGS+47 = 02
+frames 10
+keys 0x10
+frames 70
 keys 0
-frames 60
-frames 60
-map
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-key 1 6
-frames 50
-frames 500
-key 1 6
-frames 90
-key 1 6
-frames 90
+keys 0x40
+frames 80
+keys 0
+frames 200
+mash 3 60
+frames 300
+mash 1 60
+frames 900
+mash 3 60
+frames 600
 map
 keys 0x20
 frames 20
@@ -107,207 +58,67 @@ frames 40
 keys 0x40
 frames 60
 keys 0
+frames 130
+frames 90
+key 1 6
+frames 60
+key 1 6
+frames 40
+frames 60
+frames 60
 frames 120
+frames 300
 map
 key 1 6
-frames 90
+frames 40
 key 1 6
-frames 90
+frames 40
 key 1 6
+frames 40
+frames 40
+frames 60
+frames 90
 frames 150
+frames 300
 map
-key 1 6
-frames 90
-key 1 6
-frames 90
-key 1 6
-frames 200
-map
-keys 0x40
-frames 260
+echo == out on New Planet Vegeta (15/3 at 320,680)
+frames 10
+keys 0x20
+frames 130
 keys 0
 map
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-key 1 6
-frames 80
-frames 200
+keys 0x40
+frames 240
+keys 0
+frames 100
+map
+mash 17 80
 map
 poke32 0x0203FD08 7
 frames 300
-key 1 6
-frames 70
+mash 30 70
+frames 400
 map
-key 1 6
-frames 70
+mash 6 70
+frames 200
+frames 700
 map
-key 1 6
-frames 70
+keys 0x20
+frames 20
+keys 0x40
+frames 110
+keys 0x10
+frames 40
+keys 0x40
+frames 60
+keys 0
+frames 200
 map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-key 1 6
-frames 70
-map
-frames 600
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
-key 1 6
-frames 70
+frames 60
+mash 30 70
 frames 300
 map
-echo == the chapter done: FLAGS+50 (400-407) = ff
+echo == the chapter done: FLAGS+47 (376-383) = 0e, FLAGS+50 (400-407) = ff
+peek8 FLAGS+47 1
 peek8 FLAGS+50 1
 map

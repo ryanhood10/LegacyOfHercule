@@ -357,7 +357,7 @@ the arm patches pink instead of red (26 -> 247-like pink, 247 lighter) so they s
 Distinct from Piccolo (player 1 in the Cooler fight) at a glance. Its group 3 is a fall that ends
 lying, used by the both-down rule.
 
-## Paragus and the Saiyan ship (ids 170, 171, portrait 120; `tools/brolysprites.py`, 2026-10-19)
+## Paragus and the Saiyan ship (id 170, portrait 120; `tools/brolysprites.py`, 2026-10-19)
 
 **Record header +0 (u16) is the record's largest frame in bytes** (checked on every stock record:
 0x200 for 16x32 NPCs, 0x400 for 32x32 bodies, 0x1000 for the 64x64 bosses 27, 30, 34, 37, 74, 105, 122);
@@ -384,10 +384,9 @@ outline and lighter inner streaks, plus a grey moustache over the upper lip and 
 Speakers >= 8 read `portrait_module[id + 1]` (`0x0800BDCC`), so `tools/krillinsprites.py` takes
 `--extra-portrait 120=paragus_portrait` and appends the word; dialogue `text 120 "PARAGUS: ..."`.
 
-**The Saiyan ship (sprite 171, `ship_record`)**: Buu's Fury record 1, a purple ship 64x32 with two
-animations of two frames x 4 facings (front, back, two sides), converted with `buu2log2`'s converter
-into a two-group actor record (header from Bulma's 23 with the size 0x800). Without `roms/buu.gba` the
-record points at stock sprite 43's groups (a stand-in; the chapter needs Broly from that ROM anyway).
+**The Saiyan ship** was sprite 171 (Buu's Fury record 1, a purple ship 64x32, later doubled into two
+64 x 64 halves, 171 and 172) until 2026-10-21; Ryan wanted it twice that size again, which would take all
+of OBJ VRAM, so it is map art now (`tools/shipart.py`, `docs/maps.md` section 9) and 171 / 172 are free.
 Preview: `build/<dir>/paragus_preview.png` (every group, both portraits).
 
 ## Hercule's beam pose (group 18 of sprite 72, `tools/herculesprites.py`, 2026-10-19)

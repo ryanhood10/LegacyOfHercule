@@ -16,9 +16,12 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "layout": "base" | [W, H],         copy the base map's layers/collision/objects, or a blank W x H px map
   "stack_ops": [...],                ops on every layer + collision + objects at once (insert_cols/rows, stamp, crop)
   "layers": {"1": [ops], "2": [...], "3": [...]},   per-layer ops (fill, copy, clear, texture, solid, png);
+                                     a png op's picture is a "file" or "draw": NAME (drawn by tools/NAME.py's
+                                     draw(), our own art, e.g. shipart: the Saiyan ship), placed "at" [col, row]
                                      a fill with "anchor": "map" phases its block to the map origin (seamless)
   a stamp with "recolor": false keeps its tiles out of the spec's recolour (e.g. a flight spot's grass)
-  "collision": [ops],                walk / block rects and ellipses, "outside": "block" for the map border
+  "collision": [ops],                walk / block rects and ellipses, "outside": "block" for the map border;
+                                     {"op": "art_footprint", "draw": NAME, "at": [col, row]}: a drawn picture's collision
   "projectile": "walk" | [ops],      projectile mask (default: same as walk collision)
   "recolor": {"rules": [...]},       remap every tile's colours (new tile banks); see recolor()
   "effect": {"from": [13, 1]},       BG0 effect overlay (snowfall, rain) + its animated tiles, blend, BG0 priority
@@ -452,8 +455,11 @@ class Build:
         del g
 
     def png_op(self, bg, op):
-        from PIL import Image
-        im = Image.open(op["file"]).convert("RGBA")
+        im = art_module(op["draw"]).draw() if "draw" in op else None
+        if im is None:
+            from PIL import Image
+            im = Image.open(op["file"])
+        im = im.convert("RGBA")
         pal = L.bg_palette(self.rom)
         c0, r0 = op.get("at", [0, 0])
         for ty in range(im.height // 8):
@@ -497,6 +503,11 @@ class Build:
                 for x in range(256):
                     if x < n or y < n or x >= self.W - n or y >= self.H - n:
                         L.set_bit(bm, x, y, 0)
+        elif k == "art_footprint":
+            # the collision a drawn picture brings (tools/<draw>.py footprint(): {(tx, ty): 0 block / 1 walk})
+            c0, r0 = op["at"]
+            for (tx, ty), v in art_module(op["draw"]).footprint().items():
+                L.set_bit(bm, c0 + tx, r0 + ty, v)
         elif k == "from_layer":
             # walkable where the layer has a tile from the given slot set (e.g. floor tiles)
             g = self.layers[op["bg"]]
@@ -507,6 +518,14 @@ class Build:
                         L.set_bit(bm, x, y, 1)
         else:
             raise SpecError(f"unknown collision op {k}")
+
+
+def art_module(name):
+    """A picture drawn by code: tools/NAME.py with draw() (an RGBA PIL image) and footprint() (its collision)."""
+    import importlib
+    if not name.isidentifier():
+        raise SpecError(f"bad draw module {name!r}")
+    return importlib.import_module(name)
 
 
 def flip_tile(t, flip):

@@ -1,0 +1,22 @@
+{
+ "_": "The Capsule Corp backyard with Paragus' Saiyan ship parked in it (the Broly chapter; Ryan, 2026-10-21: the ship doubled again, more detail, a door to go in and out of). Zone 6 area 21 as it is, with the ship (tools/shipart.py, our own art, 256 x 160) painted on BG2 (under the players) at x 216-471, y 280-439 and blocking all of it but the doorway and the ramp. Never warped to directly: while the ship is parked (flag 400, and the trip not under way: not 401, or 402), loading zone 6 area 21 uses this map's variation instead of the stock one (src/coop/shipyard.c), so the backyard's own records, triggers and on-load (6/21's MapEntry, data/story/broly.json) stay in force.",
+ "name": "yard_ship",
+ "zone": 15,
+ "area": 10,
+ "base": [6, 21],
+ "tileset": "base",
+ "layout": "base",
+ "keep": ["decorations", "exits"],
+ "layers": {
+  "2": [
+   {"op": "png", "draw": "shipart", "at": [27, 35], "_": "the ship, its doorway at x 328-359, y 392-419 and the ramp below it"}
+  ]
+ },
+ "collision": [
+  {"op": "art_footprint", "draw": "shipart", "at": [27, 35]}
+ ],
+ "spawn": [168, 272],
+ "name_id": 190,
+ "music": 41,
+ "flags": 0
+}

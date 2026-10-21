@@ -20,7 +20,11 @@ everything below that they cover; where they differ, the ROM wins and the differ
 1. `Map_FindEntry` 0x0800EB7C: linear scan of the MapEntry table (`Map_GetCount` 0x0800E0AC returns
    the constant 327) for `(zone, area)`; not found = fatal error screen.
 2. Variation: the warp's variation, or (0) the entry's variation script (+0x28) result, or 1.
-   `FUN_0800EB4C` returns `variations[v - 1]`.
+   `FUN_0800EB4C` returns `variations[v - 1]` (12 bytes; every variation lookup goes through it: this
+   loader, the exits 0x0800C312, the debug Map Test, the new-game map). Hooked by `map_variation_hook`
+   (`src/coop/shipyard.c`, 2026-10-21): the Capsule Corp backyard (6/21) gets zone 15 area 10's variation
+   (the parked Saiyan ship) while flag 400 is set and the trip is not under way (not 401, or 402); the
+   backyard keeps its own MapEntry (records, triggers, on-load).
 3. `FUN_080040EE`: marks (zone, area) visited in the area-visit table (unknown maps are skipped).
 4. `Map_InitRenderer` 0x08006152 with the variation (section 3).
 5. Level gates (+0x20, count +7), items (+0x18, count +5), objects/chests (+0x1C, count +6), each
@@ -218,9 +222,12 @@ for layout and collision, pixels for objects):
   `copy`, `clear`, `solid` / `texture` (generated tiles in palette colours: our art, no ROM data;
   a `fill` with `"anchor": "map"` phases its block to the map origin, so separate fills and stamps
   shifted by a multiple of the block join without seams),
-  `png` (an image cut into tiles, matched against the tileset with flips, new tiles otherwise), and
+  `png` (an image cut into tiles, matched against the tileset with flips, new tiles otherwise; `"draw":
+  NAME` instead of a `"file"` takes the picture from `tools/NAME.py`'s `draw()`, our own art drawn by code,
+  e.g. `shipart`), and
   collision `walk` / `block` (rects), `walk_ellipse` / `block_ellipse`, `border`, `from_layer`;
-  `"mask": "proj"` or `"both"` picks the bitmap.
+  `"mask": "proj"` or `"both"` picks the bitmap; `art_footprint` (`"draw": NAME, "at": [col, row]`) applies
+  the collision `tools/NAME.py`'s `footprint()` gives for that picture.
 - `recolor`: rules by hue range, saturation and luminance mapping each palette colour onto a colour
   ramp, quantised to the nearest palette entry; every tile (and animated frame) becomes a new tile in
   new banks appended to a copy of the bank table. A stamp with `"recolor": false` keeps its tiles out
@@ -254,13 +261,14 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 |---|---|---|---|---|
 | 15 / 1 | `data/maps/arctic.json` | The arctic landing (post-game only, 9c): zone 8 area 28 widened and deepened into a snowfield, recoloured to snow and blue-grey ice, Snowy Highlands' falling snow; ice cliff wall with the cave mouth (a door up the mountain since the Vegeta barrier was removed, 2026-10-19), a frozen pond, two outcrops, the flight spot on a grass patch (Snowy Highlands' landing art, not recoloured) | 432 x 368 | (136, 264) |
 | 15 / 2 | `data/maps/time_chamber.json` | Hyperbolic Time Chamber: white void floor (generated tiles), the living quarters at the top edge (the Lookout palace facade, dome and entrance canopy), a door exit under the canopy back to the Lookout's chamber room (zone 9 area 3 at (96, 168), in front of the chamber door; until 2026-10-19 it led outside to zone 9 area 1) | 640 x 480 | (312, 280) |
-| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena, New Planet Vegeta in the Broly chapter: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor, the pod crater on the rim above as scenery; a 224 px landing zone south of the basin (walkable up to the rim) with the Saiyan ship (no save pad: removed 2026-10-20, a save there could trap a weak party) and Broly actors, the rim trigger and Broly's boss record (`data/story/broly.lscript`); the two boulders and the flight spot were removed (the pad needed their 44 of the 896 tile slots; the players leave by the story) | 640 x 768 | (320, 700) |
+| 15 / 3 | `data/maps/broly_arena.json` | Broly's arena, New Planet Vegeta in the Broly chapter: the walled basin of zone 3 area 6 (Northern Wastelands) as the arena floor; a 224 px landing zone south of the basin (walkable up to the rim) with the Saiyan ship (2026-10-21: `tools/shipart.py`'s 256 x 160 art on BG2 at x 192-447, y 504-663, blocking but for its doorway and ramp; Goku's pod crater, scenery on the plain above that took 660 of the 896 tile slots, was removed to fit it: 410 slots now; no save pad since 2026-10-20) and Broly actors, the rim trigger and Broly's boss record (`data/story/broly.lscript`); no flight spot (the players leave by the story) | 640 x 768 | (320, 680) |
 | 15 / 4 | `data/maps/broly_crater.json` | Optional (built when `roms/buu.gba` is present): Buu's Fury's walled wasteland crater (variation 0x0822229C there) imported whole, tiles converted to LoG2's palette, its own collision | 480 x 400 | (240, 340) |
 | 15 / 5 | `data/maps/arctic_climb1.json` | The arctic route's first climb: a trail between walls of snowy trees (Snowy Highlands area 1), two cliff tiers (area 3's cliff band) with the pass at alternate ends, pines and round trees; 7 enemies | 480 x 720 | (240, 672) |
 | 15 / 6 | `data/maps/arctic_climb2.json` | The second climb: the same trail higher up, ending under area 5's upper cliffs with the cave on to the ridge; 6 enemies | 480 x 672 | (240, 630) |
 | 15 / 7 | `data/maps/arctic_ridge.json` | The ridge: Snowy Highlands area 9 (plateau under a cliff arc with a cave), a path up from below (area 10's dip), area 7's save pad; no enemies | 288 x 400 | (160, 276) |
 | 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch, four breakable rocks (Ryan, 2026-10-20: zone 13 area 2's large rock, 3 hits, the stock large-rock drop) | 720 x 592 | (336, 464) |
-| 15 / 9 | `data/maps/saiyan_ship.json` | Inside the Saiyan ship (the Broly chapter): Buu's Fury's round room (variation 0x082546A0) imported whole, its Capsule Corp pad (BG2) cleared, the side and bottom openings closed, the top doorway opened; its door trigger (the trip under way: a trigger's condition is tested when the map loads) leads out onto New Planet Vegeta | 240 x 240 | (96, 192) |
+| 15 / 9 | `data/maps/saiyan_ship.json` | Inside the Saiyan ship (the Broly chapter): Buu's Fury's round room (variation 0x082546A0) imported whole, its Capsule Corp pad (BG2) cleared, the side and bottom openings closed, the top doorway opened; its two door triggers (a trigger's condition is tested when the map loads: the trip under way, then the ride home landed and not out yet) lead out of the ship's door onto New Planet Vegeta and, after the ride home, into the backyard; their rect reaches 20 px below the doorway (the co-op leash stops player 1 at y 80 when player 2 is at the far side) | 240 x 240 | (96, 192) |
+| 15 / 10 | `data/maps/yard_ship.json` | The Capsule Corp backyard (6/21) with the Saiyan ship parked (2026-10-21): the stock map with `tools/shipart.py`'s ship on BG2 (under the players) at x 216-471, y 280-439, blocking but for its doorway (x 328-359, y 392-419) and ramp; 643 of 896 slots. Never warped to: `map_variation_hook` (section 1) hands its variation out for 6/21 while the ship is parked | 600 x 600 | (168, 272) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an

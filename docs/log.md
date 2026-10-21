@@ -2,6 +2,19 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-21
+
+- **The big Saiyan ship with a door (Ryan):** the ship is 256 x 160 map art drawn by code (`tools/shipart.py`), not
+  sprites (twice the old 128 x 64 would take all of OBJ VRAM; sprites 171 / 172 freed): the backyard's variation while
+  it is parked (zone 15 area 10, `data/maps/yard_ship.json`; `map_variation_hook` on `FUN_0800EB4C`,
+  `src/coop/shipyard.c`) and painted into New Planet Vegeta's landing zone (Goku's pod crater scenery removed for the
+  tile slots). Its open door and ramp are walkable: Paragus steps out of it, the players walk in to board and walk out
+  on arrival and at home (flag 379). The door now works right after Paragus' scene (its trigger had a flag-377
+  condition, tested only when the map loads, so it stayed off until the backyard was entered again); his scene no
+  longer replays. Paragus and the others ride in the room both ways and get off first; on New Planet Vegeta they wait
+  at the ramp's foot for the welcome, then walk ahead to the basin. Krillin, Yamcha and Puar (the wait's backyard
+  NPCs) moved off the ship's spot. `mapbuild.py`: `png` `"draw"`, `art_footprint`. `broly_ride.txt` rewritten.
+
 ## 2026-10-20
 
 - **Duel endings (Ryan):** a duel's end refills both players' HP and ki and shows "Player N wins the duel!" before

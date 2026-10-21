@@ -87,6 +87,7 @@ ENTRY_JUMPS = [
     (0x080094B0, "vm_push_name_hook"),       # VM: push the active character's name (dialogue %s)
     (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
     (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
+    (0x0800EB4C, "map_variation_hook"),      # MapEntry -> variation: the backyard with the parked Saiyan ship (shipyard.c)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs

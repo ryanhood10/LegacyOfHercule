@@ -9,14 +9,15 @@
     },
     {
       "map": {"zone": 6, "area": 21},
-      "_": "the backyard: the Saiyan ship (sprites 171 + 172, its two halves on one spot) from Bulma's news on, except while it is away; Paragus' scene when Vegeta is a player; then the ship's door (the trigger at its foot) boards the players (broly_board)",
-      "add_records": [
-        {"kind": "actor", "sprite": 171, "x": 368, "y": 240, "facing": 0, "condition": "script:broly_ship_shown_cond"},
-        {"kind": "actor", "sprite": 172, "x": 368, "y": 240, "facing": 0, "condition": "script:broly_ship_shown_cond"}
-      ],
+      "_": "the backyard: the Saiyan ship is map art (data/maps/yard_ship.json: this map's variation while it is parked, src/coop/shipyard.c; 2026-10-21) at x 216-471, y 280-439; Paragus' scene when Vegeta is a player (once); the ship's doorway (the trigger over the top of its ramp, x 324-363, y 392-427: the walkable doorway is x 328-359) boards the players once Paragus' offer is taken (broly_board checks flag 377 itself: a trigger's condition is tested when the map loads, so a 377 condition stayed off until the backyard was entered again). Krillin, Yamcha and Puar (stock records 0-2, shown in the ten-day wait: flags 158 and not 191) moved from in front of the house (296-352, 328-344), where the ship now stands, to the patio's far corner",
+      "records": {
+        "0": {"x": 408, "y": 200},
+        "1": {"x": 440, "y": 200},
+        "2": {"x": 424, "y": 224}
+      },
       "add_triggers": [
         {"kind": "dialogue", "rect": [64, 232, 112, 312], "payload": "seq:broly_yard", "condition": "script:broly_ship_cond"},
-        {"kind": "dialogue", "rect": [344, 250, 392, 292], "payload": "seq:broly_board", "condition": "script:broly_board_cond"}
+        {"kind": "dialogue", "rect": [324, 392, 364, 428], "payload": "seq:broly_board", "condition": "script:broly_ship_cond"}
       ]
     }
   ]

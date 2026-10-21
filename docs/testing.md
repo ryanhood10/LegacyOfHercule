@@ -461,6 +461,13 @@ python tools/headless/st_test.py tools/headless/mkmenu.txt build/broly/log2-coop
   `runfork.ps1 ... -Slot 6 -Mute -State .../fight.ss` (a headless savestate loads in the fork) and a
   gdb loop (from Git Bash set `MSYS_NO_PATHCONV=1` before `wsl ... bash /mnt/...`).
 - Single-player: the same scripts without `p2 0` (slower through the dialogue; one boss bar).
+- The ship ride, end to end (2026-10-21): `tools/headless/broly_ride.txt` (alone; Paragus' scene, up the ramp
+  into the doorway at x 344, the room route around the table to its door, out on New Planet Vegeta at 320,680,
+  around the ship to the rim, test command 7, the ride home, out of the backyard ship's door at 344,412). Wait
+  about 900 frames after "The ship lands." before walking: the others get off first. Two players: `p2 0`, and
+  give player 2's pad the same direction as player 1's on every walk (`p2 0x40` beside `keys 0x40`) or the co-op
+  leash stops player 1 halfway (the room's door, the walk to the rim). Player 2 is not drawn during scenes; he
+  shows beside player 1 when the scene ends.
 
 ## Gero's computer (headless chapter run and the bunker fight in the fork, 2026-10-19)
 

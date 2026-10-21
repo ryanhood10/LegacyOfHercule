@@ -32,7 +32,7 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 360-362 | story chapters 1-7 | 360 Krillin has visited, 361 inside Triceratops Jungle, 362 Hercule's deal |
 | 363-375 | Roshi's gym (`ch8_gym`) | 363-375 |
 | 376 | the removed arctic Android 13 encounter | free since 2026-10-18 (the scene is kept in `data/archive/ch8_arctic.lscript`, not built) |
-| 377-379 | the Broly chapter's ship ride | 377 the players may board (Paragus' offer taken), 378 the ship landed on New Planet Vegeta; 379 free |
+| 377-379 | the Broly chapter's ship ride | 377 the players may board (Paragus' offer taken; his scene does not replay), 378 the ship landed on New Planet Vegeta, 379 out of the ship at home after the ride back (the room's door no longer leads anywhere) |
 | 380-399 | new maps (`data/maps/*.json`, `data/story/arctic_route.*`) | 380 free (the arctic's Vegeta barrier, removed 2026-10-19); **381 the arctic is open** (the world-map landing and its star; the post-game chapter sets it at the explosion); **382 Super 13 beaten** (the star turns into the plain marker; the post-game chapter sets it); 383-389 the arctic route's, free |
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-438 saved "available" bits of slots 0-8 (all but 6 and 7) |
@@ -102,9 +102,7 @@ sprite 72) for Roshi's gym.
 | 166 | Cooler's Namekian servant | `tools/bossmodels.py` | `NAMEK_SPRITE` |
 | 167-169 | free | | |
 | 170 | Paragus | `tools/brolysprites.py` | `PARAGUS_SPRITE` (hardcoded in `broly.lscript`) |
-| 171 | the Saiyan ship (from Buu's Fury) | `tools/brolysprites.py` | `SHIP_SPRITE` (hardcoded in `broly.lscript`) |
-| 172 | the Saiyan ship's right half (the ship doubled: 171 left, 172 right) | `tools/brolysprites.py` | `SHIP2_SPRITE` |
-| 173-174 | free | | |
+| 171-174 | free (171 / 172 were the Saiyan ship's halves until 2026-10-21: it is map art now, `tools/shipart.py`) | | |
 | 175 | Android 16 as a player | `tools/a16sprites.py` | `A16P_SPRITE` |
 | 176 | haloed Goku (dead after the Cell Games), display row 26 | `tools/halosprites.py` | `HALO_GOKU_SPRITE` |
 | 177 | haloed Super Saiyan Goku, display row 27 | `tools/halosprites.py` | `HALO_SSJ_SPRITE` |
@@ -237,7 +235,8 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 7 | `arctic_ridge.json` | arctic route, the ridge: save pad |
 | 8 | `arctic_summit.json` | arctic route, the summit: Super 13's battle, flight spot |
 | 9 | `saiyan_ship.json` | inside the Saiyan ship (the Broly chapter's ride both ways) |
-| 10-19 | free (10-14, 15-19 were allocated to two wait sessions, unused) | |
+| 10 | `yard_ship.json` | the Capsule Corp backyard (6/21) with the Saiyan ship parked: never warped to; its variation stands in for the backyard's while the ship is parked (`src/coop/shipyard.c`) |
+| 11-19 | free (10-14, 15-19 were allocated to two wait sessions, unused) | |
 
 ## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
 

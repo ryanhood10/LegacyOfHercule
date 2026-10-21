@@ -318,9 +318,9 @@ sparring match names the winner's character instead), and both players are back 
     Bulma already hands over the Scouter Note), Bulma walks in (she is not in the room after Perfect
     Cell) and adds: tell Vegeta a ship is arriving for him in the backyard, and it looks like a Saiyan
     ship (flag 400).
-  - *Backyard:* the Capsule Corp lawn (zone 6 area 21). A Saiyan ship stands on the patio (Buu's
-    Fury's purple ship, sprite 171); without Vegeta as a player a narration line says Vegeta should see
-    it. With Vegeta, Paragus steps out and says he has found a New Planet Vegeta for him to rule as
+  - *Backyard:* the Capsule Corp lawn (zone 6 area 21). A Saiyan ship stands on the patio (since
+    2026-10-21 a big round ship drawn as map art, below); without Vegeta as a player a narration line
+    says Vegeta should see it. With Vegeta, Paragus steps out and says he has found a New Planet Vegeta for him to rule as
     king. Vegeta goes aboard; Trunks follows with Krillin, Gohan and Piccolo; the ship leaves. Those
     five are the only selectable characters until the way home (Hercule stays home).
   - *The ship ride (Ryan, 2026-10-20):* the ship is twice its art's size (128 x 64, sprites 171 + 172, a left
@@ -331,9 +331,26 @@ sparring match names the winner's character instead), and both players are back 
     landed ship and Paragus' welcome. After Broly the ride home plays in the same room ("The ship escapes
     the exploding planet and heads home..." / "The ship lands back at Capsule Corp."), and the ship stays
     parked in the backyard. Narration lines Claude's drafts.
+  - *The big ship with a door (Ryan, 2026-10-21: "make the ship bigger! double it again! ... more detail
+    ... give a door to go in the front and actually enter and leave"; "all the characters from the prior
+    cutscene should be in the ship, and when we land ... they all get off"):* the ship is 256 x 160 map art
+    (`tools/shipart.py`: a grey sphere with panel lines and rivets, a red cockpit dome, a crest, a purple
+    ring of lights, swept fins, four landing legs, an open lit door with a ramp at its front), the
+    backyard's look while it is parked (`data/maps/yard_ship.json`, `src/coop/shipyard.c`) and painted
+    into New Planet Vegeta's landing zone. Paragus steps out of its door for his scene; afterwards the
+    players walk up the ramp into the doorway to board (before Paragus' offer the doorway gives "The
+    ship's hatch stands open.  Whoever flew it here can't be far..."). Paragus and the rest of the
+    trip's cast stand in the ship's room during the flight and walk out of its door first after the
+    landing; the players then walk out of the room's door and appear in the ship's doorway outside, the
+    others already waiting at the foot of the ramp for Paragus' welcome, after which they all walk ahead
+    around the ship toward the basin (the rim scene has them there). The ride home is the same: the
+    others ride in the room and get off first, the players walk out of the ship's door into the
+    backyard (flag 379) where Bulma and the others wait for the debrief. Paragus' scene plays once. The
+    hatch line is Claude's draft. To fit the ship on New Planet Vegeta, Goku's pod crater (scenery on
+    the plain above the basin, out of reach) was removed.
   - *Arrival:* New Planet Vegeta is the Broly arena (zone 15 area 3) with a landing zone added south
-    of the basin, the ship and a save pad where the players can switch to anyone of the five; Vegeta
-    is player 1 and Trunks player 2 on arrival.
+    of the basin and the ship (no save pad since 2026-10-20); Vegeta is player 1 and Trunks player 2
+    on arrival.
   - *The fight:* crossing into the basin, everyone appears on screen for the stock-style dialogue
     (each actor only when no player plays him; Broly mistakes Gohan for Kakarot's son), then only
     player 1 and player 2 fight Broly (stat 115) and Paragus (stat 116), on Cooler's melee boss AI.

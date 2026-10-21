@@ -48,14 +48,12 @@ KRILLIN_SPRITE ?= 161
 # built from the ROM); src/coop/bosses.c gives them to the co-op twins of 19, Dr. Gero and Cooler
 A13_SPRITE ?= 165
 NAMEK_SPRITE ?= 166
-# PARAGUS_SPRITE / SHIP_SPRITE / PARAGUS_PORTRAIT: the Broly side chapter's art (tools/brolysprites.py, built from
-# the ROMs: Vegeta's set made old, Buu's Fury ship record 1, Vegeta's portrait made old); src/coop/bosses.c
+# PARAGUS_SPRITE / PARAGUS_PORTRAIT: the Broly side chapter's art (tools/brolysprites.py, built from the ROM:
+# Vegeta's set made old, Vegeta's portrait made old; the Saiyan ship is map art, tools/shipart.py); src/coop/bosses.c
 # CELL2_SPRITE: a copy of Perfect Cell's stock record 30 (tools/spriteclone.py "@30"), so the Cell Games'
 # scripts can address the second Cell apart
 CELL2_SPRITE ?= 162
 PARAGUS_SPRITE ?= 170
-SHIP_SPRITE ?= 171
-SHIP2_SPRITE ?= 172
 PARAGUS_PORTRAIT ?= 120
 # HALO_GOKU_SPRITE / HALO_SSJ_SPRITE: Goku and Super Saiyan Goku with a halo on every frame (tools/halosprites.py,
 # built from the ROM), display rows 26 / 27; a script makes Goku (slot 4) dead with SetCharacterTransformation(4, 176)
@@ -89,7 +87,7 @@ BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72;
 # 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
-EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(SHIP_SPRITE)=ship_record $(SHIP2_SPRITE)=ship2_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
 
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
@@ -232,7 +230,7 @@ $(BUILD)/coop.sym: $(BUILD)/coop.elf
 $(BUILD)/hercule.patch.json: data/hercule.json $(wildcard data/*.json data/story/*.json data/story/*.lscript) tools/romdata.py tools/mapedit.py tools/script_asm.py
 	$(PYTHON) tools/romdata.py build $< $@ $(ROM) --party-slots $(PARTY_SLOTS)
 
-$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py tools/script_asm.py $(wildcard data/story/*.lscript) $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/shipart.py tools/maplib.py tools/mapchunks.py tools/buu2log2.py tools/script_asm.py $(wildcard data/story/*.lscript) $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	@mkdir -p $(BUILD)
 	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps --buu-rom $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
 

@@ -1,5 +1,5 @@
 {
- "_": "Broly side-arc arena (docs/story.md 4f): a rocky wasteland crater. Northern Wastelands zone 3 area 6: its walled basin (cliff walls north and west, a pebble rim south and east; the basin's own collision) as the arena floor, the pod crater on the plain above it as scenery, the plain filled in around them. Only the basin is walkable. The pod crater alone takes 660 of the 896 tile slots; Broly side chapter (docs/story.md 4g, data/story/broly.lscript): 224 px of plain added south of the basin as New Planet Vegeta's landing zone (the Saiyan ship, the arrival spawn; no save pad since 2026-10-20: the arena has no way out until Broly falls, so a save there could trap a weak party), walkable up into the basin over its pebble rim; Broly (sprite 159) waits in the basin; crossing the rim starts the confrontation and the fight (Broly stat 115 + Paragus stat 116, bosses.c). No flight spot: the players leave by the chapter's ending. No name banner (another planet).",
+ "_": "Broly side-arc arena (docs/story.md 4f): a rocky wasteland crater. Northern Wastelands zone 3 area 6: its walled basin (cliff walls north and west, a pebble rim south and east; the basin's own collision) as the arena floor, the plain filled in around it (until 2026-10-21 Goku's pod crater from the same map sat on the plain above as scenery: it took 660 of the 896 tile slots, and the bigger ship needed them). Only the basin is walkable; Broly side chapter (docs/story.md 4g, data/story/broly.lscript): 224 px of plain added south of the basin as New Planet Vegeta's landing zone (the Saiyan ship: tools/shipart.py's 256 x 160 art on BG2 at x 192-447, y 504-663 (high enough that the camera shows the ground in front of it above the dialogue box), its doorway at x 304-335, the players step out of it on arrival; no save pad since 2026-10-20: the arena has no way out until Broly falls, so a save there could trap a weak party), walkable up into the basin over its pebble rim; Broly (sprite 159) waits in the basin; crossing the rim starts the confrontation and the fight (Broly stat 115 + Paragus stat 116, bosses.c). No flight spot: the players leave by the chapter's ending. No name banner (another planet).",
  "name": "broly_arena",
  "zone": 15,
  "area": 3,
@@ -39,26 +39,6 @@
   {
    "op": "stamp",
    "at": [
-    44,
-    0
-   ],
-   "src": {
-    "map": [
-     3,
-     6
-    ],
-    "rect": [
-     48,
-     8,
-     32,
-     26
-    ]
-   },
-   "collision": false
-  },
-  {
-   "op": "stamp",
-   "at": [
     7,
     24
    ],
@@ -91,6 +71,29 @@
    "mask": "both"
   }
  ],
+ "layers": {
+  "2": [
+   {
+    "op": "png",
+    "draw": "shipart",
+    "at": [
+     24,
+     63
+    ],
+    "_": "the Saiyan ship (Ryan, 2026-10-21: doubled again, a door to walk out of), its doorway at x 304-335, y 616-643, the ramp below"
+   }
+  ]
+ },
+ "collision": [
+  {
+   "op": "art_footprint",
+   "draw": "shipart",
+   "at": [
+    24,
+    63
+   ]
+  }
+ ],
  "triggers": [
   {
    "type": "dialogue",
@@ -107,7 +110,7 @@
  ],
  "spawn": [
   320,
-  700
+  680
  ],
  "name_id": 221,
  "music": 30,
@@ -122,8 +125,8 @@
    "x": 216,
    "y": 640,
    "facing": 0,
-   "condition": "script:broly_trip_cond",
-   "_": "0: the Saiyan ship's left half (sprite 171) on the landing zone; record 3 is its right half"
+   "condition": "never",
+   "_": "0: unused (was the ship's left half, sprite 171, until the ship became map art on 2026-10-21; records keep their indexes)"
   },
   {
    "kind": "actor",
@@ -155,8 +158,8 @@
    "x": 216,
    "y": 640,
    "facing": 0,
-   "condition": "script:broly_trip_cond",
-   "_": "3: the ship's right half (sprite 172)"
+   "condition": "never",
+   "_": "3: unused (was the ship's right half, sprite 172)"
   }
  ]
 }

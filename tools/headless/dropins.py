@@ -78,7 +78,7 @@ chapters = [
     ("f3", "+151 +155 +156 +157", 149, None, 300, ""),                           # Gero's computer (Capsule Corp)
     ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 300, "poke8 0x0203F000 4\n"),   # the Cell Games path
     # F7 the Broly chapter (Ryan): the Capsule Corp backyard with the Saiyan ship (flag 400), Vegeta player 1, just
-    # right of the trigger by the ship (rect 64..112 x 232..312: walk left into it)
+    # right of the Paragus trigger on the walkway (rect 64..112 x 232..312: walk left into it); the ship is map art south of it
     ("f7", "+151 +155 +156 +157 +400", 165, ("0x1506", "0x011000A8"), 300, "poke8 0x0203F000 2\n"),
 ]
 text = ""
