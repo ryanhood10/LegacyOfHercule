@@ -75,11 +75,11 @@ ssave {W('f2.ss')}
 EARLY = ("+26 +30 +66 +68 +69 +77 +86 +127 +129 +132 +136 +140 +141 +143 +144 +148 +149 +151 +157 "
          "+162 +163 +164 +185 +186 +187 +188 +400")   # 400: Bulma's Saiyan-ship news (the Broly chapter: the ship waits in the backyard)
 chapters = [
-    ("f3", "+151 +155 +156 +157", 149, None, 40, ""),                           # Gero's computer (Capsule Corp)
-    ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 30, "poke8 0x0203F000 4\n"),   # the Cell Games path
+    ("f3", "+151 +155 +156 +157", 149, None, 300, ""),                           # Gero's computer (Capsule Corp)
+    ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 300, "poke8 0x0203F000 4\n"),   # the Cell Games path
     # F7 the Broly chapter (Ryan): the Capsule Corp backyard with the Saiyan ship (flag 400), Vegeta player 1, just
     # right of the trigger by the ship (rect 64..112 x 232..312: walk left into it)
-    ("f7", "+151 +155 +156 +157 +400", 165, ("0x1506", "0x011000A8"), 30, "poke8 0x0203F000 2\n"),
+    ("f7", "+151 +155 +156 +157 +400", 165, ("0x1506", "0x011000A8"), 300, "poke8 0x0203F000 2\n"),
 ]
 text = ""
 for i, (n, flags, entry, warp, settle, extra) in enumerate(chapters):
@@ -121,7 +121,7 @@ frames 300
 {WARP.format(za='0x0109', xy='0x01C002F8')}frames 200
 ssave {W('df6.ss')}
 """ + one_player("postgame.txt", 11, 500) + f"""frames 300
-{WARP.format(za='0x080F', xy='0x01D00150')}frames 30
+{WARP.format(za='0x080F', xy='0x01D00150')}frames 300
 ssave {W('df5.ss')}
 """, os.path.join(work, "menu.ss"))
 run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n in ("f3", "f4", "f5", "f6", "f7")))

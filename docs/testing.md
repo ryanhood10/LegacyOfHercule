@@ -681,7 +681,7 @@ Literal pools: search the ROM for a 32-bit value to find every code literal that
 
 ## Drop-in savestates for Ryan (2026-10-20)
 
-`python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss6` next to the play
+`python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss7` next to the play
 ROM: mGBA loads slot n with Fn (Shift+Fn saves over it). F1 his save on the Northern Wastelands save pad (Krillin),
 F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path (Goku player 1 for the
 ring's barrier), F5 the Arctic summit, F6 the post-game Lookout below Dende, F7 the Broly chapter's backyard (Vegeta player 1, flag 400: the ship is there;
@@ -689,7 +689,8 @@ walk left into the trigger by the ship). F3 / F4 / F7 are made by Map Test on th
 DEBUG_MENU=1 build (the same code but for the 4-byte title patch); F6 and F5 play the Cell Games through alone
 (`cell_games_1p.txt`), land at the Lookout's world-map site (the test warp only moves the flyer on the world map,
 and the Games' last "Journal Updated!" holds it until A), and F5 makes the wishes (`postgame.txt`), so their party
-is the real one (Goku's halo, Super Saiyan 2 Gohan). All are re-saved on the play ROM. Every one gets the story
+is the real one (Goku's halo, Super Saiyan 2 Gohan). All are re-saved on the play ROM. Each is saved 300 frames after its warp or Map Test, with the map fully loaded (Ryan, 2026-10-21: F7 saved
+30 frames after its warp opened mid-load on the Map Test spot and stayed there in mGBA; check a new one with `load`, `frames 2`, `map`: real player coordinates, not -1,-1). Every one gets the story
 before the ten-day wait as done (`EARLY` in dropins.py, worked out from the world map's on-load: no stale stars,
 the Lookout landing open) and flag 400 (Bulma's news: the Broly ship waits in the backyard). The states hold no cartridge save, so loading one leaves the .sav alone (an
 in-game save inside one still writes it). Savestates break with every rebuild: rerun after each, with mGBA closed.
