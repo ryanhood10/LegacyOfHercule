@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Keep Goku restored** (Ryan's F6 test: no haloed Goku to pick): the Cell Games' restated end script (entry 53)
+  ran the stock `ClearCharacterInPartyFlag 4`, bypassing the old byte patch at 0x3EC738, so Goku left the party
+  after the Games. The generator now keeps him (`SetCharacterInPartyFlag 4`); he shows with his halo on the save
+  pad's Switch Characters screen. Both Cell Games tests check his flags (0x0203F090 = 7f).
+- **The summit (Ryan's F5 test):** four breakable rocks (`mapbuild.py` `rocks`: stock decoration + item, the large
+  rock's drop) and, after Super 13, the fade back to Dende's Lookout where the finale plays by itself. The drop-ins'
+  F5 / F6 now come from the Cell Games played through (Goku's halo, Super Saiyan 2 Gohan).
 - **Ryan's drop-in play-test fixes:** old Hercule travels with Trunks through Goku's landing (behind him, with
   the group, hanging back at the crater's rim for his "Psst!", back with everyone); the workshop shows 16 on
   Briefs' table until he wakes, then a fade to an empty table with 16 standing beside it (the stock on-load

@@ -97,6 +97,9 @@ can draw them.
 
 ## 4. Keep Goku after Cell
 
+**2026-10-20:** the Cell Games chapter (`tools/gen_cell_games.py`) restates entry 53 as its own script, so the byte
+patch no longer runs; the generator writes `SetCharacterInPartyFlag 4` there itself.
+
 Applied as the one-byte record in `data/hercule.json` (`expect 5b -> 4f`). `tools/script_dump.py
 --rom build/log2-coop.gba map 14 3` shows Cell's defeat dialogue (record 12, stat 25) with entry 53
 now reading `PushByte 4; Step 79 SetCharacterInPartyFlag` where the stock ROM has `Step 91

@@ -782,7 +782,7 @@ sequence cg_beam_struggle
   script                                 ; stock entry 53: Goku stays in the party (Keep Goku) and wears his halo (sprite 176, row 26)
         WarpToMapWithEntities 6, 99, 1, 1832, 1088
         SetCharacterTransformation 4, 176
-        ClearCharacterInPartyFlag 4
+        SetCharacterInPartyFlag 4
         PlayAudio 62
         END
   script                                 ; Super Saiyan 2 Gohan joins (ssj2gohan.c, party slot 8)

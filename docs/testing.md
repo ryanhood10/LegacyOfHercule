@@ -683,8 +683,11 @@ Literal pools: search the ROM for a 32-bit value to find every code literal that
 
 `python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss6` next to the play
 ROM: mGBA loads slot n with Fn (Shift+Fn saves over it). F1 his save on the Northern Wastelands save pad (Krillin),
-F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path, F5 the Arctic, F6 the
-post-game Lookout. F3-F6 are made by Map Test on the DEBUG_MENU=1 build (the same code but for the 4-byte title
-patch) and re-saved on the play ROM. The states hold no cartridge save, so loading one leaves the .sav alone (an
+F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path (Goku player 1 for the
+ring's barrier), F5 the Arctic summit, F6 the post-game Lookout below Dende. F3 / F4 are made by Map Test on the
+DEBUG_MENU=1 build (the same code but for the 4-byte title patch); F6 and F5 play the Cell Games through alone
+(`cell_games_1p.txt`), land at the Lookout's world-map site (the test warp only moves the flyer on the world map,
+and the Games' last "Journal Updated!" holds it until A), and F5 makes the wishes (`postgame.txt`), so their party
+is the real one (Goku's halo, Super Saiyan 2 Gohan). All are re-saved on the play ROM. The states hold no cartridge save, so loading one leaves the .sav alone (an
 in-game save inside one still writes it). Savestates break with every rebuild: rerun after each, with mGBA closed.
 `build/play/DROP-INS.txt` lists the keys for Ryan.

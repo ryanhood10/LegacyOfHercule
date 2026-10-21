@@ -193,3 +193,12 @@ sequence pg_dende
   script
         ReturnToTitleScreen
 end
+
+; the Lookout's arrival trigger (postgame.json): back from the summit with Super 13 beaten (382) and the finale unseen
+; (483) Dende's scene plays by itself; its first entry picks the finale
+script pg_finale_cond
+    StackTestStoryFlag 382
+    StackTestStoryFlagNot 483
+    And
+    END
+end

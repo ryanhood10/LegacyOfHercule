@@ -5,8 +5,10 @@ usage: python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR
              state (tools/headless/mkmenu.txt)
   SAV        a battery save standing on the Northern Wastelands save pad (zone 3 area 3) with Krillin
 F1 that save pad (the save, answered 1 Player); F2 Goku's landing site (played on from F1 through Frieza's landing,
-then the fly pad's warp); F3-F6 Gero's computer, the Cell Games path, the Arctic, the post-game Lookout (Map Test with
-each chapter test's flags, made on DEBUG_ROM, re-saved on PLAY_ROM). States carry no cartridge save (`ssave`), so
+then the fly pad's warp); F3 Gero's computer and F4 the Cell Games path (Map Test with the chapter tests' flags;
+Goku player 1 for the ring's barrier); F6 the post-game Lookout below Dende and F5 the Arctic summit after the
+wishes, both after the Cell Games played through alone (cell_games_1p.txt, then postgame.txt's wishes), so the
+party is the real one (Goku's halo, Super Saiyan 2 Gohan). F3-F6 are made on DEBUG_ROM and re-saved on PLAY_ROM. States carry no cartridge save (`ssave`), so
 loading one never touches the .sav. Savestates break with every rebuild: run this again after each.
 """
 import os, shutil, subprocess, sys
@@ -65,22 +67,55 @@ frames 300
 {WARP.format(za='0x0603', xy='0x01C801A0')}frames 45
 ssave {W('f2.ss')}
 """)
-# F3-F6 on the debug ROM (Map Test + the chapter tests' flags), then re-saved on the play ROM
+# F3 / F4 on the debug ROM by Map Test with the chapter tests' flags (both before the Cell Games, so the stock
+# party there is right; F4 makes Goku player 1: the ring's barrier lets only him through)
 chapters = [
-    ("f3", "+151 +155 +156 +157", 149, None, 40),                              # Gero's computer (Capsule Corp)
-    ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 30),                     # the Cell Games path
-    ("f5", "+195 +191 +480 +381", 261, ("0x080F", "0x01D00150"), 30),           # the Arctic
-    ("f6", "+195 +191", 261, ("0x0109", "0x01C002F8"), 120),                    # the post-game Lookout
+    ("f3", "+151 +155 +156 +157", 149, None, 40, ""),                           # Gero's computer (Capsule Corp)
+    ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 30, "poke8 0x0203F000 4\n"),   # the Cell Games path
 ]
 text = ""
-for i, (n, flags, entry, warp, settle) in enumerate(chapters):
+for i, (n, flags, entry, warp, settle, extra) in enumerate(chapters):
     text += ("load menu.ss\n" if i else "") + f"p2 off\npreset {flags}\nmaptest {entry}\n"
     if warp:
-        text += "frames 200\n" + WARP.format(za=warp[0], xy=warp[1])
+        text += "frames 200\n" + extra + WARP.format(za=warp[0], xy=warp[1])
     text += f"frames {settle}\nssave {W('d' + n + '.ss')}\n"
 shutil.copy(menu, os.path.join(work, "menu.ss"))
 run("dbg", dbg, text, os.path.join(work, "menu.ss"))
-run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n, *_ in chapters))
+
+
+def one_player(path, first=None, last=None):
+    """A headless test's lines run alone (p2 0 -> p2 off, its other p2 lines dropped), lines first..last (1-based)."""
+    lines = open(os.path.join(here, path), encoding="utf-8").read().split("\n")[(first or 1) - 1:last]
+    out = []
+    for l in lines:
+        if l.startswith("#") or l.startswith("echo") or l.startswith("peek") or l.startswith("shot") or l == "map":
+            continue
+        if l == "p2 0":
+            l = "p2 off"
+        elif l.startswith("p2 "):
+            continue
+        out.append(l)
+    return "\n".join(out) + "\n"
+
+
+# F6 / F5 after the Cell Games played through (tools/headless/cell_games_1p.txt: Goku's halo, Super Saiyan 2
+# Gohan, the flags the Games set), F6 below Dende on the Lookout (the flyer lands at the Lookout's world-map site,
+# trigger 8 of map 176: the test warp only moves the flyer there; A first closes the Games' last 'Journal Updated!',
+# which holds the command); F5 then makes the wishes (postgame.txt's first
+# part) and stands at the Arctic summit
+games = one_player("cell_games_1p.txt")
+run("games", dbg, games + f"""key 1 6
+frames 200
+{WARP.format(za='0x6306', xy='0x05C40380')}frames 150
+key 1 10
+frames 300
+{WARP.format(za='0x0109', xy='0x01C002F8')}frames 200
+ssave {W('df6.ss')}
+""" + one_player("postgame.txt", 11, 500) + f"""frames 300
+{WARP.format(za='0x080F', xy='0x01D00150')}frames 30
+ssave {W('df5.ss')}
+""", os.path.join(work, "menu.ss"))
+run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n in ("f3", "f4", "f5", "f6")))
 
 base = os.path.splitext(os.path.basename(play))[0]
 for i in range(1, 7):

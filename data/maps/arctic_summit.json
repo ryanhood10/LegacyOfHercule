@@ -447,5 +447,15 @@
       "action": "seq:summit_13_end",
       "_": "11: Super 13 the boss (stat 145, sprite 180: src/coop/super13.c)"
     }
-  ]
+  ],
+  "rocks": {
+    "_": "Ryan (2026-10-20): four rocks to break for health / ki. Snowy Highlands' large rock (zone 13 area 2's sheet, one 32x32 frame, 1 KB of OBJ VRAM beside Super 13), 3 hits, the stock large-rock drop: random HP / EP pickups by player 1's bars, none when both are full; clear of the arrival path, the flight spot, the scene strip and the fight's middle",
+    "sheet": [13, 2],
+    "list": [
+      {"x": 184, "y": 208, "frame": 0, "hits": 3, "drop": "0x083EE6A8", "_": "back left"},
+      {"x": 504, "y": 208, "frame": 0, "hits": 3, "drop": "0x083EE6A8", "_": "back right"},
+      {"x": 176, "y": 344, "frame": 0, "hits": 3, "drop": "0x083EE6A8", "_": "left"},
+      {"x": 512, "y": 344, "frame": 0, "hits": 3, "drop": "0x083EE6A8", "_": "right"}
+    ]
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "_": "The post-game on the Lookout (docs/story.md 4i): the wishes with Yamcha's slip, the Arctic explosion and 18 leaving (flags 480, 381), Dende pointing north until Super 13 is beaten (382), the finale (483), then his yes / no question (CoopCall 18) whose yes plays Hercule's talk show, the credits and the new epilogue.",
+  "_": "The post-game on the Lookout (docs/story.md 4i): the wishes with Yamcha's slip, the Arctic explosion and 18 leaving (flags 480, 381), Dende pointing north until Super 13 is beaten (382), the finale (483, by itself on the return from the summit), then his yes / no question (CoopCall 18) whose yes plays Hercule's talk show, the credits and the new epilogue.",
   "sources": [
     "data/story/postgame.lscript"
   ],
@@ -13,7 +13,21 @@
         "4": {
           "talk": "seq:pg_dende"
         }
-      }
+      },
+      "_": "Dende (record 4) runs the post-game; arriving below him from the summit plays the finale by itself",
+      "add_triggers": [
+        {
+          "kind": "dialogue",
+          "rect": [
+            736,
+            432,
+            784,
+            472
+          ],
+          "payload": "seq:pg_dende",
+          "condition": "script:pg_finale_cond"
+        }
+      ]
     },
     {
       "map": {

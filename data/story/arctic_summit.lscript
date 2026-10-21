@@ -1,6 +1,6 @@
 ; The Arctic summit (zone 15 area 8, docs/story.md 4i): Android 13, 17 and 18 fighting when the players arrive, 13
 ; absorbs 17 then 18 and becomes Super 13, the players say they have to stop him, the fight, the explosion, Vegeta's
-; "clankers". Built into the map by tools/mapbuild.py from data/maps/arctic_summit.json ("sources").
+; "clankers", then back to the Lookout (postgame's arrival trigger plays the finale). Built into the map by tools/mapbuild.py from data/maps/arctic_summit.json ("sources").
 ; Speakers: 0 narration (13 has no portrait), 1 player 1's character, 28 Android 17, 29 Android 18, 106 Vegeta.
 ; Super 13: sprite 180, stat 145, portrait 122 (src/coop/super13.c, tools/super13sprites.py).
 
@@ -216,4 +216,7 @@ sequence summit_13_end
         PlayMusic 5                      ; the summit's own music again
         PlayAudio 62
   text 0 "@^Journal Updated!"
+  script                                 ; back to Dende's Lookout (Ryan): below Dende, where the finale starts on arrival
+        FadeOut 120
+        WarpToMapWithEntities 9, 1, 1, 760, 448
 end

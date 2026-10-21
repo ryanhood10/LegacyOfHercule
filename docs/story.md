@@ -522,7 +522,8 @@ epilogue, then the title screen; the talk-show bonus ending).
   characters say they have to stop this; the rest of the party watches from the sideline, so open
   dialogue still works (lines written per speaker or with the player's name; the duplicate-NPC rule
   keeps the two players' characters off the sideline).
-- **After 13 (Ryan):** back to Dende's Lookout. The players' characters say they are happy to finally
+- **After 13 (Ryan):** back to Dende's Lookout (built 2026-10-20: after "Journal Updated!" the summit fades and warps
+  below Dende, whose finale then plays by itself through an arrival trigger, `pg_finale_cond`). The players' characters say they are happy to finally
   have time to relax with no enemies to fight. Dende's last line: "Talk to me if you want to discuss
   our times of peace!"
 - **Dende's prompt (Ryan), from then on whenever he is talked to:** "Enter Peace Times and start
@@ -572,6 +573,7 @@ epilogue, then the title screen; the talk-show bonus ending).
 - **The end of Super 13 (Ryan):** he explodes at the end, and 17 and 18 die with him. VEGETA: "*spits*
   At last. The end of those clankers."
 - **Difficulty (Ryan):** Super 13 is slightly harder than Cell; no extra reward.
+- **Rocks on the summit (Ryan, 2026-10-20):** four breakable rocks for health / ki around the clearing.
 - **Defaults (Claude's, Ryan may change):** before Super 13 is beaten, Dende points the players north
   ("That power in the Arctic... someone has to stop it!") and his Buu's Fury prompt only appears after
   13; 18 is removed from any place that shows her once she is dead; the arrival scene plays in full the

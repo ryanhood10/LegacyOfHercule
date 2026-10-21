@@ -259,7 +259,7 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 | 15 / 5 | `data/maps/arctic_climb1.json` | The arctic route's first climb: a trail between walls of snowy trees (Snowy Highlands area 1), two cliff tiers (area 3's cliff band) with the pass at alternate ends, pines and round trees; 7 enemies | 480 x 720 | (240, 672) |
 | 15 / 6 | `data/maps/arctic_climb2.json` | The second climb: the same trail higher up, ending under area 5's upper cliffs with the cave on to the ridge; 6 enemies | 480 x 672 | (240, 630) |
 | 15 / 7 | `data/maps/arctic_ridge.json` | The ridge: Snowy Highlands area 9 (plateau under a cliff arc with a cave), a path up from below (area 10's dip), area 7's save pad; no enemies | 288 x 400 | (160, 276) |
-| 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch | 720 x 592 | (336, 464) |
+| 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch, four breakable rocks (Ryan, 2026-10-20: zone 13 area 2's large rock, 3 hits, the stock large-rock drop) | 720 x 592 | (336, 464) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an
@@ -393,4 +393,13 @@ animated tiles (frame 0 only), exits and scripts. Finding the map table (through
   the map's free space (`StoryRefs`). Broly's arena uses it; the arctic used it for the removed Android 13 encounter
   (now `data/archive/ch8_arctic.lscript`, no longer named by `arctic.json`).
 - The activation objects (0x0300209x) are named by use, not decoded.
-- Decoration records beyond the barrier pattern, item and chest record layouts: not needed yet.
+- **Breakable rocks (decoded 2026-10-20, used on the summit):** a rock is a decoration (0x18 bytes: x1, y1, x2,
+  y2, u16 0x2000 8bpp, u16 0x8000 32x32 / 0xC000 64x64, u16 frame offset in 32-byte units on the variation's sheet,
+  u8 0x28, u8 1 visible) plus an item (MapEntry +0x18 pointers, count +5; 16 bytes: u32 condition, u8 decoration
+  id, u8 hits, u8 hit mask 3, u8 0, u32 handler 0x0800F9A3, u32 drop script). Solid while it stands (its box is
+  cleared from the walk bitmap at load); each hit counts down and shakes it; at 0 it hides with debris, the
+  collision reopens and the drop script runs. Stock drops roll `StackRand 100` against player 1's HP / EP bars
+  (nothing when both are full): 0x083ED894 small (1 hit: EP 14 or HP 11), 0x083ED6CC medium (2 hits: 14 / 11 / 15
+  / 12), 0x083EE6A8 large (3 hits: 14, 11, 15, 12, 16, 13). Rocks come back on every map load. Snowy sheets: zone 13
+  area 2 (one large rock, 1 KB), zone 13 area 4 (small / medium / large at frames 0 / 0x20 / 0x40, 3 KB).
+  `mapbuild.py`'s `rocks` block writes them. Chest records: not needed yet.

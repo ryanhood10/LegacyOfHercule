@@ -189,5 +189,14 @@ for pass_no in (1, 2):
     labels = dict(labels)
 
 assert all(labels.get(k) == found.get(k) for k in labels), "indexes moved between passes"
+out += ["",
+        "; the Lookout's arrival trigger (postgame.json): back from the summit with Super 13 beaten (382) and the finale unseen",
+        "; (483) Dende's scene plays by itself; its first entry picks the finale",
+        "script pg_finale_cond",
+        "    StackTestStoryFlag 382",
+        "    StackTestStoryFlagNot 483",
+        "    And",
+        "    END",
+        "end"]
 open("data/story/postgame.lscript", "w", encoding="utf-8", newline="\n").write("\n".join(out) + "\n")
 print(len(out), "lines", labels)

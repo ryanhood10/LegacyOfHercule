@@ -38,6 +38,11 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
   "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [x1,y1,x2,y2], "decoration": 0, "dialogue_trigger": 0},
                                      a working level barrier on a kept decoration + gate (item, on-load, dialogue condition)
   "onload": {"barrier_flag": 280, "rect": [x1,y1,x2,y2]} | null,
+  "rocks": {"sheet": [Z, A], "list": [{"x":, "y":, "frame": 0, "hits": 3, "drop": "0x083EE6A8"}, ...]},
+                                     breakable stock rocks: a 32x32 decoration each (frame = offset on that stock map's
+                                     decoration sheet, 32-byte units) + an item (handler 0x0800F9A3) running a stock rock's
+                                     drop script (random HP / EP pickups by player 1's bars); solid until broken, back on
+                                     every load. Stock drops: 0x083ED894 small (1 hit), 0x083ED6CC medium (2), 0x083EE6A8 large (3)
   "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
   "requires": "buu"                  only built when that ROM is given (--buu-rom)
 }
@@ -824,6 +829,18 @@ def emit(b, pk):
     # collision
     walk = pk.put(lz(b.walk), f"{spec['name']} walk collision")
     proj = walk if spec.get("projectile", "walk") == "walk" else pk.put(lz(b.proj), f"{spec['name']} projectile mask")
+    # breakable rocks (docs/maps.md 7): decorations on a stock map's sheet; their items are added with the barrier's
+    rocks = spec.get("rocks")
+    rock_items = []
+    if rocks:
+        sheet = b.source(rocks["sheet"]).var.sheet
+        if b.decos and b.sheet and b.sheet != sheet:
+            raise SpecError("rocks: the map already has decorations on another sheet")
+        b.sheet = sheet
+        for r in rocks["list"]:
+            rock_items.append((len(b.decos), r))
+            b.decos.append(struct.pack("<iiiiHHHBB", r["x"], r["y"], r["x"] + 32, r["y"] + 32, 0x2000, 0x8000,
+                                       r.get("frame", 0), 0x28, 1))
     # decorations, gates
     deco_ptr = pk.put(b"".join(b.decos)) if b.decos else 0
     for g in spec.get("gates", []):
@@ -857,6 +874,9 @@ def emit(b, pk):
         k = bar.get("dialogue_trigger")
         if k is not None:
             b.triggers[k][0] = talk
+    for k, r in rock_items:
+        items.append(pk.put(struct.pack("<IBBBBII", 0, k, r.get("hits", 3), 3, 0, ITEM_SCRIPT_HANDLER,
+                                        int(r.get("drop", "0x083EE6A8"), 0)), "rock item"))
     item_arr = pk.put(b"".join(struct.pack("<I", p) for p in items)) if items else 0
     trig = []
     for cond, data, _ in b.triggers:
