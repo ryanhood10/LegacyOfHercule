@@ -234,6 +234,11 @@ the room for the last capsule (built as three rounds, flags 363-375; flag 214 at
 Half-health endings are one rule in the boss table (`src/coop/bosses.c`): a boss with an "ends at N%"
 value fires its defeat action at that threshold instead of at zero HP.
 
+## Android 16 as a player (Ryan, 2026-10-21)
+
+All four of his moves can be picked with L: Rocket Punch, Afterimage Rush, Big Bang and Ki Blast. As a player
+he is a little weaker than before (still above Krillin); Android 16 the boss is unchanged.
+
 ## Duels (Ryan, 2026-10-20)
 
 A duel never ends the game: the final blow leaves the loser at 1 HP, "Player N wins the duel!" (the dojo's

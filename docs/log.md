@@ -2,6 +2,18 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-21
+
+- **Android 16 as a player (Ryan):** he was stuck on Ki Blast. The L cycle (0x08004284) moves to the next
+  ability whose "learned" bit (flags bits 3-6, one per ability_list index) is set, and his flags were 0x43
+  (only Ki Blast's). Now 0x7B: Rocket Punch, Afterimage Rush, Big Bang and Ki Blast all cycle and fire for
+  either player. A little weaker as a player (the boss is untouched): HP 160 -> 140 %, strength and endurance
+  150 -> 130 %, power 110 -> 100 % of Krillin's, growth row 7 lowered (360-560 / 280-480 / 360-560). Saves
+  from before get both once (`a16_frame`). Slot 7's status page now has a technique icon pair (a rocket
+  fist, the ki ball): a slot with technique bits and no pair crashes the stats page. `a16_moves.txt`.
+- **Drop-ins** are saved 300 frames after their warp (F3-F5 and F7 were saved mid-load; F7 stayed on the
+  Map Test spot in mGBA).
+
 ## 2026-10-20
 
 - **Duel endings (Ryan):** a duel's end refills both players' HP and ki and shows "Player N wins the duel!" before

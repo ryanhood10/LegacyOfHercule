@@ -141,7 +141,7 @@ Slot 7 is the duel clone's slot (`DUEL_SLOT`, `rom.h`: fixed at 7 since slot 8 e
 `PARTY_SLOTS - 1`; `duel.c` copies player 1's entry into it for a clone duel) and,
 during the "Gero's computer" chapter only, **Android 16** (`src/coop/a16player.c`, 2026-10-19): no duel
 runs in that chapter, so `CoopCall 11` writes his entry there (row 25, Krillin's EXP, his stats, flags
-0x43, abilities 22 / 19 / 0 / 2) and `CoopCall 12` clears its flags when he leaves (a later clone duel
+0x7B since 2026-10-21: all four moves learned, abilities 22 / 19 / 0 / 2) and `CoopCall 12` clears its flags when he leaves (a later clone duel
 overwrites the slot as before). Growing `PARTY_SLOTS` was not needed. Growth row 7 (`data/hercule.json`)
 is 16's level-up range. The status screen names slot 7 "Android 16" on row 25 and names a clone after
 the character whose row it copies (`krillin.c name_slot`).

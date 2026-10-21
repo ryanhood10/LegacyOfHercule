@@ -14,7 +14,7 @@
 
 typedef struct KrDesc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } KrDesc;
 extern const KrDesc kr_kiblast[16], kr_disc[4];     // build/gen/krillin_sprites_data.c
-extern const u8 kr_status_icon_disc[], kr_status_icon_ki[];
+extern const u8 kr_status_icon_disc[], kr_status_icon_ki[], kr_status_icon_rocket[];
 extern const char *const ui_strings[];
 
 #define ABILITY_GATE() (*(u32 *)(*(u32 *)0x086DB284u + 0xC))   // the stock isReady gate (hercule.c)
@@ -116,10 +116,11 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
     (u32)kr_status_icon_disc, (u32)kr_status_icon_ki,                       // slot 6: Krillin
 #endif
 #if PARTY_SLOTS > SSJ2_SLOT
-    // slot 7: none (Android 16 and the clones have no technique bits); slot 8: Super Saiyan 2 Gohan shows
-    // Gohan's icons. Every slot whose flags hold technique bits (3, 4) needs a pair: the stats page
-    // decompresses them, and a zero word decompressed the BIOS over memory (garbage tiles, then a crash)
-    0, 0,
+    // slot 7: Android 16 (his moves are learned, so his flags hold technique bits since 2026-10-21; a duel
+    // clone copying a stock fighter's flags shows them too); slot 8: Super Saiyan 2 Gohan shows Gohan's
+    // icons. Every slot whose flags hold technique bits (3, 4) needs a pair: the stats page decompresses
+    // them, and a zero word decompressed the BIOS over memory (garbage tiles, then a crash)
+    (u32)kr_status_icon_rocket, (u32)kr_status_icon_ki,
     0x086FF6D0, 0x086FF68C,
 #endif
 };

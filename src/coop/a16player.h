@@ -24,13 +24,23 @@
 #define A16_FLAG_SAVED      430     // 430 + slot: that slot's "available" bit before the chapter's lock (slots 0-7)
 
 // Stats: 16 joins at Krillin's level (same EXP) with Krillin's numbers scaled (stronger than Krillin:
-// Hercule and Krillin stay the weaker fighters)
-#define A16_HP_PCT          160
+// Hercule and Krillin stay the weaker fighters). Lowered as a player (Ryan, 2026-10-21: "a little weaker as
+// a player-character"; the boss, android16.c, is untouched): HP 160 -> 140, strength and endurance
+// 150 -> 130, power 110 -> 100 (growth row 7 in data/hercule.json lowered with them)
+#define A16_HP_PCT          140
 #define A16_EP_PCT          110
-#define A16_STR_PCT         150
-#define A16_POW_PCT         110
-#define A16_END_PCT         150
-#define A16_FLAGS           0x43    // in party, available, 0x40 like every stock row
+#define A16_STR_PCT         130
+#define A16_POW_PCT         100
+#define A16_END_PCT         130
+// The numbers saves from before 2026-10-21 joined with: a16_frame lowers such an entry once
+#define A16_OLD_HP_PCT      160
+#define A16_OLD_STR_PCT     150
+#define A16_OLD_POW_PCT     110
+#define A16_OLD_END_PCT     150
+// Flags: in party (1), available (2), and all four moves learned (bits 3-6, one per ability_list index: the
+// stock L cycle, 0x08004284, skips a move whose bit is clear; with only 0x40 he was stuck on Ki Blast)
+#define A16_MOVES           0x78
+#define A16_FLAGS           (0x03 | A16_MOVES)
 #define ROCKET_ABILITY      22      // ability table entry (data/hercule.json)
 
 // Rocket Punch (ability 22): the forearm flies along his facing (the boss's fist frames), explodes on
@@ -45,3 +55,4 @@
 void a16_join(void);     // CoopCall 11
 void a16_leave(void);    // CoopCall 12 (0): the chapter's end: the lock lifts, 16 stays selectable
 void a16_gone(void);     // CoopCall 12, 1: the Cell Games: 16 leaves the party for good
+void a16_frame(void);    // every frame (input.c): an older save's 16 gets his four moves and the lower numbers

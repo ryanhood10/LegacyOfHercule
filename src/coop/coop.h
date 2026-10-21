@@ -220,4 +220,5 @@ void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared scre
 void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
 void p2_cycle(void);            // player 2 picks the next available character (Select)
 void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
+void a16_frame(void);                         // a16player.c, every input poll (an older save's 16: his four moves)
 void old_hercule_set(int on);   // krillin.c: slot 5 -> old Hercule's row (1) or Hercule's (0)

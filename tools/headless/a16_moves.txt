@@ -1,0 +1,105 @@
+# Android 16 as a player (slot 7, row 25; src/coop/a16player.c): all four moves learned (flags 0x7B, Ryan
+# 2026-10-21: he was stuck on Ki Blast), the L cycle 0 Rocket Punch -> 1 Afterimage Rush -> 2 Big Bang ->
+# 3 Ki Blast -> 0, each move used (EP drops), an older save's entry (flags 0x43, the old numbers) fixed once
+# by a16_frame, then player 1 alone as 16. Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/a16_moves.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Slot 7 is at PARTY+0xD0 (EP +4, ability index +9, str/pow/end +0xA, flags +0x14).
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x01AE01F4
+poke32 0x0203FD08 5
+frames 200
+poke32 0x0203FD08 11
+frames 60
+echo == 16 joined (player 2): slot 7 hp/maxhp/ep/maxep, row, idx, str/pow/end, exp, flags (7B); Krillin slot 6
+peek PARTY+0xD0 0x1C
+peek PARTY+0xB4 0x1C
+peek8 0x0203FF84 1
+echo == player 2's L cycles: 1, 2, 3, 0
+p2 0x200
+frames 2
+p2 0
+frames 10
+peek8 PARTY+0xD9 1
+p2 0x200
+frames 2
+p2 0
+frames 10
+peek8 PARTY+0xD9 1
+p2 0x200
+frames 2
+p2 0
+frames 10
+peek8 PARTY+0xD9 1
+p2 0x200
+frames 2
+p2 0
+frames 10
+peek8 PARTY+0xD9 1
+echo == each move (B): EP after Rocket Punch, Afterimage Rush, Big Bang, Ki Blast
+poke32 0x0300208C 1
+poke8 PARTY+0xD9 0
+p2 2
+frames 3
+p2 0
+frames 6
+shot a16_0_rocket
+frames 60
+peek16 PARTY+0xD4 1
+poke32 0x0300208C 1
+poke8 PARTY+0xD9 1
+p2 2
+frames 3
+p2 0
+frames 8
+shot a16_1_rush
+frames 60
+peek16 PARTY+0xD4 1
+poke32 0x0300208C 1
+poke8 PARTY+0xD9 2
+p2 2
+frames 30
+shot a16_2_bigbang
+p2 0
+frames 60
+peek16 PARTY+0xD4 1
+poke32 0x0300208C 1
+poke8 PARTY+0xD9 3
+p2 2
+frames 3
+p2 0
+frames 6
+shot a16_3_ki
+frames 60
+peek16 PARTY+0xD4 1
+echo == an older save: flags 43, str/pow/end 300/220/300, max HP 800 -> 7B, 260/200/260, 700
+poke8 PARTY+0xE4 0x43
+poke16 PARTY+0xDA 300
+poke16 PARTY+0xDC 220
+poke16 PARTY+0xDE 300
+poke16 PARTY+0xD2 800
+poke16 PARTY+0xD0 800
+frames 2
+peek PARTY+0xD0 0x18
+echo == one player: player 1 as 16, L cycles from 0 to 1, B throws the rocket
+p2 off
+poke8 PARTY 7
+poke8 PARTY+0xD9 0
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x01AE01D0
+poke32 0x0203FD08 5
+frames 200
+peek8 PARTY 1
+key 0x200 2
+frames 10
+peek8 PARTY+0xD9 1
+poke8 PARTY+0xD9 0
+poke32 0x0300208C 1
+key 2 3
+frames 6
+shot a16_4_p1_rocket
+frames 60
+peek16 PARTY+0xD4 1
+map

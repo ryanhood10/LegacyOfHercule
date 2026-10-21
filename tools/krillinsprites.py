@@ -369,7 +369,8 @@ def main():
     disc = [(16, 16, 32, 32, 0x80002000, disc_frame(pal, k)) for k in range(4)]
     icons = disc_icons(rom, pal)
     status_icons = {"kr_status_icon_disc": compress(status_icon(bg, "disc")),
-                    "kr_status_icon_ki": compress(status_icon(bg, "ki"))}
+                    "kr_status_icon_ki": compress(status_icon(bg, "ki")),
+                    "kr_status_icon_rocket": compress(status_icon(bg, "rocket"))}
     ui = ui_table(rom)
     pmod = [u32(PORTRAIT_MODULE + 4 * i) for i in range(PORTRAIT_MODULE_COPY)]
 
@@ -383,7 +384,7 @@ def main():
 
 def status_icon(bg, kind):
     """18x8 status-screen technique icon in the menu BG palette: corners 0, black field (1), a small
-    yellow disc with speed lines or a blue ki ball."""
+    yellow disc with speed lines, a blue ki ball, or (Android 16's Rocket Punch) a grey fist with a flame."""
     px = [[1] * 18 for _ in range(8)]
     for y, x in ((0, 0), (0, 17), (7, 0), (7, 17)):
         px[y][x] = 0
@@ -393,6 +394,13 @@ def status_icon(bg, kind):
         for x0, x1, y in ((1, 4, 3), (2, 5, 5), (1, 3, 4)):
             for x in range(x0, x1 + 1):
                 px[y][x] = line
+    elif kind == "rocket":
+        body, hot, rim = (nearest(bg, c, (0, 1)) for c in ((150, 150, 160), (230, 230, 235), (70, 70, 80)))
+        fire, core = (nearest(bg, c, (0, 1)) for c in ((240, 120, 20), (255, 230, 60)))
+        cx, cy, rx, ry = 12.0, 4.0, 3.6, 2.8
+        for x0, x1, y, c in ((2, 8, 3, fire), (1, 8, 4, fire), (3, 8, 5, fire), (5, 8, 4, core)):
+            for x in range(x0, x1 + 1):
+                px[y][x] = c
     else:
         body, hot, rim = (nearest(bg, c, (0, 1)) for c in ((90, 160, 255), (240, 250, 255), (40, 60, 200)))
         cx, cy, rx, ry = 9.0, 4.0, 3.2, 3.2

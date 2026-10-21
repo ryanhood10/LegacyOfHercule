@@ -83,6 +83,22 @@ void a16_leave(void) {
     flag_set_hook(p, A16_FLAG_DONE);
 }
 
+// Saves from before 2026-10-21 hold 16 with only Ki Blast learned (flags 0x43) and the old, higher numbers:
+// once, the first frame such an entry is seen, he learns all four moves and his numbers are scaled to the
+// new percentages (level-ups since he joined are scaled with them)
+static u16 rescale(u32 v, u32 now, u32 was) { return pct(v, now * 100 / was); }
+void a16_frame(void) {
+    CharacterEntry *a = &g_Party->chars[A16_SLOT];
+    if (!(a->flags & 1) || a->display_row != A16_ROW || (a->flags & A16_MOVES) == A16_MOVES) return;
+    if (!flag_test_hook(g_Party, A16_FLAG_ACTIVE)) return;          // a duel clone on his row: leave it
+    a->flags |= A16_MOVES;
+    a->max_hp = rescale(a->max_hp, A16_HP_PCT, A16_OLD_HP_PCT);
+    if (a->hp > a->max_hp) a->hp = a->max_hp;
+    a->str = rescale(a->str, A16_STR_PCT, A16_OLD_STR_PCT);
+    a->pow = rescale(a->pow, A16_POW_PCT, A16_OLD_POW_PCT);
+    a->end = rescale(a->end, A16_END_PCT, A16_OLD_END_PCT);
+}
+
 int p2_bind_slot(int slot);                          // player.c
 void a16_gone(void) {
     PartyState *p = g_Party;
