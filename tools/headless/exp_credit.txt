@@ -1,0 +1,63 @@
+# Kill EXP goes to the player of the last hit (src/coop/exp.c, docs/coop-design.md "EXP crediting"): two players in
+# East District 439 (Map Test 13: player 1 Piccolo, slot 1; player 2 Hercule, slot 5). Case A: player 2 punches a
+# 1-HP wolf at his side -> awards [p1, p2] = 0 1, Hercule's EXP (0x0203F0A8) up. Case B: player 1 fires at a 1-HP wolf
+# right beside player 2 -> 1 0, Piccolo's EXP (0x0203F038) up (the ki blast's update used to credit the player it
+# targets, here player 2). Entity addresses are fixed by the Map Test. From a debug-menu savestate (--out = its folder).
+p2 0
+maptest 13
+frames 300
+echo == before: awards [p1, p2], Piccolo (slot 1) EXP, Hercule (slot 5) EXP
+peek16 0x0203FFDC 2
+peek 0x0203F038 1
+peek 0x0203F0A8 1
+echo == case A: player 2 punches the wolf at his side (1 HP)
+poke32 0x0202992C 1
+poke32 0x020298FC 0x00022C00
+poke32 0x02029900 0x0001A800
+p2 0x20
+frames 4
+p2 0
+frames 2
+p2 1
+frames 6
+p2 0
+frames 20
+p2 1
+frames 6
+p2 0
+frames 20
+p2 1
+frames 6
+p2 0
+frames 60
+peek16 0x0203FFDC 2
+peek 0x0203F038 1
+peek 0x0203F0A8 1
+shot xa
+load menu.ss
+p2 0
+maptest 13
+frames 300
+peek16 0x0203FFDC 2
+peek 0x0203F038 1
+peek 0x0203F0A8 1
+peek8 0x0203F028 28
+echo == case B: player 1 fires at the 1-HP wolf right beside player 2
+poke32 0x02027C10 0x00016E00
+poke32 0x02027C14 0x00019000
+poke32 0x02028224 0x0001D600
+poke32 0x02028228 0x00019000
+poke32 0x0202CCAC 1
+poke32 0x0202CC7C 0x00017C00
+poke32 0x0202CC80 0x00019000
+key 0x20 3
+frames 2
+shot xb0
+key 0x02 4
+frames 10
+shot xb1
+frames 50
+shot xb2
+peek16 0x0203FFDC 2
+peek 0x0203F038 1
+peek 0x0203F0A8 1

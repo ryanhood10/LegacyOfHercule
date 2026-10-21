@@ -15,9 +15,10 @@
 // at full HP when it locks them). Super 13 cannot be locked and keeps firing, so his HP is lower: tuned
 // headless until the Cell Games-level autopilot pair loses to him narrowly (KO with him at 4-35 % left) where
 // it beats the locked Cells (docs/coop-design.md "Super Android 13" has the runs). CoopCall 17 op 0 scales
-// HP and blast damage per fight. Single-player gets S13_SOLO_HP_PCT of the HP (untested).
-#define S13_HP            10000
-#define S13_SOLO_HP_PCT   55
+// HP and blast damage per fight. Single-player gets S13_SOLO_HP_PCT of the HP. Ryan (2026-10-20, after playing
+// him alone at 5500 HP): more health, a big towering boss: 10000 -> 14000, alone 55 % -> 70 % (9800, Cell's 8230).
+#define S13_HP            14000
+#define S13_SOLO_HP_PCT   70
 #define S13_MELEE         48
 #define S13_RANGED        64
 #define S13_DEFENCE       56

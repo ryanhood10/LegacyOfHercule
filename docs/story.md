@@ -574,6 +574,11 @@ epilogue, then the title screen; the talk-show bonus ending).
   At last. The end of those clankers."
 - **Difficulty (Ryan):** Super 13 is slightly harder than Cell; no extra reward.
 - **Rocks on the summit (Ryan, 2026-10-20):** four breakable rocks for health / ki around the clearing.
+- **More health and a bigger transformation (Ryan, 2026-10-20; the lines Claude's drafts, approved):** 14000 HP
+  with two players, 9800 alone. After absorbing 18: the camera closes in, three growing surges, ANDROID 13:
+  "Yes...  YES!  I can feel their power!", "The whole mountain is shaking...", a long white-out, Super 13 and
+  the biggest shake with his music starting, "Now...  I am complete!", SUPER 13: "Look at me.  Even Cell would
+  tremble!"
 - **Defaults (Claude's, Ryan may change):** before Super 13 is beaten, Dende points the players north
   ("That power in the Arctic... someone has to stop it!") and his Buu's Fury prompt only appears after
   13; 18 is removed from any place that shows her once she is dead; the arrival scene plays in full the

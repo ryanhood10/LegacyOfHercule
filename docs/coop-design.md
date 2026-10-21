@@ -189,6 +189,14 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
   the entity-list replacement (the player being updated, or the nearest player while a non-player
   entity updates). The event grows to 16 bytes with the credited slot, using a private vtable copy
   whose fire slot calls `Party_AddExp` with that slot; the level clamp uses the credited slot too.
+- **Last hit (2026-10-20, Ryan: whoever lands the final blow gets the EXP):** `damage_calc_hook` (enemies.c) calls
+  `exp_note_hit(defender, attacker)` for every hit on a non-player: the player behind it (the attacker, or a
+  projectile's owner at +0x1C), noted per enemy in a 12-entry round robin (`.party.xp`). The award credits the
+  player of the enemy's last noted hit and clears the entry; without a note (a scripted kill) the acting player as
+  before. The note compares against `coop2.p1_frame`, not `g_PlayerObject`, which the update loop swaps to the
+  player a non-player entity targets. Before this a stock ki blast's kill went to the player the dying enemy
+  targeted (often the other one). Test: `tools/headless/exp_credit.txt` (player 2's punch -> player 2; player 1's
+  blast at a wolf beside player 2 -> player 1).
 - Verified in zone 2 area 7 with a level-40 party: player 2 (Gohan, slot 0) killing a wolf added
   4747 EXP to slot 0 and nothing to the active slot; player 1 killing one added 4747 to the active
   slot only (`peek()` shows both slots' EXP and the `awards` counters).
@@ -805,7 +813,9 @@ which is how "a little above" was read. Its damage rate on him (about 140 HP/s) 
 to locked Cells: it spends most of the fight dodging his orbs, the fight Ryan described. People who dodge
 better and use abilities and items should beat him more often; `CoopCall 17, 0` adjusts a fight without a
 rebuild, and every number above is a knob in `super13.h`. HP 10000 is still more than one Perfect Cell
-(8230). Not measured: single-player (`S13_SOLO_HP_PCT`, 55 % of the HP) and real two-person play.
+(8230). Not measured: single-player (`S13_SOLO_HP_PCT`) and real two-person play.
+**Raised 2026-10-20 (Ryan, after playing him alone at 5500 HP: more health, a big towering boss): 14000 HP, alone
+70 % (9800, above one Perfect Cell's 8230); the tuning runs above are for the 10000 HP cut.**
 
 **The twin-Cell "stall" was a crash, fixed 2026-10-19 (`src/coop/wrap.c` `attack_end`; it happens in real play).**
 Every entity stopping, frozen popups, a running `g_FrameCounter` and a dead Start were the game after a jump through a

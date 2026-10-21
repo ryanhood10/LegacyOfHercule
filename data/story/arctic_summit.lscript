@@ -124,7 +124,7 @@ sequence summit_scene
         ScreenShake 0, 10, 30
         WaitFrames 40
   text 0 "ANDROID 13: Your power is mine!"
-  script                                 ; then 18
+  script                                 ; then 18; the transformation (Ryan: more epic): the camera closes in, three surges
         WalkToPosition 165, 384, 316
         WhiteFlash 20
         PlayAudio 61
@@ -132,65 +132,90 @@ sequence summit_scene
         ScreenShake 0, 10, 30
         WaitFrames 40
         WalkToPosition 165, 348, 300
-        FadeToWhite 20
+        SetEntityFacing 165, 0
+        PanCameraToPosition 228, 230, 2        ; 13 at the centre of the view
+        WaitFrames 30
         PlayAudio 55
+        WhiteFlash 10
+        ScreenShake 0, 6, 20
+        WaitFrames 40
+        PlayAudio 55
+        WhiteFlash 20
+        ScreenShake 0, 12, 30
+        WaitFrames 30
+        PlayAudio 55
+        WhiteFlash 30
+        ScreenShake 0, 18, 40
+        WaitFrames 20
+  text 0 "ANDROID 13: Yes...  YES!  I can feel their power!"
+  script                                 ; the mountain shakes
+        PlayAudio 20
+        ScreenShake 0, 20, 120
+        WaitFrames 30
+  text 0 "@^The whole mountain is shaking..."
+  script                                 ; the reveal: a long white-out, Super 13, the biggest shake, his music
+        PlayAudio 55
+        FadeToWhite 40
         DespawnEntity 165
         SpawnCharacterEntity 180, 348, 300
         SetEntityFacing 180, 0
-        WaitFrames 30
-        WhiteFadeOut 30
-        ScreenShake 0, 20, 60
+        PlayAudio 21
+        WaitFrames 60
+        WhiteFadeOut 60
+        PlayMusic 30                     ; a boss track (Broly's fight's), on through the talk into the fight
+        ScreenShake 0, 30, 90
+        WaitFrames 40
   text 122 "SUPER 13: Now...  I am complete!"
+  text 122 "SUPER 13: Look at me.  Even Cell would tremble!"
   script                                 ; who speaks for the players: some characters have their own line
         PanCameraToPosition 216, 300, 3
         PushActiveCharIndex
         PushByte 2
         CmpEq
         JumpIfFalse L1
-        PushByte 9
+        PushByte 14
         END
       L1:
         PushActiveCharIndex
         PushByte 5
         CmpEq
         JumpIfFalse L2
-        PushByte 10
+        PushByte 15
         END
       L2:
         PushActiveCharIndex
         PushByte 6
         CmpEq
         JumpIfFalse L3
-        PushByte 11
+        PushByte 16
         END
       L3:
         PushActiveCharIndex
         PushByte 1
         CmpEq
         JumpIfFalse L4
-        PushByte 12
+        PushByte 17
         END
       L4:
-        PushByte 13
+        PushByte 18
         END
-  text 106 "VEGETA: Hmph.  Another tin can to scrap." -> 14
-  text 67 "HERCULE: Uh...  is it too late to go home?" -> 14
-  text 73 "KRILLIN: 18...  You'll pay for this!" -> 14
-  text 90 "PICCOLO: Careful.  He's stronger than Cell was." -> 14
+  text 106 "VEGETA: Hmph.  Another tin can to scrap." -> 19
+  text 67 "HERCULE: Uh...  is it too late to go home?" -> 19
+  text 73 "KRILLIN: 18...  You'll pay for this!" -> 19
+  text 90 "PICCOLO: Careful.  He's stronger than Cell was." -> 19
   text 1 "We have to stop this!"
-  script                                 ; [14] player 2 answers when there is one; alone, straight to the fight
+  script                                 ; [19] player 2 answers when there is one; alone, straight to the fight
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
-        PushByte 15
+        PushByte 20
         END
       L1:
-        PushByte 16
+        PushByte 21
         END
   fmt 0 "%s: Let's take him down together!"
         CoopCall 14, 2, 0, 0
         END
   script                                 ; the fight: the boss record (stat 145, sprite 180)
-        PlayMusic 30                     ; a boss track (Broly's fight's)
         DespawnEntity 180
         TriggerMapEvent 11
         DrawBossHealthBar 180

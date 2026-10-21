@@ -60,6 +60,7 @@ SECTIONS
         KEEP(*(.party.rv))   /* revive.c state (a downed partner) */
         KEEP(*(.party.ui))   /* small text buffers (the Cell Games' one-player title card) */
         KEEP(*(.party.cp))   /* companion.c state (old Hercule following player 1 in the prologue) */
+        KEEP(*(.party.xp))   /* exp.c: the last hit per enemy (kill EXP to that player) */
     } > partyram
 
     .bss (NOLOAD) : {

@@ -563,6 +563,7 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
     coop2.last_secondary = hit->secondary;
     coop2.last_defender = defender;
     coop2.last_attacker = (Entity *)attacker;
+    exp_note_hit(defender, attacker);   // the kill's EXP goes to the player of the last hit (exp.c)
 }
 
 // ---- boss bars ----------------------------------------------------------------------------------

@@ -214,6 +214,7 @@ extern volatile u16 g_p1_remote;   // pinned at 0x0203FF02: netplay replaces KEY
 
 void coop_init_once(void);
 void exp_init(void);         // build the EXP event vtable copy (called from coop_init_once)
+void exp_note_hit(const Entity *defender, const Entity *attacker);   // exp.c: the last hit per enemy
 void leash_p2(Entity *e);   // keep player 2 inside the camera view (shared screen)
 void coop_active_check(void);   // player 1 switched character: keep player 2 on a different one
 void p2_cycle(void);            // player 2 picks the next available character (Select)

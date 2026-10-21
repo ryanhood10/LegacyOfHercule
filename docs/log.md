@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Super 13 (Ryan):** 14000 HP (9800 alone, was 5500) and a five-beat transformation (surges, his line, the
+  shaking mountain, the white-out reveal with his music, a new boast). **Kill EXP to the last hit:** the damage
+  calculation notes the player behind each hit (a ki blast's owner too); kills by ki blasts no longer go to the
+  player the enemy targeted. `exp_credit.txt`.
 - **Keep Goku restored** (Ryan's F6 test: no haloed Goku to pick): the Cell Games' restated end script (entry 53)
   ran the stock `ClearCharacterInPartyFlag 4`, bypassing the old byte patch at 0x3EC738, so Goku left the party
   after the Games. The generator now keeps him (`SetCharacterInPartyFlag 4`); he shows with his halo on the save
