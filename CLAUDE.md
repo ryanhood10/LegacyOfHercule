@@ -39,13 +39,18 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-20): everything through the post-game is built; Ryan plays it next
+## Current phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
 
 Built and merged: every chapter through the ten-day wait, the Cell Games, the post-game (wishes, the
 Arctic, Super 13, Peace Times, the ending), the journal entries, reviving a downed partner, the
 difficulty (Easy / Normal / Hard at a new game), one-player play and player 2 dropping in and out. All
-tested headless in both modes, none of it played by people yet. Next: Ryan's playthrough feedback, then
-the Buu's Fury phase, planned in chat. He wants a slow pace, one decision at a time, answers from the
+tested headless in both modes. Ryan plays alone through the drop-in savestates (F1-F7 in mGBA) in
+`build/play`; after each change: rebuild (`make` for the play ROM, `make BUILD=build/<dir> DEBUG_MENU=1`
+for the debug ROM and its `menu.ss`), rerun `tools/headless/dropins.py`, back up his `.sav` into
+`build/play/backup/`, copy the ROM and `.ss1-.ss7` over (mGBA closed; he saves and closes it first),
+update `build/play/DROP-INS.txt`, reopen mGBA on the play ROM. Status, the feedback done so far and the
+offered-but-not-taken polish: `docs/story.md` section 0. Next: more feedback, then the Buu's Fury phase,
+planned in chat. He wants a slow pace, one decision at a time, answers from the
 player's point of view grounded in ROM facts, and no suggestions he did not ask for. Do not build a part
 of the story until he says its plan is done. Nothing may reveal Hercule as the hero before the Buu phase.
 Lines Ryan dictated stay word for word. Facts about the game come from the script dump

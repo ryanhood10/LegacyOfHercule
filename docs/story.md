@@ -7,11 +7,23 @@ and `*.lscript` (format in `docs/scripts.md`, applied in the order listed in `da
 "story"). Game facts come from the script dump (`python tools/script_dump.py map ZONE AREA`, all
 maps in `build/scripts/` after a full dump), the quest table and Ghidra.
 
-## 0. Status and how to resume (2026-10-20)
+## 0. Status and how to resume (2026-10-21)
 
 **Mode: playtest.** Everything through the post-game is built and tested headless, in co-op and with
-one player; nobody has played it yet. Next: Ryan's playthrough and his feedback, then the Buu's Fury
-phase (section 6), planned in chat. Ryan plans at a slow pace, one decision at a time, answered from the
+one player. Ryan is playing it alone (mostly as Krillin) through the drop-in savestates F1-F7 in
+`build/play` (`tools/headless/dropins.py`, `docs/testing.md` "Drop-in savestates") and gives feedback
+scene by scene; every round so far is built, merged and pushed (`docs/log.md` 2026-10-20 / 21: Gohan
+flying into scenes, old Hercule beside Trunks, Gero's empty table, the Cell Games gate / pans / beam
+clash / tougher Cells and Juniors, Super 13's health and transformation, Goku's halo, last-hit EXP,
+16 selectable until the Games, the dojo, Super Saiyan 2 Gohan's speed, duel endings, Android 16's
+moves, the big Saiyan ship with its door and the cast riding along). Not yet played by people: two
+players together, and whether the new difficulty numbers feel right. Next: more playtest feedback,
+then the Buu's Fury phase (section 6), planned in chat.
+
+**Offered polish Ryan has not taken up (2026-10-20; do not start without his OK):** the story's lead
+missing from scenes other than the Frieza stretch when someone else plays; the Gero rubble and bunker
+scenes show no Krillin or 16; Gohan's Super Saiyan 1 only from the Cell Games (could start in the
+Time Chamber); real two-player testing; the six Cell Juniors' spawn not looked at. Ryan plans at a slow pace, one decision at a time, answered from the
 player's point of view and grounded in ROM facts, with no suggestions he did not ask for. Record each
 decision in this file the same turn. Build a part of the story only after Ryan says its plan is done.
 
