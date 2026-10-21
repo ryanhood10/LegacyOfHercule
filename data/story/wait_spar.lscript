@@ -2,8 +2,8 @@
 ; matches of Roshi's gym (ch8_gym) are cleared and the last +3 capsule is paid (story flag 214), talking
 ; to Master Roshi in the Capsule Corp atrium (zone 6 area 3, record 2) ends with his offer: in co-op he
 ; books the dojo (flag 440), and walking onto the sparring mat (zone 6 area 70, the matches' rect) starts a
-; 1 v 1 duel between the two players as they are (CoopCall 1 DuelStart with player 2's own slot, no
-; flags: no clone, no pad swap, no stakes). The final blow leaves the loser at 1 HP (duel.c); a caption
+; 1 v 1 duel between the two players as they are (CoopCall 1 DuelStart with player 2's own slot, flags
+; DUEL_OWN_WINNER only: no clone, no pad swap, no stakes; its end names the winner). The final blow leaves the loser at 1 HP (duel.c); a caption
 ; names the winner, both players are healed and the fade returns them to the atrium, as the stock matches
 ; do. Repeatable: ask Roshi again. Speakers: 0 narration, 80 Master Roshi.
 
@@ -71,7 +71,7 @@ sequence lk_spar
         PlayMusic 35
         PushByte 1                       ; CoopCall 1 DuelStart (player 2's slot, flags 0, end sequence)
         CoopCall 8, 0, 0, 0
-        PushByte 0
+        PushByte 16                      ; DUEL_OWN_WINNER: lk_spar_end names the winner itself
         PushVarint seq:lk_spar_end
         Step CoopCall
 end

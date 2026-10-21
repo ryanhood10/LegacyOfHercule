@@ -124,7 +124,7 @@ typedef struct CoopExtra {
     u32 call_action[2];         // {EnemyAction_RunDialog, sequence}: what the end event fires
     s8 call_slot;               // pending duel: player 2's slot (-1 = clone of player 1)
     u8 call_flags;              // pending duel: DUEL_* flags
-    u8 call_state;              // 0 idle, 1 waiting for player 2, 2 duel running
+    u8 call_state;              // 0 idle, 1 waiting for player 2, 2 duel running, 4 / 5 the winner's line queued / showing
     u8 _pad6;
 } CoopExtra;
 _Static_assert(sizeof(CoopExtra) <= 0x2C0, "CoopExtra must fit 0x0203FB00..0x0203FDC0 (StoryTest above it)");
@@ -155,6 +155,7 @@ void p2_sync_combat(void);                          // player.c: player 2 entity
 #define DUEL_SHADOW         2   // draw player 2 through a darkening colour remap
 #define DUEL_SWAP_ON_P2_WIN 4   // when player 2 wins, the pads swap from then on
 #define DUEL_FULL_EP        8   // both players' EP stays full (no Super Saiyan drain)
+#define DUEL_OWN_WINNER    16   // the end sequence names the winner itself (no "Player N wins the duel!" first)
 void duel_start(int p2_slot, int flags, int end_script);   // duel.c
 void duel_clear(void);
 void duel_tick(void);

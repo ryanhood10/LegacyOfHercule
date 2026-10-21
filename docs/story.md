@@ -234,6 +234,11 @@ the room for the last capsule (built as three rounds, flags 363-375; flag 214 at
 Half-health endings are one rule in the boss table (`src/coop/bosses.c`): a boss with an "ends at N%"
 value fires its defeat action at that threshold instead of at zero HP.
 
+## Duels (Ryan, 2026-10-20)
+
+A duel never ends the game: the final blow leaves the loser at 1 HP, "Player N wins the duel!" (the dojo's
+sparring match names the winner's character instead), and both players are back to full health and ki.
+
 ## 4g. The ten-day wait, revised (Ryan, 2026-10-18 and 2026-10-19)
 
 - **Android 13 is held back until after Cell.** He absorbs 17 and 18 to become Super 13, so his

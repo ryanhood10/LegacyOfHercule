@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Duel endings (Ryan):** a duel's end refills both players' HP and ki and shows "Player N wins the duel!" before
+  the duel's own ending (the dojo's sparring match keeps its "X wins the sparring match!", `DUEL_OWN_WINNER`). The
+  final blow already never ended the game. `duel_end.txt`.
 - **The Broly ship ride (Ryan):** the ship doubled (128 x 64 as two 64 x 64 halves, sprites 171 / 172; 8bpp attr bit
   set, the stock collision box kept so the walks into it still finish); the players board through its door, the
   flight shakes a new interior (zone 15 area 9, Buu's Fury's round room without its Capsule Corp pad) and lands,

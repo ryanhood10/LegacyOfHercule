@@ -102,7 +102,7 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 
 | fn | call | does |
 |---|---|---|
-| 1 | DuelStart slot, flags, seq:END | player-vs-player duel (`duel.c`): slot = player 2's party slot, or -1 = a clone of player 1 (the clone slot is made available so player 2 spawns into it); flags 1 clone, 2 shadow tint, 4 swap the pads when player 2 wins, 8 full energy; END = sequence run when the duel ends (queued like an enemy's defeat dialogue, outside the damage code). Without a player 2, player 1 wins and END runs at once |
+| 1 | DuelStart slot, flags, seq:END | player-vs-player duel (`duel.c`): slot = player 2's party slot, or -1 = a clone of player 1 (the clone slot is made available so player 2 spawns into it); flags 1 clone, 2 shadow tint, 4 swap the pads when player 2 wins, 8 full energy; END = sequence run when the duel ends (queued like an enemy's defeat dialogue, outside the damage code). Without a player 2, player 1 wins and END runs at once Flags: 1 clone, 2 shadow, 4 pads swap when player 2 wins, 8 full EP, 16 the end sequence names the winner (else "Player N wins the duel!" first). At the end both duelists are refilled |
 | 2 | DuelClear | after the end scene: player 2's slot and colours back (`duel_clear`) |
 | 3 | DuelWinner -> 1 / 2 | winner of the last duel: `CoopCall 3, 0, 0, 0; PushByte 1; CmpEq; JumpIfFalse L1; PushByte 1; END; L1: PushByte 2; END` picks entry 1 or 2 |
 | 4 | HerculeAwaken | Super Hercule into his abilities (`ssj.c`, the Buu phase) |

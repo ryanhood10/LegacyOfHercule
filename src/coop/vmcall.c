@@ -48,6 +48,7 @@
 //                                       3 gone: wait for 3 after his defeat before the scene goes on); op 2 spawns him
 //                                       beside player 1 with a boss bar
 #include "coop.h"
+#include "revive.h"   // scene_running
 #include "a16player.h"
 #include "krillin.h"
 #include "ssj2gohan.h"
@@ -91,6 +92,20 @@ void coop_run_sequence(u32 *action, const void *seq) {
     list->events[list->event_count++] = (u32 *)ev;
 }
 static void run_sequence_soon(const void *seq) { coop_run_sequence(coop2.call_action, seq); }
+
+// The duel's winner (Ryan, 2026-10-20): one narration line built here (entry: u16 next, u8 mode 1 text, u8 speaker 0;
+// players.c builds its question the same way), shown before the duel's own end sequence
+static const u8 duel_wait[] __attribute__((aligned(4))) = {
+    1, 0, 0,                                                 // -> 1, script
+    0x00, 0x28, 0x02, 0x45, 0x11,                            // WaitFrames 40 (an A still held from the fight
+};                                                           // must not close the line at once)
+static const struct { u8 head[4]; char text[28]; } duel_won1 __attribute__((aligned(4))) = {
+    { 2, 0, 1, 0 }, "@^Player 1 wins the duel!",
+};
+static const struct { u8 head[4]; char text[28]; } duel_won2 __attribute__((aligned(4))) = {
+    { 2, 0, 1, 0 }, "@^Player 2 wins the duel!",
+};
+static const void *const duel_won_seq[2][3] = { { duel_wait, &duel_won1, 0 }, { duel_wait, &duel_won2, 0 } };
 
 // PartyKeep (CoopCall 10): story flags 404-411 = slots 0-7 selectable (party flags bit 1), 412-414 = player
 // 1's slot, 415-418 = player 2's slot + 1 (0 = none), 419 = Gohan (slot 0) in the party (bit 0). Flags
@@ -206,6 +221,16 @@ void coop_call_tick(void) {
         coop2.call_state = 0;
         run_sequence_soon(coop2.call_end_seq);
     } else if (coop2.call_state == 2 && !coop2.duel_active) {
+        if (coop2.duel_flags & DUEL_OWN_WINNER) {
+            coop2.call_state = 0;
+            run_sequence_soon(coop2.call_end_seq);
+        } else {                                   // "Player N wins the duel!" first
+            coop2.call_state = 4;
+            run_sequence_soon(duel_won_seq[coop2.duel_winner == 2]);
+        }
+    } else if (coop2.call_state == 4 && scene_running()) {
+        coop2.call_state = 5;
+    } else if (coop2.call_state == 5 && !scene_running()) {
         coop2.call_state = 0;
         run_sequence_soon(coop2.call_end_seq);
     }

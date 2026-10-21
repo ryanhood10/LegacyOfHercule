@@ -1333,3 +1333,14 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   animal finale x 2.5 HP and +16, all 115 % chase speed. Measured alone at 170 %: Yamcha 680 HP (stock 800, halved
   as a solo pair), Tien 1793. Roshi now announces "a special treat" for the last round instead of animal ninjas.
 
+## Duel endings (2026-10-20, Ryan)
+
+A duel never ends the game: the final blow leaves the loser at 1 HP (`duel.c`, as before). New: `duel_end` refills
+both duelists' party entries (player 1's active slot and player 2's, the clone's slot 7 in a clone duel) to full HP
+and EP, and the CoopCall-1 bridge (`coop_call_tick`, vmcall.c) shows "Player N wins the duel!" (a sequence built in
+C: WaitFrames 40, so an A still held from the fight cannot close it, then the line) before the duel's own end
+sequence: `call_state` 4 (queued) and 5 (showing; `scene_running()`), then the end sequence. A duel whose end
+sequence names the winner itself passes `DUEL_OWN_WINNER` (16): Roshi's sparring match ("X wins the sparring match!",
+which already refilled both). When player 2 wins a duel with `DUEL_SWAP_ON_P2_WIN`, the pads have swapped, so player
+2's A closes the line. Test: `tools/headless/duel_end.txt` (the space duel, each player winning once).
+

@@ -3,7 +3,8 @@
 // ignore) that comes from the opponent is handled like an enemy hit (type 0) by the other player's
 // message handler: box test, damage calculation (the attacker's own combat bytes), knock-back, OnHit.
 // The final blow never kills: the loser is left at 1 HP and the duel ends (no game over), the winner
-// is recorded, the pads swap when player 2 won and the duel asked for it, and the duel's end script
+// is recorded, both players are back to full HP and ki (Ryan, 2026-10-20; vmcall.c then shows "Player N wins
+// the duel!" before the duel's end sequence), the pads swap when player 2 won and the duel asked for it, and the duel's end script
 // (a mapScripts index, TriggerMapEvent style) runs.
 //
 // Clone duels: player 2 plays a copy of player 1's character kept in party slot 7 (DUEL_SLOT, rom.h),
@@ -136,9 +137,21 @@ void duel_start(int p2_slot, int flags, int end_script) {
     coop2.duel_active = 1;
 }
 
+// both duelists back to full HP and ki: player 1's slot and player 2's (the clone's slot in a clone duel)
+static void duel_refill(void) {
+    int slots[2] = { g_Party->active_slot, coop.p2 ? coop.p2_slot : -1 };
+    for (int k = 0; k < 2; k++) {
+        if (slots[k] < 0 || slots[k] >= PARTY_SLOTS) continue;
+        CharacterEntry *c = &g_Party->chars[slots[k]];
+        c->hp = c->max_hp;
+        c->ep = c->max_ep;
+    }
+}
+
 static void duel_end(int loser) {
     if (!coop2.duel_active) return;
     coop2.duel_active = 0;
+    duel_refill();
     coop2.duel_winner = (u8)(3 - loser);
     if (coop2.duel_winner == 2 && (coop2.duel_flags & DUEL_SWAP_ON_P2_WIN)) coop2.pad_swap ^= 1;
     if (coop2.duel_end_script >= 0) Map_SpawnScript(g_MapState, coop2.duel_end_script);

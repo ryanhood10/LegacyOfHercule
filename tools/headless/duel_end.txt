@@ -1,0 +1,88 @@
+# A duel's end (src/coop/duel.c, vmcall.c; Ryan, 2026-10-20): the final blow leaves the loser at 1 HP (no game
+# over), both duelists are back to full HP and ki, "Player N wins the duel!" shows before the duel's end sequence.
+# The space duel (Map Test 168, two players: player 1 the Map Test party's slot 1, player 2 the clone in slot 7),
+# stepped into until duel_active (coop2 +0x25C) is set. Case 1: player 2 at 1 HP, player 1's combo: winner 1, both
+# entries full (0x0203F028 slot 1, 0x0203F0D0 slot 7: hp = max, ep = max), the line on player 1's A. Case 2:
+# player 1 at 1 HP, player 2's combo: winner 2 (the pads swap: player 2's A closes the line). Entity addresses are
+# fixed by the Map Test. From a debug-menu savestate (--out = the folder holding menu.ss).
+p2 0
+maptest 168
+frames 300
+stepnz 0x0203FD5C 60
+frames 60
+frames 60
+poke16 0x0203F028 30
+poke16 0x0203F02C 5
+poke16 0x0203F0D0 1
+poke32 0x0202e848 0x0000E400
+poke32 0x0202e84C 0x00024000
+key 0x10 4
+frames 4
+key 1 4
+frames 6
+key 1 4
+frames 6
+key 1 4
+frames 2
+frames 30
+frames 30
+echo == after the final blow: duel_active / winner, player 1's HP / EP (slot 1), player 2's (slot 7)
+peek8 0x0203FD5C 2
+peek16 0x0203F028 4
+peek16 0x0203F0D0 4
+load menu.ss
+p2 0
+maptest 168
+frames 300
+stepnz 0x0203FD5C 60
+frames 60
+frames 60
+poke16 0x0203F028 1
+poke16 0x0203F0D0 300
+poke16 0x0203F0D4 5
+poke32 0x0202e848 0x0000E400
+poke32 0x0202e84C 0x00024000
+p2 0x20
+frames 4
+p2 0
+frames 4
+p2 1
+frames 4
+p2 0
+frames 6
+p2 1
+frames 4
+p2 0
+frames 6
+p2 1
+frames 4
+p2 0
+frames 40
+echo == after the final blow: duel_active / winner, player 1's HP / EP (slot 1), player 2's (slot 7): player 2 won
+peek8 0x0203FD5C 2
+peek16 0x0203F028 4
+peek16 0x0203F0D0 4
+p2 1
+frames 6
+p2 0
+frames 60
+p2 1
+frames 6
+p2 0
+frames 60
+p2 1
+frames 6
+p2 0
+frames 60
+p2 1
+frames 6
+p2 0
+frames 60
+p2 1
+frames 6
+p2 0
+frames 60
+p2 1
+frames 6
+p2 0
+frames 60
