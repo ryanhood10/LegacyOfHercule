@@ -396,10 +396,13 @@ sequence ch1_frieza_landing
         END
 end
 
-; ---- the Goku-arrival scene (zone 3 area 6, map 54): old Hercule leaves with Trunks --------------
+; ---- the Goku-arrival scene (zone 3 area 6, map 54): old Hercule travels with Trunks and leaves with him --------------
 
 sequence ch1_trunks_talk
   stockseq @083bfddc 0 77                ; the whole stock conversation up to Trunks' secret
+  script                                 ; old Hercule comes out from the crater's rim to Trunks
+        WalkToPosition 158, 552, 272
+        SetEntityFollow 158, 128
   text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bThat Frieza fellow isn't coming back, is he?"
   text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
   stockseq @083bfddc 78                  ; everyone gathers, the warning retold, home
