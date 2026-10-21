@@ -63,7 +63,7 @@ peek8 0x0203F9B7 1
 map
 shot cg06_won
 poke32 0x0203F9B0 0xCE11CA3E
-poke8 0x0203F9B5 27
+poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 140
 echo == J3: Vegeta -> expect 12
@@ -71,7 +71,7 @@ peek8 0x0203F9B7 1
 map
 shot cg07_won
 poke32 0x0203F9B0 0xCE11CA3E
-poke8 0x0203F9B5 27
+poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 140
 echo == J4: Trunks -> expect 23

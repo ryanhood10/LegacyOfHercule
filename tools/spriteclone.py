@@ -318,11 +318,11 @@ def main():
         r[1] = sprite
         r[4] = r[5] = other
         rows += r
-    # row 28 = Super Saiyan 2 Gohan as his own party member (slot 8, docs/story.md 4h): Gohan's row 3 (the
-    # standard class 0x030021E0: combat bytes from his own stats, regeneration) with the stock Super Saiyan 2
-    # row's sprite and portraits. A base form (flags 0, links to itself): the stock row 4 is a transformed
-    # form with its own class (fixed combat bytes 100, HP regeneration, an aura loop) that
-    # Party_DetransformOthers would turn back into row 2 whenever he is not player 1.
+    # row 28 = Super Saiyan 2 Gohan as his own party member (slot 8, docs/story.md 4h): Gohan's row 3 with the
+    # stock Super Saiyan 2 row's sprite, portraits and class (bytes 16-19: 0x030021E4, fixed combat bytes 100,
+    # HP regeneration, an aura loop; Ryan, 2026-10-20: as fast and strong as in the Cell fight, not a regular
+    # character). A base form (flags 0, links to itself): the stock row 4's transformed flags would make
+    # Party_DetransformOthers turn him back into row 2 whenever he is not player 1.
     ssj2 = bytearray(rows[TEEN_GOHAN_ROW * 20:TEEN_GOHAN_ROW * 20 + 20])
     stock = rows[STOCK_SSJ2_ROW * 20:STOCK_SSJ2_ROW * 20 + 20]
     assert stock[1] == SSJ2_SPRITE and ssj2[6:16] == stock[6:16], "stock Super Saiyan 2 Gohan row changed?"
@@ -331,6 +331,7 @@ def main():
     ssj2[2] = stock[2]     # dialogue / switch-screen portrait 61
     ssj2[3] = stock[3]     # status portrait 12
     ssj2[4] = ssj2[5] = SSJ2_ROW
+    ssj2[16:20] = stock[16:20]   # the Super Saiyan 2 class
     rows += ssj2
     assert len(rows) == (ROW_COUNT + EXTRA_ROWS) * 20
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))

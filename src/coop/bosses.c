@@ -45,58 +45,65 @@ static const ExtraStat gero_stats[] = {
 static const ExtraStat cell_stats[] = {
     // 140 the second Perfect Cell of the final fight: a copy of the stock final stage (stat 25)
     { 25, -1, 0, -1, 0, 0, 0, 0 },
+    // 141 / 142 a pair of Cell Juniors (Vegeta's and Trunks' fights): copies of the stock Junior (stat 26)
+    { 26, -1, 0, -1, 0, 0, 0, 0 },
+    { 26, -1, 0, -1, 0, 0, 0, 0 },
 };
 #define CELL_STAT_COUNT (sizeof cell_stats / sizeof cell_stats[0])
 
 static const BossRule rules[] = {
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
-    { 3,  50, BOSS_NO_TWIN, 0, 0 },   // test build: 17 alone, ends at half health
+    { 3,  50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },   // test build: 17 alone, ends at half health
 #else
-    { 3,  0, 0, 11, 0 },
+    { 3,  0, 0, 11, 0, 0, 0, 0 },
 #endif
-    { 4,  0, 0, 9,  0 },
+    { 4,  0, 0, 9,  0, 0, 0, 0 },
     // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door): always a pair, so the
     // story scripts (13's lines, 13 flying off) find 13 in single-player too
-    { 5,  0, BOSS_PAIR, A13_SPRITE, A13_STAT },
-    { A13_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },
-    { 7,  0, BOSS_PAIR, A13_SPRITE, A13_GERO_STAT },
-    { A13_GERO_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },
+    { 5,  0, BOSS_PAIR, A13_SPRITE, A13_STAT, 0, 0, 0 },
+    { A13_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
+    { 7,  0, BOSS_PAIR, A13_SPRITE, A13_GERO_STAT, 0, 0, 0 },
+    { A13_GERO_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
     // The forest spirit (zone 2 area 8, the stock dream's clearing): Frieza and Cooler, always a pair
-    { 41, 0, BOSS_PAIR, COOLER_SPRITE, COOLER_SPIRIT_STAT },
-    { COOLER_SPIRIT_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },     // the twin's own stat: boss pair rules for it too
+    { 41, 0, BOSS_PAIR, COOLER_SPRITE, COOLER_SPIRIT_STAT, 0, 0, 0 },
+    { COOLER_SPIRIT_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },     // the twin's own stat: boss pair rules for it too
     // Cooler (New Namek bonus) + his Namekian servant
-    { 29, 0, 0, NAMEK_SPRITE, NAMEK_STAT },
+    { 29, 0, 0, NAMEK_SPRITE, NAMEK_STAT, 0, 0, 0 },
     // Roshi's gym in the ten-day wait: the sparring matches are duos, Yamcha + Tien and Krillin + Hercule
     // (Hercule's sprite with Krillin's numbers); always pairs, so the duos stand in single-player too
-    { 106, 0, BOSS_PAIR, 121, 98 },
-    { 98,  0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },
-    { 64,  0, BOSS_PAIR, 72, 0 },
+    { 106, 0, BOSS_PAIR, 121, 98, 0, 0, 0 },
+    { 98,  0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
+    { 64,  0, BOSS_PAIR, 72, 0, 0, 0, 0 },
     // Android 13 in the arctic: unused since the encounter was removed 2026-10-18 (docs/story-archive.md H); kept for 13's post-Cell return
-    { A13_ARCTIC_STAT, 50, BOSS_NO_TWIN, 0, 0 },
+    { A13_ARCTIC_STAT, 50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     // Perfect Cell vs Ascended Trunks and Krillin: alone, ends at half health (he laughs it off)
-    { 78, 50, BOSS_NO_TWIN, 0, 0 },
-    { 79, 50, BOSS_NO_TWIN, 0, 0 },
+    { 78, 50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
+    { 79, 50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     // Broly side chapter: Broly and Paragus, always a pair (single-player too); Paragus falling first
     // makes Broly rage once (full HP, stronger, faster; enemies.c)
-    { BROLY_STAT, 0, BOSS_PAIR, PARAGUS_SPRITE, PARAGUS_STAT },
-    { PARAGUS_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY | BOSS_RAGE, 0, 0 },
+    { BROLY_STAT, 0, BOSS_PAIR, PARAGUS_SPRITE, PARAGUS_STAT, 0, 0, 0 },
+    { PARAGUS_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY | BOSS_RAGE, 0, 0, 0, 0, 0 },
     // Gero's bunker: two Android 19 spare bodies at once, single-player too (Ryan: two 19s on screen, no more
     // in co-op): the record's 19 is a BOSS_PAIR whose twin is the second 19; both-down, one defeat dialogue
-    { BUNKER19_STAT,  0, BOSS_PAIR, 12, BUNKER19B_STAT },
-    { BUNKER19B_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },
+    { BUNKER19_STAT,  0, BOSS_PAIR, 12, BUNKER19B_STAT, 0, 0, 0 },
+    { BUNKER19B_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
     // The Cell Games (docs/story.md 4h): one Perfect Cell per fight until the end (stats 21-24 alone, the
     // Juniors (26) alone in their solo fights), then two Perfect Cells in the final fight (stat 25 always a
     // pair with the copy 140, single-player too; both-down)
-    { 21, 0, BOSS_NO_TWIN, 0, 0 },
-    { 22, 0, BOSS_NO_TWIN, 0, 0 },
-    { 23, 0, BOSS_NO_TWIN, 0, 0 },
-    { 24, 0, BOSS_NO_TWIN, 0, 0 },
-    { 26, 0, BOSS_NO_TWIN, 0, 0 },
-    { 25, 0, BOSS_PAIR, CELL2_SPRITE, CELL2_STAT },
-    { CELL2_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0 },
+    // pair with the copy 140, single-player too; both-down). Ryan: tougher (CELL_*_PCT, bosses.h); Vegeta and
+    // Trunks each face two Juniors (141 + 142, a pair like the Cells)
+    { 21, 0, BOSS_NO_TWIN, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { 22, 0, BOSS_NO_TWIN, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { 23, 0, BOSS_NO_TWIN, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { 24, 0, BOSS_NO_TWIN, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { 26, 0, BOSS_NO_TWIN, 0, 0, CELL_JR_HP_PCT, CELL_SPEED_PCT, 0 },
+    { 25, 0, BOSS_PAIR, CELL2_SPRITE, CELL2_STAT, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { CELL2_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
+    { JR_PAIR_STAT, 0, BOSS_PAIR, 31, JR_PAIR2_STAT, CELL_JR_HP_PCT, CELL_SPEED_PCT, 0 },
+    { JR_PAIR2_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, CELL_JR_HP_PCT, CELL_SPEED_PCT, 0 },
     // Imperfect Cell (60) and Semi-Perfect Cell (76) use the default: a same-model Multi-Form twin
-    { -1, 0, 0, 0, 0 },
+    { -1, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 const BossRule *boss_rule(int stat_index) {

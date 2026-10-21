@@ -1,4 +1,4 @@
-r"""Drop-in savestates for play-testing: mGBA's F1-F6 slots next to the play ROM, each at an important scene.
+r"""Drop-in savestates for play-testing: mGBA's F1-F7 slots next to the play ROM, each at an important scene.
 usage: python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR
   PLAY_ROM   the ROM Ryan plays (`make`); the states are written for it (named <rom>.ss1-6 in OUTDIR)
   DEBUG_ROM  the same source built with DEBUG_MENU=1 (differs only in the title patch); MENU_SS its debug-menu
@@ -7,7 +7,7 @@ usage: python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR
 F1 that save pad (the save, answered 1 Player); F2 Goku's landing site (played on from F1 through Frieza's landing,
 then the fly pad's warp); F3 Gero's computer and F4 the Cell Games path (Map Test with the chapter tests' flags;
 Goku player 1 for the ring's barrier); F6 the post-game Lookout below Dende and F5 the Arctic summit after the
-wishes, both after the Cell Games played through alone (cell_games_1p.txt, then postgame.txt's wishes), so the
+wishes, both after the Cell Games played through alone; F7 the Broly chapter's backyard (Vegeta, the ship there) (cell_games_1p.txt, then postgame.txt's wishes), so the
 party is the real one (Goku's halo, Super Saiyan 2 Gohan). F3-F6 are made on DEBUG_ROM and re-saved on PLAY_ROM. States carry no cartridge save (`ssave`), so
 loading one never touches the .sav. Savestates break with every rebuild: run this again after each.
 """
@@ -69,13 +69,21 @@ ssave {W('f2.ss')}
 """)
 # F3 / F4 on the debug ROM by Map Test with the chapter tests' flags (both before the Cell Games, so the stock
 # party there is right; F4 makes Goku player 1: the ring's barrier lets only him through)
+# the story before the ten-day wait done (a Map Test sets only its chapter's flags): every earlier world-map landing
+# shows its plain marker, not a stale star, and the Lookout's landing (flag 127) is open; worked out from the world
+# map's on-load (each landing's star condition false with these set; 158 would bring back Capsule Corp's star)
+EARLY = ("+26 +30 +66 +68 +69 +77 +86 +127 +129 +132 +136 +140 +141 +143 +144 +148 +149 +151 +157 "
+         "+162 +163 +164 +185 +186 +187 +188 +400")   # 400: Bulma's Saiyan-ship news (the Broly chapter: the ship waits in the backyard)
 chapters = [
     ("f3", "+151 +155 +156 +157", 149, None, 40, ""),                           # Gero's computer (Capsule Corp)
     ("f4", "+191 +421", 323, ("0x010E", "0x00700108"), 30, "poke8 0x0203F000 4\n"),   # the Cell Games path
+    # F7 the Broly chapter (Ryan): the Capsule Corp backyard with the Saiyan ship (flag 400), Vegeta player 1, just
+    # right of the trigger by the ship (rect 64..112 x 232..312: walk left into it)
+    ("f7", "+151 +155 +156 +157 +400", 165, ("0x1506", "0x011000A8"), 30, "poke8 0x0203F000 2\n"),
 ]
 text = ""
 for i, (n, flags, entry, warp, settle, extra) in enumerate(chapters):
-    text += ("load menu.ss\n" if i else "") + f"p2 off\npreset {flags}\nmaptest {entry}\n"
+    text += ("load menu.ss\n" if i else "") + f"p2 off\npreset {flags} {EARLY}\nmaptest {entry}\n"
     if warp:
         text += "frames 200\n" + extra + WARP.format(za=warp[0], xy=warp[1])
     text += f"frames {settle}\nssave {W('d' + n + '.ss')}\n"
@@ -103,7 +111,8 @@ def one_player(path, first=None, last=None):
 # trigger 8 of map 176: the test warp only moves the flyer there; A first closes the Games' last 'Journal Updated!',
 # which holds the command); F5 then makes the wishes (postgame.txt's first
 # part) and stands at the Arctic summit
-games = one_player("cell_games_1p.txt")
+games = one_player("cell_games_1p.txt").replace("preset +191 +421\n", f"preset +191 +421 {EARLY}\n", 1)
+assert EARLY in games
 run("games", dbg, games + f"""key 1 6
 frames 200
 {WARP.format(za='0x6306', xy='0x05C40380')}frames 150
@@ -115,9 +124,9 @@ ssave {W('df6.ss')}
 {WARP.format(za='0x080F', xy='0x01D00150')}frames 30
 ssave {W('df5.ss')}
 """, os.path.join(work, "menu.ss"))
-run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n in ("f3", "f4", "f5", "f6")))
+run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n in ("f3", "f4", "f5", "f6", "f7")))
 
 base = os.path.splitext(os.path.basename(play))[0]
-for i in range(1, 7):
+for i in range(1, 8):
     shutil.copy(os.path.join(work, f"f{i}.ss"), os.path.join(out, f"{base}.ss{i}"))
-print(f"wrote {base}.ss1-6 in {out}")
+print(f"wrote {base}.ss1-7 in {out}")

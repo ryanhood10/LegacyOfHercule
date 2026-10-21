@@ -458,6 +458,18 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 - **Everyone helps in the beam struggle:** Vegeta's stock blast hits one Cell, and Piccolo, Krillin,
   Tien and Yamcha blast the other (each a short line or shout), before Goku's "Now's your chance!"
 
+**Ryan's F4 play-test (2026-10-20):**
+- **Tougher Cell Games:** every Perfect Cell +60 % HP and +15 % chase speed (stats 21-25 and the second Cell 140),
+  the Juniors +50 % HP and +15 % speed (`bosses.h` `CELL_*`, the boss rules' new `hp_pct` / `speed_pct`).
+- **Two Juniors each for Vegeta and Trunks:** Cell spawns six Juniors; J3 and J4 are a pair (stat 141 + 142,
+  both-down, two bars), J1 and J2 stay one each.
+- **The beam struggle (Ryan):** one clash, Gohan's and Cell's: Hercule stands behind Gohan and the second Cell
+  behind Cell, both in the beam pose with their beams adding to their partner's, every beam stopping where the
+  clash meets; at the end Hercule's beam pushes through with Gohan's, the second Cell explodes with Cell, and
+  Hercule stays.
+- **The last fight to 0:** fight 8's bars run over the whole HP (stock: drawn over 20-100 %, so they looked a fifth
+  full when the Cells fell).
+
 **Hercule's beam pose (Ryan): new art**, copied from how Goku and Gohan look in their Kamehameha
 (built and merged 2026-10-19: sprite 72 group 18, `tools/herculesprites.py`). Every other Cell Games
 decision above is made.
@@ -467,6 +479,9 @@ decision above is made.
   Dragon Ball gate (flag 191). The Broly chapter is optional: playable before or after the Games, and
   it stays available any time after its trigger.
 - **Title cards for the team fights too:** "Players 1 & 2 fight!" before fights 3, 7 and 8.
+- **Super Saiyan 2 Gohan as fast and strong as in the fight (Ryan, 2026-10-20):** his row 28 takes the stock
+  Super Saiyan 2 row's class (0x030021E4: combat bytes 100, HP regeneration, the aura loop; he walks about 70 %
+  faster than Gohan) while staying a base form (flags 0), so nothing turns him back into Gohan.
 - **Super Saiyan 2 Gohan as his own character:** sprite 58 is a full playable set (the stock game
   already gives player 1 a Super Saiyan 2 Gohan for fights 7 and 8, so a display row with it exists).
   After the Games he joins as a separate, very strong party member; regular Gohan stays selectable.

@@ -299,10 +299,32 @@ static const EnemyStat *spawn_stat(int stat_index, const BossRule *rule, EnemySt
         if (!resolve_stat(stat_index, buf)) return 0;
         st = buf;
     }
+    if (rule && rule->hp_pct) {                 // a boss made tougher (bosses.h hp_pct)
+        if (st != buf) { *buf = *st; st = buf; }
+        buf->max_hp = buf->max_hp * rule->hp_pct / 100;
+    }
     if (rule && rule->end_pct) {
         if (st != buf) { *buf = *st; st = buf; }
         buf->max_hp = buf->max_hp * (100 - rule->end_pct) / 100;
     }
+    return st;
+}
+
+// Roshi's sparring room (bosses.h DOJO_*): a tougher copy of every enemy spawned there; the duos' stats (Yamcha
+// 106, Tien 98, Krillin 64) by one rule, the animal finale's by another
+static int in_dojo(void) {
+    const u8 *m = (const u8 *)g_MapState;   // map state: +0 zone, +1 area
+    return m && m[0] == DOJO_ZONE && m[1] == DOJO_AREA;
+}
+
+static const EnemyStat *dojo_stat(const EnemyStat *st, EnemyStat *buf, int stat_index) {
+    if (!st || !in_dojo()) return st;
+    if (st != buf) { *buf = *st; st = buf; }
+    int duo = stat_index == 106 || stat_index == 98 || stat_index == 64;
+    int add = duo ? DOJO_DUO_ATK_ADD : DOJO_FINALE_ATK_ADD;
+    buf->max_hp = buf->max_hp * (duo ? DOJO_DUO_HP_PCT : DOJO_FINALE_HP_PCT) / 100;
+    buf->melee = (u8)(buf->melee + add > 255 ? 255 : buf->melee + add);
+    buf->ranged = (u8)(buf->ranged + add > 255 ? 255 : buf->ranged + add);
     return st;
 }
 
@@ -318,7 +340,7 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     if (rec->stat_index == S13_STAT) return s13_spawn(rec);   // Super Android 13: single boss, own AI (super13.c)
     const BossRule *rule = boss_rule(rec->stat_index);
     EnemyStat buf;
-    const EnemyStat *st = spawn_stat(rec->stat_index, rule, &buf);
+    const EnemyStat *st = dojo_stat(spawn_stat(rec->stat_index, rule, &buf), &buf, rec->stat_index);
     if (!st) return 0;
     if (is_boss_rec(rec, st) && diff_boss_hp_pct() != 100) {   // the difficulty's boss HP (difficulty.h)
         if (st != &buf) { buf = *st; st = &buf; }
@@ -358,7 +380,7 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     EnemyStat tbuf;
     int tstat = -1;
     if (boss && rule && rule->partner_stat && !(coop2.off & COOP_OFF_PARTNER)) {
-        const EnemyStat *p = spawn_stat(rule->partner_stat, boss_rule(rule->partner_stat), &tbuf);
+        const EnemyStat *p = dojo_stat(spawn_stat(rule->partner_stat, boss_rule(rule->partner_stat), &tbuf), &tbuf, rule->partner_stat);
         if (p && diff_boss_hp_pct() != 100) {
             if (p != &tbuf) { tbuf = *p; p = &tbuf; }
             tbuf.max_hp = boss_hp(tbuf.max_hp);
@@ -520,6 +542,11 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
     m->speed = (s32)cls[3];
     if (coop.p2 && !companion_active() && is_coop_enemy(e) && !(coop2.off & COOP_OFF_SPEED)) m->speed = m->speed * diff_speed_pct() / 100;   // x 1.2 on Normal
     if (is_raged(e)) m->speed = m->speed * BOSS_RAGE_SPEED_NUM / BOSS_RAGE_SPEED_DEN;
+    if (is_coop_enemy(e) && in_dojo()) m->speed = m->speed * DOJO_SPEED_PCT / 100;   // Roshi's sparring room
+    if (is_coop_enemy(e)) {                     // a boss made faster (bosses.h speed_pct)
+        const BossRule *r = boss_rule(record_of_const(e)->stat_index);
+        if (r && r->speed_pct) m->speed = m->speed * r->speed_pct / 100;
+    }
     if (is_s13(e)) m->speed = m->speed * S13_SPEED_PCT / 100;   // Super 13 is slow (super13.h)
     return m;
 }

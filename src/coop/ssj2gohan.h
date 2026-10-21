@@ -6,7 +6,7 @@
 
 #define SSJ2_SLOT           8       // party slot (PARTY_SLOTS >= 9); regular Gohan keeps slot 0
 #define GOHAN_SLOT          0
-#define SSJ2_ROW            28      // display row: Gohan's row 3 (standard class) with sprite 58, portraits 61 / 12
+#define SSJ2_ROW            28      // display row: Gohan's row 3 with row 4's sprite 58, portraits 61 / 12 and Super Saiyan 2 class
 #define SSJ2_SPRITE         58      // the stock record, repointed to ssj2_record (hurt / lying / tumble filled)
 #define SSJ2_BURST_ABILITY  23      // ability table entry (data/hercule.json)
 

@@ -8,7 +8,7 @@
 // while a non-player entity (a ki blast) updates, the player that entity targets.
 #include "coop.h"
 
-#define EXP_HITS 12        // enemies remembered at once (a round-robin; a death clears its entry)
+#define EXP_HITS 8         // enemies remembered at once (a round-robin; a death clears its entry)
 typedef struct ExpHit { const Entity *enemy, *player; } ExpHit;
 static ExpHit exp_hits[EXP_HITS] __attribute__((section(".party.xp")));
 static u8 exp_hit_next __attribute__((section(".party.xp")));

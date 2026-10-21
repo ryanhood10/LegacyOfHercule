@@ -1146,8 +1146,22 @@ clears flag 440 as it starts, so each spar needs a new talk with Roshi.
   commit waits for every pending command). A beam held through dialogue therefore cannot be a command:
   `cg_beam` does the command's work directly (`Entity_GetBox` 0x080079B9, `Beam_Init` 0x0801D84D, the list add,
   animation 30, `Entity_BeamPoint` 0x08007A27 plus the per-facing offsets at 0x08701DF0, `Beam_Fire`
-  0x08014479; `Beam_End` 0x0801451D to stop). A beam object fades on its own, so the struggle refires them.
-  The stock clash beam between Gohan and Cell is a decoration of map 326, not a beam.
+  0x08014479; `Beam_End` 0x0801451D to stop). The struggle refires them at each step.
+  The stock clash between Gohan and Cell is background art of map 326 (BG0's strip at y 383..392, BG1's
+  starburst; its knot x 428..453, middle about (440, 387)), not a decoration or a beam.
+- **Beams that stop in the middle (2026-10-20, Ryan).** The beam object (0x50 bytes, decompiled): +0x10 state
+  (0 charge, 1 out, 2 ending), +0x11 head blocked, +0x1C / +0x20 origin, +0x2C / +0x30 unit direction, +0x34
+  length (the drawn tip 16 px beyond), +0x4C owner (the hit type is the owner's byte +0x16C). It grows up to 6 px a
+  frame until a projectile-mask wall, the view's edge, an accepted hit or an opposing beam's head stops it, and
+  nothing in its own code ends it (only `Beam_End`). `cg_beam` gives a held beam a RAM copy of its vtable
+  (0x08025830, 16 words in `.party.bv`) whose update (slot 10, 0x0801D88B) clamps +0x34 after the stock update
+  so the tip ends at x 440 (any `on` but 2; 2 = no cap, the finale's push through Cell), and sets the owner to
+  player 1: a script actor is only 0x16C bytes, so its +0x16C is a heap header byte and the beam could hurt the
+  player. Hercule stands behind Gohan (521, 392) and the second Cell behind Cell (324, 416), on their lines; in
+  the finale Hercule's beam (on 2) pushes through with Gohan's, the second Cell gets every explosion batch's
+  flash, hurt pose and jitter and is despawned with Cell, and Hercule stays.
+- **Hardcoded partyram addresses:** the headless tests poke `cg_state` (0x0203F9B0), `s13` (0x0203F9CC) and
+  `rv` (0x0203F9F8) by address, so new partyram state goes in a section after them (`.party.xp`, `.party.bv`).
 - **Entities by sprite.** The VM finds "the entity showing sprite N" by its record pointer (`0x08009370`:
   0 = player 1, 1-6 = party slots, else `sprite_index[N]`, then message 5). A second actor of the same model
   needs its own record: sprite 162 is a copy of Perfect Cell's record 30 (`tools/spriteclone.py` `162=@30`).
@@ -1307,3 +1321,15 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
 - Tests: `tools/headless/cell_games_1p.txt` (the whole Games alone: every fight won, "Goku fights!", player 1's A
   punching as Goku in fight 2), `tools/headless/dropout.txt` (leave after 4 s, come back, a downed player 1 when
   player 2 leaves = game over); the summit, post-game and Gero chapter runs pass with `p2 off` too.
+
+## Boss toughness by rule and the dojo (2026-10-20)
+
+- `BossRule` (bosses.h) gains `hp_pct` (applied in `spawn_stat`, before the end_pct, difficulty and pair rules)
+  and `speed_pct` (in `speed_module`, for co-op enemies by their record's stat). Used by the Cell Games (Ryan: too
+  easy): Perfect Cell 21-25 and 140 at 160 % / 115 %, the Juniors 26 / 141 / 142 at 150 % / 115 %.
+- Roshi's sparring room (zone 6 area 70, `ch8_gym`; its enemies use stock stats seen all over the world, so the
+  boost goes by map, `in_dojo()` reading `g_MapState` +0 / +1): every enemy spawned there gets a tougher private
+  stat (`dojo_stat`): the duos' stats (Yamcha 106, Tien 98, Krillin 64) x 2.2 HP and +12 melee / ranged, the
+  animal finale x 2.5 HP and +16, all 115 % chase speed. Measured alone at 170 %: Yamcha 680 HP (stock 800, halved
+  as a solo pair), Tien 1793. Roshi now announces "a special treat" for the last round instead of animal ninjas.
+

@@ -51,7 +51,8 @@
           "action": "seq:cg_j2_end"
         },
         "10": {
-          "action": "seq:cg_j3_end"
+          "action": "seq:cg_j3_end",
+          "stat": 141
         },
         "11": {
           "action": "seq:cg_fight7_end"
@@ -63,7 +64,8 @@
       "add_records": [
         {
           "like": 10,
-          "action": "seq:cg_head_scene"
+          "action": "seq:cg_head_scene",
+          "stat": 141
         }
       ]
     },

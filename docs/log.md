@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Ryan's F4 batch:** tougher Cells and Juniors (`hp_pct` / `speed_pct` boss rules), six Juniors with two each for
+  Vegeta and Trunks, fight 8 drawn to 0, the beam struggle restaged (helpers behind, beams capped at the clash,
+  the second Cell explodes, Hercule stays), Super Saiyan 2 Gohan on the Super Saiyan 2 class, Roshi's dojo tougher
+  by map with "a special treat", and the drop-ins with the earlier story's flags plus an F7 for the Broly chapter.
 - **Android 16 selectable (Ryan's F3 test):** after the workshop scene 16 stays in the party and selectable on the
   save pads (the players trade Krillin and 16) through the rest of the wait; `CoopCall 12, 1` takes him out at the
   Cell Games' start. Alone, player 1 is 16 after the scene, Krillin an actor by the table. `ch9_gero.txt` checks

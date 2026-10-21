@@ -15,6 +15,8 @@
 //   BOSS_NO_TWIN   the boss fights alone even in co-op
 //   BOSS_PAIR      always a pair, single-player too, under the boss rules (partner model and stat,
 //                  both-down) whatever the stat's HP and EXP (the forest "spirits", Frieza + Cooler)
+//   hp_pct         the boss's HP in percent of its stat's (0 = 100; before the difficulty and pair rules)
+//   speed_pct      its chase speed in percent (0 = 100)
 //   BOSS_RAGE      on the partner's stat: when this boss falls while the other of the pair still stands,
 //                  the survivor rages once (enemies.c): full HP again, BOSS_RAGE_* more attack and defence,
 //                  faster chase modules, and the rage dialogue set by CoopCall 9 (Paragus -> Broly)
@@ -52,6 +54,9 @@ typedef struct BossRule {
     u8 flags;
     s16 partner_sprite;
     s16 partner_stat;
+    u16 hp_pct;          // 0 = 100
+    u8 speed_pct;        // 0 = 100
+    u8 _pad;
 } BossRule;
 
 // Sprite ids of the new boss models (tools/bossmodels.py; the Makefile passes A13_SPRITE=165 and
@@ -82,6 +87,22 @@ typedef struct BossRule {
 #define CELL2_SPRITE 30     // the Makefile passes 162, an alias of record 30 (tools/spriteclone.py "@30")
 #endif
 #define CELL2_STAT 140      // the second Perfect Cell of the final fight (stat 25's twin: two pieces of Cell survived)
+#define JR_PAIR_STAT 141    // a Cell Junior that comes as a pair (Vegeta's and Trunks' fights: two at once)
+#define JR_PAIR2_STAT 142   // the pair's second Junior
+// Ryan (2026-10-20): the Cell Games were too easy: more health and a little more speed (our numbers)
+#define CELL_HP_PCT 160
+#define CELL_JR_HP_PCT 150
+#define CELL_SPEED_PCT 115
+// Roshi's sparring room (zone 6 area 70, data/story/ch8_gym): Ryan (2026-10-20): every match was too easy. The
+// duos (Yamcha 106 + Tien 98, Krillin 64 + Hercule) and the animal finale get more HP, attack and speed there only
+// (their stats are stock ones used all over the world). Our numbers.
+#define DOJO_ZONE 6
+#define DOJO_AREA 70
+#define DOJO_DUO_HP_PCT 220
+#define DOJO_DUO_ATK_ADD 12
+#define DOJO_FINALE_HP_PCT 250
+#define DOJO_FINALE_ATK_ADD 16
+#define DOJO_SPEED_PCT 115
 #define GERO_STAT_BASE 120
 #define BUNKER19_STAT 120   // the bunker's Android 19 spare body A (the record), BOSS_PAIR with B
 #define BUNKER19B_STAT 121  // spare body B (the pair's twin)

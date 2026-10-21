@@ -133,7 +133,7 @@ sequence ch8_gym_animals
         ClearStoryFlag 373
         ClearStoryFlag 374
         ClearStoryFlag 375
-  text 80 "MASTER ROSHI: Ho ho!  Not bad at all!\x0bFor your last lesson, I've hired some special animal ninjas.\x0bA different kind of training!  Ready...  begin!"
+  text 80 "MASTER ROSHI: Ho ho!  Not bad at all!\x0bFor the last round, I have a special treat for you...\x0bReady...  begin!"
   script                                 ; the first round (the next ones start from the defeats below)
         PlayMusic 35
         TriggerMapEvent 8

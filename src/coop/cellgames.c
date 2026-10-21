@@ -49,7 +49,18 @@ u8 *cg_test_slot(void) {
 // beam command of script step 137 (NPCFireKamehameha, 0x0801D788 / 0x0801D7DC) drives it, but without the
 // command chain: step 137 and batch commits wait for the entity's commands, so a beam held through the dialogue
 // would stall the scene. on 0 ends that entity's beam. The beam struggle gives Hercule and the second Cell
-// their beams this way (the stock clash beam between Gohan and Cell is a decoration of map 326).
+// their beams this way (the stock clash between Gohan and Cell is background art of map 326: BG0's strip, BG1's
+// starburst, its knot at x 428..453, y about 387).
+// any other on: the beam stops where the clash meets (Ryan: Hercule behind Gohan and the second Cell behind Cell add to
+// the clash, their beams stop in the middle); on 2: no cap (the finale's push through Cell).
+// The beam object (0x50 bytes, decompiled 2026-10-20): +0x10 state (0 charge, 1 out, 2 ending), +0x11 head
+// blocked (impact frames), +0x1C / +0x20 origin, +0x2C / +0x30 unit direction, +0x34 length in px (the head;
+// the drawn tip is 16 px beyond), +0x4C owner. It grows up to 6 px a frame until a projectile-mask wall, the view's
+// edge, a hit or an opposing beam's head stops it, so a camera pan let the held beams run on past the middle.
+// The cap wraps the update (vtable slot 10) in a RAM copy of the vtable and clamps the length after the stock
+// update, so the drawing (it reads +0x34) never sees it longer. The hit type is the owner's byte +0x16C, past a
+// script actor's 0x16C-byte allocation (a heap header byte): the owner becomes player 1 (type 1: enemies only;
+// the scene has none), so the beam can neither hurt nor be stopped by a player.
 ROM_FN(Entity *, Vm_FindCharEntity, (int id), 0x08009371);   // 0 = player 1, 1-6 party slots, else a sprite id
 ROM_FN(void, Entity_GetBox, (s32 *out, Entity *e), 0x080079B9);
 ROM_FN(void, Entity_BeamPoint, (s32 *out, Entity *e), 0x08007A27);
@@ -57,6 +68,40 @@ ROM_FN(void *, Beam_Init, (void *mem, s32 *pos, int a, Entity *owner), 0x0801D84
 ROM_FN(void, Beam_Fire, (void *beam, int facing, s32 *pos), 0x08014479);
 ROM_FN(void, Beam_End, (void *beam), 0x0801451D);
 #define BEAM_OFFSETS ((const s32 *)0x08701DF0)   // per facing {dx, dy}: down, up, left (-9, 2), right (10, 0)
+
+typedef struct Beam {
+    u32 *vtable; s32 sort_y; u8 prio, _p0[3]; u16 tile, tile_bytes;
+    u8 state, impact, alt, _p1;              // +0x10
+    s32 fx_time, ticks;                      // +0x14
+    s32 x, y;                                // +0x1C origin (world px)
+    s32 sx, sy;                              // +0x24 screen
+    s32 dx, dy;                              // +0x2C unit direction
+    s32 len;                                 // +0x34 px
+    s32 facing, mult;                        // +0x38
+    const u8 *frame, *frame_set, *frames;    // +0x40
+    Entity *owner;                           // +0x4C
+} Beam;
+_Static_assert(sizeof(Beam) == 0x50, "Beam size");
+#define BEAM_VTABLE   0x08025830u            // relative offsets (Beam_Init's subclass); slot 10 = update
+#define BEAM_VT_SLOTS 16                     // 14 known slots (partyram is tight: 16 words)
+#define CG_CLASH_X    440                    // map 326: the middle of the stock clash
+ROM_FN(void, Beam_Update, (Beam *b, int run), 0x0801D88B);
+static u32 cg_beam_vt[BEAM_VT_SLOTS] __attribute__((section(".party.bv")));   // last in partyram: the tests peek cg_state, s13, rv by address
+
+static void cg_beam_update(Beam *b, int run) {
+    Beam_Update(b, run);
+    if (b->state != 1 || !b->dx) return;
+    s32 cap = (CG_CLASH_X - b->x) * b->dx - 16;   // the drawn tip on the clash's middle
+    if (cap < 8) cap = 8;
+    if (b->len > cap) { b->len = cap; b->impact = 1; }
+}
+
+static void cg_beam_capped(Beam *b) {
+    const s32 *vt = (const s32 *)BEAM_VTABLE;
+    for (int i = 0; i < BEAM_VT_SLOTS; i++) cg_beam_vt[i] = BEAM_VTABLE + vt[i] - (u32)cg_beam_vt;
+    cg_beam_vt[10] = (u32)cg_beam_update - (u32)cg_beam_vt;
+    b->vtable = cg_beam_vt;
+}
 
 void cg_beam(int id, int on) {
     Entity *e = Vm_FindCharEntity(id);
@@ -76,6 +121,8 @@ void cg_beam(int id, int on) {
     pos[1] = (box[1] + box[3]) >> 1;
     void *beam = Beam_Init(0, pos, 0, e);
     if (!beam) return;
+    if (g_PlayerObject) ((Beam *)beam)->owner = g_PlayerObject;   // a known hit type (see above)
+    if (on != 2) cg_beam_capped(beam);   // 2: the finale's push through Cell
     EntityList_Add(g_EntityList, (Entity *)beam);
     Entity_SetAnimation(e, 30);              // the beam pose (group 18)
     int f = e->facing & 3;
