@@ -6,9 +6,9 @@
   "maps": [
     {
       "map": {"zone": 6, "area": 5},
-      "_": "Dr. Briefs' workshop: 16 stands by Bulma's console from the wait until he joins; the scene once the TV announcement and the Scouter Note are done",
-      "add_records": [
-        {"kind": "actor", "sprite": 8, "x": 344, "y": 184, "facing": 0, "condition": "script:ch9_ws_a16_cond"}
+      "_": "Dr. Briefs' workshop: 16 lies on the table (the stock decorations 6 / 7, shown by the on-load during the wait) until he wakes in the scene; from flag 420 the table is empty; the scene once the TV announcement and the Scouter Note are done",
+      "edits": [
+        {"at": "onload", "replace": [["StackTestStoryFlagNot 191", "StackTestStoryFlagNot 191\nAnd\nStackTestStoryFlagNot 420"]]}
       ],
       "add_triggers": [
         {"like": 1, "rect": [25, 97, 312, 312], "payload": "seq:ch9_workshop", "condition": "script:ch9_ws_cond"}

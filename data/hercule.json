@@ -175,16 +175,16 @@
       "note": "game action 59 (Deprecated_CharacterSpecialAttack, an assert no script calls) -> CoopCall, the script-to-C bridge (src/coop/vmcall.c, docs/scripts.md)"
     },
     {
-      "offset": "0x408E15",
-      "expect": "272804",
-      "bytes": "021eff",
-      "note": "the Cell Games ring barrier (map 323 gate): Goku only at level 40 -> anyone at level 30 (data/story/cell_games)"
+      "offset": "0x40DA17",
+      "expect": "01",
+      "bytes": "00",
+      "note": "the Cell Games arena grounds (map 323 row +7): no level gate label over the ring's barrier (Ryan: Goku only, no level)"
     },
     {
       "offset": "0x408DD4",
       "expect": "020b00040b0004021600270d0400c302140411",
-      "bytes": "020b0216001d0d00c302140411111111111111",
-      "note": "the ring barrier's condition (map 323 item): (player 1 is Goku and level > 39) and not 195 -> (player 1's level > 29) and not 195"
+      "bytes": "020b00040b00c3021404111111111111111111",
+      "note": "the ring barrier's condition (map 323 item): (player 1 is Goku and level > 39) and not 195 -> player 1 is Goku and not 195"
     },
     {
       "offset": "0x4C80",

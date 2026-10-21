@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Ryan's drop-in play-test fixes:** old Hercule travels with Trunks through Goku's landing (behind him, with
+  the group, hanging back at the crater's rim for his "Psst!", back with everyone); the workshop shows 16 on
+  Briefs' table until he wakes, then a fade to an empty table with 16 standing beside it (the stock on-load
+  shows the body decorations only before flag 420; no standing double); the Cell Games ring lets only Goku
+  through, at any level; the camera follows Hercule out and pans to Cell; Gohan flies into the ring and can go
+  Super Saiyan 1 (teen row 2 from the Games' start).
 - **Gohan walks and flies in for his scenes** (Ryan: he appeared out of thin air): the pop-in stand-in is gone.
   When nobody plays Gohan, `ch1_opening` stages him as an actor (sprite 55) guarded by the new CoopCall 22: he
   walks up with the Z fighters at Frieza's landing, stands with them on the return, flies in with the group to
@@ -105,7 +111,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Hercule subbed in, Gohan + Hercule, four Cell Juniors fought by Krillin / Piccolo / Vegeta / Trunks
   alternating pads, Hercule's retreat and return, 16's bird line, two Perfect Cells (stat 140, sprite 162, a
   record copy of 30), the two-on-two beam struggle with held beams (CoopCall 16), the ending without Hercule's
-  join and with Goku's halo, the ring barrier for anyone at level 30, the arena gated on Gero's computer.
+  join and with Goku's halo, the ring barrier for anyone at level 30 (Goku only, any level, since 2026-10-20), the arena gated on Gero's computer.
   Fixed on the way: the co-op leash kept players 20 px under a map's top edge, so top-edge doors (the ring,
   Gero's lab area 47) could not be reached in co-op. Tested end to end headless (`tools/headless/cell_games.txt`,
   new runner command `stepz`, test command `COOP_CMD_WIN_STAT`).

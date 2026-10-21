@@ -25,14 +25,6 @@ script ch9_ws_cond
     END
 end
 
-; 16 stands in the workshop from the ten-day wait (151) until he joins the players
-script ch9_ws_a16_cond
-    StackTestStoryFlag 151
-    StackTestStoryFlagNot 420
-    And
-    END
-end
-
 ; the chapter runs (16 in the party, the bunker not done yet)
 script ch9_active_cond
     StackTestStoryFlag 420
@@ -121,7 +113,7 @@ script ch9_a48_onload
     END
 end
 
-; ---- zone 6 area 5: Dr. Briefs' workshop. 16 wakes, Gero's computer is running again ---------------
+; ---- zone 6 area 5: Dr. Briefs' workshop. 16 wakes on the table, Gero's computer is running again -----
 
 sequence ch9_workshop
   [0] script
@@ -143,12 +135,10 @@ sequence ch9_workshop
         END
   [1] text 48 "DR. BRIEFS: Ah, there you are!  Good news: Android 16 is all fixed up.\x0bAnd that nasty bomb Dr. Gero hid inside him?  Gone.  I took it out myself!"
   [2] text 36 "BULMA: He hasn't moved since we closed him up, though.\x0bDad, are you sure you connected everything?"
-  [3] script
+  [3] script                             ; 16 stirs on the table
         WaitFrames 40
         PlayAudio 62
-        SetEntityFacing 8, 2
-        WaitFrames 30
-        SetEntityFacing 8, 0
+        WaitFrames 50
         END
   [4] text 26 "ANDROID 16: ...Systems online."
   [5] text 26 "ANDROID 16: I am receiving a signal.\x0bIt comes from Dr. Gero's laboratory in the Northern Mountains.\x0bHis computer is running again."
@@ -161,9 +151,14 @@ sequence ch9_workshop
         CoopCall 11, 0, 0, 0
         CoopCall 6, 7, 0, 0
         SetActiveCharacterNoReset 6
-        FadeOut 30
-        WarpToMapWithEntities 6, 5, 1, 232, 296   ; the workshop again: 16's and Krillin's actors gone
-        SetEntityFacing 0, 1
+        FadeOut 60
+        WarpToMapWithEntities 6, 5, 1, 328, 188   ; the workshop again, Krillin by Briefs' table: the table is
+        SetEntityFacing 0, 3                      ; empty now (the on-load shows 16's body only before flag 420)
+        CoopCall 22, 1, 7, 0                      ; nobody plays 16 (alone): he stands by the table as an actor;
+        JumpIfFalse L1                            ; with two players he is player 2, beside Krillin
+        SpawnCharacterEntity 8, 356, 176
+        SetEntityFacing 8, 2
+      L1:
         SetActiveEntity 0
         SetPlayerVisible 1
         END

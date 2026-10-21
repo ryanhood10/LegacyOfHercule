@@ -432,8 +432,14 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 **Additions (Ryan, 2026-10-19; draft lines Claude's):**
 - **No save pad** at the arena: as in the stock game, a game over sends the players back to their
   last save before the Games.
-- **The ring barrier is loosened and lowered:** any character may pass (stock: Goku only, level 40),
-  at level 30 (Claude's number; Ryan may change it). The fight-1 script makes player 1 Goku.
+- **The ring barrier (Ryan, 2026-10-20):** Goku only, as in the stock game, but no level gate (stock: level
+  40; the 2026-10-19 build let anyone through at level 30). The fight-1 script makes player 1 Goku.
+- **Super Saiyan 1 Gohan (Ryan, 2026-10-20):** from the Games' start Gohan is the teen Gohan of the cutscenes
+  (sprite 56, row 2) and can go Super Saiyan on B (stock kept him on kid Gohan's row, no transformation,
+  until the scripted Super Saiyan 2).
+- **Hercule's walk-out and Gohan's entrance (Ryan, 2026-10-20):** the camera pans up to the crowd, Hercule
+  steps in and the camera follows him down between Goku and Cell, pans to Cell for his line, then up to
+  Gohan, who flies into the ring.
 - **Hercule's excuse when Goku calls him out (before the stomach ache):** HERCULE: "Heh... I only
   slipped last time, you know!"
 - **Hercule leaves after fight 3 and comes back changed.** When Cell spawns the Juniors: HERCULE: "Uh...

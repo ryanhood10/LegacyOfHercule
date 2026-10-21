@@ -1,10 +1,12 @@
 # The Cell Games played ALONE (no player 2: `p2 off`): the same run as cell_games.txt; after each win cg_state + 7
 # has no 0x80 (no player 2), and fight 2 / J2 / J4 (player 2's solo fights) are played on player 1's pad.
+# The ring's barrier lets only Goku through (poke8 0x0203F000 4 makes him player 1 before the walk up).
 # Fight 2: the title card reads "Goku fights!" and player 1's A punches as Goku (shots cg02b / cg02c).
 p2 off
 preset +191 +421
 maptest 323
 frames 200
+poke8 0x0203F000 4
 poke32 0x0203FD0C 0x010E
 poke32 0x0203FD54 0x00700108
 poke32 0x0203FD08 5

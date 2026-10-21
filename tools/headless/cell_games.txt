@@ -1,5 +1,6 @@
 # The Cell Games end to end (docs/story.md 4h, docs/testing.md "Cell Games"). From a debug-menu savestate of a
 # DEBUG_MENU=1 build: python tools/headless/st_test.py tools/headless/cell_games.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# The ring's barrier lets only Goku through (poke8 0x0203F000 4 makes him player 1 before the walk up).
 # Each fight is queued by writing its stat + 1 to cg_state + 5 (what COOP_CMD_WIN_STAT does; the command itself only
 # runs between scenes): it wins itself once that enemy stands and player 1 is free; stepz presses A on both pads until the queue byte (cg_state + 5) clears. After each win
 # cg_state + 7 tells who fought: player 1's party slot | solo << 4 | 0x80 when player 2's entity stood.
@@ -7,6 +8,7 @@ p2 0
 preset +191 +421
 maptest 323
 frames 200
+poke8 0x0203F000 4
 poke32 0x0203FD0C 0x010E
 poke32 0x0203FD54 0x00700108
 poke32 0x0203FD08 5

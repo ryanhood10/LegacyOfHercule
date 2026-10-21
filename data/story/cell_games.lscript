@@ -9,9 +9,10 @@
 ; ---- map 324 (zone 14 area 2), the ring ----
 
 sequence cg_ring
-  script                                 ; stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too
+  script                                 ; stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too; Gohan can go Super Saiyan
         SetActiveCharacter 4
         CoopCall 15, 1, 0, 0
+        SetCharacterTransformation 0, 56
         SetCharEP 2, 5000
         SetCharHP 2, 5000
         SetCharEP 3, 5000
@@ -77,24 +78,34 @@ end
 sequence cg_fight2_end
   stockseq @083e93e8 0 9    ; Goku gives up, Vegeta, Trunks, Cell: "which one of these pitiful specimens"
   text 1 "#I need someone to take over...\x0b...Hercule!  Get out here!"
-  script                                 ; Hercule walks out
-        SpawnCharacterEntity 72, 600, 120
-        WalkToPosition 72, 520, 300
+  script                                 ; Hercule walks out between Goku and Cell
+        PanCameraToPosition 400, 40, 3
+        SpawnCharacterEntity 72, 664, 112
         SetEntityFacing 72, 2
+        WalkToPosition 72, 584, 124
+        SetActiveEntity 72
+        WalkToPosition 72, 424, 440
+        SetEntityFacing 72, 3
+        SetActiveEntity 0
   text 67 "HERCULE: Heh...  I only slipped last time, you know!"
   script
         SetEntityAnimation 72, 2
         WaitFrames 30
   text 67 "Ooh...  ohhh, my stomach!  Must have been something I ate!\x0bThe champ can't fight like this!"
+  script                                 ; over to Cell
+        PanCameraToPosition 364, 360, 3
   text 40 "CELL: This is your replacement, Goku?\x0bThe clown I threw out of the ring?"
   script
         PanCameraToPosition 392, 48, 3
         WaitFrames 60
   text 59 "GOHAN: I can't let Hercule face Cell alone!"
-  script
-        WalkToPosition 56, 480, 300
-        SetEntityFacing 56, 2
-        PanCameraToPosition 328, 304, 3
+  script                                 ; Gohan flies into the ring
+        SetActiveEntity 56
+        PlayAudio 26
+        FlyToPosition 56, 400, 412
+        SetEntityFacing 56, 3
+        SetActiveEntity 0
+        PanCameraToPosition 306, 356, 3
   text 67 "HERCULE: Well...  since the kid insists...\x0bstand back, boy, and watch a professional!"
   stock @083e9362    ; "Wonderful.  Let's get started!"
   script                                 ; stock entry 20: Gohan player 1, player 2 is Hercule
@@ -781,13 +792,13 @@ sequence cg_beam_struggle
   stock @083ec73e    ; "Journal Updated!"
 end
 
-; ---- map 323 (zone 14 area 1), the arena grounds: the ring's barrier lets anyone at level 30 through (its condition: a byte patch in data/hercule.json) ----
+; ---- map 323 (zone 14 area 1), the arena grounds: the ring's barrier lets only Goku through, at any level (Ryan:
+;      Goku-locked as in the stock game, no level gate; its condition and the gate label: byte patches in data/hercule.json) ----
 
 script cg_barrier_cond
     PushActiveCharIndex
-    StackGetCharLevel
-    PushByte 30
-    CmpLt
+    PushByte 4
+    CmpNe
     StackTestStoryFlagNot 195
     And
     END
@@ -796,7 +807,7 @@ end
 sequence cg_barrier
   script
         PlayAudio 28
-  text 0 "@^You must be at least level 30 to enter the ring."
+  stock @083e8048    ; "Only Goku is allowed to pass through this barrier."
 end
 
 ; the world map's arena landing: the Dragon Balls returned (191) and Gero's computer done (421)

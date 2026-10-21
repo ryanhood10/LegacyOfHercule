@@ -84,8 +84,10 @@ b = body(A2, "m324_t0", 0)
 heal = []
 for s in (5, 6):
     heal += [f"SetCharEP {s}, 5000", f"SetCharHP {s}, 5000"]
-b = ["SetActiveCharacter 4", "CoopCall 15, 1, 0, 0"] + b[:10] + heal + b[10:]
-script(b, "stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too")
+# Gohan is the teen Gohan of the Games' cutscenes (sprite 56, row 2) from here: Super Saiyan 1 on B (row 5); stock kept
+# him on kid Gohan's row 0 (no transformation) until the scripted Super Saiyan 2 (Ryan: "this would just be Super Saiyan 1 Gohan")
+b = ["SetActiveCharacter 4", "CoopCall 15, 1, 0, 0", "SetCharacterTransformation 0, 56"] + b[:10] + heal + b[10:]
+script(b, "stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too; Gohan can go Super Saiyan")
 stockseq(A2, "m324_t0", 1, 26, "\"I'll fight Cell first\", Hercule's ring scene, \"Let's do this!\"")
 title(P1)
 script(body(A2, "m324_t0", 27), "stock entry 27: fight 1")
@@ -105,14 +107,29 @@ emit("")
 emit("sequence cg_fight2_end")
 stockseq(A3, "m325_r0_defeat", 0, 9, "Goku gives up, Vegeta, Trunks, Cell: \"which one of these pitiful specimens\"")
 text(1, "#I need someone to take over...\\x0b...Hercule!  Get out here!")
-script(["SpawnCharacterEntity 72, 600, 120", "WalkToPosition 72, 520, 300", "SetEntityFacing 72, 2"], "Hercule walks out")
+# Ryan: the camera follows Hercule out and pans to Cell when he talks; Gohan flies into the ring. Desert map 325:
+# the crowd stands on the plateau (y 96-120), Goku at (368, 440) faces Cell at (484, 440) on the floor below.
+script(["PanCameraToPosition 400, 40, 3",                  # up to the crowd on the plateau
+        "SpawnCharacterEntity 72, 664, 112",               # Hercule steps in from just off screen ...
+        "SetEntityFacing 72, 2",
+        "WalkToPosition 72, 584, 124",
+        "SetActiveEntity 72",                              # ... and the camera follows him down into the ring
+        "WalkToPosition 72, 424, 440",
+        "SetEntityFacing 72, 3",
+        "SetActiveEntity 0"], "Hercule walks out between Goku and Cell")
 text(67, "HERCULE: Heh...  I only slipped last time, you know!")
 script(["SetEntityAnimation 72, 2", "WaitFrames 30"])
 text(67, "Ooh...  ohhh, my stomach!  Must have been something I ate!\\x0bThe champ can't fight like this!")
+script(["PanCameraToPosition 364, 360, 3"], "over to Cell")
 text(40, "CELL: This is your replacement, Goku?\\x0bThe clown I threw out of the ring?")
 script(["PanCameraToPosition 392, 48, 3", "WaitFrames 60"])
 text(59, "GOHAN: I can't let Hercule face Cell alone!")
-script(["WalkToPosition 56, 480, 300", "SetEntityFacing 56, 2", "PanCameraToPosition 328, 304, 3"])
+script(["SetActiveEntity 56",                              # the camera follows Gohan's flight into the ring
+        "PlayAudio 26",
+        "FlyToPosition 56, 400, 412",
+        "SetEntityFacing 56, 3",
+        "SetActiveEntity 0",
+        "PanCameraToPosition 306, 356, 3"], "Gohan flies into the ring")
 text(67, "HERCULE: Well...  since the kid insists...\\x0bstand back, boy, and watch a professional!")
 emit(f"  stock @{A3['m325_r0_defeat']['entries'][19]['head'].split('@')[1].split()[0]}    ; \"Wonderful.  Let's get started!\"")
 b = body(A3, "m325_r0_defeat", 20)
@@ -274,16 +291,17 @@ emit("end")
 emit("")
 
 # ---------------------------------------------------------------- map 323 and the world map ------------
-emit("; ---- map 323 (zone 14 area 1), the arena grounds: the ring's barrier lets anyone at level 30 through (its condition: a byte patch in data/hercule.json) ----")
+emit("; ---- map 323 (zone 14 area 1), the arena grounds: the ring's barrier lets only Goku through, at any level (Ryan:")
+emit(";      Goku-locked as in the stock game, no level gate; its condition and the gate label: byte patches in data/hercule.json) ----")
 emit("")
 emit("script cg_barrier_cond")
-for l in ["PushActiveCharIndex", "StackGetCharLevel", "PushByte 30", "CmpLt", "StackTestStoryFlagNot 195", "And", "END"]:
+for l in ["PushActiveCharIndex", "PushByte 4", "CmpNe", "StackTestStoryFlagNot 195", "And", "END"]:
     emit("    " + l)
 emit("end")
 emit("")
 emit("sequence cg_barrier")
 script(["PlayAudio 28"])
-text(0, "@^You must be at least level 30 to enter the ring.")
+emit("  stock @083e8048    ; \"Only Goku is allowed to pass through this barrier.\"")
 emit("end")
 emit("")
 emit("; the world map's arena landing: the Dragon Balls returned (191) and Gero's computer done (421)")
