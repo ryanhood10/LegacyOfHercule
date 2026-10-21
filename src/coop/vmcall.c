@@ -180,7 +180,7 @@ void vm_coop_call(s32 *st) {
         break;
     case 10: party_keep(st, a); break;
     case 11: a16_join(); break;
-    case 12: a16_leave(); break;
+    case 12: if (a == 1) a16_gone(); else a16_leave(); break;
 #if PARTY_SLOTS > SSJ2_SLOT
     case 20: ssj2_join(); break;
 #endif

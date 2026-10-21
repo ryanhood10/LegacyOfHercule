@@ -1,0 +1,29 @@
+# Android 16 leaves the party at the Cell Games (CoopCall 12, 1 in cg_ring, src/coop/a16player.c a16_gone): Map Test 323
+# with 16 joined by test command 11 (player 2 on him), Goku walks into the ring: slot 7 flags 43 -> 00, player 2
+# 07 -> 05 (Hercule). From a debug-menu savestate (--out = the folder holding menu.ss).
+p2 0
+preset +191 +421 +420
+maptest 323
+frames 200
+poke32 0x0203FD08 11
+frames 60
+echo == 16 joined: slot 7 flags (43), player 2 slot (07)
+peek8 0x0203F0E4 1
+peek8 0x0203FF84 1
+poke8 0x0203F000 4
+poke32 0x0203FD0C 0x010E
+poke32 0x0203FD54 0x00700108
+poke32 0x0203FD08 5
+frames 200
+key 0x40 20
+key 1 6
+frames 120
+p2 0x40
+key 0x40 160
+p2 0
+waitmap 14 2 300
+frames 100
+echo == the ring scene started: slot 7 flags (00), player 2 slot (05 = Hercule)
+peek8 0x0203F0E4 1
+peek8 0x0203FF84 1
+map

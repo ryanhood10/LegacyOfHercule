@@ -123,3 +123,5 @@ peek8 0x0203FF84 1
 peek FLAGS+0x34 1
 shot g18_krillin_hercule
 save g_home.ss
+echo == 16 stays in the party after the chapter (slot 7 flags 43: in party, selectable) until the Cell Games
+peek8 0x0203F0E4 1

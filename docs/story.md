@@ -340,6 +340,11 @@ value fires its defeat action at that threshold instead of at zero HP.
   castle-defense game where waves of Cell Juniors try to steal it. The hunt appears to gate the Cell
   Games (`docs/story-rom.md` section 8); confirm in play before building on it.
 
+- **16 selectable until the Cell Games (Ryan, 2026-10-20):** after the workshop scene 16 is in the party and
+  selectable on the save pads, so the two players can trade who is Krillin and who is 16; he stays after the
+  chapter and leaves for good at the Cell Games' start, where he is the stock NPC who dies. Alone, player 1 is 16
+  after the scene (Krillin stands by the table as an actor; switch to him at a save pad).
+
 ## 4h. The Cell Games (Ryan, 2026-10-19; built 2026-10-19, `data/story/cell_games`)
 
 Stock flow, fight by fight with the scripted player 1: `docs/story-rom.md` section 9. Ryan's plan

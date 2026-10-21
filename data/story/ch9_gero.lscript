@@ -1,6 +1,6 @@
 ; Chapter 9 side chapter "Gero's computer" (docs/story.md 4g): Krillin (player 1) and Android 16 (player 2,
 ; the last party slot: src/coop/a16player.c, CoopCall 11 / 12) go back to Dr. Gero's lab during the ten-day
-; wait. Flags 420-439: 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down,
+; wait. Flags 420-439: 420 running (16 joined; he stays selectable until the Cell Games), 421 over, 422 rubble punched, 423 / 424 west / east generator down,
 ; 425 bunker done, 430 + slot the selectable bits saved by the lock.
 ; Opcode 0x05 (lscript "Not") is the VM's logical OR (decompiled 0x08008FE6; docs/scripts.md 2.1).
 
@@ -149,16 +149,27 @@ sequence ch9_workshop
   [10] text 0 "@^Krillin and Android 16 set out for Dr. Gero's lab in the Northern Mountains."
   [11] script
         CoopCall 11, 0, 0, 0
+        CoopCall 5, 0, 0, 0                       ; two players: Krillin player 1, 16 player 2
+        JumpIfFalse L0
         CoopCall 6, 7, 0, 0
         SetActiveCharacterNoReset 6
+        Jump L2
+      L0:
+        SetActiveCharacterNoReset 7               ; alone, player 1 is 16 (Ryan); Krillin at a save pad
+      L2:
         FadeOut 60
         WarpToMapWithEntities 6, 5, 1, 328, 188   ; the workshop again, Krillin by Briefs' table: the table is
         SetEntityFacing 0, 3                      ; empty now (the on-load shows 16's body only before flag 420)
-        CoopCall 22, 1, 7, 0                      ; nobody plays 16 (alone): he stands by the table as an actor;
-        JumpIfFalse L1                            ; with two players he is player 2, beside Krillin
+        CoopCall 22, 1, 7, 0                      ; the one of the two nobody plays stands by the table as an actor
+        JumpIfFalse L1                            ; (alone: Krillin; with two players neither)
         SpawnCharacterEntity 8, 356, 176
         SetEntityFacing 8, 2
       L1:
+        CoopCall 22, 1, 6, 0
+        JumpIfFalse L3
+        SpawnCharacterEntity 76, 356, 176
+        SetEntityFacing 76, 2
+      L3:
         SetActiveEntity 0
         SetPlayerVisible 1
         END

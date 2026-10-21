@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-20
 
+- **Android 16 selectable (Ryan's F3 test):** after the workshop scene 16 stays in the party and selectable on the
+  save pads (the players trade Krillin and 16) through the rest of the wait; `CoopCall 12, 1` takes him out at the
+  Cell Games' start. Alone, player 1 is 16 after the scene, Krillin an actor by the table. `ch9_gero.txt` checks
+  slot 7 after the chapter.
 - **Super 13 (Ryan):** 14000 HP (9800 alone, was 5500) and a five-beat transformation (surges, his line, the
   shaking mountain, the white-out reveal with his music, a new boast). **Kill EXP to the last hit:** the damage
   calculation notes the player behind each hit (a ki blast's owner too); kills by ki blasts no longer go to the

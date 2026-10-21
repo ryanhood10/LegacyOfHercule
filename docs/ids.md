@@ -182,7 +182,7 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 9 | Stage (op, b, c): rage dialogue, place player 2 | Broly chapter |
 | 10 | PartyKeep (op) | Broly chapter |
 | 11 | A16Join () | Gero's computer |
-| 12 | A16Leave () | Gero's computer |
+| 12 | A16Leave (op: 0 the chapter's end, 16 stays selectable; 1 the Cell Games, 16 gone) | Gero's computer, the Cell Games |
 | 13 | WaveStart (seq, round) | Time Chamber |
 | 14 | Wave (op) | Time Chamber |
 | 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |

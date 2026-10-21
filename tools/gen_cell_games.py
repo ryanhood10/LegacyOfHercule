@@ -86,7 +86,8 @@ for s in (5, 6):
     heal += [f"SetCharEP {s}, 5000", f"SetCharHP {s}, 5000"]
 # Gohan is the teen Gohan of the Games' cutscenes (sprite 56, row 2) from here: Super Saiyan 1 on B (row 5); stock kept
 # him on kid Gohan's row 0 (no transformation) until the scripted Super Saiyan 2 (Ryan: "this would just be Super Saiyan 1 Gohan")
-b = ["SetActiveCharacter 4", "CoopCall 15, 1, 0, 0", "SetCharacterTransformation 0, 56"] + b[:10] + heal + b[10:]
+# Android 16 (selectable since Gero's computer) leaves the party for good: here he is the stock NPC who dies
+b = ["CoopCall 12, 1, 0, 0", "SetActiveCharacter 4", "CoopCall 15, 1, 0, 0", "SetCharacterTransformation 0, 56"] + b[:10] + heal + b[10:]
 script(b, "stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too; Gohan can go Super Saiyan")
 stockseq(A2, "m324_t0", 1, 26, "\"I'll fight Cell first\", Hercule's ring scene, \"Let's do this!\"")
 title(P1)

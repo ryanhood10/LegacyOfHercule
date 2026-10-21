@@ -4,8 +4,10 @@
 #pragma once
 
 // Party slot 7, the duel clone's slot (DUEL_SLOT, rom.h; slot 8 is Super Saiyan 2 Gohan's).
-// No duel runs during the chapter, so 16 borrows it: CoopCall 11 writes his entry there when the chapter
-// starts and CoopCall 12 takes him out of the party when it ends (any later duel overwrites the slot).
+// The clone duels that write it (chapters 3 and 7) come before the chapter, so 16 borrows it: CoopCall 11
+// writes his entry there when the chapter starts; he stays selectable on the save pads after it (Ryan,
+// 2026-10-20: the players trade Krillin and 16 at a pad) until CoopCall 12, 1 takes him out for good at the
+// Cell Games, where he dies (the dojo's duel uses player 2's own slot, never this one).
 #define A16_SLOT            DUEL_SLOT
 #define A16_ROW             25      // display row (tools/spriteclone.py)
 #ifndef A16P_SPRITE
@@ -14,7 +16,7 @@
 
 // Story flags (420-439 are this chapter's; docs/scripts.md 2.5)
 #define A16_FLAG_ACTIVE     420     // the chapter runs: 16 is in the party (set by CoopCall 11)
-#define A16_FLAG_DONE       421     // the chapter is over: 16 has left the party (set by CoopCall 12)
+#define A16_FLAG_DONE       421     // the chapter is over: the party lock is lifted (set by CoopCall 12)
 #define A16_FLAG_RUBBLE     422     // 16 punched through the rubble at the cave mouth (zone 8 area 48)
 #define A16_FLAG_GEN_WEST   423     // the generator in zone 8 area 27 is shut down again
 #define A16_FLAG_GEN_EAST   424     // the generator in zone 8 area 40 is shut down again
@@ -41,4 +43,5 @@
 #define ROCKET_RADIUS       20      // blast half-size (px)
 
 void a16_join(void);     // CoopCall 11
-void a16_leave(void);    // CoopCall 12
+void a16_leave(void);    // CoopCall 12 (0): the chapter's end: the lock lifts, 16 stays selectable
+void a16_gone(void);     // CoopCall 12, 1: the Cell Games: 16 leaves the party for good

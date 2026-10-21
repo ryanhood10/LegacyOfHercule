@@ -10,6 +10,7 @@
 
 sequence cg_ring
   script                                 ; stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too; Gohan can go Super Saiyan
+        CoopCall 12, 1, 0, 0
         SetActiveCharacter 4
         CoopCall 15, 1, 0, 0
         SetCharacterTransformation 0, 56

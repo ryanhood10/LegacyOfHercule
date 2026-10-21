@@ -3,9 +3,11 @@
 //    "available" bit (saved in story flags 430 + slot), 16's entry is written into the last party slot
 //    (display row 25, sprite 175, Krillin's level with stronger numbers, his abilities) and flag 420 is
 //    set. The script then makes Krillin player 1 (SetActiveCharacterNoReset 6) and binds player 2 to 16.
-//  * CoopCall 12 (a16_leave): 16 leaves the party for good (slot flags 0), the saved bits come back,
-//    Hercule is in the party and available, flag 421; the script makes Krillin player 1 and Hercule
-//    player 2.
+//  * CoopCall 12 (a16_leave): the chapter's end: the saved bits come back, Hercule is in the party and
+//    available, flag 421; 16 stays in the party and selectable (Ryan: the players trade Krillin and 16 at a
+//    save pad); the script makes Krillin player 1 and Hercule player 2.
+//  * CoopCall 12, 1 (a16_gone): the Cell Games' start: 16 leaves the party for good (slot flags 0; he is the
+//    stock NPC who dies there); player 2 on him moves to Hercule.
 //  * Rocket Punch (ability 22): his forearm flies along his facing and explodes on the first enemy.
 // The status screen shows slot 7 as "Android 16" (tools/krillinsprites.py) with his status portrait
 // (id 120); krillin.c names a duel clone in that slot after the character it copies.
@@ -75,16 +77,23 @@ void a16_leave(void) {
         if (s == KRILLIN_SLOT || s == A16_SLOT) continue;
         if (flag_test_hook(p, A16_FLAG_SAVED + s)) p->chars[s].flags |= 2;
     }
-    p->chars[A16_SLOT].flags = 0;
+    if (flag_test_hook(p, A16_FLAG_ACTIVE)) p->chars[A16_SLOT].flags = A16_FLAGS;   // 16 stays selectable
     p->chars[KRILLIN_SLOT].flags |= 3;
     p->chars[HERCULE_SLOT].flags |= 3;
     flag_set_hook(p, A16_FLAG_DONE);
 }
 
+int p2_bind_slot(int slot);                          // player.c
+void a16_gone(void) {
+    PartyState *p = g_Party;
+    if (!flag_test_hook(p, A16_FLAG_ACTIVE) || p->chars[A16_SLOT].display_row != A16_ROW) return;   // never joined / a duel's
+    p->chars[A16_SLOT].flags = 0;
+    if (coop.p2 && coop.p2_slot == A16_SLOT) p2_bind_slot(HERCULE_SLOT);
+}
+
 // COOP_CMD_A16_PARTY (fork tests): the chapter's party without its scene: 16 joins, Krillin becomes player 1
 // through the VM's SetActiveCharacterNoReset (action 115) and player 2 plays 16's slot.
 ROM_FN(void, VM_SetActiveCharacterNoReset, (s32 *stack), 0x0800A681);
-int p2_bind_slot(int slot);                          // player.c
 void a16_test_party(void) {
     a16_join();
     s32 st[2] = { 1, KRILLIN_SLOT };
