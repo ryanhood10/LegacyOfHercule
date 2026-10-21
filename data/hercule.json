@@ -51,18 +51,18 @@
       ]
     },
     "7": {
-      "_": "Android 16 in the last slot during the Gero's computer chapter (src/coop/a16player.c): above Krillin's",
+      "_": "Android 16 in the last slot during the Gero's computer chapter (src/coop/a16player.c): above Krillin's; lowered 2026-10-21 (Ryan: a little weaker as a player)",
       "str": [
-        400,
-        600
+        360,
+        560
       ],
       "pow": [
-        300,
-        500
+        280,
+        480
       ],
       "end": [
-        400,
-        600
+        360,
+        560
       ]
     },
     "5": {

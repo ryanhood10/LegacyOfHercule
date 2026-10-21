@@ -688,6 +688,12 @@ Literal pools: search the ROM for a 32-bit value to find every code literal that
 
 ## Drop-in savestates for Ryan (2026-10-20)
 
+`tools/headless/a16_moves.txt` (Android 16 as a player, from a debug-menu state): test command 11 (16 on player 2), player
+2's L cycles 0 -> 1 -> 2 -> 3 -> 0 (slot 7's ability index, PARTY+0xD9), each move with B (Rocket Punch 6 EP, Afterimage
+Rush 4, Big Bang 10, Ki Blast 2), an older save's entry (flags 0x43, the old numbers) fixed once, then player 1 alone as
+16. In Map Test 13 the snakes interrupt moves (hurt state); the same steps in the town (Map Test 7, `mash 60 20`
+first) show every EP drop.
+
 `python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss7` next to the play
 ROM: mGBA loads slot n with Fn (Shift+Fn saves over it). F1 his save on the Northern Wastelands save pad (Krillin),
 F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path (Goku player 1 for the
