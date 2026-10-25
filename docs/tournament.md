@@ -1,9 +1,11 @@
 # Tournament mode: design in progress (Ryan, 2026-10-24)
 
-Status: **being planned in chat, nothing built.** Ryan wants the plan settled one decision at a time before
-any code. This page records what is decided, what is proposed, and the engine facts the plan rests on.
-Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the fighter roster, the
-duel / boss / menu infrastructure), plus the sprite check and world-map photos in `build/wm/`.
+Status: **being planned in chat, nothing built.** Ryan wants the plan settled before any code ("no stone left
+unturned on triggers and characters"). This page records what is decided, what is proposed, and the engine
+facts the plan rests on. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
+fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
+for LoG2, `buu_fighters.png` and `buu_part*.png` for Buu's Fury: idle and attack frame of every record with an
+attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 
 ## 1. Decided
 
@@ -19,97 +21,207 @@ duel / boss / menu infrastructure), plus the sprite check and world-map photos i
 - **Three divisions at the director's door:** 1v1, 2v2, Royal Rumble.
   - 1v1 in co-op seeds the two players on opposite sides of the bracket; they meet in the final as a duel
     (`duel.c`, different characters allowed). Earlier rounds alternate: one player fights, the other sits
-    out (solo mode, as the Cell Games).
+    out (solo mode, as the Cell Games). NPC-vs-NPC matches are never played; they resolve off-screen.
   - **2v2 is co-op only** (no AI teammate exists; 1P does not see the option).
   - **Royal Rumble = survival rounds** (Ryan, 2026-10-24): each round is a free-for-all pack in the ring,
     NPCs hit each other too, the packs get stronger each round, a headliner at the end. In co-op both
-    players are in every round. NPCs target the players most but still fight each other (a target weight,
-    section 4).
+    players are in every round. NPCs target the players most but still fight each other (section 8).
+- **All of Buu's Fury's cast is in** (Ryan, 2026-10-24: not held for the Buu phase). The **Legend tier
+  opens after Cell and Super 13** (the post-game's flag 382) and that is where the Buu-era fighters appear.
+- **Villains are playable too** (Ryan): a chosen set of villains unlock as tournament fighters (section 4).
 - **A progression track beside the story.** The tournament opens in chapter 1 with a small roster and
   grows with the story: three kinds of unlock, and story characters never unlock by being beaten (the
   tournament cannot leak the story).
   1. *Story-playables:* a party character is selectable in the tournament from the moment the story gives
      him (follows the party flags).
   2. *Beat-to-unlock:* a tournament-only fighter becomes playable the first time a player beats him in a
-     match. A chosen few (each needs a player-layout record, a row, moves and derived stats).
-  3. *Challengers:* win a tier under a condition, a cutscene, a hidden fighter walks in, beat him to add him
-     (Mercenary Tao, King Cold once he has fight poses, a Buu-era surprise; the Mario 64 twist: win Champion
-     1v1 as Hercule to meet "the real champion").
+     match.
+  3. *Challengers* (Ryan, 2026-10-24, Smash-style): **winning a tournament** (a division at a tier) plays a
+     cutscene in which a hidden fighter walks in and challenges you; beat him and he is unlocked. **Lose and
+     you must win that tournament again for another shot.** Each division x tier has its own challenger
+     (section 6), so every tournament is worth winning; some have a Mario 64 condition on top (won *as*
+     someone).
+- **Pop-ups** (Ryan, 2026-10-24): when the story unlocks a tournament fighter, and especially a tier or a
+  division, a pop-up says so ("New tournament tier: Champion!"), shown **at a safe moment**: not inside the
+  scene that set the flag but on the first frame afterwards where no scene runs, no dialogue is pending and
+  the player is controllable, through the same pop-up path as the game's own "Journal Updated!" (section 8).
 - **Fixed tiers you grow into** (Budokai's Novice / Adept / Advanced), opened by story flags, so the LoG2
-  level matters; the three difficulty settings still apply.
-- **Every fighter gets a kit, budgeted per fighter**: a transform-at-N%-HP boss rule (Goku goes Super
-  Saiyan at half health, Frieza goes Mecha, Cell goes up a form), one or two signature moves from a shared
-  projectile library (the player's Kamehameha, Masenko, Big Bang, Special Beam Cannon, Destructo Disc with
-  an enemy owner), hand-written specials (16's rockets, 13's nova) only for tier finals and challengers.
-- **Two new screens:** a character select with tabs (Z Fighters / Androids / Villains / Buu Saga), a face
-  grid under each tab (icons made from the sprites the way the save pad's switch screen makes its
-  portraits), locked fighters dark with "?", the big dialogue portrait and stats at the side; and the
-  **bracket**, animated: next match highlighted, faces slide to the middle, announcer line, fade to the ring;
-  in the ring both walk in, face off, the announcer calls it; the loser lies, the winner poses, the announcer
-  calls the winner; back on the bracket the loser greys, the winner slides to the next column, the other
-  matches of the round resolve off-screen with quick slides (NPC-vs-NPC is never played), the next match
-  highlights. Buu's Fury's announcer sprite (its record 207) is cheap to bring over.
-- **The waiting room shows the pool:** the fighters standing around are today's pool, spawned as actors
-  with a line each.
+  level matters; the three difficulty settings still apply. Tournament-only playables derive their numbers
+  from the lead's level (the Android 16 recipe), each with its own multipliers.
+- **Every fighter gets a kit, budgeted per fighter**: a transform-at-N%-HP boss rule, one or two signature
+  moves from a shared library (section 5), hand-written specials only for headliners and challengers.
+- **Two new screens:** a character select with tabs and a face grid, and the **animated bracket** with the
+  before / after cutscenes (section 7). The waiting room shows today's pool as actors with a line each.
 - **Fights end at 1 HP** like duels; nobody dies. Prizes are items and a record line (LoG2 has no money);
   little or no EXP so the tournament cannot over-level the story.
 
 ## 2. Proposed, not yet decided
 
-- **Bracket size:** 8 (one clean screen, three rounds) or 16 (two pages or small icons).
+- **Bracket size as an option at the director** (Ryan asked, 2026-10-24): "Quick" = 8 fighters (three rounds,
+  one screen) or "Full" = 16 (four rounds, two bracket pages). Proposed: both from the start, the challenger
+  comes after either, Full pays the better item prize. Co-op seeding holds for both (opposite halves).
 - **Unlock progress global across the three save files** (Budokai-style, in the unused 6.8 KB of the save
-  chip) or per save file.
+  chip) or per save file. Proposed: global for beat-to-unlock and challengers; the pool itself still follows
+  the save's story flags.
 - **Ring-outs:** skip for now (no edge mechanic in LoG2; doable later as "knocked past the ring's edge").
 - **Heal between rounds:** partial (a Senzu-sized chunk), full before the final.
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
   with one giant, then the headliner with two helpers; partial heal between; you must be standing at the
   end of a round to advance.
-- **Opening tiers** (chapter -> tier): 1 Rookie from the start; 2 Adept after the Android 19 fight; 3
-  Z-Fighter after Gingertown; 4 Champion in the ten-day wait; 5 Legend after the post-game; 6 the Buu phase.
+- **Mirror matches:** story heroes also appear as *opponents* once they are in your party (their playable
+  body on a boss AI set with their signature beam), which doubles the pool and lets Gohan fight Gohan.
 
-### Roster by chapter (proposed)
+## 3. Tiers and their story triggers
 
-| when | new opponents in the pool | new selectable | tier |
+| tier | opens when | flag |
+|---|---|---|
+| 1 Rookie | from the start (Gohan's house flight spot) | none |
+| 2 Adept | the Android 19 + 13 fight is won (chapter 3) | `ch3_zone7`'s end flag (to confirm when built) |
+| 3 Z-Fighter | Gingertown is done (chapter 5) | `ch5_lookout`'s Gingertown end flag |
+| 4 Champion | the ten-day wait begins (Perfect Cell, the Games announced) | 191 (the Cell Games landing opens) |
+| 5 Legend | Cell and Super 13 beaten (the post-game) | 382 (Super 13 beaten) |
+
+Each fighter below has his own "in the pool from" trigger; a tier's roster is everyone whose trigger is met
+and whose tier is at or below it. The waiting room, the select screen and the bracket all read the same table.
+
+## 4. The complete roster
+
+Roles: **P** playable from the story (follows the party), **O** opponent, **B** beat-to-unlock (playable once a
+player beats him), **C** challenger (section 6). Art: LoG2 sprite id, or Buu's Fury record id ("Buu r.N",
+imported through `buu2log2`; identities read off `build/wm/buu_part*.png`, "(?)" = to confirm in play).
+Cost: *cheap* = exists or one build-script change; *moderate* = a player-layout record built from boss frames
+(the Android 16 player recipe) or a converted Buu record plus a row and a portrait; *big* = hand-written
+specials in C (the Super 13 kind).
+
+### 4a. The LoG2 era (tiers 1-4)
+
+| fighter | art | role | in the pool from | kit (transform / signatures / specials) | cost |
+|---|---|---|---|---|---|
+| Gohan (kid, teen) | 53 / 56, SSJ 59 | P, O (mirror) | start | SSJ at 50 % (once the story has it); Masenko, Kamehameha | cheap |
+| Krillin | 161 | P, O (mirror; dojo body 76 stat 64) | start | Destructo Disc, Afterimage Rush, Scatter Shot (Shockwave) | cheap |
+| Yamcha | 156, stat 106 | O, **B** | start | Wolf Fang Fist = Afterimage Rush + combo; Spirit Ball = a homing ball (rocket class) | moderate (row, player layout from 8 groups) |
+| Tien | 121, stat 98 | O, **B** | start | Tri-Beam = a short heavy beam that costs HP; Solar Flare = stun; Multi-Form = a twin at 50 % (the pair rule) | moderate (7 groups; stock body) |
+| Hercule "the champ" | 72 | O from the start (he *is* the champion), P from West City | start / West City (flag 362) | Dynamite Kick, Megaton Punch, Taunt (his own four); as an opponent on AI set 98 (works, the dojo) | cheap |
+| Frieza (final form) | 48, stat 41 base | O, **B** (villain) | start | Death Beam (thin beam), Death Ball; **transforms to Mecha Frieza at 40 %** (faster, +attack) | moderate |
+| Mecha Frieza | 49 | O, **B** (villain) | start | Death Beam, a rush; no transform | moderate |
+| King Cold | 74 (cutscene poses only) | **C** | Rookie 2v2 challenger (with Mecha Frieza) | melee giant, Death Beam | big-ish: 3 fight poses to draw (74 crashes on set 21 today) |
+| Mercenary Tao | 50, stat 44 (AI 129) | **C** | Rookie 1v1 challenger | Dodon Ray (thin beam), Crane rush; the ROM's own AI | moderate (4 groups) |
+| Piccolo | 103 | P, O (mirror) | West City (flag 26 / 362) | Special Beam Cannon, Scatter Shot, cape off = Transformation at 50 % | cheap |
+| Vegeta | 137, SSJ 139 | P, O (mirror) | chapter 3 (the space duel) | Big Bang, Galick Gun (beam), SSJ at 50 % | cheap |
+| Android 19 | 12, stat 5 | O | the 19 fight won | absorbs ranged hits (stock), eye beams, energy drain on grab | cheap |
+| Dr. Gero / Android 20 | 14, stat 6 | O | the 19 fight won | energy absorb (heals on hit), eye beam | cheap |
+| Android 13 (base) | 165, stat 110 | O, **B** (villain) | the 19 fight won | S.S. Deadly Bomber (ball), rush; no transform until Legend (Super 13 is his own entry) | moderate |
+| Android 17 | 9, stat 3 | O, **B** (villain) | the road fight (chapter 4's end flag) | Power Blitz (ball), Energy Barrier (poise burst), afterimage | moderate |
+| Android 18 | 11, stat 4 | O, **B** (villain) | the road fight | Power Blitz, Finger Beam (thin beam), Infinity Bullet (volley) | moderate |
+| Trunks | 135, SSJ 134 | P, O (mirror) | chapter 5 (the Lookout) | Burning Attack, Sword Blast, SSJ at 50 % | cheap |
+| Imperfect Cell | 28, stat 60 | O | Gingertown done | Kamehameha, tail drain (a melee hit that heals him), Multi-Form twin at 50 % | cheap |
+| Android 16 | 160 boss / 175 player, stat 109 | O; P from Gero's computer (flag 421, tournament copy stays after the Games) | the island fight done | the existing rockets, barrage, bombs, rocket punch (`android16.c`) | cheap |
+| Goku | 60, SSJ 61 | P, O (mirror) | when he is playable (the wait) | Kamehameha, Spirit Bomb (Legend final only), Instant Transmission (teleport behind the target), SSJ at 50 % | cheap + IT moderate |
+| Semi-Perfect Cell | 29, stat 76 | O | flag 191 | Kamehameha, Multi-Form twin | cheap |
+| Perfect Cell | 30, stat 78 | O (Champion headliner), **B** (villain) | flag 191 | Kamehameha, Solar Flare (stun), Cell Jr summon (two 31s as helpers: Rumble / 2v2), **Super Perfect at 30 %** (speed, aura) | moderate; summon big-ish |
+| Cell Jr | 31, stat 26 | O (Rumble pack) | flag 191 | Kamehameha (small), rush | cheap |
+| Cooler | 34, stat 29 (giant) | O, **B** (villain) | Cooler beaten (`ch8_cooler`'s flag) | Death Flash (beam), Supernova (big ball); **Ryan: not in the pool before his story fight** | moderate |
+| The Namekian servant | 166, stat 113 | O (filler) | Cooler beaten | Special Beam Cannon, melee | cheap |
+| Broly (LSSJ) | 159, stat 115 (giant) | O (Champion headliner), **B** (villain) | flag 402 (the Broly chapter done) | Eraser Cannon (ball), Gigantic Meteor (big ball), Blaster Shell (volley); the existing rage at 50 % | moderate |
+| Paragus | 170, stat 116 | O (filler) | flag 402 | melee, Ki Blast; "my son!" taunt | cheap |
+| SSJ2 Gohan | 58 | P (slot 8), O (Gohan's Legend form) | the Cell Games done | Kamehameha, SSJ2 Burst (his own) | cheap |
+| Super Android 13 | 180, stat 145 (giant) | O (Legend headliner), **B** (villain) | flag 382 | the existing nova, bomber, wave, roar (`super13.c`) | cheap as O; moderate as B |
+
+### 4b. The Buu era (tier 5 Legend, flag 382; all imported from Buu's Fury)
+
+| fighter | Buu record | role | kit | cost |
+|---|---|---|---|---|
+| Goku (Buu saga) | 105 base, 108 SSJ, 110 SSJ3 | O, **B** (a second Goku skin: "Goku (Other World)", 113 with the halo) | **SSJ at 60 %, SSJ3 at 25 %** (the three records as one fighter), Kamehameha, Instant Transmission, Dragon Fist (rush) | moderate |
+| Majin Vegeta | 274 / 275 (SSJ, M on the brow) | O, **B** | Big Bang, Final Flash (beam), **Final Explosion** (a nova at 10 % that costs his life: he loses, you take heavy damage) | moderate |
+| Mystic Gohan | 100 | O, **B** | Masenko, Kamehameha; no transform (already at full power), high stats | moderate |
+| Great Saiyaman | 101 | O, **B** | justice poses (the Taunt), Masenko; a joke fighter with Gohan's numbers | moderate |
+| Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
+| Goten (SSJ) | 92 | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
+| Kid Trunks (SSJ) | 93 | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
+| Gotenks | 277 base (?), SSJ / SSJ3 forms among 119-120 (?) | O, **C** (Legend 2v2) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
+| Vegito | 273 (SSJ) (?) | O, **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
+| Uub | 263 | O, **C** (Legend, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
+| Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
+| Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
+| Dabura | 63 (giant, winged) | O, **B** (villain), **C** (Z-Fighter Rumble) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
+| Fat Buu | 33 (giant) | O, **B** (villain), **C** (Champion Rumble) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
+| Super Buu | 39 / 40 base, 42 (Gotenks absorbed, vest) (?), 43 (Gohan absorbed, gi) (?) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
+| Kid Buu | 37 (32 x 64) | O, **C** (Legend Rumble headliner) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
+| Super Janemba | 144 (giant, horned, tail) | O, **C** (Champion 1v1) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
+| Pikkon | 62 (cap, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
+| Olibu (?) | 242 (giant brawler, partial set) | O, **C** (Adept Rumble) | melee brawler, Ki Blast | cheap |
+| Kibito | 32 (giant, partial set) | O, **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
+| Pui Pui | 224 (32 x 64, partial set) | O (Rumble pack) | ki volley, melee | cheap |
+| Yakon | 290 (giant beast, partial set) | O, **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
+| Spopovich (?) | 293 (giant brawler, partial set; 216 is his NPC) | O (Rumble pack) | brawler, **energy steal** (drains EP, Yamu's trick) | cheap |
+| Buu-era Vegeta base / Goku variants | 116, 269-272, 107, 109, 114, 119-120 | skins and forms of the above | | |
+
+Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
+the announcer 207, Yamu 21. Not in either ROM: Pikkon's rival Olibu may be 242 or 293 (to confirm), Bojack,
+Hirudegarn, Pan.
+
+### 4c. Playable villains (Ryan: "some villains playable to make it cooler")
+
+Beat-to-unlock set, first pass: Frieza, Mecha Frieza, Android 17, Android 18, Android 13, Perfect Cell, Cooler,
+Broly, Super 13, Dabura, Fat Buu, Super Buu, plus the challengers King Cold, Tao, Janemba, Kid Buu, Yakon as
+C-unlocks. Buu imports come out of the converter already in a player layout (old Hercule plays on row 24
+today), so they are the cheaper playables; LoG2 boss bodies need the Android 16 regrouping each. Every
+playable villain gets: the combo, Ki Blast, two signatures from the library, and his transform where he has
+one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived from the lead's level.
+
+## 5. The move library (shared, each move written once)
+
+| kind | base in the game today | gives |
+|---|---|---|
+| beam | the players' Kamehameha / held beam, with an enemy owner | Kamehameha, Galick Gun, Final Flash, Death Beam (thin), Dodon Ray, Thunder Flash, Special Beam Cannon, Final Kamehameha, Candy Beam (stun on hit), Tri-Beam (costs HP) |
+| ball | Big Bang (0x080258B4), Masenko | Death Ball, Power Blitz, Deadly Bomber, Eraser Cannon, Planet Burst (big), Supernova, Big Tree Cannon |
+| homing | Android 16's rocket class | Spirit Ball, Kamikaze Ghosts (x3), Gotenks' ghosts |
+| volley | Super 13's ki volley | Human Extinction Attack, Blaster Shell, Infinity Bullet, Hellzone Grenade |
+| cone / wave | Super 13's wave | Evil Flame, Mouth Blast |
+| nova | Super 13's nova | Angry Explosion, Final Explosion (self-cost), Hyper Tornado (short) |
+| rush | Afterimage Rush, Dynamite Kick | Wolf Fang Fist, Dragon Fist, Crane rush, mad rush |
+| teleport | new: move behind the target with a flash | Instant Transmission, Rakshasa's Claw |
+| stun | new: a status that freezes the target N frames | Solar Flare, Stone Spit (petrify), Galactic Donut, Candy Beam |
+| drain | new: a hit that moves HP or EP | tail drain, energy absorb (19 / Gero), Darkness Eater, energy steal |
+| regen / heal | new: HP ticks | Buu regeneration, Kibito's Heal |
+| transform | new boss rule "at N % swap sprite + stats" | every chain in section 4; the rage rule exists |
+| summon | new: spawn helpers mid-fight (the Rumble entrant path) | Cell Jr summon, Multi-Form twin (the pair rule exists) |
+
+New kinds (teleport, stun, drain, regen, transform, summon) are each one piece of C shared by everyone who
+uses them; the move table then just names which fighter has which, with numbers.
+
+## 6. The challenger ladder (one per division x tier; Smash-style re-win on a loss)
+
+| tier | 1v1 | 2v2 (a pair) | Royal Rumble |
 |---|---|---|---|
-| Start (chapter 1, from Gohan's house) | Yamcha, Tien, Frieza, Mecha Frieza, Hercule "the champ" | Gohan, Krillin | 1 Rookie |
-| After the forest spirit fight | (Cooler held back) | | |
-| West City (2) | Piccolo | Piccolo, Hercule | |
-| The Android 19 fight (3) | Android 19, Android 13 (base), Dr. Gero | Vegeta | 2 Adept |
-| The road (4) | Android 17, Android 18 | | |
-| Lookout / Trunks' chapter (5) | | Trunks | |
-| Gingertown (5) | Imperfect Cell | | 3 Z-Fighter |
-| The island (6) | Android 16 | Goku (when playable) | |
-| Perfect Cell (7) | Semi-Perfect, Perfect Cell | | |
-| The ten-day wait (8) | Cooler + the Namekian, Broly, Paragus; Krillin and Hercule as dojo bodies | Android 16; Super Saiyan forms | 4 Champion |
-| After the Cell Games (9) | Cell Jr, the final Cell | SSJ2 Gohan | |
-| Post-game (10) | Super 13 | | 5 Legend |
-| Buu phase (later) | Dabura, Fat Buu, Super Buu, Kid Buu, SSJ3 Goku, Gotenks, Vegito, Uub... | Buu-era imports | 6 |
+| Rookie | Mercenary Tao | Mecha Frieza & King Cold | Yakon |
+| Adept | Pikkon | Spopovich & Pui Pui | Olibu (?) |
+| Z-Fighter | Kibito | Goten & Kid Trunks | Dabura |
+| Champion | Super Janemba | Pikkon & Olibu | Fat Buu |
+| Legend | Vegito (won as Goku or Vegeta; else Majin Vegeta) | Gotenks (won as Goten & Trunks; else Super Buu's Gotenks form) | Kid Buu |
 
-Beat-to-unlock candidates (first picks): Yamcha, Tien, Frieza, Android 17, Android 18, Perfect Cell, Broly,
-plus the challengers. The rest stay opponents.
+Mario 64-style extras: win Legend 1v1 as Hercule -> Uub ("the champion's student"); win Legend 1v1 as Goku ->
+the SSJ3 form for playable Goku; as Vegeta -> the Majin form. Each challenger fight is its own cutscene in the
+ring after the trophy; a loss ends with "come back when you've won again" and the record notes the attempt.
+The pairings are Ryan's to shuffle; the structure (one hidden fighter per tournament) is the point.
 
-## 3. Who can fight today (facts, 2026-10-24)
+## 7. The screens and the cutscenes
 
-- **Playable:** Gohan (kid, teen, SSJ, SSJ2), Piccolo, Vegeta (+SSJ), Trunks (+SSJ), Goku (+SSJ, halo),
-  Hercule (+Super Hercule, old Hercule), Krillin, Android 16, SSJ2 Gohan. All have dialogue and status
-  portraits (`docs/ids.md`).
-- **Opponents with real AI now:** Cell (Imperfect 60, Semi 76, Perfect 78/79, Games 21-25, second Cell 140),
-  Cell Jr 26 (pairs 141/142), Android 16 boss 109 (`android16.c`), Super 13 145 (`super13.c`), Androids 17 (3),
-  18 (4), 19 (5, bunker 120/121), 20/Gero (6/7), 13 base (110/112/114), Cooler 29, the Namekian 113, Frieza 41,
-  Broly 115, Paragus 116, Mercenary Tao 44 (sprite 50; a Goku-only bonus boss), Yamcha 106, Tien 98, Krillin
-  64 (dojo). AI sets: 21 melee boss, 29 the 19/Gero set, 80/116/148/138 the Cell forms, 98 Krillin/Tien
-  (`docs/sprites.md` 614-631).
-- **Fight art checked** (`build/wm/fighters_sheet.png`): Frieza 48 and Mecha Frieza 49 have full fight sets;
-  King Cold 74 has cutscene poses only (crashes under set 21); Tien 121, Yamcha 156, Krillin 76, 17 (9), 18
-  (11), 19 (12), Gero (14), the Cells (28-31) all full.
-- **Importable from Buu's Fury with attack sets:** Fat Buu 33, Kid Buu 37/39, Super Buu 40-43, Dabura 63,
-  SSJ Goten / Trunks 92/93, the Buu-era party 97-120 (SSJ3 Goku 110/111/120), Hercule 128, a red horned
-  demon 144, Goten / Trunks 212-215, Gohan / Goten 259/260, Uub 263, Vegeta and Vegito 269-277. The
-  Broly pipeline (`buu2log2.Converter`, `BUU_SPRITES`) imports a humanoid boss on AI set 21 cheaply; Super
-  13's hand-written specials are the expensive kind.
-- **Playable with no new art:** Tien (needs abilities and a row), Paragus (Vegeta's layout).
+- **Division choice** at the director: a three-line list box (new widget), then Quick / Full for 1v1.
+- **Character select:** tabs (Z Fighters / Androids / Villains / Buu Saga), a face grid under each (icons
+  made from the sprites the way the save pad's switch screen makes its portraits), locked fighters dark with
+  "?", the big dialogue portrait, name and stats at the side; in co-op player 1 picks, then player 2 (the
+  same fighter twice gets the duel's violet shadow tint).
+- **Bracket, animated:** next match highlighted; both faces slide to the middle ("GOHAN vs FRIEZA"); the
+  announcer's line; fade to the ring. In the ring: both walk in from opposite doors, face off, the announcer
+  calls it. End: loser lying, winner's pose, the announcer calls the winner, fade. Bracket: the loser greys,
+  the winner slides to the next column with a sound, the other matches of the round resolve with quick
+  slides, the next match highlights. Full (16) shows two pages. The Rumble uses a board of faces instead.
+  Buu's Fury's announcer (record 207, NPC grade) is a cheap import.
+- **Pop-ups:** "New fighter: Android 17!" / "New tournament tier: Champion!" through the game's pop-up
+  path, queued by the flag and shown at the next safe frame (section 8).
 
-## 4. Engine facts the plan rests on
+## 8. Engine facts the plan rests on
 
 - **Hits are list broadcasts with a type byte**: players accept types 0 and 2, enemies accept 1 (player
   attacks); enemies never hurt each other only because their handler ignores type 0. We already wrap every
@@ -120,18 +232,28 @@ plus the challengers. The rest stay opponents.
   player-only fields; prototype with two fighters in a room first.
 - **Sprite memory is a GBA hardware cap**: 32 KB of OBJ tiles, and OAM's tile index cannot address more
   (a patched emulator would not help). A normal body holds about 1 KB resident, a 64 x 64 giant (Broly,
-  Super 13, Cooler) 4 KB, plus HUD, bars (0x200 each, two bar positions) and projectiles. Comfortable: 2
-  players plus 4 normal fighters; a giant counts for four. Entrants wait off-screen and step in as others
-  fall. ROM space is plentiful.
+  Super 13, Cooler, Dabura, the Buus, Janemba) 4 KB, plus HUD, bars (0x200 each, two bar positions) and
+  projectiles. Comfortable: 2 players plus 4 normal fighters; a giant counts for four. Entrants wait
+  off-screen and step in as others fall. ROM space is plentiful.
 - **Working RAM**: the GBA's 256 KB + 32 KB is not the limit; our reserved co-op region is nearly full
   (`partyram` 0x20 bytes free, `coop2` 0x24), grown by lowering the heap cap (`docs/party-8-slots.md`);
   tournament state lives on the heap while at the grounds.
 - **Save chip**: 6.8 KB of the 8 KB EEPROM is unused (`party_save.c`): room for a global tournament record
-  (unlocks, wins) through `Eeprom_Write`.
+  (unlocks, wins, challenger attempts) through `Eeprom_Write`.
+- **Pop-ups at a safe moment**: a per-frame tick (like `a16_frame` in `input.c`) sees a queued notice and
+  shows it only when `scene_running()` is false, no dialogue is pending and player 1 is controllable; the
+  pop-up itself is the stock item / journal pop-up object (`ItemPopup_Create` + `Modal_Run`, `party.c`),
+  which the game already shows mid-play without harm.
 - **Duels** need two real pads (`vmcall.c` skips the fight otherwise); the winner is the final blow, and an
   enemy's lethal hit would also end a duel (no NPCs in the player-vs-player final).
 - **Rounds**: `waves.c` (RAM-built records, clear detection, a script between rounds) is the template;
-  Roshi's gym shows flag-gated rounds; `wait_spar.lscript` the duel loop.
+  Roshi's gym shows flag-gated rounds; `wait_spar.lscript` the duel loop. **Fighters as opponents**: an enemy
+  record with the fighter's sprite on a boss AI set (Hercule's body already fights in the dojo on set 98);
+  AI sets and their group needs: `docs/sprites.md` 614-631.
+- **Playable bodies**: a Buu import through `buu2log2` lands in Hercule's 21-group player layout (old
+  Hercule plays on row 24); a LoG2 boss body needs the `a16sprites.py` regrouping; each playable needs a
+  display row (rows 29+ free), portraits (ids 127+ free; Buu's portrait module 0x086F393C is importable, as
+  old Hercule's 126 was) and a temporary party slot for the match (the way 16 and the duel clone borrow 7).
 - **UI pieces**: `switch.c` (the save pad's screen: `Portrait_Create` OBJ portraits from sprite records,
   `Canvas_*`, BG tilemap writes), `krillin.c` `status_tabs_hook` (a tab strip), `Modal_Run` screen objects.
   No list-choice widget exists (only yes / no questions).
@@ -139,15 +261,18 @@ plus the challengers. The rest stay opponents.
   351-371): a landing trigger pair on a rect with a condition, a banner name, and a minimap icon at about
   (153 + wx/45, wy/45 - 9).
 - **Buu's Fury's map table** was found on 2026-10-24 (MapEntry table 0x0808E2E0, 452 rows; names UTF-16LE
-  through 0x0806BCE8). A lister and renders of the tournament maps are being built in a side session
-  (branch from "Buu's Fury map lister and tournament-ground renders").
+  through 0x0806BCE8). A lister and renders of the tournament maps are being built in a side session.
+- **Buu's Fury records with attack sets** (from `build/buu_sprites/report.md`, animations 2-6 present): 43
+  full sets, 26 partial; the full list and frames are in `build/wm/buu_fighters.png`.
 
-## 5. Build order (once the plan is done)
+## 9. Build order (once the plan is done)
 
 1. Buu map lister; the grounds imported; the world-map landing; the save pads; the director with the
-   division list.
-2. The fight engine: the pool table, tiers, the 1v1 bracket in 1P (solo rounds), heal between rounds.
-3. The select and bracket screens, with the animations.
+   division list; the pop-up path.
+2. The fighter table, tiers and triggers; the fight engine; the 1v1 bracket in 1P (solo rounds), heal
+   between rounds; the transform rule.
+3. The select and bracket screens, with the animations and the announcer.
 4. Co-op 1v1 (duel final), then the Rumble (NPC-vs-NPC hook and target weights), then 2v2.
-5. Roster imports, kits, transforms.
-6. Unlocks, challengers, the global record.
+5. The move library's new kinds (teleport, stun, drain, regen, summon), then kits fighter by fighter.
+6. Roster imports (Buu's Fury), playable villains, portraits.
+7. Unlocks: beat-to-unlock, the challenger ladder with its cutscenes, the global record, the pop-ups.
