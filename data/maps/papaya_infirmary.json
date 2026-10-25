@@ -93,11 +93,12 @@
  "records": [
   {
    "kind": "npc",
-   "sprite": 89,
+   "sprite": 154,
    "x": 240,
    "y": 120,
    "facing": 0,
-   "talk": "seq:tny_nurse_talk"
+   "talk": "seq:tny_nurse_talk",
+   "_": "the nurse (sprite 154, a woman in a teal dress)"
   }
  ],
  "spawn": [

@@ -87,6 +87,21 @@ GREET(saiyaman, "GREAT SAIYAMAN: Champion of justice,\x0b" "the Great Saiyaman! 
 GREET(bhercule, "HERCULE: The world champion, Hercule!\x0b" "Still the greatest, ha ha ha!")
 GREET(bpiccolo, "PICCOLO: Piccolo.  Concentrate.  The ring\x0b" "doesn't forgive mistakes.")
 GREET(superbuu, "SUPER BUU: Buu!  Buu fight!  Buu win!")
+// the hidden challengers, once a player has unlocked them (Ryan, 2026-10-25: unlocked fighters show up here too)
+GREET(puipui,   "PUI PUI: Pui Pui, of planet Zoon!  I'm only here\x0b" "to...  compete.  Yes.  Compete.")
+GREET(goten,    "GOTEN: I'm Goten!  Trunks and me are gonna\x0b" "win the grown-up division too!")
+GREET(ktrunks,  "TRUNKS: I'm Trunks.  Don't cry when you lose,\x0b" "okay?")
+GREET(yakon,    "YAKON: Yakon hungry...  for light.\x0b" "Yours looks tasty.")
+GREET(pikkon,   "PIKKON: Pikkon.  I've waited a long time for\x0b" "a real match.  Don't disappoint me.")
+GREET(dabura,   "DABURA: I am Dabura, King of the Demon Realm.\x0b" "Kneel, or burn.")
+GREET(evilbuu,  "EVIL BUU: ...Grrrrr.")
+GREET(kibito,   "KIBITO: I am Kibito, attendant to the Supreme\x0b" "Kai.  I fight with honour.")
+GREET(fatbuu,   "MAJIN BUU: Buu like tournament!\x0b" "Buu turn you into candy!")
+GREET(janemba,  "JANEMBA: Janemba...  JANEMBAAA!")
+GREET(kidbuu,   "KID BUU: Hee hee hee...  AHAHAHA!")
+GREET(gotenks,  "GOTENKS: The Grim Reaper of Justice,\x0b" "Gotenks, has arrived!")
+GREET(uub,      "UUB: I'm Uub!  Mr. Hercule's tournament is\x0b" "the best!  I'll do my best too!")
+GREET(vegito,   "VEGITO: Vegito.  Give me your best shot.\x0b" "Seriously, it's fine.")
 
 static const void *const *const greet[TF_COUNT] = {
     [TF_YAMCHA] = gs_yamcha, [TF_TIEN] = gs_tien, [TF_FRIEZA] = gs_frieza, [TF_MECHA_FRIEZA] = gs_mecha,
@@ -99,6 +114,10 @@ static const void *const *const greet[TF_COUNT] = {
     [TF_SUPER13] = gs_super13, [TF_BGOKU] = gs_bgoku, [TF_MAJIN_VEGETA] = gs_mvegeta,
     [TF_MYSTIC_GOHAN] = gs_mgohan, [TF_SAIYAMAN] = gs_saiyaman, [TF_BHERCULE] = gs_bhercule,
     [TF_BPICCOLO] = gs_bpiccolo, [TF_SUPER_BUU] = gs_superbuu,
+    [TF_PUIPUI] = gs_puipui, [TF_GOTEN] = gs_goten, [TF_KID_TRUNKS] = gs_ktrunks, [TF_YAKON] = gs_yakon,
+    [TF_PIKKON] = gs_pikkon, [TF_DABURA] = gs_dabura, [TF_EVIL_BUU] = gs_evilbuu, [TF_KIBITO] = gs_kibito,
+    [TF_FAT_BUU] = gs_fatbuu, [TF_JANEMBA] = gs_janemba, [TF_KID_BUU] = gs_kidbuu, [TF_GOTENKS] = gs_gotenks,
+    [TF_UUB] = gs_uub, [TF_VEGITO] = gs_vegito,
 };
 
 static void gr_init(void) {
@@ -115,9 +134,18 @@ static int gr_sprite_ok(int sprite) {
 
 static int gr_in_pool(int id) {
     const TFighter *f = &tny_fighters[id];
+    if (gr.force_rookie) return (f->role & TR_OPPONENT) && f->tier == TIER_ROOKIE;
+    if (f->role & TR_CHALLENGER) return tny_unlocked(id);     // a hidden challenger once a player has won him
     if (!(f->role & TR_OPPONENT)) return 0;
-    if (gr.force_rookie) return f->tier == TIER_ROOKIE;
     return tny_in_pool(id);
+}
+
+// New faces first: the newest open tier's fighters and the unlocked challengers come before the rest
+static int gr_fresh(int id) {
+    int top = TIER_ROOKIE;
+    for (int t = TIER_LEGEND; t > TIER_ROOKIE; t--) if (tny_tier_open(t)) { top = t; break; }
+    const TFighter *f = &tny_fighters[id];
+    return (f->role & TR_CHALLENGER) || f->tier == top;
 }
 
 static Entity *gr_spawn_npc(int sprite, int x, int y, const void *talk) {
@@ -144,6 +172,16 @@ static int gr_spawn_fighters(void) {
     for (int i = n - 1; i > 0; i--) {              // shuffle: a different crowd each visit
         int j = Rand_Range(i + 1);
         u8 t = ids[i]; ids[i] = ids[j]; ids[j] = t;
+    }
+    if (!gr.force_rookie) {                         // then the new faces up front (stable): at most half the room
+        u8 fresh[TF_COUNT], rest[TF_COUNT];
+        int nf = 0, nr = 0;
+        for (int i = 0; i < n; i++) {
+            if (gr_fresh(ids[i]) && nf < GR_MAX_SLOTS / 2) fresh[nf++] = ids[i];
+            else rest[nr++] = ids[i];
+        }
+        for (int i = 0; i < nf; i++) ids[i] = fresh[i];
+        for (int i = 0; i < nr; i++) ids[nf + i] = rest[i];
     }
     int slots = 0, placed = 0;
     for (int i = 0; i < n && slots < GR_MAX_SLOTS; i++) {

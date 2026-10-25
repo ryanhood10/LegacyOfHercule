@@ -1,0 +1,47 @@
+# The grounds' people (Ryan, 2026-10-25): the street's Master Roshi (advice), a vendor behind each stall, the
+# ZZTV reporter in a suit with his cameraman beside their van, the plaza's woman fan, the infirmary's nurse.
+# Screenshots of each spot and of Roshi's line; from a Map Test of the world map with flag 441 set (no welcome).
+# python tools/headless/st_test.py tools/headless/tny_npcs.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+p2 0
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x014A00C8
+poke32 0x0203FD08 5
+frames 300
+map
+shot np01_van_crew
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x01E000F0
+poke32 0x0203FD08 5
+frames 300
+shot np02_gifts
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x0258013C
+poke32 0x0203FD08 5
+frames 300
+shot np03_food_roshi
+key 0x10 2
+frames 4
+key 1 10
+frames 60
+shot np04_roshi_line
+key 1 10
+frames 40
+key 1 10
+frames 40
+key 1 10
+frames 60
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x02D000C4
+poke32 0x0203FD08 5
+frames 300
+shot np05_drinks
+poke32 0x0203FD0C 0x0E0F
+poke32 0x0203FD54 0x009000F0
+poke32 0x0203FD08 5
+frames 300
+map
+shot np06_nurse

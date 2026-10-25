@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **The grounds' people (Ryan's first look):** Roshi with advice beside the food stall, vendors behind the stalls, the
+  reporter in a suit with a cameraman and the ZZTV van (`tools/vanart.py`), a woman fan relabelled, a woman nurse; the
+  waiting room shows unlocked challengers and the newest tier first. `docs/tournament.md` 16, `tny_npcs.txt`.
 - **The tournament runs as scenes (Ryan):** no free movement or moves in the ring between fights (only A for the
   lines; Start / Select blocked as before); the players stay in the ring from the first match to the trophy.
 - **Tournament polish (branch `tny-polish`):** the ring presentation (the announcer, sprite 230 with his portrait,

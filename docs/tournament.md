@@ -904,3 +904,15 @@ knock-out) the d-pad, B, L and R are masked on both pads too (`tny_engine.c`, th
 A stays free to close the lines. Matches without a player are never played: the bracket screen's animation shows
 their winners.
 
+## 16. The grounds' people, Ryan's first look (2026-10-25)
+
+- The street: Master Roshi (his NPC sprite 88, portrait 80) beside the food stall with a short piece of advice
+  (`tny_roshi_talk`); a vendor behind each stall's counter (gifts 99, food 80, drinks 101); the ZZTV reporter in a suit
+  (sprite 16, the suited man at the Cell Games) with his cameraman (sprite 141, red cap, the camera on his shoulder)
+  beside their news van, our own map art (`tools/vanart.py`, 64 x 48, its footprint blocked).
+- The plaza's fan who looked like a woman but spoke as "KID" is a woman fan now; the infirmary's nurse is a woman
+  (sprite 154) instead of the dog-man (89).
+- The waiting room's crowd (`tny_grounds.c`): still a random six of this save's pool (it grows as the story opens tiers),
+  now with the newest tier's fighters and every unlocked hidden challenger first (at most half the room), each
+  challenger with his own greeting. Test: `tools/headless/tny_npcs.txt` (the street, the stalls, Roshi's line, the nurse).
+

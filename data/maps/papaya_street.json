@@ -1,5 +1,5 @@
 {
- "_": "The street up to the stadium gate, stalls on both sides: Buu's Fury's zone 7 area 2 (0x08249F40) imported whole with its collision. A vendor at the food stall, a ZZTV reporter, three fans.",
+ "_": "The street up to the stadium gate, stalls on both sides: Buu's Fury's zone 7 area 2 (0x08249F40) imported whole with its collision. Master Roshi with advice in front of the food stall, a vendor behind each stall, the ZZTV reporter and his cameraman beside their van (tools/vanart.py), three fans.",
  "name": "papaya_street",
  "zone": 15,
  "area": 12,
@@ -96,20 +96,20 @@
   {
    "kind": "npc",
    "sprite": 88,
-   "x": 284,
+   "x": 336,
    "y": 600,
-   "facing": 0,
-   "talk": "seq:tny_vendor_talk",
-   "_": "the vendor at the food stall"
+   "facing": 2,
+   "talk": "seq:tny_roshi_talk",
+   "_": "Master Roshi in front of the food stall: tournament advice (his stock NPC sprite 88)"
   },
   {
    "kind": "npc",
-   "sprite": 111,
-   "x": 300,
-   "y": 330,
-   "facing": 2,
+   "sprite": 16,
+   "x": 184,
+   "y": 360,
+   "facing": 3,
    "talk": "seq:tny_reporter_talk",
-   "_": "the reporter"
+   "_": "the ZZTV reporter in a suit (sprite 16, the Cell Games' suited man) beside his van"
   },
   {
    "kind": "npc",
@@ -134,6 +134,42 @@
    "y": 140,
    "facing": 0,
    "talk": "seq:tny_fan6_talk"
+  },
+  {
+   "kind": "npc",
+   "sprite": 141,
+   "x": 224,
+   "y": 360,
+   "facing": 2,
+   "talk": "seq:tny_camera_talk",
+   "_": "the cameraman (sprite 141, red cap, camera on the shoulder) filming the reporter"
+  },
+  {
+   "kind": "npc",
+   "sprite": 99,
+   "x": 196,
+   "y": 444,
+   "facing": 0,
+   "talk": "seq:tny_gifts_talk",
+   "_": "the gifts stall's vendor, behind the counter"
+  },
+  {
+   "kind": "npc",
+   "sprite": 80,
+   "x": 284,
+   "y": 564,
+   "facing": 0,
+   "talk": "seq:tny_vendor_talk",
+   "_": "the food stall's vendor, behind the counter"
+  },
+  {
+   "kind": "npc",
+   "sprite": 101,
+   "x": 196,
+   "y": 684,
+   "facing": 0,
+   "talk": "seq:tny_drinks_talk",
+   "_": "the drinks stall's vendor, behind the counter"
   }
  ],
  "spawn": [
@@ -145,5 +181,29 @@
  "flags": 0,
  "sources": [
   "data/story/papaya.lscript"
+ ],
+ "layers": {
+  "1": [
+   {
+    "op": "png",
+    "draw": "vanart",
+    "at": [
+     13,
+     35
+    ],
+    "_": "the ZZTV news van (tools/vanart.py)"
+   }
+  ]
+ },
+ "collision": [
+  {
+   "op": "art_footprint",
+   "draw": "vanart",
+   "at": [
+    13,
+    35
+   ],
+   "_": "the van's body and wheels"
+  }
  ]
 }

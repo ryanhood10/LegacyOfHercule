@@ -61,8 +61,24 @@ end
 
 ; ---- the street (15 / 12) ------------------------------------------------------------------------------
 
+sequence tny_roshi_talk
+  text 80 "MASTER ROSHI: Ho ho!  Entering the tournament?\x0bKeep your guard up and save your ki for the final.\x0bAnd win a few: mystery fighters come calling!"
+end
+
 sequence tny_vendor_talk
   text 0 "VENDOR: Hot food here!  Hot food!\x0bA champion can't fight on an empty stomach!"
+end
+
+sequence tny_gifts_talk
+  text 0 "VENDOR: Souvenirs!  Hercule dolls, Hercule\x0bheadbands, Hercule mugs!  Two for one!"
+end
+
+sequence tny_drinks_talk
+  text 0 "VENDOR: Ice-cold drinks!\x0bStay hydrated between rounds, champ!"
+end
+
+sequence tny_camera_talk
+  text 0 "CAMERAMAN: Shh!  We're live!\x0bSmile for the folks at home!"
 end
 
 sequence tny_reporter_talk
@@ -70,7 +86,7 @@ sequence tny_reporter_talk
 end
 
 sequence tny_fan4_talk
-  text 0 "KID: When I grow up I'm gonna enter the tournament\x0band beat EVERYBODY!"
+  text 0 "WOMAN: I waited all night for a front-row seat!\x0bThe stands are going to be packed!"
 end
 
 sequence tny_fan5_talk
