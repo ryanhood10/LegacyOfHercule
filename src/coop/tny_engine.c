@@ -780,9 +780,10 @@ int tny_ring_active(void) {
 }
 
 int tny_ko_check(int k, s32 dmg) {
-    if (eng.magic != ENG_MAGIC || eng.phase != P_MATCH || coop2.duel_active) return 0;
+    if (eng.magic != ENG_MAGIC || coop2.duel_active || !tny_ring_active()) return 0;
     const CharacterEntry *c = &g_Party->chars[k ? coop.p2_slot : g_Party->active_slot];
     if (dmg < c->hp) return 0;
+    if (eng.phase != P_MATCH) return 1;              // after the fight's end (a blast still flying): 1 HP, no more
     eng.koed = 1;
     // a fight of both players: while the partner stands the revive takes the KO (revive.c)
     if (eng.fighter == 2 && eng.players == 2 && coop.p2 && g_PlayerObject && !coop_solo()) {
