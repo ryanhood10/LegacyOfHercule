@@ -1301,6 +1301,7 @@ static void story_watch(void) {
     if (eng.absent > 300) eng.baseline = 0;          // the title, a load: the next look is a silent baseline
     eng.absent = 0;
     if ((g_FrameCounter & 15) != 3) return;
+    if (eng.force_tiers || eng.force_flags) return;   // tests force the pool: no notices from that
     u16 tiers = 0, story = 0;
     for (int t = 0; t < TIER_COUNT; t++) if (tny_tier_open(t)) tiers |= (u16)(1 << t);
     for (int id = TF_GOHAN; id < TF_COUNT; id++) if (tny_unlocked(id)) story |= (u16)(1 << (id - TF_GOHAN));
