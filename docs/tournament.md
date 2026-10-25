@@ -635,3 +635,70 @@ moves"). What it does and the calls we made:
   spawn); speed changes on transform (the chase modules are built once; only attack and defence rise); Gohan /
   Goku / Vegeta / Trunks / Piccolo transforms (story playables, never opponents); the engine's stats (160 + id) are
   used when a build has them, else a stand-in stock stat per body (`stand_in_stat[]`).
+
+## 12. The screens (built 2026-10-25, branch `tny-ui`)
+
+`src/coop/tny_ui.c` (the screen framework, the list box, the pop-up, CoopCall 28-29, test commands 28-29),
+`tny_ui_grid.c` (the character select and the unlock board), `tny_ui_bracket.c` (the bracket and the Rumble board),
+`tny_ui.h` (internal). Test: `tools/headless/tny_ui.txt` (`docs/testing.md` "Tournament screens").
+
+**How a screen runs** (the save pad's switch-screen recipe, decompiled 2026-10-25): stock fade-out (screen object
+vtable 0x0802462C, `{vt, 0x100, 0x10}`) -> our screen object through `Modal_Run` (0x0801F2F4: slot 1 open, 2 close,
+3 update, 4 vblank, 5 "done?") -> `0x08005F1A(world 0x03001090, 1)` puts the map's tiles, maps, palettes and display
+registers back -> stock fade-in (0x08024334, `{vt, 0, 0x10}`). Our object carries a relative vtable built at run
+time in its own block. `EntityList_Begin` / `End` (0x08006F4A / 0x08006FA4) set the map's entities **and the OBJ VRAM
+allocator** (it lives in the entity list at +0x694) aside and restore them, broadcasting message 9 so every entity
+re-uploads its frames: nothing the screen allocates can leak (the test checks the largest free block before and
+after every screen: equal). Display while a screen is up: BG3 the switch screen's scrolling checker (tiles 1-4,
+its slot-4 scroller 0x08000BE4), BG1 a 240 x 160 8bpp "bitmap" (tiles 16-615, map 0xE800) the screens draw panels,
+lines and text into, OBJ faces at priority 1, our own OAM entries appended after the entity list's (the 64 x 64
+dialogue portrait, "?" marks at priority 0). Palettes: the menu BG palette (0x081D4F50) with ours in 224-239, the
+OBJ palette 0x081DA6C8. Text is the dialogue font through the stock canvas (`Canvas_Text` 0x0801F636; the font is
+capitals only). Faces are stock `Portrait` entities (0x08007C70, the switch screen's), centred on their idle frame's
+box; looks through the entity's colour remap (+0x28, 0x080076EE): 0 full colour, 0x086D0ED0 dim, 0x086D0DD0 grey,
+ours all-black for silhouettes. Player 2's HUD panel is re-composed after a screen (its tiles were drawn over).
+
+**Our calls (ui piece):**
+- Every screen is full-screen (the map uses all four BG layers and both char blocks, so an overlay would need the
+  same restore); the list box is a centred box over the checker. Fades in / out by `BLDY` (16 frames each way).
+- **List box** (`tny_ui_choose`): title in gold, up to 7 lines, Up / Down wrap, A answers the index, B -1. Either
+  pad drives it.
+- **Select** (`tny_ui_select`): tabs Z Fighters / Tourney / Villains / Buu Saga (L / R), eight faces a page (4 x 2;
+  Left / Right past the edge turns the page), the right panel: the dialogue portrait (or the standing body when the
+  fighter has portrait 0), the name, the tier. Listed: fighters a player can ever pick (`TR_STORY`, `TR_BEAT`,
+  `TR_CHALLENGER`) whose record is in the build; pure opponents (Android 19, Cell Jr. ...) are not shown. Pickable =
+  `tny_unlocked(id)` and `tny_tier_open(his tier)`; the rest are black silhouettes with "?", the panel then says why
+  (the table's `unlock_text`, "Joins with the story" for a story fighter, "Opens with a higher tier"). The cursor
+  starts on the player's own party character. Player 1's pad for player 0, player 2's (`coop.input2`) for player 1
+  (the cursor frame is blue for player 2). A on a locked fighter buzzes; A on a pickable one flashes and returns 1;
+  B returns 0. The same fighter twice (the violet shadow) is the engine's to apply in the match.
+- **Bracket** (`tny_ui_bracket`): a two-sided tree (round 1 down both edges with names, winners one column in per
+  round, the champion top centre); Quick one page, Full a page per half and a page for the final. Players' names in
+  red (player 1) / blue (player 2), the fallen grey. Phase 0 draws the bracket as it stands; phase 1 first animates
+  every result since the screen was last shown (the seats and winners last drawn are kept in `.tny.ui`; when the
+  seats differ, every result is new): the players' matches first (the loser greys, a beat, the winner slides to the
+  next column), then the round's other matches with quick slides, grouped by page. Then the next match
+  (`round` / `match`) lights up, both faces slide to the middle and the banner says "GOHAN vs FRIEZA"; a finished
+  bracket slides nobody and the banner says "GOHAN wins!". A (or B / Start) skips the animation, then closes the
+  screen; it closes itself after 5 s.
+- **Rumble board** (`tny_ui_rumble_board`): up to eight faces with names; the fallen grey one after another with a
+  red frame; "Standing: N".
+- **Unlock board** (CoopCall 28, a=1; the grounds' courtyard object): every `TR_BEAT` / `TR_CHALLENGER` fighter in
+  the build, table order, eight a page, a counter "4 / 38" at the top; locked: black with "?", the panel only the
+  condition (plus "Lost once: win again" for a challenger with `tny_challenge_tried`); unlocked: colour, portrait,
+  name, "Unlocked!". A or B closes it.
+- **Pop-up** (`tny_popup_show`): one narration line in the stock dialogue box (the "Journal Updated!" look) with
+  the item pop-up's jingle; closed with A. It runs the dialogue screen (0x08023E88) at once: call it from the
+  engine's safe frame (`tny_engine_frame`), as the test does from `tny_ui_frame`.
+- **CoopCall 28**: a=1 the unlock board, a=2 the bracket (phase b); pushes 1 (the grounds' script ends the talk on
+  it). **CoopCall 29**: the select for player a at tier b, pushes the fighter id or -1.
+- ui_strings 380-399 and portraits 190-199 stay unused: labels are C strings drawn by the screens.
+- The roster's `tny_fighter_ok` read past the sprite index for art not in the build (found here and by grounds;
+  fixed on main): the screens also check a record's shape before making a face of it (`ui_sprite_record`).
+
+**For the engine:** call `tny_ui_choose` / `tny_ui_select` / `tny_ui_bracket` / `tny_ui_rumble_board` from a script
+step (CoopCall 23-27) or the per-frame tick, not while another modal screen is up (a second call while one runs
+returns at once: `select` 0, `choose` -1). `tny_ui_bracket(0)` once when a bracket is drawn up, `(1)` after each
+round's results are in (`winner[][]` filled for the whole round, `round` / `match` on the players' next match);
+a new bracket (different seats) starts the animation history over. Pop-ups: `tny_popup_show` from
+`tny_engine_frame` at the safe frame.

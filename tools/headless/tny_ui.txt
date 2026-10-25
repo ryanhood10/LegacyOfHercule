@@ -260,6 +260,68 @@ key 2 4
 frames 100
 echo == board closed: OBJ VRAM before = after
 peek16 UI+0x7C 2
+# ---- 7b. everyone unlocked: the faces in colour, the art pieces' portraits (Evil Buu has none: his body stands in)
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0xFFFFFFFF
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0xFFFFFFFF
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 6
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+key 0x10 4
+frames 20
+shot u34b_board_all
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34c_board_all_p2
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34d_board_all_p3
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34e_board_all_p4
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34f_board_all_p5
+key 2 4
+frames 100
+peek16 UI+0x7C 2
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0x10085
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0x3C0000
+poke32 0x0203FD08 29
+frames 20
 # ---- 8. the pop-ups (shown from tny_ui_frame, the engine's context): a fighter, a tier
 poke32 0x0203FD0C 7
 poke32 0x0203FD54 0

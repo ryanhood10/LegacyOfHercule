@@ -191,9 +191,10 @@ const u8 ui_remap_black[256] = {
 #undef B4
 };
 
-// A sprite id's record, or 0. tny_fighter_ok() reads Character_GetSpriteRecord, which indexes the relocated
-// sprite_index without a bound: an id past its end (art not in this build) returns whatever follows it in ROM.
-// So the record is checked for the shape every real one has (docs/sprites.md "Record format").
+// A sprite id's record, or 0. Character_GetSpriteRecord indexes the relocated sprite_index without a bound (an id
+// past its end returns whatever follows it in ROM; tny_fighter_ok() bounds it since 3e06449), so a face is only
+// made from a record with the shape every real one has (docs/sprites.md "Record format"): a bad one would be
+// decoded into OBJ VRAM.
 static int rom_ptr(u32 a) { return a >= 0x08000000u && a < 0x0A000000u && !(a & 3); }
 void *ui_sprite_record(int sprite_id) {
     if (sprite_id <= 0) return 0;
@@ -566,7 +567,7 @@ int tny_ui_choose(const char *title, const char *const *lines, int n) {
     c.lines = lines;
     c.n = n;
     c.result = -1;
-    if (!ui_run(choose_open, choose_step, 0, &c, UI_PAD_BOTH)) return 0;
+    if (!ui_run(choose_open, choose_step, 0, &c, UI_PAD_BOTH)) return -1;
     ui_st.last_ret = (s8)c.result;
     return c.result;
 }

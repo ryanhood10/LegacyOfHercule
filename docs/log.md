@@ -4,6 +4,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament screens (branch `tny-ui`):** `src/coop/tny_ui*.c`: a full-screen modal framework on the save pad's
+  switch-screen recipe (stock fades, our `Modal_Run` object, the map's entities and OBJ VRAM allocator set aside
+  and restored, a bitmap BG for panels and text, stock Portrait faces, 64 x 64 dialogue portraits as OBJ), the list
+  box, the character select (four tabs, pages, black "?" silhouettes, portrait and name; player 2 on the second
+  pad), the bracket (Quick / Full with pages; results animated: loser greys, winner slides, quick slides for the
+  rest, "GOHAN vs FRIEZA", the champion), the Rumble board, the unlock board (CoopCall 28, 1), the pop-up (a
+  narration line in the dialogue box). Test `tools/headless/tny_ui.txt` (every screen, no OBJ VRAM leaked, display
+  registers restored); regression identical to main. `docs/tournament.md` 12.
 - **Tournament grounds built (branch `tny-grounds`):** Papaya Island as zone 15 areas 11-16, Buu's Fury's zone 7
   imported whole (plaza, street, courtyard, infirmary, waiting room, ring; `data/maps/papaya_*.json`), a world-map
   landing open from the start in the island sea at (1260, 1820) (the plan's spot is desert on our map), both
