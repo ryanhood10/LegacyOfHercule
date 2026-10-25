@@ -22,6 +22,7 @@ inspection goes through the GDB stub.
 | New maps (zone 15) | building and warping to the new maps |
 | Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
 | Tournament grounds (headless) | Papaya Island: the world-map landing, the welcome, both pads, every exit, the board, the director, the waiting room's fighters |
+| Tournament art (Buu's Fury imports) | any new fighter sprite: spawn it as an opponent from a RAM record, fight, hit test, OBJ VRAM with giants |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
@@ -622,6 +623,37 @@ python tools/headless/st_test.py tools/headless/ssj2_duel.txt build/ssj2t/log2-c
   into the file), player 1 through `FORK_SLOT=9 /root/fork-s9/keys.sh`, the gate word and ability index
   through `gdbsrv.sh pause` / `cmd 'set ...'` / `cmd continue`, `COOP_CMD_WAVE_CLEAR` (13) clears the
   map's enemies first; `win_shot.ps1` needs an absolute output path.
+
+## Tournament art: Buu's Fury imports (headless, art-buu, 2026-10-25)
+
+```
+make BUILD=build/art-buu DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/art-buu/log2-coop.gba --out build/art-buu/hl
+python tools/headless/st_test.py tools/headless/tny_artbuu.txt build/art-buu/log2-coop.gba build/art-buu/hl/menu.ss --out build/art-buu/hl --cols 6 > build/art-buu/hl/artbuu.out
+python tools/headless/objfree.py build/art-buu/hl/artbuu.out
+grep -E "^hit|0202....: " build/art-buu/hl/artbuu.out | paste - -      # the hit test: HP per fighter
+```
+
+- **Spawning any sprite as an opponent:** poke an enemy record into `coop2.boss_rec` (0x0203FD6C: handler 0x0800E77F,
+  flags 1, stat, x, y, sprite id, action 0x086D66BC = a stock no-op action, behaviours 0) and run test command 8
+  SPAWN_RECORD with `cmd_arg` = 0x0203FD6C (EWRAM records are accepted since 2026-10-25). Stat 29 is Cooler's
+  numbers on AI set 21 (boss melee: groups 0, 1, 2, 5-8); in one-player (`p2 off`) he comes alone (in co-op stat
+  29 brings the Namekian twin). The fighter stands 48 px right of player 1. `findent E 0x080252a4` finds the first
+  enemy (the co-op enemy vtable); his HP is at `E+0x188` (10200 for stat 29 at the spawn).
+- `tny_artbuu.txt`: the 28 fighters two at a time (8 s each, player 1 turning and punching; shots and `ents` at 3 s
+  and 8 s; `entrec` 1 each = the entity uses our record; command 13 clears the pair), the OBJ VRAM free list with
+  two giants on screen (three pairs), a **hit test** per fighter (alone, 24 px right of player 1, six punches facing
+  him; 34 Cooler and 9 Android 17 as stock controls: every HP must drop below 10200) and the announcer (230) as an
+  actor (test command 3). Pass: no CRASH, every `entrec` 1 then 0, every hit-test HP below 10200, objfree's largest
+  block >= 4096 with two giants.
+- Result (2026-10-25): all 28 spawn, walk, attack and take hits; HP after six punches 9605-10133 (Cooler 9797, 17
+  10131); OBJ VRAM with two giants: 20992 / 17920 / 15104 bytes free (largest 20992 / 17152 / 12032). The free
+  total falls by 512 bytes per spawn because each command 8 leaves its boss bar behind (a test artifact).
+- **Portraits load:** `python -I tools/tnyportraits.py roms/log2.gba /dev/null --buu roms/buu.gba --check
+  build/art-buu/log2-coop.gba $(TNY_PORTRAITS)` (the pairs from the Makefile) reads the built ROM's portrait table
+  through the getter's literal (0x0800BE10, word id + 1) and decodes every id: "29 portraits load" (2026-10-25).
+- Previews of every conversion (Buu colours left, ours right, the hurt box in red on group 0):
+  `build/art-buu/tny/buu_preview_<id>.png`; portraits: `build/art-buu/tny_portraits.png`.
 
 ## Haloed Goku (headless, 2026-10-19)
 

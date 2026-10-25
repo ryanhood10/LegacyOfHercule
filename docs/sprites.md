@@ -169,7 +169,26 @@ rows poked to 22, player 2 cycled with Select: player 2's entity took `buu_recor
 Hercule (`build/buu/proof_ingame.png`, `build/buu/t13`-`t19`). Broly (159) converts and compiles
 but was not spawned in game.
 
+**The tournament's imports (2026-10-25, art-buu):** `--spec data/tny_buu.txt` lists one record per line (`<id>=<Buu
+record> [g:a,...] [@<template>]`: a group map and a per-id template, e.g. `230=8 @80` puts the announcer on a town
+NPC's 5-group layout); `--section .rodata.art` puts everything in the second ROM blob; `--expect` checks the ids
+against the Makefile's `TNY_BUU_IDS`; `--fit` (tournament only; 158 / 159 keep Buu's boxes) moves a body drawn more
+than 8 px off its usual place (Yakon) and gives LoG2-sized hurt boxes: normal bodies LoG2's standard (-2, -26, 18, 10),
+giants the idle frame's drawn body, at least 20 px either side of its centre. Buu's own boxes are 2-5 px smaller than
+LoG2's and 20 of the 28 imports took no punch at arm's length before (`tools/headless/tny_artbuu.txt`'s hit test).
+The previews draw the hurt box in red on group 0 and use each record's own group map. Decisions per record:
+`docs/tournament.md` 4e.
+
 ### Ids in the Buu ROM (from `build/buu_sprites/atlas.png`; identities read off the art)
+
+**Corrections (2026-10-25, each drawn at 3-6x and matched to Buu's own portraits):** 8 is the World Tournament
+announcer (blond, sunglasses, suit); 207 is the Ox-King and 216 Pintar (not the announcer and Spopovich); 32 is
+Evil Buu (grey, caped, a partial set); 62 / 132 / 179 a small capped soldier; 148 Kibito (NPC set), 149 Supreme Kai;
+92 / 93 Super Saiyan Vegito (identical frames); 102 / 104 Gohan in the Saiyaman tunic (base / SSJ), 103 SSJ Gohan in
+school clothes, 97 Gohan in school clothes; 113 / 114 Goten (base / SSJ), 259 / 260 Kid Trunks (base / SSJ); 116
+Gotenks (full set), 117 / 118 Gotenks NPC sets, 277 a red-haired kid; 41 Super Buu with Gotenks absorbed (the vest),
+42 / 43 with Gohan absorbed; 214 / 215 Pikkon (two palettes); 242 Spopovich, 293 Yamu (partial sets), 290 Yakon,
+224 Pui Pui. Portrait module ids (0x086F393C, 163 words, 0-7 empty): `docs/ids.md` "Portraits" 140-168.
 
 Full fight set (attack groups 2-6 present; boss or playable grade): 28 **Legendary Super Saiyan
 Broly** (64x64, 22 anims, beams), 33 Fat Buu, 37/39 Kid Buu, 40-43 Super Buu forms, 63 Dabura

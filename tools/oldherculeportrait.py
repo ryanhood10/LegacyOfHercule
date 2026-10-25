@@ -25,13 +25,14 @@ W = 64
 BUU_FRAME = {0, 2, 28, 29, 30, 62, 63, 64, 109, 110}   # the gold frame's colours
 
 
-def build(log, buu):
+def build(log, buu, buu_id=BUU_HERCULE):
+    """LoG2-format 64x64 portrait (raw indices) of Buu's Fury portrait `buu_id` (stock 67 without the Buu ROM)."""
     ref = m.unpack(log, struct.unpack_from('<I', log, LOG_TABLE - B + 4 * LOG_HERCULE)[0])[:4096]
     if buu is None:
         return bytes(ref)
     bpal = [S.Sprites.rgb(c) for c in struct.unpack_from('<256H', buu, BS.PALETTE - B)]
     lpal = S.Sprites(log).pal
-    src = m.unpack(buu, struct.unpack_from('<I', buu, BUU_PORTRAIT_MODULE - B + 4 * BUU_HERCULE)[0])[:4096]
+    src = m.unpack(buu, struct.unpack_from('<I', buu, BUU_PORTRAIT_MODULE - B + 4 * buu_id)[0])[:4096]
     # the gold frame: flood from the edge through its colours, within 5 px of the edge
     frame, stack = set(), [(y, x) for y in range(W) for x in range(W) if y in (0, W - 1) or x in (0, W - 1)]
     while stack:
