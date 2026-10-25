@@ -73,8 +73,12 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **No ring-outs** (Ryan, 2026-10-25): the platform's edge stays closed ground, matches are won by damage only.
 - **Full heal before every round, in every division** (Ryan, 2026-10-25): HP and ki back to full between
   matches and between the Rumble's rounds; each fight starts clean, Budokai-style.
-- **Fights end at 1 HP** like duels; nobody dies. Prizes are items and a record line (LoG2 has no money);
-  little or no EXP so the tournament cannot over-level the story.
+- **Fights end at 1 HP** like duels; nobody dies.
+- **Rewards** (Ryan, 2026-10-25): the *first* win of each tournament pays a **+3 capsule** (the stat set per
+  tier: fifteen capsules across the board, five per stat), Full pays a second one, every later win a **Senzu
+  bean** (the Rumble a second for finishing with no player KO); plus the hidden challenger and the record's
+  line. Fights pay **a small EXP trickle** (about a tenth of a story boss of that tier; tuned so a full run
+  nudges a level, never jumps one). LoG2 has no money.
 
 ## 2. Proposed, not yet decided
 
