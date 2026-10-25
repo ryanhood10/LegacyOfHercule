@@ -58,6 +58,11 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   save files (beat-to-unlock, challengers, forms, wins and attempts), in the unused 6.8 KB after the save
   slots; it survives a deleted file. The *pool* still follows each file's story flags, so a fresh file cannot
   fight Cell at Rookie, but a fighter earned anywhere is selectable everywhere once his tier is open.
+- **Bracket size is a choice at the director** (Ryan, 2026-10-25): **Quick** = 8 fighters, three rounds, one
+  bracket screen, in every tier; **Full** = 16 fighters, four rounds, two bracket pages, offered once the tier's
+  pool has 15 opponents (Adept after the road fight, and every tier above; never Rookie). Either win brings the
+  tier's hidden challenger; Full pays the better item prize and has its own line in the record. Co-op seeding
+  (opposite halves) holds for both.
 - **Fixed tiers you grow into** (Budokai's Novice / Adept / Advanced), opened by story flags, so the LoG2
   level matters; the three difficulty settings still apply. Tournament-only playables derive their numbers
   from the lead's level (the Android 16 recipe), each with its own multipliers.
@@ -70,9 +75,6 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 
 ## 2. Proposed, not yet decided
 
-- **Bracket size as an option at the director** (Ryan asked, 2026-10-24): "Quick" = 8 fighters (three rounds,
-  one screen) or "Full" = 16 (four rounds, two bracket pages). Proposed: both from the start, the challenger
-  comes after either, Full pays the better item prize. Co-op seeding holds for both (opposite halves).
 - **Ring-outs:** skip for now (no edge mechanic in LoG2; doable later as "knocked past the ring's edge").
 - **Heal between rounds:** partial (a Senzu-sized chunk), full before the final.
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
