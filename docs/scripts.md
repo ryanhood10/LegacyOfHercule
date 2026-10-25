@@ -50,6 +50,7 @@ Useful action facts found on the way (decompiled):
 
 | action | fact |
 |---|---|
+| 53 WalkToPosition (char, x, y) / 63 BeginCommandBatch / 64 CommitCommandBatch | the step builds a walk command (0x08026620(0, {x, y}): 1 px a frame, idle at the end) and appends it to the entity's command list (+0x150) with 0x0800E04C; outside a batch that call runs the command modal at once (the script waits), inside one (the batch word 0x030020F8 = 1) it only queues, and the commit runs the modal 0x0800DE20 (message 0xB starts every queue, message 10 steps them; entities without commands are animated and drawn, not updated) until all are done: walks in one batch run together. C can do the same with an entity pointer (the tournament's walk-in, `tny_engine.c` `walk_in`) |
 | 104 DespawnCharacterAndRecordPosition (char, record) | removes the entity showing sprite `char` and spawns map record `record` (any handler, its condition ignored) at its position and facing: how a stand-in actor becomes the boss |
 | 84 TriggerMapEvent (record) | spawns map record `record` ignoring its condition (records with condition 1 exist only for this) |
 | 73 SetCharacterTransformation (slot, sprite) | the second argument is a **sprite id**: the display row showing that sprite becomes the slot's row (assertion "unable to find sprite index in character display data" when none does) |

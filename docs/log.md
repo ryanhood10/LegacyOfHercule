@@ -4,6 +4,16 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament polish (branch `tny-polish`):** the ring presentation (the announcer, sprite 230 with his portrait,
+  at the ring's edge between fights; both sides walk in from the platform's edges through the stock script commands;
+  his call; at the end the loser lies down and the winner poses while he calls it, poses held through the line; the
+  Rumble's pack enters after he leaves), the hidden fight's alternatives (one rule: the challenger, else the
+  tournament's alternative while locked: Champion Rumble -> Majin Vegeta, Legend 1 v 1 -> Goku (Buu saga), Legend
+  2 v 2 -> both, Legend Rumble -> Super Buu's final form until beaten once), Android 16 and Super 13 as opponents on
+  their own paths with the tier's numbers (Super 13 kneels in the ring, no explosion), the giants' faces (cropped
+  heads on the select grid and the unlock board, half size on the bracket and the Rumble board). Test
+  `tools/headless/tny_polish.txt`; every `tny_*.txt` and ch9_gero, cell_games_1p, duel_end, a16_moves pass on the
+  debug ROM. `docs/tournament.md` 14.
 - **Tournament engine (branch `tny-engine`):** `src/coop/tny_engine.c`: the pool (tiers on flags 85 / 136 / 191 / 382,
   confirmed in the scripts; no mirror matches), the director's flow from CoopCall 23 (tier, division, Quick / Full,
   select), random brackets with off-screen simulation, matches in the ring spawned from RAM records on stats

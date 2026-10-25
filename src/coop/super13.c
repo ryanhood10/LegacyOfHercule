@@ -23,6 +23,7 @@
 #include "super13.h"
 #include "revive.h"
 #include "difficulty.h"
+int tny_ring_active(void);   // tny_engine.c: a tournament runs and the players are in the ring
 
 typedef struct S13Desc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } S13Desc;
 extern const S13Desc s13_orb_s[3], s13_orb_m[2], s13_orb_l[2], s13_trail[2];   // build/gen/super13_sprites_data.c
@@ -671,6 +672,11 @@ static void s13_update(Entity *e) {
         }
         if (e->ctrl_state != &a->ctrl) Entity_SetCtrlState(e, &a->ctrl);   // a script animation stays out
         Entity_BaseUpdate(e);
+        if (tny_ring_active()) {   // a tournament match (tny_engine.c): no explosion, he kneels, beaten
+            set_frames(a, S13_G_POWER, 0);
+            s13.state = 3;
+            return;
+        }
         dying(a);
         return;
     }

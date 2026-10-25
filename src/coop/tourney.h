@@ -182,6 +182,7 @@ void tny_moves_test(u32 cmd, u32 arg, u32 arg2);                 // test command
 void tny_moves_frame(void);                                      // every frame: kits, transforms, statuses
 void tny_moves_attach(Entity *e, int fighter_id);                // give a spawned opponent his kit
 void tny_rumble_mode(int on);                                    // NPCs hit each other, target weights on / off
+void tny_moves_final_form(Entity *e);                            // every transform of his kit now (a final-form fight)
 // grounds
 int  tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push);  // CoopCall 30
 void tny_grounds_test(u32 cmd, u32 arg, u32 arg2);               // test command 30

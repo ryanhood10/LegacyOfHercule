@@ -35,6 +35,7 @@ typedef struct Grid {
     u8 confirm;              // frames left of the pick's flash
     u8 ids[TF_COUNT];
     Entity *face[PAGE];
+    u16 crop[PAGE];          // a giant's face: a 32 x 32 crop of his head (ui_face_crop), 0xFFFF none
     Entity *panel_face;
     u16 port_tile;
     u8 locked[PAGE];         // drawn as a silhouette
@@ -168,6 +169,15 @@ static void draw_panel(Ui *u, Grid *g) {
         ui_text_wrap(u, PANEL_X + 4, 100 + lines * 12, PANEL_W - 8, C_P1, "Lost once: win again", 3 - lines);
 }
 
+static void crops_free(Grid *g) {
+    for (int k = 0; k < PAGE; k++) {
+        if (g->crop[k] != 0xFFFF) UiObjVram_Free(g_EntityList, g->crop[k]);
+        g->crop[k] = 0xFFFF;
+    }
+}
+static int face_cx(int k) { return cell_x(k) + (CELL_W - 2) / 2; }
+static int face_cy(int k) { return cell_y(k) + FACE_DY; }
+
 static void face_look(Grid *g, int k) {
     Entity *e = g->face[k];
     if (!e) return;
@@ -177,6 +187,7 @@ static void face_look(Grid *g, int k) {
 
 static void build_page(Ui *u, Grid *g) {
     for (int k = 0; k < PAGE; k++) { ui_face_kill(g->face[k]); g->face[k] = 0; }
+    crops_free(g);
     panel_clear(g);
     if (g->cur >= on_page(g)) g->cur = on_page(g) ? (u8)(on_page(g) - 1) : 0;
     draw_tabs(u, g);
@@ -186,7 +197,10 @@ static void build_page(Ui *u, Grid *g) {
     for (int k = 0; k < on_page(g); k++) {
         int id = g->ids[g->page * PAGE + k];
         g->locked[k] = !pickable(g, id);
-        g->face[k] = ui_face(tny_fighters[id].sprite, cell_x(k) + (CELL_W - 2) / 2, cell_y(k) + FACE_DY);
+        int sprite = tny_fighters[id].sprite;
+        // a giant (64 x 64) or a tall body overflows the 34 x 56 cell: his head, cropped to 32 x 32 (polish)
+        if (ui_face_big(sprite)) g->crop[k] = ui_face_crop(sprite, g->locked[k] ? ui_remap_black : 0);
+        if (g->crop[k] == 0xFFFF) g->face[k] = ui_face(sprite, face_cx(k), face_cy(k));
         face_look(g, k);
     }
     draw_bar(u, g);
@@ -209,6 +223,7 @@ static void move_cursor(Ui *u, Grid *g, int k) {
 static void grid_open(Ui *u) {
     Grid *g = u->ctx;
     g->port_tile = 0xFFFF;
+    for (int k = 0; k < PAGE; k++) g->crop[k] = 0xFFFF;
     build_list(g);
     if (g->mode == GRID_SELECT) {             // the cursor starts on the player's own character
         int slot = g->player ? coop.p2_slot : g_Party->active_slot;
@@ -220,8 +235,12 @@ static void grid_open(Ui *u) {
 
 static void grid_step(Ui *u) {
     Grid *g = u->ctx;
-    for (int k = 0; k < on_page(g); k++)
-        if (g->locked[k] && g->face[k]) ui_qmark_draw(u, ui_face_x(g->face[k]), ui_face_y(g->face[k]));
+    for (int k = 0; k < on_page(g); k++) {
+        if (g->crop[k] != 0xFFFF) {
+            ui_crop_draw(u, g->crop[k], face_cx(k), face_cy(k));
+            if (g->locked[k]) ui_qmark_draw(u, face_cx(k), face_cy(k));
+        } else if (g->locked[k] && g->face[k]) ui_qmark_draw(u, ui_face_x(g->face[k]), ui_face_y(g->face[k]));
+    }
     if (g->port_tile != 0xFFFF) ui_portrait_draw(u, g->port_tile, PORT_X, PORT_Y);
     if (g->confirm) {
         if (--g->confirm == 0) ui_leave(u);
@@ -283,6 +302,7 @@ static void grid_step(Ui *u) {
 
 static void grid_close(Ui *u) {
     Grid *g = u->ctx;
+    crops_free(g);
     panel_clear(g);
 }
 

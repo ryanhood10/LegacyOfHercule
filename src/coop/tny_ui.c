@@ -289,6 +289,84 @@ void ui_portrait_draw(Ui *u, u16 tile, int x, int y) {
     ui_obj(u, ((u32)y & 0xFF) | 0x2000u | (((u32)x & 0x1FF) << 16) | (3u << 30), tile | (1u << 10));
 }
 
+// ---- a giant's face cropped to a grid cell (polish, 2026-10-25) --------------------------------------------------
+// A frame blob decodes (UiGfx_Decompress, kinds 0-2) into 8bpp OBJ tiles in 1D order, the way the entities' frames
+// reach their OBJ VRAM slots: tile (tx, ty) of a w x h frame is bytes ((ty * w / 8) + tx) * 64. The crop is the four
+// middle tile columns from the first tile row with a visible pixel (the top of the head): head and shoulders.
+static const u8 *idle_desc(int sprite_id) {
+    const u8 *rec = ui_sprite_record(sprite_id);
+    return rec ? *(const u8 *const *)(rec + 0x4C) : 0;     // group 0, facing down, frame 0
+}
+int ui_face_big(int sprite_id) {
+    const u8 *d = idle_desc(sprite_id);
+    return d && rom_ptr((u32)d) && (d[2] > 32 || d[3] > 48);
+}
+u16 ui_face_crop(int sprite_id, const u8 *remap) {
+    const u8 *d = idle_desc(sprite_id);
+    if (!d || !rom_ptr((u32)d)) return 0xFFFF;
+    int w = d[2], h = d[3];
+    const u32 *blob = *(const u32 *const *)(d + 8);
+    if (!rom_ptr((u32)blob) || blob[0] > 2 || w < 32 || h < 32 || w > 64 || h > 64) return 0xFFFF;
+    if (UiObjVram_Largest(g_EntityList) < 0x400) { ui_st.heap_fail++; return 0xFFFF; }
+    u8 *buf = Arena_Alloc(w * h);
+    if (!buf) { ui_st.heap_fail++; return 0xFFFF; }
+    UiGfx_Decompress(blob, buf);
+    int tw = w / 8, th = h / 8, cx = (tw - 4) / 2, top = 0;
+    for (; top < th - 4; top++) {
+        int seen = 0;
+        for (int c = cx; c < cx + 4 && !seen; c++) {
+            const u8 *t = buf + (top * tw + c) * 64;
+            for (int i = 0; i < 64 && !seen; i++) seen = t[i] != 0;
+        }
+        if (seen) break;
+    }
+    u16 tile = ObjVram_Alloc(g_EntityList, 0x400);
+    if (tile != 0xFFFF) {
+        volatile u16 *dst = (volatile u16 *)(OBJ_VRAM + tile * 0x20);
+        for (int r = 0; r < 4; r++)
+            for (int c = 0; c < 4; c++) {
+                const u8 *t = buf + ((top + r) * tw + cx + c) * 64;
+                for (int i = 0; i < 64; i += 2) {
+                    u8 a = t[i], b = t[i + 1];
+                    if (remap) { if (a) a = remap[a]; if (b) b = remap[b]; }
+                    *dst++ = (u16)(a | (b << 8));
+                }
+            }
+    }
+    Arena_Free(buf);
+    return tile;
+}
+void ui_crop_draw(Ui *u, u16 tile, int x, int y) {
+    if (tile == 0xFFFF) return;
+    x -= 16; y -= 16;
+    // 32 x 32, 8bpp, square; priority 1 (with the faces)
+    ui_obj(u, ((u32)y & 0xFF) | 0x2000u | (((u32)x & 0x1FF) << 16) | (2u << 30), tile | (1u << 10));
+}
+
+// Giants' faces at half size on the screens whose faces move (the bracket, the Rumble board; polish, 2026-10-25): a
+// face's OAM entry (attr2's tile = the Portrait entity's OBJ tile, +0x0C) that is 64 x 64 becomes an affine sprite on
+// matrix 31 (entries 124-127's attr3: PA = PD = 0x200, a 1/2 scale) without double size: a 32 x 32 body in the
+// middle of its 64 x 64 box, the same centre. Faces face down (never flipped), so the flip bits it replaces are 0.
+#define UI_PORTRAIT_VT 0x08025C30u
+static void shrink_giants(EntityList *l) {
+    int used = 0;
+    for (int k = 0; k < 124; k++) {
+        u32 w0 = UI_OAM_SHADOW[k * 2], w1 = UI_OAM_SHADOW[k * 2 + 1];
+        if ((w0 & 0x300) == 0x200) continue;                      // hidden
+        if ((w0 & 0xC000) != 0 || (w0 >> 30) != 3) continue;     // square, size 3: 64 x 64
+        for (int i = 0; i < l->count; i++) {
+            const Entity *e = l->items[i];
+            if ((u32)e->vtable != UI_PORTRAIT_VT || (*(const u16 *)((const u8 *)e + 0x0C) & 0x3FF) != (w1 & 0x3FF)) continue;
+            UI_OAM_SHADOW[k * 2] = (w0 & ~0x3E000000u) | 0x100u | (31u << 25);
+            used = 1;
+            break;
+        }
+    }
+    if (!used) return;
+    static const u16 m[4] = { 0x200, 0, 0, 0x200 };
+    for (int j = 0; j < 4; j++) UI_OAM_SHADOW[(124 + j) * 2 + 1] = (UI_OAM_SHADOW[(124 + j) * 2 + 1] & 0xFFFF) | ((u32)m[j] << 16);
+}
+
 static void qmark_make(Ui *u) {
     u->qmark_tile = 0xFFFF;
     if (!u->canvas_buf || UiObjVram_Largest(g_EntityList) < 0x100) return;
@@ -442,6 +520,7 @@ static void slot_update(Ui *u) {
         ((void (*)(Entity *))vslot(e, 2))(e);
     }
     UiEntityList_Draw(l);
+    if (u->shrink) shrink_giants(l);
     if (u->n_extra) {
         int k = 0;
         while (k < 128 && UI_OAM_SHADOW[k * 2] != 0x200) k++;

@@ -20,7 +20,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
-| engine | 446-459 (none used yet) | 160-219 (160-209 used: 160 + fighter id) | - | - | - | - | 23 (24-27 free) | 21-25 | EEPROM 0x1E00-0x1E3F (the global record) | `.tny.eng` 0x240 (0x1B8 used) |
+| engine | 446-459 (none used yet) | 160-219 (160-209 used: 160 + fighter id) | - | - | - | - | 23 (24-27 free) | 21-25 | EEPROM 0x1E00-0x1E3F (the global record) | `.tny.eng` 0x240 (0x21C used) |
 | moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
 | ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
 
@@ -267,7 +267,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
 | 19+ | 19-20 allocated to the post-game chapter | |
-| 21 | TNY_SEED (engine) | `arg` = the next tournament's draw seed (`tny_engine.c`) |
+| 21 | TNY_SEED (engine) | `arg` = the next tournament's draw seed (`tny_engine.c`); `arg2` = 0x7E000000 \| fighter: he is the players' first opponent (the seat across from player 1, outside the pool's rules) or the Rumble's headliner; any other `arg2`: none |
 | 22 | TNY_FORCE (engine) | `arg` 0: every opponent of the running fight takes a lethal blow from player 1 (a won fight); 1: the fight is lost (player at 1 HP); 2: the running duel ends, `arg2` = the winner (1 / 2) |
 | 23 | TNY_RECORD (engine) | `arg` 0: wipe the global record; 1 / 2: set / clear fighter `arg2`'s unlock bit; 3: reread it into `eng.rec` (0x0203ED68) |
 | 24 | TNY_FORCE_POOL (engine) | `arg` = tiers forced open (bits 0-4); `arg2` bit 0 ignore the fighters' story flags, bit 1 a fighter without art fights with Tien's body (121); no story notices while anything is forced |
@@ -339,7 +339,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
 | 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
-| 0x0203EC00 | 0x1B8 of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0002): phase +4, result +7, picks +12, bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the record as last read +0x168; then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
+| 0x0203EC00 | 0x21C of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |

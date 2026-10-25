@@ -293,6 +293,7 @@ static int lerp(int a, int b, int t, int d) {
 
 static void bracket_open(Ui *u) {
     Br *br = u->ctx;
+    u->shrink = 1;                                // giants' faces at half size (tny_ui.c shrink_giants)
     br->state = S_START;
     int page = 0;
     if (br->n_ev) page = page_of_match(br, br->ev_r[0], br->ev_m[0]);
@@ -466,6 +467,7 @@ static void board_pos(const Board *bd, int i, int *x, int *y) {
 
 static void board_open(Ui *u) {
     Board *bd = u->ctx;
+    u->shrink = 1;
     bm_fill(0, 0, 240, 16, C_PANEL);
     bm_hline(0, 16, 240, C_BORDER);
     ui_text(u, 120, 2, 1, C_GOLD, "Royal Rumble");
