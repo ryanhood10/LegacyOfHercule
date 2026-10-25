@@ -102,7 +102,7 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   Android 16 recipe), so your LoG2 strength carries over and a villain feels like himself.
 - **The director:** one list box (1v1 / 2v2 / Royal Rumble; 2v2 hidden in 1P), then Quick / Full for 1v1, then
   the select screen. No house rules beyond that.
-- **The announcer** (Buu record 207) is imported and calls every match; the crowd is LoG2's townspeople.
+- **The announcer** (Buu record 8; 207 is the Ox-King, 4e) is imported and calls every match; the crowd is LoG2's townspeople.
 - **Pop-up wording:** "New tournament fighter!" / "New tournament tier: Champion!" / "New division: Full
   bracket!", one line each, the journal pop-up's style.
 
@@ -177,27 +177,27 @@ specials in C (the Super 13 kind).
 | Mystic Gohan | 100 | O, **B** | Masenko, Kamehameha; no transform (already at full power), high stats | moderate |
 | Great Saiyaman | 101 | O, **B** | justice poses (the Taunt), Masenko; a joke fighter with Gohan's numbers | moderate |
 | Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
-| Goten (SSJ) | 92 | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
-| Kid Trunks (SSJ) | 93 | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
-| Gotenks | 277 base, 119 SSJ, 120 SSJ3 (confirmed by eye, `build/wm/buu_ids_x2.png`) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
-| Vegito | 273 (SSJ) (?) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
+| Goten (SSJ) | 114 (113 base; 92 was a guess, 4e) | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
+| Kid Trunks (SSJ) | 260 (259 base; 93 was a guess, 4e) | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
+| Gotenks | 116 base, 119 SSJ, 120 SSJ3 (4e: 277 is a red-haired kid) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
+| Vegito | 92 (SSJ; 93 has the same frames; 273 is a Vegeta, 4e) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
 | Uub | 263 | **C** (Champion Rumble, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
 | Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
 | Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
 | Dabura | 63 (giant, winged) | **C** (Adept 2v2: alone against your team) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
 | Fat Buu | 33 (giant) | O, **C** (Z-Fighter 2v2, with Hercule) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
-| Super Buu | 39 / 40 base, 42 (Gotenks absorbed, vest) (?), 43 (Gohan absorbed, gi) (?) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
+| Super Buu | 40 base, 41 (Gotenks absorbed, vest), 43 (Gohan absorbed, gi) (4e) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
 | Kid Buu | 37 (32 x 64) | **C** (Champion 1v1) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
 | Super Janemba | 144 (giant, horned, tail) | **C** (Z-Fighter Rumble) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
-| Evil Buu | 62 (grey, thin, the cape frame is his spit) | O, **C** (Adept Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
-| Pikkon | 132 / 179 (two palettes; cap, red vest, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
-| Kibito | 32 (giant, partial set) | **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
+| Evil Buu | 32 (grey, thin, caped; 62 is a capped soldier, 4e) | O, **C** (Adept Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
+| Pikkon | 214 / 215 (two palettes: tall hat, white scarf; 132 / 179 are capped soldiers, 4e) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
+| Kibito | 148 (NPC set: idle, walk, casting, lying; 32 is Evil Buu, 4e) | **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
 | Pui Pui | 224 (32 x 64, partial set) | **C** (Rookie 1v1) | ki volley, melee | cheap |
 | Yakon | 290 (giant beast, partial set) | **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
 | Buu-era Vegeta base / Goku variants | 116 (Vegeta base), 269-272, 107, 109, 114; 99 (Goku's 64 x 64 Spirit Bomb / big-beam frames); 97 / 102 Gohan outfits; 113 Goku with the halo | skins and forms of the above | | |
 
 Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
-the announcer 207, Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
+the announcer 8 (207 is the Ox-King, 216 Pintar), Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
 (base / SSJ): kid Trunks in an alternate outfit, or Goten mis-palettised; a skin either way.
 
 ### 4c. Playable villains (Ryan: "some villains playable to make it cooler")
@@ -222,6 +222,48 @@ the Rookie Rumble (2 rounds of 3 and a headliner) 7 distinct fighters, later Rum
 | Z-Fighter | Gingertown done | + Imperfect Cell; after the island + Android 16 = **17-20** | + Trunks (chapter 5) | none new | Kibito (1v1), Fat Buu & Hercule (2v2), Super Janemba (Rumble) |
 | Champion | flag 191 (the wait) | + Semi-Perfect, Perfect Cell, Cell Jr; Cooler, the Namekian (Cooler beaten); Broly, Paragus (flag 402) = **24-27** | + Goku, Android 16 (flag 421) | Perfect Cell, Cooler, Broly | Kid Buu (1v1), Gotenks (2v2), Uub (Rumble, as Hercule) |
 | Legend | flag 382 | + the final Cell, Super 13, Buu-saga Goku / Vegeta / Gohan / Saiyaman / Goten / Trunks / Hercule / Piccolo, Super Buu = **about 40** | + SSJ2 Gohan | Super 13, Super Buu, the Buu-era heroes | Vegito (1v1), the forms (2v2), Super Buu's final form headlines the Rumble |
+
+## 4e. Buu's Fury imports: built (art-buu, 2026-10-25)
+
+Every Buu's Fury fighter of 4b and the announcer are converted (`data/tny_buu.txt`, `tools/buu2log2.py --spec --fit
+--section .rodata.art`, Makefile `TNY_BUU_IDS`) into Hercule's 21-group player layout at the sprite ids of `tourney.h`
+(195-222, 230: `docs/ids.md`), in the second ROM blob (about 950 KB of the 2 MiB; the code blob is unchanged), with
+their dialogue portraits (140-168, `tools/tnyportraits.py`) in `tourney_data.c`'s portrait column (Broly's 141 too).
+Test: `tools/headless/tny_artbuu.txt` (`docs/testing.md` "Tournament art").
+
+Our calls, made while building:
+- **Records checked by eye; several first guesses were wrong.** Each candidate was drawn at 3-6x (idle and attack
+  frames) and matched against Buu's own portraits: Kibito is 148 (32 is a grey caped Buu: Evil Buu), Pikkon 214 (132 /
+  179 / 62 are a small capped soldier), Goten SSJ 114 (92 / 93 are Super Saiyan Vegito: orange undershirt, blue gi;
+  102 / 104 are Gohan in the Saiyaman tunic), Kid Trunks SSJ 260 (259 base, the only lavender-haired kid), Gotenks
+  116 (277 is a red-haired kid; 117 / 118 are Gotenks NPC sets), Super Buu with Gotenks absorbed 41 (the vest; 42 / 43
+  both wear Gohan's gi top), the announcer 8 (blond, sunglasses, suit; 207 is the Ox-King and 216 Pintar). The ids in
+  `tourney.h` stay; their comments name the records.
+- **Partial sets are mapped by hand** (`data/tny_buu.txt`): Spopovich and Yamu lie down (anim 15) for the fall and
+  daze groups and power up (17) for shout and charge; Pui Pui has idle, walk, three attacks and hurt only (run =
+  walk, charge = his first attack); Yakon's darkness (18) is his beam group; Kibito has no attack frames at all,
+  so every attack, charge and beam group is his casting pose (anim 12) and his hurt / fall / daze is the lying one;
+  Evil Buu has no hurt anim (his lean, 7, stands in). The three forms of Super Buu, Gotenks and Goku use one map each,
+  so the moves piece's transform rule swaps sprites with no group surprises.
+- **Hurt boxes like LoG2's** (`--fit`): Buu's boxes are 2-5 px smaller than LoG2's, and at arm's length 20 of the
+  28 imports never took a punch that hits Android 17 or Cooler (the hit test). Normal bodies now carry LoG2's
+  standard (-2, -26, 18, 10) on every facing (raised to the head for tall Pui Pui); giants one box over the idle
+  frame's drawn body, at least 20 px either side of its centre (Cooler's is 48 wide). After it every import, and both
+  stock controls, lose HP to six punches.
+- **Yakon is recentred**: his 64 px body fills the frame from x + 0 (centre x + 32; the other giants centre near
+  x + 16), so his frames move 16 px left; without it he stood beside his own position and punches missed.
+- **Giants** (64 x 64 frames: the OBJ slot is 4 KB) are Spopovich, Yamu (lean, but his kicks need the 64 px frame),
+  Yakon, Dabura, Fat Buu, Evil Buu (the cape), the three Super Buus and Janemba: `tourney_data.c` marks Yamu and
+  Evil Buu `TR_GIANT` and no longer Kibito (148 is a 32 x 32 body). Kid Buu and Pui Pui are 32 x 64 (2 KB).
+  Two giants on screen with player 1 leave 12-21 KB of OBJ VRAM free, largest block 12 KB or more.
+- **The announcer** is a town NPC's 5-group layout (record 80): idle, walk, and the raised microphone in group 4.
+- **Portraits**: Buu's Fury's own, on LoG2's grey frame (old Hercule's 126 recipe); the forms have their own (Super
+  Buu 151-153, Gotenks 157-159, Goku 162-164) for the moves piece's transforms, though the roster row names the
+  first. Evil Buu has none in Buu's Fury: his row keeps 0 (the ui draws his face from the sprite). Without
+  `roms/buu.gba` every id gets LoG2's Hercule portrait so no id is empty.
+- **Colours**: the nearest LoG2 OBJ colour per Buu colour (`build/<dir>/gen/tny_buu_report.md`). Most move 8-24
+  colours by small distances; Yakon's greens come out darker and browner than Buu's (LoG2's palette has no matching
+  mid greens): readable, a re-tint later if Ryan dislikes it.
 
 ## 5. The move library (shared, each move written once)
 
@@ -274,7 +316,7 @@ fighter per tournament, shown on the board as a silhouette with its condition) i
   calls it. End: loser lying, winner's pose, the announcer calls the winner, fade. Bracket: the loser greys,
   the winner slides to the next column with a sound, the other matches of the round resolve with quick
   slides, the next match highlights. Full (16) shows two pages. The Rumble uses a board of faces instead.
-  Buu's Fury's announcer (record 207, NPC grade) is a cheap import.
+  Buu's Fury's announcer (record 8, NPC grade) is imported as sprite 230 (4e).
 - **The unlock board** (outside the arena, on the courtyard): a grid of silhouettes, one per unlockable
   tournament fighter (B and C of section 4), drawn in one dark colour (the duel's shadow remap technique, in
   black); the cursor on one shows its condition and nothing else: "Beat this fighter in a match", "Win the

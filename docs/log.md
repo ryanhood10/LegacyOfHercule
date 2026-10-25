@@ -4,6 +4,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament art: Buu's Fury imports (branch `tny-art-buu`):** 28 fighters (sprites 195-222: Spopovich to the Buu-saga
+  Piccolo, the three forms of Super Buu, Gotenks and Goku) and the announcer (230) converted by `buu2log2.py --spec
+  data/tny_buu.txt --fit` into the second ROM blob (about 950 KB), with 29 dialogue portraits (140-168,
+  `tools/tnyportraits.py`) in the roster's portrait column. Records checked by eye: Kibito 148, Pikkon 214, Evil Buu 32,
+  Goten 114, Kid Trunks 260, Gotenks 116, Vegito 92, Super Buu (Gotenks) 41, the announcer 8 replace the plan's
+  guesses. Partial sets mapped by hand; LoG2-sized hurt boxes (Buu's own let 20 of 28 dodge punches); Yakon recentred.
+  Test command 8 accepts an EWRAM record. `tools/headless/tny_artbuu.txt` spawns, fights and hit-tests every one;
+  regression unchanged (`docs/tournament.md` 4e, `docs/testing.md` "Tournament art").
 - **Tournament build started** (Ryan: "deploy a team"): the contract on main (`src/coop/tourney.h`, `tourney_data.c`,
   `tourney_hooks.c`), a 0x400-byte `tourneyram` region (the heap cap now ends at 0x0203EC00: `patch_rom.py` 0xF8FE),
   a second ROM blob for art (`rom2` at 0x08E00000, `patch_rom.py --art`), allocations in `docs/ids.md`; seven
