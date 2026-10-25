@@ -517,11 +517,13 @@ void coop_debug_tick(void) {
         if (bar) EntityList_Add(g_SceneTable[1], (Entity *)bar);
     } else if (cmd == COOP_CMD_SPAWN_RECORD) {
         // a boss record from any map, beside player 1 on this one (test the boss pairs without their maps'
-        // cutscenes); the record's action is kept, so a defeat fires its dialogue / script
+        // cutscenes); the record's action is kept, so a defeat fires its dialogue / script. A record in EWRAM works
+        // too (a test pokes one, e.g. into boss_rec itself: a stock stat with a new sprite, docs/testing.md
+        // "Tournament art (Buu's Fury imports)")
         const EnemyRecord *src = (const EnemyRecord *)coop2.cmd_arg;
         EnemyRecord *r = (EnemyRecord *)coop2.boss_rec;
         Entity *p1 = g_PlayerObject;
-        if (!p1 || (u32)src < 0x08000000u) return;
+        if (!p1 || (u32)src < 0x02000000u) return;
         memcpy(r, src, 0x1C);
         r->behaviour_count = 0;
         r->x = (s16)((p1->x >> 8) + 48);

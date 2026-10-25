@@ -3,13 +3,26 @@ palette) and emit them as C data for the co-op ROM, in the shape tools/spriteclo
 
 usage: buu2log2.py roms/log2.gba roms/buu.gba build/gen/buu_sprites_data.c 158=128 [159=28 ...]
            [--template 72] [--preview-dir build] [--report build/gen/buu_sprites_report.md]
-           [--map 158 5:3,6:4,...]
+           [--map 158 5:3,6:4,...] [--spec data/tny_buu.txt] [--expect IDS] [--fit] [--section .rodata.art]
 
   158=128      LoG2 sprite id 158 <- Buu record 128 (emits `buu_record_158`)
   --template   LoG2 record whose group layout (count, frames per group, header) the output copies
                (default 72 = Hercule: the game's animation tables index frames per group, so a
                converted record keeps the template's frame counts, cycling the Buu frames)
   --map        per-id override of the LoG2 group -> Buu animation table (see GROUP_MAP)
+  --spec       a file of more pairs, one per line: `<id>=<buu record> [g:a,g:a,...] [@<template>]`
+               (the group map override and a per-id template; `#` starts a comment)
+  --expect     the ids the caller expects (space-separated); a mismatch with the spec is an error
+  --section    put every emitted object in this section (`.rodata.art`: the second ROM blob, tourney.h
+               TNY_ART), so big imports stay out of the code blob
+  --fit        (the tournament imports; without it a record keeps the Buu record's own boxes and offsets,
+               as 158 / 159 do) a body drawn more than 8 px off its usual place (giants centre near x + 16,
+               normal bodies near x + 8; Yakon's fills his frame from x + 0) is moved back, every frame
+               alike; and one hurt box for every facing: giants (largest frame 64x64) the idle frame's
+               drawn body, 4 px in from each side and at least 20 px either side of its centre, between the
+               Buu record's own top and bottom (Broly's side boxes were 29 px wide and fists landing on his
+               body missed; docs/sprites.md "Super Android 13"); normal bodies LoG2's standard
+               (-2, -26, 18, 10), raised for a taller body (`body_box`)
 
 What it does, per frame: composites the Buu frame's parts (most frames have one, a few two or
 four), applies the record's own 256-byte colour remap table if it has one, maps every Buu palette
@@ -216,14 +229,24 @@ class Converter:
         self.l2 = S.Sprites(log2_rom)
         self.bu = B.BuuSprites(buu_rom)
         self.table = nearest_table(self.bu.pal, self.l2.pal)
-        self.template = template
-        rec = self.l2.record(template)
-        groups = self.l2.groups(rec)
-        counts = self.l2.frame_counts(groups)
-        self.t_counts = [counts.get(g[0], 0) if g[0] else 0 for g in groups]
-        self.t_header = bytearray(log2_rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C])
+        self.log2_rom = log2_rom
+        self.templates = {}
+        self.set_template(template)
         self.used = {}      # Buu index -> pixel count (for the report)
         self.blob_cache = {}
+        self.fit = False        # --fit: recentre and LoG2 hurt boxes (the tournament imports); off keeps Buu's boxes
+        self.shifted = 0
+
+    def set_template(self, template):
+        """Use LoG2 record `template`'s group layout (count, frames per group, header) from now on."""
+        if template not in self.templates:
+            rec = self.l2.record(template)
+            groups = self.l2.groups(rec)
+            counts = self.l2.frame_counts(groups)
+            self.templates[template] = ([counts.get(g[0], 0) if g[0] else 0 for g in groups],
+                                        bytearray(self.log2_rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C]))
+        self.template = template
+        self.t_counts, self.t_header = self.templates[template]
 
     def convert_frame(self, d, remap, bu_rec):
         """Buu descriptor -> (xo, yo, w, h, attr, blob bytes, raw tile bytes) in LoG2 form."""
@@ -292,15 +315,79 @@ class Converter:
             struct.pack_into("<H", header, 0, size)
             if size >= 0x1000:
                 header[3] = max(header[3], 0x18)
+        # a body drawn far off its position (Yakon's fills his 64 px frame from x + 0: centre x + 32, where the other
+        # giants centre near x + 16 and normal bodies near x + 8) is moved back, every frame alike, so the AI's
+        # spacing, the shadow and the hurt box sit under the drawn body
+        ext = body_extent(groups[0]) if groups[0] and self.fit else None
+        if ext:
+            want = 16 if size >= 0x1000 else 8
+            centre = (ext[0] + ext[2]) // 2
+            if abs(centre - want) > 8:
+                dx = want - centre
+                self.shifted = dx
+                for g in groups:
+                    if g:
+                        for dirs in g:
+                            dirs[:] = [(f[0] + dx,) + tuple(f[1:]) for f in dirs]
+        if ext:
+            box = giant_box(groups[0], rec["boxes"]) if size >= 0x1000 else body_box(groups[0])
+            for k in range(4):
+                header[0x0C + 16 * k:0x1C + 16 * k] = struct.pack("<iiii", *box)
         return header, groups, rec
 
 
-def emit_c(records):
+def body_extent(group0):
+    """The idle frame's drawn pixels over all four facings, in entity coordinates: (x1, y1, x2, y2, centre x)."""
+    xs, ys = [], []
+    for dirs in group0:
+        xo, yo, w, h, attr, blob, raw = dirs[0]
+        px = [(xx, yy) for yy in range(h) for xx in range(w)
+              if raw[((yy // 8) * (w // 8) + xx // 8) * 64 + (yy % 8) * 8 + xx % 8]]
+        if px:
+            lo, hi = min(p[0] for p in px), max(p[0] for p in px) + 1
+            if attr & 0x10000000:
+                lo, hi = w - hi, w - lo
+            xs += [xo + lo, xo + hi]
+            ys += [yo + min(p[1] for p in px)]
+    if not xs:
+        return None
+    return min(xs), min(ys), max(xs), None, (min(xs) + max(xs)) // 2
+
+
+def giant_box(group0, boxes):
+    """One hurt box {x1, y1, x2, y2} for every facing of a 64x64 body (see the module doc): the drawn body 4 px in
+    from each side but at least 20 px either side of its centre (a lean body such as Yamu's; LoG2's giants: Cooler's
+    box is 48 px wide, Perfect Cell's 43), between the Buu record's own top and bottom."""
+    ext = body_extent(group0)
+    if not ext:
+        return boxes[0]
+    x1, _, x2, _, cx = ext
+    return (min(x1 + 4, cx - 20), min(b[1] for b in boxes), max(x2 - 4, cx + 20), max(b[3] for b in boxes))
+
+
+# LoG2's hurt box of every stock 32x32 fighter (Android 17 = 9, Goku 60, Hercule 72): Buu's own boxes are 2-5 px
+# narrower and shorter, so punches that land on a LoG2 body at arm's length missed the imports (tny_artbuu.txt's
+# hit test, 2026-10-25)
+LOG2_BODY_BOX = (-2, -26, 18, 10)
+
+
+def body_box(group0):
+    """One hurt box for a normal (32 px wide) body: LoG2's standard box, raised to the drawn top + 4 for a tall
+    32x64 one (Pui Pui)."""
+    ext = body_extent(group0)
+    x1, y1, x2, y2 = LOG2_BODY_BOX
+    if ext:
+        y1 = min(y1, ext[1] + 4)
+    return (x1, y1, x2, y2)
+
+
+def emit_c(records, section=None):
     """records: [(log2 id, header, groups)] -> C source text."""
     lines = ["/* generated by tools/buu2log2.py from the Buu's Fury ROM: sprite records converted to",
              " * LoG2's record format and OBJ palette. Build output only; never commit. */",
              '#include "rom.h"', "",
              "typedef struct { signed char xo, yo; u8 w, h; u32 attr; const void *blob; } BuuDesc;", ""]
+    sec = f' __attribute__((section("{section}")))' if section else ""
     blob_names = {}
     for sid, header, groups in records:
         n = 0
@@ -315,7 +402,7 @@ def emit_c(records):
                         n += 1
                         blob_names[blob] = name
                         words = ", ".join(f"0x{b:02x}" for b in blob)
-                        lines.append(f"static const u8 {name}[{len(blob)}] __attribute__((aligned(4))) = {{{words}}};")
+                        lines.append(f"static const u8 {name}[{len(blob)}] __attribute__((aligned(4))){sec} = {{{words}}};")
         arr_names = {}
         for gi, g in enumerate(groups):
             if not g:
@@ -324,16 +411,16 @@ def emit_c(records):
                 name = f"buu{sid}_g{gi}_d{d}"
                 arr_names[(gi, d)] = name
                 entries = ", ".join(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {blob_names[blob]}}}" for (xo, yo, w, h, attr, blob, _) in dirs)
-                lines.append(f"static const BuuDesc {name}[{len(dirs)}] = {{{entries}}};")
+                lines.append(f"static const BuuDesc {name}[{len(dirs)}]{sec} = {{{entries}}};")
         hdr = ", ".join(f"0x{b:02x}" for b in header)
         grp = ", ".join("{" + ", ".join(arr_names[(gi, d)] if g else "0" for d in range(4)) + "}" for gi, g in enumerate(groups))
         lines.append(f"typedef struct {{ u8 header[0x4C]; const BuuDesc *groups[{len(groups)}][4]; u32 end; }} BuuRecord{sid};")
-        lines.append(f"const BuuRecord{sid} buu_record_{sid} = {{{{{hdr}}}, {{{grp}}}, 0}};")
+        lines.append(f"const BuuRecord{sid} buu_record_{sid}{sec} = {{{{{hdr}}}, {{{grp}}}, 0}};")
         lines.append("")
     return "\n".join(lines) + "\n"
 
 
-def preview(conv, sid, bu_id, header, groups, rec, path):
+def preview(conv, sid, bu_id, header, groups, rec, path, gmap=GROUP_MAP):
     """Left: the Buu frames in Buu colours; right: the converted frames in LoG2's palette."""
     cell = 72
     anims = [conv.bu.anim(a) if a else [] for a in rec["anims"]]
@@ -345,7 +432,7 @@ def preview(conv, sid, bu_id, header, groups, rec, path):
         cv.text(2, y + 2, str(gi), (255, 255, 0), 2)
         if not g:
             continue
-        src = GROUP_MAP.get(gi, 0)
+        src = gmap.get(gi, 0)
         frames = anims[src] if src < len(anims) and anims[src] else anims[0]
         for d in range(4):
             conv.bu.draw(cv, 40 + d * cell + cell // 2, y + cell - 4, frames[0][d], rec["remap"])
@@ -359,12 +446,20 @@ def preview(conv, sid, bu_id, header, groups, rec, path):
                         px = w - 1 - xx if hflip else xx
                         py = h - 1 - yy if vflip else yy
                         cv.put(ox + xo + px, y + cell - 4 + yo + py, conv.l2.pal[ci])
+            if gi == 0:                       # the hurt box (header +0x0C + facing * 0x10), in red
+                x1, y1, x2, y2 = struct.unpack_from("<iiii", header, 0x0C + 16 * d)
+                for xx in range(x1, x2 + 1):
+                    cv.put(ox + xx, y + cell - 4 + y1, (255, 0, 0))
+                    cv.put(ox + xx, y + cell - 4 + y2, (255, 0, 0))
+                for yy in range(y1, y2 + 1):
+                    cv.put(ox + x1, y + cell - 4 + yy, (255, 0, 0))
+                    cv.put(ox + x2, y + cell - 4 + yy, (255, 0, 0))
     cv.save(path)
 
 
 def main():
     args = sys.argv[1:]
-    opts = {"--template": "72", "--preview-dir": None, "--report": None}
+    opts = {"--template": "72", "--preview-dir": None, "--report": None, "--spec": None, "--section": None, "--expect": None, "--fit": None}
     maps = {}
     pos = []
     i = 0
@@ -374,6 +469,9 @@ def main():
             sid = int(args[i + 1])
             maps[sid] = {int(k): int(v) for k, v in (kv.split(":") for kv in args[i + 2].split(","))}
             i += 3
+        elif a == "--fit":
+            opts["--fit"] = True
+            i += 1
         elif a in opts:
             opts[a] = args[i + 1]
             i += 2
@@ -384,21 +482,45 @@ def main():
     buu_rom = open(pos[1], "rb").read()
     out_c = pos[2]
     pairs = [tuple(int(x) for x in p.split("=")) for p in pos[3:]]
+    templates = {}
+    if opts["--spec"]:
+        for line in open(opts["--spec"], encoding="utf-8"):
+            words = line.split("#")[0].split()
+            if not words:
+                continue
+            sid, bu_id = (int(x) for x in words[0].split("="))
+            pairs.append((sid, bu_id))
+            for w in words[1:]:
+                if w.startswith("@"):
+                    templates[sid] = int(w[1:])
+                else:
+                    maps[sid] = {int(k): int(v) for k, v in (kv.split(":") for kv in w.split(","))}
+    assert len({p[0] for p in pairs}) == len(pairs), "a sprite id is listed twice"
+    if opts["--expect"] is not None:   # the Makefile's own list of the ids (it appends them to the sprite index)
+        want = sorted(int(x) for x in opts["--expect"].split())
+        assert sorted(p[0] for p in pairs) == want, f"spec ids {sorted(p[0] for p in pairs)} != --expect {want}"
     conv = Converter(log2_rom, buu_rom, int(opts["--template"]))
+    default_template = conv.template
+    conv.fit = bool(opts["--fit"])
     records = []
     report = [f"# Buu's Fury -> LoG2 sprite conversion (template LoG2 {conv.template}, groups {conv.t_counts})", ""]
     for sid, bu_id in pairs:
         gmap = dict(GROUP_MAP)
         gmap.update(maps.get(sid, {}))
         conv.used = {}
+        conv.shifted = 0
+        conv.set_template(templates.get(sid, default_template))
         header, groups, rec = conv.convert(bu_id, gmap)
         records.append((sid, header, groups))
         nblobs = len({fr[5] for g in groups if g for dirs in g for fr in dirs})
         total = sum(len(b) for b in {fr[5] for g in groups if g for dirs in g for fr in dirs})
         rawtotal = sum(len(raw) for raw in {fr[5]: fr[6] for g in groups if g for dirs in g for fr in dirs}.values())
-        report.append(f"## LoG2 sprite {sid} <- Buu record {bu_id} ({rec['addr']:#x}, {rec['count']} anims, remap {'yes' if rec['remap'] else 'no'})")
+        report.append(f"## LoG2 sprite {sid} <- Buu record {bu_id} ({rec['addr']:#x}, {rec['count']} anims, remap {'yes' if rec['remap'] else 'no'}, template {conv.template})")
         report.append(f"- {nblobs} frame blobs, {total} bytes compressed (literal-only would be about {rawtotal * 9 // 8})")
-        report.append(f"- boxes {rec['boxes']}")
+        if conv.shifted:
+            report.append(f"- frames moved {conv.shifted:+d} px in x (the drawn body back over the position)")
+            print(f"  sprite {sid}: frames moved {conv.shifted:+d} px in x")
+        report.append(f"- boxes {rec['boxes']} -> {[struct.unpack_from('<iiii', header, 0x0C + 16 * k) for k in range(4)]}")
         changed = [(ci, n) for ci, n in sorted(conv.used.items(), key=lambda kv: -kv[1]) if conv.table[ci][1] > 0]
         exact = sum(n for ci, n in conv.used.items() if conv.table[ci][1] == 0)
         report.append(f"- {exact} pixels kept an exact colour, {sum(n for _, n in changed)} pixels in {len(changed)} colours moved to the nearest LoG2 colour:")
@@ -415,11 +537,11 @@ def main():
         if opts["--preview-dir"]:
             os.makedirs(opts["--preview-dir"], exist_ok=True)
             p = os.path.join(opts["--preview-dir"], f"buu_preview_{sid}.png")
-            preview(conv, sid, bu_id, header, groups, rec, p)
+            preview(conv, sid, bu_id, header, groups, rec, p, gmap)
             report.append(f"- preview: `{p}`")
             report.append("")
     os.makedirs(os.path.dirname(out_c) or ".", exist_ok=True)
-    open(out_c, "w", encoding="utf-8", newline="\n").write(emit_c(records))
+    open(out_c, "w", encoding="utf-8", newline="\n").write(emit_c(records, opts["--section"]))
     if opts["--report"]:
         open(opts["--report"], "w", encoding="utf-8").write("\n".join(report) + "\n")
     print(f"wrote {out_c}")

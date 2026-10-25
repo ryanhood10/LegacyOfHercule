@@ -41,27 +41,27 @@
 #define TS_CHICHI           187
 #define TS_VIDEL            188
 #define TS_CHIAOTZU         189
-// art-buu: Buu's Fury imports through tools/buu2log2.py (player layout already)
+// art-buu: Buu's Fury imports through tools/buu2log2.py (player layout already; data/tny_buu.txt, records checked by eye)
 #define TS_SPOPOVICH        195     // Buu r.242
 #define TS_YAMU             196     // Buu r.293
 #define TS_PUIPUI           197     // Buu r.224
 #define TS_YAKON            198     // Buu r.290
-#define TS_KIBITO           199     // Buu r.32
-#define TS_PIKKON           200     // Buu r.132
+#define TS_KIBITO           199     // Buu r.148 (NPC set; r.32 is Evil Buu)
+#define TS_PIKKON           200     // Buu r.214 (r.132 is a capped soldier)
 #define TS_DABURA           201     // Buu r.63
 #define TS_FAT_BUU          202     // Buu r.33
-#define TS_EVIL_BUU         203     // Buu r.62
+#define TS_EVIL_BUU         203     // Buu r.32 (grey, caped; r.62 is a capped soldier)
 #define TS_KID_BUU          204     // Buu r.37
 #define TS_SUPER_BUU        205     // Buu r.40 (base)
-#define TS_SUPER_BUU_G      206     // Buu r.42 (Gotenks absorbed)
+#define TS_SUPER_BUU_G      206     // Buu r.41 (Gotenks absorbed: the vest)
 #define TS_SUPER_BUU_GH     207     // Buu r.43 (Gohan absorbed)
 #define TS_JANEMBA          208     // Buu r.144
-#define TS_GOTEN            209     // Buu r.92 (SSJ)
-#define TS_KID_TRUNKS       210     // Buu r.93 (SSJ)
-#define TS_GOTENKS          211     // Buu r.277
+#define TS_GOTEN            209     // Buu r.114 (SSJ; r.92 is Vegito)
+#define TS_KID_TRUNKS       210     // Buu r.260 (SSJ)
+#define TS_GOTENKS          211     // Buu r.116 (r.277 is a red-haired kid)
 #define TS_GOTENKS_SSJ      212     // Buu r.119
 #define TS_GOTENKS_SSJ3     213     // Buu r.120
-#define TS_VEGITO           214     // Buu r.273
+#define TS_VEGITO           214     // Buu r.92 (SSJ; r.93 is the same frames)
 #define TS_UUB              215     // Buu r.263
 #define TS_BGOKU            216     // Buu r.105 (base)
 #define TS_BGOKU_SSJ        217     // Buu r.108
@@ -70,7 +70,7 @@
 #define TS_MYSTIC_GOHAN     220     // Buu r.100
 #define TS_SAIYAMAN         221     // Buu r.101
 #define TS_BPICCOLO         222     // Buu r.212
-#define TS_ANNOUNCER        230     // Buu r.207 (NPC)
+#define TS_ANNOUNCER        230     // Buu r.8 (NPC; r.207 is the Ox-King)
 // playables: player-layout versions of LoG2 bodies (the a16sprites.py regrouping)
 #define TS_P_YAMCHA         235
 #define TS_P_TIEN           236

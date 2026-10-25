@@ -132,6 +132,9 @@ sprite 72) for Roshi's gym.
 | 181-184 | Super 13's allocation, unused | | |
 | 235-244 | the tournament's player-layout LoG2 bodies (`tourney.h` `TS_P_*`): 235 Yamcha (156), 236 Tien (121), 237 Frieza (48), 238 Mecha Frieza (49 + 48's attacks), 239 Tao (50), 240 Android 13 (`a13_record`'s frames rebuilt), 241 Android 17 (9), 242 Android 18 (11), 243 Perfect Cell (30, 64 x 64), 244 Cooler (34, 64 x 64) | `tools/tnyplayables.py` (`TNY_ART`) | `TNY_PLAY_SPRITES` |
 | 245-249 | the playables' allocation, unused | | |
+| 195-222 | the tournament's Buu's Fury fighters (art-buu, `tourney.h` TS_*): 195 Spopovich (Buu r.242), 196 Yamu (293), 197 Pui Pui (224), 198 Yakon (290), 199 Kibito (148), 200 Pikkon (214), 201 Dabura (63), 202 Fat Buu (33), 203 Evil Buu (32), 204 Kid Buu (37), 205 / 206 / 207 Super Buu, Gotenks absorbed, Gohan absorbed (40 / 41 / 43), 208 Super Janemba (144), 209 Goten SSJ (114), 210 Kid Trunks SSJ (260), 211 / 212 / 213 Gotenks, SSJ, SSJ3 (116 / 119 / 120), 214 Vegito SSJ (92), 215 Uub (263), 216 / 217 / 218 Goku, SSJ, SSJ3 (105 / 108 / 110), 219 Majin Vegeta (274), 220 Mystic Gohan (100), 221 Great Saiyaman (101), 222 Piccolo with the cape (212); Hercule's 21-group layout, second ROM blob | `tools/buu2log2.py --spec data/tny_buu.txt --fit --section .rodata.art` | `TNY_BUU_IDS` (with `BUU=1`) |
+| 223-229 | art-buu's allocation, unused | | |
+| 230 | the World Tournament announcer (Buu r.8, NPC: idle, walk, mic raised in group 4; town NPC 80's 5-group layout) | `data/tny_buu.txt` `230=8 @80` | `TNY_BUU_IDS` |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
@@ -167,7 +170,10 @@ finds row 4 first).
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
 | 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
-| 127+ | free | `krillinsprites.py` asserts ids are unique |
+| 127-139 | art-new's allocation (tournament) | |
+| 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
+| 169-189 | art-buu's allocation, unused | |
+| 190-199 | ui's allocation (tournament) | |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).
@@ -236,7 +242,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 5 | WARP | `arg` = zone \| area << 8, `arg2` = x \| y << 16 (pixels) |
 | 6 | DUEL | start a duel (`arg` packs slot, flags, end script) |
 | 7 | STORY_WIN | win every boss fight on the map |
-| 8 | SPAWN_RECORD | spawn the enemy record at address `arg` with a boss bar |
+| 8 | SPAWN_RECORD | spawn the enemy record at address `arg` with a boss bar; `arg` may be in EWRAM (since 2026-10-25: a test pokes a record into `coop2.boss_rec` 0x0203FD6C itself and passes that address, `tny_artbuu.txt`) |
 | 9 | PARTNER_WIN | only the boss twins fall (Broly's rage test) |
 | 10 | DOWN | player `arg` (0 / 1) goes down as from a lethal hit (`revive.c`) |
 | 11 | A16_PARTY | Krillin player 1, Android 16 player 2 |

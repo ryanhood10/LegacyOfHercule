@@ -1,0 +1,43 @@
+# The tournament's Buu's Fury imports (docs/tournament.md 4b, src/coop/tourney.h TS_*): read by
+# tools/buu2log2.py --spec, built into build/gen/tny_buu_sprites_data.c in the second ROM blob (TNY_ART).
+# One line per sprite: <LoG2 id>=<Buu record> [<LoG2 group>:<Buu anim>,...] [@<template record>]
+# The group map overrides buu2log2.GROUP_MAP (LoG2 groups: 0 idle, 1 walk, 2 run, 3 fall, 4 shout, 5 charge,
+# 6-8 attacks, 9 fist up, 11 hurt, 12 dazed / down, 13 shout, 14 / 16 fidget, 17 halo, 18 / 19 beams,
+# 20 tumble); a group whose Buu anim is missing falls back to the idle. Records were identified by eye
+# (2026-10-25, art-buu): several differ from the plan's first guesses (docs/tournament.md 4e).
+
+# Rookie
+195=242 3:15,4:17,5:17,9:19,12:15,13:17,17:0,18:18,19:17,20:9            # Spopovich (partial set: no charge / shout / beams)
+196=293 3:15,4:17,5:17,9:17,12:15,13:17,17:0,18:18,19:17,20:9            # Yamu (partial set)
+197=224 2:1,3:9,4:0,5:4,9:4,12:9,13:0,14:0,16:0,17:0,18:5,19:6,20:9      # Pui Pui (idle, walk, three attacks, hurt)
+198=290 3:9,4:19,5:19,8:4,9:19,12:9,13:19,17:0,18:18,19:19,20:9          # Yakon (18 = fading into darkness)
+# Adept / Z-Fighter
+199=148 2:1,3:15,4:12,5:12,6:12,7:12,8:12,9:12,11:15,12:15,13:12,14:0,16:0,17:0,18:12,19:12,20:15   # Kibito (NPC set: casting pose for every attack)
+200=214                                                                  # Pikkon (full set)
+201=63                                                                   # Dabura
+202=33                                                                   # Fat Buu
+203=32 3:7,4:18,5:3,7:3,8:18,9:18,11:7,12:7,13:18,17:0,18:18,19:3,20:7   # Evil Buu (grey, caped; partial set)
+204=37                                                                   # Kid Buu
+# Super Buu's three forms: one map for all three (the moves piece chains them)
+205=40                                                                   # Super Buu
+206=41                                                                   # Super Buu, Gotenks absorbed (the vest)
+207=43                                                                   # Super Buu, Gohan absorbed (the gi top)
+208=144                                                                  # Super Janemba
+209=114                                                                  # Goten (Super Saiyan)
+210=260                                                                  # Kid Trunks (Super Saiyan)
+# Gotenks' three forms
+211=116                                                                  # Gotenks
+212=119                                                                  # Gotenks, Super Saiyan
+213=120                                                                  # Gotenks, Super Saiyan 3
+214=92                                                                   # Vegito (Super Saiyan)
+215=263                                                                  # Uub
+# Buu-saga Goku's three forms
+216=105                                                                  # Goku
+217=108                                                                  # Goku, Super Saiyan
+218=110                                                                  # Goku, Super Saiyan 3
+219=274                                                                  # Majin Vegeta
+220=100                                                                  # Mystic Gohan
+221=101                                                                  # Great Saiyaman
+222=212                                                                  # Piccolo (Buu saga, caped)
+# the announcer: an NPC actor (idle, walk) on a town NPC's layout
+230=8 @80                                                                # the World Tournament announcer
