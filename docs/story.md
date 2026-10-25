@@ -688,6 +688,8 @@ shop, a city-defence mission. No player-count setting: one player is playing wit
 
 ## 7. Still open
 
+- **Tournament mode** (Ryan, 2026-10-24): a World Tournament on Papaya Island open from chapter 1, planned
+  in `docs/tournament.md`; nothing built yet.
 - Super Saiyan Hercule's look: gold afro (what we have) or a different "Super Human" look?
 - Name of the Goku + Hercule fusion in our text ("Gokule" is the fan name).
 - UI note: save-pad switching with only two characters already works as a trade (player 1 taking

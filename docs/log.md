@@ -2,6 +2,14 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-24
+
+- **Tournament mode planned** (Ryan): `docs/tournament.md` holds the decisions (Papaya Island from Buu's
+  Fury, a landing south-west of West City, 1v1 / 2v2 (co-op only) / Royal Rumble as survival rounds, a
+  progression track beside the story, tiers, three unlock kinds, the select and bracket screens) and the
+  engine facts (hit types, targeting, the OBJ VRAM cap, the save chip's free space). Buu's Fury's map table
+  (0x0808E2E0) and name table (0x0806BCE8) were found; a side session builds the lister and renders.
+
 ## 2026-10-21
 
 - **The big Saiyan ship with a door (Ryan):** the ship is 256 x 160 map art drawn by code (`tools/shipart.py`), not

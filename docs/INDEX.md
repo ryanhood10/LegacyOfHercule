@@ -24,6 +24,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the current story plan: status, standing rules, chapter table, Ryan's decisions per chapter, what is open | story work |
+| `docs/tournament.md` | the tournament mode (Papaya Island from Buu's Fury): decisions so far, the roster by chapter, the engine facts it rests on, the build order; planning in chat, nothing built | tournament work |
 | `docs/story-rom.md` | what the stock ROM does per chapter (maps, speakers, flags, quotes from the script dump) | grounding a story answer in ROM facts |
 | `docs/story-archive.md` | superseded options, cost tables, investigation notes, removed content (dated) | why something was decided |
 | `docs/scripts.md` | story scripts: bytecode, dialogue, triggers, records, condition words, flags, lscript, story specs, chapters implemented | editing a scene or a map's records |
@@ -173,3 +174,4 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | what the stock game does on a map | `build/scripts/map_NNN_zZ_aA.txt` (script dump), `docs/story-rom.md` |
 | the Time Chamber rounds, Roshi's spar | `src/coop/waves.c`, `data/story/wait_chamber.*`, `wait_spar.*`, `docs/coop-design.md` |
 | the Broly chapter | `data/story/broly.*`, `data/maps/broly_arena.json`, `tools/brolysprites.py`, `docs/story.md` 4g |
+| the tournament mode (planned) | `docs/tournament.md` |
