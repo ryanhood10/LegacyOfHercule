@@ -54,6 +54,10 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   fighter as a greyed silhouette, no name; pick one and it shows exactly what to do ("Win the Rookie
   tournament as Krillin", "Beat this fighter in a match"). Once unlocked the face and name appear in colour.
   Only tournament unlockables are on it, never story characters (section 7).
+- **Unlock progress is global** (Ryan, 2026-10-25): one tournament record on the save chip, shared by the three
+  save files (beat-to-unlock, challengers, forms, wins and attempts), in the unused 6.8 KB after the save
+  slots; it survives a deleted file. The *pool* still follows each file's story flags, so a fresh file cannot
+  fight Cell at Rookie, but a fighter earned anywhere is selectable everywhere once his tier is open.
 - **Fixed tiers you grow into** (Budokai's Novice / Adept / Advanced), opened by story flags, so the LoG2
   level matters; the three difficulty settings still apply. Tournament-only playables derive their numbers
   from the lead's level (the Android 16 recipe), each with its own multipliers.
@@ -69,9 +73,6 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **Bracket size as an option at the director** (Ryan asked, 2026-10-24): "Quick" = 8 fighters (three rounds,
   one screen) or "Full" = 16 (four rounds, two bracket pages). Proposed: both from the start, the challenger
   comes after either, Full pays the better item prize. Co-op seeding holds for both (opposite halves).
-- **Unlock progress global across the three save files** (Budokai-style, in the unused 6.8 KB of the save
-  chip) or per save file. Proposed: global for beat-to-unlock and challengers; the pool itself still follows
-  the save's story flags.
 - **Ring-outs:** skip for now (no edge mechanic in LoG2; doable later as "knocked past the ring's edge").
 - **Heal between rounds:** partial (a Senzu-sized chunk), full before the final.
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
