@@ -1,6 +1,7 @@
 // New enemy stats and per-boss rules (bosses.h). Numbers here are our own tuning, not ROM data: an
 // extra stat names a stock stat to start from and overrides what differs.
 #include "bosses.h"
+#include "tny_engine.h"   // stats 160-219: the tournament's opponents (tny_engine.c)
 
 const ExtraStat extra_stats[] = {
     // 110 Android 13, base form (not yet "Super"): Android 19's AI set (29) and boss class. More HP than
@@ -107,6 +108,7 @@ static const BossRule rules[] = {
 };
 
 const BossRule *boss_rule(int stat_index) {
+    if (stat_index >= TNY_STAT0 && stat_index < TNY_STAT0 + TNY_STAT_COUNT) return tny_boss_rule(stat_index);
     for (const BossRule *r = rules; r->stat >= 0; r++)
         if (r->stat == stat_index) return r;
     return 0;
@@ -117,6 +119,7 @@ int resolve_stat(int stat_index, EnemyStat *out) {
         *out = ENEMY_STATS[stat_index];
         return 1;
     }
+    if (stat_index >= TNY_STAT0 && stat_index < TNY_STAT0 + TNY_STAT_COUNT) return tny_resolve_stat(stat_index, out);
     int i = stat_index - EXTRA_STAT_BASE;
     const ExtraStat *x;
     if (stat_index >= GERO_STAT_BASE && (u32)(stat_index - GERO_STAT_BASE) < GERO_STAT_COUNT)

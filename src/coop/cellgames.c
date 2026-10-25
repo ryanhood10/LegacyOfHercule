@@ -8,6 +8,7 @@
 // and is cleared, so a game over or a reload never leaves a player hidden.
 #include "coop.h"
 #include "krillin.h"
+#include "tny_engine.h"
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
 #define CG_MAGIC 0xCE11CA3Eu
@@ -33,7 +34,7 @@ static int in_arena(void) {
 
 int coop_solo(void) {
     if (cg_state.magic != CG_MAGIC || !cg_state.solo) return 0;
-    if (!in_arena()) { cg_state.solo = 0; cg_state.owner[0] = cg_state.owner[1] = 0; return 0; }
+    if (!in_arena() && !tny_ring_active()) { cg_state.solo = 0; cg_state.owner[0] = cg_state.owner[1] = 0; return 0; }
     return cg_state.solo;
 }
 

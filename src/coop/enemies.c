@@ -12,6 +12,7 @@
 #include "android16.h"
 #include "bosses.h"
 #include "super13.h"
+#include "tny_engine.h"
 
 ROM_FN(void, Enemy_UpdateStates, (Entity *e), 0x0800772B);   // aux + control state; the AI tick follows in 0x0800E5A5
 #define ENEMY_UPDATE 0x0800E5A5u
@@ -353,7 +354,7 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = buf.max_hp * SOLO_PAIR_HP_PCT / 100;
     }
-    if (alone && p2_coming() && !coop_solo()) {   // one boss against two players: more HP (bosses.h)
+    if (alone && p2_coming() && !coop_solo() && !(rule->flags & BOSS_FLAT)) {   // one boss against two players: more HP (bosses.h)
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = buf.max_hp * COOP_LONE_BOSS_HP_PCT / 100;
     }
@@ -593,6 +594,7 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
     coop2.last_defender = defender;
     coop2.last_attacker = (Entity *)attacker;
     exp_note_hit(defender, attacker);   // the kill's EXP goes to the player of the last hit (exp.c)
+    tny_note_hit(defender, attacker);   // a tournament opponent: was the last hit a player's (beat-to-unlock)
 }
 
 // ---- boss bars ----------------------------------------------------------------------------------

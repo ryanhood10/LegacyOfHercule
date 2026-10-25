@@ -18,6 +18,7 @@
 #include "revive.h"
 #include "difficulty.h"
 #include "wide.h"
+#include "tny_engine.h"
 
 ReviveState rv __attribute__((section(".party.rv"), used));
 
@@ -227,7 +228,7 @@ void revive_tick(void) {
         }
         set_tint(e, rv.hold[k] && rv.glow && rv.glow_n >= 256 && ((rv.hold[k] >> 3) & 1) ? rv.glow : 0);
         if (rv.left[k]) rv.left[k]--;
-        if (!rv.left[k]) game_over();
+        if (!rv.left[k] && !tny_ring_active()) game_over();   // in the tournament's ring he stays down: out of the fight
     }
 }
 

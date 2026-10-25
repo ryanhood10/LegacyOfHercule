@@ -3,6 +3,7 @@
 #include "coop.h"
 #include "revive.h"
 #include "wide.h"
+#include "tny_engine.h"
 
 // Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
 // the game never zeroes them, hence the magic. Order fixed: remote word at +0, state at +4.
@@ -252,6 +253,11 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
     if (companion_active()) return 1;            // the companion takes no hits (companion.c)
+    if (tny_ko_check(1, dmg)) {                  // a tournament fight: 1 HP and out (tny_engine.c)
+        Player_Knockback(e, (void *)hit);
+        g_Party->chars[coop.p2_slot].hp = 1;
+        return 0;
+    }
     if (revive_hit(e, (u8 *)hit, 1)) return 1;   // 1: no hurt state for the body
     Player_Knockback(e, (void *)hit);
     if (duel_p2_final_blow(e, dmg)) return 0;   // a duel's final blow: 1 HP, the duel ends
