@@ -28,6 +28,10 @@
 #define TNY_RING_CENTER_Y   360
 #endif
 
+#ifndef TNY_FLAG_ARRIVED
+#define TNY_FLAG_ARRIVED    441     // grounds: the first visit's arrival scene has played (tny_ring.h)
+#endif
+
 // Engine flags (446-459, cleared at a new game): none taken yet; the global record (unlocks, wins, attempts,
 // prizes paid) lives on the save chip, the tournament in progress in `.tny.eng`.
 

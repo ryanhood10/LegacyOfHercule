@@ -134,6 +134,7 @@ typedef struct TnyEng {
     u32 step_action[2];
     struct { u8 head[4]; char text[72]; } say_entry;
     TRecord rec;                         // the record as last read or written (tests peek it)
+    u8 down_t[MAX_OPP];                  // frames a Rumble fighter has lain down (his body leaves at 60)
 } TnyEng;
 _Static_assert(sizeof(TnyEng) <= 0x240, ".tny.eng holds 0x240 bytes (docs/ids.md)");
 // offsets the tests peek (docs/testing.md "Tournament engine"): eng is at the start of tourneyram, 0x0203EC00
@@ -733,6 +734,7 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
         eng.opp_id[i] = ids[i];
         eng.opp_by[i] = kind != K_RUMBLE;           // 1 v 1 / 2 v 2: only players hit him
         eng.opp_in[i] = 0;
+        eng.down_t[i] = 0;
         eng.opp[i] = 0;
         eng.nopp++;
     }
@@ -753,6 +755,16 @@ static void fight_frame(void) {
     if (eng.timer < 0xFFFF) eng.timer++;
     int alive = 0;
     for (int i = 0; i < eng.nopp; i++) {
+        if (eng.opp_in[i] == 2 && eng.kind == K_RUMBLE && eng.opp[i]) {   // a fallen Rumble fighter's body leaves: its
+            Entity *d = eng.opp[i];                                       // OBJ VRAM goes to the next entrant
+            if (!in_list(d)) eng.opp[i] = 0;
+            else if (++eng.down_t[i] >= 60) {
+                EntityList_Broadcast(g_SceneTable[1], 0xF, d);
+                EntityList_Remove(g_SceneTable[1], d, 0);
+                eng.opp[i] = 0;
+            }
+            continue;
+        }
         if (eng.opp_in[i] != 1) continue;
         Entity *e = eng.opp[i];
         if (!e || !in_list(e) || e->hp <= 0) {
@@ -1307,7 +1319,9 @@ static void story_watch(void) {
     for (int id = TF_GOHAN; id < TF_COUNT; id++) if (tny_unlocked(id)) story |= (u16)(1 << (id - TF_GOHAN));
     u8 full = 0;
     for (int t = TIER_ADEPT; t < TIER_COUNT; t++) if ((tiers >> t) & 1 && pool_of(t, 0) >= 15) full |= (u8)(1 << t);
-    if (eng.baseline) {
+    // before the first visit to Papaya Island (the grounds' arrival flag) the tournament means nothing to the
+    // players yet: no notices, the baseline only follows the story (our call, 2026-10-25)
+    if (eng.baseline && flag(TNY_FLAG_ARRIVED)) {
         for (int t = 0; t < TIER_COUNT; t++) if ((tiers & ~eng.seen_tiers) >> t & 1) tny_notify(tier_notice[t]);
         if (story & ~eng.seen_story) tny_notify(new_fighter);
         if (full & ~eng.full_seen) tny_notify(new_full);

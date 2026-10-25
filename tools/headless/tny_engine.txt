@@ -193,12 +193,12 @@ frames 10
 stepz 0x0203ECFD 4000
 echo expect Uub unlocked (+0xE bit 0)
 peek8 0x0203ED68 0x40
-echo == 7. the story opens Adept (flag 85): a pop-up at the next safe frame (shown + 1); nothing forced
+echo == 7. the story opens Adept (flag 85) after the first visit (flag 441): a pop-up at the next safe frame (shown + 1); nothing forced
 poke32 0x0203FD0C 0
 poke32 0x0203FD54 0
 poke32 0x0203FD08 24
 frames 10
-flags -85
+flags +441 -85
 frames 60
 peek8 0x0203ECEC 2
 flags +85
