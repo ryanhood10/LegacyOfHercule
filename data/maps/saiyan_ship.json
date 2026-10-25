@@ -1,5 +1,5 @@
 {
- "_": "Inside the Saiyan ship (the Broly chapter, data/story/broly.lscript; Ryan, 2026-10-20): Buu's Fury's round room (variation 0x082546A0 in that ROM) imported whole, its Capsule Corp pad (BG2) cleared to the floor beneath, the side and bottom openings closed, the top doorway opened: walking into it (once the ship has landed, flag 378) leads out of the ship's door onto New Planet Vegeta, and after the ride home into the backyard. The flights there and back shake this room while nobody moves.",
+ "_": "Inside the Saiyan ship (the Broly chapter, data/story/broly.lscript; Ryan, 2026-10-20): Buu's Fury's round room (variation 0x082546A0 in that ROM: zone 6 area 6 'Hyperbolic Time Chamber', its living quarters) imported whole, its Capsule Corp pad (BG2) cleared to the floor beneath, the side and bottom openings closed, the top doorway opened: walking into it (once the ship has landed, flag 378) leads out of the ship's door onto New Planet Vegeta, and after the ride home into the backyard. The flights there and back shake this room while nobody moves.",
  "name": "saiyan_ship",
  "zone": 15,
  "area": 9,

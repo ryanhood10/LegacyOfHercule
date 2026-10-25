@@ -125,8 +125,8 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `krillinsprites.py` | Krillin's playable sprite (id 161: sprite 76 + Goku's fight groups re-headed), status portrait (73 in the menu BG palette), blue ki blast, Destructo Disc frames, HUD and status icons, the UI string table with per-slot blocks, the portrait module table (status portraits 119 Krillin, 121 Android 16; `--extra-portrait ID=SYMBOL` for other generators' portraits, e.g. 120 Paragus; ids must be unique) -> `build/gen/krillin_sprites_data.c` |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |
 | `mapchunks.py` | Python port of the IWRAM decompressor, savestate reader, map chunk tools |
-| `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates (also reads Buu's Fury variations) |
-| `mapexport.py` | render any map from the ROM: per-layer PNGs, composite, walk / projectile overlays, summary; `--list`, `--all`, `--tileset`, `--table/--count` for a built ROM |
+| `maplib.py` | map format library: MapEntry, variation, layers, tileset slots + banks, animations, collision bitmaps, triggers, exits, gates; `Game` profiles for LoG2 and Buu's Fury (picked from the ROM header: tables, names, palette, trigger kinds) |
+| `mapexport.py` | render any map from either ROM: per-layer PNGs, composite, walk / projectile overlays, summary (exits with their target maps' names); `--list`, `--all`, `--tileset`, `--map Z/A ... --sheet` (labelled contact sheet), `--buu` (Buu's Fury: `--buu --list` is its 452-map listing), `--table/--count` for a built ROM |
 | `mapbuild.py` | build new maps from `data/maps/*.json`: stamps / fills from stock maps (or Buu's Fury maps, palette-converted; map-anchored fills), generated tiles, recolour into new banks (per-stamp opt-out), effect overlays, collision ops, triggers, exits, gates, records (enemies copied from stock records, with their item drop) -> `--maps` records + MapEntry rows |
 | `shipart.py` | the Saiyan ship as map art (256 x 160, our own art drawn by code: hull, cockpit dome, crest, ring of lights, fins, legs, an open door with a ramp), left-right symmetric; `draw()` for a `png` op's `"draw": "shipart"`, `footprint()` for `art_footprint` (all of it blocks but the doorway and ramp); `shipart.py OUT.png --x4 PREVIEW.png` |
 | `widerender.py` | offline reference render of the wide view from a savestate |
@@ -168,6 +168,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | Super Android 13 (the post-game boss): placing him, his attacks, tuning, the explosion | `src/coop/super13.c/.h`, `docs/coop-design.md` "Super Android 13", `docs/sprites.md` "Super Android 13", `docs/testing.md` "Super Android 13" |
 | wide view | `docs/widescreen.md`, `src/coop/wide.c`, `tools/mgba-wide/` |
 | a map's layout, collision, exits, tiles; adding or re-dressing a map | `docs/maps.md`, `tools/mapexport.py`, `tools/mapbuild.py`, `data/maps/` |
+| Buu's Fury maps: the table, names, the World Tournament grounds, rendering or importing one | `docs/maps.md` section 10, `python tools/mapexport.py --buu --list` |
 | what Ryan decided / asked for | `docs/story.md` (current), `docs/log.md`, `docs/plan-legacy-of-hercule.md` section 4 "Rules we keep" |
 | a free flag / stat / sprite / row / portrait / ability / CoopCall / test command / map area | `docs/ids.md` |
 | how to add a chapter, boss, sprite, character, map | `docs/howto.md` |

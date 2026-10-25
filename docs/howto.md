@@ -10,6 +10,7 @@ row, portrait, ability, CoopCall, test command, map, memory), read and update `d
 |---|---|
 | what a stock map does (scenes, NPCs, triggers, flags) | `build/scripts/map_NNN_zZ_aA.txt` (the full script dump; regenerate with `python tools/script_dump.py`) |
 | a map's exits, gates, triggers with their flag conditions | `python tools/mapexport.py Z A`, then `build/maps/zZaAv1.txt` |
+| a Buu's Fury map: its name, size, exits, a render | `python tools/mapexport.py --buu --list` (all 452), `--buu Z A` (PNGs + .txt); the tournament grounds are `docs/maps.md` section 10 |
 | what an engine function does | `build/decomp_all/<addr>_FUN_<addr>.c` (whole-ROM Ghidra corpus; grep it) |
 | who calls / references an address | `tools/ghidra/FindRefs.java` (`docs/testing.md` "Ghidra headless") |
 | an opcode's meaning | `docs/scripts.md` 2.1; the Arefu reference's `DBZKit/BytecodeVM_OpCodes.md` (facts only) |

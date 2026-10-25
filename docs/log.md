@@ -4,6 +4,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-24
 
+- **Buu's Fury's map table read (branch `buu-maps`):** its MapEntry table (0x0808E2E0, 452 rows, LoG2's layout) and
+  UTF-16 name table (0x0806BCE8) are decoded; `maplib` picks the game from the ROM header (`Game` profiles) and
+  `python tools/mapexport.py --buu --list` names every Buu map with its variations' addresses and sizes
+  (`build/maps/buu_maps.txt`); `--map Z/A ... --sheet` renders several maps into a labelled contact sheet. The World
+  Tournament grounds (zone 7: plaza with or without Bulma's plane, street, courtyard, infirmary, waiting room with
+  the save pad, the ring, the ring with the smashed wall) and the Other World Stadium (1/20) are rendered in
+  `build/maps/buu/tournament/` with their exits (one chain, 7/5 the hub); Broly's crater is 8/71 "Giant Crater" v2
+  and the ship's room 6/6 "Hyperbolic Time Chamber". `docs/maps.md` section 10.
 - **Tournament mode planned** (Ryan): `docs/tournament.md` holds the decisions (Papaya Island from Buu's
   Fury, a landing south-west of West City, 1v1 / 2v2 (co-op only) / Royal Rumble as survival rounds, a
   progression track beside the story, tiers, three unlock kinds, the select and bracket screens) and the

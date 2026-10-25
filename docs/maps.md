@@ -2,10 +2,11 @@
 
 Everything a Legacy of Goku II map needs, decoded from the ROM (Ghidra corpus `build/decomp_all/`,
 checked against savestates and by rendering every map), and the tools that read and write it:
-`tools/maplib.py` (format library), `tools/mapexport.py` (render any map from the ROM),
+`tools/maplib.py` (format library, both games), `tools/mapexport.py` (render any map from either ROM),
 `tools/mapbuild.py` (build new maps from `data/maps/*.json`), `tools/patch_rom.py --maps` (place
 them and relocate the map table). The new maps (zone 15) are in section 9 (the arctic route 9a);
-world-map markers in 9b, the arctic landing on the world map in 9c.
+world-map markers in 9b, the arctic landing on the world map in 9c; Buu's Fury's maps (its table, names,
+the World Tournament grounds) in 10.
 
 Addresses are GBA addresses (file offset + 0x08000000). "Resource" means the loader format of
 `Resource_LoadOrDecompress` 0x0801F394: `{u32 mode, u32 size}` then data; mode 0 = stored, 1/2 =
@@ -198,8 +199,10 @@ argument id << 1 | visible) and 6 (find by id).
 ## 8. Tools
 
 ```
-python tools/mapexport.py --list                         every map: index, zone, area, variations, size, name
+python tools/mapexport.py --list                         every map: index, zone, area, variations, name id + name, each variation's address, size, non-tiled layers
 python tools/mapexport.py 8 28 [--var V] [--grid]        build/maps/z8a28v1*.png: per layer, composite, walk / projectile overlays, .txt summary
+python tools/mapexport.py --map 8/28 --map 9/1 --sheet build/maps/sheet.png   several maps + a labelled contact sheet (50 %) and sheet_half.png (25 %)
+python tools/mapexport.py --buu --list / --buu 7 6       Buu's Fury (roms/buu.gba): the same for its maps (section 10)
 python tools/mapexport.py --all --out build/maps/all     all 335 variations (about 25 minutes)
 python tools/mapexport.py --tileset 8 28                 the VRAM tile slots of a map, numbered
 python tools/mapexport.py 15 1 --rom build/maps/log2-wide.gba --table <table_offset> --count <rows>   a built ROM's new maps (both from build/maps.patch.json)
@@ -370,25 +373,63 @@ flight spots land at (1100, 800), the rect's centre.
 - **Test position:** `COOP_CMD_WARP` with zone 6 area 99 (`cmd_arg` 0x6306) puts the flyer anywhere,
   e.g. `cmd_arg2` 0x03200460 = (1120, 800); moving the flyer's entity position does not stick.
 
-## 10. Buu's Fury maps (decoded; one imported)
+## 10. Buu's Fury maps (table and names decoded 2026-10-24; two imported)
 
-Buu's Fury uses the same map engine: the tiled layer header (create fn 0x08008087, 1374 layers), the
-0x50-byte variation record (identical field layout: blend, priorities, size, animations, four layers,
-decorations, spawn, collision, projectile mask, affine, exits, slot table, bank table) and the same
-resource/decompressor format; its maps render with `maplib` unchanged given its BG palette
-(0x0805632C, 0x200 below the OBJ palette 0x0805652C) and its own bank table (per variation +0x4C).
-All 401 variation records found by scanning (records whose layer slots point at tiled-layer headers)
-render: contact sheets come from rendering each record (a scratch script over `maplib`; worth turning
-into `mapexport --buu` if more imports are wanted). What is not found: its MapEntry table (no
-0x38-stride table with LoG2's shape; its map names are not plain text), so a record cannot be tied to
-a zone/area, a name or the script that stages a fight; Broly's own battle map is therefore not
-identified. Candidates by look: 0x0822229C (a big crater inside walled wasteland, imported as zone
-15 area 4) and 0x0824F55C (a crater in sand). Also of note for the story: 0x082546A0 / 0x08254DA0
-(round rooms with a table and a bed, likely the Time Chamber's living quarters inside) and
-0x08255C9C / 0x08256F34 (dark rooms with light cones). Importing any of them is one stamp op
-(section 8); what it does not bring: decorations (their sprite sheets live in the Buu ROM),
-animated tiles (frame 0 only), exits and scripts. Finding the map table (through Buu's
-`Map_FindEntry`, the routine that scans for zone and area) would name the records.
+Buu's Fury (USA `BG3E`, `roms/buu.gba`) uses the same map engine: the tiled layer header (create fn
+0x08008087), the 0x50-byte variation record (identical field layout: blend, priorities, size,
+animations, four layers, decorations, spawn, collision, projectile mask, affine, exits, slot table,
+bank table), the same resource / decompressor format and the same 0x38-byte MapEntry row. `maplib`
+reads it unchanged: `L.Rom(path)` picks the game from the header code (`ALFE` / `BG3E`) and the
+`Game` profile (`L.LOG2` / `L.BUU`: table addresses, name encoding, BG palette, layer classes,
+trigger kinds) feeds `L.entries`, `name_text`, `bg_palette`, `Trigger.kind` and `Layer.kind`.
+
+| what | Buu's Fury | notes |
+|---|---|---|
+| MapEntry table | **0x0808E2E0**, 452 rows x 0x38 | LoG2's layout (section 2): zone +0, area +1, variations +2, triggers +3 / +0x10, flags +8, name id +0xC, music +0x24, variations* +0x2C; code literal 0x08008A58; zones 0-15 and 18-22, no duplicate zone / area |
+| map names | **0x0806BCE8**: u32 pointer per name id to a 0-terminated **UTF-16LE** string | ids 0..601 all valid (literals 0x08000674, 0x080008E0, 0x080039D8, 0x080056FC); id 0 is empty (the world map, the zone-0 scenes) |
+| BG palette | 0x0805632C | 0x200 below the OBJ palette 0x0805652C; bank table per variation (+0x4C) |
+| layer classes | 0x08008087 tiled (1535 layers); 0x08007A41 (254: BG0, sometimes BG1 / BG2, on maps with an overlay: the effect layer by use, LoG2's 0x08004FCD); 0x0800897B (41, mostly BG3 of zone 0 / 6 interiors, not decoded); the world map's BG1 0x08007B63 / BG2 0x080088BD | only tiled layers render; `--list` marks the rest (`[BG0:effect?]`, `[affine BG1:world-map ...]`) |
+| world map | zone 0 area 50, 0x082AD8BC, 3584 x 2560, affine | the tiled-only scan missed it |
+| trigger create fns | 0x08007675 edge-exit (669 uses: map edges, wall openings), 0x080072CD exit (170: door-sized rects), 0x08007387 script, 0x0800742D dialogue (payload: a sequence in 0x0877xxxx-0x0878xxxx), 0x08007499 savepad, 0x080076C5 world-label (payload = name id); unknown 0x08007543 (1), 0x08024A55 (2) | named by use, not decompiled; the exit pair's roles are inferred from where their rects sit; payloads have LoG2's layout (dir, zone, area, variation, x, y) |
+
+```
+python tools/mapexport.py --buu --list > build/maps/buu_maps.txt      all 452 maps: index, zone, area, variations, name id + name, each variation's address and size, non-tiled layers
+python tools/mapexport.py --buu 7 6                                   build/maps/z7a6v1*.png + .txt (triggers, exits with their target maps' names)
+python tools/mapexport.py --buu --map 7/1 --map 7/2 --map 7/3 --map 7/4 --map 7/5 --map 7/6 --map 7/7 --map 1/20 \
+    --out build/maps/buu/tournament --sheet build/maps/buu/tournament/sheet.png     the tournament grounds + a labelled contact sheet (50 %) and sheet_half.png (25 %)
+```
+
+Checked against the rows known from the earlier research: zone 7 areas 1-7 (below), 6/6 "Hyperbolic
+Time Chamber" = 0x082546A0 (the room imported as the Saiyan ship's interior, `saiyan_ship.json`; its
+openings lead to 6/7, 6/8 and 6/9), 8/71 "Giant Crater" v2 = 0x0822229C (Broly's crater,
+`broly_crater.json`; v1 0x082237C8 is the same map with an effect layer). The other records named by
+address before: 6/16 "Giant Crater" 0x0824F55C (the crater in sand), 6/5 "Kami's Palace" 0x08254DA0
+(the second round room), 6/2 and 6/4 "Kami's Palace" 0x08256F34 / 0x08255C9C (the dark rooms).
+
+**The World Tournament grounds (zone 7, Papaya Island) and the Other World Stadium**, from
+`build/maps/buu_maps.txt` and the renders in `build/maps/buu/tournament/` (not committed):
+
+| row | zone/area | name id, name | variation | size | what it is | exits (rect -> map, arrival) |
+|---|---|---|---|---|---|---|
+| 133 | 7/1 | 576 Papaya Island | v1 0x0824C000 | 480 x 560 | the plaza by the sea, Bulma's Capsule Corp plane parked on it | top edge (8,0)-(457,9) -> 7/2 at (224, 772) |
+| 133 | 7/1 | 576 Papaya Island | v2 0x0824AE74 | 480 x 560 | the plaza without the plane | the same |
+| 134 | 7/2 | 576 Papaya Island | 0x08249F40 | 480 x 800 | the street up to the gate, stalls both sides | bottom edge -> 7/1 at (232, 8), v1 with flag 45 set, v2 with it clear; gate door (216,32)-(249,41) -> 7/3 at (216, 224) |
+| 135 | 7/3 | 576 Papaya Island | 0x082480A8 | 480 x 240 | the courtyard inside the gate | bottom door -> 7/2 at (216, 32); top door (216,32)-(249,41) -> 7/4 at (376, 144) |
+| 136 | 7/4 | 598 World Tournament Stadium | 0x082478E4 | 480 x 160 | the infirmary corridor (beds), effect layer on BG0 | right door (376,144)-(409,153) -> 7/3 at (216, 32); left door (32,144)-(41,153) -> 7/5 at (352, 16) |
+| 137 | 7/5 | 598 World Tournament Stadium | 0x082473A4 | 400 x 400 | the fighters' waiting room (table, screen), save pad at (24,264)-(65,305), effect layer on BG0 | door (96,336)-(129,353) -> 7/6 at (336, 136) |
+| 138 | 7/6 | 598 World Tournament Stadium | 0x08246B34 | 720 x 720 | the ring with the stands, music 0x32 | door (336,136)-(369,145) -> 7/5 at (96, 336) |
+| 139 | 7/7 | 598 World Tournament Stadium | 0x08244600 | 720 x 720 | the same ring with the left wall smashed (rubble), music 0x2C; shares 7/6's collision 0x082444BC | the same door -> 7/5 |
+| 46 | 1/20 | 575 Other World Stadium | 0x0828ECF0 | 688 x 736 | the Other World ring (green field, clouds), no exits or triggers, 18 scripts | none (reached by script) |
+
+So the grounds are one chain: plaza 7/1 -> street 7/2 -> courtyard 7/3 -> infirmary 7/4 -> waiting
+room 7/5 -> ring 7/6 (or 7/7 after the wall breaks); 7/5 is the hub with the save pad. The plaza's
+other triggers: a script at (209,321)-(256,352), a save pad at (112,304)-(169,345), a dialogue at
+(416,456)-(433,473); the street has seven flag-gated dialogues (the stalls); the courtyard two.
+
+Importing any of them stays one `stamp` op by address (section 8, `{"rom": "buu", "variation":
+"0x..."}`); what it does not bring: decorations (their sprite sheets live in the Buu ROM), animated
+tiles (frame 0 only), effect layers, exits and scripts (the Buu script format is not dumped). Buu's
+scripts (`MapEntry` +0x14, counts above) are where its fights are staged.
 
 ## Open
 
