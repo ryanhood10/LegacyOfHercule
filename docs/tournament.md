@@ -355,3 +355,65 @@ roster table's shape, every cross-piece function) with `tourney_data.c` (the ros
 5. The move library's new kinds (teleport, stun, drain, regen, summon), then kits fighter by fighter.
 6. Roster imports (Buu's Fury), playable villains, portraits.
 7. Unlocks: beat-to-unlock, the challenger ladder with its cutscenes, the global record, the pop-ups.
+
+## 10. Built: the moves piece (branch `tny-moves`, 2026-10-25)
+
+`src/coop/tny_moves.c`; tests `tools/headless/tny_moves.txt` and `tny_rumble.txt` (`docs/testing.md` "Tournament
+moves"). What it does and the calls we made:
+
+- **`tny_moves_attach(e, fighter)`** works on any enemy entity (the ROM's vtable, the co-op copy, Android 16's or
+  Super 13's private one). The fighter gets a private vtable copy of the one he had (destroy, update, messages
+  wrapped; the rest untouched, so the co-op pair / both-down / rage rules still run) and a private stat copy
+  (`e->behaviour`). `enemies.c` counts him as before: `is_coop_enemy` / `is_enemy` also ask `tny_moves_base(e)`
+  (the one edit outside the piece, two lines). Up to 8 fighters with a kit at once; state on the heap, the
+  registry in `.tny.mv` (magic "MOVE"), dropped when a fighter leaves the entity list (a map change).
+- **The kit table `tny_kits[TF_COUNT]`**: one row per fighter, up to six moves `{kind, a, b, flags, power, cd}`;
+  every TR_OPPONENT and TR_CHALLENGER fighter has a row (sections 4a / 4b). Numbers are ours, to tune in play:
+  `power` is the 10.10 multiplier on the stock damage formula with the fighter's own stat (`stat_ranged` for
+  blasts, `stat_melee` for rush hits), `cd` the move's own cooldown in frames, plus a pace between specials (150-225
+  frames). A special starts only from idle or walking, with the target within 170 px; beams only when the target
+  is in line (they fire along the four facings, as the players' do).
+- **The library's kinds** (section 5), each written once: beam (the players' Kamehameha beam object with the
+  fighter as owner: an enemy's hit-type byte +0x16C is 0, so it hurts players only; thin = 112 px, stun = Candy
+  Beam, cost = Tri-Beam's 5 % HP), ball (Super 13's orbs; the large one is held over the head and thrown slowly
+  homing), homing (Android 16's rockets, or orbs: Spirit Ball, Gotenks' ghosts), volley (small orbs or Krillin's
+  blue ki blasts; converge = Hellzone Grenade), wave (Super 13's), nova (Super 13's; self-KO = Chiaotzu at 10 %,
+  Final Explosion at 10 %: the fighter takes his own remaining HP through his OnHit, so the engine sees a normal
+  defeat), rush (a dash with map collision and N hits; stun = a grab, a frying pan, a throw), teleport (a flash,
+  behind the target, a strike; dodge = hop away), stun (a flash round him: Solar Flare; the target at range:
+  psychic hold; a projectile: Stone Spit 3 s, Galactic Donut), heal (Kibito: the most hurt fighter of his side),
+  drain (passive: his melee hits heal him, or take a player's ki), regen (passive, permille of max a second),
+  transform (at N % HP, once: a power-up pose, the new body, + attack / defence), summon (helpers beside him; at N %
+  HP a copy of himself with half his health: Multi-Form).
+- **Stuns**: a stunned player's pad is dead (both pads read 0 in the input poll) with a ring of orbs over his head; a
+  stunned fighter stands in his hurt pose with no AI. A special cannot be stunned out of, and a hit during one
+  only does damage (Android 16's rule); KF_POISE fighters (giants, bruisers, Android 17, Super Perfect Cell...)
+  also get a 75-frame poise window after a stun.
+- **Transforms check the body** (our call): a body must have every pose group its AI set plays
+  (`tny_moves_body_fits(sprite, ai_set)`, the table in `docs/sprites.md`); Mecha Frieza's stock sprite 49 has only
+  groups 0, 1, 3, 5, and under Frieza's set 21 the first swing jumps to C002E560 (found by `tny_rumble.txt`). So a
+  transform takes the sprite if it fits, else the play body of the fighter shown by that sprite (Mecha Frieza ->
+  the playables' 238), else stays a stat boost on his own body. Same rule for spawns: test command 26 and the
+  summons skip a fighter whose body does not fit (`mv.spawn_fail` 4). **The engine should do the same** before it
+  spawns an opponent (Mecha Frieza needs TS_P_MECHA; sprite 49 as an opponent crashes).
+- **Summons** (our call): Cell Jr. helpers only in a Rumble or a 2v2 (`MF_TEAMONLY`, from `tny_bracket()`'s
+  division), Multi-Form copies in every division; helpers and copies never summon or transform. They spawn through
+  `enemy_spawn_hook` with co-op twins off and get a kit of their own, on the summoner's side.
+- **Rumble mode (`tny_rumble_mode`)**: a fighter's message wrapper takes a type-0 hit from a fighter of another side
+  as a player's (type 1) and gives it back as type 0 to the next receiver; his own blasts and projectiles never hit
+  him; helpers share their summoner's side. Targeting is done in the fighter's own update, not in
+  `coop_target()` (our call: `entities.c` only asks `coop_target()` when player 2 is present, and the Rumble must
+  work alone too): the nearest player 70 %, the nearest other fighter 30 %, re-rolled every 3 s, always a player
+  within 40 px; `g_PlayerObject` points at the target while the stock AI runs (as `entities.c` does for player 2).
+  **Prototype result**: every AI set of the roster ran against other fighters for 20 s per pack with no crash, in
+  co-op and alone (`tny_rumble.txt`: sets 21, 98, 129, 29, 80, 116, 148, the Namekian's, Paragus', Broly, Cooler,
+  Android 16, Dr. Gero, Android 13, Super 13, Cell Jr., old Hercule); no AI set had to stay player-only.
+  Android 16 and Super 13 keep their own specials and aim them at players only (natives: `KF_NATIVE`); they take
+  Rumble hits like everyone.
+- **Kill credit**: an NPC's killing blow gives nobody EXP (the stat copy's EXP is 0 during that hit);
+  `mv.npc_kos` counts NPC-vs-NPC eliminations, and `tny_moves_last_hitter(e)` gives the engine the player or fighter
+  behind the last hit a fighter took (beat-to-unlock in a Rumble: the last hit).
+- **Not done here**: no twin rule for opponents (the engine adds it; our test spawns set `COOP_OFF_TWINS` around the
+  spawn); speed changes on transform (the chase modules are built once; only attack and defence rise); Gohan /
+  Goku / Vegeta / Trunks / Piccolo transforms (story playables, never opponents); the engine's stats (160 + id) are
+  used when a build has them, else a stand-in stock stat per body (`stand_in_stat[]`).

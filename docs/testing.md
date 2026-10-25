@@ -12,6 +12,7 @@ inspection goes through the GDB stub.
 | section | use it for |
 |---|---|
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
+| Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -363,6 +364,37 @@ tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"        
   shared-screen leash pulls one back otherwise), `kr_setidx.sh SLOT INDEX` (selected ability); state
   counters at `kr_state` (`coop.sym`). Screens: `tools\win_burst.ps1` (N frames from one process, start
   it ~1.7 s before the action; check each frame's title bar, another session's window may be on top).
+
+## Tournament moves (headless, branch `tny-moves`, 2026-10-25)
+
+```
+make BUILD=build/moves DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/moves/log2-coop.gba --out build/moves/hl
+python tools/headless/st_test.py tools/headless/tny_moves.txt build/moves/log2-coop.gba build/moves/hl/menu.ss --out build/moves/hl --cols 6
+python tools/headless/st_test.py tools/headless/tny_rumble.txt build/moves/log2-coop.gba build/moves/hl/menu.ss --out build/moves/hl --cols 6
+```
+
+Both run on New Planet Vegeta's open ground (Map Test 147, then the test warp to zone 15 area 3 at 276, 354), two
+players (drop `p2 0` for the one-player run). Test command 26 spawns a fighter with his kit, 27 forces a move,
+turns the Rumble on, sets HP, adds a passive or clears the ring (`docs/ids.md`). The state `mv` is found by its
+magic 0x4D4F5645 ("MOVE", `find mv` after the first spawn: it is set up then); kit `i` is the word at `mv + 8 + 4i`,
+its entity at kit + 0x138, the entity's HP at +0x188 and sprite record at +0x48. Counters: `mv+0x28` the two stunned
+players and their frames left, `+0x34` specials / projectiles fired, `+0x38` blasts that landed / Rumble hits,
+`+0x3C` NPC-vs-NPC KOs / transforms, `+0x40` summons / stuns, `+0x44` drains / kits attached, `+0x50` the last spawn's
+failure (1 no player, 2 no art in this build, 3 no stat, 4 the body lacks the AI set's pose groups) and the least
+free OBJ VRAM seen.
+
+- `tny_moves.txt`: every library kind forced on Perfect Cell (beam, ball, big ball, homing, volley, wave, nova, rush,
+  teleport, Solar Flare, Stone Spit, Candy Beam, heal, power-up, Multi-Form), the players and Cell put back in place
+  before each one (knock-backs move them); then kits: Frieza (Death Beam, Death Ball, the transform at 35 %: sprite 49
+  does not fit set 21, so a stat boost until the playables' 238 is merged), Tien (Tri-Beam's HP cost, Solar Flare:
+  both players frozen 85 frames), Yamcha (Spirit Ball, Wolf Fang Fist), Android 18 (Infinity Bullet), Android 13
+  (Deadly Bomber), Perfect Cell with the Rumble on (two Cell Jr.), a Cell Jr.'s self-destruct (he is gone), Tien
+  with regeneration (+5 % in 5 s) and drain (a melee hit takes 12 ki from Piccolo, `mv+0x44` counts it); finally a Rumble pack of three (Yamcha, Tien, Cell Jr.) for 20 s:
+  all three lose HP (Yamcha 800 -> 686, Tien 2110 -> 1957, Cell Jr. 13473 -> 13320 in the 2026-10-25 run) while they fight each other and the players.
+- `tny_rumble.txt`: seven packs of three, 20 s each, covering every AI set of the roster in the build (Mecha
+  Frieza's pack plays with two: his sprite 49 is refused). No CRASH line = pass. Run 2026-10-25: no crash in co-op
+  or alone.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 
