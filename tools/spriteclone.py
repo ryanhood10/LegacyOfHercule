@@ -270,6 +270,8 @@ def main():
         if not sym.startswith("@"):
             lines.append(f"extern const char {sym}[];")
     lines.append("const void *const sprite_index[%d] __attribute__((aligned(4))) = {%s};" % (len(entries), ", ".join(entries)))
+    # its length: ids at or past it have no record (Character_GetSpriteRecord would read past the table)
+    lines.append("const unsigned sprite_index_count = %d;" % len(entries))
     # display rows: stock 22 rows then row 22 = Hercule's row with sprite 157, transformed flag, links
     rows = bytearray(rom[DISPLAY_DATA - S.ROM_BASE:DISPLAY_DATA - S.ROM_BASE + ROW_COUNT * 20])
     new = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])

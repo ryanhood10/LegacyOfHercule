@@ -20,6 +20,7 @@ inspection goes through the GDB stub.
 | Krillin / old Hercule tests | the playable-character test triggers |
 | New maps (zone 15) | building and warping to the new maps |
 | Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
+| Tournament grounds (headless) | Papaya Island: the world-map landing, the welcome, both pads, every exit, the board, the director, the waiting room's fighters |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
@@ -363,6 +364,28 @@ tools/fork/padq.sh F:/.../build/kn/p2cmd.txt "0x30C:0.3 0:0.5 1:0.4 0:5"        
   shared-screen leash pulls one back otherwise), `kr_setidx.sh SLOT INDEX` (selected ability); state
   counters at `kr_state` (`coop.sym`). Screens: `tools\win_burst.ps1` (N frames from one process, start
   it ~1.7 s before the action; check each frame's title bar, another session's window may be on top).
+
+## Tournament grounds (headless, 2026-10-25)
+
+```
+make BUILD=build/grounds DEBUG_MENU=1                                  # needs roms/buu.gba (the maps import Buu's Fury's)
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/grounds/log2-coop.gba --out build/grounds/hl
+python tools/headless/st_test.py tools/headless/tny_grounds.txt build/grounds/log2-coop.gba build/grounds/hl/menu.ss --out build/grounds/hl --cols 5 > build/grounds/hl/grounds.out
+```
+
+`tny_grounds.txt` (co-op, from a Map Test of the world map with flag 441 clear): the landing at (1260, 1820) (the
+flyer's shadow on a small island), A lands on the plaza's beach (232, 392); the welcome (caption, four announcer
+lines; flag 441 set: `FLAGS+0x37` reads 02); the plaza's pad (Save / Switch Characters, "Game Saved!"); the
+announcer's line; plaza -> street -> courtyard; the unlock board's fallback line (no ui piece); courtyard ->
+infirmary -> waiting room with test command 30 arg 1 (the Rookie stand-in pool: six fighters in one player, five
+in co-op when player 2's character is one of them); a fighter's greeting; the director's welcome and fallback
+line (no engine piece); the waiting room's pad; the ring door -> the walkway and its "ring is for fighters" line;
+then every exit back (ring -> waiting room -> infirmary -> courtyard -> street -> plaza, no second welcome) and the
+flight spot to the world map at (1260, 1820); then `reset` and Continue: Select Game names the save "WORLD
+TOURNAMENT", the players question (a black screen, A twice), the game resumes on the waiting room's pad (48, 268).
+Pass: 14 `waitmap ... reached`, the arrival `map` lines of
+`docs/tournament.md` 9b, the shots show each line, no CRASH. Dialogue pages are pressed one A each (an extra A
+re-talks to the NPC in front, or flies off the beach's flight spot). Map previews: `build/grounds/maps/papaya_*.png`.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 

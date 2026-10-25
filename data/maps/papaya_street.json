@@ -1,0 +1,149 @@
+{
+ "_": "The street up to the stadium gate, stalls on both sides: Buu's Fury's zone 7 area 2 (0x08249F40) imported whole with its collision. A vendor at the food stall, a ZZTV reporter, three fans.",
+ "name": "papaya_street",
+ "zone": 15,
+ "area": 12,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  480,
+  800
+ ],
+ "priorities": [
+  2,
+  3,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08249F40"
+    },
+    "rect": [
+     0,
+     0,
+     60,
+     100
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    216,
+    0,
+    264,
+    48
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    13,
+    1
+   ],
+   "at": [
+    240,
+    196
+   ],
+   "facing": 1,
+   "_": "the stadium gate: the courtyard"
+  },
+  {
+   "type": "door",
+   "rect": [
+    0,
+    764,
+    480,
+    800
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    11,
+    1
+   ],
+   "at": [
+    240,
+    64
+   ],
+   "facing": 0,
+   "_": "the bottom edge: the plaza"
+  }
+ ],
+ "records": [
+  {
+   "kind": "npc",
+   "sprite": 88,
+   "x": 284,
+   "y": 600,
+   "facing": 0,
+   "talk": "seq:tny_vendor_talk",
+   "_": "the vendor at the food stall"
+  },
+  {
+   "kind": "npc",
+   "sprite": 111,
+   "x": 300,
+   "y": 330,
+   "facing": 2,
+   "talk": "seq:tny_reporter_talk",
+   "_": "the reporter"
+  },
+  {
+   "kind": "npc",
+   "sprite": 152,
+   "x": 120,
+   "y": 640,
+   "facing": 3,
+   "talk": "seq:tny_fan4_talk"
+  },
+  {
+   "kind": "npc",
+   "sprite": 85,
+   "x": 340,
+   "y": 170,
+   "facing": 2,
+   "talk": "seq:tny_fan5_talk"
+  },
+  {
+   "kind": "npc",
+   "sprite": 153,
+   "x": 150,
+   "y": 140,
+   "facing": 0,
+   "talk": "seq:tny_fan6_talk"
+  }
+ ],
+ "spawn": [
+  240,
+  744
+ ],
+ "name_id": 357,
+ "music": 41,
+ "flags": 0,
+ "sources": [
+  "data/story/papaya.lscript"
+ ]
+}

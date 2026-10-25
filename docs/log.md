@@ -4,6 +4,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament grounds built (branch `tny-grounds`):** Papaya Island as zone 15 areas 11-16, Buu's Fury's zone 7
+  imported whole (plaza, street, courtyard, infirmary, waiting room, ring; `data/maps/papaya_*.json`), a world-map
+  landing open from the start in the island sea at (1260, 1820) (the plan's spot is desert on our map), both
+  save pads on Buu's Capsule Corp pads, the first-visit welcome (flag 441), a crowd of stock townspeople, the
+  announcer (art-buu's sprite 230 or a stand-in), the director (CoopCall 23 with a fallback line), the unlock
+  board (our art, CoopCall 28, 1), the waiting room's fighters (CoopCall 30, 0; test command 30 forces the Rookie
+  pool), the ring sealed for the engine (`src/coop/tny_ring.h`). `mapbuild.py` gained npc records, script
+  payloads, trigger activations and an on-load script; `spriteclone.py` emits `sprite_index_count`.
+  `docs/tournament.md` 9b, test `tools/headless/tny_grounds.txt`.
 - **Tournament build started** (Ryan: "deploy a team"): the contract on main (`src/coop/tourney.h`, `tourney_data.c`,
   `tourney_hooks.c`), a 0x400-byte `tourneyram` region (the heap cap now ends at 0x0203EC00: `patch_rom.py` 0xF8FE),
   a second ROM blob for art (`rom2` at 0x08E00000, `patch_rom.py --art`), allocations in `docs/ids.md`; seven

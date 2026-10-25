@@ -1,0 +1,300 @@
+# The tournament grounds (Papaya Island, zone 15 areas 11-16; docs/tournament.md "The grounds", docs/testing.md
+# "Tournament grounds"), headless, co-op. From a fresh Map Test of the world map (a new game's flags: 441 clear):
+# the landing in the island sea, the first visit's welcome, both save pads, every exit both ways, the unlock
+# board and the director (their fallback lines while ui / engine are the weak defaults), the waiting room's
+# fighters with the Rookie stand-in pool (test command 30, 1), the ring's walkway, the flight spot back.
+# python tools/headless/st_test.py tools/headless/tny_grounds.txt build/grounds/log2-coop.gba build/grounds/hl/menu.ss --out build/grounds/hl --cols 6
+# Warps: COOP_CMD_WARP (cmd 5 at 0x0203FD08, arg zone | area << 8, arg2 x | y << 16); a field map's player shows
+# about 300 frames after the warp. Pass: every waitmap reached, the map lines at the arrivals listed in
+# docs/tournament.md "The grounds", flag 441 set by the welcome, "Game Saved!" twice, six fighters in the waiting
+# room (ents), no CRASH line.
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags -441
+p2 0
+# 1. the world map: the landing south-west of West City (the plain marker on the minimap), then A
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x071C04EC
+poke32 0x0203FD08 5
+frames 150
+map
+shot gr01_wm_landing
+key 1 10
+waitmap 15 11 600
+frames 200
+map
+shot gr02_arrival
+# 2. the welcome (flag 441): the caption, then the announcer's four lines (11 pages, one A each)
+key 1 10
+frames 90
+shot gr03_welcome1
+key 1 10
+frames 60
+key 1 10
+frames 60
+key 1 10
+frames 60
+shot gr03_welcome2
+key 1 10
+frames 60
+key 1 10
+frames 60
+key 1 10
+frames 60
+shot gr03_welcome3
+key 1 10
+frames 60
+key 1 10
+frames 60
+key 1 10
+frames 60
+shot gr03_welcome4
+key 1 10
+frames 90
+peek8 FLAGS+0x37
+map
+# 3. the plaza's save pad
+poke32 0x0203FD0C 0x0B0F
+poke32 0x0203FD54 0x014A0090
+poke32 0x0203FD08 5
+frames 300
+key 0x40 10
+key 1 10
+frames 120
+shot gr04_pad_menu
+key 1 10
+frames 120
+shot gr05_pad_saved
+key 1 10
+frames 60
+# 4. talk to the announcer (the stock stand-in without art-buu's sprite 230): three pages
+poke32 0x0203FD0C 0x0B0F
+poke32 0x0203FD54 0x014A00E8
+poke32 0x0203FD08 5
+frames 300
+key 0x40 6
+key 1 10
+frames 60
+shot gr06_announcer
+key 1 10
+frames 40
+key 1 10
+frames 40
+key 1 10
+frames 60
+# 5. the plaza's top (hold Up) -> the street
+poke32 0x0203FD0C 0x0B0F
+poke32 0x0203FD54 0x004000F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 12 300
+keys 0
+frames 300
+map
+shot gr07_street
+ents
+# 6. the street's gate (hold Up) -> the courtyard
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x004000F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 13 300
+keys 0
+frames 300
+map
+shot gr08_courtyard
+# 7. the unlock board: A in front of it (the fallback line without the ui piece)
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x00B80040
+poke32 0x0203FD08 5
+frames 300
+key 0x40 6
+key 1 10
+frames 90
+shot gr09_board
+key 1 10
+frames 40
+key 1 10
+frames 60
+# 8. the courtyard's top door (hold Up) -> the infirmary
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x007800F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 14 300
+keys 0
+frames 300
+map
+shot gr10_infirmary
+# 9. the infirmary's left door (hold Down) -> the waiting room, with the Rookie stand-in pool
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 30
+frames 5
+poke32 0x0203FD0C 0x0E0F
+poke32 0x0203FD54 0x0078002C
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 15 300
+keys 0
+frames 300
+map
+shot gr11_waiting
+ents
+# 9b. talk to the fighter on the spot at (296, 104): his greeting by name (two pages)
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00860128
+poke32 0x0203FD08 5
+frames 300
+key 0x40 6
+key 1 10
+frames 60
+shot gr11b_fighter
+key 1 10
+frames 40
+key 1 10
+frames 60
+# 10. the director: his welcome (two pages), then the fallback line without the engine piece (two pages)
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+key 0x80 6
+key 1 10
+frames 60
+shot gr12_director
+key 1 10
+frames 40
+key 1 10
+frames 60
+shot gr13_director_fallback
+key 1 10
+frames 40
+key 1 10
+frames 60
+# 11. the waiting room's save pad
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x01180030
+poke32 0x0203FD08 5
+frames 300
+key 0x40 10
+key 1 10
+frames 120
+shot gr14_pad2_menu
+key 1 10
+frames 120
+shot gr15_pad2_saved
+key 1 10
+frames 60
+# 12. the ring door (hold Down) -> the ring's walkway; down the walkway to its end (the closed line)
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x01400078
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 16 300
+keys 0
+frames 300
+map
+shot gr16_ring
+keys 0x80
+frames 90
+keys 0
+frames 60
+map
+shot gr17_ring_walkway
+key 1 10
+frames 40
+key 1 10
+frames 60
+# 13. back up the walkway (hold Up) -> the waiting room
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x00B40168
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 15 300
+keys 0
+frames 300
+map
+# 14. the waiting room's top door (hold Up) -> the infirmary
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00500168
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+waitmap 15 14 300
+keys 0
+frames 300
+map
+# 15. the infirmary's right door (hold Down) -> the courtyard
+poke32 0x0203FD0C 0x0E0F
+poke32 0x0203FD54 0x00780190
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 13 300
+keys 0
+frames 300
+map
+# 16. the courtyard's gate (hold Down) -> the street
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x00C400F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 12 300
+keys 0
+frames 300
+map
+# 17. the street's bottom (hold Down) -> the plaza (no welcome the second time)
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x02E800F0
+poke32 0x0203FD08 5
+frames 300
+keys 0x80
+waitmap 15 11 300
+keys 0
+frames 300
+map
+shot gr18_plaza_again
+# 18. the flight spot on the beach -> the world map at the landing
+poke32 0x0203FD0C 0x0B0F
+poke32 0x0203FD54 0x017800E8
+poke32 0x0203FD08 5
+frames 300
+key 0x80 10
+key 1 10
+waitmap 6 99 600
+frames 120
+map
+shot gr19_wm_back
+# 19. continue from the last save (the waiting room's pad): reset keeps the save; Select Game names the place
+# ("WORLD TOURNAMENT"); the game resumes on the pad at (48, 268)
+reset
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 300
+key 8 10
+frames 200
+key 1 10
+frames 200
+shot gr20_select_game
+key 1 10
+waitmap 15 15 900
+frames 300
+# the 1 / 2 players question (players.c) sits on a black screen: A twice
+shot gr21a
+key 1 10
+frames 200
+shot gr21b
+key 1 10
+frames 300
+map
+shot gr21_continued

@@ -1,6 +1,6 @@
 # Tournament mode: design in progress (Ryan, 2026-10-24)
 
-Status: **plan done (Ryan, 2026-10-25), nothing built yet.** Every decision below is Ryan's unless marked "our
+Status: **plan done (Ryan, 2026-10-25); the team is building it (9a); the grounds are built (9b).** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -343,6 +343,60 @@ roster table's shape, every cross-piece function) with `tourney_data.c` (the ros
 | engine | the pool, brackets, simulation, the match loop in all divisions, heal, rewards, the global record, unlocks, challengers, pop-up queue | a 1P Rookie 1v1 can be entered, fought, won, and unlocks recorded; co-op flows tested |
 | moves | the kits (section 5), transforms, NPC-vs-NPC hits and Rumble targeting | every opponent fights with his kit; a Rumble pack fights itself |
 | ui | list box, select screen, bracket screen and animation, Rumble board, unlock board, pop-up look | each screen opens from its CoopCall and returns its answer |
+
+## 9b. The grounds (built 2026-10-25, branch `tny-grounds`)
+
+Papaya Island as six zone-15 maps, Buu's Fury's zone 7 imported whole (`data/maps/papaya_*.json`, `"requires":
+"buu"`: tiles converted to LoG2's palette, Buu's own collision), the world-map landing, the people, the director,
+the board and the waiting room's fighters. Code: `src/coop/tny_grounds.c` (CoopCall 30, test command 30),
+`src/coop/tny_ring.h` (the ring and waiting-room numbers the engine includes); scenes and lines:
+`data/story/papaya.lscript`; the landing: `data/story/papaya_route.json`; the board's art: `tools/boardart.py`.
+
+| area | map (Buu source) | size | what is there | exits (rect, hold) -> arrival |
+|---|---|---|---|---|
+| 11 | plaza (7/1 v2 0x0824AE74, no plane) | 480 x 560 | save pad on Buu's Capsule Corp pad (112, 304)-(169, 345); flight spot on the beach (200, 368)-(264, 416) -> world (1260, 1820); the welcome (enter (176, 344)-(288, 432), flag 441 clear); the announcer (232, 300) (sprite 230, stand-in 99 without it); three fans | top (176, 0)-(304, 48) Up -> street (240, 744) |
+| 12 | street (7/2) | 480 x 800 | vendor at the food stall, ZZTV reporter, three fans | gate (216, 0)-(264, 48) Up -> courtyard (240, 196); bottom (0, 764)-(480, 800) Down -> plaza (240, 64) |
+| 13 | courtyard (7/3) | 480 x 240 | the unlock board (our art, x 40-87, y 128-167; A in (36, 164)-(92, 204): CoopCall 28, 1); a fan | gate (216, 212)-(264, 240) Down -> street (240, 64); stadium door (216, 56)-(264, 100) Up -> infirmary (400, 120) |
+| 14 | infirmary (7/4) | 480 x 160 | a nurse | right (376, 136)-(424, 160) Down -> courtyard (240, 116); left (32, 136)-(56, 160) Down -> waiting room (360, 112) |
+| 15 | waiting room (7/5), the hub | 400 x 400 | save pad on Buu's pad (24, 264)-(65, 305); the director (168, 328) at the ring door; today's fighters (six spots) | top (336, 56)-(384, 100) Up -> infirmary (44, 120); ring door (96, 330)-(144, 360) Down -> ring walkway (360, 192) |
+| 16 | ring (7/6) | 720 x 720 | the platform x 232-487, y 256-511, closed all round; the walkway's end says "The ring is for fighters in a match" | walkway door (336, 120)-(384, 170) Up -> waiting room (120, 312) |
+
+Our calls (the grounds piece, Ryan: "you make the decisions"):
+
+- **The landing is at (1260, 1820)**, rect (1204, 1760)-(1317, 1881), not (1100-1200, 2000): on our world map that
+  spot is brown desert (checked on screen with the test warp); 180 px north is the island sea, and at (1260, 1820)
+  the flyer's shadow sits on a small island among rocks. No overlap with any landing rect (the nearest are West
+  City (1440, 1528)-(1553, 1649) and (840, 1416)-(953, 1537)). Open from the start (its only condition: the grounds' maps are in the build, `CoopCall 30, 2`; `BUU=0` has no
+  landing), banner
+  "Papaya Island" (ui_strings 357), the plain marker at (181, 31) on the minimap.
+- **The infirmary is in**, as Buu's Fury chains it (courtyard -> infirmary -> waiting room); area 17 stays free
+  (the smashed ring 7/7 is not imported).
+- **The pads keep Buu's art:** its Capsule Corp pad is the same pad LoG2 draws (zone 7 area 9), so the save pad
+  trigger sits on it instead of stamping LoG2's pad over it.
+- **The ring stays sealed from the walkway** (Buu's collision: one blocked row between them). Players who walk in
+  from the waiting room see the ring from the walkway; fighters are warped onto the platform by the engine, and no
+  door or edge can be reached from the platform (no ring-outs, no walking out of a match).
+- **Names:** "Papaya Island" (357) outdoors, "World Tournament" (358) indoors and the ring. Music: West City's
+  (41) outdoors, Roshi's dojo (29) indoors, the Cell Games arrival (6) in the ring. Town flags (0) everywhere but
+  the ring (1).
+- **People are stock townspeople** on stock sprites (83, 85, 86, 88, 89, 111, 150, 152, 153; the director 100, the
+  announcer's stand-in 99), speaker 0 with the name in the line (no portraits needed).
+- **The waiting room's fighters** are town NPCs made in C from one scratch record in `.tny.gr` (the NPC keeps a
+  pointer to the record's behaviour words, which never change); six spots, a giant takes two, shuffled each
+  visit, a fighter whose sprite is not in the build is skipped. Their greetings live in `tny_grounds.c` (one per
+  opponent, by name). `Character_GetSpriteRecord` reads `sprite_index` without a bound, so the grounds check the
+  id against `sprite_index_count` (new, `tools/spriteclone.py`); **`tny_fighter_ok` in `tourney_data.c` should do
+  the same** (engine): an id past the table returns garbage, not 0.
+- **The director and the board** branch on what their CoopCall pushes (a sentinel 0 under it): nothing pushed (the
+  weak default) shows the fallback line ("Sorry, the tournament isn't ready yet!" / "the posters haven't gone up
+  yet!"); any pushed value ends the talk (1 = took over; 0 = declined, quietly).
+
+`tny_ring.h` (the engine includes it): `TNY_RING_ZONE` / `AREA` 15 / 16; the platform `TNY_RING_X0..X1` 232..488,
+`Y0..Y1` 256..512 (exclusive ends; an entity stops about 16-20 px short of a blocked edge); entry points
+`TNY_RING_P1` (280, 360), `TNY_RING_P2` (280, 416) on the left, `TNY_RING_OPP` (440, 384) on the right (more
+opponents step 56 px in y); camera centre `TNY_RING_CENTER` (360, 384); the waiting room's return point
+`TNY_WAIT_*` (15 / 15, (200, 300), in front of the director). Test: `tools/headless/tny_grounds.txt`
+(`docs/testing.md` "Tournament grounds").
 
 ## 9. Build order (once the plan is done)
 
