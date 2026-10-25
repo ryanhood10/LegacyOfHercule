@@ -13,11 +13,15 @@
 // (a stand-in while the engine's tny_in_pool is the weak default), 2 spawn the fighters now beside the rest.
 #include "tourney.h"
 #include "tny_ring.h"
+#include "krillin.h"   // ui_strings, UI_CAPS (player 1's name)
+extern const char *const ui_strings[];
+int item_use_hook(int id);                         // party.c: PickUpItem (the pop-up, the count)   // relocated UI strings (krillin.c): UI_CAPS + slot = a name in capitals
 
 extern const unsigned sprite_index_count;   // build/gen/sprites_data.c (tools/spriteclone.py)
 
 #define GR_MAGIC 0x50415041u                // "PAPA"
-#define GR_MAX_SLOTS 6
+#define GR_MAX_SLOTS 7   // eight hung the engine test's Champion Rumble after a waiting-room visit (cause not found; seven passes)
+#define GR_OUT_SLOTS 4      // the courtyard: unlocked fighters hanging around outside
 #define NPC_HANDLER 0x0800B711u            // town NPC record handler (talkable; MapScript create, returns the entity)
 
 typedef struct NpcRecord {                 // map script record of a town NPC (docs/scripts.md 2.3)
@@ -43,8 +47,10 @@ static const u32 face_down_wait[2] = { 0x0800CB0Fu, 0x7D00 };   // NpcBehavior_F
 // Open floor in the waiting room (400 x 400; data/maps/papaya_waiting.json): clear of the table (160..240,
 // 168..224), the chairs, the save pad (24..65, 264..305), the doors and the director (168, 328).
 static const s16 spots[GR_MAX_SLOTS][2] = {
-    { 80, 120 }, { 296, 104 }, { 344, 184 }, { 296, 264 }, { 80, 216 }, { 224, 128 },
+    { 80, 120 }, { 296, 104 }, { 344, 184 }, { 296, 264 }, { 80, 216 }, { 224, 128 }, { 360, 264 },
 };
+// the courtyard's free floor (zone 15 area 13; the board is at the left, a fan at (392, 176))
+static const s16 out_spots[GR_OUT_SLOTS][2] = { { 136, 176 }, { 320, 168 }, { 448, 168 }, { 176, 140 } };
 
 // ---- greetings: one dialogue entry each (u16 next = 1, mode 1 text, speaker 0), then the stop word ----------
 #define GREET(name, txt) \
@@ -58,7 +64,7 @@ GREET(mecha,    "MECHA FRIEZA: They rebuilt me better.\x0b" "Frieza's comeback s
 GREET(kingcold, "KING COLD: I am King Cold.  My sons were\x0b" "mere children compared to me.")
 GREET(hercule,  "HERCULE: Ha ha ha!  The champ is here!\x0b" "Autographs after the tournament, please!")
 GREET(roshi,    "MASTER ROSHI: Ho ho!  Old Roshi still has a few\x0b" "tricks up his sleeve, youngster.")
-GREET(tao,      "MERCENARY TAO: Mercenary Tao.  I've killed men\x0b" "for less than a trophy.")
+GREET(tao,      "GENERAL TAO: General Tao.  Half machine now,\x0b" "and twice the killer I was.")
 GREET(spopovich,"SPOPOVICH: SPOPOVICH...  CRUSH!")
 GREET(yamu,     "YAMU: I'm Yamu.  Your energy looks...\x0b" "delicious.")
 GREET(chichi,   "CHI-CHI: Chi-Chi, Ox-King's daughter!\x0b" "Don't you dare go easy on me!")
@@ -132,23 +138,37 @@ static int gr_sprite_ok(int sprite) {
     return sprite >= 7 && (unsigned)sprite < sprite_index_count && Character_GetSpriteRecord(sprite) != 0;
 }
 
+// The waiting room shows today's competition: this save's pool, minus the fighters a player has already unlocked
+// (they hang around in the courtyard instead) and minus Master Roshi (he gives advice out on the street).
 static int gr_in_pool(int id) {
     const TFighter *f = &tny_fighters[id];
-    if (gr.force_rookie) return (f->role & TR_OPPONENT) && f->tier == TIER_ROOKIE;
-    if (f->role & TR_CHALLENGER) return tny_unlocked(id);     // a hidden challenger once a player has won him
-    if (!(f->role & TR_OPPONENT)) return 0;
-    return tny_in_pool(id);
+    if (id == TF_ROSHI || !(f->role & TR_OPPONENT)) return 0;
+    if (gr.force_rookie) return f->tier == TIER_ROOKIE;
+    return tny_in_pool(id) && !tny_unlocked(id);
 }
 
-// New faces first: the newest open tier's fighters and the unlocked challengers come before the rest
-static int gr_fresh(int id) {
-    int top = TIER_ROOKIE;
-    for (int t = TIER_LEGEND; t > TIER_ROOKIE; t--) if (tny_tier_open(t)) { top = t; break; }
+// The courtyard: fighters a player has unlocked (beaten ones and hidden challengers), Ryan 2026-10-25: "put some of
+// them outside the building as we unlock them".
+static int gr_outside(int id) {
     const TFighter *f = &tny_fighters[id];
-    return (f->role & TR_CHALLENGER) || f->tier == top;
+    if (id == TF_ROSHI || !(f->role & (TR_BEAT | TR_CHALLENGER))) return 0;   // Roshi stays on the street
+    if (f->tier != TIER_ROOKIE && !tny_tier_open(f->tier) && !(f->role & TR_CHALLENGER)) return 0;
+    return tny_unlocked(id);
+}
+
+ROM_FN(int, ObjVram_Largest, (void *list), 0x08006D71);   // largest free OBJ VRAM block (bytes)
+#define GR_VRAM_MARGIN 0x2000   // what a crowd always leaves free: a fuller room starved the ring's next scene
+                                // (the engine test's Rumble after a Champion visit; Ryan's eight places, 2026-10-25)
+
+// A crowd member only while his body fits with the margin to spare (header bytes 0-1: his OBJ VRAM size)
+static int gr_room_for(int sprite) {
+    const u8 *rec = (const u8 *)Character_GetSpriteRecord(sprite);
+    int need = rec ? (rec[0] | rec[1] << 8) : 0x800;
+    return ObjVram_Largest(g_EntityList) >= need + GR_VRAM_MARGIN;
 }
 
 static Entity *gr_spawn_npc(int sprite, int x, int y, const void *talk) {
+    if (!gr_room_for(sprite)) return 0;
     NpcRecord *r = &gr.rec;
     r->handler = NPC_HANDLER;
     r->condition = 0;
@@ -173,22 +193,35 @@ static int gr_spawn_fighters(void) {
         int j = Rand_Range(i + 1);
         u8 t = ids[i]; ids[i] = ids[j]; ids[j] = t;
     }
-    if (!gr.force_rookie) {                         // then the new faces up front (stable): at most half the room
-        u8 fresh[TF_COUNT], rest[TF_COUNT];
-        int nf = 0, nr = 0;
-        for (int i = 0; i < n; i++) {
-            if (gr_fresh(ids[i]) && nf < GR_MAX_SLOTS / 2) fresh[nf++] = ids[i];
-            else rest[nr++] = ids[i];
-        }
-        for (int i = 0; i < nf; i++) ids[i] = fresh[i];
-        for (int i = 0; i < nr; i++) ids[nf + i] = rest[i];
-    }
     int slots = 0, placed = 0;
     for (int i = 0; i < n && slots < GR_MAX_SLOTS; i++) {
         const TFighter *f = &tny_fighters[ids[i]];
         int cost = (f->role & TR_GIANT) ? 2 : 1;
         if (slots + cost > GR_MAX_SLOTS) continue;
         if (gr_spawn_npc(f->sprite, spots[placed][0], spots[placed][1], greet[ids[i]])) {
+            placed++;
+            slots += cost;
+        }
+    }
+    return placed;
+}
+
+// The courtyard's crowd: up to four unlocked fighters (a giant takes two places), a different few each visit.
+static int gr_spawn_outside(void) {
+    u8 ids[TF_COUNT];
+    int n = 0;
+    for (int id = 0; id < TF_COUNT; id++)
+        if (greet[id] && gr_outside(id) && gr_sprite_ok(tny_fighters[id].sprite)) ids[n++] = (u8)id;
+    for (int i = n - 1; i > 0; i--) {
+        int j = Rand_Range(i + 1);
+        u8 t = ids[i]; ids[i] = ids[j]; ids[j] = t;
+    }
+    int slots = 0, placed = 0;
+    for (int i = 0; i < n && slots < GR_OUT_SLOTS; i++) {
+        const TFighter *f = &tny_fighters[ids[i]];
+        int cost = (f->role & TR_GIANT) ? 2 : 1;
+        if (slots + cost > GR_OUT_SLOTS) continue;
+        if (gr_spawn_npc(f->sprite, out_spots[placed][0], out_spots[placed][1], greet[ids[i]])) {
             placed++;
             slots += cost;
         }
@@ -205,6 +238,27 @@ static int gr_maps_built(void) {
     return 0;
 }
 
+// Yamcha knocked out in the infirmary's last bed (an easter egg): an actor's idle behaviour resets his pose, so his
+// lying frame (group 12 of his playable body) is written back every frame while the infirmary is loaded, the way
+// the engine holds the end-of-match poses (tny_engine.c poses_apply: the group pointer +0x4C, frame +0x14).
+#define GR_BED_SPRITE  TS_P_YAMCHA
+#define GR_BED_GROUP   12
+void tny_grounds_frame(void) {
+    const u8 *m = (const u8 *)g_MapState;
+    if (!m || m[0] != 15 || m[1] != 14 || !gr_sprite_ok(GR_BED_SPRITE)) return;
+    const u8 *rec = (const u8 *)Character_GetSpriteRecord(GR_BED_SPRITE);
+    if (!rec || rec[2] <= GR_BED_GROUP) return;
+    const u32 *grp = (const u32 *)(rec + 0x4C + 0x10 * GR_BED_GROUP);
+    EntityList *list = g_EntityList;
+    for (int i = 0; i < list->count; i++) {
+        Entity *e = list->items[i];
+        if (!e || e->sprite_record != rec || !grp[e->facing & 3]) continue;
+        *(u32 *)((u8 *)e + 0x4C) = (u32)grp;
+        *(u16 *)((u8 *)e + 0x14) = 0;
+        *(u16 *)((u8 *)e + 0x12) = 0;
+    }
+}
+
 int tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
     (void)fn; (void)c;
     gr_init();
@@ -218,6 +272,24 @@ int tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
     case 2:
         *push = gr_maps_built();
         return 1;
+    case 3:                                        // player 1's name in capitals (a %s argument)
+        *push = (s32)ui_strings[UI_CAPS + (g_Party->active_slot < PARTY_SLOTS ? g_Party->active_slot : 0)];
+        return 1;
+    case 4:                                        // the courtyard's on-load: the unlocked fighters outside
+        gr_spawn_outside();
+        return 0;
+    case 5:                                        // an item with its pop-up (the hidden arena's Senzu: item b)
+        item_use_hook((int)b);
+        return 0;
+    case 6: {                                      // every entity on sprite b plays group c (a held pose: Yamcha
+        void *rec = gr_sprite_ok((int)b) ? Character_GetSpriteRecord((int)b) : 0;   // in bed). The script
+        EntityList *list = g_EntityList;           // command waits for the animation to end, which a lying pose
+        for (int i = 0; rec && i < list->count; i++) {    // never does
+            Entity *e = list->items[i];
+            if (e && e->sprite_record == rec) Entity_SetAnimation(e, (int)c);
+        }
+        return 0;
+    }
     }
     return 0;
 }

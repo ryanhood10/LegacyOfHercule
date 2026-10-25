@@ -126,7 +126,61 @@ sequence tny_nurse_talk
   text 0 "NURSE: Lost a match?  Don't worry, everyone here\x0bwalks out on their own two feet.\x0bWe've got Senzu-strength bandages!"
 end
 
+; the injured fighter in the first bed (A at the bed's foot): player 1's own line
+sequence tny_patient
+  fmt 0 "%s: Aww man.  This guy's in bad shape."
+        CoopCall 30, 3, 0, 0
+        END
+end
+
+; an easter egg: Yamcha knocked out in the last bed (his lying pose, group 12 of his playable body 235)
+script tny_inf_onload
+        CoopCall 30, 6, 235, 12
+end
+
+sequence tny_yamcha_bed
+  text 114 "YAMCHA: ...I'm fine.  I'm fine!\x0bJust resting my eyes.  Don't tell Bulma."
+end
+
+; ---- the hidden arena (15 / 17): an easter egg ------------------------------------------------------------
+
+; the crack behind the courtyard's right flowerbed
+sequence tny_secret_in
+  text 0 "@^A cold draft is coming from a crack in the wall\x0bbehind the flowers...  You squeeze through."
+  script
+        SetPlayerVisible 0
+        FadeOut 30
+        WarpToMapWithEntities 15, 17, 1, 344, 464
+        SetEntityFacing 0, 1
+        SetPlayerVisible 1
+        SetActiveEntity 0
+end
+
+; Pikkon, training alone: a hint, and one Senzu bean (flag 442)
+sequence tny_secret_pikkon
+  text 147 "PIKKON: Hm.  Nobody has found this place in years.\x0bThey say it was built for fighters who had\x0bnothing left to prove."
+  script -> 3
+        StackTestStoryFlag 442
+        JumpIfFalse L1
+        PushByte 3
+        END
+      L1:
+        PushByte 2
+        END
+  text 147 "PIKKON: You'll need this more than I do.\x0bWin the Adept tournament, and maybe we'll meet\x0bin the ring." -> 4
+  text 147 "PIKKON: Train hard.  When you've won the Adept\x0btournament, I'll be waiting."
+  stop
+  script
+        CoopCall 30, 5, 0, 0
+        SetStoryFlag 442
+end
+
 ; ---- the waiting room (15 / 15) ----------------------------------------------------------------------------
+
+; the courtyard's on-load: the fighters a player has unlocked hang around outside (CoopCall 30 op 4)
+script tny_court_onload
+        CoopCall 30, 4, 0, 0
+end
 
 ; on load: today's fighters stand around the room (src/coop/tny_grounds.c, CoopCall 30 op 0)
 script tny_wait_onload

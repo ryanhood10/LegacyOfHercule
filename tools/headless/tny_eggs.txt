@@ -1,0 +1,53 @@
+# Papaya Island's easter eggs (2026-10-25): Yamcha knocked out in the infirmary's last bed (his lying pose held by
+# tny_grounds_frame; A at the bed's foot: his line), the crack behind the courtyard's right flowerbed into the hidden
+# arena (Buu's Fury's Other World Stadium, zone 15 area 17), Pikkon there (a hint and one Senzu bean, flag 442 =
+# FLAGS+55 bit 2), the way back out (the ring's bottom edge).
+# python tools/headless/st_test.py tools/headless/tny_eggs.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441 -442
+p2 0
+echo == 1. Yamcha in the last bed (lying), his line
+poke32 0x0203FD0C 0x0E0F
+poke32 0x0203FD54 0x00700192
+poke32 0x0203FD08 5
+frames 300
+shot eg01_yamcha_bed
+key 0x40 2
+frames 4
+key 1 10
+frames 60
+shot eg02_yamcha_line
+mash 3 40
+frames 60
+echo == 2. the crack in the courtyard: into the hidden arena
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x008C01C0
+poke32 0x0203FD08 5
+frames 300
+key 0x10 2
+frames 4
+key 1 10
+frames 60
+shot eg03_crack
+mashmap 15 17 20
+frames 200
+map
+shot eg04_arena
+echo == 3. Pikkon: the hint and the Senzu (flag 442 set), then the way out
+key 0x40 130
+frames 10
+key 1 10
+frames 60
+shot eg05_pikkon
+mash 8 50
+frames 60
+shot eg06_after
+echo FLAGS+55: bit 2 (flag 442) set
+peek8 FLAGS+55 1
+key 0x80 140
+waitmap 15 13 600
+frames 120
+map
+shot eg07_back

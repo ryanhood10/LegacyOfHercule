@@ -1,5 +1,5 @@
 {
- "_": "The stadium's infirmary corridor (beds): Buu's Fury's zone 7 area 4 (0x082478E4), its tiled layers (the BG0 effect overlay is not imported) and collision; a nurse. Its two bottom doors lead to the courtyard (right) and the waiting room (left), as in Buu's Fury.",
+ "_": "The stadium's infirmary corridor (beds): Buu's Fury's zone 7 area 4 (0x082478E4), its tiled layers (the BG0 effect overlay is not imported) and collision; a nurse; an injured fighter in the first bed (our art, tools/patientart.py; A at the bed's foot). Its two bottom doors lead to the courtyard (right) and the waiting room (left), as in Buu's Fury.",
  "name": "papaya_infirmary",
  "zone": 15,
  "area": 14,
@@ -10,7 +10,7 @@
   160
  ],
  "priorities": [
-  3,
+  1,
   2,
   3,
   3
@@ -99,6 +99,14 @@
    "facing": 0,
    "talk": "seq:tny_nurse_talk",
    "_": "the nurse (sprite 154, a woman in a teal dress)"
+  },
+  {
+   "kind": "actor",
+   "sprite": 235,
+   "x": 420,
+   "y": 70,
+   "facing": 0,
+   "_": "an easter egg: Yamcha knocked out in the last bed (his playable body 235, lying: tny_inf_onload)"
   }
  ],
  "spawn": [
@@ -110,5 +118,45 @@
  "flags": 0,
  "sources": [
   "data/story/papaya.lscript"
- ]
+ ],
+ "layers": {
+  "0": [
+   {
+    "op": "png",
+    "draw": "patientart",
+    "at": [
+     5,
+     6
+    ],
+    "_": "the injured man in the first bed (tools/patientart.py)"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    40,
+    96,
+    84,
+    124
+   ],
+   "payload": "seq:tny_patient",
+   "activation": "press",
+   "_": "A at the first bed's foot: player 1 remarks on the patient"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    400,
+    96,
+    444,
+    124
+   ],
+   "payload": "seq:tny_yamcha_bed",
+   "activation": "press",
+   "_": "A at the last bed's foot: Yamcha"
+  }
+ ],
+ "onload": "script:tny_inf_onload"
 }

@@ -1,0 +1,62 @@
+# The grounds' crowds (Ryan, 2026-10-25): the waiting room shows today's competition (up to eight places: this save's
+# pool minus the unlocked fighters and Roshi), the courtyard the unlocked ones (up to four places); the infirmary's
+# patient (A at the first bed's foot: player 1's line). From a Map Test of the world map, flag 441 set (no welcome),
+# the global record wiped; then Yamcha (0), Tien (1) and Pui Pui (36) unlocked.
+# python tools/headless/st_test.py tools/headless/tny_crowd.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+p2 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00C000C8
+poke32 0x0203FD08 5
+frames 300
+shot cr01_room_top
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x012C00C8
+poke32 0x0203FD08 5
+frames 300
+shot cr02_room_bottom
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x009800F0
+poke32 0x0203FD08 5
+frames 300
+shot cr03_court_empty
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 1
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 36
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x009800F0
+poke32 0x0203FD08 5
+frames 300
+shot cr04_court_unlocked
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00C000C8
+poke32 0x0203FD08 5
+frames 300
+shot cr05_room_after
+poke32 0x0203FD0C 0x0E0F
+poke32 0x0203FD54 0x0070003E
+poke32 0x0203FD08 5
+frames 300
+key 0x40 2
+frames 4
+key 1 10
+frames 60
+shot cr06_patient
+key 1 10
+frames 60
+map

@@ -912,7 +912,30 @@ their winners.
   beside their news van, our own map art (`tools/vanart.py`, 64 x 48, its footprint blocked).
 - The plaza's fan who looked like a woman but spoke as "KID" is a woman fan now; the infirmary's nurse is a woman
   (sprite 154) instead of the dog-man (89).
-- The waiting room's crowd (`tny_grounds.c`): still a random six of this save's pool (it grows as the story opens tiers),
-  now with the newest tier's fighters and every unlocked hidden challenger first (at most half the room), each
-  challenger with his own greeting. Test: `tools/headless/tny_npcs.txt` (the street, the stalls, Roshi's line, the nurse).
+- The waiting room's crowd (`tny_grounds.c`), revised after Ryan's second look ("it was more accurate before"): up to
+  seven places (one more spot; eight hung the engine test's Champion Rumble after a waiting-room visit, cause not
+  found, so seven it is), every member spawned only while his body leaves 8 KB of OBJ VRAM free, a random draw of today's competition: this save's pool minus the fighters a player
+  has unlocked and minus Roshi (he stays on the street). The **courtyard** holds the unlocked ones: up to four
+  places of beaten fighters and won hidden challengers (each with his greeting), a different few each visit
+  (CoopCall 30 op 4, the courtyard's on-load). The newest-tier-first rule of the first pass is gone.
+- Sprite 50 is LoG2's own General Tao (the cyborg: the helmet, the red armour; Goku's hidden bonus fight, map 46),
+  so the roster calls him "General Tao" (was "Mercenary Tao").
+- The infirmary's first bed holds an injured man (our art, `tools/patientart.py`, on BG0 with priority 1); A at the
+  bed's foot gives player 1's own line, "<NAME>: Aww man.  This guy's in bad shape." (CoopCall 30 op 3 pushes
+  player 1's name in capitals). Tests: `tools/headless/tny_npcs.txt` (the street, the stalls, Roshi's line, the nurse),
+  `tools/headless/tny_crowd.txt` (the room and courtyard before and after unlocks, the patient).
+
+## 17. Papaya Island's easter eggs (2026-10-25, Claude's picks after Ryan's "pick some stuff and build it out")
+
+- **Yamcha in the infirmary's last bed**: an actor on his playable body (sprite 235) whose lying frame (group 12) is
+  written back every frame while the infirmary is loaded (`tny_grounds_frame`, the engine's pose-holding method; a
+  `SetEntityAnimation` from the on-load waited forever for a looping pose and hid the player). A at the bed's foot:
+  "YAMCHA: ...I'm fine.  I'm fine!  Just resting my eyes.  Don't tell Bulma."
+- **The hidden arena** (zone 15 area 17, `data/maps/papaya_secret.json`): Buu's Fury's Other World Stadium (its zone 1
+  area 20) imported whole, only the ring floor walkable. A at a crack behind the courtyard's right flowerbed
+  (`tny_secret_in`) squeezes the players through; Pikkon (sprite 200, portrait 147) trains alone on the ring: a hint
+  about the Adept tournament (where he is the 1v1 challenger) and one Senzu bean (flag 442, CoopCall 30 op 5 gives
+  the item with its pop-up); the ring's bottom edge leads back to the crack. Place name 359 "Hidden Arena".
+- CoopCall 30 (grounds) gained op 3 (player 1's name in capitals), op 4 (the courtyard's unlocked crowd), op 5 (an
+  item with its pop-up), op 6 (every entity on a sprite plays a group). Test: `tools/headless/tny_eggs.txt`.
 

@@ -73,6 +73,18 @@
    "payload": "seq:tny_board",
    "activation": "press",
    "_": "the unlock board: A in front of it"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    448,
+    112,
+    480,
+    160
+   ],
+   "payload": "seq:tny_secret_in",
+   "activation": "press",
+   "_": "an easter egg: A at the crack behind the right flowerbed"
   }
  ],
  "exits": [
@@ -149,5 +161,6 @@
    ],
    "_": "the unlock board's lower half and posts"
   }
- ]
+ ],
+ "onload": "script:tny_court_onload"
 }

@@ -16,7 +16,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | maps / strings | RAM |
 |---|---|---|---|---|---|---|---|---|---|---|
-| grounds | 441-445 (441 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (11-16 used); ui_strings 357-379 (357, 358 used) | `.tny.gr` 0x40 (0x24 used) |
+| grounds | 441-445 (441, 442 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (all used); ui_strings 357-379 (357-359 used) | `.tny.gr` 0x40 (0x24 used) |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
@@ -56,7 +56,7 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-438 saved "available" bits of slots 0-8 (all but 6 and 7) |
 | 440 | Lookout / dojo (`wait_spar`) | 440 Roshi's dojo booked for a spar |
-| 441-445 | the tournament grounds (`data/story/papaya.lscript`, `tny_ring.h`) | 441 the plaza's first-visit welcome has played; 442-445 free |
+| 441-445 | the tournament grounds (`data/story/papaya.lscript`, `tny_ring.h`) | 441 the plaza's first-visit welcome has played; 442 Pikkon's Senzu bean taken (the hidden arena); 443-445 free |
 | 446-459 | the tournament engine (`tourney.h` `TNY_FLAG_ENGINE0`) | |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
 | 462-463 | free | |
@@ -293,12 +293,12 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 9 | `saiyan_ship.json` | inside the Saiyan ship (the Broly chapter's ride both ways) |
 | 10 | `yard_ship.json` | the Capsule Corp backyard (6/21) with the Saiyan ship parked: never warped to; its variation stands in for the backyard's while the ship is parked (`src/coop/shipyard.c`) |
 | 11 | `papaya_plaza.json` | Papaya Island's plaza (Buu 7/1 v2): the world-map landing's beach and flight spot, save pad, the announcer, the first-visit welcome (flag 441); needs `roms/buu.gba` |
-| 12 | `papaya_street.json` | the street with the stalls (Buu 7/2): vendor, reporter, fans |
-| 13 | `papaya_courtyard.json` | the courtyard (Buu 7/3): the unlock board (CoopCall 28, 1) |
-| 14 | `papaya_infirmary.json` | the infirmary corridor (Buu 7/4) between the courtyard and the waiting room |
+| 12 | `papaya_street.json` | the street with the stalls (Buu 7/2): Roshi, a vendor behind each stall, the reporter, his cameraman and the ZZTV van (`tools/vanart.py`), fans |
+| 13 | `papaya_courtyard.json` | the courtyard (Buu 7/3): the unlock board (CoopCall 28, 1), the unlocked fighters (CoopCall 30, 4), the crack into the hidden arena |
+| 14 | `papaya_infirmary.json` | the infirmary corridor (Buu 7/4) between the courtyard and the waiting room: the nurse, the injured man (`tools/patientart.py`), Yamcha in the last bed |
 | 15 | `papaya_waiting.json` | the fighters' waiting room (Buu 7/5), the hub: save pad, the director (CoopCall 23), today's fighters (CoopCall 30, 0) |
 | 16 | `papaya_ring.json` | the ring with the stands (Buu 7/6, 720 x 720): the engine's stage (`src/coop/tny_ring.h`) |
-| 17 | grounds, free | |
+| 17 | `papaya_secret.json` | the hidden arena (Buu's Other World Stadium, 1/20 there): Pikkon, the Senzu (flag 442); an easter egg |
 | 18-19 | free | |
 
 ## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
@@ -314,7 +314,8 @@ places: `krillinsprites.py` asserts the index.
 | 356 | The Arctic | `data/maps/arctic*.json` (zone 15 areas 1, 5-8), the world-map banner (`data/story/arctic_route.json`) |
 | 357 | Papaya Island | the plaza, street, courtyard (zone 15 areas 11-13), the world-map banner (`data/story/papaya_route.json`) |
 | 358 | World Tournament | the infirmary, waiting room, ring (zone 15 areas 14-16) |
-| 359-379 | grounds, free | |
+| 359 | Hidden Arena | the hidden arena (zone 15 area 17, an easter egg) |
+| 360-379 | grounds, free | |
 | 380-399 | the tournament ui | |
 
 ## Memory (EWRAM; `src/coop/coop.ld`, exact layout in `$(BUILD)/coop.map`)

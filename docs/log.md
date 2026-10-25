@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Easter eggs:** Yamcha knocked out in the infirmary's last bed; a crack behind the courtyard's flowerbed into a
+  hidden arena (Buu's Other World Stadium) where Pikkon gives a hint and a Senzu bean. The waiting room holds seven
+  (eight hung the Champion Rumble test). `tny_eggs.txt`, `docs/tournament.md` 17.
+- **Crowds and the patient (Ryan):** the waiting room shows up to seven of today's competition (not unlocked, no Roshi),
+  the courtyard the unlocked fighters; General Tao named for his cyborg body; an injured man in the infirmary's first
+  bed with player 1's line. `tny_crowd.txt`.
 - **The grounds' people (Ryan's first look):** Roshi with advice beside the food stall, vendors behind the stalls, the
   reporter in a suit with a cameraman and the ZZTV van (`tools/vanart.py`), a woman fan relabelled, a woman nurse; the
   waiting room shows unlocked challengers and the newest tier first. `docs/tournament.md` 16, `tny_npcs.txt`.
