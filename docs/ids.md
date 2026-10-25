@@ -127,6 +127,11 @@ sprite 72) for Roshi's gym.
 | 178-179 | free (the hercule-beam session's allocation, unused) | | |
 | 180 | Super Android 13 (Buu's Fury Broly recoloured; Perfect Cell's groups as a stand-in with `BUU=0`) | `tools/super13sprites.py` | `S13_SPRITE` |
 | 181-184 | Super 13's allocation, unused | | |
+| 185 | King Cold (tournament; Cooler's 64x64 set 34 recoloured, Cold's head from 74, a cape; player layout + AI set 21) | `tools/tnysprites.py` | `KING_COLD_SPRITE` (`tourney.h` `TS_KING_COLD`) |
+| 186 | Master Roshi (tournament; Krillin's 76 + Goku's 60 groups re-headed with Roshi's 88 head and beard, a shell) | `tools/tnysprites.py` | `ROSHI_SPRITE` (`TS_ROSHI`) |
+| 187 | Chi-Chi (tournament; Android 18's set 11 with Chi-Chi's 33 head, her LoG2 outfit) | `tools/tnysprites.py` | `CHICHI_SPRITE` (`TS_CHICHI`) |
+| 188 | Videl (tournament; Android 18's set 11 with Buu's Fury's Videl head, record 276, white shirt) | `tools/tnysprites.py` | `VIDEL_SPRITE` (`TS_VIDEL`) |
+| 189 | Chiaotzu (tournament; kid Gohan's set 53 with Chiaotzu's 32 head and outfit) | `tools/tnysprites.py` | `CHIAOTZU_SPRITE` (`TS_CHIAOTZU`) |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
@@ -160,7 +165,9 @@ finds row 4 first).
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
 | 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
-| 127+ | free | `krillinsprites.py` asserts ids are unique |
+| 127 | Videl's dialogue portrait (Buu's Fury's short-haired Videl, module 0x086F393C id 153, on LoG2's frame; stock 43 Chi-Chi without `roms/buu.gba`); the tournament's other new fighters use stock portraits: King Cold 70, Roshi 80, Chi-Chi 43, Chiaotzu 42 (`tourney_data.c`) | Makefile `VIDEL_PORTRAIT`, `tools/tnysprites.py` `tny_videl_portrait`, `--extra-portrait` |
+| 128-139 | art-new's allocation, unused | |
+| 140+ | tournament allocations (art-buu 140-189, ui 190-199) | `krillinsprites.py` asserts ids are unique |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).

@@ -139,12 +139,12 @@ specials in C (the Super 13 kind).
 | Hercule "the champ" | 72 | O from the start (he *is* the champion), P from West City | start / West City (flag 362) | Dynamite Kick, Megaton Punch, Taunt (his own four); as an opponent on AI set 98 (works, the dojo) | cheap |
 | Frieza (final form) | 48, stat 41 base | O, **B** (villain) | start | Death Beam (thin beam), Death Ball; **transforms to Mecha Frieza at 40 %** (faster, +attack) | moderate |
 | Mecha Frieza | 49 | O, **B** (villain) | start | Death Beam, a rush; no transform | moderate |
-| **King Cold** | to build: Cooler's 64 x 64 fight set (34) recoloured and re-headed (the Paragus method), Cold's armour and cape; 74 keeps the cutscenes | O, **B** (villain) | start (Ryan: in the Rookie bracket) | melee giant with reach, Death Beam, a throw | moderate-big (a recolour + head; new frames only if the body reads wrong) |
+| **King Cold** | **built: sprite 185** (Cooler's 64 x 64 fight set 34 recoloured, Cold's head from 74, a red cape; section 9b); 74 keeps the cutscenes | O, **B** (villain) | start (Ryan: in the Rookie bracket) | melee giant with reach, Death Beam, a throw | moderate-big (a recolour + head; new frames only if the body reads wrong) |
 | Mercenary Tao | 50, stat 44 (AI 129) | O, **B** | start (a 23rd Budokai finalist) | Dodon Ray (thin beam), Crane rush, the hidden blade (a one-off heavy hit); the ROM's own AI | moderate (4 groups) |
-| **Master Roshi** | to build: a stock human fight set (Krillin's 76 or Hercule's 72) re-headed with Roshi's head (bald, beard, sunglasses, 75 for the face), orange shirt | O, **B** | start | **MAX Power** (bulks up at 50 %: +attack, slower), a slow heavy Kamehameha, Thunder Shock Surprise (a short stun), Drunken Fist (a rush) | moderate-big |
-| Chi-Chi | to build: Android 18's fight set (11) re-headed, Chi-Chi's dress; Buu's 55 for the face | O, **B** | start | a frying-pan heavy hit (stun), a fast combo, no ki | moderate-big |
-| Videl | to build: Android 18's set (11) re-headed; Buu's 56 for the face | O, **B** | start (a 25th Budokai fighter) | fast combo, Hawk Arrow (a rush), flight dodge | moderate-big |
-| Chiaotzu | 102 (tiny NPC) + drawn poses | O, **B** | start | Dodon Ray, **psychic hold** (a stun), self-destruct at 10 % (a nova that costs him the match) | big (tiny body, poses from scratch) |
+| **Master Roshi** | **built: sprite 186** (Krillin's 76 + Goku's 60 groups re-headed with Roshi's head and beard from his NPC sprite 88, a shell; section 9b) | O, **B** | start | **MAX Power** (bulks up at 50 %: +attack, slower), a slow heavy Kamehameha, Thunder Shock Surprise (a short stun), Drunken Fist (a rush) | moderate-big |
+| Chi-Chi | **built: sprite 187** (Android 18's set 11 with her NPC sprite 33's head, her LoG2 outfit; section 9b) | O, **B** | start | a frying-pan heavy hit (stun), a fast combo, no ki | moderate-big |
+| Videl | **built: sprite 188** (Android 18's set 11 with Buu's Fury's Videl head, record 276; portrait 127; section 9b) | O, **B** | start (a 25th Budokai fighter) | fast combo, Hawk Arrow (a rush), flight dodge | moderate-big |
+| Chiaotzu | **built: sprite 189** (kid Gohan's set 53 with his NPC sprite 32's head and outfit; section 9b) | O, **B** | start | Dodon Ray, **psychic hold** (a stun), self-destruct at 10 % (a nova that costs him the match) | big (tiny body, poses from scratch) |
 | Spopovich | Buu r.242 (bald giant in black trunks, partial set) | O, **B** | start (he fought Hercule in the 24th; pre-Majin here) | brawler, toughness (poise), a bear hug (grab) | cheap |
 | Yamu | Buu r.293 (lean, purple belt, partial set) | O, **B** | start (his 25th Budokai partner) | brawler, **energy steal** (drains EP) | cheap |
 | Piccolo | 103 | P | West City (flag 26 / 362) | Special Beam Cannon, Scatter Shot, cape off = Transformation at 50 % | cheap |
@@ -196,7 +196,7 @@ specials in C (the Super 13 kind).
 | Yakon | 290 (giant beast, partial set) | **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
 | Buu-era Vegeta base / Goku variants | 116 (Vegeta base), 269-272, 107, 109, 114; 99 (Goku's 64 x 64 Spirit Bomb / big-beam frames); 97 / 102 Gohan outfits; 113 Goku with the halo | skins and forms of the above | | |
 
-Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
+Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 276 (56 is Chi-Chi, 55 Chiaotzu), Android 18 (Buu) 6, Future Trunks 4,
 the announcer 207, Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
 (base / SSJ): kid Trunks in an alternate outfit, or Goten mis-palettised; a skin either way.
 
@@ -343,6 +343,36 @@ roster table's shape, every cross-piece function) with `tourney_data.c` (the ros
 | engine | the pool, brackets, simulation, the match loop in all divisions, heal, rewards, the global record, unlocks, challengers, pop-up queue | a 1P Rookie 1v1 can be entered, fought, won, and unlocks recorded; co-op flows tested |
 | moves | the kits (section 5), transforms, NPC-vs-NPC hits and Rumble targeting | every opponent fights with his kit; a Rumble pack fights itself |
 | ui | list box, select screen, bracket screen and animation, Rumble board, unlock board, pop-up look | each screen opens from its CoopCall and returns its answer |
+
+## 9b. art-new: the five fighters built from existing bodies (built 2026-10-25, branch `tny-art-new`)
+
+King Cold 185, Master Roshi 186, Chi-Chi 187, Videl 188, Chiaotzu 189 (`tools/tnysprites.py`, `docs/sprites.md`
+"Tournament fighters (art-new)"): each one record in the player layout whose groups 0-2 and 5-8 also serve the melee
+boss AI set 21, tested headless as an opponent (10 s on set 21) and, for the four normal bodies, as player 1's body
+(`tools/headless/tny_artnew.txt`). Portraits: King Cold 70, Roshi 80, Chi-Chi 43, Chiaotzu 42 (stock, in
+`tourney_data.c`), Videl 127 (new: Buu's Fury's). Our calls, made while building:
+
+- **Chi-Chi wears her LoG2 outfit** (the orange tabard over white sleeves of her NPC sprite 33), not a red / purple
+  qipao: the game already draws her that way, and her head is her own NPC head.
+- **Videl has her short hair** (the 25th Budokai look; Buu's Fury's own Videl, record 276, and portrait 153 have it),
+  not the pigtails: the tournament is where she cut it.
+- **Chiaotzu dresses as LoG2's Chiaotzu** (sprite 32: light-blue shirt, red sash, black trousers, white face, the cap
+  with the red ball), not in green: the stock NPC is the reference players know.
+- **Roshi fights in the orange turtle gi** (Krillin's body), with his own head, beard and sunglasses from his NPC
+  sprite 88 and the shell on his back.
+- **King Cold keeps Cooler's size** (about 44 px tall against the 62 px of his cutscene sprite 74): the frames are
+  Cooler's (his attacks, the death pose), only head, colours and cape are Cold's. A 64 x 64 body all the same, so he
+  counts as a giant (`TR_GIANT`).
+- The sprite ids and portrait 127 are Makefile knobs (`KING_COLD_SPRITE` ... `VIDEL_PORTRAIT`) matching `tourney.h`.
+
+For the other pieces: the records carry groups 16 (special melee) and 18 (beam pose, 7 frames) for the playables' kits
+(Roshi and Chiaotzu have real beam poses from Goku / kid Gohan, the others their charge pose). King Cold as a player
+body needs a display row (the playables piece): his OBJ VRAM slot must come from his record (0x1000), so poking his
+record into a bound player overflows. Observed while testing (for the engine's Rumble, where fighters step in as
+others fall): a body spawned with test command 8 on the same map right after another fighter's 10-s fight and
+knock-out showed in pieces or not at all for one to two seconds; not reproduced after a short fight, cause not found
+(suspects: the dead one's boss bar, which stays in the entity list, or OBJ VRAM held by the fight's effects).
+`docs/testing.md` "Tournament fighters (art-new)".
 
 ## 9. Build order (once the plan is done)
 

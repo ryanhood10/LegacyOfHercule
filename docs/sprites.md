@@ -51,7 +51,7 @@ similar body and recoloured).
 | 73, 103, 104 | 1 / 10 / 9 | Piccolo (NPC, playable with cape, variant) | yes (103) |
 | 76 | 13 (7 used) | **Krillin** NPC set: idle, walk, run, knock-down, shout, ki pose, punch combo, lying (12) | playable as **sprite 161** (below) |
 | 121 | 7 | **Tien** (bald, green pants, attack and hurt poses) | yes, needs abilities + a row |
-| 75 | 1 | Master Roshi | no (idle only) |
+| 75 | 1 | a white-robed figure (an earlier note said Master Roshi: wrong; **Roshi is 88**, bald, red sunglasses, white beard, orange shirt; checked 2026-10-25) | no (idle only) |
 | 94 | 2 | Android 18 (blonde) | no (NPC poses) |
 | 8 | 7 | **Android 16** (orange mohawk, green armour): idle, walk, hit-stun (2-4), one punch (6), knock-down (12) | the island scenes' actor; the boss uses id 160 (below) |
 | 9, 10, 11 | 13 / 2 / 13 | Android 17 fight set (the island boss), 17 NPC, Android 18 fight set | enemy-grade, full |
@@ -60,7 +60,7 @@ similar body and recoloured).
 | 29, 30, 28 | 4 | Imperfect Cell, Perfect Cell, Cell Jr. | enemy-grade |
 | 34, 48, 49, 50, 74 | 2-3 | Frieza final form, Mecha Frieza (small), King Cold (large cape) | enemy-grade; a playable Mecha Frieza needs run/charge poses drawn |
 | 37-39, 44-47 | 3 | large and small robots | enemy-grade |
-| 23, 24, 95, 102 | 2 | Bulma, Dende, Chiaotzu | NPC |
+| 23, 24, 95, 102 | 2 | Bulma, Dende, Oolong (102: an earlier note said Chiaotzu; **Chiaotzu is 32**, white face, cap with a red ball; **Chi-Chi is 33**, bun, orange tabard; checked 2026-10-25) | NPC |
 | 63-65, 105-106, 108-110, 112-119, 122-127, 136, 144-149 | 2-3 | birds, dragons, dinos, scorpions, snakes, wolves, a squirrel-like animal (136), boars | enemy-grade; 136 is the animal-quest candidate |
 | 128-135, 141-143, 150-156 | 2-10 | more human sets (kid Goku/Gohan, purple-haired, red-haired) | check sheets |
 
@@ -183,7 +183,8 @@ NPC / cutscene grade (2-20 anims, no attack set): 0-1 ships, 2 mushroom-cap man,
 with sword, 5 armoured Saiyan, 6 Android 18, 7/67/69/70 pirate robot, 9-12 and 229 Dr. Briefs
 variants, 18 Baba, 21/272 Yamu with the energy container (244 = Yamu recoloured purple),
 29/112/262 Van Zant (sunglasses, "HUGE" tank top, rifle), 113 Smitty, 31 Bulma, 50-54 a crouching
-brown creature in five palettes, 55 Chi-Chi, 56 Videl, 64 Dabura cutscene, 81 Roshi,
+brown creature in five palettes, 55 Chiaotzu (white face, red cheeks; an earlier note said Chi-Chi), 56 Chi-Chi (bun; an
+earlier note said Videl), 276 Videl (short hair, white shirt; portraits 152 / 153 with and without pigtails), 64 Dabura cutscene, 81 Roshi,
 86-87/210/220 ghost Kamikaze (Gotenks), 88-89 Dabura large, 137-143 Fat Buu large and parts,
 149 Supreme Kai, 154 Babidi's ship, 183 Mr. Popo, 184 blonde girl (Erasa), 196-198 Bulma / Launch
 types, 199 Oolong, 207/216 tournament announcer and Spopovich, 242 pale giant, 280 Dragon Ball,
@@ -629,3 +630,39 @@ pose and three attacks as well. King Cold's sprite 74 (5 groups: 0, 1, 3, 4; gro
 21 crashes the first time the AI charges or attacks: groups 5-8 lie past its count and read compressed
 frame bytes as descriptor pointers ("Jumped to invalid address C002E564", reproduced in the fork). It
 would need a fight set drawn before it can partner Cooler; the story uses the Namekian servant instead.
+
+## Tournament fighters (art-new: ids 185-189, portrait 127; `tools/tnysprites.py`, 2026-10-25)
+
+Five fighters the tournament needs that neither ROM has as a fight set (`docs/tournament.md` 4a), each **one record**
+in the playable player layout (21 groups, Hercule's 72 pattern of filled groups and frame counts: 0 idle 2, 1 walk 4,
+2 hit-stun 4, 3 knock-down 4, 4 shout 4, 5 ki pose / charge 3, 6-8 attacks 4, 11 hurt 2, 12 lying 4, 13 flight 4, 17
+halo 2, 20 tumble 4; plus 16 special melee and 18 beam pose, 7 frames each, for the playables' kits) whose groups 0, 1,
+2 and 5-8 are what the melee boss AI set 21 plays, so the same record is an opponent and a player body. **Group 2 of a
+player record is the hit-stun** (Hercule 72, Goku 60, kid Gohan 53 all show the hit sparks there; the "run" in
+`a16sprites.py`'s comment is wrong), so the two layouts agree; group 3 is the knock-back / knock-down in both. Every
+frame is decoded, edited and LZ-compressed (`buu2log2.compress`); the records, arrays and blobs are `TNY_ART` (second
+ROM blob, about 185 KB for all five). Previews: `build/<dir>/tny_preview_<name>.png` (+ `_x3`), every group x 4
+facings x every frame, and `tny_preview_videl_portrait.png`.
+
+| id | fighter | body | head and colours |
+|---|---|---|---|
+| 185 | King Cold | Cooler's 64x64 fight set (34: groups 0-2, 5-8, 12; header and hurt boxes Cooler's, largest frame 0x1000) | Cooler's armour greys -> Cold's white / mint plates, his purples -> Cold's purple skin (74's palette), the gems teal; Cooler's spiked head (found from the forehead gem 77: the head is the 8-connected opaque area from 12 rows above the gem to the mouth row, gem + 6, within 12 px) replaced by Cold's head cut from 74 (horns, teal dome, face; back view: the dome over purple skin), mouth on Cooler's mouth row; a red cape drawn per frame from the shoulders to the knees (vertical folds, a ragged hem; behind the body in front and side views, over the back in back views, arms stay in front). Lying frames (12) get the head too (the face toward the viewer), no cape. Cooler's attack frames kept: Cold has Cooler's build, smaller than his cutscene sprite 74 (about 44 px against 62) |
+| 186 | Master Roshi | Krillin's: his NPC set 76 (0 idle, 1 walk, 2 hit, 3 knock-down, 4 shout, 5 ki pose, 6 punch combo, 12 lying, 20 = 3) and Goku's 60 (7, 8 attacks, 11 hurt, 13 flight, 16 special melee, 18 Kamehameha pose); Goku's header | upright frames re-headed with Roshi's head from his NPC sprite 88 (bald, red sunglasses, white eyebrows) and his beard (the greys under the chin, joined to it, with a grey outline), chin on the old chin row (Goku: largest black hair component + chin offset from his idle; Krillin: the top opaque row + offset), raised hands that touch a wristband away from the face kept; the turtle shell (green oval, darker plate lines, black rim) on every back view. The gi stays orange / blue (his fighting gi) |
+| 187 | Chi-Chi | Android 18's fight set (11: 0-8, 12; 11 hurt = 18's 3, 3 / 12 / 20 = 18's fall 12, 13 = walk); Hercule's header | upright frames: 18's gold hair (and her group 4's dimmer ramp) and face cleared, Chi-Chi's head from her NPC sprite 33 pasted (bun with the pink ring, black hair; chin on 18's chin row, face centre on 18's); the rest of 18's hair black. Her LoG2 outfit: the blue vest -> orange-yellow tabard, its navy shading blue (the trousers), boots dark, the Red Ribbon logo on the back gone |
+| 188 | Videl | Android 18's fight set, as Chi-Chi | Videl's head from Buu's Fury (record 276, her short hair at the 25th Budokai, blue eyes; Buu's tan face onto LoG2's skin ramp), a white shirt (vest and sleeves white, plainer stripes), black shorts / leggings (18's own), white shoes. Without `roms/buu.gba`: Chi-Chi's head without the bun |
+| 189 | Chiaotzu | kid Gohan's complete set (53, the smallest playable body; his header) | Chiaotzu's head from his NPC sprite 32 (white face, red cheeks, black cap with the red ball), his outfit there: the shirt (greys above the sash touching it or its outline) light blue, the sash red, the trousers black, the skin white. Lying / tumbling frames: Gohan's hair cut back to a round cap around the face |
+
+**Portraits:** King Cold 70, Roshi 80, Chi-Chi 43 and Chiaotzu 42 are stock dialogue portraits (set in `tourney_data.c`'s
+portrait column); Videl has none in LoG2, so **127** is Buu's Fury's short-haired Videl (portrait module id 153) on LoG2's
+grey frame (the `oldherculeportrait.py` method), appended to `portrait_module` through `--extra-portrait`.
+
+**Test records:** after each sprite record (record + 0x1A0, behind the 21 groups the engine reads) the generator puts an
+enemy record for `COOP_CMD_SPAWN_RECORD` (which takes ROM records only): stat 29 (Cooler, AI set 21) for King Cold, stat
+4 (Android 18, AI set 21) for the others. `tools/headless/tny_artnew.txt` (`docs/testing.md` "Tournament fighters
+(art-new)") fights each for 10 s and then drives the four normal bodies as player 1.
+
+**Seen headless:** all five fight on AI set 21 (idle, walk, hit-stun, charge, the three attacks; King Cold fires Cooler's
+ki), take hits and fall to `COOP_CMD_WAVE_CLEAR`; Roshi, Chi-Chi, Videl and Chiaotzu walk, punch, fire the ki blast and
+take hits as player 1's body. King Cold as a player body needs a display row (his 0x1000 OBJ VRAM slot comes from the
+bind); that is the playables piece's.
+
