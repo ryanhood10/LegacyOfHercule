@@ -205,7 +205,12 @@ void vm_coop_call(s32 *st) {
         if (a == 1) vm_push(st, s13_call(1, 0, 0));
         else s13_call(a, b, c);
         break;
-    default: break;
+    default:                               // 23-30: the tournament team (tourney_hooks.c)
+        if (fn >= 23 && fn <= 30) {
+            s32 v = 0;
+            if (tny_coop_call(fn, a, b, c, &v)) vm_push(st, v);
+        }
+        break;
     }
 }
 

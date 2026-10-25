@@ -5,6 +5,24 @@ ranges here and update this page in the same commit.** Before parallel sessions 
 its own range of every kind (`docs/howto.md` "Work in parallel sessions"). Last checked against
 the code on 2026-10-19 (main e45c765).
 
+## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
+
+The tournament team (docs/tournament.md "The team") takes numbers only from its own row. Cross-piece calls go through
+`tourney_hooks.c` (weak defaults; dispatch of CoopCall 23-30, test commands 21-30 and the per-frame tick), so no
+piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own `.tny.<name>` section in
+`tourneyram` (0x0203EC00, 0x400 bytes; the heap cap now ends there). ROM: big generated art goes to `rom2`
+(0x08E00000, 2 MiB) with `TNY_ART` (`.rodata.art`), written by `patch_rom.py --art`.
+
+| piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | maps / strings | RAM |
+|---|---|---|---|---|---|---|---|---|---|---|
+| grounds | 441-445 | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17; ui_strings 357-379 | `.tny.gr` 0x40 |
+| art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
+| art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
+| playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
+| engine | 446-459 | 160-219 | - | - | - | - | 23-27 | 21-25 | - | `.tny.eng` 0x240 |
+| moves | - | 220-229 | - | - | - | - | - | 26-27 | - | `.tny.mv` 0x80 |
+| ui | - | - | - | - | 190-199 | - | 28-29 | 28-29 | ui_strings 380-399 | `.tny.ui` 0x100 |
+
 ## Allocations for the Cell Games and post-game build (2026-10-19)
 
 Each piece takes numbers only from its own row; say in its report if it needs more. RAM: nobody adds to

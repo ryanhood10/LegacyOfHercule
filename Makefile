@@ -224,6 +224,10 @@ $(BUILD)/coop.elf: $(OBJS) src/coop/coop.ld Makefile
 $(BUILD)/coop.bin: $(BUILD)/coop.elf
 	$(OBJCOPY) -O binary -j .text $< $@
 
+# the second blob: big generated art (.rodata.art, coop.ld rom2 at 0x08E00000; tourney.h TNY_ART)
+$(BUILD)/art.bin: $(BUILD)/coop.elf
+	$(OBJCOPY) -O binary -j .art $< $@
+
 $(BUILD)/coop.sym: $(BUILD)/coop.elf
 	$(NM) $< > $@
 
@@ -234,8 +238,8 @@ $(BUILD)/maps.patch.json: $(MAP_SPECS) tools/mapbuild.py tools/shipart.py tools/
 	@mkdir -p $(BUILD)
 	$(PYTHON) tools/mapbuild.py build $(MAP_SPECS) $@ --rom $(ROM) --free $(MAP_FREE) --preview $(BUILD)/maps --buu-rom $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
 
-$(OUT): $(BUILD)/coop.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH) $(MAPS_PATCH)
-	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS)
+$(OUT): $(BUILD)/coop.bin $(BUILD)/art.bin $(BUILD)/coop.sym tools/patch_rom.py $(DATA_PATCH) $(MAPS_PATCH)
+	$(PYTHON) tools/patch_rom.py $(ROM) $(BUILD)/coop.bin $(BUILD)/coop.sym $@ $(PATCH_FLAGS) --art $(BUILD)/art.bin
 
 clean:
 	rm -rf $(BUILD)/obj $(BUILD)/coop.* $(BUILD)/hercule.patch.json $(BUILD)/maps.patch.json $(OUT)

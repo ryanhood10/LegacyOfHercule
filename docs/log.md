@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament build started** (Ryan: "deploy a team"): the contract on main (`src/coop/tourney.h`, `tourney_data.c`,
+  `tourney_hooks.c`), a 0x400-byte `tourneyram` region (the heap cap now ends at 0x0203EC00: `patch_rom.py` 0xF8FE),
+  a second ROM blob for art (`rom2` at 0x08E00000, `patch_rom.py --art`), allocations in `docs/ids.md`; seven
+  sessions build the pieces (`docs/tournament.md` 9a). Full regression unchanged on the foundation.
 - **Tournament plan closed** (Ryan): no mirror matches; Rookie's pool of 13 (King Cold, Master Roshi, Chi-Chi,
   Videl, Chiaotzu to build; Tao, Spopovich, Yamu as regulars); the unlock board (silhouettes with conditions);
   a global unlock record; Quick (8) / Full (16) at the director; no ring-outs; full heal every round; capsules,

@@ -220,6 +220,7 @@ void input_poll_hook(InputSystem *in) {
     krillin_frame(in);   // krillin.c: old Hercule's weak combat bytes, KR_TEST triggers
     ssj2_frame();        // ssj2gohan.c: SSJ2_TEST triggers
     a16_frame();         // a16player.c: an older save's Android 16 gets his four moves
+    tny_frame();         // tourney_hooks.c: the tournament team's per-frame work (engine, moves, ui)
 #ifdef SSJ_TEST
     if (coop.p2 && (coop.input2.pressed & KEY_START)) {   // test builds: player 2's Start transforms
         extern int ssj_ready(CharacterEntry *); extern void ssj_use(CharacterEntry *, Entity *);

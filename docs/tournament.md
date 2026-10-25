@@ -327,6 +327,23 @@ fighter per tournament, shown on the board as a silhouette with its condition) i
 - **Buu's Fury records with attack sets** (from `build/buu_sprites/report.md`, animations 2-6 present): 43
   full sets, 26 partial; the full list and frames are in `build/wm/buu_fighters.png`.
 
+## 9a. The team (2026-10-25, Ryan: "deploy a team ... you make the decisions")
+
+Seven sessions, each in its own git worktree on its own branch, building into its own `BUILD=build/<piece>`;
+the main session merges, rebuilds and runs the whole regression. The contract is `src/coop/tourney.h` (ids, the
+roster table's shape, every cross-piece function) with `tourney_data.c` (the roster) and `tourney_hooks.c`
+(weak defaults and the dispatchers); numbers in `docs/ids.md` "Allocations for the tournament build".
+
+| piece | owns | done when |
+|---|---|---|
+| grounds | Papaya Island maps (zone 15 areas 11-17), the world-map landing, pads, crowd, director, board object, waiting-room actors | you can fly in, walk the grounds, save, talk to the director (CoopCall 23) and the board (CoopCall 28) |
+| art-new | King Cold, Master Roshi, Chi-Chi, Videl, Chiaotzu bodies (sprites 185-189, portraits 127-139) | each runs as an opponent on AI set 21 and as a player body |
+| art-buu | every Buu's Fury import (195-230) and portraits (140-189) | each converted record spawns and fights; portraits load |
+| playables | player-layout LoG2 bodies (235-249), display rows 29-79, `tny_play_row` / `tny_play_entry` | every TR_BEAT / TR_CHALLENGER fighter has a row and plays |
+| engine | the pool, brackets, simulation, the match loop in all divisions, heal, rewards, the global record, unlocks, challengers, pop-up queue | a 1P Rookie 1v1 can be entered, fought, won, and unlocks recorded; co-op flows tested |
+| moves | the kits (section 5), transforms, NPC-vs-NPC hits and Rumble targeting | every opponent fights with his kit; a Rumble pack fights itself |
+| ui | list box, select screen, bracket screen and animation, Rumble board, unlock board, pop-up look | each screen opens from its CoopCall and returns its answer |
+
 ## 9. Build order (once the plan is done)
 
 1. Buu map lister; the grounds imported; the world-map landing; the save pads; the director with the

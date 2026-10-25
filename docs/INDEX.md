@@ -25,6 +25,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the current story plan: status, standing rules, chapter table, Ryan's decisions per chapter, what is open | story work |
 | `docs/tournament.md` | the tournament mode (Papaya Island from Buu's Fury): decisions so far, the roster by chapter, the engine facts it rests on, the build order; planning in chat, nothing built | tournament work |
+| `src/coop/tourney.h`, `tourney_data.c`, `tourney_hooks.c` | the tournament team's contract: ids, the roster table, the cross-piece API with weak defaults, the CoopCall 23-30 / test command 21-30 / per-frame dispatchers (`docs/tournament.md` 9a) | tournament work |
 | `docs/story-rom.md` | what the stock ROM does per chapter (maps, speakers, flags, quotes from the script dump) | grounding a story answer in ROM facts |
 | `docs/story-archive.md` | superseded options, cost tables, investigation notes, removed content (dated) | why something was decided |
 | `docs/scripts.md` | story scripts: bytecode, dialogue, triggers, records, condition words, flags, lscript, story specs, chapters implemented | editing a scene or a map's records |

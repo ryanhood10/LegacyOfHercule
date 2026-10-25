@@ -29,6 +29,7 @@ import romdata   # noqa: E402  (party table layout shared with tools/romdata.py)
 
 ROM_BASE = 0x08000000
 CODE_AT = 0x00800000
+ART_AT = 0x00E00000          # the second blob (coop.ld rom2): big generated art, up to 2 MiB
 ROM_SIZE = 0x01000000
 
 # (vtable address, slot, symbol): slot word becomes (symbol | 1) - vtable
@@ -98,8 +99,10 @@ ENTRY_JUMPS = [
 # at 0x0203F000, where coop.ld's partyram region (relocated party block + save-menu slot store) starts:
 # (0x0203F000 - 0x02000808) / 4 = 0xF9FE words. (The earlier 0xFCC0 let the mirror's last 8 bytes
 # overlap coop2's magic word at 0x0203FB00; nothing wrote them, so it never showed.)
+# Since 2026-10-25 the cap ends at 0x0203EC00 instead, below the tournament team's `tourneyram` region (0x400
+# bytes, coop.ld): (0x0203EC00 - 0x02000808) / 4 = 0xF8FE words.
 WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000F9FE),
+    (0x01F20C, 0x0000FDFE, 0x0000F8FE),
 ]
 
 # The 27 pointer words that hold the party block's address (g_PartyState, 0x03000E90): the static
@@ -385,6 +388,14 @@ def main():
         sys.exit(f"original ROM is larger than {CODE_AT:#x}")
     rom += b"\xff" * (ROM_SIZE - len(rom))
     rom[CODE_AT:CODE_AT + len(code)] = code
+    if "--art" in sys.argv:
+        art = open(sys.argv[sys.argv.index("--art") + 1], "rb").read()
+        if len(art) > 0x200000:
+            sys.exit(f"art blob is {len(art):#x} bytes, more than rom2's 2 MiB")
+        if any(b != 0xFF for b in rom[ART_AT:ART_AT + len(art)]):
+            sys.exit(f"art blob at {ART_AT:#x} overlaps used ROM")
+        rom[ART_AT:ART_AT + len(art)] = art
+        print(f"art    {len(art)} bytes at {ROM_BASE + ART_AT:#x}")
 
     for off, old, new in WORD_PATCHES:
         cur = struct.unpack_from("<I", rom, off)[0]

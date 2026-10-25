@@ -21,15 +21,21 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
 MEMORY
 {
     rom   (rx)  : ORIGIN = 0x08800000, LENGTH = 0x00100000
+    rom2  (r)   : ORIGIN = 0x08E00000, LENGTH = 0x00200000   /* big generated art (.rodata.art*): tools/patch_rom.py --art */
+    tourneyram (rw) : ORIGIN = 0x0203EC00, LENGTH = 0x00000400   /* the tournament team's state (tourney.h); the heap cap ends here */
     ewram (rw)  : ORIGIN = 0x0203FF00, LENGTH = 0x00000100
     vtram (rw)  : ORIGIN = 0x0203FE00, LENGTH = 0x00000100   /* below the pinned block, above the heap */
     ewram2 (rw) : ORIGIN = 0x0203FB00, LENGTH = 0x00000300   /* co-op difficulty state (enemies.c) */
-    partyram (rw) : ORIGIN = 0x0203F000, LENGTH = 0x00000B00 /* relocated party block + save-menu slot store (party.c);
-                                                                 the heap cap in tools/patch_rom.py ends here */
+    partyram (rw) : ORIGIN = 0x0203F000, LENGTH = 0x00000B00 /* relocated party block + save-menu slot store (party.c) */
 }
 
 SECTIONS
 {
+    .art : {
+        KEEP(*(.rodata.art*))
+        . = ALIGN(4);
+    } > rom2
+
     .text : {
         *(.text*)
         *(.rodata*)
@@ -63,6 +69,13 @@ SECTIONS
         KEEP(*(.party.xp))   /* exp.c: the last hit per enemy (kill EXP to that player) */
         KEEP(*(.party.bv))   /* cellgames.c: the capped beams' vtable copy (last: the sections before keep their addresses) */
     } > partyram
+
+    .tny (NOLOAD) : {
+        KEEP(*(.tny.eng))    /* engine (<= 0x240) */
+        KEEP(*(.tny.ui))     /* ui (<= 0x100) */
+        KEEP(*(.tny.mv))     /* moves (<= 0x80) */
+        KEEP(*(.tny.gr))     /* grounds (<= 0x40) */
+    } > tourneyram
 
     .bss (NOLOAD) : {
         *(.bss*)
