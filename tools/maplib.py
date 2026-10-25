@@ -1,7 +1,11 @@
-"""Map format library for Legacy of Goku II (USA): reads the MapEntry table, map variations, tiled
-layers, the tileset (slot table + shared tile banks), animated tile sequences, the global BG palette,
-collision bitmaps, triggers, exits and level gates. Shared by tools/mapexport.py (render to PNG) and
-tools/mapbuild.py (build new maps). Format notes: docs/maps.md.
+"""Map format library for Legacy of Goku II (USA) and Buu's Fury (USA): reads the MapEntry table, map
+variations, tiled layers, the tileset (slot table + shared tile banks), animated tile sequences, the
+global BG palette, collision bitmaps, triggers, exits and level gates. Shared by tools/mapexport.py
+(render to PNG) and tools/mapbuild.py (build new maps). Format notes: docs/maps.md (section 10 for Buu).
+
+Both games share the format; what differs per ROM (table addresses, name encoding, the create functions
+that name a trigger's or layer's kind) lives in a Game profile, picked from the ROM header's game code
+(ALFE / BG3E) when a Rom is opened. The module-level constants are LoG2's.
 
 All addresses are GBA addresses (ROM 0x08000000 + file offset). Nothing here writes the ROM.
 """
@@ -31,10 +35,54 @@ SAVEPAD_CREATE = 0x08010AC7      # trigger: save / switch-characters pad
 WORLDLABEL_CREATE = 0x0801A6B3   # trigger (world map only): landing-spot name banner
 SLOT_LIMIT = 896                 # VRAM 0x06000000..0x0600E000 holds 896 8bpp tiles (map BGs at 0x0600E000+)
 
+# Buu's Fury (USA, BG3E): same engine, its own addresses (docs/maps.md section 10)
+BUU_MAP_ENTRIES = 0x0808E2E0     # 452 x 0x38, LoG2's row layout (code literal 0x08008A58)
+BUU_MAP_COUNT = 452
+BUU_MAP_NAMES = 0x0806BCE8       # name id -> UTF-16LE string pointer (literals 0x08000674, 0x080008E0, 0x080039D8, 0x080056FC)
+BUU_BG_PALETTE = 0x0805632C      # 0x200 below its OBJ palette 0x0805652C
+BUU_LAYER_EFFECT = 0x08007A41    # BG0 (sometimes BG1/2) class on maps with an overlay: not a chunk grid (LoG2's 0x08004FCD by use)
+BUU_LAYER_OTHER = 0x0800897B     # another non-chunk class (41 layers, mostly BG3 in zone 0 / 6 interiors); not decoded
+BUU_WORLD_LAYERS = (0x08007B63, 0x080088BD)  # the world map's (zone 0 area 50, affine) BG1 / BG2 classes
+# Buu trigger create functions, named by use (the exit pair by where their rects sit: 0x08007675 on map edges and
+# wall openings, 0x080072CD on door-sized rects); payload layouts match LoG2's (exits: dir, zone, area, var, x, y)
+BUU_EDGE_EXIT_CREATE = 0x08007675
+BUU_EXIT_CREATE = 0x080072CD
+BUU_SCRIPT_CREATE = 0x08007387
+BUU_DIALOG_CREATE = 0x0800742D
+BUU_SAVEPAD_CREATE = 0x08007499
+BUU_WORLDLABEL_CREATE = 0x080076C5  # payload = map name id (the banner over a landing spot)
+
+
+class Game:
+    """Per-ROM constants: where the map tables are, how names are stored, what the create functions mean."""
+
+    def __init__(self, name, code, map_entries, map_count, map_names, names_utf16, bg_palette, layer_classes, trigger_kinds):
+        self.name, self.code = name, code
+        self.map_entries, self.map_count, self.map_names, self.names_utf16 = map_entries, map_count, map_names, names_utf16
+        self.bg_palette, self.layer_classes, self.trigger_kinds = bg_palette, layer_classes, trigger_kinds
+        self.exit_creates = {c for c, k in trigger_kinds.items() if k in ("exit", "edge-exit")}
+
+
+LOG2 = Game("log2", b"ALFE", MAP_ENTRIES, MAP_COUNT, MAP_NAMES, False, BG_PALETTE,
+            {LAYER_TILED: "tiled", LAYER_EFFECT: "effect"},
+            {EXIT_CREATE: "exit", EDGE_EXIT_CREATE: "edge-exit", SCRIPT_CREATE: "script", DIALOG_CREATE: "dialogue",
+             SAVEPAD_CREATE: "savepad", WORLDLABEL_CREATE: "world-label"})
+BUU = Game("buu", b"BG3E", BUU_MAP_ENTRIES, BUU_MAP_COUNT, BUU_MAP_NAMES, True, BUU_BG_PALETTE,
+           {LAYER_TILED_BUU: "tiled", BUU_LAYER_EFFECT: "effect?", BUU_LAYER_OTHER: "class 0x0800897B",
+            BUU_WORLD_LAYERS[0]: "world-map", BUU_WORLD_LAYERS[1]: "world-map"},
+           {BUU_EXIT_CREATE: "exit", BUU_EDGE_EXIT_CREATE: "edge-exit", BUU_SCRIPT_CREATE: "script",
+            BUU_DIALOG_CREATE: "dialogue", BUU_SAVEPAD_CREATE: "savepad", BUU_WORLDLABEL_CREATE: "world-label"})
+GAMES = {g.name: g for g in (LOG2, BUU)}
+
 
 class Rom:
-    def __init__(self, data):
+    def __init__(self, data, game=None):
         self.data = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
+        if game is None:
+            code = bytes(self.data[0xAC:0xB0])
+            game = next((g.name for g in GAMES.values() if g.code == code), "log2")
+        self.game = GAMES[game]
+        self._area_names = None
 
     def off(self, a):
         return a - ROM_BASE
@@ -68,6 +116,24 @@ class Rom:
         o = a - ROM_BASE
         return self.data[o:self.data.index(b"\0", o)].decode("latin-1")
 
+    def wstr(self, a):
+        """UTF-16LE string ending in a 0 word (Buu's Fury's map names)."""
+        o, out = a - ROM_BASE, []
+        while True:
+            c = struct.unpack_from("<H", self.data, o)[0]
+            if c == 0:
+                return "".join(out)
+            out.append(chr(c))
+            o += 2
+
+    def map_name(self, zone, area):
+        """Name of the first MapEntry with this zone / area (for exit targets), or None."""
+        if self._area_names is None:
+            self._area_names = {}
+            for e in entries(self):
+                self._area_names.setdefault((e.zone, e.area), e.name_text())
+        return self._area_names.get((zone, area))
+
 
 def bgr555_to_rgb(c):
     return ((c & 31) * 255 // 31, ((c >> 5) & 31) * 255 // 31, ((c >> 10) & 31) * 255 // 31)
@@ -77,7 +143,8 @@ def rgb_to_bgr555(r, g, b):
     return (r * 31 + 127) // 255 | ((g * 31 + 127) // 255) << 5 | ((b * 31 + 127) // 255) << 10
 
 
-def bg_palette(rom, addr=BG_PALETTE):
+def bg_palette(rom, addr=None):
+    addr = addr or rom.game.bg_palette
     return [rom.u16(addr + 2 * i) for i in range(256)]
 
 
@@ -103,9 +170,13 @@ class MapEntry:
         return Variation(self.rom, self.rom.u32(self.variations + 4 * (v - 1)))
 
     def name_text(self):
+        g = self.rom.game
         if self.name >> 16:
             return f"script {self.name:#x}"
-        return self.rom.cstr(self.rom.u32(MAP_NAMES + 4 * self.name)) if self.name != 0xDD else "(none)"
+        if not g.names_utf16 and self.name == 0xDD:
+            return "(none)"
+        p = self.rom.u32(g.map_names + 4 * self.name)
+        return self.rom.wstr(p) if g.names_utf16 else self.rom.cstr(p)
 
     def trigger_list(self):
         out = []
@@ -118,11 +189,13 @@ class MapEntry:
         return [Gate(self.rom.read(self.gates + 8 * k, 8)) for k in range(self.ngate)]
 
 
-def entries(rom, table=MAP_ENTRIES, count=MAP_COUNT):
+def entries(rom, table=None, count=None):
+    """The ROM's MapEntry rows (its game's table unless another is given, e.g. a built ROM's relocated one)."""
+    table, count = table or rom.game.map_entries, count or rom.game.map_count
     return [MapEntry(rom, table + i * MAP_ENTRY_SIZE, i) for i in range(count)]
 
 
-def find_entry(rom, zone, area, nth=0, table=MAP_ENTRIES, count=MAP_COUNT):
+def find_entry(rom, zone, area, nth=0, table=None, count=None):
     hits = [e for e in entries(rom, table, count) if e.zone == zone and e.area == area]
     return hits[nth] if len(hits) > nth else None
 
@@ -151,9 +224,10 @@ class Trigger:
         self.payload = rom.u32(addr + 0x10)
 
     def kind(self):
-        return {EXIT_CREATE: "exit", EDGE_EXIT_CREATE: "edge-exit", SCRIPT_CREATE: "script",
-                DIALOG_CREATE: "dialogue", SAVEPAD_CREATE: "savepad",
-                WORLDLABEL_CREATE: "world-label"}.get(self.create, f"create {self.create:#x}")
+        return self.rom.game.trigger_kinds.get(self.create, f"create {self.create:#x}")
+
+    def is_exit(self):
+        return self.create in self.rom.game.exit_creates
 
     def exit_target(self):
         """Exit payload at +0x10: u8 dir (low nibble: 0 none, 1 up, 2 left?, 3 right.. index into the key
@@ -229,6 +303,12 @@ class Layer:
             self.grid = [rom.u32(addr + 0x18 + 4 * i) for i in range(self.cols * self.rows)]
         else:
             self.scale, self.offset, self.cols, self.rows, self.grid = (1024, 1024), (0, 0), 0, 0, []
+
+    def kind(self):
+        """'tiled', 'effect', ... per the ROM's game profile; 'none' for an empty slot."""
+        if not self.addr:
+            return "none"
+        return self.rom.game.layer_classes.get(self.create, f"create {self.create:#x}")
 
     def chunk(self, cx, cy, cache=None):
         p = self.grid[cy * self.cols + cx]

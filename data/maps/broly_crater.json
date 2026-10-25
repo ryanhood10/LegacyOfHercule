@@ -1,5 +1,5 @@
 {
- "_": "Broly's crater (optional, built only when roms/buu.gba is present): Buu's Fury's walled wasteland crater (variation record 0x0822229C in that ROM; its map table is not decoded, so the record is named by address), imported whole: all four layers and the collision, its tiles converted to LoG2's palette (nearest colour) into new tile banks. The LoG2-only arena is zone 15 area 3.",
+ "_": "Broly's crater (optional, built only when roms/buu.gba is present): Buu's Fury's walled wasteland crater (variation record 0x0822229C in that ROM: zone 8 area 71 'Giant Crater', variation 2; docs/maps.md section 10), imported whole: all four layers and the collision, its tiles converted to LoG2's palette (nearest colour) into new tile banks. The LoG2-only arena is zone 15 area 3.",
  "name": "broly_crater",
  "zone": 15, "area": 4,
  "requires": "buu",
