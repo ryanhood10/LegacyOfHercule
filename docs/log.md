@@ -4,6 +4,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament engine (branch `tny-engine`):** `src/coop/tny_engine.c`: the pool (tiers on flags 85 / 136 / 191 / 382,
+  confirmed in the scripts; no mirror matches), the director's flow from CoopCall 23 (tier, division, Quick / Full,
+  select), random brackets with off-screen simulation, matches in the ring spawned from RAM records on stats
+  160 + fighter id (tier-scaled, never twinned), full heal and the 1 HP rule, co-op 1 v 1 turns with a duel final,
+  2 v 2 as four teams, the Royal Rumble's rounds and headliners, prizes (+3 capsules, Senzu), an EXP trickle, the
+  global record on the save chip (EEPROM 0x1E00), beat-to-unlock, the hidden challengers (Uub / Vegito conditions),
+  pop-ups and the story watch (after the first visit). Player 1 changes body only through a ring reload. Test
+  `tools/headless/tny_engine.txt`; regression (ch9_gero, cell_games_1p, duel_end, a16_moves) unchanged.
+  `docs/tournament.md` 13.
 - **Tournament screens (branch `tny-ui`):** `src/coop/tny_ui*.c`: a full-screen modal framework on the save pad's
   switch-screen recipe (stock fades, our `Modal_Run` object, the map's entities and OBJ VRAM allocator set aside
   and restored, a bitmap BG for panels and text, stock Portrait faces, 64 x 64 dialogue portraits as OBJ), the list

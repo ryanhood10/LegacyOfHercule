@@ -5,8 +5,8 @@
 //
 // Flow (one tournament): CoopCall 23 at the director arms P_DIRECTOR and pushes 1. Every frame
 // (tny_engine_frame, from the input poll) decides what comes next; anything that opens a screen, warps, spawns
-// or shows a line runs as a "step" in an entity-list event (the context the game's own level-up and defeat
-// dialogues run in), one at a time and only while no scene runs and player 1 is free:
+// or shows a line runs as a "step" from that tick (where the ui's screens expect their callers), one at a time
+// and only while no scene runs and player 1 is free; warps go through the test-warp command:
 //   P_DIRECTOR   the choices (tier, division, Quick / Full), the select screens, the draw; warp to the ring
 //   P_TO_RING    wait for the ring map
 //   P_NEXT       the next thing to play: a bracket match (NPC matches resolve off-screen first), a Rumble
@@ -28,7 +28,6 @@ ROM_FN(void, Eeprom_Write, (void *dev, int off, const void *src, int len), 0x080
 ROM_FN(u32, Save_Checksum, (const void *buf, int len), 0x0802153F);
 ROM_FN(int, ObjVram_Largest, (void *list), 0x08006D71);              // largest free OBJ VRAM block (bytes)
 #define EEPROM_DEV          (*(void *const *)0x081D952C)               // the party module's EEPROM device
-#define DEATH_EVENT_VTABLE  0x080238FCu                                // event whose fire runs action->func(action)
 #define ENEMY_RECORD_HANDLER 0x0800E77Fu
 
 Entity *enemy_spawn_hook(const EnemyRecord *rec);                     // enemies.c
@@ -131,10 +130,15 @@ typedef struct TnyEng {
     // a line in a text box (the announcer, the fallback pop-up): one entry in RAM
     const void *say_seq[3];
     u32 say_action[2];
-    u32 step_action[2];
+    u8 stepping;                         // a step runs (its screens' nested input polls tick again: kept out)
+    u8 _p3[3];
+    u32 step_sp;                         // the stack at the step's tick: a deeper tick is nested, a shallower one
+                                         // finds a stale flag (a reset or a state loaded mid-step) and clears it
     struct { u8 head[4]; char text[72]; } say_entry;
     TRecord rec;                         // the record as last read or written (tests peek it)
     u8 down_t[MAX_OPP];                  // frames a Rumble fighter has lain down (his body leaves at 60)
+    u8 br_shown;                         // the bracket screen has shown this draw (then phase 1 with the results)
+    u8 *tint;                            // the same fighter twice on the floor: player 2's shadow remap (arena)
 } TnyEng;
 _Static_assert(sizeof(TnyEng) <= 0x240, ".tny.eng holds 0x240 bytes (docs/ids.md)");
 // offsets the tests peek (docs/testing.md "Tournament engine"): eng is at the start of tourneyram, 0x0203EC00
@@ -404,23 +408,10 @@ void tny_notify(const char *line) {
 static int popup_is_stub(void) { return *(const u16 *)((u32)tny_popup_show & ~1u) == 0x4770; }
 
 // ---- steps (entity-list events) ----------------------------------------------------------------------------
-typedef struct ActionEvent { u32 *vtable; s32 ticks; s32 x, y; const u32 *action; } ActionEvent;
+// Steps run from the frame tick; a step that opens a modal screen runs the game loop inside it, and that loop's
+// input polls call the tick again: `stepping` keeps those nested ticks out
+#define stepping eng.stepping
 static void run_step(void);
-static void step_fire(u32 *action) { (void)action; eng.pending = 0; run_step(); }
-static void queue_step(void) {
-    ActionEvent *ev = Arena_Alloc(sizeof *ev);
-    if (!ev) return;
-    eng.step_action[0] = (u32)step_fire;
-    eng.step_action[1] = 0;
-    ev->vtable = (u32 *)DEATH_EVENT_VTABLE;
-    ev->ticks = 1;
-    ev->x = g_PlayerObject ? g_PlayerObject->x >> 8 : 0;
-    ev->y = g_PlayerObject ? g_PlayerObject->y >> 8 : 0;
-    ev->action = eng.step_action;
-    EntityList *l = g_EntityList;
-    l->events[l->event_count++] = (u32 *)ev;
-    eng.pending = 1;
-}
 
 // ---- players --------------------------------------------------------------------------------------------
 static CharacterEntry *entry_of(int slot) { return &g_Party->chars[slot]; }
@@ -606,6 +597,43 @@ static void unstage_players(void) {
     heal_all();
 }
 
+// The same fighter twice on the floor (2 v 2, the Rumble): player 2 drawn through a dark violet remap, the duel's
+// shadow (duel.c builds the same for its clone); the hit flash clears the field, so the fight frame puts it back
+#define OBJ_PAL ((volatile const u16 *)0x05000200)
+static void shadow_on(void) {
+    if (!eng.tint) {
+        u8 *t = Arena_Alloc(256);
+        if (!t) return;
+        t[0] = 0;
+        for (int i = 1; i < 256; i++) {
+            u16 c = OBJ_PAL[i];
+            int r = (c & 31) * 45 / 100, g = ((c >> 5) & 31) * 40 / 100, b = ((c >> 10) & 31) * 55 / 100 + 2;
+            int best = i, bestd = 0x7FFFFFFF;
+            for (int j = 1; j < 256; j++) {
+                u16 d = OBJ_PAL[j];
+                int dr = (d & 31) - r, dg = ((d >> 5) & 31) - g, db = ((d >> 10) & 31) - b;
+                int dist = dr * dr + dg * dg + db * db;
+                if (dist < bestd) { bestd = dist; best = j; }
+            }
+            t[i] = (u8)best;
+        }
+        eng.tint = t;
+    }
+    if (coop.p2 && *(u8 **)((u8 *)coop.p2 + 0x24) != eng.tint) {
+        *(u8 **)((u8 *)coop.p2 + 0x24) = eng.tint;
+        *(u32 *)((u8 *)coop.p2 + 0x20) = 0;          // the next frame is decoded through the remap
+    }
+}
+static void shadow_off(void) {
+    if (coop.p2 && eng.tint && *(u8 **)((u8 *)coop.p2 + 0x24) == eng.tint) {
+        *(u8 **)((u8 *)coop.p2 + 0x24) = 0;
+        *(u32 *)((u8 *)coop.p2 + 0x20) = 0;
+    }
+    if (eng.tint) Arena_Free(eng.tint);
+    eng.tint = 0;
+}
+static int twins_on_floor(void) { return eng.players == 2 && eng.fighter == 2 && eng.pick[0] == eng.pick[1]; }
+
 // ---- opponents --------------------------------------------------------------------------------------------
 static const u32 no_action[2] = { ENEMY_ACTION_NONE, 0 };
 static int in_list(const Entity *e) {
@@ -740,6 +768,7 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
     }
     eng.nwait = eng.nopp;
     eng.lone = kind == K_CHALLENGE && n == 1 && who == 2;
+    eng.tint = 0;                                    // an arena block of an earlier map is gone
     stage_players(who);                            // the caller checked needs_reload(who) first
     spawn_waiting(opp_budget(), 1);
     eng.lone = 0;
@@ -753,6 +782,7 @@ static int opp_budget(void) { return eng.kind == K_RUMBLE ? 5 : MAX_OPP * 2; }
 
 static void fight_frame(void) {
     if (eng.timer < 0xFFFF) eng.timer++;
+    if (twins_on_floor()) shadow_on();
     int alive = 0;
     for (int i = 0; i < eng.nopp; i++) {
         if (eng.opp_in[i] == 2 && eng.kind == K_RUMBLE && eng.opp[i]) {   // a fallen Rumble fighter's body leaves: its
@@ -900,6 +930,7 @@ static void draw_bracket(void) {
             b->seat[s] = k < n ? pool[k++] : NO;
         }
     eng.results = 0;
+    eng.br_shown = 0;
 }
 
 // ---- the Rumble ----------------------------------------------------------------------------------------------
@@ -1114,7 +1145,8 @@ static void step_next(void) {
         return;
     }
     if (!find_next()) {                              // the bracket is played out
-        tny_ui_bracket(1);
+        tny_ui_bracket(eng.br_shown ? 1 : 0);
+        eng.br_shown = 1;
         eng.results = 0;
         eng.phase = (players_in(champion_seat()) & ~eng.out) ? P_TROPHY : P_EXIT;
         return;
@@ -1125,7 +1157,8 @@ static void step_next(void) {
     int duel = eng.division == DIV_1V1 && pa && pb;
     int who = duel ? 2 : (pa | pb) == 3 ? 2 : (pa | pb) == 2 ? 1 : 0;
     if (needs_reload(who)) { stage_players(who); restage(P_NEXT); return; }   // this step again after the reload
-    tny_ui_bracket(eng.results ? 1 : 0);
+    tny_ui_bracket(eng.br_shown ? 1 : 0);            // the draw once (0), then the results since (1)
+    eng.br_shown = 1;
     eng.results = 0;
     static const char *const round_name[4] = { "Round 1: ", "Round 2: ", "Round 3: ", "Round 4: " };
     const char *round = r == eng.br.rounds - 1 ? "The final: " : round_name[r & 3];
@@ -1159,6 +1192,7 @@ static void step_match_end(void) {
     if (won) for (int i = 0; i < eng.nopp; i++)
         if (eng.opp_by[i] && (tny_fighters[eng.opp_id[i]].role & TR_BEAT)) unlock(eng.opp_id[i]);
     clear_opps();
+    shadow_off();
     heal_all();
     if (won) {
         if (eng.fighter == 2 || eng.players == 1) { exp_trickle(exp_slot(0)); if (eng.players == 2) exp_trickle(exp_slot(1)); }
@@ -1260,6 +1294,7 @@ static void step_challenge(void) {
 // ---- leaving ---------------------------------------------------------------------------------------------------
 static void cleanup(int restore) {
     tny_rumble_mode(0);
+    if (restore) shadow_off(); else eng.tint = 0;
     if (restore) {
         clear_opps();
         unstage_players();
@@ -1297,12 +1332,12 @@ static void run_step(void) {
     switch (eng.phase) {
     case P_IDLE: popup_step(); break;
     case P_DIRECTOR: step_director(); break;
-    case P_NEXT: if (!popup_step()) step_next(); break;
+    case P_NEXT: if (!(popup_is_stub() && popup_step())) step_next(); break;
     case P_MATCH_END: step_match_end(); break;
     case P_TROPHY: step_trophy(); break;
     case P_PRIZE: step_prize(); break;
     case P_CHALLENGE: step_challenge(); break;
-    case P_EXIT: if (!popup_step()) step_exit(); break;
+    case P_EXIT: if (!(popup_is_stub() && popup_step())) step_exit(); break;
     default: break;
     }
 }
@@ -1335,6 +1370,10 @@ static void story_watch(void) {
 // ---- every frame (input poll) --------------------------------------------------------------------------------------
 void tny_engine_frame(void) {
     state_check();
+    if (stepping) {                                  // a step's screen is open: its nested input polls stay out
+        if ((u32)__builtin_frame_address(0) < eng.step_sp) return;
+        stepping = 0;
+    }
     story_watch();
     if (eng.say_hold && !scene_running()) eng.say_hold--;
     int safe = g_PlayerObject && p1_controllable() && !scene_running() && !eng.say_hold;
@@ -1396,7 +1435,18 @@ void tny_engine_frame(void) {
     case P_MATCH_END: want = eng.timer >= 90; break;
     default: break;
     }
-    if (want) queue_step();
+    // the pop-up queue: shown here, in the frame tick, at the safe moment (the ui's tny_popup_show runs its own
+    // modal line), between the tournament's steps (idle, or before the next match / the way out)
+    if (eng.qn && (eng.phase == P_IDLE || eng.phase == P_NEXT || eng.phase == P_EXIT) && !popup_is_stub()) {
+        eng.step_sp = (u32)__builtin_frame_address(0);
+        stepping = 1;
+        popup_step();
+        stepping = 0;
+        return;
+    }
+    // the step runs here, in the frame tick (the ui's screens are made to be opened from it; one opened from an
+    // entity-list event lost the next event across its set-aside of the map's entities)
+    if (want) { eng.pending = 0; eng.step_sp = (u32)__builtin_frame_address(0); stepping = 1; run_step(); stepping = 0; }
 }
 
 // ---- CoopCall 23-27 ------------------------------------------------------------------------------------------------

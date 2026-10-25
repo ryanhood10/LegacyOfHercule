@@ -20,7 +20,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
-| engine | 446-459 | 160-219 | - | - | - | - | 23-27 | 21-25 | - | `.tny.eng` 0x240 |
+| engine | 446-459 (none used yet) | 160-219 (160-209 used: 160 + fighter id) | - | - | - | - | 23 (24-27 free) | 21-25 | EEPROM 0x1E00-0x1E3F (the global record) | `.tny.eng` 0x240 (0x1B8 used) |
 | moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
 | ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
 
@@ -105,6 +105,8 @@ sprite 72) for Roshi's gym.
 | 145 | Super Android 13 (own spawn path, `s13_stat`; `BOSS_NO_TWIN` by construction: no twin, no stat-table row) | (own row: 10000 HP, 48 / 64 / 56, AI set 21) | `super13.c` |
 | 146-149 | Super 13's allocation, unused | | |
 | 150+ | 150-154 allocated to the post-game chapter; 155+ free | | |
+| 160-209 | the tournament's opponents: stat 160 + fighter id (`tourney.h` TF_*), resolved per tournament tier (`tny_engine.c` `tny_resolve_stat`; the rule `BOSS_NO_TWIN \| BOSS_FLAT`); 16 and Super 13 keep 109 / 145 | (boss class of 29; Cell Jr 26) | engine |
+| 210-219 | the engine's, free | | |
 
 ## Sprite ids (relocated `sprite_index`, stock 0-156, gaps are 0)
 
@@ -232,7 +234,8 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21 | Players: the 1 / 2 players answer (`players.c`) | every game start |
 | 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55) |
-| 23-27 | the tournament engine (23: the director's whole flow; pushes 1 when it took over) | tournament (`tourney_hooks.c`) |
+| 23 | Director (op): op 0 the director's whole flow (pushes 1 when the engine took over, 0 when it cannot start now); op 1 pushes 1 while a tournament runs (`tny_engine.c`) | the waiting room's director (`papaya.lscript`) |
+| 24-27 | the tournament engine, free | |
 | 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
 | 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
 | 31+ | free | |
@@ -264,7 +267,12 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
 | 19+ | 19-20 allocated to the post-game chapter | |
-| 21-29 | the tournament team (`docs/ids.md` allocations above) | |
+| 21 | TNY_SEED (engine) | `arg` = the next tournament's draw seed (`tny_engine.c`) |
+| 22 | TNY_FORCE (engine) | `arg` 0: every opponent of the running fight takes a lethal blow from player 1 (a won fight); 1: the fight is lost (player at 1 HP); 2: the running duel ends, `arg2` = the winner (1 / 2) |
+| 23 | TNY_RECORD (engine) | `arg` 0: wipe the global record; 1 / 2: set / clear fighter `arg2`'s unlock bit; 3: reread it into `eng.rec` (0x0203ED68) |
+| 24 | TNY_FORCE_POOL (engine) | `arg` = tiers forced open (bits 0-4); `arg2` bit 0 ignore the fighters' story flags, bit 1 a fighter without art fights with Tien's body (121); no story notices while anything is forced |
+| 25 | TNY_START (engine) | a tournament without the director's screens, from where player 1 stands (the way back): `arg` = division \| full << 4 \| tier << 8, `arg2` = player 1's pick \| player 2's << 8 (0xFF = his own character) |
+| 28-29 | the tournament ui (below / `docs/tournament.md` 12) | |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
 | 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |
@@ -331,12 +339,16 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
 | 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
+| 0x0203EC00 | 0x1B8 of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0002): phase +4, result +7, picks +12, bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the record as last read +0x168; then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |
 | 0x0203FEC0 | | wide-view descriptor (`wide.h`) |
 | 0x0203FF00 | 2 + 2 | `g_p2_remote`, `g_p1_remote` pad words |
 | 0x0203FF04 | 0xE4 | `coop` (`CoopState`): `p2` +4, `p2_slot` +0x80, `exp_awards` +0xD8 |
+
+Save chip (8 KiB EEPROM, `party_save.c`): the header 0x0-0xF, three save slots of `SAVE_STRIDE` (0x10-0x54F with 9
+party slots), **the tournament's global record 0x1E00-0x1E3F** (`tny_engine.c` `TRecord`), the rest free.
 
 Useful `coop2` words: `cmd` 0x0203FD08, `cmd_arg` 0x0203FD0C, `a16` 0x0203FD34, `a16_bot` 0x0203FD44,
 `cmd_arg2` 0x0203FD54, `duel_active` / `duel_winner` 0x0203FD5C / 0x0203FD5D.

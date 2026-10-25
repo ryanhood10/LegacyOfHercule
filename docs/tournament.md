@@ -1,6 +1,6 @@
 # Tournament mode: design in progress (Ryan, 2026-10-24)
 
-Status: **plan done (Ryan, 2026-10-25); the team is building it (9a); the grounds are built (9b).** Every decision below is Ryan's unless marked "our
+Status: **plan done (Ryan, 2026-10-25); the team is building it (9a); the grounds (9b) and the engine (13) are built.** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -702,3 +702,123 @@ returns at once: `select` 0, `choose` -1). `tny_ui_bracket(0)` once when a brack
 round's results are in (`winner[][]` filled for the whole round, `round` / `match` on the players' next match);
 a new bracket (different seats) starts the animation history over. Pop-ups: `tny_popup_show` from
 `tny_engine_frame` at the safe frame.
+
+## 13. The engine (built 2026-10-25, branch `tny-engine`)
+
+`src/coop/tny_engine.c` (+ `tny_engine.h`, the hooks other files call) runs every tournament; `tourney_data.c`'s
+numbers are the engine's. Our calls (Ryan left them to us) are marked *decided*.
+
+**The flow.** CoopCall 23 (op 0) at the director arms the tournament and pushes 1 (op 1 pushes 1 while one runs).
+Everything after that is a state machine: each frame (`tny_engine_frame`, the input poll) watches, and every action
+that opens a screen, spawns, warps or shows a line runs as a *step* from that tick, one at a time, only when no scene
+runs, player 1 is free and a queued line has run (`say_hold`); the ticks of a step's own screens (their nested input
+polls) stay out (`stepping`, checked against the stack depth so a flag left by a reset clears itself). Steps first ran
+as entity-list events; with the ui merged, an event queued after a screen's set-aside of the map's entities was lost
+(the flow hung), so they moved to the tick, where the ui expects its callers. Lines ("Round 1: ...") are dialogue
+events (`coop_run_sequence`). Warps go through the test-warp command (`coop2.cmd` 5), so they happen at the start of
+the list update: a map change inside an event fire freed the arena under the event loop (found headless: the game
+froze). The director's lists answer B by ending the talk (nothing changed).
+
+1. *The director*: the tier (a list only when more than one is open), the division (1 v 1 / 2 v 2 / Royal Rumble;
+   2 v 2 only with two players), Quick / Full for 1 v 1 when the tier's pool has 15 (never Rookie), then
+   `tny_ui_select` for player 1 and player 2. B anywhere ends it quietly. A pick that is not pickable (locked, or a
+   tournament fighter without a display row) falls back to the player's own character.
+2. *The characters* are set once for the whole tournament: a story pick plays from his party slot (player 1 switches
+   with the SetActiveCharacter step), a tournament playable's entry (`tny_play_entry`, at the lead's level) is
+   written into a *carrier* slot: the player's own slot, else the duel clone's slot 7 when nobody is in it (backed
+   up in `.tny.eng`, restored on the way out). The same story fighter twice: player 2 gets a copy in a carrier. 16
+   after his chapter (flag 421) plays as a copy of his entry (the `a16_join` recipe). Then the warp into the ring:
+   the map load builds player 1's body (a body change in place keeps the old OBJ VRAM slot; a 64 x 64 one overflows
+   it, the playables piece's finding). Whenever player 1's fighter changes later (a co-op 1 v 1's turns), the ring
+   reloads first (`P_RESTAGE`) and the step runs again.
+3. *The bracket*: a random draw from the tier's pool (`tny_in_pool` and the fighter's own tier at or below the
+   tournament's; no repeats, no story playables, no challengers). Seats are filled unit by unit (a 2 v 2 team is two
+   seats), so a short pool leaves whole byes at the end; a bye's opponent advances. Co-op 1 v 1: player 1 in the
+   first half, player 2 in the second. **2 v 2** (*decided*): a Quick bracket of 8 seats = 4 teams (seats 2k and
+   2k + 1), `rounds` 2, `winner[r][m]` the winning team's first seat; Full is not offered for 2 v 2.
+4. *Simulation*: a match without a player resolves off-screen when the players' next match comes up: power p
+   (below) per fighter, a team the sum; side A wins with probability pA^2 / (pA^2 + pB^2) (HP x attack scale as p^2;
+   *decided*). The engine's own RNG (an LCG seeded from the frame counter, or by test command 21), so the game's
+   RNG and lockstep netplay are untouched.
+5. *A fight*: both players healed (HP and EP full), placed 40 px left of the ring's centre, the opponent(s) 40 px
+   right (`tny_ring.h`), spawned from a RAM enemy record (stat 160 + fighter id, script-spawned: boss rules) through
+   `enemy_spawn_hook`, his kit attached (`tny_moves_attach`), a boss bar each in 1 v 1 / 2 v 2 (the second one under
+   the first), the announcer's line ("Round 1: Gohan vs. Frieza!", "The final: ..."). Android 16 and Super 13 spawn
+   on their own stats (109 / 145) and paths. Co-op 1 v 1: the players take turns, the other sits out (the Cell Games'
+   solo modes 1 / 2: player 2's matches are played on player 1's entity as player 2's pick; `coop_solo` holds in the
+   ring while the tournament runs); the final between them is a duel (the CoopCall 1 path: `coop2.call_state`, the
+   winner's line; the same fighter twice: the duel's shadow). The same fighter twice on the floor (2 v 2, Rumble):
+   player 2 is drawn through the duel's dark violet remap (the ui does not tint).
+6. *The end of a fight*: all opponents down = won (`fight_frame`). **The 1 HP rule** (`tny_ko_check` from both
+   take-damage hooks): a lethal hit leaves the player at 1 HP and he is out of the fight; it holds for the whole stay
+   in the ring (a blast still flying after the fight ended killed the player before: found headless). In a fight of
+   both players (2 v 2, Rumble) the first lethal hit downs the player through the revive (`revive.c`; the partner may
+   revive him; the countdown running out in the ring just leaves him down, no game over); the second player's lethal
+   hit loses the fight. 90 frames later: bodies and bars cleared, unlocks, the EXP trickle, the result line, the next
+   step.
+7. *Royal Rumble*: rounds per tier (section 1; fighters at once, players included), packs drawn from the pool
+   without the headliners and without repeats in one Rumble; giants only where the plan puts them (the Z-Fighter's
+   last round, the Legend's rounds from the second) and a giant takes two places; the headliner round is the
+   headliner(s) (Rookie King Cold, Adept 17 and 18, Z-Fighter 16, Champion Broly, Legend Super Buu; the strongest left
+   when his art or story flag is missing) with helpers to three fighters, the headliner spawning last. No bars.
+   `tny_rumble_mode(1)` during the rounds. An entrant waits while OBJ VRAM has no block for his body (0x800, 0x1400 for
+   a giant) and comes in when one frees; a fallen fighter's body leaves after 60 frames (art-new saw a next fighter
+   drawn in pieces while a knocked-out body still held its tiles); with nobody of the fight standing the next one comes
+   in regardless. `tny_ui_rumble_board` before each round.
+8. *The trophy*: the winner's line, then the prizes (*decided*): the first win of each tournament ever (the global
+   record) a +3 capsule whose stat turns with tier and division ((tier + division) % 3: STR / PWR / END, items
+   3 / 6 / 9: five of each over the fifteen tournaments), Full a second one ((tier + 1) % 3) the first time, every
+   later win a Senzu bean (item 0), the Rumble a second Senzu when no player went down. Items through `item_use_hook`
+   (the stock pick-up pop-up).
+9. *The hidden challenger*: every still-locked fighter whose `challenger_of` is this tournament and whose art is in
+   the build (a pair in the Rookie 2 v 2); Uub only when the Champion Rumble was won as Hercule, Vegito only when the
+   Legend 1 v 1 was won as Goku or Vegeta (*decided*: the "else Majin Vegeta / SSJ3" variants of section 6 are not
+   built; the Legend 2 v 2 and Rumble have no challenger in the roster). "A challenger appears: Pui Pui!", the fight
+   (the winner alone in a co-op 1 v 1; the team otherwise; a lone challenger against two gets the lone-boss HP x1.8):
+   won = unlocked ("... joins the tournament fighters!"), lost = the attempt in the record ("Come back when you've
+   won again!").
+10. *The way out*: entries restored, both players' own slots back, then the warp to where the director talk began.
+   Pause and player 2's Select switch are blocked in the ring. A map change away from the ring mid-tournament (a
+   reload) drops the tournament; entries are restored only into the running game (never into a freshly loaded party).
+
+**Opponents' numbers** (stats 160-209 = 160 + fighter id; `tny_resolve_stat` from `bosses.c`'s `resolve_stat`, a
+`BOSS_NO_TWIN | BOSS_FLAT` rule from `boss_rule`; *decided*, to tune in play): a base per *tournament* tier (Rookie
+1400 HP, melee / ranged / defence 12 / 12 / 10; Adept 2800, 22 / 20 / 18; Z-Fighter 4200, 33 / 33 / 34; Champion 5800,
+47 / 50 / 52; Legend 8000, 58 / 62 / 58), times the fighter's power (75-140: HP x p %, attack and defence x
+(100 + p) / 200 %), the boss class of stat 29 (Cell Jr his own), no kill EXP; then the difficulty's boss HP and
+damage as for every boss. AI set: the one that fits the body (21 most, 98 Tien / Hercule, 129 Tao, 29 the androids,
+80 / 116 / 148 / 138 the Cells), else the first of 21, 98, 129, 11 whose pose groups the body has. A body without the
+regular groups (Mecha Frieza's cutscene sprite 49) uses the fighter's play body, else he is not in the pool. **No
+twins** in tournament fights (the rule's `BOSS_NO_TWIN`; `BOSS_FLAT` skips the lone-boss x1.8, which the engine
+applies itself to a lone challenger).
+
+**EXP** (*decided*): a won fight pays each fighting player 1/16 of his level's span (to the player's own slot when he
+fought as a tournament playable); a Quick run nudges about a fifth of a level.
+
+**The global record** on the save chip: 64 bytes at EEPROM offset 0x1E00 (clear of the three save slots at any
+`PARTY_SLOTS`; read from the game's 8 KiB RAM mirror, which boot fills from the chip; written through `Eeprom_Write`),
+magic "NTY1", version 1, a checksum: unlocked bits per fighter id, wins per tournament (tier x 3 + division), Full
+wins per tier, challenger attempts, prizes paid. Shared by the three save files and kept by a deleted file.
+*Decided*: the first-win capsules follow this global record too (a second save file gets Senzu beans for tournaments
+already won on another).
+
+**Unlocks**: a `TR_BEAT` fighter is unlocked when he falls in a fight the players won and the last hit on him was a
+player's (the damage calculation's note, `tny_note_hit`; the moves piece's `tny_moves_last_hitter` when he has a
+kit); a challenger by beating him. "New tournament fighter!" queues.
+
+**Pop-ups**: `tny_notify` queues up to four lines; shown through the ui's `tny_popup_show` from the frame tick when no
+scene runs, player 1 is free and no step is pending (idle, or between fights); without the ui a narration line in a
+step. The story watch (every 16 frames): tiers open, story playables in the party, tiers whose pool reached 15 ("New
+division: Full bracket!"). *Decided*: no notices before the first visit to Papaya Island (the grounds' flag 441; a
+party join made the "New tournament fighter!" line eat the button presses of `a16_moves.txt`), none after a load (the
+first look after 300 frames without player 1 is a silent baseline), none while a test forces the pool.
+
+**Tiers** (confirmed against the scripts): Adept 85 (the 19 + 13 fight's defeat sequence), Z-Fighter 136
+(`ch5_gingertown_end`), Champion 191, Legend 382; pool flags 127 (17 / 18, the road), 146 (16, the island), 301
+(Cooler and his Namekian: Cooler beaten, zone 6 area 61's defeat script), 402 (Broly, Paragus), 421 (16 playable).
+Mirror rule: Hercule leaves the pool once he is in the party, 16 once he is the players'.
+
+**For the other pieces**: the ui reads `tny_bracket()` (live while a tournament runs) and gets `tny_ui_bracket(0)`
+once per draw, `(1)` before each later match and at the end; the grounds' director needs nothing more. RAM:
+`.tny.eng` 0x1B8 of its 0x240. Not built: the walk-in from opposite doors, the loser lying / winner's pose and the
+announcer standing in the ring (the lines are narration); the Rumble's NPC-vs-NPC fighting is the moves piece's.

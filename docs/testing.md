@@ -819,6 +819,25 @@ screen, the display registers at the end as at the start, no allocation failures
 build (2026-10-25) the regression scripts `ch9_gero`, `cell_games_1p`, `duel_end`, `a16_moves` printed the same as
 main's.
 
+## Tournament engine (headless, 2026-10-25)
+
+```
+make BUILD=build/engine DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/engine/log2-coop.gba --out build/engine/hl
+python tools/headless/st_test.py tools/headless/tny_engine.txt build/engine/log2-coop.gba build/engine/hl/menu.ss --out build/engine/hl --cols 6
+```
+
+`tools/headless/tny_engine.txt` plays, from Map Test 13: the director in the waiting room (a talk, CoopCall 23) into a
+Rookie 1 v 1 and its challenger; a real loss (player 1 at 1 HP, the opponent's hits: no game over); a lost challenge
+(the attempt in the record); a tournament playable (Yamcha's entry in player 1's slot, restored); a Champion Full
+bracket as Gohan; the Champion Rumble as Hercule (Uub challenges); the story notice (flags 441, 85); then with player 2:
+a co-op 1 v 1 (turns, the duel final), 2 v 2, a co-op Rumble; a power cycle reads the record back. Every fight is
+waited for with `stepz` on `eng.t_nofight` (0x0203ECFC: 0 while a fight runs and no line is up; A on both pads
+closes lines and screens) and won with test command 22; the end of a tournament with `stepz` on `eng.t_busy`
+(0x0203ECFD). A test command needs about 10 frames to be taken (the entity list's update): wait `frames 10` between
+two. Test command 24 `arg2` 2 gives a fighter whose art is missing Tien's body, so the flow runs on any build. Pass:
+every stepz reached, no CRASH, the record lines as the echoes say.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

@@ -34,28 +34,28 @@ key 1 10
 frames 60
 key 1 10
 frames 40
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e1_round1
 map
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e1_challenger
 echo expect phase 4, kind 2 (the challenger's fight)
 peek8 0x0203EC04 4
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 map
 echo expect back in 15 / 15; record: unlocked Pui Pui (+0xC bit 4), wins[0] 1, paid bit 0
 peek8 0x0203ED68 0x40
@@ -64,12 +64,12 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD54 0xFFFF
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke16 0x0203F028 1
 frames 900
 shot e2_loss
 peek8 0x0203EC04 4
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 map
 peek16 0x0203F028 2
 echo == 3. a lost challenge: Pui Pui locked again, won tournament, the challenger beats us: attempts[0] 1
@@ -81,23 +81,23 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD54 0xFFFF
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 1
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 peek8 0x0203ED68 0x40
 echo == 4. a tournament playable: Yamcha (unlocked) on player 1's own slot 1 (row 0x1D), restored after
 poke32 0x0203FD0C 1
@@ -108,14 +108,14 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD54 0xFF00
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e4_yamcha
 peek8 0x0203EC0C 1
 peek8 0x0203F030 1
 poke32 0x0203FD0C 1
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 peek8 0x0203F030 1
 echo == 5. Champion 1 v 1 Full (16, four rounds) as Gohan (player 1 on slot 0, back on 1 after), tiers forced open
 poke32 0x0203FD0C 0x1F
@@ -126,31 +126,31 @@ poke32 0x0203FD0C 0x310
 poke32 0x0203FD54 0xFF32
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 peek8 PARTY 1
 peek8 0x0203EC6C 0x38
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e5_challenger
 peek8 0x0203EC04 4
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 peek8 PARTY 1
 echo expect full_wins[3] 1 (+0x22), paid bits 9 and 19
 peek8 0x0203ED68 0x40
@@ -159,38 +159,38 @@ poke32 0x0203FD0C 0x302
 poke32 0x0203FD54 0xFF38
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e6_round1
 peek8 0x0203EC10 0x20
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e6_headliner
 peek8 0x0203EC10 0x20
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e6_uub
 echo expect the challenger's fight (phase 4, kind 2): Uub, since Hercule won it
 peek8 0x0203EC04 4
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 echo expect Uub unlocked (+0xE bit 0)
 peek8 0x0203ED68 0x40
 echo == 7. the story opens Adept (flag 85) after the first visit (flag 441): a pop-up at the next safe frame (shown + 1); nothing forced
@@ -205,7 +205,7 @@ flags +85
 frames 60
 shot e7_notice
 peek8 0x0203ECEC 2
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 peek8 0x0203ECEC 2
 poke32 0x0203FD0C 0
 poke32 0x0203FD54 2
@@ -222,25 +222,25 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD54 0xFFFF
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e8_p1
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e8_p2
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e8_duel
 echo expect phase 6 (the duel), duel_active 1
 peek8 0x0203EC04 4
@@ -249,12 +249,12 @@ poke32 0x0203FD0C 2
 poke32 0x0203FD54 2
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e8_challenger
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 map
 peek8 PARTY 1
 peek8 0x0203FF84 1
@@ -266,21 +266,21 @@ poke32 0x0203FD0C 1
 poke32 0x0203FD54 0xFFFF
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e9_2v2
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e9_pair
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 echo == 10. co-op Royal Rumble Rookie: two rounds, King Cold's round, Yakon
 poke32 0x0203FD0C 3
 poke32 0x0203FD08 21
@@ -289,25 +289,25 @@ poke32 0x0203FD0C 2
 poke32 0x0203FD54 0xFFFF
 poke32 0x0203FD08 25
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e10_rumble
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFC 3000
+stepz 0x0203ECFC 80
 shot e10_yakon
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
-stepz 0x0203ECFD 4000
+stepz 0x0203ECFD 80
 echo expect wins[1] wins[2] 1, Goten / Kid Trunks / Yakon unlocked
 peek8 0x0203ED68 0x40
 echo == 11. a power cycle keeps the record (read back from the save chip)
