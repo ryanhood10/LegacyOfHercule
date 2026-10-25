@@ -1,4 +1,4 @@
-r"""Drop-in savestates for play-testing: mGBA's F1-F7 slots next to the play ROM, each at an important scene.
+r"""Drop-in savestates for play-testing: mGBA's F1-F9 slots next to the play ROM, each at an important scene.
 usage: python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR
   PLAY_ROM   the ROM Ryan plays (`make`); the states are written for it (named <rom>.ss1-6 in OUTDIR)
   DEBUG_ROM  the same source built with DEBUG_MENU=1 (differs only in the title patch); MENU_SS its debug-menu
@@ -125,8 +125,26 @@ ssave {W('df6.ss')}
 ssave {W('df5.ss')}
 """, os.path.join(work, "menu.ss"))
 run("conv", play, "".join(f"load {W('d' + n + '.ss')}\nframes 1\nssave {W(n + '.ss')}\n" for n in ("f3", "f4", "f5", "f6", "f7")))
+# F8 / F9 the tournament (docs/tournament.md): F8 from his own save (F1) on Papaya Island's beach, the first visit's
+# welcome ahead (walk up the plaza); F9 from F6 (after the Cell Games, Goku with his halo) in the waiting room beside the
+# director with every tier open (flag 382: Legend; 441: the grounds visited, so the tournament pop-ups run)
+run("tny", play, f"""load {W('f1.ss')}
+p2 off
+frames 10
+{WARP.format(za='0x0B0F', xy='0x018800E8')}frames 300
+ssave {W('f8.ss')}
+load {W('f6.ss')}
+p2 off
+frames 10
+{WARP.format(za='0x0F0F', xy='0x012C00C8')}frames 300
+flags +382 +441
+frames 240
+key 1 6
+frames 120
+ssave {W('f9.ss')}
+""")
 
 base = os.path.splitext(os.path.basename(play))[0]
-for i in range(1, 8):
+for i in range(1, 10):
     shutil.copy(os.path.join(work, f"f{i}.ss"), os.path.join(out, f"{base}.ss{i}"))
-print(f"wrote {base}.ss1-7 in {out}")
+print(f"wrote {base}.ss1-9 in {out}")
