@@ -237,13 +237,16 @@ for layout and collision, pixels for objects):
   (the arctic landing's grass flight spot).
 - `effect` {from: [zone, area]}: that map's BG0 overlay, its animated tiles and blend; the base
   map's own animations move out of the way when their slots collide.
-- `triggers` (flight / warp / script / dialogue / savepad: the stock save and switch-characters pad,
+- `triggers` (flight / warp / script (`"payload": "script:NAME"` or raw `"bytes"`) / dialogue / savepad: the stock save and switch-characters pad,
   16 bytes, stamp its art from a map that has one), `exits` (edge / door; **use door exits at a
   bordered edge**: an edge exit's rect must be reached, and a 1-tile `border` stops the player about
   20 px short, the same trap as area 47's top exit in 9b), `gates`, `onload` (the barrier pattern with a
   flag), `records` (an enemy with `"action": "like"` keeps the stock record's defeat action, e.g. the
   random item drop), `spawn`, `name_id` (an id from 356 up is one of ours, `docs/ids.md` "UI strings"),
-  `music`, `flags`, `priorities`.
+  `music`, `flags`, `priorities`. Script and dialogue triggers take `"activation"`: `"press"` (A inside the rect),
+  `"enter"`, `"facing"` (defaults: script press, dialogue enter). `records` also take `"kind": "npc"` (a talkable
+  town NPC, `"talk": "seq:NAME"`), and `"onload": "script:NAME"` runs a script from the spec's sources (2026-10-25,
+  the tournament grounds).
 - Foreign maps: a `src.map` of `{"rom": "buu", "variation": "0x0822229C"}` reads a Buu's Fury
   variation record (`--buu-rom`, default `roms/buu.gba`); its tiles are converted to LoG2's palette
   (nearest colour) as new tiles. A spec with `"requires": "buu"` is skipped when that ROM is absent
@@ -272,6 +275,7 @@ literals and sets the count. The old table stays in place. `make` runs it by def
 | 15 / 8 | `data/maps/arctic_summit.json` | The summit: Snowy Highlands area 10's clearing stretched to 720 x 592 (crown of cliffs and snowy trees at the back, rock rims on the sides, the path up at the bottom), a flight spot on a grass patch, four breakable rocks (Ryan, 2026-10-20: zone 13 area 2's large rock, 3 hits, the stock large-rock drop) | 720 x 592 | (336, 464) |
 | 15 / 9 | `data/maps/saiyan_ship.json` | Inside the Saiyan ship (the Broly chapter): Buu's Fury's round room (variation 0x082546A0) imported whole, its Capsule Corp pad (BG2) cleared, the side and bottom openings closed, the top doorway opened; its two door triggers (a trigger's condition is tested when the map loads: the trip under way, then the ride home landed and not out yet) lead out of the ship's door onto New Planet Vegeta and, after the ride home, into the backyard; their rect reaches 20 px below the doorway (the co-op leash stops player 1 at y 80 when player 2 is at the far side) | 240 x 240 | (96, 192) |
 | 15 / 10 | `data/maps/yard_ship.json` | The Capsule Corp backyard (6/21) with the Saiyan ship parked (2026-10-21): the stock map with `tools/shipart.py`'s ship on BG2 (under the players) at x 216-471, y 280-439, blocking but for its doorway (x 328-359, y 392-419) and ramp; 643 of 896 slots. Never warped to: `map_variation_hook` (section 1) hands its variation out for 6/21 while the ship is parked | 600 x 600 | (168, 272) |
+| 15 / 11-16 | `data/maps/papaya_*.json` | **Papaya Island, the tournament grounds** (2026-10-25, needs `roms/buu.gba`): Buu's Fury's zone 7 imported whole, map by map: plaza (7/1 v2, the landing's beach and flight spot, save pad), street (7/2), courtyard (7/3, the unlock board drawn by `tools/boardart.py`), infirmary (7/4), waiting room (7/5, save pad, the director), ring (7/6); exits, people and the ring's numbers in `docs/tournament.md` 9b; the world-map landing in 9d | 480 x 560 ... 720 x 720 | plaza (232, 392) |
 
 Reaching them from story scripts: `PushMultiVarint [15, AREA, 1, x, y]` then `Step 38
 WarpToMapWithEntities` (or 39 without entities), from a trigger script, a dialogue entry or an
@@ -372,6 +376,16 @@ flight spots land at (1100, 800), the rect's centre.
   site, each behind its site's flag) look like the switches for those. The arctic site has none.
 - **Test position:** `COOP_CMD_WARP` with zone 6 area 99 (`cmd_arg` 0x6306) puts the flyer anywhere,
   e.g. `cmd_arg2` 0x03200460 = (1120, 800); moving the flyer's entity position does not stick.
+
+## 9d. Papaya Island's landing on the world map (`data/story/papaya_route.*`, 2026-10-25)
+
+The tournament grounds' landing, open from the start: a landing trigger (`like` 21, `tny_wm_land` warps to zone
+15 area 11 at (232, 392), the plaza's beach) and a banner (`like` 22, name 357 "Papaya Island") on rect
+(1204, 1760)-(1317, 1881) with the condition `tny_grounds_built` (`CoopCall 30, 2`: the maps are in the build; a `BUU=0` build has
+neither the maps nor the landing), and an on-load edit that appends the plain marker at (181, 31) (`sub_800AC5C`)
+under the same check. The spot is the island sea south-west of West City: the plan's (1100-1200, 2000) is desert on our
+map, and at (1260, 1820) the flyer's shadow is on a small island among rocks (headless shots, `docs/testing.md`
+"Tournament grounds"). The plaza's flight spot lands back at (1260, 1820).
 
 ## 10. Buu's Fury maps (table and names decoded 2026-10-24; two imported)
 

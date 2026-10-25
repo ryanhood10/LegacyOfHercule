@@ -34,13 +34,16 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      actions and conditions as seq:NAME / script:NAME; a COND is 0, "flag:N",
                                      "noflag:N", "script:NAME", "never" or a number
   "records": [{"kind": "actor", "sprite":, "x":, "y":, "facing": 0, "condition": COND},
+              {"kind": "npc", "sprite":, "x":, "y":, "facing": 0, "talk": "seq:NAME", "condition": COND},
               {"kind": "enemy", "like": [zone, area, record], "stat":, "sprite":, "x":, "y":, "condition": COND,
                "action": "seq:NAME" | "like" | "none"}],   map script records; an enemy copies a stock record's
                                      behaviours ("action": "like" also its defeat action, e.g. the random item drop)
   "exits": [{"type": "edge"|"door", "rect": [...], "dir": "down|up|left|right", "to": [z, a, v], "at": [x, y]}],
   "barrier": {"char": 2, "level": 50, "flag": 380, "rect": [x1,y1,x2,y2], "decoration": 0, "dialogue_trigger": 0},
                                      a working level barrier on a kept decoration + gate (item, on-load, dialogue condition)
-  "onload": {"barrier_flag": 280, "rect": [x1,y1,x2,y2]} | null,
+  "onload": {"barrier_flag": 280, "rect": [x1,y1,x2,y2]} | "script:NAME" | null,
+  a "script" trigger takes "payload": "script:NAME" (or raw "bytes"); script and dialogue triggers take
+  "activation": "press" (A inside the rect) | "enter" | "facing" (defaults: script press, dialogue enter)
   "rocks": {"sheet": [Z, A], "list": [{"x":, "y":, "frame": 0, "hits": 3, "drop": "0x083EE6A8"}, ...]},
                                      breakable stock rocks: a 32x32 decoration each (frame = offset on that stock map's
                                      decoration sheet, 32-byte units) + an item (handler 0x0800F9A3) running a stock rock's
@@ -682,9 +685,21 @@ class StoryRefs:
 
 
 FACE_AND_WAIT = 0x0800CB0F      # NpcBehavior_FaceAndWait_Create {fn, facing << 16 | ticks} (tools/mapedit.py)
-HANDLER_ACTOR, HANDLER_ENEMY = 0x0800D6DF, 0x0800E77F
+HANDLER_ACTOR, HANDLER_ENEMY, HANDLER_NPC = 0x0800D6DF, 0x0800E77F, 0x0800B711
 ACTION_SCRIPT, ACTION_DIALOG, ACTION_NONE = 0x0801069B, 0x080106B3, 0x08010699
 TRIGGER_DIALOG_COND, TRIGGER_DIALOG_FN = 0x0800D7E1, 0x0800D765   # a dialogue run on entering the rect
+
+
+ACTIVATIONS = {"press": 0x0800D839, "enter": 0x0800D765, "facing": 0x0800D87F}
+
+
+def activation(t, default):
+    """A trigger's activation object: "press" (A inside the rect), "enter" (walking in), "facing" (A while facing
+    the object's direction), a number, or the type's default."""
+    a = t.get("activation")
+    if a is None:
+        return default
+    return ACTIVATIONS[a] if isinstance(a, str) else a
 
 
 def emit_records(b, pk, refs):
@@ -696,6 +711,11 @@ def emit_records(b, pk, refs):
         if r["kind"] == "actor":
             beh = pk.put(struct.pack("<II", FACE_AND_WAIT, (r.get("facing", 0) << 16) | 0x7D00), "actor behaviour")
             ptrs.append(pk.put(struct.pack("<IIhhIII", HANDLER_ACTOR, cond, x, y, sprite, 1, beh), f"{b.spec['name']} actor record"))
+        elif r["kind"] == "npc":     # a talkable town NPC: +0xC dialogue, +0x10 sprite, +0x14 count, +0x18 behaviours
+            talk = refs.ref(r["talk"]) if "talk" in r else 0
+            beh = pk.put(struct.pack("<II", FACE_AND_WAIT, (r.get("facing", 0) << 16) | 0x7D00), "npc behaviour")
+            ptrs.append(pk.put(struct.pack("<IIhhIIII", HANDLER_NPC, cond, x, y, talk, sprite, 1, beh),
+                               f"{b.spec['name']} npc record"))
         elif r["kind"] == "enemy":
             z, a, n = r["like"]
             src = rom.u32(L.find_entry(rom, z, a).scripts + 4 * n)
@@ -712,7 +732,7 @@ def emit_records(b, pk, refs):
             ptrs.append(pk.put(struct.pack("<IIIhhIIII", HANDLER_ENEMY, cond, r["stat"], x, y, sprite, action, cnt, beh),
                                f"{b.spec['name']} enemy record"))
         else:
-            raise SpecError(f"record kind {r['kind']!r} (actor, enemy)")
+            raise SpecError(f"record kind {r['kind']!r} (actor, npc, enemy)")
     if not ptrs:
         return 0, 0
     return len(ptrs), pk.put(b"".join(struct.pack("<I", p) for p in ptrs), f"{b.spec['name']} record array")
@@ -912,12 +932,13 @@ def emit(b, pk):
             s = pk.put(script_warp(z, a, v, x, y, music=t.get("music")), f"{spec['name']} warp script")
             d = struct.pack("<IIhhhhI", L.SCRIPT_CREATE, ACT_PRESS, x1, y1, x2, y2, s)
         elif t["type"] == "script":
-            s = pk.put(bytes.fromhex(t["bytes"]), f"{spec['name']} script")
-            d = struct.pack("<IIhhhhI", L.SCRIPT_CREATE, t.get("activation", ACT_PRESS), x1, y1, x2, y2, s)
+            s = refs.ref(t["payload"]) if "payload" in t else pk.put(bytes.fromhex(t["bytes"]), f"{spec['name']} script")
+            d = struct.pack("<IIhhhhI", L.SCRIPT_CREATE, activation(t, ACT_PRESS), x1, y1, x2, y2, s)
         elif t["type"] == "savepad":     # the stock save / switch-characters pad: 16 bytes, no payload
             d = struct.pack("<IIhhhh", L.SAVEPAD_CREATE, ACT_PRESS, x1, y1, x2, y2)
         elif t["type"] == "dialogue":
-            d = struct.pack("<IIhhhhI", TRIGGER_DIALOG_COND, TRIGGER_DIALOG_FN, x1, y1, x2, y2, refs.ref(t["payload"]))
+            d = struct.pack("<IIhhhhI", TRIGGER_DIALOG_COND, activation(t, TRIGGER_DIALOG_FN), x1, y1, x2, y2,
+                            refs.ref(t["payload"]))
         else:
             raise SpecError(f"unknown trigger type {t['type']}")
         trig.append((refs.condition(t.get("condition", 0)), pk.put(d)))
@@ -935,7 +956,9 @@ def emit(b, pk):
     # on-load script
     onload = 0
     ol = spec.get("onload")
-    if ol:
+    if isinstance(ol, str):         # "script:NAME" from the spec's sources
+        onload = refs.ref(ol)
+    elif ol:
         onload = pk.put(script_barrier_onload(ol["barrier_flag"], ol["rect"]), f"{spec['name']} on-load")
     elif bar:
         onload = pk.put(script_barrier_onload(bar["flag"], bar["rect"], bar.get("decoration", 0)), f"{spec['name']} on-load")

@@ -25,7 +25,7 @@
 #define UI_DESC2    (UI_STOCK + 3 * UI_BLOCK)
 #define UI_NAME     (UI_STOCK + 4 * UI_BLOCK)   // "Gohan", ..., "Krillin" (status title, dialogue %s)
 #define UI_CAPS     (UI_STOCK + 5 * UI_BLOCK)   // "GOHAN", ..., "KRILLIN"
-#define UI_PLACES   (UI_STOCK + 6 * UI_BLOCK)   // new map names (PLACE_NAMES): 356 "The Arctic"
+#define UI_PLACES   (UI_STOCK + 6 * UI_BLOCK)   // new map names (PLACE_NAMES): 356 "The Arctic", 357 "Papaya Island", 358 "World Tournament"
 
 // Old Hercule is comic relief: his combat bytes (entity +0x160 / +0x161) are divided by this while his
 // slot shows OLD_HERCULE_ROW

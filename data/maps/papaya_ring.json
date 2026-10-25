@@ -1,0 +1,97 @@
+{
+ "_": "The ring with the stands: Buu's Fury's zone 7 area 6 (0x08246B34), 720 x 720, imported whole with its collision: the platform (x 232-487, y 256-511) is closed all round (no ring-outs; the walkway from the stadium door stops one tile short of it, as in Buu's Fury). The engine stages matches on the platform (src/coop/tny_ring.h). Walking in from the waiting room reaches the walkway only.",
+ "name": "papaya_ring",
+ "zone": 15,
+ "area": 16,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  720,
+  720
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08246B34"
+    },
+    "rect": [
+     0,
+     0,
+     90,
+     90
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    336,
+    216,
+    384,
+    248
+   ],
+   "payload": "seq:tny_ring_closed",
+   "_": "the walkway's end"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    336,
+    120,
+    384,
+    170
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    15,
+    1
+   ],
+   "at": [
+    120,
+    312
+   ],
+   "facing": 1,
+   "_": "the walkway's door: the waiting room"
+  }
+ ],
+ "spawn": [
+  360,
+  384
+ ],
+ "name_id": 358,
+ "music": 6,
+ "flags": 1,
+ "sources": [
+  "data/story/papaya.lscript"
+ ]
+}

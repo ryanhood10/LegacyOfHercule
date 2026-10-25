@@ -1,0 +1,113 @@
+{
+ "_": "The stadium's infirmary corridor (beds): Buu's Fury's zone 7 area 4 (0x082478E4), its tiled layers (the BG0 effect overlay is not imported) and collision; a nurse. Its two bottom doors lead to the courtyard (right) and the waiting room (left), as in Buu's Fury.",
+ "name": "papaya_infirmary",
+ "zone": 15,
+ "area": 14,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  480,
+  160
+ ],
+ "priorities": [
+  3,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082478E4"
+    },
+    "rect": [
+     0,
+     0,
+     60,
+     20
+    ]
+   },
+   "layers": [
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    376,
+    136,
+    424,
+    160
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    13,
+    1
+   ],
+   "at": [
+    240,
+    116
+   ],
+   "facing": 0,
+   "_": "the right door: the courtyard"
+  },
+  {
+   "type": "door",
+   "rect": [
+    32,
+    136,
+    56,
+    160
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    15,
+    1
+   ],
+   "at": [
+    360,
+    112
+   ],
+   "facing": 0,
+   "_": "the left door: the waiting room"
+  }
+ ],
+ "records": [
+  {
+   "kind": "npc",
+   "sprite": 89,
+   "x": 240,
+   "y": 120,
+   "facing": 0,
+   "talk": "seq:tny_nurse_talk"
+  }
+ ],
+ "spawn": [
+  400,
+  120
+ ],
+ "name_id": 358,
+ "music": 29,
+ "flags": 0,
+ "sources": [
+  "data/story/papaya.lscript"
+ ]
+}

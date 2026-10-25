@@ -1,0 +1,188 @@
+{
+ "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is on the beach below the plaza (the world-map landing arrives there). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
+ "name": "papaya_plaza",
+ "zone": 15,
+ "area": 11,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  480,
+  560
+ ],
+ "priorities": [
+  2,
+  3,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0824AE74"
+    },
+    "rect": [
+     0,
+     0,
+     60,
+     70
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    0,
+    0,
+    18,
+    9
+   ],
+   "_": "the grass behind the left brick wall"
+  },
+  {
+   "op": "block",
+   "rect": [
+    42,
+    0,
+    18,
+    9
+   ],
+   "_": "the grass behind the right brick wall"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "savepad",
+   "rect": [
+    112,
+    304,
+    169,
+    345
+   ],
+   "_": "Buu's Capsule Corp pad"
+  },
+  {
+   "type": "flight",
+   "rect": [
+    200,
+    368,
+    264,
+    416
+   ],
+   "world": [
+    1260,
+    1820
+   ],
+   "_": "the beach: back to the world map at the landing"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    176,
+    344,
+    288,
+    432
+   ],
+   "payload": "seq:tny_arrival",
+   "condition": "noflag:441",
+   "_": "the first visit's welcome"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    176,
+    0,
+    304,
+    48
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    12,
+    1
+   ],
+   "at": [
+    240,
+    744
+   ],
+   "facing": 1,
+   "_": "the street, through the gap in the wall"
+  }
+ ],
+ "records": [
+  {
+   "kind": "npc",
+   "sprite": 230,
+   "x": 232,
+   "y": 300,
+   "facing": 0,
+   "talk": "seq:tny_announcer_talk",
+   "condition": "script:tny_has_announcer",
+   "_": "the announcer (art-buu)"
+  },
+  {
+   "kind": "npc",
+   "sprite": 99,
+   "x": 232,
+   "y": 300,
+   "facing": 0,
+   "talk": "seq:tny_announcer_talk",
+   "condition": "script:tny_no_announcer",
+   "_": "the announcer's stand-in"
+  },
+  {
+   "kind": "npc",
+   "sprite": 83,
+   "x": 128,
+   "y": 200,
+   "facing": 3,
+   "talk": "seq:tny_fan1_talk"
+  },
+  {
+   "kind": "npc",
+   "sprite": 150,
+   "x": 352,
+   "y": 216,
+   "facing": 2,
+   "talk": "seq:tny_fan2_talk"
+  },
+  {
+   "kind": "npc",
+   "sprite": 86,
+   "x": 344,
+   "y": 340,
+   "facing": 2,
+   "talk": "seq:tny_fan3_talk"
+  }
+ ],
+ "spawn": [
+  232,
+  392
+ ],
+ "name_id": 357,
+ "music": 41,
+ "flags": 0,
+ "sources": [
+  "data/story/papaya.lscript"
+ ]
+}

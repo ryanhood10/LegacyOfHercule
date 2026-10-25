@@ -1,0 +1,153 @@
+{
+ "_": "The courtyard inside the gate: Buu's Fury's zone 7 area 3 (0x082480A8) imported whole; the unlock board (our art, tools/boardart.py) on the left (A in front of it: CoopCall 28, 1 the ui's board screen) and a fan.",
+ "name": "papaya_courtyard",
+ "zone": 15,
+ "area": 13,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  480,
+  240
+ ],
+ "priorities": [
+  2,
+  3,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082480A8"
+    },
+    "rect": [
+     0,
+     0,
+     60,
+     30
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "layers": {
+  "1": [
+   {
+    "op": "png",
+    "draw": "boardart",
+    "at": [
+     5,
+     16
+    ],
+    "_": "the unlock board"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    36,
+    164,
+    92,
+    204
+   ],
+   "payload": "seq:tny_board",
+   "activation": "press",
+   "_": "the unlock board: A in front of it"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    216,
+    212,
+    264,
+    240
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    12,
+    1
+   ],
+   "at": [
+    240,
+    64
+   ],
+   "facing": 0,
+   "_": "the gate: back to the street"
+  },
+  {
+   "type": "door",
+   "rect": [
+    216,
+    56,
+    264,
+    100
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    14,
+    1
+   ],
+   "at": [
+    400,
+    120
+   ],
+   "facing": 1,
+   "_": "the stadium door: the infirmary"
+  }
+ ],
+ "records": [
+  {
+   "kind": "npc",
+   "sprite": 85,
+   "x": 392,
+   "y": 176,
+   "facing": 2,
+   "talk": "seq:tny_fan7_talk"
+  }
+ ],
+ "spawn": [
+  240,
+  196
+ ],
+ "name_id": 357,
+ "music": 41,
+ "flags": 0,
+ "sources": [
+  "data/story/papaya.lscript"
+ ],
+ "collision": [
+  {
+   "op": "art_footprint",
+   "draw": "boardart",
+   "at": [
+    5,
+    16
+   ],
+   "_": "the unlock board's lower half and posts"
+  }
+ ]
+}
