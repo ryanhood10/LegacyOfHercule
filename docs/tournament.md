@@ -893,3 +893,14 @@ faces slide, draw a giant at half size instead: his face's 64 x 64 OAM entry bec
 
 **RAM**: `.tny.eng` 0x21C (the presentation's fields fill the old line's 76 bytes; the line moved to the end, 100
 characters; the state's magic is now 0x7E6E0003). The record's `extra` word (was padding): bit 0 the final form beaten.
+
+## 15. The tournament runs as scenes (Ryan, 2026-10-25)
+
+"We shouldn't have access to the save pad in between tournament rounds": from the director's last choice to the
+trophy (or the players' elimination) the players stay in the ring (zone 15 area 16, which has no save pad); the
+waiting room and its pad come back only when the tournament is over. In the ring Start and Select are blocked, and
+whenever no fight is running (the walk-in, the announcer's lines, the poses, the bracket's turn, the pause after a
+knock-out) the d-pad, B, L and R are masked on both pads too (`tny_engine.c`, the input lock beside `t_nofight`);
+A stays free to close the lines. Matches without a player are never played: the bracket screen's animation shows
+their winners.
+

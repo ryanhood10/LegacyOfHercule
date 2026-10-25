@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **The tournament runs as scenes (Ryan):** no free movement or moves in the ring between fights (only A for the
+  lines; Start / Select blocked as before); the players stay in the ring from the first match to the trophy.
 - **Tournament polish (branch `tny-polish`):** the ring presentation (the announcer, sprite 230 with his portrait,
   at the ring's edge between fights; both sides walk in from the platform's edges through the stock script commands;
   his call; at the end the loser lies down and the winner poses while he calls it, poses held through the line; the

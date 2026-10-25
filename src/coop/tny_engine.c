@@ -1744,14 +1744,19 @@ void tny_engine_frame(void) {
         eng.phase = P_IDLE;
         eng.pending = 0;
     }
-    // pause and saving are blocked in the ring (and player 2's Select switch)
+    eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
+    // pause and saving are blocked in the ring (and player 2's Select switch); between fights (the walk-in, the
+    // announcer's lines, the poses, the bracket's turn) nobody moves or attacks either: the tournament runs as
+    // scenes from the first match to the trophy (Ryan, 2026-10-25). A stays free to close the lines.
     if (eng.phase >= P_TO_RING && eng.phase < P_EXITING && in_ring() && p1_in_play()) {
-        g_InputSystem->pressed &= (u16)~(KEY_START | KEY_SELECT);
-        g_InputSystem->current &= (u16)~KEY_START;
-        coop.input2.pressed &= (u16)~(KEY_START | KEY_SELECT);
+        u16 lock = KEY_START | KEY_SELECT;
+        if (eng.t_nofight) lock |= KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT | KEY_B | KEY_L | KEY_R;
+        g_InputSystem->pressed &= (u16)~lock;
+        g_InputSystem->current &= (u16)~(lock & ~KEY_SELECT);
+        coop.input2.pressed &= (u16)~lock;
+        coop.input2.current &= (u16)~(lock & ~KEY_SELECT);
     }
     if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
-    eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
