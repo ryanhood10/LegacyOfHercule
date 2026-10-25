@@ -168,9 +168,28 @@ def swap_head(px, w, h, head, chin_off):
     if hair is None:
         return out, False
     top = min(y for y, _ in hair)
-    chin = min(h - 1, top + chin_off)
     xs = [x for _, x in hair]
     x0, x1 = max(0, min(xs) - 1), min(w - 1, max(xs) + 1)
+    # the chin of THIS frame (2026-10-25, Ryan: Krillin's head popped off his body in the dash): the lowest face-skin
+    # pixel connected to the hair, inside the hair's columns; the idle frame's chin offset only as a fallback (in
+    # leaning and crouched frames Goku's face sits lower under the hair than standing, and the head floated)
+    skin = (114, 115, 116)
+    hair_set = set(hair)
+    seen, stack = set(), []
+    for y, x in hair:
+        for ny, nx in ((y + 1, x), (y, x - 1), (y, x + 1)):
+            if 0 <= ny < h and 0 <= nx < w and px[ny][nx] in skin and (ny, nx) not in seen:
+                seen.add((ny, nx))
+                stack.append((ny, nx))
+    while stack:
+        y, x = stack.pop()
+        for ny, nx in ((y + 1, x), (y - 1, x), (y, x - 1), (y, x + 1)):
+            if 0 <= ny < h and x0 <= nx <= x1 and px[ny][nx] in skin and (ny, nx) not in seen and (ny, nx) not in hair_set:
+                if ny <= top + chin_off + 6:
+                    seen.add((ny, nx))
+                    stack.append((ny, nx))
+    chin = max(y for y, _ in seen) if len(seen) >= 6 else top + chin_off
+    chin = min(h - 1, max(chin, top + chin_off - 3))
     band = [(y, x) for y in range(top, chin + 1) for x in range(x0, x1 + 1)]
     face = [x for y, x in band if px[y][x] in (114, 115, 116)]
     cx = (sum(face) / len(face)) if len(face) >= 6 else (sum(xs) / len(xs))

@@ -899,3 +899,12 @@ before the ten-day wait as done (`EARLY` in dropins.py, worked out from the worl
 the Lookout landing open) and flag 400 (Bulma's news: the Broly ship waits in the backyard). The states hold no cartridge save, so loading one leaves the .sav alone (an
 in-game save inside one still writes it). Savestates break with every rebuild: rerun after each, with mGBA closed.
 `build/play/DROP-INS.txt` lists the keys for Ryan.
+
+## Playable bodies: floating heads and the dash (2026-10-25)
+
+`python -I tools/headcheck.py BUILT.gba coop.sym 161,175,...` flags frames whose second-largest pixel blob sits above
+the body with empty rows between (a pasted head off its shoulders). The dash, which the checker cannot judge for a head
+that still touches, is filmed in the ring for every playable row: poke slot 1's display row (`PARTY+0x30`), make it player
+1 (`PARTY` = 1), warp to zone 15 area 16 at (248, 384), then `keys 0x10` / `frames 4` / `keys 0` / `frames 6` / `keys 0x10`
+(a double tap; the runner's `key` releases after each press, so holds need `keys`) and shots every few frames.
+

@@ -144,6 +144,35 @@ frames 120
 ssave {W('f9.ss')}
 """)
 
+# F8 / F9 powered up (Ryan, 2026-10-25: "strengthen the characters ... so i can win"): every party member's max HP x3,
+# max ki x2, strength / power / endurance x2 (u16, capped), HP and ki full. The entries are read from the state first.
+import re
+import struct
+PARTY_ADDR = 0x0203F000
+
+
+def boost(name):
+    log = run(name + "_read", play, f"load {W(name + '.ss')}\nframes 2\npeek PARTY 0x1F0\n")
+    words = next(l for l in log.splitlines() if l.startswith("0203f000:")).split(":", 1)[1].split()
+    data = b"".join(struct.pack("<I", int(w, 16)) for w in words)
+    pokes = []
+    for slot in range(9):
+        o = 0xC + slot * 0x1C
+        mhp, mep = struct.unpack_from("<H", data, o + 2)[0], struct.unpack_from("<H", data, o + 6)[0]
+        st, pw, en = struct.unpack_from("<3H", data, o + 10)
+        if not struct.unpack_from("<I", data, o + 20)[0] & 1:
+            continue
+        a = PARTY_ADDR + o
+        nm, ne = min(0xFFFF, mhp * 3), min(0xFFFF, mep * 2)
+        for off, v in ((0, nm), (2, nm), (4, ne), (6, ne), (10, min(0xFFFF, st * 2)), (12, min(0xFFFF, pw * 2)),
+                       (14, min(0xFFFF, en * 2))):
+            pokes.append(f"poke16 0x{a + off:08X} {v}")
+    run(name + "_boost", play, f"load {W(name + '.ss')}\n" + "\n".join(pokes) + f"\nframes 1\nssave {W(name + '.ss')}\n")
+
+
+boost("f8")
+boost("f9")
+
 base = os.path.splitext(os.path.basename(play))[0]
 for i in range(1, 10):
     shutil.copy(os.path.join(work, f"f{i}.ss"), os.path.join(out, f"{base}.ss{i}"))

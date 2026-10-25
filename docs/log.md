@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Heads stay on (Ryan: Krillin's head popped off in his dash):** `krillinsprites.py` measures the chin per frame (the
+  lowest face skin under Goku's hair) instead of reusing the idle frame's, so leaning and crouched frames no longer
+  float the head. `tools/headcheck.py` flags detached heads; a dash film of every playable row (22-66) checked by eye.
+  The Buu imports' dash group (13) now plays their run (was an arms-up frame). F8 / F9 drop-ins come powered up
+  (`dropins.py`: max HP x3, ki and stats x2).
 - **Easter eggs:** Yamcha knocked out in the infirmary's last bed; a crack behind the courtyard's flowerbed into a
   hidden arena (Buu's Other World Stadium) where Pikkon gives a hint and a Senzu bean. The waiting room holds seven
   (eight hung the Champion Rumble test). `tny_eggs.txt`, `docs/tournament.md` 17.
