@@ -22,6 +22,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
   the new body has another OBJ VRAM size (a 64 x 64 one overran the old slot's buffer and crashed).
   `tools/headless/tny_play.txt`: all 38 as player 2 and as player 1, walk, punch, four abilities each, no crash;
   regression (ch9_gero, cell_games_1p, duel_end, a16_moves) output identical to main. `docs/tournament.md` 10.
+- **Tournament moves (branch `tny-moves`)**: `src/coop/tny_moves.c` gives every opponent and challenger his kit
+  (`tny_kits[]`, one row per fighter) from a move library written once (beam, ball, homing, volley, wave, nova, rush,
+  teleport, stun, heal, drain, regen, transform, summon) and adds Rumble mode (fighters hurt fighters of other sides,
+  70 / 30 target weights, no EXP for NPC kills). Transforms and spawns check the body against the AI set's pose
+  groups (Mecha Frieza's sprite 49 crashes under set 21). Every AI set of the roster ran in Rumble packs without a
+  crash; tests `tny_moves.txt`, `tny_rumble.txt`; `docs/tournament.md` 10.
 - **Tournament build started** (Ryan: "deploy a team"): the contract on main (`src/coop/tourney.h`, `tourney_data.c`,
   `tourney_hooks.c`), a 0x400-byte `tourneyram` region (the heap cap now ends at 0x0203EC00: `patch_rom.py` 0xF8FE),
   a second ROM blob for art (`rom2` at 0x08E00000, `patch_rom.py --art`), allocations in `docs/ids.md`; seven

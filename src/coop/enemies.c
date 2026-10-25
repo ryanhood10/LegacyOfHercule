@@ -24,12 +24,14 @@ BossBar *bossbar_create_hook(void *mem, Entity *e, int lo, int hi);
 void *memcpy(void *dst, const void *src, unsigned n);   // util.c
 #define COLLISION_MAP ((const void *)g_Ctx[4])
 
-int is_coop_enemy(const Entity *e) { return e && e->vtable == coop2.enemy_vtable; }
+// A tournament fighter with a kit (tny_moves.c) runs on a private vtable copy of the one he had: he still counts.
+const u32 *tny_moves_base(const Entity *e);
+int is_coop_enemy(const Entity *e) { return e && (e->vtable == coop2.enemy_vtable || tny_moves_base(e) == coop2.enemy_vtable); }
 
 // A co-op enemy's record copy lives behind its stat copy in the entity block (create_coop_enemy).
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
-static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e)); }
+static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e) || tny_moves_base(e)); }
 
 // Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
