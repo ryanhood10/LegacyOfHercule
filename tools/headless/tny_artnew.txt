@@ -1,0 +1,685 @@
+# The tournament's five new fighters (art-new, tools/tnysprites.py; docs/testing.md "Tournament fighters (art-new)").
+# Each is spawned as an opponent 48 px right of player 1 through COOP_CMD_SPAWN_RECORD (8), from the test enemy record
+# the generator puts after his sprite record (record + 0x1A0; stat 29 Cooler's for King Cold, stat 4 Android 18's for
+# the others: both run the melee boss AI set 21). He fights player 1 (Piccolo, a deep HP pool, punching back every
+# 20 frames) for 10 s; every 20 frames 'peek e+0x48 2' prints the enemy's sprite record and current pose group
+# pointer (group = (pointer - record - 0x4C) / 16: the AI's idle 0, walk 1, hit-stun 2, knock-back 3, charge 5,
+# attacks 6-8). Then COOP_CMD_WAVE_CLEAR (13) knocks him out (entrec: 1 standing, then 0). Each fighter gets a fresh
+# warp (spawned on the same map after a long fight and a knock-out, the next body once showed in pieces for a second).
+# The record is found through the relocated sprite index: the word at 0x0800959C is sprite_index + 0x1C (id - 7).
+# From the debug-menu state (tools/headless/mkmenu.txt) of any DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_artnew.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/tny --cols 8
+maptest 147
+frames 300
+deref idx 0x0800959C
+# ---- cold (sprite 185)
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2c8
+peek rec 3
+poke32 0x0203FD0C rec+0x1A0
+poke32 0x0203FD08 8
+frames 20
+entrec rec
+findent e 0x080252a4
+shot cold_0
+key 0x10 4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_1
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_3
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_5
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot cold_6
+entrec rec
+poke32 0x0203FD08 13
+frames 30
+shot cold_ko
+frames 120
+entrec rec
+# ---- roshi (sprite 186)
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2cc
+peek rec 3
+poke32 0x0203FD0C rec+0x1A0
+poke32 0x0203FD08 8
+frames 20
+entrec rec
+findent e 0x080252a4
+shot roshi_0
+key 0x10 4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_1
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_3
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_5
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot roshi_6
+entrec rec
+poke32 0x0203FD08 13
+frames 30
+shot roshi_ko
+frames 120
+entrec rec
+# ---- chichi (sprite 187)
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d0
+peek rec 3
+poke32 0x0203FD0C rec+0x1A0
+poke32 0x0203FD08 8
+frames 20
+entrec rec
+findent e 0x080252a4
+shot chichi_0
+key 0x10 4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_1
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_3
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_5
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chichi_6
+entrec rec
+poke32 0x0203FD08 13
+frames 30
+shot chichi_ko
+frames 120
+entrec rec
+# ---- videl (sprite 188)
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d4
+peek rec 3
+poke32 0x0203FD0C rec+0x1A0
+poke32 0x0203FD08 8
+frames 20
+entrec rec
+findent e 0x080252a4
+shot videl_0
+key 0x10 4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_1
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_3
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_5
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot videl_6
+entrec rec
+poke32 0x0203FD08 13
+frames 30
+shot videl_ko
+frames 120
+entrec rec
+# ---- chiaotzu (sprite 189)
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d8
+peek rec 3
+poke32 0x0203FD0C rec+0x1A0
+poke32 0x0203FD08 8
+frames 20
+entrec rec
+findent e 0x080252a4
+shot chiaotzu_0
+key 0x10 4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_1
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_3
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_4
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_5
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+mash 1 20
+peek e+0x48 2
+shot chiaotzu_6
+entrec rec
+poke32 0x0203FD08 13
+frames 30
+shot chiaotzu_ko
+frames 120
+entrec rec
+# ==== as a player body: player 1's entity (0x03001FA8) is pointed at the record (+0x48) and driven by player 1's own
+# control states (walk four ways, the A combo, the ki pose, a hit from Chi-Chi as an enemy). Only the four normal
+# bodies: King Cold's 64x64 frames need the 0x1000 OBJ VRAM slot a display row's bind gives (playables piece).
+# ---- roshi as player 1
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2cc
+deref pl 0x03001FA8
+poke32 pl+0x48 rec
+key 0x10 24
+peek pl+0x48 2
+shot proshi_walk_r
+key 0x20 24
+peek pl+0x48 2
+shot proshi_walk_l
+key 0x80 24
+peek pl+0x48 2
+shot proshi_walk_d
+key 0x40 24
+peek pl+0x48 2
+shot proshi_walk_u
+key 0x10 2
+mash 1 6
+peek pl+0x48 2
+shot proshi_a1
+mash 1 6
+peek pl+0x48 2
+shot proshi_a2
+mash 1 10
+peek pl+0x48 2
+shot proshi_a3
+frames 40
+keys 2
+frames 30
+peek pl+0x48 2
+shot proshi_b
+keys 0
+frames 30
+deref en idx+0x2d0
+poke32 0x0203FD0C en+0x1A0
+poke32 0x0203FD08 8
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+shot proshi_fight
+peek pl+0x48 2
+# ---- chichi as player 1
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d0
+deref pl 0x03001FA8
+poke32 pl+0x48 rec
+key 0x10 24
+peek pl+0x48 2
+shot pchichi_walk_r
+key 0x20 24
+peek pl+0x48 2
+shot pchichi_walk_l
+key 0x80 24
+peek pl+0x48 2
+shot pchichi_walk_d
+key 0x40 24
+peek pl+0x48 2
+shot pchichi_walk_u
+key 0x10 2
+mash 1 6
+peek pl+0x48 2
+shot pchichi_a1
+mash 1 6
+peek pl+0x48 2
+shot pchichi_a2
+mash 1 10
+peek pl+0x48 2
+shot pchichi_a3
+frames 40
+keys 2
+frames 30
+peek pl+0x48 2
+shot pchichi_b
+keys 0
+frames 30
+deref en idx+0x2d0
+poke32 0x0203FD0C en+0x1A0
+poke32 0x0203FD08 8
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+shot pchichi_fight
+peek pl+0x48 2
+# ---- videl as player 1
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d4
+deref pl 0x03001FA8
+poke32 pl+0x48 rec
+key 0x10 24
+peek pl+0x48 2
+shot pvidel_walk_r
+key 0x20 24
+peek pl+0x48 2
+shot pvidel_walk_l
+key 0x80 24
+peek pl+0x48 2
+shot pvidel_walk_d
+key 0x40 24
+peek pl+0x48 2
+shot pvidel_walk_u
+key 0x10 2
+mash 1 6
+peek pl+0x48 2
+shot pvidel_a1
+mash 1 6
+peek pl+0x48 2
+shot pvidel_a2
+mash 1 10
+peek pl+0x48 2
+shot pvidel_a3
+frames 40
+keys 2
+frames 30
+peek pl+0x48 2
+shot pvidel_b
+keys 0
+frames 30
+deref en idx+0x2d0
+poke32 0x0203FD0C en+0x1A0
+poke32 0x0203FD08 8
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+shot pvidel_fight
+peek pl+0x48 2
+# ---- chiaotzu as player 1
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01C00114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+deref rec idx+0x2d8
+deref pl 0x03001FA8
+poke32 pl+0x48 rec
+key 0x10 24
+peek pl+0x48 2
+shot pchiaotzu_walk_r
+key 0x20 24
+peek pl+0x48 2
+shot pchiaotzu_walk_l
+key 0x80 24
+peek pl+0x48 2
+shot pchiaotzu_walk_d
+key 0x40 24
+peek pl+0x48 2
+shot pchiaotzu_walk_u
+key 0x10 2
+mash 1 6
+peek pl+0x48 2
+shot pchiaotzu_a1
+mash 1 6
+peek pl+0x48 2
+shot pchiaotzu_a2
+mash 1 10
+peek pl+0x48 2
+shot pchiaotzu_a3
+frames 40
+keys 2
+frames 30
+peek pl+0x48 2
+shot pchiaotzu_b
+keys 0
+frames 30
+deref en idx+0x2d0
+poke32 0x0203FD0C en+0x1A0
+poke32 0x0203FD08 8
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+frames 30
+peek pl+0x48 2
+shot pchiaotzu_fight
+peek pl+0x48 2
+# ==== Videl's dialogue portrait 127: portrait_module (the literal at 0x0800BE10) word 128 points at a kind-1 blob of 4096
+deref pm 0x0800BE10
+deref vp pm+0x200
+peek vp 2

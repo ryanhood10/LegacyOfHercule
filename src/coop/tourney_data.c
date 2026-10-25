@@ -33,9 +33,9 @@ const TFighter tny_fighters[TF_COUNT] = {
     [TF_TAO]           = { "Mercenary Tao",    50, TS_P_TAO,       53, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
     [TF_SPOPOVICH]     = { "Spopovich",  TS_SPOPOVICH, TS_SPOPOVICH, 142, TIER_ROOKIE,  TAB_TOURNAMENT, BEAT | TR_GIANT, 0, NO, NO, "Beat this fighter in a match" },
     [TF_YAMU]          = { "Yamu",       TS_YAMU,     TS_YAMU,      143, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT | TR_GIANT, 0, NO, NO, "Beat this fighter in a match" },
-    [TF_CHICHI]        = { "Chi-Chi",    TS_CHICHI,   TS_CHICHI,    0, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
-    [TF_VIDEL]         = { "Videl",      TS_VIDEL,    TS_VIDEL,     0, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
-    [TF_CHIAOTZU]      = { "Chiaotzu",   TS_CHIAOTZU, TS_CHIAOTZU,  0, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
+    [TF_CHICHI]        = { "Chi-Chi",    TS_CHICHI,   TS_CHICHI,   43, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
+    [TF_VIDEL]         = { "Videl",      TS_VIDEL,    TS_VIDEL,   127, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
+    [TF_CHIAOTZU]      = { "Chiaotzu",   TS_CHIAOTZU, TS_CHIAOTZU, 42, TIER_ROOKIE,   TAB_TOURNAMENT, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
 
     [TF_A19]           = { "Android 19",       12, 0,              30, TIER_ADEPT,    TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_GERO]          = { "Dr. Gero",         14, 0,              31, TIER_ADEPT,    TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
