@@ -104,24 +104,34 @@ int ui_text_width(const char *s) {
     return w;
 }
 
-static void canvas_draw(Ui *u, int x, int align, int colour, int shadow, const char *s) {
+// Draw a line into the canvas; only the columns [*x0, *x1) are cleared and used (the text's own width).
+static void canvas_draw(Ui *u, int x, int align, int colour, int shadow, const char *s, int *x0, int *x1) {
     u8 *c = u->canvas;
-    memset(u->canvas_buf, 0, CV_W * CV_H);
+    int w = ui_text_width(s) + 3;
+    int a = align == 0 ? x : align == 1 ? x - w / 2 - 1 : x - w;
+    int b = a + w + 2;
+    if (a < 0) a = 0;
+    if (b > CV_W) b = CV_W;
+    if (b <= a) { *x0 = *x1 = 0; return; }
+    for (int r = 0; r < CV_H; r++) memset(u->canvas_buf + r * CV_W + a, 0, (unsigned)(b - a));
     c[0] = (u8)align;
     *(s32 *)(c + 4) = x;
     *(s32 *)(c + 8) = 12;     // the glyphs' top row = baseline - 12
     c[0x28] = (u8)shadow;
     c[0x29] = (u8)colour;
     UiCanvas_Text(c, s);
+    *x0 = a;
+    *x1 = b;
 }
 
 void ui_text(Ui *u, int x, int y, int align, int colour, const char *s) {
     if (!u->canvas_buf || !s) return;
-    canvas_draw(u, x, align, colour, C_BLACK, s);
-    const u8 *b = u->canvas_buf;
-    for (int r = 0; r < CV_H; r++, b += CV_W)
-        for (int i = 0; i < CV_W; i++)
-            if (b[i]) bm_put(i, y + r, b[i]);
+    int a, b;
+    canvas_draw(u, x, align, colour, C_BLACK, s, &a, &b);
+    const u8 *row = u->canvas_buf;
+    for (int r = 0; r < CV_H; r++, row += CV_W)
+        for (int i = a; i < b; i++)
+            if (row[i]) bm_put(i, y + r, row[i]);
 }
 
 // Word wrap into lines of at most w pixels; returns the lines drawn (12 px apart).
@@ -283,7 +293,9 @@ static void qmark_make(Ui *u) {
     if (!u->canvas_buf || UiObjVram_Largest(g_EntityList) < 0x100) return;
     u16 tile = ObjVram_Alloc(g_EntityList, 0x100);
     if (tile == 0xFFFF) return;
-    canvas_draw(u, 8, 1, OBJ_C_WHITE, OBJ_C_BLACK, "?");
+    int a, b;
+    memset(u->canvas_buf, 0, CV_W * CV_H);
+    canvas_draw(u, 8, 1, OBJ_C_WHITE, OBJ_C_BLACK, "?", &a, &b);
     u8 px[16 * 16];
     for (int r = 0; r < 16; r++)
         for (int i = 0; i < 16; i++) px[r * 16 + i] = u->canvas_buf[r * CV_W + i];
@@ -420,7 +432,9 @@ static void slot_update(Ui *u) {
     u->keys = busy ? 0 : keys;
     u->held = busy ? 0 : held;
     u->n_extra = 0;
+    u->idle = 0;
     if (u->on_step) u->on_step(u);
+    ui_st.ready = u->idle && !busy;
     EntityList *l = g_EntityList;
     for (int i = l->count - 1; i >= 0; i--) {
         Entity *e = l->items[i];
@@ -474,6 +488,7 @@ int ui_run(void (*on_open)(Ui *), void (*on_step)(Ui *), void (*on_close)(Ui *),
     u->qmark_tile = 0xFFFF;
     run_fade(UI_FADE_OUT_VT, 0x100, 0x10);
     UiModal_Run(u);
+    ui_st.ready = 0;
     Arena_Free(u);
     UiMap_Refresh(UI_WORLD, 1);
     coop.hud2.hp_px = 0xFF;           // player 2's panel tiles were drawn over: compose it again
@@ -528,6 +543,7 @@ static void choose_open(Ui *u) {
 
 static void choose_step(Ui *u) {
     Choose *c = u->ctx;
+    u->idle = 1;
     int d = ui_dpad(u);
     int old = c->cur;
     if (d & KEY_UP) c->cur = c->cur > 0 ? c->cur - 1 : c->n - 1;
@@ -585,6 +601,15 @@ void tny_popup_show(const char *line) {
     coop.input2.pressed = 0;
     ui_st.screens++;
     ui_st.busy = 0;
+}
+
+// Every frame (input.c through tourney_hooks.c): the pop-up test (test command 28, 7) runs here, in the same
+// context as the engine's pop-up queue.
+void tny_ui_frame(void) {
+    if (ui_st.magic != UI_MAGIC || !ui_st.popup_test) return;
+    int k = ui_st.popup_test - 1;
+    ui_st.popup_test = 0;
+    tny_popup_show(k == 1 ? "New tournament tier: Champion!" : k == 2 ? "New division: Full bracket!" : "New tournament fighter!");
 }
 
 // ---- CoopCall 28-29 (scripts) ----------------------------------------------------------------------------------
@@ -678,7 +703,7 @@ void tny_ui_test(u32 cmd, u32 arg, u32 arg2) {
             break;
         }
         case 6: tny_ui_grid(GRID_BOARD, 0, 0, 0); break;
-        case 7: tny_popup_show(arg2 == 1 ? "New tournament tier: Champion!" : arg2 == 2 ? "New division: Full bracket!" : "New tournament fighter!"); break;
+        case 7: ui_st.popup_test = (u8)(arg2 + 1); break;   // shown from tny_ui_frame (the input poll), as the engine would
         }
     } else if (cmd == 29) {
         switch (arg) {

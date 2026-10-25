@@ -32,6 +32,7 @@ typedef struct Br {
     Entity *mover, *mover2;
     u8 vs_a, vs_b;           // seats of the next match (0xFF none)
     u8 wait;
+    u8 skip;                 // A during the animation: the rest plays at once
 } Br;
 
 enum { S_START, S_EVENT, S_GREY, S_SLIDE, S_PAUSE, S_NEXT, S_VS, S_WAIT };
@@ -76,8 +77,8 @@ static int seat_on_page(const Br *br, int s) {
 static void seat_pos(const Br *br, int s, int l, int *x, int *y) {
     if (full(br) && br->page == 2) {
         if (l >= 4) { *x = 120; *y = 44; return; }
-        *x = (s >> 3) ? 160 : 80;
-        *y = 92;
+        *x = (s >> 3) ? 164 : 76;
+        *y = 84;
         return;
     }
     int local = s & 7;
@@ -168,12 +169,12 @@ static void draw_title(Ui *u, Br *br) {
     const char *tier = br->b.tier < TIER_COUNT ? ui_tier_names[br->b.tier] : "";
     ui_text(u, 4, 2, 0, C_GOLD, tier);
     int x = 4 + ui_text_width(tier) + 6;
-    ui_text(u, x, 2, 0, C_WHITE, br->b.size == 16 ? "Full bracket" : "Quick bracket");
+    ui_text(u, x, 2, 0, C_WHITE, br->b.size == 16 ? "Full" : "Quick");
     int r = br->b.round < br->b.rounds ? br->b.round : br->b.rounds - 1;
     ui_text(u, 236, 2, 2, C_LINE, br->b.round >= br->b.rounds ? "Champion" : round_name(br, r));
     if (full(br)) {
         static const char *const pages[3] = { "Left half", "Right half", "Final" };
-        ui_text(u, 120, 2, 1, C_GREY, pages[br->page]);
+        ui_text(u, 124, 2, 1, C_GREY, pages[br->page]);
     }
 }
 
@@ -228,20 +229,33 @@ static void banner(Ui *u, const char *a, const char *mid, const char *b) {
 // ---- results and the next match -----------------------------------------------------------------------------------
 static int is_player(const Br *br, int s) { return s != 0xFF && (s == br->b.p1_seat || s == br->b.p2_seat); }
 
+// The results to animate: round by round, the players' matches first, then the others grouped by page (the
+// page the players' last result is on first), so a Full bracket turns its pages as few times as it can.
+static void add_event(Br *br, int r, int m) {
+    br->ev_r[br->n_ev] = (u8)r;
+    br->ev_m[br->n_ev] = (u8)m;
+    br->n_ev++;
+}
+static int pending(const Br *br, int r, int m) { return br->b.winner[r][m] != 0xFF && br->shown[r][m] == 0xFF; }
+static int players_match(const Br *br, int r, int m) {
+    return is_player(br, match_seat(&br->b, br->b.winner, r, m, 0)) || is_player(br, match_seat(&br->b, br->b.winner, r, m, 1));
+}
 static void collect_events(Br *br) {
     br->n_ev = br->ev = 0;
+    int last_page = -1;
     for (int r = 0; r < br->b.rounds && r < 4; r++) {
         int n = br->b.size >> (r + 1);
-        for (int pass = 0; pass < 2; pass++)          // the players' matches first, then the others
+        for (int m = 0; m < n && m < 8; m++)
+            if (pending(br, r, m) && players_match(br, r, m)) { add_event(br, r, m); last_page = page_of_match(br, r, m); }
+        for (int pass = 0; pass < 4; pass++) {          // pass 0: last_page; passes 1-3: pages 0, 1, 2 (others)
             for (int m = 0; m < n && m < 8; m++) {
-                if (br->b.winner[r][m] == 0xFF || br->shown[r][m] != 0xFF) continue;
-                int s0 = match_seat(&br->b, br->b.winner, r, m, 0), s1 = match_seat(&br->b, br->b.winner, r, m, 1);
-                int pl = is_player(br, s0) || is_player(br, s1);
-                if ((pass == 0) != pl) continue;
-                br->ev_r[br->n_ev] = (u8)r;
-                br->ev_m[br->n_ev] = (u8)m;
-                br->n_ev++;
+                if (!pending(br, r, m) || players_match(br, r, m)) continue;
+                int pg = page_of_match(br, r, m);
+                if (pass == 0 ? pg != last_page : (pg != pass - 1 || pg == last_page)) continue;
+                add_event(br, r, m);
             }
+        }
+        if (br->n_ev) last_page = page_of_match(br, br->ev_r[br->n_ev - 1], br->ev_m[br->n_ev - 1]);
     }
 }
 
@@ -292,6 +306,13 @@ static void bracket_open(Ui *u) {
 static void bracket_step(Ui *u) {
     Br *br = u->ctx;
     ui_st.anim_frames++;
+    ui_st.dbg[0] = br->state; ui_st.dbg[1] = br->ev; ui_st.dbg[2] = br->n_ev; ui_st.dbg[3] = br->page;
+    if (br->state != S_WAIT && (u->keys & (KEY_A | KEY_B | KEY_START))) br->skip = 1;
+    if (br->skip && br->state != S_WAIT) {            // waits end now, slides land now
+        if (br->t < br->wait) br->t = br->wait;
+        if (br->state == S_SLIDE || br->state == S_VS) br->t = br->dur - 1;
+        if (br->state == S_START) br->t = 12;
+    }
     switch (br->state) {
     case S_START:
         if (++br->t >= 12) { br->t = 0; br->state = br->ev < br->n_ev ? S_EVENT : S_NEXT; }
@@ -335,7 +356,6 @@ static void bracket_step(Ui *u) {
             br->state = S_PAUSE;
             br->t = 0;
             br->wait = slow ? 24 : 2;
-            if (br->ev >= br->n_ev) build_page(u, br, br->page);   // lines and names in their new colours
         }
         break;
     }
@@ -371,7 +391,8 @@ static void bracket_step(Ui *u) {
         br->mover2 = b;
         if (a) { br->sx = (s16)ui_face_x(a); br->sy = (s16)ui_face_y(a); }
         if (b) { br->sx2 = (s16)ui_face_x(b); br->sy2 = (s16)ui_face_y(b); }
-        br->tx = 92; br->ty = 106; br->tx2 = 148; br->ty2 = 106;
+        if (full(br) && br->page == 2) { br->tx = 100; br->ty = 84; br->tx2 = 140; br->ty2 = 84; }
+        else { br->tx = 92; br->ty = 106; br->tx2 = 148; br->ty2 = 106; }
         br->dur = 24;
         br->t = 0;
         br->state = S_VS;
@@ -391,6 +412,7 @@ static void bracket_step(Ui *u) {
         }
         break;
     case S_WAIT:
+        u->idle = 1;
         br->t++;
         if ((u->keys & (KEY_A | KEY_B | KEY_START)) || br->t > 300) {
             if (u->keys) ui_sfx(UI_SFX_OK);
@@ -483,6 +505,7 @@ static void board_step(Ui *u) {
         }
         return;
     }
+    if (bd->shown_down >= bd->n) u->idle = 1;
     if (bd->shown_down >= bd->n && ((u->keys & (KEY_A | KEY_B | KEY_START)) || bd->t > 240)) ui_leave(u);
 }
 

@@ -119,7 +119,7 @@ static void draw_bar(Ui *u, Grid *g) {
         char buf[8] = { (char)('1' + g->page), '/', (char)('0' + pages(g)), 0 };
         ui_text(u, x, BAR_Y + 4, 0, C_GREY, buf);
     }
-    ui_text(u, 236, BAR_Y + 4, 2, C_LINE, g->mode == GRID_SELECT ? "L R tab  A pick  B back" : "B close");
+    ui_text(u, 236, BAR_Y + 4, 2, C_LINE, g->mode == GRID_SELECT ? "L R tab  A pick  B back" : "A B close");
 }
 
 static void panel_clear(Grid *g) {
@@ -229,6 +229,7 @@ static void grid_step(Ui *u) {
         bm_frame(cell_x(g->cur), cell_y(g->cur), CELL_W - 2, CELL_H - 2, on ? C_WHITE : cursor_colour(g));
         return;
     }
+    u->idle = 1;
     int n = on_page(g), d = ui_dpad(u), col = g->cur % COLS, row = g->cur / COLS;
     if (d & KEY_RIGHT) {
         if (col < COLS - 1 && g->cur + 1 < n) move_cursor(u, g, g->cur + 1);
@@ -247,9 +248,10 @@ static void grid_step(Ui *u) {
             build_page(u, g);
             ui_sfx(UI_SFX_MOVE);
         }
-    } else if (d & (KEY_UP | KEY_DOWN)) {
-        int k = row ? g->cur - COLS : g->cur + COLS;
-        if (k >= 0 && k < n) move_cursor(u, g, k);
+    } else if ((d & KEY_UP) && row > 0) {
+        move_cursor(u, g, g->cur - COLS);
+    } else if ((d & KEY_DOWN) && row < ROWS - 1 && g->cur + COLS < n) {
+        move_cursor(u, g, g->cur + COLS);
     }
     if (g->mode == GRID_SELECT && (u->keys & (KEY_L | KEY_R))) {
         g->tab = (u8)((g->tab + ((u->keys & KEY_R) ? 1 : TAB_COUNT - 1)) % TAB_COUNT);
@@ -268,6 +270,9 @@ static void grid_step(Ui *u) {
             g->confirm = 24;
         } else if (g->mode == GRID_SELECT) {
             ui_sfx(UI_SFX_BUZZ);
+        } else {                                  // the board: A closes it as B does
+            ui_sfx(UI_SFX_BACK);
+            ui_leave(u);
         }
     } else if (u->keys & KEY_B) {
         ui_sfx(UI_SFX_BACK);

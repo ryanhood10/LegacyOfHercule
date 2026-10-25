@@ -89,6 +89,7 @@ struct Ui {
     u8 n_extra;
     u8 ok;                      // the display and canvas are ready
     u16 qmark_tile;             // OBJ tiles of the "?" mark (0xFFFF none)
+    u8 idle;                    // the screen waits for a button this frame (on_step sets it; tests read it)
 };
 
 int  ui_run(void (*on_open)(Ui *), void (*on_step)(Ui *), void (*on_close)(Ui *), void *ctx, int pads);
@@ -150,6 +151,9 @@ typedef struct UiState {
     u16 vram_before, vram_after;   // largest free OBJ VRAM block before / after the last screen (tests)
     u16 heap_fail;              // allocation failures seen (tests)
     u16 anim_frames;            // frames the last bracket animation ran (tests)
+    u8 dbg[4];                  // the last bracket screen: state, event, events, page (tests)
+    u32 ready;                  // a screen is open and waits for a button (tests: waitnz)
+    u8 popup_test;              // test command 28, 7: the pop-up to show from tny_ui_frame (+1)
 } UiState;
 extern UiState tny_ui_state;
 #define ui_st tny_ui_state
