@@ -1,0 +1,325 @@
+# The tournament engine end to end (src/coop/tny_engine.c, docs/tournament.md "The engine (built)", docs/testing.md
+# "Tournament engine"). Runs on the weak defaults of the ui (automatic choices) and with the test stand-in body for
+# fighters whose art is not in the build (test command 24, arg2 2). Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_engine.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Engine state `eng` at 0x0203EC00 (tourneyram): +4 phase (0 idle, 4 a fight), +7 result (1 won, 2 lost), +12 picks,
+# +0x6C the bracket (TBracket), +0xEC queued / shown pop-ups, +0xFC / +0xFD the tests' wait bytes (0 = a fight is on /
+# nothing runs), +0x168 the record as last read (64 bytes: magic "NTY1", +8 unlocked bits, +0x10 wins[15],
+# +0x1F full_wins[5], +0x24 attempts[16], +0x34 prizes paid). Test commands (coop2.cmd 0x0203FD08, arg 0x0203FD0C,
+# arg2 0x0203FD54): 21 seed, 22 force (0 win, 1 lose, 2 the duel's winner arg2), 23 record (0 wipe, 1 / 2 set / clear a
+# fighter's bit, 3 reread), 24 force (tiers mask, arg2 1 story flags off 2 stand-in bodies), 25 start (division |
+# full << 4 | tier << 8, picks arg2 = p1 | p2 << 8, 0xFF = own). A command needs ~10 frames to be taken.
+# Expected lines are noted at each echo; no CRASH line, every stepz reached.
+p2 off
+maptest 13
+frames 300
+echo == setup: stand-in bodies, the record wiped, seed 42
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD08 21
+frames 10
+echo == 1. 1P, the director in the waiting room (CoopCall 23): Rookie 1 v 1 Quick as Piccolo, three wins, the challenger
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+key 0x80 6
+key 1 10
+frames 60
+key 1 10
+frames 40
+stepz 0x0203ECFC 3000
+shot e1_round1
+map
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e1_challenger
+echo expect phase 4, kind 2 (the challenger's fight)
+peek8 0x0203EC04 4
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+map
+echo expect back in 15 / 15; record: unlocked Pui Pui (+0xC bit 4), wins[0] 1, paid bit 0
+peek8 0x0203ED68 0x40
+echo == 2. a real loss: player 1 at 1 HP takes the opponent's hits: result 2, no game over, HP full again after
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+poke16 0x0203F028 1
+frames 900
+shot e2_loss
+peek8 0x0203EC04 4
+stepz 0x0203ECFD 4000
+map
+peek16 0x0203F028 2
+echo == 3. a lost challenge: Pui Pui locked again, won tournament, the challenger beats us: attempts[0] 1
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 36
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+peek8 0x0203ED68 0x40
+echo == 4. a tournament playable: Yamcha (unlocked) on player 1's own slot 1 (row 0x1D), restored after
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFF00
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+shot e4_yamcha
+peek8 0x0203EC0C 1
+peek8 0x0203F030 1
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+peek8 0x0203F030 1
+echo == 5. Champion 1 v 1 Full (16, four rounds) as Gohan (player 1 on slot 0, back on 1 after), tiers forced open
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 3
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x310
+poke32 0x0203FD54 0xFF32
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+peek8 PARTY 1
+peek8 0x0203EC6C 0x38
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e5_challenger
+peek8 0x0203EC04 4
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+peek8 PARTY 1
+echo expect full_wins[3] 1 (+0x22), paid bits 9 and 19
+peek8 0x0203ED68 0x40
+echo == 6. Champion Royal Rumble as Hercule: four rounds, Broly headlines, then Uub (won as Hercule)
+poke32 0x0203FD0C 0x302
+poke32 0x0203FD54 0xFF38
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+shot e6_round1
+peek8 0x0203EC10 0x20
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e6_headliner
+peek8 0x0203EC10 0x20
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e6_uub
+echo expect the challenger's fight (phase 4, kind 2): Uub, since Hercule won it
+peek8 0x0203EC04 4
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+echo expect Uub unlocked (+0xE bit 0)
+peek8 0x0203ED68 0x40
+echo == 7. the story opens Adept (flag 85): a pop-up at the next safe frame (shown + 1); nothing forced
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 24
+frames 10
+flags -85
+frames 60
+peek8 0x0203ECEC 2
+flags +85
+frames 60
+shot e7_notice
+peek8 0x0203ECEC 2
+stepz 0x0203ECFD 4000
+peek8 0x0203ECEC 2
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+echo == 8. co-op 1 v 1: alternating solo fights (player 2 on player 1's entity after a ring reload), the duel final
+p2 0
+frames 400
+peek8 0x0203FF84 1
+poke32 0x0203FD0C 7
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+shot e8_p1
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e8_p2
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e8_duel
+echo expect phase 6 (the duel), duel_active 1
+peek8 0x0203EC04 4
+peek8 0x0203FD5C 2
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 2
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e8_challenger
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+map
+peek8 PARTY 1
+peek8 0x0203FF84 1
+echo == 9. 2 v 2 Rookie: teams, two opponents at once, two bars; the junior pair challenges
+poke32 0x0203FD0C 9
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+shot e9_2v2
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e9_pair
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+echo == 10. co-op Royal Rumble Rookie: two rounds, King Cold's round, Yakon
+poke32 0x0203FD0C 3
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 3000
+shot e10_rumble
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 3000
+shot e10_yakon
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 4000
+echo expect wins[1] wins[2] 1, Goten / Kid Trunks / Yakon unlocked
+peek8 0x0203ED68 0x40
+echo == 11. a power cycle keeps the record (read back from the save chip)
+reset
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 5500
+maptest 13
+frames 300
+poke32 0x0203FD0C 3
+poke32 0x0203FD08 23
+frames 10
+peek8 0x0203ED68 0x40
