@@ -158,7 +158,8 @@ key 1 10
 frames 40
 key 1 10
 frames 60
-# 10. the director: his welcome (two pages), then the fallback line without the engine piece (two pages)
+# 10. the director: his welcome (two pages), then the engine's division list (the ui's list box); B backs out
+# and ends the talk (the full flow is tny_engine.txt)
 poke32 0x0203FD0C 0x0F0F
 poke32 0x0203FD54 0x013200A8
 poke32 0x0203FD08 5
@@ -170,12 +171,10 @@ shot gr12_director
 key 1 10
 frames 40
 key 1 10
-frames 60
-shot gr13_director_fallback
-key 1 10
-frames 40
-key 1 10
-frames 60
+frames 120
+shot gr13_director_list
+key 2 10
+frames 160
 # 11. the waiting room's save pad
 poke32 0x0203FD0C 0x0F0F
 poke32 0x0203FD54 0x01180030
