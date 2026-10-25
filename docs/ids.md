@@ -9,7 +9,8 @@ the code on 2026-10-19 (main e45c765).
 
 The tournament team (docs/tournament.md "The team") takes numbers only from its own row. Cross-piece calls go through
 `tourney_hooks.c` (weak defaults; dispatch of CoopCall 23-30, test commands 21-30 and the per-frame tick), so no
-piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own `.tny.<name>` section in
+piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made `is_coop_enemy` / `is_enemy` in
+`enemies.c` also count a fighter with a kit, through `tny_moves_base()`). RAM: each piece's own `.tny.<name>` section in
 `tourneyram` (0x0203EC00, 0x400 bytes; the heap cap now ends there). ROM: big generated art goes to `rom2`
 (0x08E00000, 2 MiB) with `TNY_ART` (`.rodata.art`), written by `patch_rom.py --art`.
 
@@ -20,7 +21,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
 | engine | 446-459 | 160-219 | - | - | - | - | 23-27 | 21-25 | - | `.tny.eng` 0x240 |
-| moves | - | 220-229 | - | - | - | - | - | 26-27 | - | `.tny.mv` 0x80 |
+| moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
 | ui | - | - | - | - | 190-199 | - | 28-29 | 28-29 | ui_strings 380-399 | `.tny.ui` 0x100 |
 
 ## Allocations for the Cell Games and post-game build (2026-10-19)
@@ -251,6 +252,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 19+ | 19-20 allocated to the post-game chapter | |
 | 21-29 | the tournament team (`docs/ids.md` allocations above) | |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
+| 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
+| 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |
+| 27 | TNY_DRIVE (moves) | `arg` = op << 24: 0 force move (`reg << 8 \| move`: 1-6 his kit's slot, 0x80 \| kind a library kind, 0xFB-0xFF Multi-Form / self-KO / stun beam / stun projectile / big ball), 1 Rumble = `arg & 1`, 2 HP of kit `reg` := `arg2` (0x800000NN = NN %), 3 no specials for `arg2` frames, 4 every kit fighter leaves, 5 a passive on top (11 drain, 12 regen) |
 
 ## Zone 15 areas (new maps, `data/maps/*.json`, built by `tools/mapbuild.py`)
 
