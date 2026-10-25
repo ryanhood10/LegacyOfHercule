@@ -129,11 +129,13 @@ sprite 72) for Roshi's gym.
 | 178-179 | free (the hercule-beam session's allocation, unused) | | |
 | 180 | Super Android 13 (Buu's Fury Broly recoloured; Perfect Cell's groups as a stand-in with `BUU=0`) | `tools/super13sprites.py` | `S13_SPRITE` |
 | 181-184 | Super 13's allocation, unused | | |
+| 235-244 | the tournament's player-layout LoG2 bodies (`tourney.h` `TS_P_*`): 235 Yamcha (156), 236 Tien (121), 237 Frieza (48), 238 Mecha Frieza (49 + 48's attacks), 239 Tao (50), 240 Android 13 (`a13_record`'s frames rebuilt), 241 Android 17 (9), 242 Android 18 (11), 243 Perfect Cell (30, 64 x 64), 244 Cooler (34, 64 x 64) | `tools/tnyplayables.py` (`TNY_ART`) | `TNY_PLAY_SPRITES` |
+| 245-249 | the playables' allocation, unused | | |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
 
-## Display rows (`display_rows`, stock 0-21, 29 rows, row limit patched at file 0x42D6)
+## Display rows (`display_rows`, stock 0-21, 80 rows, row limit patched at file 0x42D6)
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
@@ -144,7 +146,9 @@ leaves copies out of step: grep for the number before moving one.
 | 26 | haloed Goku (links 27 / 27, as 19 / 20 do) | 176 | Goku's (63 / 14) | `spriteclone.py` `--halo-sprites` |
 | 27 | haloed Super Saiyan Goku (flags 1, links 26 / 26) | 177 | SSJ Goku's (65 / 15) | `spriteclone.py` `--halo-sprites` |
 | 28 | Super Saiyan 2 Gohan (party slot 8): Gohan's row 3 (standard class), a base form linking to itself | 58 | 61 / 12 (the stock Super Saiyan 2 Gohan's, from row 4) | `spriteclone.py` `SSJ2_ROW`, `ssj2gohan.h` |
-| 29+ | free (29 was allocated to Super Saiyan 2 Gohan, unused; raise the limit in `patch_rom.py` and `EXTRA_ROWS` in `spriteclone.py`) | | | |
+| 29-66 | the tournament's playables, one per `TR_BEAT` / `TR_CHALLENGER` fighter of `tourney_data.c` in `TFighterId` order (29 Yamcha ... 47 Super 13, 48-52 the Buu-saga five, 53-66 the challengers; the map `tny_play_rows`, `tny_play_row()`): Gohan's standard row, links to itself | the table's `play_sprite` (72 when that record is not in the build; 180 -> 243 with `BUU=0`) | the table's portrait (Hercule's 67 when 0) / Hercule's status portrait | `tools/tnyplayables.py` `display_rows` (via `spriteclone.py`), `tny_play.c` |
+| 67-79 | the playables' allocation, unused (Hercule's row as filler) | | | |
+| 80+ | free (raise the limit in `patch_rom.py`, an imm8, and `EXTRA_ROWS` in `spriteclone.py`) | | | |
 
 The stock row 4 (sprite 58, class `0x030021E4`: fixed combat bytes 100, HP regeneration, an aura sound
 loop; flags 3, links to row 2) stays the Cell Games' transformation (`SetCharacterTransformation 0, 58`
@@ -176,7 +180,8 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
-| 24+ | free (24 allocated to Super Saiyan 2 Gohan, unused) | |
+| 24-40 | allocated to the tournament's playables, unused (their kits use 0-23: `tny_play.c`) | |
+| 41+ | free (24 was allocated to Super Saiyan 2 Gohan, unused) | |
 
 ## Party slots (`PARTY_SLOTS` = 9)
 
