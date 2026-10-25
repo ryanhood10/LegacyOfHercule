@@ -90,6 +90,7 @@ struct Ui {
     u8 ok;                      // the display and canvas are ready
     u16 qmark_tile;             // OBJ tiles of the "?" mark (0xFFFF none)
     u8 idle;                    // the screen waits for a button this frame (on_step sets it; tests read it)
+    u8 shrink;                  // giants' 64 x 64 faces at half size (OBJ affine; the bracket, the Rumble board)
 };
 
 int  ui_run(void (*on_open)(Ui *), void (*on_step)(Ui *), void (*on_close)(Ui *), void *ctx, int pads);
@@ -125,6 +126,10 @@ void ui_obj(Ui *u, u32 attr01, u32 attr2);
 u16  ui_portrait_load(int portrait_id);                 // OBJ tile of a 64 x 64 8bpp dialogue portrait, 0xFFFF none
 void ui_portrait_draw(Ui *u, u16 tile, int x, int y);
 void ui_qmark_draw(Ui *u, int x, int y);                // a 16 x 16 "?" centred on (x, y)
+// A face too big for a grid cell (a 64 x 64 giant, a 32 x 64 body): a 32 x 32 crop of its idle frame's head
+int  ui_face_big(int sprite_id);                        // the idle frame is wider than 32 or taller than 48 px
+u16  ui_face_crop(int sprite_id, const u8 *remap);      // OBJ tile of the crop (remap: the silhouette), 0xFFFF none
+void ui_crop_draw(Ui *u, u16 tile, int x, int y);       // centred on (x, y)
 
 // Data the screens read: the engine's, or the test overrides of test command 29 (tny_ui.c).
 int ui_unlocked(int id);

@@ -1,6 +1,7 @@
 # Tournament mode: design in progress (Ryan, 2026-10-24)
 
-Status: **plan done (Ryan, 2026-10-25); the team is building it (9a); the grounds (9b) and the engine (13) are built.** Every decision below is Ryan's unless marked "our
+Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13) and polished (14: the ring presentation, the hidden
+fight's alternatives, 16 and Super 13 as opponents, the giants' faces).** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -297,11 +298,20 @@ way to get him. A pair challenges you in 2v2; a lone giant can challenge the tea
 | Rookie | Pui Pui | Goten & Kid Trunks (the junior champions) | Yakon |
 | Adept | Pikkon | Dabura, alone against your team | Evil Buu |
 | Z-Fighter | Kibito | Fat Buu & Hercule (Buu saga): the odd couple | Super Janemba |
-| Champion | Kid Buu | Gotenks, the fusion alone against your team | Uub (won as Hercule: "the champion's student"; else Majin Vegeta's form for playable Vegeta) |
-| Legend | Vegito (won as Goku or Vegeta; else SSJ3 for playable Goku) | the Legend trophy: the SSJ3 / Majin forms for whoever won | Super Buu's final form as the headliner; the prize is the record's last line |
+| Champion | Kid Buu | Gotenks, the fusion alone against your team | Uub (won as Hercule: "the champion's student"); else Majin Vegeta |
+| Legend | Vegito (won as Goku or Vegeta); else Goku (Buu saga: SSJ at 60 %, SSJ3 at 25 %) | Goku (Buu saga) and Majin Vegeta together (the forms) | Super Buu in his final form (Gohan absorbed), after the Rumble's headliner; beating it is the record's last line |
 
 Each challenger fight is its own cutscene in the ring after the trophy; a loss ends with "come back when you've
-won again" and the record notes the attempt. The pairings are Ryan's to shuffle; the structure (one hidden
+won again" and the record notes the attempt.
+
+**The alternatives** (*decided* 2026-10-25, the polish, section 14): one rule for every "else" above. After a win the
+tournament's own challenger comes when he is still locked, in the build and his condition is met; otherwise the
+tournament's *alternative* comes, when still locked. The alternatives are beat-to-unlock fighters of the Legend pool
+(Majin Vegeta, Goku (Buu saga)), so the challenge is a second way to unlock them and a loss records no attempt (that
+line of the record is the challengers'). The final form is the one exception to "still locked": the Legend Rumble's
+headliner is Super Buu himself, unlocked when beaten there, so his final form comes after every Legend Rumble win until
+it is beaten once (the record's `extra` bit 0). The unlock board's lines say both ways ("Beat him, or win the Champion
+Rumble"). The pairings are Ryan's to shuffle; the structure (one hidden
 fighter per tournament, shown on the board as a silhouette with its condition) is the point.
 
 ## 7. The screens and the cutscenes
@@ -772,8 +782,7 @@ froze). The director's lists answer B by ending the talk (nothing changed).
    (the stock pick-up pop-up).
 9. *The hidden challenger*: every still-locked fighter whose `challenger_of` is this tournament and whose art is in
    the build (a pair in the Rookie 2 v 2); Uub only when the Champion Rumble was won as Hercule, Vegito only when the
-   Legend 1 v 1 was won as Goku or Vegeta (*decided*: the "else Majin Vegeta / SSJ3" variants of section 6 are not
-   built; the Legend 2 v 2 and Rumble have no challenger in the roster). "A challenger appears: Pui Pui!", the fight
+   Legend 1 v 1 was won as Goku or Vegeta; otherwise the tournament's alternative (section 6, built in the polish: 14). "A challenger appears: Pui Pui!", the fight
    (the winner alone in a co-op 1 v 1; the team otherwise; a lone challenger against two gets the lone-boss HP x1.8):
    won = unlocked ("... joins the tournament fighters!"), lost = the attempt in the record ("Come back when you've
    won again!").
@@ -820,5 +829,67 @@ Mirror rule: Hercule leaves the pool once he is in the party, 16 once he is the 
 
 **For the other pieces**: the ui reads `tny_bracket()` (live while a tournament runs) and gets `tny_ui_bracket(0)`
 once per draw, `(1)` before each later match and at the end; the grounds' director needs nothing more. RAM:
-`.tny.eng` 0x1B8 of its 0x240. Not built: the walk-in from opposite doors, the loser lying / winner's pose and the
-announcer standing in the ring (the lines are narration); the Rumble's NPC-vs-NPC fighting is the moves piece's.
+`.tny.eng` 0x21C of its 0x240 (since the polish). The walk-in, the end poses and the announcer in the ring came with the
+polish (section 14); the Rumble's NPC-vs-NPC fighting is the moves piece's.
+
+## 14. The polish (built 2026-10-25, branch `tny-polish`)
+
+The engine's open items: `src/coop/tny_engine.c` (presentation, alternatives, 16 / Super 13), `src/coop/super13.c` (his
+end in the ring), `src/coop/tny_moves.c` (`tny_moves_final_form`), `src/coop/tny_ui.c` / `tny_ui_grid.c` /
+`tny_ui_bracket.c` (the giants' faces). Test `tools/headless/tny_polish.txt` (`docs/testing.md` "Tournament polish").
+
+**The ring presentation.** Before a bracket match or a challenge the players stand on the left of the platform
+(`TNY_RING_P1` / `P2`; in a co-op fight both), the opponents on the right (`TNY_RING_OPP`), the announcer (sprite 230,
+an actor facing down at the ring's top edge, (360, 308); the stock townsman 99 when the art is missing) appears, and
+everyone walks 40 px to his fighting mark at the same time (the stock script commands: `WalkToPosition`'s command
+object queued on each entity and run by `CommitCommandBatch`'s modal, about 40 frames; nothing else moves meanwhile).
+Then the announcer calls it with his portrait (speaker 140; 0 = narration without the art): "ANNOUNCER: Round 1:
+GOHAN versus FRIEZA!  Begin!" ("The final: ...", "Royal Rumble, round 2!  Last ones standing win!", "And now, the
+headliner: BROLY!  Begin!", "PUI PUI challenges you!  Begin!"). A closes the line and he leaves before the first blow;
+the boss bars come then. A Rumble round has no walk: the players stand on their marks, he calls the round, leaves, and
+only then does the pack come in (he never shares OBJ VRAM with a fight). The co-op final (the duel): he calls it and
+leaves when the duel starts. At the end (90 frames after the last blow) the loser lies down (his lying group 12, else
+the knock-down 3, else the hit-stun; Super 13 kneels in his power-up crouch, group 23, because his 12 is the death
+light), the winner shows his victory pose facing the crowd (the shout group 4's last frame, else the fidget 14, else the
+ki pose 5), the announcer comes back and calls it ("The winner...  GOHAN!", "FRIEZA wins!  GOHAN is out of the
+tournament!", "Round cleared!  GOHAN stands tall!", "GOHAN defeats PUI PUI!"); the poses hold while the line shows,
+then the bracket screen. The trophy: the players' pose and "Ladies and gentlemen...  GOHAN wins the Rookie
+tournament!"; the challenger: "Wait...  a challenger appears: PUI PUI!". About a second of walking and one line each
+way.
+
+*Decided / found:*
+- **The world is frozen but drawn while a line shows** (decompiled: the dialogue modal's update 0x08004EA8 draws the
+  entity list, 0x08006AD8, without updating it), so a pose written into an entity's frame fields (+0x4C the group's
+  four facing arrays, +0x14 the frame) holds for the whole line; the engine rewrites it every frame and, outside the
+  line, zeroes both pads (never during it: A closes the line).
+- **The walk is the stock command system** (decompiled 2026-10-25): `WalkToPosition` (step 53, 0x08009D4A) builds a
+  command with 0x08026620(0, {x, y}) and appends it to the entity's command list (+0x150) through 0x0800E04C; outside a
+  batch that call runs the command modal at once; `BeginCommandBatch` / `CommitCommandBatch` set / clear the batch word
+  0x030020F8, and the commit runs 0x0800DE20's modal (message 0xB starts every queue, message 10 steps them each frame,
+  entities without commands are only animated and drawn) until all are done. The engine queues one walk per fighter and
+  commits once: they walk together. The walk ends in the idle pose; the facings are set after.
+- **Lines with a portrait start with the name** ("ANNOUNCER: ..."), as the stock lines do; names are in capitals.
+- **No camera move:** the camera stays on player 1; a body knocked far by the last blow can lie at the view's edge.
+
+**The hidden fight's alternatives**: section 6 (the rule). Super Buu's final form is his kit's two transforms applied
+at the spawn (`tny_moves_final_form`: sprite 207, both attack and defence boosts, no transform left to fire). The
+roster's unlock lines for Majin Vegeta, Goku (Buu saga) and Super Buu name both ways.
+
+**Android 16 and Super 13 as opponents.** Both spawn on their own paths (stats 109 / 145: `a16_spawn` / `s13_spawn`,
+their own AI and specials) and the engine then replaces their story numbers with the tournament's (the stat copy's HP,
+attack and defence from `tny_resolve_stat` at the running tier, the difficulty's boss HP on top; 16's island slicing
+keeps the same total). Their ends: 16's stage-over rule already left him standing with no scene (the record's action is
+none); Super 13's explosion (the light, a dozen blasts, the shake, the empty pose) does not run while
+`tny_ring_active()`: he kneels and stays (`s13.state` 3). Both then take the end's poses. 16 headlines the Z-Fighter
+Rumble (with the pool's story flag 146 and before he is the players', flag 421), Super 13 is in the Legend pool;
+test command 21's `arg2` 0x7E0000NN forces either into a test's first match.
+
+**The giants' faces.** The select grid and the unlock board (cells 34 x 56) show a giant (an idle frame wider than 32 or
+taller than 48 px: the 64 x 64 bodies, Kid Buu, Pui Pui) as a 32 x 32 crop: his idle frame decoded (`UiGfx_Decompress`:
+8bpp OBJ tiles in 1D order), the four middle tile columns from the first tile row with a visible pixel (head and
+shoulders), the silhouette remap applied for a locked one, drawn as our own OBJ. The bracket and the Rumble board, whose
+faces slide, draw a giant at half size instead: his face's 64 x 64 OAM entry becomes an affine sprite on matrix 31
+(1/2 scale, no double size: the same centre). The select's big panel (a fighter without a portrait) keeps the full body.
+
+**RAM**: `.tny.eng` 0x21C (the presentation's fields fill the old line's 76 bytes; the line moved to the end, 100
+characters; the state's magic is now 0x7E6E0003). The record's `extra` word (was padding): bit 0 the final form beaten.

@@ -1,0 +1,344 @@
+# The tournament's polish (docs/tournament.md section 14, docs/testing.md "Tournament polish"): the ring presentation
+# (the announcer, the walk-in, the end poses), Android 16 and Super 13 as opponents on their own paths, the Z-Fighter
+# Rumble's headliner 16, the hidden fight's alternatives (Champion Rumble -> Majin Vegeta, Legend 1 v 1 -> Goku (Buu
+# saga), Legend Rumble -> Super Buu's final form, Legend 2 v 2 -> the pair) and the select grid's cropped giant faces.
+#   python tools/headless/st_test.py tools/headless/tny_polish.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Engine state `eng` 0x0203EC00 (tny_engine.c TnyEng): +4 phase (4 a fight, 5 its end, 10 the intro), +6 kind (2 a
+# challenge), +0x2C opp[0], +0x57 chal[0..1], +0x59 nchal, +0x14C the announcer entity (0 = none), +0x150 pres,
+# +0x152 poses held, +0x153 final form, +0x168 the record (+8 unlocked bits, +0x24 attempts), +0x1B7 the line's
+# speaker (140 = the announcer's portrait), +0x1B8 its text. Test command 21's arg2 0x7E0000NN forces fighter NN as the
+# players' first opponent (or the Rumble's headliner). coop2.a16 0x0203FD34; s13 0x0203F9CC (+0xA booms, +0x15 state).
+# Pass: every stepz / waitnz reached, no CRASH, the peeks as the echo lines say.
+p2 off
+maptest 13
+frames 300
+echo == setup: stand-in bodies, the record wiped
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+echo == 1. Rookie 1 v 1: the announcer on the ring's edge, both fighters walk in, his call; the fight without him
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+waitnz 0x0203ED4C 1500
+frames 12
+shot p1_walkin
+echo expect phase 10 (the intro)
+peek8 0x0203EC04 1
+frames 60
+shot p1_call
+echo expect the announcer's portrait (speaker 0x8c) and his call
+peek8 0x0203EDB7 1
+peek8 0x0203EDB8 48
+stepz 0x0203ECFC 80
+shot p1_fight
+echo expect phase 4 and no announcer (+0x14C = 0) during the fight
+peek8 0x0203EC04 1
+peek 0x0203ED4C 1
+echo == 2. the end: the loser lies down, the winner's pose, the announcer calls the winner (held while the line shows)
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 130
+shot p2_end_won
+echo expect phase 5, pres 1, two poses held, an announcer
+peek8 0x0203EC04 1
+peek8 0x0203ED50 4
+peek 0x0203ED4C 1
+stepz 0x0203ECFC 80
+echo == 3. a real loss: player 1 at 1 HP takes the opponent's hits, lies down while the opponent cheers
+poke16 0x0203F028 1
+frames 900
+shot p3_end_lost
+peek8 0x0203EC04 1
+peek8 0x0203ED50 4
+stepz 0x0203ECFD 80
+map
+echo == 4. Android 16 (stat 109, android16.c) as a Z-Fighter opponent: his own AI, the tier's numbers, no end scene
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 3
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0x7E000013
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x200
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+echo expect coop2.a16 set (his entity) and the tier's HP (Z-Fighter 4200 x 110 %) at +0x188
+peek 0x0203FD34 1
+deref OPP 0x0203EC2C
+peek OPP+0x188 1
+frames 400
+shot p4_a16_fight
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 130
+shot p4_a16_down
+echo expect phase 5 (the end), result 1 (won); he lies down: his frame group (+0x4C) = his record (+0x48) + 0xC + 0x10 x 12 (or 3)
+peek8 0x0203EC04 4
+deref OPP 0x0203EC2C
+peek OPP+0x48 2
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo == 5. Super Android 13 (stat 145, super13.c) as a Legend opponent: beaten in the ring he kneels, no explosion
+poke32 0x0203FD0C 6
+poke32 0x0203FD54 0x7E00001C
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x400
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+echo expect s13.boss set and the tier's HP (Legend 8000 x 130 %)
+peek 0x0203F9D0 1
+deref OPP 0x0203EC2C
+peek OPP+0x188 1
+frames 400
+shot p5_s13_fight
+poke16 0x0203F9D6 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 130
+shot p5_s13_down
+echo expect s13.state 3 (beaten in the ring), phase 5, his frame group (+0x4C) = his record (+0x48) + 0x1BC (group 23,
+echo   the kneel; the death would show group 12, then the blank 26); booms: only his orbs still in flight (the death's own
+echo   are a dozen or more)
+peek8 0x0203F9E1 1
+peek8 0x0203EC04 1
+deref OPP 0x0203EC2C
+peek OPP+0x48 2
+peek16 0x0203F9D6 1
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo == 6. the Z-Fighter Royal Rumble: three rounds, then Android 16 headlines (his own path in a Rumble)
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x202
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+shot p6_round1
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+frames 200
+shot p6_headliner16
+echo expect the headliner round: Android 16 (0x13) in the ring, coop2.a16 set
+peek8 0x0203EC1A 6
+peek 0x0203FD34 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+echo expect Super Janemba's challenge (kind 2, chal 0x2D)
+peek8 0x0203EC04 4
+peek8 0x0203EC57 3
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo == 7. the Champion Royal Rumble won as Gohan (not Hercule): no Uub; Majin Vegeta (0x1E) challenges instead
+poke32 0x0203FD0C 8
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x302
+poke32 0x0203FD54 0xFF32
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+shot p7_majin_vegeta
+echo expect a challenge (phase 4, kind 2) by 0x1E, one fighter
+peek8 0x0203EC04 4
+peek8 0x0203EC57 3
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo expect Majin Vegeta unlocked (+0xB bit 6: 0x40) and no Uub (+0xE bit 0 clear)
+peek8 0x0203ED68 0x40
+echo == 8. the Legend 1 v 1 won as Gohan (not Goku or Vegeta): no Vegito; Goku (Buu saga, 0x1D) challenges; a loss
+echo    records no attempt (he is a beat-to-unlock fighter)
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x400
+poke32 0x0203FD54 0xFF32
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+shot p8_bgoku
+peek8 0x0203EC04 4
+peek8 0x0203EC57 3
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo expect Goku (Buu saga) still locked (+0xB bit 5 clear); attempts: only Janemba's from 6 (+0x2D = 1)
+peek8 0x0203ED68 0x40
+echo == 9. the Legend Royal Rumble: Super Buu headlines; then Super Buu in his final form (Gohan absorbed, sprite 207)
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x402
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+shot p9_final_form
+echo expect a challenge by Super Buu (0x23) in his final form (+0x153 = 1): the body is sprite 207's record (the last
+echo   peek), record bit extra 0 set after the win (+0x38 = 01)
+peek8 0x0203EC04 4
+peek8 0x0203EC57 3
+peek8 0x0203ED53 1
+deref OPP 0x0203EC2C
+peek OPP+0x48 1
+deref SIDX 0x0800959C
+peek SIDX+0x320 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo expect Super Buu unlocked (+0xC bit 3: 0x08) and his final form beaten (+0x38 bit 0)
+peek8 0x0203ED68 0x40
+echo == 10. the select grid: giants' faces are 32 x 32 crops of their heads (Villains, Buu Saga)
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 120
+key 0x100 4
+frames 20
+key 0x100 4
+frames 30
+shot p10_select_villains
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 30
+shot p10_select_villains_p2
+key 0x100 4
+frames 30
+shot p10_select_buu
+key 2 4
+frames 100
+echo == 11. co-op Legend 2 v 2: no challenger of its own; Goku (Buu saga) and Majin Vegeta's pair rule, Majin Vegeta
+echo     unlocked in 7, so Goku alone challenges the team
+p2 0
+frames 400
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x401
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+waitnz 0x0203ED4C 1500
+frames 12
+shot p11_walkin_2v2
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 80
+shot p11_challenge
+peek8 0x0203EC04 4
+peek8 0x0203EC57 3
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFD 80
+echo expect Goku (Buu saga) unlocked now (+0xB bit 5: 0x20, with Majin Vegeta's 0x40)
+peek8 0x0203ED68 0x40

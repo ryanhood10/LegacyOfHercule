@@ -1552,6 +1552,19 @@ void tny_moves_attach(Entity *e, int fighter_id) {
     mv.attached++;
 }
 
+// His final form at once (the engine's final-form challenge: Super Buu, Gohan absorbed, after the Legend Rumble):
+// every transform of his kit applied now, in table order, and marked done so none fires again
+void tny_moves_final_form(Entity *e) {
+    TKit *k = kit_of(e);
+    if (!k) return;
+    for (int i = 0; i < KIT_MOVES; i++) {
+        const TMove *m = &k->def->m[i];
+        if (m->kind != MK_TRANSFORM || (k->done & (1 << i))) continue;
+        k->done |= (u8)(1 << i);
+        transform(k, m);
+    }
+}
+
 void tny_rumble_mode(int on) {
     mv_init();
     mv.rumble = on ? 1 : 0;

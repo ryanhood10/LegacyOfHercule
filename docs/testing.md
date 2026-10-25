@@ -838,6 +838,28 @@ closes lines and screens) and won with test command 22; the end of a tournament 
 two. Test command 24 `arg2` 2 gives a fighter whose art is missing Tien's body, so the flow runs on any build. Pass:
 every stepz reached, no CRASH, the record lines as the echoes say.
 
+## Tournament polish (headless, 2026-10-25)
+
+```
+make BUILD=build/polish DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/polish/log2-coop.gba --out build/polish/hl
+python tools/headless/st_test.py tools/headless/tny_polish.txt build/polish/log2-coop.gba build/polish/hl/menu.ss --out build/polish/hl --cols 6
+```
+
+`tools/headless/tny_polish.txt` (`docs/tournament.md` 14), from Map Test 13: a Rookie 1 v 1 caught mid walk-in
+(`waitnz` on the announcer entity, `eng` +0x14C: shot `p1_walkin`), the announcer's call (speaker 0x8C, the text at
+`eng` +0x1B8), the fight without him; the end of a won fight (phase 5, two poses held) and of a real loss (player 1 at
+1 HP, lying: `p3_end_lost`); Android 16 forced into a Z-Fighter first match (test command 21 `arg2` 0x7E000013:
+`coop2.a16` set, the tier's 4620 HP, lying after the blow: his frame group = record + 0x10C, group 12); Super 13 in a
+Legend first match (10400 HP; beaten he kneels: group 23 = record + 0x1BC, `s13.state` 3, no death explosion); the
+Z-Fighter Rumble with 16 as the headliner (`opp_id` ends 0x13), Janemba's challenge; the Champion Rumble as Gohan:
+Majin Vegeta challenges (`chal` 0x1E), unlocked, no Uub; the Legend 1 v 1 as Gohan: Goku (Buu saga, 0x1D), lost, no
+attempt recorded; the Legend Rumble: Super Buu's final form (`eng` +0x153 = 1, his body = sprite 207's record, compared
+with the sprite index), won: the record's `extra` bit 0 (+0x38); the select's Villains and Buu Saga tabs (cropped giants:
+`p10_*`); co-op Legend 2 v 2: Goku (Buu saga) alone challenges (Majin Vegeta is unlocked by then), won. The screens:
+`build/<dir>/hl/tny_polish.png`. Pass: every `stepz` / `waitnz` reached, no CRASH, the peeks as the echoes say.
+`tny_ui.txt`'s bracket shots (`u18`-`u29`) show King Cold and the other giants at half size.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

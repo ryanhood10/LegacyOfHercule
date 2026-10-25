@@ -58,13 +58,13 @@ const TFighter tny_fighters[TF_COUNT] = {
 
     [TF_SUPER_PERFECT_CELL] = { "Super Perfect Cell", 30, 0,       40, TIER_LEGEND,   TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_SUPER13]       = { "Super Android 13",180, 180,           122, TIER_LEGEND,   TAB_VILLAINS,   BEAT | TR_GIANT, 0, NO, NO, "Beat this fighter in a match" },
-    [TF_BGOKU]         = { "Goku (Buu Saga)", TS_BGOKU, TS_BGOKU,   162, TIER_LEGEND,   TAB_BUU,        BEAT, 0,   NO, NO, "Beat this fighter in a match" },
-    [TF_MAJIN_VEGETA]  = { "Majin Vegeta", TS_MAJIN_VEGETA, TS_MAJIN_VEGETA, 165, TIER_LEGEND, TAB_BUU, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
+    [TF_BGOKU]         = { "Goku (Buu Saga)", TS_BGOKU, TS_BGOKU,   162, TIER_LEGEND,   TAB_BUU,        BEAT, 0,   NO, NO, "Beat him, or win the Legend 1 v 1" },
+    [TF_MAJIN_VEGETA]  = { "Majin Vegeta", TS_MAJIN_VEGETA, TS_MAJIN_VEGETA, 165, TIER_LEGEND, TAB_BUU, BEAT, 0,   NO, NO, "Beat him, or win the Champion Rumble" },
     [TF_MYSTIC_GOHAN]  = { "Mystic Gohan", TS_MYSTIC_GOHAN, TS_MYSTIC_GOHAN, 166, TIER_LEGEND, TAB_BUU, BEAT, 0,   NO, NO, "Beat this fighter in a match" },
     [TF_SAIYAMAN]      = { "Great Saiyaman", TS_SAIYAMAN, TS_SAIYAMAN, 167, TIER_LEGEND,  TAB_BUU,        BEAT, 0,   NO, NO, "Beat this fighter in a match" },
     [TF_BHERCULE]      = { "Hercule (Buu Saga)", 158, 0,            126, TIER_LEGEND,  TAB_BUU,        OPP,  0,   NO, NO, 0 },
     [TF_BPICCOLO]      = { "Piccolo (Buu Saga)", TS_BPICCOLO, 0,   168, TIER_LEGEND,   TAB_BUU,        OPP,  0,   NO, NO, 0 },
-    [TF_SUPER_BUU]     = { "Super Buu",  TS_SUPER_BUU, TS_SUPER_BUU, 151, TIER_LEGEND,  TAB_BUU,        BEAT | TR_GIANT | TR_HEADLINER, 0, NO, NO, "Beat this fighter in a match" },
+    [TF_SUPER_BUU]     = { "Super Buu",  TS_SUPER_BUU, TS_SUPER_BUU, 151, TIER_LEGEND,  TAB_BUU,        BEAT | TR_GIANT | TR_HEADLINER, 0, NO, NO, "Beat him, or win the Legend Rumble" },
 
     [TF_PUIPUI]        = { "Pui Pui",    TS_PUIPUI,   TS_PUIPUI,    144, TIER_ROOKIE,   TAB_BUU,        CHAL, 0,   NO, T(TIER_ROOKIE, DIV_1V1),      "Win the Rookie tournament (1 v 1)" },
     [TF_GOTEN]         = { "Goten",      TS_GOTEN,    TS_GOTEN,     155, TIER_ROOKIE,   TAB_BUU,        CHAL, 0,   NO, T(TIER_ROOKIE, DIV_2V2),      "Win the Rookie tournament (2 v 2)" },

@@ -20,6 +20,8 @@
 // the same game is still running (player 1 present), never into a freshly loaded party.
 #include "tny_engine.h"
 #include "revive.h"
+#include "super13.h"
+#include "difficulty.h"
 
 // ---- ROM ------------------------------------------------------------------------------------------------
 ROM_FN(void, Step_SetActiveCharacter, (s32 *st), 0x0800A785);        // VM step 70: player 1 plays party slot st[top]
@@ -68,17 +70,17 @@ typedef struct TRecord {
     u8 full_wins[5];       // 1 v 1 Full wins per tier
     u8 attempts[16];       // challenger attempts lost (id - TF_PUIPUI)
     u32 paid;              // bit t: tournament t's first-win capsule paid; bit 16 + tier: the Full capsule
-    u32 _p1;
+    u32 extra;             // bit 0: Super Buu's final form beaten (the Legend Rumble's hidden fight, the record's last line)
     u32 checksum;          // Save_Checksum of the bytes before it
 } TRecord;
 _Static_assert(sizeof(TRecord) == 64, "TRecord is 64 bytes (8-byte EEPROM blocks)");
 
 // ---- state (.tny.eng, NOLOAD) --------------------------------------------------------------------------
-#define ENG_MAGIC     0x7E6E0002u
+#define ENG_MAGIC     0x7E6E0003u     // 3: the presentation fields (polish)
 #define MAX_OPP       6
 #define NO            0xFF
 enum { P_IDLE, P_DIRECTOR, P_TO_RING, P_NEXT, P_MATCH, P_MATCH_END, P_DUEL, P_TROPHY, P_PRIZE, P_CHALLENGE,
-       P_RESTAGE, P_EXIT, P_EXITING };
+       P_INTRO, P_RESTAGE, P_EXIT, P_EXITING };
 enum { K_MATCH, K_RUMBLE, K_CHALLENGE };
 enum { R_NONE, R_WON, R_LOST };
 
@@ -134,13 +136,25 @@ typedef struct TnyEng {
     u8 _p3[3];
     u32 step_sp;                         // the stack at the step's tick: a deeper tick is nested, a shallower one
                                          // finds a stale flag (a reset or a state loaded mid-step) and clears it
-    struct { u8 head[4]; char text[72]; } say_entry;
+    // the ring presentation (76 bytes, where the first say entry was)
+    Entity *pose_e[4];                   // held poses (the loser lying, the winner's pose) while a line shows
+    u8 pose_g[4], pose_f[4];             // their group and frame
+    struct { u32 handler, flags; s16 x, y; s32 sprite, count; const void *beh; } ann_rec;   // the announcer's
+                                         // actor record (MapScript_CreateCharacter; the actor keeps pointing at it)
+    Entity *ann;                         // the announcer on the ring's edge (between fights only)
+    u8 pres;                             // P_INTRO / P_MATCH_END: 0 the presentation's first part, 1 its line ran
+    u8 force_opp;                        // test command 21 arg2: the players' next opponent / headliner (NO = none)
+    u8 npose;                            // poses held (pose_e)
+    u8 chal_final;                       // the hidden fight is Super Buu's final form (the Legend Rumble's)
+    u8 _p4[20];
     TRecord rec;                         // the record as last read or written (tests peek it)
     u8 down_t[MAX_OPP];                  // frames a Rumble fighter has lain down (his body leaves at 60)
     u8 br_shown;                         // the bracket screen has shown this draw (then phase 1 with the results)
     u8 *tint;                            // the same fighter twice on the floor: player 2's shadow remap (arena)
+    struct { u8 head[4]; char text[100]; } say_entry;   // a line (the announcer's, the fallback pop-up)
 } TnyEng;
 _Static_assert(sizeof(TnyEng) <= 0x240, ".tny.eng holds 0x240 bytes (docs/ids.md)");
+_Static_assert(__builtin_offsetof(TnyEng, rec) == 360 && __builtin_offsetof(TnyEng, pose_e) == 284, "the presentation fields fill the old line's 76 bytes");
 // offsets the tests peek (docs/testing.md "Tournament engine"): eng is at the start of tourneyram, 0x0203EC00
 _Static_assert(__builtin_offsetof(TnyEng, phase) == 4 && __builtin_offsetof(TnyEng, pick) == 12 &&
                __builtin_offsetof(TnyEng, rng) == 100 && __builtin_offsetof(TnyEng, br) == 108 &&
@@ -369,23 +383,42 @@ const TBracket *tny_bracket(void) {
 
 // ---- lines in a text box ---------------------------------------------------------------------------------
 static const u8 say_wait[] __attribute__((aligned(4))) = { 1, 0, 0, 0x00, 0x14, 0x02, 0x45, 0x11 };   // WaitFrames 20
-static char *cat(char *o, const char *s) {
+static char *catu(char *o, const char *s, int upper) {   // upper: in capitals (the announcer calls names so)
     char *end = eng.say_entry.text + sizeof eng.say_entry.text - 1;
-    while (s && *s && o < end) *o++ = *s++;
+    while (s && *s && o < end) { char ch = *s++; *o++ = upper && ch >= 'a' && ch <= 'z' ? (char)(ch - 32) : ch; }
     *o = 0;
     return o;
 }
-static void say(const char *a, const char *b, const char *c, const char *d, const char *e) {
+static char *cat(char *o, const char *s) { return catu(o, s, 0); }
+// A line: built now (say_prep), shown by the next list update (say_go: a dialogue event; the fight frame and the
+// steps wait for it). Speaker 0 = narration ("@^" caption), else a portrait (the announcer's 140)
+static char *say_open(int speaker) {
     eng.say_entry.head[0] = 2; eng.say_entry.head[1] = 0;   // next: the end
     eng.say_entry.head[2] = 1;                               // text
-    eng.say_entry.head[3] = 0;                               // narration
-    char *o = cat(eng.say_entry.text, "@^");
-    o = cat(o, a); o = cat(o, b); o = cat(o, c); o = cat(o, d); cat(o, e);
+    eng.say_entry.head[3] = (u8)speaker;
+    return cat(eng.say_entry.text, speaker ? "ANNOUNCER: " : "@^");
+}
+static void say_go(void) {
     eng.say_seq[0] = say_wait;
     eng.say_seq[1] = &eng.say_entry;
     eng.say_seq[2] = 0;
     coop_run_sequence(eng.say_action, eng.say_seq);
     eng.say_hold = 8;
+}
+static void say(const char *a, const char *b, const char *c, const char *d, const char *e) {
+    char *o = say_open(0);
+    o = cat(o, a); o = cat(o, b); o = cat(o, c); o = cat(o, d); cat(o, e);
+    say_go();
+}
+// The announcer's line: plain parts and NAMES (upper case) alternate, starting with plain text
+static int ann_speaker(void);
+static void ann_prep(const char *a, const char *n1, const char *b, const char *n2, const char *c) {
+    char *o = say_open(ann_speaker());
+    o = cat(o, a);
+    o = catu(o, n1, 1);
+    o = cat(o, b);
+    o = catu(o, n2, 1);
+    cat(o, c);
 }
 
 static const char *const tier_name[TIER_COUNT] = { "Rookie", "Adept", "Z-Fighter", "Champion", "Legend" };
@@ -552,7 +585,7 @@ static int needs_reload(int who) { return p1_slot_for(who) != g_Party->active_sl
 static void warp_ring(void);
 // Who is on the ring's floor: player 1 / player 2 alone (the other sits out: the Cell Games' solo modes) or both.
 // Returns 1 when player 1's body changed: the ring reloads (P_RESTAGE) and the caller's step runs again on arrival.
-static int stage_players(int who) {
+static int stage_players(int who, int x) {
     int mode = eng.players == 2 && who != 2 ? (who == 0 ? 1 : 2) : 0;
     if (coop_solo() != mode) {
         if (!mode && eng.slot[1] < PARTY_SLOTS) coop.p2_slot = eng.slot[1];   // player 2 comes back on his pick
@@ -567,8 +600,8 @@ static int stage_players(int who) {
     }
     if (mode == 0 && eng.players == 2 && coop.p2 && coop.p2_slot != eng.slot[1]) bind_p2(eng.slot[1]);
     heal_all();
-    place(g_PlayerObject, FIGHT_P_X, TNY_RING_P1_Y, 3);
-    if (who == 2) place(coop.p2, FIGHT_P_X, TNY_RING_P2_Y, 3);
+    place(g_PlayerObject, x, TNY_RING_P1_Y, 3);
+    if (who == 2) place(coop.p2, x, TNY_RING_P2_Y, 3);
     return 0;
 }
 
@@ -660,6 +693,17 @@ static Entity *spawn_opp(int id, int x, int y) {
     r->behaviour_count = 0;
     Entity *e = enemy_spawn_hook(r);               // the co-op scaling and the difficulty; never a twin (tny_rule)
     if (!e) return 0;
+    EnemyStat t;
+    if (stat != TNY_STAT0 + id && tny_resolve_stat(TNY_STAT0 + id, &t)) {
+        // 16 and Super 13 spawn on their own paths (android16.c / super13.c: their stats 109 / 145, their own AI and
+        // specials) with their story numbers: the tournament's tier numbers replace them, the difficulty on top
+        EnemyStat *st = (EnemyStat *)e->behaviour;
+        st->max_hp = t.max_hp * diff_boss_hp_pct() / 100;
+        e->hp = st->max_hp;
+        st->melee = e->stat_melee = t.melee;
+        st->ranged = e->stat_ranged = t.ranged;
+        st->defence = e->defence = t.defence;
+    }
     EntityList_Add(g_SceneTable[1], e);
     e->facing = 2;
     tny_moves_attach(e, id);
@@ -679,7 +723,10 @@ static int spawn_waiting(int budget, int alone) {
         int w = weight(eng.opp_id[i]);
         if (load && load + w > budget) break;
         if (!(alone && !load) && ObjVram_Largest(g_EntityList) < (w == 2 ? 0x1400 : 0x800)) break;   // wait for a free block
-        int x = FIGHT_O_X + opp_spot[i][0], y = TNY_RING_OPP_Y + opp_spot[i][1];
+        // a bracket match's opponents enter on their side of the platform and walk in (step_intro); the Rumble's
+        // fighters and later entrants appear on their marks
+        int x0 = eng.kind != K_RUMBLE && eng.phase != P_MATCH ? TNY_RING_OPP_X : FIGHT_O_X;
+        int x = x0 + opp_spot[i][0], y = TNY_RING_OPP_Y + opp_spot[i][1];
         if (x > TNY_RING_X1 - 16) x = TNY_RING_X1 - 16;
         if (y < TNY_RING_Y0 + 8) y = TNY_RING_Y0 + 8;
         if (y > TNY_RING_Y1 - 8) y = TNY_RING_Y1 - 8;
@@ -747,6 +794,147 @@ static void lethal_hit(Entity *e) {
     ((int (*)(Entity *, const u8 *))((u32)e->vtable + e->vtable[14]))(e, m + 0x24);
 }
 
+// ---- the ring presentation: the announcer at the ring's edge, the walk-in, the end poses -----------------------
+// The walk is the stock script command (WalkToPosition's object, decompiled 2026-10-25: 0x08009D4A queues
+// 0x08026620's command on the entity's command list +0x150 through 0x0800E04C; BeginCommandBatch sets the batch word
+// 0x030020F8, CommitCommandBatch 0x0800E038 runs the command modal (0x0800DE20: message 0xB starts every queue, each
+// frame message 10 steps them, entities without commands are only animated and drawn) until every queue is done).
+// While a dialogue line shows the world is frozen but drawn (the dialogue modal's update, 0x08004EA8, draws the
+// entity list without updating it), so a pose written into an entity's frame fields holds for the whole line.
+ROM_FN(void *, Cmd_Walk, (void *mem, const s32 *xy), 0x08026621);
+ROM_FN(void, Cmd_Queue, (u32 *batch, void *cmd, Entity *e), 0x0800E04D);
+ROM_FN(void, Cmd_Begin, (u32 *batch), 0x0800E033);
+ROM_FN(void, Cmd_Commit, (u32 *batch), 0x0800E039);
+#define CMD_BATCH           ((u32 *)0x030020F8)
+#define ACTOR_HANDLER       0x0800D6DFu
+#define ANN_STANDIN         99                      // the grounds' stand-in for the announcer (a stock townsman)
+#define ANN_PORTRAIT        140                     // art-buu's announcer portrait (Buu's Fury portrait 10)
+#define ANN_X               TNY_RING_CENTER_X       // at the ring's top edge, between the fighters
+#define ANN_Y               (TNY_RING_Y0 + 52)
+#define E8(e, o)            (*(u8 *)((u8 *)(e) + (o)))
+#define E16(e, o)           (*(u16 *)((u8 *)(e) + (o)))
+#define E32(e, o)           (*(u32 *)((u8 *)(e) + (o)))
+
+static int sprite_ok(int s) { return s >= 7 && (unsigned)s < sprite_index_count && Character_GetSpriteRecord(s) != 0; }
+static int ann_sprite(void) { return sprite_ok(TS_ANNOUNCER) ? TS_ANNOUNCER : ANN_STANDIN; }
+static int ann_speaker(void) { return ann_sprite() == TS_ANNOUNCER ? ANN_PORTRAIT : 0; }
+
+// The announcer between fights (never during one: no OBJ VRAM taken from a fight). An actor (the stock character
+// record handler) facing down; the line runs without him when OBJ VRAM is short.
+static void ann_show(void) {
+    static const u32 face_down[2] = { 0x0800CB0Fu, 0x7D00 };   // NpcBehavior_FaceAndWait: face down, ~9 min
+    if (eng.ann && in_list(eng.ann)) return;
+    eng.ann = 0;
+    if (!in_ring() || ObjVram_Largest(g_EntityList) < 0x800) return;
+    eng.ann_rec.handler = ACTOR_HANDLER;
+    eng.ann_rec.flags = 0;
+    eng.ann_rec.x = ANN_X;
+    eng.ann_rec.y = ANN_Y;
+    eng.ann_rec.sprite = ann_sprite();
+    eng.ann_rec.count = 1;
+    eng.ann_rec.beh = face_down;
+    Entity *a = MapScript_CreateCharacter((const ActorRecord *)&eng.ann_rec);
+    if (!a) return;
+    EntityList_Add(g_SceneTable[1], a);
+    eng.ann = a;
+}
+static void ann_hide(void) {
+    Entity *a = eng.ann;
+    eng.ann = 0;
+    if (a && in_list(a) && a->sprite_record == Character_GetSpriteRecord(eng.ann_rec.sprite))
+        EntityList_Remove(g_SceneTable[1], a, 0);
+}
+
+// Pose groups (a record's group = 4 facing arrays of 12-byte frames): a frame's descriptor is drawable, and an
+// array's length is its run of drawable descriptors up to the next array of the record (docs/sprites.md "Frame counts")
+static int desc_ok(const u8 *d) {
+    u32 b = *(const u32 *)(d + 8);
+    if (b < 0x08000000u || b >= 0x0A000000u || (b & 3)) return 0;
+    if (!(d[2] == 8 || d[2] == 16 || d[2] == 32 || d[2] == 64) || !(d[3] == 8 || d[3] == 16 || d[3] == 32 || d[3] == 64)) return 0;
+    return *(const u32 *)b <= 2;
+}
+static const u32 *grp_of(const Entity *e, int g) {
+    const u8 *rec = (const u8 *)e->sprite_record;
+    if (!rec || g >= rec[2]) return 0;
+    const u32 *grp = (const u32 *)(rec + 0x4C + 0x10 * g);
+    return grp[0] && grp[1] && grp[2] && grp[3] && desc_ok((const u8 *)grp[e->facing & 3]) ? grp : 0;
+}
+static int frames_of(const Entity *e, const u32 *grp) {
+    const u8 *rec = (const u8 *)e->sprite_record, *d = (const u8 *)grp[e->facing & 3];
+    int n = 1;
+    for (; n < 8; n++) {
+        const u8 *p = d + 12 * n;
+        for (int g = 0; g < rec[2]; g++)
+            for (int f = 0; f < 4; f++) if (*(const u8 *const *)(rec + 0x4C + 0x10 * g + 4 * f) == p) return n;
+        if (!desc_ok(p)) break;
+    }
+    return n;
+}
+// Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd)
+static void pose_hold(Entity *e, int win) {
+    if (!e || !in_list(e) || eng.npose >= 4) return;
+    if (win) e->facing = 0;
+    static const s8 lie[][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };     // group, frame (-1 = the last)
+    static const s8 cheer[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };
+    const s8 (*tab)[2] = win ? cheer : lie;
+    int g = -1, f = 0;
+    if (!win && is_s13(e)) { g = S13_G_POWER; f = 0; }          // Super 13's group 12 is his death light: he kneels
+    for (int i = 0; g < 0 && i < 3; i++) {
+        const u32 *grp = grp_of(e, tab[i][0]);
+        if (!grp) continue;
+        g = tab[i][0];
+        f = tab[i][1] < 0 ? frames_of(e, grp) - 1 : tab[i][1];
+    }
+    if (g < 0 || !grp_of(e, g)) return;
+    int k = eng.npose++;
+    eng.pose_e[k] = e;
+    eng.pose_g[k] = (u8)g;
+    eng.pose_f[k] = (u8)f;
+}
+static void poses_apply(int still) {
+    for (int k = 0; k < eng.npose; k++) {
+        Entity *e = eng.pose_e[k];
+        const u32 *grp = e && in_list(e) ? grp_of(e, eng.pose_g[k]) : 0;
+        if (!grp) continue;
+        E32(e, 0x4C) = (u32)grp;
+        E16(e, 0x14) = eng.pose_f[k];
+        E16(e, 0x12) = 0;
+    }
+    // nobody moves while they are held (the frames before the line's freeze; never during it: A closes the line)
+    if (!still) return;
+    g_InputSystem->current = g_InputSystem->pressed = 0;
+    coop.input2.current = coop.input2.pressed = 0;
+}
+static void poses_release(void) {
+    for (int k = 0; k < eng.npose; k++) {
+        Entity *e = eng.pose_e[k];
+        if (e && in_list(e) && (e == g_PlayerObject || e == coop.p2)) Entity_SetAnimation(e, 0);
+        eng.pose_e[k] = 0;
+    }
+    eng.npose = 0;
+}
+
+// The walk-in: the fighters from their sides of the platform to their marks (the command modal: nothing else
+// moves meanwhile), then everyone faces his opponent
+static void walk_cmd(Entity *e, int x, int y) {
+    if (!e || !in_list(e) || E32(e, 0x150)) return;
+    s32 xy[2] = { x, y };
+    void *c = Cmd_Walk(0, xy);
+    if (c) Cmd_Queue(CMD_BATCH, c, e);
+}
+static void walk_in(void) {
+    Entity *p1 = g_PlayerObject, *p2 = eng.fighter == 2 && !coop_solo() ? coop.p2 : 0;
+    Cmd_Begin(CMD_BATCH);
+    walk_cmd(p1, FIGHT_P_X, TNY_RING_P1_Y);
+    if (p2) walk_cmd(p2, FIGHT_P_X, TNY_RING_P2_Y);
+    for (int i = 0; i < eng.nopp; i++)
+        if (eng.opp_in[i] == 1 && eng.opp[i]) walk_cmd(eng.opp[i], FIGHT_O_X + opp_spot[i][0], eng.opp[i]->y >> 8);
+    Cmd_Commit(CMD_BATCH);
+    if (p1) p1->facing = 3;
+    if (p2 && in_list(p2)) p2->facing = 3;
+    for (int i = 0; i < eng.nopp; i++) if (eng.opp_in[i] == 1 && eng.opp[i] && in_list(eng.opp[i])) eng.opp[i]->facing = 2;
+}
+
 // ---- the fight ---------------------------------------------------------------------------------------------
 static const char *pname(int k) { return tny_fighters[eng.pick[k]].name; }
 static const char *fname(int id) { return id < TF_COUNT ? tny_fighters[id].name : "?"; }
@@ -769,11 +957,35 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
     eng.nwait = eng.nopp;
     eng.lone = kind == K_CHALLENGE && n == 1 && who == 2;
     eng.tint = 0;                                    // an arena block of an earlier map is gone
-    stage_players(who);                            // the caller checked needs_reload(who) first
-    spawn_waiting(opp_budget(), 1);
+    // the caller checked needs_reload(who) first. A bracket match / a challenge: everyone on his side of the
+    // platform, the walk-in and the announcer's call come in step_intro; a Rumble round: the players on their marks,
+    // the pack comes in after the announcer's line (he never shares the floor with a pack)
+    stage_players(who, kind == K_RUMBLE ? FIGHT_P_X : TNY_RING_P1_X);
+    if (kind != K_RUMBLE) {
+        spawn_waiting(opp_budget(), 1);
+        if (eng.chal_final && kind == K_CHALLENGE)
+            for (int i = 0; i < eng.nopp; i++) if (eng.opp[i]) tny_moves_final_form(eng.opp[i]);
+    }
     eng.lone = 0;
+    eng.timer = 0;
+    eng.pres = 0;
+    eng.phase = P_INTRO;
+}
+
+// The walk-in and the announcer's call (the line was prepared by the caller: ann_prep), then the fight
+static void step_intro(void) {
+    if (eng.pres == 0) {
+        ann_show();
+        if (eng.kind != K_RUMBLE) walk_in();
+        say_go();
+        eng.pres = 1;
+        return;
+    }
+    eng.pres = 0;
+    ann_hide();
+    if (eng.kind == K_RUMBLE) spawn_waiting(opp_budget(), 1);
     bars();
-    if (kind == K_RUMBLE) tny_rumble_mode(1);
+    if (eng.kind == K_RUMBLE) tny_rumble_mode(1);
     eng.timer = 0;
     eng.phase = P_MATCH;
 }
@@ -922,6 +1134,13 @@ static void draw_bracket(void) {
     u8 pool[TF_GOHAN];
     int n = pool_of(eng.tier, pool), k = 0;
     shuffle(pool, n);
+    if (eng.force_opp != NO) {                      // test command 21: him first, into the seat across from player 1
+        int j = 0;
+        while (j < n && pool[j] != eng.force_opp) j++;
+        if (j == n && n < TF_GOHAN) n++;
+        for (; j > 0; j--) pool[j] = pool[j - 1];
+        pool[0] = eng.force_opp;
+    }
     // fill unit by unit so a bye is a whole unit at the end of the draw (a 2 v 2 team is never half empty)
     for (int u = 0; u < nu; u++)
         for (int i = 0; i < w; i++) {
@@ -929,6 +1148,15 @@ static void draw_bracket(void) {
             if (s == b->p1_seat || s == b->p2_seat) continue;
             b->seat[s] = k < n ? pool[k++] : NO;
         }
+    if (eng.force_opp != NO) {                      // the forced fighter sits across from player 1
+        int across = w == 2 ? ((b->p1_seat >> 1) ^ 1) * 2 : b->p1_seat ^ 1;
+        for (int s = 0; s < b->size; s++)
+            if (b->seat[s] == eng.force_opp && s != across && s != b->p1_seat && s != b->p2_seat) {
+                b->seat[s] = b->seat[across];
+                b->seat[across] = eng.force_opp;
+                break;
+            }
+    }
     eng.results = 0;
     eng.br_shown = 0;
 }
@@ -956,14 +1184,14 @@ static int draw_pack(u8 *out, int slots, int giant) {
     if (giant >= 0) {                                // a giant first when the round wants one
         for (int i = 0; i < n && slots >= 2; i++) {
             int id = pool[i];
-            if (used(id) || is_headliner(id) || weight(id) != 2) continue;
+            if (used(id) || is_headliner(id) || id == eng.force_opp || weight(id) != 2) continue;
             out[k++] = (u8)id; use(id); slots -= 2;
             break;
         }
     }
     for (int i = 0; i < n && slots > 0 && k < MAX_OPP; i++) {
         int id = pool[i];
-        if (used(id) || is_headliner(id)) continue;
+        if (used(id) || is_headliner(id) || id == eng.force_opp) continue;
         if (weight(id) == 2 && (giant < 0 || slots < 2)) continue;
         out[k++] = (u8)id; use(id); slots -= weight(id);
     }
@@ -984,7 +1212,8 @@ static void rumble_round(void) {
         n = draw_pack(ids, slots, giant);
     } else {                                        // the headliner(s) with helpers: three fighters
         n = 0;
-        for (int i = 0; i < 2; i++) {
+        if (eng.force_opp != NO) { ids[n++] = eng.force_opp; use(eng.force_opp); }   // test command 21
+        for (int i = 0; n == 0 && i < 2; i++) {
             int id = headliners[eng.tier][i];
             if (id != NO && tny_in_pool(id) && !used(id)) { ids[n++] = (u8)id; use(id); }
         }
@@ -1008,10 +1237,10 @@ static void rumble_round(void) {
     u8 down[MAX_OPP] = { 0 };
     tny_ui_rumble_board(ids, down, n);
     if (!n) { eng.result = R_WON; eng.kind = K_RUMBLE; eng.phase = P_MATCH_END; eng.timer = 90; return; }
-    start_fight(K_RUMBLE, eng.players == 2 ? 2 : 0, ids, n);
     char num[2] = { (char)('1' + eng.rb_round), 0 };
-    if (eng.rb_round < regular) say("Royal Rumble, round ", num, "!  Last ones standing win!", 0, 0);
-    else say("The headliner: ", fname(ids[n - 1]), "!", 0, 0);
+    if (eng.rb_round < regular) ann_prep("Royal Rumble, round ", num, "!  Last ones standing win!", 0, 0);
+    else ann_prep("And now, the headliner: ", fname(ids[n - 1]), "!  Begin!", 0, 0);
+    start_fight(K_RUMBLE, eng.players == 2 ? 2 : 0, ids, n);
 }
 
 // ---- prizes, unlocks ----------------------------------------------------------------------------------------
@@ -1060,8 +1289,10 @@ static void restage(int back) { eng.back = (u8)back; eng.phase = P_RESTAGE; }
 static int arrived(int zone, int area) {
     if (eng.timer < 0xFFFF) eng.timer++;
     // a ring-to-ring reload may give the new player 1 the old one's address: then 90 frames settle it
-    return eng.timer > 20 && on_map(zone, area) && g_PlayerObject && (g_PlayerObject != eng.from || eng.timer > 90)
-           && !coop2.cmd && p1_in_play() && !scene_running();
+    int in = eng.timer > 20 && on_map(zone, area) && g_PlayerObject && (g_PlayerObject != eng.from || eng.timer > 90)
+             && !coop2.cmd && p1_in_play() && !scene_running();
+    if (in) { eng.ann = 0; eng.npose = 0; }          // a new map: the announcer and the posed bodies are gone
+    return in;
 }
 
 static void begin_tournament(void) {
@@ -1156,14 +1387,14 @@ static void step_next(void) {
     int pa = players_in(a) & ~eng.out, pb = players_in(b) & ~eng.out;
     int duel = eng.division == DIV_1V1 && pa && pb;
     int who = duel ? 2 : (pa | pb) == 3 ? 2 : (pa | pb) == 2 ? 1 : 0;
-    if (needs_reload(who)) { stage_players(who); restage(P_NEXT); return; }   // this step again after the reload
+    if (needs_reload(who)) { stage_players(who, FIGHT_P_X); restage(P_NEXT); return; }   // this step again after the reload
     tny_ui_bracket(eng.br_shown ? 1 : 0);            // the draw once (0), then the results since (1)
     eng.br_shown = 1;
     eng.results = 0;
     static const char *const round_name[4] = { "Round 1: ", "Round 2: ", "Round 3: ", "Round 4: " };
     const char *round = r == eng.br.rounds - 1 ? "The final: " : round_name[r & 3];
     if (duel) {                                      // the co-op final: player 1 against player 2, a duel
-        stage_players(2);                            // player 2's entity comes back on his pick when player 1 stands
+        stage_players(2, FIGHT_P_X);                 // player 2's entity comes back on his pick when player 1 stands
         coop2.call_end_seq = 0;
         coop2.call_slot = (s8)eng.slot[1];            // duel_start binds player 2 there
         coop2.call_flags = (u8)(eng.pick[0] == eng.pick[1] ? DUEL_SHADOW : 0);   // the same fighter twice: the shadow
@@ -1171,22 +1402,67 @@ static void step_next(void) {
         coop2.call_state = 1;                        // vmcall.c starts it once player 2 stands (the CoopCall 1 path)
         eng.phase = P_DUEL;
         eng.timer = 0;
-        say(round, pname(0), " vs. ", pname(1), "!");
+        ann_show();                                  // he leaves when the duel starts (the frame tick)
+        ann_prep(round, pname(0), " versus ", pname(1), "!  Begin!");
+        say_go();
         return;
     }
     int lead = pa ? b : a;                           // the opponents' unit
     u8 ids[2];
     int n = 0;
     for (int i = 0; i < unit_w(); i++) if (eng.br.seat[lead + i] != NO) ids[n++] = eng.br.seat[lead + i];
+    if (eng.division == DIV_2V2) {
+        char *o = say_open(ann_speaker());
+        o = cat(o, round);
+        o = cat(o, "your team versus ");
+        o = catu(o, fname(ids[0]), 1);
+        if (n > 1) { o = cat(o, " & "); o = catu(o, fname(ids[1]), 1); }
+        cat(o, "!  Begin!");
+    } else {
+        ann_prep(round, pname(who), " versus ", fname(ids[0]), "!  Begin!");
+    }
     start_fight(K_MATCH, who, ids, n);
-    if (eng.division == DIV_2V2)
-        say(round, "your team vs. ", fname(ids[0]), n > 1 ? " & " : "!", n > 1 ? fname(ids[1]) : 0);
-    else
-        say(round, pname(who), " vs. ", fname(ids[0]), "!");
 }
 
 // ---- the end of a fight ---------------------------------------------------------------------------------------
+static const char *chal_name(int i);
+static Entity *floor_p2(void) { return eng.fighter == 2 && coop.p2 && !coop_solo() ? coop.p2 : 0; }
+
+// The end's presentation: the loser lies down, the winner shows his pose, the announcer calls it; the poses hold
+// while the line shows (the step after it releases them)
+static void end_show(void) {
+    int won = eng.result == R_WON, k = eng.fighter == 2 ? 0 : eng.fighter;
+    const char *team = eng.division == DIV_2V2 || (eng.fighter == 2 && eng.players == 2) ? "your team" : 0;
+    const char *me = team ? team : pname(k);
+    if (eng.kind == K_RUMBLE && won) clear_opps();  // a cleared round: the fallen leave before he comes in
+    Entity *pl[2] = { g_PlayerObject, floor_p2() };
+    for (int i = 0; i < 2; i++) if (pl[i]) pose_hold(pl[i], won);
+    for (int i = 0; i < eng.nopp; i++) {
+        Entity *e = eng.opp[i];
+        if (!e || !in_list(e)) continue;
+        if (won) pose_hold(e, 0);
+        else if (e->hp > 0) pose_hold(e, 1);
+    }
+    ann_show();
+    if (eng.kind == K_CHALLENGE) {
+        if (won) ann_prep("", me, " defeats ", chal_name(0), eng.nchal > 1 ? " and partner!" : "!");
+        else ann_prep("", chal_name(0), eng.nchal > 1 ? " and partner win!" : " wins!", 0, 0);
+    } else if (eng.kind == K_RUMBLE) {
+        if (won) ann_prep(eng.rb_round + 1 < eng.rb_rounds ? "Round cleared!  " : "The headliner is down!  ", me,
+                          team ? " stand tall!" : " stands tall!", 0, 0);
+        else ann_prep("", me, team ? " are out of the Royal Rumble!" : " is out of the Royal Rumble!", 0, 0);
+    } else {
+        if (won) ann_prep("The winner...  ", me, "!", 0, 0);
+        else ann_prep("", eng.nopp > 1 ? "your opponents" : fname(eng.opp_id[0]), eng.nopp > 1 ? " win!  " : " wins!  ",
+                      me, team ? " are out of the tournament!" : " is out of the tournament!");
+    }
+    say_go();
+    eng.pres = 1;
+}
+
 static void step_match_end(void) {
+    if (eng.pres == 0) { end_show(); return; }
+    eng.pres = 0;
     int won = eng.result == R_WON;
     if (eng.kind == K_RUMBLE) tny_rumble_mode(0);
     if (won) for (int i = 0; i < eng.nopp; i++)
@@ -1201,20 +1477,23 @@ static void step_match_end(void) {
     int k = eng.fighter == 2 ? 0 : eng.fighter;
     if (eng.kind == K_CHALLENGE) {
         rec_load();
+        if (won && eng.chal_final) { eng.rec.extra |= 1; rec_save(); }   // the final form beaten: the record's last line
         if (won) for (int i = 0; i < eng.nchal; i++) unlock(eng.chal[i]);
         else for (int i = 0; i < eng.nchal; i++) {
+            if (eng.chal[i] < TF_PUIPUI || eng.chal[i] > TF_VEGITO) continue;   // an alternative: no attempt line
             u8 *a = &eng.rec.attempts[eng.chal[i] - TF_PUIPUI];
             if (*a < 255) (*a)++;
             rec_save();
         }
-        if (won) say(fname(eng.chal[0]), " joins the tournament fighters!", 0, 0, 0);
+        if (won && eng.chal_final) say("Super Buu's final form is beaten!  The Legend Royal Rumble is yours!", 0, 0, 0, 0);
+        else if (won) say(fname(eng.chal[0]), eng.nchal > 1 ? " and partner join the tournament fighters!" : " joins the tournament fighters!", 0, 0, 0);
         else say("Come back when you've won again!", 0, 0, 0, 0);
         eng.phase = P_EXIT;
         return;
     }
     if (eng.kind == K_RUMBLE) {
-        if (won) { eng.rb_round++; say("Round cleared!", 0, 0, 0, 0); eng.phase = P_NEXT; }
-        else { say(pname(0), eng.players == 2 ? " and partner are out of the Royal Rumble!" : " is out of the Royal Rumble!", 0, 0, 0); eng.phase = P_EXIT; }
+        if (won) { eng.rb_round++; eng.phase = P_NEXT; }
+        else eng.phase = P_EXIT;
         return;
     }
     // a bracket match
@@ -1223,11 +1502,9 @@ static void step_match_end(void) {
     int pa = players_in(a) & ~eng.out;
     int mine = pa ? a : b, theirs = pa ? b : a;
     set_winner(r, m, won ? mine : theirs);
-    if (won) say(eng.division == DIV_2V2 ? "Your team" : pname(k), " wins!", 0, 0, 0);
-    else {
+    if (!won) {
         if (eng.division == DIV_2V2) eng.out = 3;
         else eng.out |= (u8)(1 << k);
-        say(eng.division == DIV_2V2 ? "Your team" : pname(k), eng.division == DIV_2V2 ? " is out of the tournament!" : " is out of the tournament!", 0, 0, 0);
     }
     eng.phase = P_NEXT;
 }
@@ -1246,8 +1523,17 @@ static void step_trophy(void) {
     if (eng.full && eng.rec.full_wins[eng.tier] < 255) eng.rec.full_wins[eng.tier]++;
     rec_save();
     int w = winner_player();
-    const char *who = w == 2 ? (eng.players == 2 ? "Your team" : pname(0)) : pname(w);
-    say(who, " wins the ", tier_name[eng.tier], eng.division == DIV_RUMBLE ? " Royal Rumble!" : " tournament!", 0);
+    const char *who = w == 2 ? (eng.players == 2 ? "your team" : pname(0)) : pname(w);
+    pose_hold(g_PlayerObject, 1);
+    if (coop.p2 && !coop_solo()) pose_hold(coop.p2, 1);
+    ann_show();
+    char *o = say_open(ann_speaker());
+    o = cat(o, "Ladies and gentlemen...  ");
+    o = catu(o, who, 1);
+    o = cat(o, w == 2 && eng.players == 2 ? " win the " : " wins the ");
+    o = cat(o, tier_name[eng.tier]);
+    cat(o, eng.division == DIV_RUMBLE ? " Royal Rumble!" : eng.division == DIV_2V2 ? " tournament (2 v 2)!" : " tournament!");
+    say_go();
     eng.phase = P_PRIZE;
 }
 
@@ -1257,9 +1543,49 @@ static int won_as(int id) {
     return 0;
 }
 
+// The hidden fight after a win (docs/tournament.md section 6, the rule decided 2026-10-25): the tournament's own
+// challenger(s) when still locked, in the build and his condition met; otherwise the tournament's *alternative*
+// when still locked: Champion Rumble -> Majin Vegeta (not won as Hercule: no Uub), Legend 1 v 1 -> Goku (Buu saga,
+// the SSJ3 path; not won as Goku or Vegeta: no Vegito), Legend 2 v 2 -> Goku (Buu saga) and Majin Vegeta (the forms),
+// Legend Rumble -> Super Buu in his final form (Gohan absorbed). Alternatives are beat-to-unlock fighters: winning
+// the challenge unlocks them as beating them anywhere does; a lost one records no attempt (that line is the
+// challengers'). The final form is the exception to "still locked": the Rumble's headliner is Super Buu himself (beaten
+// there, he is unlocked already), so his final form comes after every Legend Rumble win until he is beaten in it once
+// (the record's `extra` bit 0: the record's last line).
+static const struct { u8 t, a, b, final; } alt_chal[] = {
+    { TIER_CHAMPION * DIV_COUNT + DIV_RUMBLE, TF_MAJIN_VEGETA, NO, 0 },
+    { TIER_LEGEND * DIV_COUNT + DIV_1V1, TF_BGOKU, NO, 0 },
+    { TIER_LEGEND * DIV_COUNT + DIV_2V2, TF_BGOKU, TF_MAJIN_VEGETA, 0 },
+    { TIER_LEGEND * DIV_COUNT + DIV_RUMBLE, TF_SUPER_BUU, NO, 1 },
+};
+static const char *chal_name(int i) {
+    if (i == 0 && eng.chal_final) return "Super Buu, final form";
+    return fname(eng.chal[i]);
+}
+static int pick_challengers(int t) {
+    eng.nchal = 0;
+    eng.chal_final = 0;
+    for (int id = TF_PUIPUI; id <= TF_VEGITO && eng.nchal < 2; id++) {
+        const TFighter *f = &tny_fighters[id];
+        if (f->challenger_of != t || rec_bit(id) || !body_of(id)) continue;
+        if (id == TF_UUB && !won_as(TF_P_HERCULE)) continue;                       // "won as Hercule"
+        if (id == TF_VEGITO && !won_as(TF_GOKU) && !won_as(TF_VEGETA)) continue;   // "won as Goku or Vegeta"
+        eng.chal[eng.nchal++] = (u8)id;
+    }
+    for (unsigned i = 0; !eng.nchal && i < sizeof alt_chal / sizeof alt_chal[0]; i++) {
+        if (alt_chal[i].t != t) continue;
+        const u8 ids[2] = { alt_chal[i].a, alt_chal[i].b };
+        int open = alt_chal[i].final ? !(eng.rec.extra & 1) : 1;
+        for (int j = 0; j < 2 && open; j++)
+            if (ids[j] != NO && (alt_chal[i].final || !rec_bit(ids[j])) && body_of(ids[j])) eng.chal[eng.nchal++] = ids[j];
+        eng.chal_final = (u8)(eng.nchal && alt_chal[i].final);
+    }
+    return eng.nchal;
+}
+
 // The prizes (Ryan, 2026-10-25): the first win of each tournament a +3 capsule (the stat turns with the tier and
 // the division: five of each across the fifteen), Full a second one, every later win a Senzu bean (the Rumble a
-// second one with no player KO); then the hidden challenger, if he is still locked
+// second one with no player KO); then the hidden fight, if one is still locked
 static void step_prize(void) {
     int t = tny_tourney_index(eng.tier, eng.division);
     static const u8 capsule[3] = { ITEM_STR3, ITEM_PWR3, ITEM_END3 };
@@ -1270,30 +1596,27 @@ static void step_prize(void) {
     if (paid) rec_save();
     else item_use_hook(ITEM_SENZU);
     if (eng.division == DIV_RUMBLE && !eng.koed) item_use_hook(ITEM_SENZU);
-    // the hidden challenger(s) of this tournament
-    eng.nchal = 0;
-    for (int id = TF_PUIPUI; id <= TF_VEGITO && eng.nchal < 2; id++) {
-        const TFighter *f = &tny_fighters[id];
-        if (f->challenger_of != t || rec_bit(id) || !body_of(id)) continue;
-        if (id == TF_UUB && !won_as(TF_P_HERCULE)) continue;                       // "won as Hercule"
-        if (id == TF_VEGITO && !won_as(TF_GOKU) && !won_as(TF_VEGETA)) continue;   // "won as Goku or Vegeta"
-        eng.chal[eng.nchal++] = (u8)id;
-    }
-    if (!eng.nchal) { eng.phase = P_EXIT; return; }
-    say("A challenger appears: ", fname(eng.chal[0]), eng.nchal > 1 ? " and " : "!", eng.nchal > 1 ? fname(eng.chal[1]) : 0, 0);
+    if (!pick_challengers(t)) { eng.phase = P_EXIT; return; }
+    ann_show();
+    ann_prep("Wait...  a challenger appears: ", chal_name(0), eng.nchal > 1 ? " and " : "!", eng.nchal > 1 ? chal_name(1) : 0,
+             eng.nchal > 1 ? "!" : 0);
+    say_go();
     eng.phase = P_CHALLENGE;
 }
 
 static void step_challenge(void) {
     int w = winner_player();
-    if (needs_reload(w)) { stage_players(w); restage(P_CHALLENGE); return; }
+    if (needs_reload(w)) { stage_players(w, FIGHT_P_X); restage(P_CHALLENGE); return; }
+    ann_prep("", chal_name(0), eng.nchal > 1 ? " and " : " challenges you!  Begin!", eng.nchal > 1 ? chal_name(1) : 0,
+             eng.nchal > 1 ? " challenge you!  Begin!" : 0);
     start_fight(K_CHALLENGE, w, eng.chal, eng.nchal);
-    say(fname(eng.chal[0]), eng.nchal > 1 ? " and partner challenge you!" : " challenges you!", 0, 0, 0);
 }
 
 // ---- leaving ---------------------------------------------------------------------------------------------------
 static void cleanup(int restore) {
     tny_rumble_mode(0);
+    if (restore) { poses_release(); ann_hide(); } else { eng.npose = 0; eng.ann = 0; }
+    eng.pres = 0;
     if (restore) shadow_off(); else eng.tint = 0;
     if (restore) {
         clear_opps();
@@ -1329,6 +1652,7 @@ static int popup_step(void) {
 }
 
 static void run_step(void) {
+    if (eng.npose) poses_release();                  // the poses held for the last line
     switch (eng.phase) {
     case P_IDLE: popup_step(); break;
     case P_DIRECTOR: step_director(); break;
@@ -1337,6 +1661,7 @@ static void run_step(void) {
     case P_TROPHY: step_trophy(); break;
     case P_PRIZE: step_prize(); break;
     case P_CHALLENGE: step_challenge(); break;
+    case P_INTRO: step_intro(); break;
     case P_EXIT: if (!(popup_is_stub() && popup_step())) step_exit(); break;
     default: break;
     }
@@ -1394,6 +1719,7 @@ void tny_engine_frame(void) {
         if (eng.timer < 90) eng.timer++;
         break;
     case P_DUEL:
+        if (eng.ann && coop2.duel_active) ann_hide();   // the announcer leaves when the duel begins
         if (coop2.call_state == 0 && coop2.duel_winner && !coop2.duel_active) {
             duel_clear();
             heal_all();
@@ -1424,6 +1750,7 @@ void tny_engine_frame(void) {
         g_InputSystem->current &= (u16)~KEY_START;
         coop.input2.pressed &= (u16)~(KEY_START | KEY_SELECT);
     }
+    if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
     eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
@@ -1431,7 +1758,7 @@ void tny_engine_frame(void) {
     int want = 0;
     switch (eng.phase) {
     case P_IDLE: want = eng.qn != 0; break;
-    case P_DIRECTOR: case P_NEXT: case P_TROPHY: case P_PRIZE: case P_CHALLENGE: case P_EXIT: want = 1; break;
+    case P_DIRECTOR: case P_NEXT: case P_TROPHY: case P_PRIZE: case P_CHALLENGE: case P_EXIT: case P_INTRO: want = 1; break;
     case P_MATCH_END: want = eng.timer >= 90; break;
     default: break;
     }
@@ -1466,7 +1793,8 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 }
 
 // ---- test commands 21-25 (docs/ids.md) ------------------------------------------------------------------------------
-//   21 SEED       arg = the draw's seed for the next tournament
+//   21 SEED       arg = the draw's seed for the next tournament; arg2 = 0x7E000000 | fighter: he is the players' first
+//                 opponent (a bracket: the seat across from player 1, out of the pool's rules) or the Rumble's headliner
 //   22 FORCE      arg 0: every opponent in the fight takes a lethal blow from player 1 (a won fight); 1: the fight is
 //                 lost; 2: the running duel ends, arg2 = the winner (1 / 2)
 //   23 RECORD     arg 0: wipe the record; 1 / 2: set / clear fighter arg2's unlock bit; 3: reread it into eng.rec
@@ -1476,7 +1804,11 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 void tny_engine_test(u32 cmd, u32 arg, u32 arg2) {
     state_check();
     switch (cmd) {
-    case 21: eng.rng = arg; eng.seeded = 1; break;
+    case 21:
+        eng.rng = arg;
+        eng.seeded = 1;
+        eng.force_opp = (arg2 >> 24) == 0x7E && (arg2 & 0xFF) < TF_GOHAN ? (u8)arg2 : NO;   // 0x7E0000NN: fighter NN
+        break;
     case 22:
         if (arg == 0 && eng.phase == P_MATCH) {
             for (int i = 0; i < eng.nopp; i++) {
