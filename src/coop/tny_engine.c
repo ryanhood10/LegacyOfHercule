@@ -37,6 +37,9 @@ int item_use_hook(int id);                                            // party.c
 int flag_test_hook(PartyState *p, u32 id);                            // party.c
 int p2_bind_slot(int slot);                                           // player.c
 extern const char *const ui_strings[];
+// the moves piece (tny_moves.c): who hit a kit fighter last (the Rumble's NPCs hit each other); weak, so the
+// engine links without it and keeps its own note from the damage calculation (tny_note_hit)
+Entity *tny_moves_last_hitter(const Entity *e) __attribute__((weak));
 
 #define A16_STAT_ID   109     // android16.c's own spawn path (rockets, barrage, bombs, punch)
 #define S13_STAT_ID   145     // super13.c's own spawn path
@@ -76,7 +79,7 @@ _Static_assert(sizeof(TRecord) == 64, "TRecord is 64 bytes (8-byte EEPROM blocks
 #define MAX_OPP       6
 #define NO            0xFF
 enum { P_IDLE, P_DIRECTOR, P_TO_RING, P_NEXT, P_MATCH, P_MATCH_END, P_DUEL, P_TROPHY, P_PRIZE, P_CHALLENGE,
-       P_EXIT, P_EXITING };
+       P_RESTAGE, P_EXIT, P_EXITING };
 enum { K_MATCH, K_RUMBLE, K_CHALLENGE };
 enum { R_NONE, R_WON, R_LOST };
 
@@ -123,7 +126,8 @@ typedef struct TnyEng {
     u8 preset_pick[2];
     u8 refresh;                          // the active slot's entry was rewritten: set_active must reload it
     u8 t_nofight, t_busy;                // tests (stepz): 0 = a fight runs and no line is up / nothing runs
-    u8 _pad2[2];
+    u8 back;                             // P_RESTAGE: the phase whose step runs again once the ring has reloaded
+    u8 say_hold;                         // frames without a scene before the next step (a line's event fires late)
     // a line in a text box (the announcer, the fallback pop-up): one entry in RAM
     const void *say_seq[3];
     u32 say_action[2];
@@ -376,6 +380,7 @@ static void say(const char *a, const char *b, const char *c, const char *d, cons
     eng.say_seq[1] = &eng.say_entry;
     eng.say_seq[2] = 0;
     coop_run_sequence(eng.say_action, eng.say_seq);
+    eng.say_hold = 8;
 }
 
 static const char *const tier_name[TIER_COUNT] = { "Rookie", "Adept", "Z-Fighter", "Champion", "Legend" };
@@ -547,45 +552,56 @@ static void place(Entity *e, int x, int y, int facing) {
 
 // Who is on the ring's floor for this fight: player 1 / player 2 alone (the other sits out: the Cell Games' solo
 // modes) or both; the fighters' entries are written and the characters set
-static void stage_players(int who) {
-    if (eng.players == 2 && who != 2) {
-        cg_set_solo(who == 0 ? 1 : 2);            // the other player's entity leaves the floor
-        apply_entry(who);
-        set_active(eng.slot[who]);                 // solo 2: player 2's pad drives player 1's entity as his pick
-    } else {
-        if (eng.players == 2) {
-            cg_set_solo(0);
-            apply_entry(0);
-            apply_entry(1);
-            bind_p2(eng.slot[1]);                  // player 2 first: player 1's change must not trade with him
-            set_active(eng.slot[0]);
-            if (coop.p2) coop.last_active = g_Party->active_slot;
-        } else {
-            apply_entry(0);
-            set_active(eng.slot[0]);
-        }
+// The fighter on player 1's entity for a fight: his pick, or in a co-op 1 v 1 player 2's pick on player 2's own
+// matches (solo 2: player 2's pad drives player 1's entity). A body change of player 1 goes through a reload of
+// the ring map (the playables piece: a changed body in place keeps the old OBJ VRAM slot, a 64 x 64 one overflows it)
+static int p1_slot_for(int who) { return eng.players == 2 && who == 1 ? eng.slot[1] : eng.slot[0]; }
+static int needs_reload(int who) { return p1_slot_for(who) != g_Party->active_slot; }
+static void warp_ring(void);
+// Who is on the ring's floor: player 1 / player 2 alone (the other sits out: the Cell Games' solo modes) or both.
+// Returns 1 when player 1's body changed: the ring reloads (P_RESTAGE) and the caller's step runs again on arrival.
+static int stage_players(int who) {
+    int mode = eng.players == 2 && who != 2 ? (who == 0 ? 1 : 2) : 0;
+    if (coop_solo() != mode) {
+        if (!mode && eng.slot[1] < PARTY_SLOTS) coop.p2_slot = eng.slot[1];   // player 2 comes back on his pick
+        cg_set_solo(mode);                         // 1 / 2: the other player's entity leaves the floor
     }
+    int target = p1_slot_for(who);
+    if (target != g_Party->active_slot) {
+        set_active(target);
+        coop.last_active = g_Party->active_slot;
+        warp_ring();
+        return 1;
+    }
+    if (mode == 0 && eng.players == 2 && coop.p2 && coop.p2_slot != eng.slot[1]) bind_p2(eng.slot[1]);
     heal_all();
     place(g_PlayerObject, FIGHT_P_X, TNY_RING_P1_Y, 3);
     if (who == 2) place(coop.p2, FIGHT_P_X, TNY_RING_P2_Y, 3);
+    return 0;
 }
 
-// Back to the players' own characters between fights (and at the end)
-static void unstage_players(void) {
-    restore_entries();
-    if (eng.players == 2) {
-        if (coop_solo()) {
-            set_active(eng.own[0]);
-            coop.p2_slot = eng.own[1] < PARTY_SLOTS ? eng.own[1] : coop.p2_slot;
-            cg_set_solo(0);
-        } else {
-            if (eng.own[1] < PARTY_SLOTS) bind_p2(eng.own[1]);
-            set_active(eng.own[0]);
-            if (coop.p2) coop.last_active = g_Party->active_slot;
-        }
-    } else {
-        set_active(eng.own[0]);
+// The tournament's characters, set up once before the warp into the ring: the picks' entries in their slots,
+// player 1 on his pick (the warp's map load builds his body), player 2's slot (he respawns there)
+static void enter_players(void) {
+    apply_entry(0);
+    if (eng.players == 2) apply_entry(1);
+    set_active(eng.slot[0]);
+    coop.last_active = g_Party->active_slot;
+    if (eng.players == 2 && eng.slot[1] < PARTY_SLOTS) {
+        if (coop.p2) bind_p2(eng.slot[1]); else coop.p2_slot = eng.slot[1];
     }
+}
+
+// Back to the players' own characters (the end, or a tournament dropped): entries restored, both slots back;
+// the warp back (a map load) gives player 1 his own body again
+static void unstage_players(void) {
+    if (eng.players == 2 && coop_solo()) cg_set_solo(0);
+    restore_entries();
+    if (eng.players == 2 && eng.own[1] < PARTY_SLOTS) {
+        if (coop.p2) bind_p2(eng.own[1]); else coop.p2_slot = eng.own[1];
+    }
+    set_active(eng.own[0]);
+    coop.last_active = g_Party->active_slot;
     heal_all();
 }
 
@@ -722,7 +738,7 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
     }
     eng.nwait = eng.nopp;
     eng.lone = kind == K_CHALLENGE && n == 1 && who == 2;
-    stage_players(who);
+    stage_players(who);                            // the caller checked needs_reload(who) first
     spawn_waiting(opp_budget(), 1);
     eng.lone = 0;
     bars();
@@ -739,7 +755,14 @@ static void fight_frame(void) {
     for (int i = 0; i < eng.nopp; i++) {
         if (eng.opp_in[i] != 1) continue;
         Entity *e = eng.opp[i];
-        if (!e || !in_list(e) || e->hp <= 0) { eng.opp_in[i] = 2; continue; }
+        if (!e || !in_list(e) || e->hp <= 0) {
+            if (e && in_list(e) && tny_moves_last_hitter) {      // the kit's own note of the last hitter
+                const Entity *h = tny_moves_last_hitter(e);
+                if (h) eng.opp_by[i] = (u8)(h == g_PlayerObject || h == coop.p2);
+            }
+            eng.opp_in[i] = 2;
+            continue;
+        }
         alive++;
     }
     if (eng.nwait && eng.timer > 30 && (eng.timer & 15) == 0) spawn_waiting(opp_budget(), !alive);
@@ -988,10 +1011,13 @@ static void warp(int zone, int area, int x, int y) {
     eng.from = g_PlayerObject;
     eng.timer = 0;
 }
+static void warp_ring(void) { warp(TNY_RING_ZONE, TNY_RING_AREA, FIGHT_P_X, TNY_RING_P1_Y); }
+static void restage(int back) { eng.back = (u8)back; eng.phase = P_RESTAGE; }
 static int arrived(int zone, int area) {
     if (eng.timer < 0xFFFF) eng.timer++;
-    return eng.timer > 20 && on_map(zone, area) && g_PlayerObject && g_PlayerObject != eng.from && !coop2.cmd
-           && p1_in_play() && !scene_running();
+    // a ring-to-ring reload may give the new player 1 the old one's address: then 90 frames settle it
+    return eng.timer > 20 && on_map(zone, area) && g_PlayerObject && (g_PlayerObject != eng.from || eng.timer > 90)
+           && !coop2.cmd && p1_in_play() && !scene_running();
 }
 
 static void begin_tournament(void) {
@@ -1052,6 +1078,7 @@ static void step_director(void) {
     }
     eng.preset = 0;
     resolve_slots();
+    enter_players();
     begin_tournament();
     // where the director stands (the way back) and off to the ring
     const u8 *m = map_state();
@@ -1060,7 +1087,7 @@ static void step_director(void) {
     eng.ret_area = m ? m[1] : 0;
     eng.ret_x = p1 ? (s16)(p1->x >> 8) : 0;
     eng.ret_y = p1 ? (s16)(p1->y >> 8) : 0;
-    warp(TNY_RING_ZONE, TNY_RING_AREA, TNY_RING_P1_X, TNY_RING_P1_Y);
+    warp_ring();
     eng.phase = P_TO_RING;
 }
 
@@ -1079,21 +1106,18 @@ static void step_next(void) {
         eng.phase = (players_in(champion_seat()) & ~eng.out) ? P_TROPHY : P_EXIT;
         return;
     }
-    tny_ui_bracket(eng.results ? 1 : 0);
-    eng.results = 0;
     int r = eng.br.round, m = eng.br.match;
     int a = side(r, m, 0), b = side(r, m, 1);
     int pa = players_in(a) & ~eng.out, pb = players_in(b) & ~eng.out;
+    int duel = eng.division == DIV_1V1 && pa && pb;
+    int who = duel ? 2 : (pa | pb) == 3 ? 2 : (pa | pb) == 2 ? 1 : 0;
+    if (needs_reload(who)) { stage_players(who); restage(P_NEXT); return; }   // this step again after the reload
+    tny_ui_bracket(eng.results ? 1 : 0);
+    eng.results = 0;
     static const char *const round_name[4] = { "Round 1: ", "Round 2: ", "Round 3: ", "Round 4: " };
     const char *round = r == eng.br.rounds - 1 ? "The final: " : round_name[r & 3];
-    if (eng.division == DIV_1V1 && pa && pb) {       // the co-op final: player 1 against player 2, a duel
-        restore_entries();
-        if (coop_solo()) coop.p2_slot = eng.own[1] < PARTY_SLOTS ? eng.own[1] : coop.p2_slot;
-        cg_set_solo(0);                              // player 2's entity comes back when player 1 stands
-        apply_entry(0);
-        apply_entry(1);
-        set_active(eng.slot[0]);
-        heal_all();
+    if (duel) {                                      // the co-op final: player 1 against player 2, a duel
+        stage_players(2);                            // player 2's entity comes back on his pick when player 1 stands
         coop2.call_end_seq = 0;
         coop2.call_slot = (s8)eng.slot[1];            // duel_start binds player 2 there
         coop2.call_flags = (u8)(eng.pick[0] == eng.pick[1] ? DUEL_SHADOW : 0);   // the same fighter twice: the shadow
@@ -1105,7 +1129,6 @@ static void step_next(void) {
         return;
     }
     int lead = pa ? b : a;                           // the opponents' unit
-    int who = (pa | pb) == 3 ? 2 : (pa | pb) == 2 ? 1 : 0;
     u8 ids[2];
     int n = 0;
     for (int i = 0; i < unit_w(); i++) if (eng.br.seat[lead + i] != NO) ids[n++] = eng.br.seat[lead + i];
@@ -1123,7 +1146,7 @@ static void step_match_end(void) {
     if (won) for (int i = 0; i < eng.nopp; i++)
         if (eng.opp_by[i] && (tny_fighters[eng.opp_id[i]].role & TR_BEAT)) unlock(eng.opp_id[i]);
     clear_opps();
-    unstage_players();
+    heal_all();
     if (won) {
         if (eng.fighter == 2 || eng.players == 1) { exp_trickle(exp_slot(0)); if (eng.players == 2) exp_trickle(exp_slot(1)); }
         else exp_trickle(exp_slot(eng.fighter));
@@ -1216,6 +1239,7 @@ static void step_prize(void) {
 
 static void step_challenge(void) {
     int w = winner_player();
+    if (needs_reload(w)) { stage_players(w); restage(P_CHALLENGE); return; }
     start_fight(K_CHALLENGE, w, eng.chal, eng.nchal);
     say(fname(eng.chal[0]), eng.nchal > 1 ? " and partner challenge you!" : " challenges you!", 0, 0, 0);
 }
@@ -1296,8 +1320,13 @@ static void story_watch(void) {
 void tny_engine_frame(void) {
     state_check();
     story_watch();
-    int safe = g_PlayerObject && p1_controllable() && !scene_running();
+    if (eng.say_hold && !scene_running()) eng.say_hold--;
+    int safe = g_PlayerObject && p1_controllable() && !scene_running() && !eng.say_hold;
     switch (eng.phase) {
+    case P_RESTAGE:
+        if (arrived(TNY_RING_ZONE, TNY_RING_AREA)) eng.phase = eng.back;
+        else if (eng.timer > 1200) eng.phase = eng.back;
+        break;
     case P_TO_RING:
         if (arrived(TNY_RING_ZONE, TNY_RING_AREA)) eng.phase = P_NEXT;
         else if (eng.timer > 1200) { cleanup(0); eng.phase = P_IDLE; }   // the warp never came
@@ -1312,7 +1341,7 @@ void tny_engine_frame(void) {
     case P_DUEL:
         if (coop2.call_state == 0 && coop2.duel_winner && !coop2.duel_active) {
             duel_clear();
-            unstage_players();
+            heal_all();
             int r = eng.br.round, m = eng.br.match;
             int a = side(r, m, 0), b = side(r, m, 1);
             int p1side = (players_in(a) & 1) ? a : b;
@@ -1341,7 +1370,7 @@ void tny_engine_frame(void) {
         coop.input2.pressed &= (u16)~(KEY_START | KEY_SELECT);
     }
     eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
-    eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending;
+    eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
     int want = 0;
