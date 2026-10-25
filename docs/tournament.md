@@ -71,15 +71,15 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **Two new screens:** a character select with tabs and a face grid, and the **animated bracket** with the
   before / after cutscenes (section 7). The waiting room shows today's pool as actors with a line each.
 - **No ring-outs** (Ryan, 2026-10-25): the platform's edge stays closed ground, matches are won by damage only.
+- **Full heal before every round, in every division** (Ryan, 2026-10-25): HP and ki back to full between
+  matches and between the Rumble's rounds; each fight starts clean, Budokai-style.
 - **Fights end at 1 HP** like duels; nobody dies. Prizes are items and a record line (LoG2 has no money);
   little or no EXP so the tournament cannot over-level the story.
 
 ## 2. Proposed, not yet decided
 
-- **Heal between rounds:** partial (a Senzu-sized chunk), full before the final.
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
-  with one giant, then the headliner with two helpers; partial heal between; you must be standing at the
-  end of a round to advance.
+  with one giant, then the headliner with two helpers; you must be standing at the end of a round to advance.
 
 ## 3. Tiers and their story triggers
 
