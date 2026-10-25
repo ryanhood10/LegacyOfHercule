@@ -122,6 +122,8 @@ typedef struct TnyEng {
     u8 preset;                           // test command 25: choices given, skip the screens
     u8 preset_pick[2];
     u8 refresh;                          // the active slot's entry was rewritten: set_active must reload it
+    u8 t_nofight, t_busy;                // tests (stepz): 0 = a fight runs and no line is up / nothing runs
+    u8 _pad2[2];
     // a line in a text box (the announcer, the fallback pop-up): one entry in RAM
     const void *say_seq[3];
     u32 say_action[2];
@@ -133,7 +135,7 @@ _Static_assert(sizeof(TnyEng) <= 0x240, ".tny.eng holds 0x240 bytes (docs/ids.md
 // offsets the tests peek (docs/testing.md "Tournament engine"): eng is at the start of tourneyram, 0x0203EC00
 _Static_assert(__builtin_offsetof(TnyEng, phase) == 4 && __builtin_offsetof(TnyEng, pick) == 12 &&
                __builtin_offsetof(TnyEng, rng) == 100 && __builtin_offsetof(TnyEng, br) == 108 &&
-               __builtin_offsetof(TnyEng, qn) == 236 && __builtin_offsetof(TnyEng, rec) == 356, "TnyEng layout (tests)");
+               __builtin_offsetof(TnyEng, qn) == 236 && __builtin_offsetof(TnyEng, t_nofight) == 252 && __builtin_offsetof(TnyEng, rec) == 360, "TnyEng layout (tests)");
 static TnyEng eng TNY_SECTION("eng") __attribute__((used));
 
 #define TFORCE_POOL_FLAGS 1      // ignore the fighters' story flags (pool_flag)
@@ -298,14 +300,15 @@ static int a16_ours(void) {
 // His body as an opponent: his sprite when its record is in this build and has the pose groups an AI set needs
 // (idle, walk, hit-stun, an attack at least: Mecha Frieza's cutscene body 49 has none of the fight poses), else his
 // player-layout record (play_sprite, the playables / art pieces), else the test stand-in when it is on, else none
+extern const unsigned sprite_index_count;   // build/gen/sprites_data.c: the index has no bounds check
 static int fightable(int sprite) {
-    return sprite && has_groups(Character_GetSpriteRecord(sprite), ai_groups(11));
+    return sprite >= 7 && (unsigned)sprite < sprite_index_count && has_groups(Character_GetSpriteRecord(sprite), ai_groups(11));
 }
 static int body_of(int id) {
     if (id < 0 || id >= TF_COUNT) return 0;
     const TFighter *f = &tny_fighters[id];
     if (tny_fighter_ok(id) && fightable(f->sprite)) return f->sprite;
-    if (f->play_sprite && Character_GetSpriteRecord(f->play_sprite) && fightable(f->play_sprite)) return f->play_sprite;
+    if (fightable(f->play_sprite)) return f->play_sprite;
     if (eng.magic == ENG_MAGIC && (eng.force_flags & TFORCE_STANDIN)) return STANDIN_SPRITE;
     return 0;
 }
@@ -532,6 +535,9 @@ static void restore_entries(void) {
     eng.backed = 0;
 }
 
+// Where a fight starts: both sides a little off the centre, so the camera (on player 1) shows the opponent
+#define FIGHT_P_X   (TNY_RING_CENTER_X - 40)
+#define FIGHT_O_X   (TNY_RING_CENTER_X + 40)
 static void place(Entity *e, int x, int y, int facing) {
     if (!e) return;
     e->x = x << 8;
@@ -560,8 +566,8 @@ static void stage_players(int who) {
         }
     }
     heal_all();
-    place(g_PlayerObject, TNY_RING_P1_X, TNY_RING_P1_Y, 3);
-    if (who == 2) place(coop.p2, TNY_RING_P2_X, TNY_RING_P2_Y, 3);
+    place(g_PlayerObject, FIGHT_P_X, TNY_RING_P1_Y, 3);
+    if (who == 2) place(coop.p2, FIGHT_P_X, TNY_RING_P2_Y, 3);
 }
 
 // Back to the players' own characters between fights (and at the end)
@@ -616,7 +622,7 @@ static Entity *spawn_opp(int id, int x, int y) {
 }
 
 static const s16 opp_spot[MAX_OPP][2] = {
-    { 0, 0 }, { 24, 48 }, { 24, -48 }, { 72, 24 }, { 72, -24 }, { -120, 56 },
+    { 0, 0 }, { 0, 56 }, { 0, -56 }, { 48, 28 }, { 48, -28 }, { -96, 80 },
 };
 // Spawn waiting entrants while the ring has room (a giant counts double) and OBJ VRAM has a block for the body;
 // `alone` (nobody of the fight stands): the next one comes in whatever the VRAM says, so a fight never stalls
@@ -628,7 +634,7 @@ static int spawn_waiting(int budget, int alone) {
         int w = weight(eng.opp_id[i]);
         if (load && load + w > budget) break;
         if (!(alone && !load) && ObjVram_Largest(g_EntityList) < (w == 2 ? 0x1400 : 0x800)) break;   // wait for a free block
-        int x = TNY_RING_OPP_X + opp_spot[i][0], y = TNY_RING_OPP_Y + opp_spot[i][1];
+        int x = FIGHT_O_X + opp_spot[i][0], y = TNY_RING_OPP_Y + opp_spot[i][1];
         if (x > TNY_RING_X1 - 16) x = TNY_RING_X1 - 16;
         if (y < TNY_RING_Y0 + 8) y = TNY_RING_Y0 + 8;
         if (y > TNY_RING_Y1 - 8) y = TNY_RING_Y1 - 8;
@@ -663,6 +669,12 @@ static void clear_opps(void) {
         if (e->hp > 0) e->hp = 0;
         EntityList_Broadcast(g_SceneTable[1], 0xF, e);   // "entity died": its bar lets go
         EntityList_Remove(g_SceneTable[1], e, 0);
+    }
+    // the fight's boss bars (bound to nobody now): off the screen before the next fight's
+    EntityList *l = g_EntityList;
+    for (int i = l->count - 1; i >= 0; i--) {
+        Entity *b = l->items[i];
+        if (b && (b->vtable == (u32 *)BOSSBAR_VTABLE || b->vtable == coop2.bar_vtable)) EntityList_Remove(g_SceneTable[1], b, -8);
     }
 }
 
@@ -1291,7 +1303,7 @@ void tny_engine_frame(void) {
         else if (eng.timer > 1200) { cleanup(0); eng.phase = P_IDLE; }   // the warp never came
         break;
     case P_MATCH:
-        if (!in_ring()) break;
+        if (!in_ring() || scene_running()) break;   // the fight waits for the announcer's line
         fight_frame();
         break;
     case P_MATCH_END:
@@ -1328,6 +1340,8 @@ void tny_engine_frame(void) {
         g_InputSystem->current &= (u16)~KEY_START;
         coop.input2.pressed &= (u16)~(KEY_START | KEY_SELECT);
     }
+    eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
+    eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
     int want = 0;

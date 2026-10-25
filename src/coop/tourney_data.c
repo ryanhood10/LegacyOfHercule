@@ -1,7 +1,9 @@
 // The tournament roster (docs/tournament.md section 4, tourney.h): one row per fighter. Owned by the engine
 // session after the team starts; other pieces read it. Portrait ids are the dialogue portraits where the game
 // has one (art sessions fill 0s); pool flags are the story flags named in docs/tournament.md section 3 (the
-// engine confirms each against the chapter scripts).
+// engine confirmed each against the chapter scripts on 2026-10-25: 85 the 19 + 13 fight, 136 Gingertown, 127 the
+// road (17 / 18), 146 the island (16), 191 the Cell Games announced, 301 Cooler beaten (stock zone 6 area 61's
+// defeat script), 402 the Broly chapter, 382 Super 13, 421 Gero's computer over).
 #include "tourney.h"
 
 #define NO 0xFF
@@ -9,8 +11,8 @@
 // The tiers open on these story flags (Rookie from the start).
 const u16 tny_tier_flag[TIER_COUNT] = {
     0,      // Rookie: from the first flight
-    86,     // Adept: the Android 19 + 13 fight won (zone 8's landing opens; engine to confirm)
-    136,    // Z-Fighter: Gingertown done (engine to confirm)
+    85,     // Adept: the Android 19 + 13 fight won (stock zone 7 area 15 defeat sequence 0x083d4834, kept by ch3_zone7)
+    136,    // Z-Fighter: Gingertown done (ch5_lookout's ch5_gingertown_end sets it)
     191,    // Champion: the ten-day wait (the Cell Games landing opens)
     382,    // Legend: Super 13 beaten
 };
@@ -49,8 +51,8 @@ const TFighter tny_fighters[TF_COUNT] = {
     [TF_SEMI_CELL]     = { "Semi-Perfect Cell",29, 0,              39, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_PERFECT_CELL]  = { "Perfect Cell",     30, TS_P_PCELL,     40, TIER_CHAMPION, TAB_VILLAINS,   BEAT, 0,   NO, NO, "Beat this fighter in a match" },
     [TF_CELL_JR]       = { "Cell Jr.",         31, 0,               0, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
-    [TF_COOLER]        = { "Cooler",           34, TS_P_COOLER,    44, TIER_CHAMPION, TAB_VILLAINS,   BEAT | TR_GIANT, 0, NO, NO, "Beat this fighter in a match" },
-    [TF_NAMEKIAN]      = { "Namekian Warrior",166, 0,               0, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
+    [TF_COOLER]        = { "Cooler",           34, TS_P_COOLER,    44, TIER_CHAMPION, TAB_VILLAINS,   BEAT | TR_GIANT, 301, NO, NO, "Beat this fighter in a match" },
+    [TF_NAMEKIAN]      = { "Namekian Warrior",166, 0,               0, TIER_CHAMPION, TAB_VILLAINS,   OPP,  301,   NO, NO, 0 },
     [TF_BROLY]         = { "Broly",           159, 159,             0, TIER_CHAMPION, TAB_VILLAINS,   BEAT | TR_GIANT | TR_HEADLINER, 402, NO, NO, "Beat this fighter in a match" },
     [TF_PARAGUS]       = { "Paragus",         170, 0,             120, TIER_CHAMPION, TAB_VILLAINS,   OPP,  402, NO, NO, 0 },
 
