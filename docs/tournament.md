@@ -138,33 +138,34 @@ specials in C (the Super 13 kind).
 | Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
 | Goten (SSJ) | 92 | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
 | Kid Trunks (SSJ) | 93 | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
-| Gotenks | 277 base (?), SSJ / SSJ3 forms among 119-120 (?) | O, **C** (Legend 2v2) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
+| Gotenks | 277 base, 119 SSJ, 120 SSJ3 (confirmed by eye, `build/wm/buu_ids_x2.png`) | O, **C** (Legend 2v2) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
 | Vegito | 273 (SSJ) (?) | O, **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
 | Uub | 263 | O, **C** (Legend, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
 | Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
 | Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
 | Dabura | 63 (giant, winged) | O, **B** (villain), **C** (Z-Fighter Rumble) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
-| Fat Buu | 33 (giant) | O, **B** (villain), **C** (Champion Rumble) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
+| Fat Buu | 33 (giant) | O, **C** (Champion 2v2, with Hercule) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
 | Super Buu | 39 / 40 base, 42 (Gotenks absorbed, vest) (?), 43 (Gohan absorbed, gi) (?) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
 | Kid Buu | 37 (32 x 64) | O, **C** (Legend Rumble headliner) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
 | Super Janemba | 144 (giant, horned, tail) | O, **C** (Champion 1v1) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
-| Pikkon | 62 (cap, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
-| Olibu (?) | 242 (giant brawler, partial set) | O, **C** (Adept Rumble) | melee brawler, Ki Blast | cheap |
+| Evil Buu | 62 (grey, thin, the cape frame is his spit) | O, **C** (Champion Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
+| Pikkon | 132 / 179 (two palettes; cap, red vest, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
+| Spopovich | 242 (bald giant in black trunks, partial set; 216 is his NPC) | O, **C** (Adept 2v2, with Yamu) | brawler, Majin toughness (poise), **energy steal** (drains EP) | cheap |
 | Kibito | 32 (giant, partial set) | O, **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
-| Pui Pui | 224 (32 x 64, partial set) | O (Rumble pack) | ki volley, melee | cheap |
-| Yakon | 290 (giant beast, partial set) | O, **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
-| Spopovich (?) | 293 (giant brawler, partial set; 216 is his NPC) | O (Rumble pack) | brawler, **energy steal** (drains EP, Yamu's trick) | cheap |
-| Buu-era Vegeta base / Goku variants | 116, 269-272, 107, 109, 114, 119-120 | skins and forms of the above | | |
+| Pui Pui | 224 (32 x 64, partial set) | O (Rumble pack), **C** (Rookie Rumble) | ki volley, melee | cheap |
+| Yakon | 290 (giant beast, partial set) | O, **C** (Adept Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
+| Yamu | 293 (lean, purple belt, partial set) | O, **C** (Adept 2v2, with Spopovich) | brawler, **energy steal** (the container trick: drains EP) | cheap |
+| Buu-era Vegeta base / Goku variants | 116 (Vegeta base), 269-272, 107, 109, 114; 99 (Goku's 64 x 64 Spirit Bomb / big-beam frames); 97 / 102 Gohan outfits; 113 Goku with the halo | skins and forms of the above | | |
 
 Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
-the announcer 207, Yamu 21. Not in either ROM: Pikkon's rival Olibu may be 242 or 293 (to confirm), Bojack,
-Hirudegarn, Pan.
+the announcer 207, Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
+(base / SSJ): kid Trunks in an alternate outfit, or Goten mis-palettised; a skin either way.
 
 ### 4c. Playable villains (Ryan: "some villains playable to make it cooler")
 
 Beat-to-unlock set, first pass: Frieza, Mecha Frieza, Android 17, Android 18, Android 13, Perfect Cell, Cooler,
-Broly, Super 13, Dabura, Fat Buu, Super Buu, plus the challengers King Cold, Tao, Janemba, Kid Buu, Yakon as
-C-unlocks. Buu imports come out of the converter already in a player layout (old Hercule plays on row 24
+Broly, Super 13, Dabura, Super Buu, plus the challengers King Cold, Tao, Janemba, Kid Buu, Yakon, Fat Buu, Evil
+Buu, Spopovich and Yamu as C-unlocks. Buu imports come out of the converter already in a player layout (old Hercule plays on row 24
 today), so they are the cheaper playables; LoG2 boss bodies need the Android 16 regrouping each. Every
 playable villain gets: the combo, Ki Blast, two signatures from the library, and his transform where he has
 one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived from the lead's level.
@@ -194,10 +195,10 @@ uses them; the move table then just names which fighter has which, with numbers.
 
 | tier | 1v1 | 2v2 (a pair) | Royal Rumble |
 |---|---|---|---|
-| Rookie | Mercenary Tao | Mecha Frieza & King Cold | Yakon |
-| Adept | Pikkon | Spopovich & Pui Pui | Olibu (?) |
+| Rookie | Mercenary Tao | Mecha Frieza & King Cold | Pui Pui |
+| Adept | Pikkon | Spopovich & Yamu (Babidi's thugs) | Yakon |
 | Z-Fighter | Kibito | Goten & Kid Trunks | Dabura |
-| Champion | Super Janemba | Pikkon & Olibu | Fat Buu |
+| Champion | Super Janemba | Fat Buu & Hercule (Buu saga): the odd couple | Evil Buu |
 | Legend | Vegito (won as Goku or Vegeta; else Majin Vegeta) | Gotenks (won as Goten & Trunks; else Super Buu's Gotenks form) | Kid Buu |
 
 Mario 64-style extras: win Legend 1v1 as Hercule -> Uub ("the champion's student"); win Legend 1v1 as Goku ->
