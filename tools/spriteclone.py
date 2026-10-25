@@ -17,6 +17,7 @@ usage: spriteclone.py roms/log2.gba build/gen/sprites_data.c [--preview build/ss
   --halo-sprites        sprites of haloed Goku's rows 26 / 27 (default 176,177: tools/halosprites.py; 60,61 = unhaloed)
   --ssj2-sprite         sprite of Super Saiyan 2 Gohan's row 28 (default 58: the stock record, repointed by
                         tools/ssj2sprites.py to ssj2_record with the hurt / lying / tumble groups filled)
+Rows 29-79 are the tournament's playables, from tools/tnyplayables.py display_rows (src/coop/tourney_data.c).
 Facts: see docs/sprites.md. The game's decoder needs each frame stream to start with the
 literal-width op (0 0 1 0000 0 1), then literal bytes (1 + 8 bits), then the end code
 (0 0 0 0000000 00); streams are 32-bit little-endian words, bits MSB first.
@@ -52,7 +53,7 @@ TEEN_GOHAN_ROW = 3       # Gohan's party row (slot 0, standard class): copied fo
 STOCK_SSJ2_ROW = 4       # the Cell Games' Super Saiyan 2 Gohan (sprite 58, portraits 61 / 12, class 0x030021E4)
 SSJ2_ROW = 28            # Super Saiyan 2 Gohan as his own party member (slot 8, src/coop/ssj2gohan.h)
 SSJ2_SPRITE = 58
-EXTRA_ROWS = 7           # rows 22-28
+EXTRA_ROWS = 58          # rows 22-28, then 29-79: the tournament's playables (tools/tnyplayables.py display_rows)
 DISPLAY_DATA = 0x081D967C
 HAIR_GOLD, HAIR_SHADE, HAIR_LIGHT, HAIR_BRIGHT = 120, 20, 46, 8   # SSJ Goku's hair indices
 BLACK = 1
@@ -333,6 +334,14 @@ def main():
     ssj2[4] = ssj2[5] = SSJ2_ROW
     ssj2[16:20] = stock[16:20]   # the Super Saiyan 2 class
     rows += ssj2
+    # rows 29-79 = the tournament's playables (docs/tournament.md 9a, tools/tnyplayables.py): one per TR_BEAT /
+    # TR_CHALLENGER fighter of src/coop/tourney_data.c; a play sprite missing from this build shows Hercule (72)
+    import tnyplayables
+    stock_ok = lambda sid: sid < NEW_SPRITE and S.ROM_BASE <= idx_words[sid] < S.ROM_BASE + len(rom)
+    have = lambda sid: sid in extra or sid == NEW_SPRITE or stock_ok(sid)
+    buu = any(v.startswith("buu_record_") for v in extra.values())
+    for r in tnyplayables.display_rows(rom, have, buu):
+        rows += r
     assert len(rows) == (ROW_COUNT + EXTRA_ROWS) * 20
     lines.append("const u8 display_rows[%d] __attribute__((aligned(4))) = {%s};" % (len(rows), ", ".join(f"0x{b:02x}" for b in rows)))
     lines.append(f"const u32 display_row_count = {ROW_COUNT + EXTRA_ROWS};")

@@ -131,12 +131,13 @@ LITERAL_RELOCATIONS = [
     (0x081D94D0, "status_module", 0, [0x377C]),
     (0x03000E90, "g_party_block", 0, PARTY_PTR_WORDS),
 ]
-# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 29
+# (file offset, old byte, new byte): CharacterData_FindBySprite's row limit (CMP R2,#imm8) 22 -> 80
 # (row 22 = Super Saiyan Hercule, row 23 = Krillin, row 24 = old Hercule, row 25 = Android 16, rows 26 / 27 =
-# haloed Goku / Super Saiyan Goku, row 28 = Super Saiyan 2 Gohan; tools/spriteclone.py). The search runs
-# from row 0, so SetCharacterTransformation(slot, 58) still finds the stock row 4 before row 28.
+# haloed Goku / Super Saiyan Goku, row 28 = Super Saiyan 2 Gohan, rows 29-79 the tournament's playables;
+# tools/spriteclone.py, tools/tnyplayables.py). The search runs from row 0, so SetCharacterTransformation(slot,
+# 58) still finds the stock row 4 before row 28, and 72 finds Hercule's row 21 before a degraded row.
 BYTE_PATCHES = [
-    (0x42D6, 0x16, 0x1D),
+    (0x42D6, 0x16, 0x50),
 ]
 
 

@@ -70,7 +70,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o
 
 SSJ_TEST ?= 0
 
@@ -87,7 +87,9 @@ BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72;
 # 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
-EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+# 235-244: the tournament's player-layout LoG2 bodies (tools/tnyplayables.py; ids in src/coop/tourney.h TS_P_*)
+TNY_PLAY_SPRITES := 235=tnyp_yamcha_record 236=tnyp_tien_record 237=tnyp_frieza_record 238=tnyp_mecha_record 239=tnyp_tao_record 240=tnyp_a13_record 241=tnyp_a17_record 242=tnyp_a18_record 243=tnyp_pcell_record 244=tnyp_cooler_record
+EXTRA_SPRITES := $(TNY_PLAY_SPRITES) 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
 
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o
@@ -106,7 +108,7 @@ $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16
 	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
-$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags
+$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
 	$(PYTHON) tools/spriteclone.py $(ROM) $@ $(CLONE_FLAGS)
 
 # re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
@@ -193,6 +195,14 @@ $(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/buu2log2.py t
 	$(PYTHON) tools/super13sprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
 
 $(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# the tournament's player-layout bodies (sprites 235-244) and the fighter -> display row map (never committed); preview beside it
+$(BUILD)/gen/tny_play_sprites_data.c: tools/tnyplayables.py tools/bossmodels.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py src/coop/tourney.h src/coop/tourney_data.c $(ROM)
+	$(PYTHON) tools/tnyplayables.py $(ROM) $@ --preview-dir $(BUILD)
+
+$(BUILD)/obj/tny_play_sprites_data.o: $(BUILD)/gen/tny_play_sprites_data.c src/coop/rom.h src/coop/tourney.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
