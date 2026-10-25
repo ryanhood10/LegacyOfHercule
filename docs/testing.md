@@ -795,6 +795,30 @@ frames, 30 for the Kamehameha), EP peeked after each. Pass: no `CRASH`, every EP
 the bodies right in the sheet (fighters whose art is not in the build show Hercule). 342 shots: the sheet's command
 line has to stay under Windows' 32 K limit (P1 shots only the walk, the punch and ability 0). About a minute.
 
+## Tournament screens (headless, 2026-10-25)
+
+`tools/headless/tny_ui.txt` opens every ui screen through test command 28 on a co-op Map Test (149) and drives it
+with key presses (player 2's select with `p2 MASK`): the two list boxes, the select for player 1 (tabs, a locked
+fighter refused, pages, a pick) and player 2, the Quick and Full brackets round by round (phase 0, then each round
+played by test command 29, 4 and shown with phase 1: mid-slide shots, the page turns, the final page, the
+champion), the Rumble board, the unlock board (some unlocked, then everyone), both pop-ups (shown from
+`tny_ui_frame`, the engine's context), then the courtyard's real board object (CoopCall 28, 1). The test stand-ins
+(fake unlocks, tiers, a fake bracket) are test command 29; the engine's own data replaces them once merged. Wait
+for a screen with `waitnz UI+0x88` (UI = `find UI 0x7A1C0002`, the ui's RAM): it is nonzero while a screen waits
+for a button. Leave about 100 frames after a screen closes before the next test command: commands run in the map's
+entity update, which is paused while a screen or a fade runs (a second poke before that overwrites the first).
+
+```
+make BUILD=build/ui DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/ui/log2-coop.gba --out build/ui/hl
+python tools/headless/st_test.py tools/headless/tny_ui.txt build/ui/log2-coop.gba build/ui/hl/menu.ss --out build/ui/hl --cols 4
+```
+
+Pass: the peeks as the echo lines say (answers 1 and -1, picks 0x32 and 0x33, OBJ VRAM before = after every
+screen, the display registers at the end as at the start, no allocation failures) and no CRASH line. On the merged
+build (2026-10-25) the regression scripts `ch9_gero`, `cell_games_1p`, `duel_end`, `a16_moves` printed the same as
+main's.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

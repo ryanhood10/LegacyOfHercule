@@ -22,7 +22,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
 | engine | 446-459 | 160-219 | - | - | - | - | 23-27 | 21-25 | - | `.tny.eng` 0x240 |
 | moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
-| ui | - | - | - | - | 190-199 | - | 28-29 | 28-29 | ui_strings 380-399 | `.tny.ui` 0x100 |
+| ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
 
 ## Allocations for the Cell Games and post-game build (2026-10-19)
 

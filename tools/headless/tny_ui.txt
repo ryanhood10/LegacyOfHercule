@@ -1,0 +1,358 @@
+# The tournament's screens (ui piece: src/coop/tny_ui*.c, docs/tournament.md "The screens (ui piece)", docs/testing.md
+# "Tournament screens"), headless, co-op. Every screen opens through test command 28 (coop2.cmd 0x0203FD08 = 28,
+# cmd_arg 0x0203FD0C = the screen, cmd_arg2 0x0203FD54), the test stand-ins through 29 (fake unlocks, tiers, a fake
+# bracket and its rounds: the engine's data while the engine piece is not merged). UI = the ui's RAM (found by its
+# magic): +7 last answer, +8 / +9 last picks of player 1 / 2, +0x7C / +0x7E the largest free OBJ VRAM block before /
+# after the last screen (must be equal: nothing leaked), +0x88 nonzero while a screen waits for a button.
+# python tools/headless/st_test.py tools/headless/tny_ui.txt build/ui/log2-coop.gba build/ui/hl/menu.ss --out build/ui/hl --cols 4
+# Pass: the shots as named; the peeks as the echo lines say; display registers the same at the end as at the start;
+# no CRASH line.
+p2 0
+maptest 149
+frames 200
+echo == the map's display registers before any screen
+peek16 0x04000000 8
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 29
+frames 20
+find UI 0x7A1C0002
+# stand-ins: unlocked Yamcha 0, Frieza 2, Tao 7 | A17 16; Gohan 50, Krillin 51, Piccolo 52, Vegeta 53; every tier open
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0x10085
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0x3C0000
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0x1F
+poke32 0x0203FD08 29
+frames 20
+# ---- 1. the list box (the director's division question): Down, A -> 1 ("2 v 2"); then Quick / Full, B -> -1
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 28
+frames 30
+shot u01_fadeout
+waitnz UI+0x88 600
+shot u02_list
+key 0x80 4
+frames 10
+shot u03_list_down
+key 1 4
+frames 80
+shot u04_back_on_map
+echo == list box: last answer (byte 3 of the second word) = 01; OBJ VRAM before = after
+peek UI+4 1
+peek16 UI+0x7C 2
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot u05_list_size
+key 2 4
+frames 80
+echo == list box backed out with B: last answer = ff
+peek UI+4 1
+# ---- 2. the character select, player 1: four tabs, locked silhouettes, pages, a locked pick refused, a pick
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot u06_select_z
+key 0x80 4
+frames 12
+shot u07_select_locked
+key 1 4
+frames 12
+shot u08_select_buzz
+key 0x100 4
+frames 20
+shot u09_select_tourney
+key 0x100 4
+frames 20
+shot u10_select_villains
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u11_select_villains_p2
+key 0x100 4
+frames 20
+shot u12_select_buu
+key 0x100 4
+frames 20
+key 0x40 4
+frames 12
+key 0x20 4
+frames 12
+shot u13_select_gohan
+key 1 4
+frames 12
+shot u14_select_pick
+frames 80
+echo == player 1 picked Gohan: last answer 01, last pick 0x32 (TF_GOHAN = 50); OBJ VRAM before = after
+peek UI+4 2
+peek16 UI+0x7C 2
+# ---- 3. the character select, player 2 on the second pad: starts on its own slot (the Map Test's Hercule, locked
+# here), Up -> Piccolo, Left -> Krillin, A
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot u15_select_p2
+p2 0x40
+frames 4
+p2 0
+frames 12
+p2 0x20
+frames 4
+p2 0
+frames 12
+p2 1
+frames 4
+p2 0
+frames 12
+shot u16_select_p2_pick
+frames 80
+echo == player 2 picked Krillin: last pick 2 (byte 1 of the third word) = 0x33 (TF_KRILLIN = 51)
+peek UI+4 2
+# ---- 4. the Quick bracket (8): phase 0, then each round played (29, 4: the players win) and shown with phase 1
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x108
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 60
+shot u17_quick_vs_slide
+waitnz UI+0x88 600
+shot u18_quick_vs
+key 1 4
+frames 100
+peek16 UI+0x7C 2
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 44
+shot u19_quick_loser_grey
+frames 22
+shot u20_quick_winner_slide
+frames 40
+shot u21_quick_others
+waitnz UI+0x88 1500
+shot u22_quick_semis
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot u23_quick_final
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot u24_quick_champion
+key 1 4
+frames 100
+echo == Quick bracket done: OBJ VRAM before = after
+peek16 UI+0x7C 2
+# ---- 5. the Full bracket (16, co-op seeding: player 2 in the other half): pages turn, the final page, the champion
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x110
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot u25_full_left
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 150
+shot u26_full_right_half
+waitnz UI+0x88 1500
+shot u27_full_quarters
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 40
+key 1 4
+waitnz UI+0x88 1500
+shot u28_full_final
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot u29_full_champion
+key 1 4
+frames 100
+echo == Full bracket done: OBJ VRAM before = after
+peek16 UI+0x7C 2
+# ---- 6. the Rumble board: six faces, three fallen (mask 0x26) greying one after another
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0x26
+poke32 0x0203FD08 28
+frames 50
+shot u30_rumble_greying
+waitnz UI+0x88 600
+shot u31_rumble
+key 1 4
+frames 100
+# ---- 7. the unlock board (test command; the courtyard's real CoopCall 28 below): colour when unlocked, pages
+poke32 0x0203FD0C 6
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot u32_board
+key 0x10 4
+frames 20
+shot u33_board_locked
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34_board_page2
+key 2 4
+frames 100
+echo == board closed: OBJ VRAM before = after
+peek16 UI+0x7C 2
+# ---- 7b. everyone unlocked: the faces in colour, the art pieces' portraits (Evil Buu has none: his body stands in)
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0xFFFFFFFF
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0xFFFFFFFF
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 6
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+key 0x10 4
+frames 20
+shot u34b_board_all
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34c_board_all_p2
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34d_board_all_p3
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34e_board_all_p4
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 12
+key 0x10 4
+frames 20
+shot u34f_board_all_p5
+key 2 4
+frames 100
+peek16 UI+0x7C 2
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0x10085
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0x3C0000
+poke32 0x0203FD08 29
+frames 20
+# ---- 8. the pop-ups (shown from tny_ui_frame, the engine's context): a fighter, a tier
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 40
+shot u35_popup_fighter
+key 1 4
+frames 60
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 40
+shot u36_popup_tier
+key 1 4
+frames 60
+shot u37_map_again
+echo == the map's display registers after every screen: as at the start
+peek16 0x04000000 8
+# ---- 9. the courtyard's notice board for real (grounds' object, CoopCall 28 a=1), closed with A
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x00B80040
+poke32 0x0203FD08 5
+frames 300
+key 0x40 6
+key 1 10
+waitnz UI+0x88 600
+shot u38_courtyard_board
+key 1 4
+frames 100
+map
+shot u39_courtyard_after
+echo == screens opened (byte 3 of the third word) and allocation failures (UI+0x80): none failed
+peek UI+8 1
+peek16 UI+0x80 1
