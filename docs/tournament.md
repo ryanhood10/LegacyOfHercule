@@ -26,6 +26,14 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   - **Royal Rumble = survival rounds** (Ryan, 2026-10-24): each round is a free-for-all pack in the ring,
     NPCs hit each other too, the packs get stronger each round, a headliner at the end. In co-op both
     players are in every round. NPCs target the players most but still fight each other (section 8).
+- **Rumble rounds and headliners** (Ryan, 2026-10-25): the count is fighters in the ring at once, players
+  included. Rookie 2 rounds (3, 3), headliner King Cold; Adept 3 rounds (3, 4, 4), headliner Android 17 & 18
+  together; Z-Fighter 3 rounds (4, 4, 4; a giant in the last), headliner Android 16; Champion 4 rounds (4 x 4),
+  headliner Broly; Legend 4 rounds (4 x 4; giants from round 2), headliner Super Buu changing form twice. The
+  headliner enters last with two helpers. Packs are drawn at random from the tier's pool minus the headliner,
+  no fighter twice in one Rumble; a fallen fighter is out; the players advance when the pack is down and both
+  stand (a KO'd player is revived between rounds; every round starts at full health). A giant counts double
+  against the sprite-memory budget, so a round with one has one body fewer.
 - **All of Buu's Fury's cast is in** (Ryan, 2026-10-24: not held for the Buu phase). The **Legend tier
   opens after Cell and Super 13** (the post-game's flag 382) and that is where the Buu-era fighters appear.
 - **Villains are playable too** (Ryan): a chosen set of villains unlock as tournament fighters (section 4).
@@ -82,8 +90,6 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 
 ## 2. Proposed, not yet decided
 
-- **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
-  with one giant, then the headliner with two helpers; you must be standing at the end of a round to advance.
 
 ## 3. Tiers and their story triggers
 
