@@ -45,6 +45,15 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   division, a pop-up says so ("New tournament tier: Champion!"), shown **at a safe moment**: not inside the
   scene that set the flag but on the first frame afterwards where no scene runs, no dialogue is pending and
   the player is controllable, through the same pop-up path as the game's own "Journal Updated!" (section 8).
+- **No mirror matches** (Ryan, 2026-10-25): your own party never appears as opponents. The pool is other people.
+- **Rookie is the first tournament and must be exciting** (Ryan, 2026-10-25): the early pool is widened with
+  fighters we build from existing bodies: **King Cold** (Ryan: "we will have to create him"), **Master Roshi** with a
+  strong Kamehameha, and (proposed) Chi-Chi, Videl and Chiaotzu; plus Mercenary Tao, Spopovich and Yamu as
+  canon tournament regulars from the start (section 4a).
+- **The unlock board** (Ryan, 2026-10-25): a notice board outside the arena lists every unlockable tournament
+  fighter as a greyed silhouette, no name; pick one and it shows exactly what to do ("Win the Rookie
+  tournament as Krillin", "Beat this fighter in a match"). Once unlocked the face and name appear in colour.
+  Only tournament unlockables are on it, never story characters (section 7).
 - **Fixed tiers you grow into** (Budokai's Novice / Adept / Advanced), opened by story flags, so the LoG2
   level matters; the three difficulty settings still apply. Tournament-only playables derive their numbers
   from the lead's level (the Android 16 recipe), each with its own multipliers.
@@ -68,8 +77,6 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
   with one giant, then the headliner with two helpers; partial heal between; you must be standing at the
   end of a round to advance.
-- **Mirror matches:** story heroes also appear as *opponents* once they are in your party (their playable
-  body on a boss AI set with their signature beam), which doubles the pool and lets Gohan fight Gohan.
 
 ## 3. Tiers and their story triggers
 
@@ -97,26 +104,32 @@ specials in C (the Super 13 kind).
 
 | fighter | art | role | in the pool from | kit (transform / signatures / specials) | cost |
 |---|---|---|---|---|---|
-| Gohan (kid, teen) | 53 / 56, SSJ 59 | P, O (mirror) | start | SSJ at 50 % (once the story has it); Masenko, Kamehameha | cheap |
-| Krillin | 161 | P, O (mirror; dojo body 76 stat 64) | start | Destructo Disc, Afterimage Rush, Scatter Shot (Shockwave) | cheap |
+| Gohan (kid, teen) | 53 / 56, SSJ 59 | P | start | SSJ at 50 % (once the story has it); Masenko, Kamehameha | cheap |
+| Krillin | 161 | P | start | Destructo Disc, Afterimage Rush, Scatter Shot (Shockwave) | cheap |
 | Yamcha | 156, stat 106 | O, **B** | start | Wolf Fang Fist = Afterimage Rush + combo; Spirit Ball = a homing ball (rocket class) | moderate (row, player layout from 8 groups) |
 | Tien | 121, stat 98 | O, **B** | start | Tri-Beam = a short heavy beam that costs HP; Solar Flare = stun; Multi-Form = a twin at 50 % (the pair rule) | moderate (7 groups; stock body) |
 | Hercule "the champ" | 72 | O from the start (he *is* the champion), P from West City | start / West City (flag 362) | Dynamite Kick, Megaton Punch, Taunt (his own four); as an opponent on AI set 98 (works, the dojo) | cheap |
 | Frieza (final form) | 48, stat 41 base | O, **B** (villain) | start | Death Beam (thin beam), Death Ball; **transforms to Mecha Frieza at 40 %** (faster, +attack) | moderate |
 | Mecha Frieza | 49 | O, **B** (villain) | start | Death Beam, a rush; no transform | moderate |
-| King Cold | 74 (cutscene poses only) | **C** | Rookie 2v2 challenger (with Mecha Frieza) | melee giant, Death Beam | big-ish: 3 fight poses to draw (74 crashes on set 21 today) |
-| Mercenary Tao | 50, stat 44 (AI 129) | **C** | Rookie 1v1 challenger | Dodon Ray (thin beam), Crane rush; the ROM's own AI | moderate (4 groups) |
-| Piccolo | 103 | P, O (mirror) | West City (flag 26 / 362) | Special Beam Cannon, Scatter Shot, cape off = Transformation at 50 % | cheap |
-| Vegeta | 137, SSJ 139 | P, O (mirror) | chapter 3 (the space duel) | Big Bang, Galick Gun (beam), SSJ at 50 % | cheap |
+| **King Cold** | to build: Cooler's 64 x 64 fight set (34) recoloured and re-headed (the Paragus method), Cold's armour and cape; 74 keeps the cutscenes | O, **B** (villain) | start (Ryan: in the Rookie bracket) | melee giant with reach, Death Beam, a throw | moderate-big (a recolour + head; new frames only if the body reads wrong) |
+| Mercenary Tao | 50, stat 44 (AI 129) | O, **B** | start (a 23rd Budokai finalist) | Dodon Ray (thin beam), Crane rush, the hidden blade (a one-off heavy hit); the ROM's own AI | moderate (4 groups) |
+| **Master Roshi** | to build: a stock human fight set (Krillin's 76 or Hercule's 72) re-headed with Roshi's head (bald, beard, sunglasses, 75 for the face), orange shirt | O, **B** | start | **MAX Power** (bulks up at 50 %: +attack, slower), a slow heavy Kamehameha, Thunder Shock Surprise (a short stun), Drunken Fist (a rush) | moderate-big |
+| Chi-Chi (proposed) | to build: Android 18's fight set (11) re-headed, Chi-Chi's dress; Buu's 55 for the face | O, **B** | start | a frying-pan heavy hit (stun), a fast combo, no ki | moderate-big |
+| Videl (proposed) | to build: Android 18's set (11) re-headed; Buu's 56 for the face | O, **B** | start (a 25th Budokai fighter) | fast combo, Hawk Arrow (a rush), flight dodge | moderate-big |
+| Chiaotzu (proposed) | 102 (tiny NPC) + drawn poses | O, **B** | start | Dodon Ray, **psychic hold** (a stun), self-destruct at 10 % (a nova that costs him the match) | big (tiny body, poses from scratch) |
+| Spopovich | Buu r.242 (bald giant in black trunks, partial set) | O, **B** | start (he fought Hercule in the 24th; pre-Majin here) | brawler, toughness (poise), a bear hug (grab) | cheap |
+| Yamu | Buu r.293 (lean, purple belt, partial set) | O, **B** | start (his 25th Budokai partner) | brawler, **energy steal** (drains EP) | cheap |
+| Piccolo | 103 | P | West City (flag 26 / 362) | Special Beam Cannon, Scatter Shot, cape off = Transformation at 50 % | cheap |
+| Vegeta | 137, SSJ 139 | P | chapter 3 (the space duel) | Big Bang, Galick Gun (beam), SSJ at 50 % | cheap |
 | Android 19 | 12, stat 5 | O | the 19 fight won | absorbs ranged hits (stock), eye beams, energy drain on grab | cheap |
 | Dr. Gero / Android 20 | 14, stat 6 | O | the 19 fight won | energy absorb (heals on hit), eye beam | cheap |
 | Android 13 (base) | 165, stat 110 | O, **B** (villain) | the 19 fight won | S.S. Deadly Bomber (ball), rush; no transform until Legend (Super 13 is his own entry) | moderate |
 | Android 17 | 9, stat 3 | O, **B** (villain) | the road fight (chapter 4's end flag) | Power Blitz (ball), Energy Barrier (poise burst), afterimage | moderate |
 | Android 18 | 11, stat 4 | O, **B** (villain) | the road fight | Power Blitz, Finger Beam (thin beam), Infinity Bullet (volley) | moderate |
-| Trunks | 135, SSJ 134 | P, O (mirror) | chapter 5 (the Lookout) | Burning Attack, Sword Blast, SSJ at 50 % | cheap |
+| Trunks | 135, SSJ 134 | P | chapter 5 (the Lookout) | Burning Attack, Sword Blast, SSJ at 50 % | cheap |
 | Imperfect Cell | 28, stat 60 | O | Gingertown done | Kamehameha, tail drain (a melee hit that heals him), Multi-Form twin at 50 % | cheap |
-| Android 16 | 160 boss / 175 player, stat 109 | O; P from Gero's computer (flag 421, tournament copy stays after the Games) | the island fight done | the existing rockets, barrage, bombs, rocket punch (`android16.c`) | cheap |
-| Goku | 60, SSJ 61 | P, O (mirror) | when he is playable (the wait) | Kamehameha, Spirit Bomb (Legend final only), Instant Transmission (teleport behind the target), SSJ at 50 % | cheap + IT moderate |
+| Android 16 | 160 boss / 175 player, stat 109 | O until he joins; P from Gero's computer (flag 421, the tournament copy stays after the Games) | the island fight done | the existing rockets, barrage, bombs, rocket punch (`android16.c`) | cheap |
+| Goku | 60, SSJ 61 | P | when he is playable (the wait) | Kamehameha, Spirit Bomb (Legend final only), Instant Transmission (teleport behind the target), SSJ at 50 % | cheap + IT moderate |
 | Semi-Perfect Cell | 29, stat 76 | O | flag 191 | Kamehameha, Multi-Form twin | cheap |
 | Perfect Cell | 30, stat 78 | O (Champion headliner), **B** (villain) | flag 191 | Kamehameha, Solar Flare (stun), Cell Jr summon (two 31s as helpers: Rumble / 2v2), **Super Perfect at 30 %** (speed, aura) | moderate; summon big-ish |
 | Cell Jr | 31, stat 26 | O (Rumble pack) | flag 191 | Kamehameha (small), rush | cheap |
@@ -124,7 +137,7 @@ specials in C (the Super 13 kind).
 | The Namekian servant | 166, stat 113 | O (filler) | Cooler beaten | Special Beam Cannon, melee | cheap |
 | Broly (LSSJ) | 159, stat 115 (giant) | O (Champion headliner), **B** (villain) | flag 402 (the Broly chapter done) | Eraser Cannon (ball), Gigantic Meteor (big ball), Blaster Shell (volley); the existing rage at 50 % | moderate |
 | Paragus | 170, stat 116 | O (filler) | flag 402 | melee, Ki Blast; "my son!" taunt | cheap |
-| SSJ2 Gohan | 58 | P (slot 8), O (Gohan's Legend form) | the Cell Games done | Kamehameha, SSJ2 Burst (his own) | cheap |
+| SSJ2 Gohan | 58 | P (slot 8) | the Cell Games done | Kamehameha, SSJ2 Burst (his own) | cheap |
 | Super Android 13 | 180, stat 145 (giant) | O (Legend headliner), **B** (villain) | flag 382 | the existing nova, bomber, wave, roar (`super13.c`) | cheap as O; moderate as B |
 
 ### 4b. The Buu era (tier 5 Legend, flag 382; all imported from Buu's Fury)
@@ -138,23 +151,21 @@ specials in C (the Super 13 kind).
 | Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
 | Goten (SSJ) | 92 | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
 | Kid Trunks (SSJ) | 93 | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
-| Gotenks | 277 base, 119 SSJ, 120 SSJ3 (confirmed by eye, `build/wm/buu_ids_x2.png`) | O, **C** (Legend 2v2) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
-| Vegito | 273 (SSJ) (?) | O, **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
-| Uub | 263 | O, **C** (Legend, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
+| Gotenks | 277 base, 119 SSJ, 120 SSJ3 (confirmed by eye, `build/wm/buu_ids_x2.png`) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
+| Vegito | 273 (SSJ) (?) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
+| Uub | 263 | **C** (Champion Rumble, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
 | Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
 | Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
-| Dabura | 63 (giant, winged) | O, **B** (villain), **C** (Z-Fighter Rumble) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
-| Fat Buu | 33 (giant) | O, **C** (Champion 2v2, with Hercule) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
+| Dabura | 63 (giant, winged) | **C** (Adept 2v2: alone against your team) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
+| Fat Buu | 33 (giant) | O, **C** (Z-Fighter 2v2, with Hercule) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
 | Super Buu | 39 / 40 base, 42 (Gotenks absorbed, vest) (?), 43 (Gohan absorbed, gi) (?) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
-| Kid Buu | 37 (32 x 64) | O, **C** (Legend Rumble headliner) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
-| Super Janemba | 144 (giant, horned, tail) | O, **C** (Champion 1v1) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
-| Evil Buu | 62 (grey, thin, the cape frame is his spit) | O, **C** (Champion Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
+| Kid Buu | 37 (32 x 64) | **C** (Champion 1v1) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
+| Super Janemba | 144 (giant, horned, tail) | **C** (Z-Fighter Rumble) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
+| Evil Buu | 62 (grey, thin, the cape frame is his spit) | O, **C** (Adept Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
 | Pikkon | 132 / 179 (two palettes; cap, red vest, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
-| Spopovich | 242 (bald giant in black trunks, partial set; 216 is his NPC) | O, **C** (Adept 2v2, with Yamu) | brawler, Majin toughness (poise), **energy steal** (drains EP) | cheap |
-| Kibito | 32 (giant, partial set) | O, **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
-| Pui Pui | 224 (32 x 64, partial set) | O (Rumble pack), **C** (Rookie Rumble) | ki volley, melee | cheap |
-| Yakon | 290 (giant beast, partial set) | O, **C** (Adept Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
-| Yamu | 293 (lean, purple belt, partial set) | O, **C** (Adept 2v2, with Spopovich) | brawler, **energy steal** (the container trick: drains EP) | cheap |
+| Kibito | 32 (giant, partial set) | **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
+| Pui Pui | 224 (32 x 64, partial set) | **C** (Rookie 1v1) | ki volley, melee | cheap |
+| Yakon | 290 (giant beast, partial set) | **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
 | Buu-era Vegeta base / Goku variants | 116 (Vegeta base), 269-272, 107, 109, 114; 99 (Goku's 64 x 64 Spirit Bomb / big-beam frames); 97 / 102 Gohan outfits; 113 Goku with the halo | skins and forms of the above | | |
 
 Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
@@ -163,12 +174,26 @@ the announcer 207, Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. R
 
 ### 4c. Playable villains (Ryan: "some villains playable to make it cooler")
 
-Beat-to-unlock set, first pass: Frieza, Mecha Frieza, Android 17, Android 18, Android 13, Perfect Cell, Cooler,
-Broly, Super 13, Dabura, Super Buu, plus the challengers King Cold, Tao, Janemba, Kid Buu, Yakon, Fat Buu, Evil
-Buu, Spopovich and Yamu as C-unlocks. Buu imports come out of the converter already in a player layout (old Hercule plays on row 24
+Beat-to-unlock set, first pass: King Cold, Tao, Spopovich, Yamu, Frieza, Mecha Frieza, Android 17, Android 18,
+Android 13, Perfect Cell, Cooler, Broly, Super 13, Super Buu, plus the challengers Pui Pui, Yakon, Dabura, Evil
+Buu, Fat Buu, Janemba, Kid Buu as C-unlocks. Buu imports come out of the converter already in a player layout (old Hercule plays on row 24
 today), so they are the cheaper playables; LoG2 boss bodies need the Android 16 regrouping each. Every
 playable villain gets: the combo, Ki Blast, two signatures from the library, and his transform where he has
 one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived from the lead's level.
+
+## 4d. The pool and the unlocks, tier by tier (Ryan asked for exact counts, 2026-10-25)
+
+No mirrors: the counts are opponents other than your party. "Beat" = he becomes playable the first time a
+player beats him in any match (the last hit in a Rumble). An 8-man bracket needs 7 opponents, Full (16) 15,
+the Rookie Rumble (2 rounds of 3 and a headliner) 7 distinct fighters, later Rumbles up to 14.
+
+| tier | opens | opponents in the pool (count) | playable now | unlock by beating | hidden challengers |
+|---|---|---|---|---|---|
+| Rookie | the first flight | Yamcha, Tien, Frieza, Mecha Frieza, King Cold, Hercule, Master Roshi, Mercenary Tao, Spopovich, Yamu, (+ Chi-Chi, Videl, Chiaotzu if built) = **10-13** | Gohan, Krillin | all ten but Hercule | Pui Pui (1v1), Goten & Kid Trunks (2v2), Yakon (Rumble) |
+| Adept | the 19 + 13 fight won | + Android 19, Dr. Gero, Android 13; after the road + 17, 18 = **15-18** (Full 16 opens after the road) | + Piccolo, Hercule (West City), Vegeta (chapter 3) | 13, 17, 18 | Pikkon (1v1), Dabura (2v2), Evil Buu (Rumble) |
+| Z-Fighter | Gingertown done | + Imperfect Cell; after the island + Android 16 = **17-20** | + Trunks (chapter 5) | none new | Kibito (1v1), Fat Buu & Hercule (2v2), Super Janemba (Rumble) |
+| Champion | flag 191 (the wait) | + Semi-Perfect, Perfect Cell, Cell Jr; Cooler, the Namekian (Cooler beaten); Broly, Paragus (flag 402) = **24-27** | + Goku, Android 16 (flag 421) | Perfect Cell, Cooler, Broly | Kid Buu (1v1), Gotenks (2v2), Uub (Rumble, as Hercule) |
+| Legend | flag 382 | + the final Cell, Super 13, Buu-saga Goku / Vegeta / Gohan / Saiyaman / Goten / Trunks / Hercule / Piccolo, Super Buu = **about 40** | + SSJ2 Gohan | Super 13, Super Buu, the Buu-era heroes | Vegito (1v1), the forms (2v2), Super Buu's final form headlines the Rumble |
 
 ## 5. The move library (shared, each move written once)
 
@@ -191,20 +216,23 @@ one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived fr
 New kinds (teleport, stun, drain, regen, transform, summon) are each one piece of C shared by everyone who
 uses them; the move table then just names which fighter has which, with numbers.
 
-## 6. The challenger ladder (one per division x tier; Smash-style re-win on a loss)
+## 6. The hidden challengers (one per tournament; Smash-style re-win on a loss)
 
-| tier | 1v1 | 2v2 (a pair) | Royal Rumble |
+Not the bracket: the bracket is drawn at random from the pool (section 4). This table says which *hidden*
+fighter walks in after you win a given tournament; he is never in the pool, so that tournament is the only
+way to get him. A pair challenges you in 2v2; a lone giant can challenge the team too.
+
+| tier | 1v1 | 2v2 | Royal Rumble |
 |---|---|---|---|
-| Rookie | Mercenary Tao | Mecha Frieza & King Cold | Pui Pui |
-| Adept | Pikkon | Spopovich & Yamu (Babidi's thugs) | Yakon |
-| Z-Fighter | Kibito | Goten & Kid Trunks | Dabura |
-| Champion | Super Janemba | Fat Buu & Hercule (Buu saga): the odd couple | Evil Buu |
-| Legend | Vegito (won as Goku or Vegeta; else Majin Vegeta) | Gotenks (won as Goten & Trunks; else Super Buu's Gotenks form) | Kid Buu |
+| Rookie | Pui Pui | Goten & Kid Trunks (the junior champions) | Yakon |
+| Adept | Pikkon | Dabura, alone against your team | Evil Buu |
+| Z-Fighter | Kibito | Fat Buu & Hercule (Buu saga): the odd couple | Super Janemba |
+| Champion | Kid Buu | Gotenks, the fusion alone against your team | Uub (won as Hercule: "the champion's student"; else Majin Vegeta's form for playable Vegeta) |
+| Legend | Vegito (won as Goku or Vegeta; else SSJ3 for playable Goku) | the Legend trophy: the SSJ3 / Majin forms for whoever won | Super Buu's final form as the headliner; the prize is the record's last line |
 
-Mario 64-style extras: win Legend 1v1 as Hercule -> Uub ("the champion's student"); win Legend 1v1 as Goku ->
-the SSJ3 form for playable Goku; as Vegeta -> the Majin form. Each challenger fight is its own cutscene in the
-ring after the trophy; a loss ends with "come back when you've won again" and the record notes the attempt.
-The pairings are Ryan's to shuffle; the structure (one hidden fighter per tournament) is the point.
+Each challenger fight is its own cutscene in the ring after the trophy; a loss ends with "come back when you've
+won again" and the record notes the attempt. The pairings are Ryan's to shuffle; the structure (one hidden
+fighter per tournament, shown on the board as a silhouette with its condition) is the point.
 
 ## 7. The screens and the cutscenes
 
@@ -219,6 +247,11 @@ The pairings are Ryan's to shuffle; the structure (one hidden fighter per tourna
   the winner slides to the next column with a sound, the other matches of the round resolve with quick
   slides, the next match highlights. Full (16) shows two pages. The Rumble uses a board of faces instead.
   Buu's Fury's announcer (record 207, NPC grade) is a cheap import.
+- **The unlock board** (outside the arena, on the courtyard): a grid of silhouettes, one per unlockable
+  tournament fighter (B and C of section 4), drawn in one dark colour (the duel's shadow remap technique, in
+  black); the cursor on one shows its condition and nothing else: "Beat this fighter in a match", "Win the
+  Rookie tournament (1v1)", "Win the Champion Rumble as Hercule". Unlocked ones show in colour with the name.
+  The same table drives the board, the select screen's locks and the pop-ups.
 - **Pop-ups:** "New fighter: Android 17!" / "New tournament tier: Champion!" through the game's pop-up
   path, queued by the flag and shown at the next safe frame (section 8).
 
