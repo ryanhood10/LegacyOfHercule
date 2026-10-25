@@ -90,8 +90,11 @@ const TFighter tny_fighters[TF_COUNT] = {
     [TF_SSJ2_GOHAN]    = { "SSJ2 Gohan",       58, 0,              61, TIER_ROOKIE,   TAB_ZFIGHTERS,  STORY, 0,  8, NO, 0 },
 };
 
+extern const unsigned sprite_index_count;   // build/gen/sprites_data.c (tools/spriteclone.py)
+
+// The sprite index has no bounds check: an id past this build's table (art not merged, BUU=0) reads garbage.
 int tny_fighter_ok(int id) {
     if (id < 0 || id >= TF_COUNT) return 0;
     const TFighter *f = &tny_fighters[id];
-    return f->sprite && Character_GetSpriteRecord(f->sprite) != 0;
+    return f->sprite >= 7 && (unsigned)f->sprite < sprite_index_count && Character_GetSpriteRecord(f->sprite) != 0;
 }

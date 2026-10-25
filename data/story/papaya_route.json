@@ -1,0 +1,49 @@
+{
+  "_": "Papaya Island's world-map landing (the tournament grounds, docs/tournament.md 'The grounds', docs/maps.md 9d): open from the start (the only condition is CoopCall 30, 2: the grounds' maps are in the build, i.e. roms/buu.gba was there; a BUU=0 build has no landing). A landing in the island sea south-west of West City, world rect (1204, 1760)-(1317, 1881) around (1260, 1820) (the plan's (1100-1200, 2000) is desert on our map; checked on screen: the flyer's shadow on a small island among rocks), with its banner 'Papaya Island' (ui_strings 357) and a plain minimap marker at (181, 31) (153 + wx/45, wy/45 - 9). The maps are data/maps/papaya_*.json (zone 15 areas 11-16); the plaza's flight spot returns to (1260, 1820).",
+  "sources": [
+    "data/story/papaya.lscript"
+  ],
+  "maps": [
+    {
+      "map": {
+        "zone": 6,
+        "area": 99
+      },
+      "add_triggers": [
+        {
+          "like": 21,
+          "rect": [
+            1204,
+            1760,
+            1317,
+            1881
+          ],
+          "payload": "script:tny_wm_land",
+          "condition": "script:tny_grounds_built"
+        },
+        {
+          "like": 22,
+          "rect": [
+            1204,
+            1760,
+            1317,
+            1881
+          ],
+          "payload": 357,
+          "condition": "script:tny_grounds_built"
+        }
+      ],
+      "edits": [
+        {
+          "at": "onload",
+          "replace": [
+            [
+              "END",
+              "CoopCall 30, 2, 0, 0\nJumpIfFalse tny_wm_done\nsub_800AC5C 181, 31\ntny_wm_done:\nEND"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

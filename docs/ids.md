@@ -15,7 +15,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own
 
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | maps / strings | RAM |
 |---|---|---|---|---|---|---|---|---|---|---|
-| grounds | 441-445 | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17; ui_strings 357-379 | `.tny.gr` 0x40 |
+| grounds | 441-445 (441 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (11-16 used); ui_strings 357-379 (357, 358 used) | `.tny.gr` 0x40 (0x24 used) |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
@@ -54,7 +54,9 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 380-399 | new maps (`data/maps/*.json`, `data/story/arctic_route.*`) | 380 free (the arctic's Vegeta barrier, removed 2026-10-19); **381 the arctic is open** (the world-map landing and its star; the post-game chapter sets it at the explosion); **382 Super 13 beaten** (the star turns into the plain marker; the post-game chapter sets it); 383-389 the arctic route's, free |
 | 400-419 | Broly chapter (`broly`) | 400 ship landed, 401 trip under way, 402 done, 403 confrontation seen, 404-419 party kept by CoopCall 10 |
 | 420-439 | Gero's computer (`ch9_gero`, `src/coop/a16player.h`) | 420 running, 421 over, 422 rubble punched, 423 / 424 west / east generator down, 425 bunker done, 430-438 saved "available" bits of slots 0-8 (all but 6 and 7) |
-| 440-459 | Lookout / dojo (`wait_chamber`, `wait_spar`) | 440 Roshi's dojo booked for a spar |
+| 440 | Lookout / dojo (`wait_spar`) | 440 Roshi's dojo booked for a spar |
+| 441-445 | the tournament grounds (`data/story/papaya.lscript`, `tny_ring.h`) | 441 the plaza's first-visit welcome has played; 442-445 free |
+| 446-459 | the tournament engine (`tourney.h` `TNY_FLAG_ENGINE0`) | |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
 | 462-463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
@@ -210,7 +212,10 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21 | Players: the 1 / 2 players answer (`players.c`) | every game start |
 | 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55) |
-| 22+ | free | |
+| 23-27 | the tournament engine (23: the director's whole flow; pushes 1 when it took over) | tournament (`tourney_hooks.c`) |
+| 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
+| 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
+| 31+ | free | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -238,7 +243,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 15-16 | allocated to the Cell Games chapter | |
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
-| 19+ | 19-20 allocated to the post-game chapter; 21+ free | |
+| 19+ | 19-20 allocated to the post-game chapter | |
+| 21-29 | the tournament team (`docs/ids.md` allocations above) | |
+| 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 
 ## Zone 15 areas (new maps, `data/maps/*.json`, built by `tools/mapbuild.py`)
 
@@ -254,7 +261,14 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 8 | `arctic_summit.json` | arctic route, the summit: Super 13's battle, flight spot |
 | 9 | `saiyan_ship.json` | inside the Saiyan ship (the Broly chapter's ride both ways) |
 | 10 | `yard_ship.json` | the Capsule Corp backyard (6/21) with the Saiyan ship parked: never warped to; its variation stands in for the backyard's while the ship is parked (`src/coop/shipyard.c`) |
-| 11-19 | free (10-14, 15-19 were allocated to two wait sessions, unused) | |
+| 11 | `papaya_plaza.json` | Papaya Island's plaza (Buu 7/1 v2): the world-map landing's beach and flight spot, save pad, the announcer, the first-visit welcome (flag 441); needs `roms/buu.gba` |
+| 12 | `papaya_street.json` | the street with the stalls (Buu 7/2): vendor, reporter, fans |
+| 13 | `papaya_courtyard.json` | the courtyard (Buu 7/3): the unlock board (CoopCall 28, 1) |
+| 14 | `papaya_infirmary.json` | the infirmary corridor (Buu 7/4) between the courtyard and the waiting room |
+| 15 | `papaya_waiting.json` | the fighters' waiting room (Buu 7/5), the hub: save pad, the director (CoopCall 23), today's fighters (CoopCall 30, 0) |
+| 16 | `papaya_ring.json` | the ring with the stands (Buu 7/6, 720 x 720): the engine's stage (`src/coop/tny_ring.h`) |
+| 17 | grounds, free | |
+| 18-19 | free | |
 
 ## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
 
@@ -267,7 +281,10 @@ places: `krillinsprites.py` asserts the index.
 | id | text | used by |
 |---|---|---|
 | 356 | The Arctic | `data/maps/arctic*.json` (zone 15 areas 1, 5-8), the world-map banner (`data/story/arctic_route.json`) |
-| 357+ | free | |
+| 357 | Papaya Island | the plaza, street, courtyard (zone 15 areas 11-13), the world-map banner (`data/story/papaya_route.json`) |
+| 358 | World Tournament | the infirmary, waiting room, ring (zone 15 areas 14-16) |
+| 359-379 | grounds, free | |
+| 380-399 | the tournament ui | |
 
 ## Memory (EWRAM; `src/coop/coop.ld`, exact layout in `$(BUILD)/coop.map`)
 

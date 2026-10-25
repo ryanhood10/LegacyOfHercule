@@ -1,0 +1,127 @@
+{
+ "_": "The fighters' waiting room, the grounds' hub: Buu's Fury's zone 7 area 5 (0x082473A4), tiled layers and collision; its Capsule Corp pad is the save pad; the director at the ring door (CoopCall 23: the engine's tournament flow); today's fighters stand around (on-load CoopCall 30 op 0, src/coop/tny_grounds.c).",
+ "name": "papaya_waiting",
+ "zone": 15,
+ "area": 15,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  400,
+  400
+ ],
+ "priorities": [
+  3,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082473A4"
+    },
+    "rect": [
+     0,
+     0,
+     50,
+     50
+    ]
+   },
+   "layers": [
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "triggers": [
+  {
+   "type": "savepad",
+   "rect": [
+    24,
+    264,
+    65,
+    305
+   ],
+   "_": "Buu's Capsule Corp pad"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    336,
+    56,
+    384,
+    100
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    14,
+    1
+   ],
+   "at": [
+    44,
+    120
+   ],
+   "facing": 1,
+   "_": "the top door: the infirmary"
+  },
+  {
+   "type": "door",
+   "rect": [
+    96,
+    330,
+    144,
+    360
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    16,
+    1
+   ],
+   "at": [
+    360,
+    192
+   ],
+   "facing": 0,
+   "_": "the ring door: the walkway into the stadium"
+  }
+ ],
+ "records": [
+  {
+   "kind": "npc",
+   "sprite": 100,
+   "x": 168,
+   "y": 328,
+   "facing": 0,
+   "talk": "seq:tny_director_talk",
+   "_": "the director"
+  }
+ ],
+ "onload": "script:tny_wait_onload",
+ "spawn": [
+  360,
+  112
+ ],
+ "name_id": 358,
+ "music": 29,
+ "flags": 0,
+ "sources": [
+  "data/story/papaya.lscript"
+ ]
+}

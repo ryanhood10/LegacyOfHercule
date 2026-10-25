@@ -94,7 +94,7 @@ NEW_STRINGS = {   # slot -> block -> text (ours, not ROM data)
 # place names after the per-slot blocks (index UI_STOCK + len(UI_BLOCKS) * SLOTS + n = UI_PLACES + n in
 # src/coop/krillin.h): map name ids for the new maps, used as a MapEntry name, a world-map banner payload and
 # the save menu's location (docs/maps.md 9c)
-PLACE_NAMES = ["The Arctic"]
+PLACE_NAMES = ["The Arctic", "Papaya Island", "World Tournament"]   # 356, 357 (grounds), 358 (grounds)
 PLACES_AT = 356                     # UI_PLACES; data/maps/arctic*.json and data/story/arctic_route.json use 356
 
 

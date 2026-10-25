@@ -1,0 +1,143 @@
+; Papaya Island, the World Martial Arts Tournament's grounds (docs/tournament.md "The grounds"; maps
+; data/maps/papaya_*.json, zone 15 areas 11-16; the world-map landing data/story/papaya_route.json).
+; Lines are ours (the grounds piece, 2026-10-25). Speakers: 0 narration (names in the text), 67 Hercule.
+; Flags: 441 the first visit's arrival scene seen. CoopCall 23 = the engine's director entry point, 28 = the
+; ui's screens (op 1 the unlock board), 30 = ours (src/coop/tny_grounds.c: op 0 the waiting room's fighters,
+; op 1 b = "sprite b has a record in this build").
+
+; ---- the world map ------------------------------------------------------------------------------------
+
+; the landing: onto the beach below the plaza (zone 15 area 11), where the flight spot is
+script tny_wm_land
+    WarpToMapWithEntities 15, 11, 1, 232, 392
+    END
+end
+
+; ---- conditions -----------------------------------------------------------------------------------------
+
+script tny_grounds_built                ; the grounds' maps are in this build (BUU=0 builds have none)
+        CoopCall 30, 2, 0, 0
+end
+
+script tny_has_announcer                ; Buu's Fury's announcer (art-buu's sprite 230) is in this build
+        CoopCall 30, 1, 230, 0
+end
+
+script tny_no_announcer                 ; ...or not: a stock stand-in takes his place
+        CoopCall 30, 1, 230, 0
+        PushByte 0
+        CmpEq
+end
+
+; ---- the plaza (15 / 11) ---------------------------------------------------------------------------------
+
+; the first visit (flag 441 clear): the announcer's welcome on the beach
+sequence tny_arrival
+  script
+        SetStoryFlag 441
+        PlayAudio 62
+  text 0 "@^Papaya Island"
+  text 0 "ANNOUNCER: Welcome, welcome!  You've arrived at\x0bthe World Martial Arts Tournament!"
+  text 0 "ANNOUNCER: All fighters welcome!  Rookies and legends,\x0bheroes and villains...  everyone gets a shot!"
+  text 0 "ANNOUNCER: And who knows?  Maybe one of you can\x0btake the title from our reigning champion...\x0bthe great HERCULE!"
+  text 0 "ANNOUNCER: Fighters sign in with the director.\x0bUp the street, through the gate, past the infirmary:\x0bthe fighters' waiting room!"
+end
+
+sequence tny_announcer_talk
+  text 0 "ANNOUNCER: The fighters' waiting room is up the street,\x0bthrough the gate and past the infirmary.\x0bThe director will sign you in!"
+end
+
+sequence tny_fan1_talk
+  text 0 "FAN: I came all the way from West City for this!\x0bI hope Hercule shows off his Dynamite Kick!"
+end
+
+sequence tny_fan2_talk
+  text 0 "GIRL: Are you a fighter?  You look kind of strong!\x0bI'll cheer for you!"
+end
+
+sequence tny_fan3_talk
+  text 0 "OLD MAN: I've watched every tournament since\x0bthe 21st.  Some of those fighters could fly!\x0bNobody ever believes me..."
+end
+
+; ---- the street (15 / 12) ------------------------------------------------------------------------------
+
+sequence tny_vendor_talk
+  text 0 "VENDOR: Hot food here!  Hot food!\x0bA champion can't fight on an empty stomach!"
+end
+
+sequence tny_reporter_talk
+  text 0 "REPORTER: ZZTV, live from Papaya Island!\x0bThe fighters' waiting room is packed this year...\x0bAny words for our viewers?"
+end
+
+sequence tny_fan4_talk
+  text 0 "KID: When I grow up I'm gonna enter the tournament\x0band beat EVERYBODY!"
+end
+
+sequence tny_fan5_talk
+  text 0 "FAN: The ring's in the stadium past the gate.\x0bThe stands are already full!"
+end
+
+sequence tny_fan6_talk
+  text 0 "WOMAN: My husband entered the Rookie division.\x0bHe's in the infirmary now..."
+end
+
+; ---- the courtyard (15 / 13) -------------------------------------------------------------------------------
+
+; the unlock board (press A in front of it): the ui's screen (CoopCall 28 op 1). Without the ui piece nothing
+; is pushed and the fallback line shows; a ui that pushes any value (even 0) ends the talk here.
+sequence tny_board
+  script -> 2
+        PushByte 0
+        CoopCall 28, 1, 0, 0
+        JumpIfFalse L1
+        Pop
+        PushByte 2
+        END
+      L1:
+        PushByte 1
+        END
+  text 0 "@^The notice board lists the tournament's hidden fighters...\x0bbut the posters haven't gone up yet!"
+  stop
+end
+
+sequence tny_fan7_talk
+  text 0 "FAN: Have you seen the notice board?\x0bThey say mystery fighters show up\x0bwhen someone wins a tournament!"
+end
+
+; ---- the infirmary (15 / 14) ------------------------------------------------------------------------------
+
+sequence tny_nurse_talk
+  text 0 "NURSE: Lost a match?  Don't worry, everyone here\x0bwalks out on their own two feet.\x0bWe've got Senzu-strength bandages!"
+end
+
+; ---- the waiting room (15 / 15) ----------------------------------------------------------------------------
+
+; on load: today's fighters stand around the room (src/coop/tny_grounds.c, CoopCall 30 op 0)
+script tny_wait_onload
+        CoopCall 30, 0, 0, 0
+end
+
+; the director at the ring door: CoopCall 23 is the engine's whole flow (division, select, bracket, matches).
+; The engine pushes 1 when it took over (the talk ends), 0 when it did not (the talk ends quietly); without
+; the engine piece nothing is pushed and the fallback line shows.
+sequence tny_director_talk
+  text 0 "DIRECTOR: Welcome to the World Martial Arts Tournament!\x0bReady to sign in?"
+  script -> 3
+        PushByte 0
+        CoopCall 23, 0, 0, 0
+        JumpIfFalse L1
+        Pop
+        PushByte 3
+        END
+      L1:
+        PushByte 2
+        END
+  text 0 "DIRECTOR: Sorry, the tournament isn't ready yet!\x0bCome back soon."
+  stop
+end
+
+; ---- the ring (15 / 16) ------------------------------------------------------------------------------------
+
+sequence tny_ring_closed
+  text 0 "@^The ring is for fighters in a match.\x0bSign in with the director in the waiting room!"
+end
