@@ -3,8 +3,8 @@
 # The space duel (Map Test 168, two players: player 1 the Map Test party's slot 1, player 2 the clone in slot 7),
 # stepped into until duel_active (coop2 +0x25C) is set. Case 1: player 2 at 1 HP, player 1's combo: winner 1, both
 # entries full (0x0203F028 slot 1, 0x0203F0D0 slot 7: hp = max, ep = max), the line on player 1's A. Case 2:
-# player 1 at 1 HP, player 2's combo: winner 2 (the pads swap: player 2's A closes the line). Entity addresses are
-# fixed by the Map Test. From a debug-menu savestate (--out = the folder holding menu.ss).
+# player 1 at 1 HP, player 2's combo: winner 2 (the pads swap: player 2's A closes the line). Player 2's entity
+# is found by its vtable copy (findent; the heap moved by 0x400 on 2026-10-25). From a debug-menu savestate (--out = the folder holding menu.ss).
 p2 0
 maptest 168
 frames 300
@@ -14,8 +14,9 @@ frames 60
 poke16 0x0203F028 30
 poke16 0x0203F02C 5
 poke16 0x0203F0D0 1
-poke32 0x0202e848 0x0000E400
-poke32 0x0202e84C 0x00024000
+findent p2e 0x0203FE00
+poke32 p2e+0x158 0x0000E400
+poke32 p2e+0x15C 0x00024000
 key 0x10 4
 frames 4
 key 1 4
@@ -40,8 +41,8 @@ frames 60
 poke16 0x0203F028 1
 poke16 0x0203F0D0 300
 poke16 0x0203F0D4 5
-poke32 0x0202e848 0x0000E400
-poke32 0x0202e84C 0x00024000
+poke32 p2e+0x158 0x0000E400
+poke32 p2e+0x15C 0x00024000
 p2 0x20
 frames 4
 p2 0

@@ -36,6 +36,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
   guesses. Partial sets mapped by hand; LoG2-sized hurt boxes (Buu's own let 20 of 28 dodge punches); Yakon recentred.
   Test command 8 accepts an EWRAM record. `tools/headless/tny_artbuu.txt` spawns, fights and hit-tests every one;
   regression unchanged (`docs/tournament.md` 4e, `docs/testing.md` "Tournament art").
+- **Tournament art-new (branch `tny-art-new`):** King Cold 185, Master Roshi 186, Chi-Chi 187, Videl 188, Chiaotzu 189
+  built from existing bodies by `tools/tnysprites.py` (Cooler's set with Cold's head and a cape; Krillin's body with
+  Roshi's head, beard and shell; Android 18's set with Chi-Chi's / Videl's heads and outfits; kid Gohan's set with
+  Chiaotzu's head), one player-layout record each that also runs on AI set 21, all in the second ROM blob (about
+  185 KB); portraits stock (70, 80, 43, 42) plus Videl's 127 from Buu's Fury. Tested headless
+  (`tools/headless/tny_artnew.txt`): each fights 10 s on set 21 and falls, the four normal bodies play as player 1.
+  Older sprite notes corrected (Roshi is 88, Chiaotzu 32, Chi-Chi 33; Buu 55 Chiaotzu, 56 Chi-Chi, 276 Videl; a
+  player record's group 2 is the hit-stun). `docs/sprites.md` "Tournament fighters (art-new)", `docs/tournament.md` 9b.
 - **Tournament build started** (Ryan: "deploy a team"): the contract on main (`src/coop/tourney.h`, `tourney_data.c`,
   `tourney_hooks.c`), a 0x400-byte `tourneyram` region (the heap cap now ends at 0x0203EC00: `patch_rom.py` 0xF8FE),
   a second ROM blob for art (`rom2` at 0x08E00000, `patch_rom.py --art`), allocations in `docs/ids.md`; seven
