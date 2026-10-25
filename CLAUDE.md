@@ -39,7 +39,16 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
+## Current phase (2026-10-25): the tournament mode is built; Ryan playtests it next
+
+The World Tournament on Papaya Island (`docs/tournament.md`: the plan, then sections 9b-13 what each piece built)
+was built by a seven-piece team on 2026-10-25 and merged: grounds (zone 15 areas 11-16, world-map landing),
+art (sprites 185-189, 195-230, 235-244; portraits 127, 140-168), playables (rows 29-79), moves (kits, Rumble
+mode), ui (list box, select, bracket, boards, pop-ups), engine (pool, brackets, all divisions, the global record on
+the save chip at EEPROM 0x1E00, unlocks, challengers). Contract: `src/coop/tourney.h`. Tests: `tools/headless/tny_*.txt`.
+Drop-ins F8 (Papaya Island, early) and F9 (waiting room, every tier open).
+
+## Earlier phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
 
 Built and merged: every chapter through the ten-day wait, the Cell Games, the post-game (wishes, the
 Arctic, Super 13, Peace Times, the ending), the journal entries, reviving a downed partner, the
