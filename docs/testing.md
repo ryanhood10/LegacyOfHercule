@@ -692,6 +692,23 @@ A, A (Select Game, new game), then `stepnz 0x0203FA49 40` (A until `players.aski
 (one player) or `key 2 6` (two). `players.mode` is 0x0203FA48; with `p2 0` (a second pad) mode 1 leaves
 `coop.p2` 0 and mode 2 brings player 2 in.
 
+## Tournament playables (headless, 2026-10-25)
+
+```
+make BUILD=build/playables DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/playables/log2-coop.gba --out build/playables/hl
+python tools/headless/tny_play_gen.py            # after a kit or roster change: rewrites tny_play.txt (--only TF_A,TF_B: tny_play_sub.txt)
+python tools/headless/st_test.py tools/headless/tny_play.txt build/playables/log2-coop.gba build/playables/hl/menu.ss --out build/playables/hl --cols 6
+```
+
+Map Test 13 (zone 2 area 7, wolves cleared with test command 13). Each of the 38 fighters' entries (row, kit, numbers
+at a fixed lead: what `tny_play_entry` writes) is poked into party slot 7 (`PARTY+0xD0`); player 2 is bound to slot 7
+(`poke8 0x0203FF84 7`; a new row re-binds through `p2_sync_combat`), then player 1 alone (`p2 off`, active slot 7, a
+warp per fighter). Each: walk left, the A combo, abilities 0-3 (gate word 0x0300208C set before each, B held 6
+frames, 30 for the Kamehameha), EP peeked after each. Pass: no `CRASH`, every EP line drops (or rises for a Taunt),
+the bodies right in the sheet (fighters whose art is not in the build show Hercule). 342 shots: the sheet's command
+line has to stay under Windows' 32 K limit (P1 shots only the walk, the punch and ability 0). About a minute.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

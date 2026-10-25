@@ -589,6 +589,20 @@ skin blue, the orange hair white and grey (its outline dark grey), the green arm
 earring gone and the eyes red. Dialogue: `text 122 "SUPER 13: ..."` (speakers >= 8 read
 `portrait_module[id + 1]`). Base Android 13 still has no portrait (123 is allocated for it, unused).
 
+## The tournament's player bodies (ids 235-244, `tools/tnyplayables.py`, 2026-10-25)
+
+Player-layout records for the LoG2 bodies that exist only as enemy sets (`docs/tournament.md` 10): Goku's player
+header with 21 groups, filled from the enemy groups by `PLAYER_FROM` (idle 0, walk 1 = run 2 = dash 13, knock-down
+3 <- knock-back 3 / death fall 12 / hit-stun 2, shout 4 <- 4 / charge 5, ki pose 5 <- charge 5, attacks 6-8, hurt 11
+<- hit-stun 2, lying 12 <- 12 / the knock-back's last frame, halo 17 <- idle, tumble 20 <- 3 / 12 / 2, beam 18 <- 18),
+every descriptor array padded with its last frame to the frame count of Goku's own array (the engine plays a fixed
+count per state). Descriptors point at the stock frame blobs, so a body is a few hundred bytes (`TNY_ART`). Facts
+found on the way: the entity's OBJ VRAM size and per-entity frame buffer come from the record's first half-word at
+construction (`0x080075A8`: `+0x0E` = size, `+0x30` = a heap buffer of that size; 0x400 for 32 x 32 bodies, 0x1000
+for 64 x 64), and the map box (`+0x154`) from header bytes 3 / 4; so a body of another size needs a new entity
+(`player.c` `p2_bind` rebuilds player 2). 64 x 64 bodies play fine as players (Perfect Cell, Cooler, Broly 159, Super
+13 180). The Kamehameha (animation 48) plays with a group 18 alone (no 19).
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control

@@ -364,7 +364,16 @@ static void install_behaviour(Entity *e, int slot) {
 // (new sprite record, behaviour re-installed), plus an idle reset so the new sprite's frames apply.
 static void p2_bind(Entity *p2, int slot) {
     coop.p2_slot = (u8)slot;
-    p2->sprite_record = CharacterEntry_GetSpriteRecord(&g_Party->chars[slot]);
+    void *rec = CharacterEntry_GetSpriteRecord(&g_Party->chars[slot]);
+    // A body of another OBJ size (a 64 x 64 tournament fighter, tools/tnyplayables.py): the entity's VRAM slot
+    // (+0x0E) and frame buffer (+0x30) were sized from the old record's first half-word at construction, and a
+    // bigger frame overruns them (heap corruption, a jump to garbage). The entity leaves instead and ensure_p2
+    // builds a new one on this slot on player 1's next idle frame.
+    if (rec && *(const u16 *)rec != *(const u16 *)((const u8 *)p2 + 0x0E)) {
+        EntityList_Remove(g_SceneTable[1], p2, 0);   // its destroy clears coop.p2
+        return;
+    }
+    p2->sprite_record = rec;
     install_behaviour(p2, slot);
     Entity_SetAnimation(p2, ANIM_IDLE);
     coop.rebinds++;
