@@ -70,12 +70,12 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   moves from a shared library (section 5), hand-written specials only for headliners and challengers.
 - **Two new screens:** a character select with tabs and a face grid, and the **animated bracket** with the
   before / after cutscenes (section 7). The waiting room shows today's pool as actors with a line each.
+- **No ring-outs** (Ryan, 2026-10-25): the platform's edge stays closed ground, matches are won by damage only.
 - **Fights end at 1 HP** like duels; nobody dies. Prizes are items and a record line (LoG2 has no money);
   little or no EXP so the tournament cannot over-level the story.
 
 ## 2. Proposed, not yet decided
 
-- **Ring-outs:** skip for now (no edge mechanic in LoG2; doable later as "knocked past the ring's edge").
 - **Heal between rounds:** partial (a Senzu-sized chunk), full before the final.
 - **Rumble rounds, a first draft:** round 1 three normal-size fighters, round 2 four, round 3 four stronger
   with one giant, then the headliner with two helpers; partial heal between; you must be standing at the
