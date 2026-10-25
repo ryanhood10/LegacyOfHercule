@@ -1,0 +1,370 @@
+# Rumble mode against every AI set the roster uses (src/coop/tny_moves.c, docs/testing.md "Tournament moves"): packs
+# of three kit fighters fight each other and the two players for 20 s each, the stock AI aiming at other fighters
+# (Rumble targeting); a crash prints CRASH. HP of each fighter is printed at the start and the end of its pack.
+#   python tools/headless/st_test.py tools/headless/tny_rumble.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01620114
+poke32 0x0203FD08 5
+frames 300
+# ---- pack 0: set 21 / 98 / 129: Yamcha, Tien, Tao
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000100
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000201
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000307
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r0a
+frames 600
+shot r0b
+frames 600
+shot r0c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 1: set 29 / 80 / 116: Android 19, Imperfect Cell, Semi-Perfect Cell
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x0000010D
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000212
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000314
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r1a
+frames 600
+shot r1b
+frames 600
+shot r1c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 2: set 148 / Namekian / Paragus: Perfect Cell, the Namekian, Paragus
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000115
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000218
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x0000031A
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r2a
+frames 600
+shot r2b
+frames 600
+shot r2c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 3: set 98 / 21: Hercule, Android 17, Android 18
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000105
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000210
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000311
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r3a
+frames 600
+shot r3b
+frames 600
+shot r3c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 4: giants: Broly, Cooler, and Mecha Frieza
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000119
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000217
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000303
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r4a
+frames 600
+shot r4b
+frames 600
+shot r4c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 5: natives: Android 16 (rockets) with Dr. Gero and Android 13
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000113
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x0000020E
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x0000030F
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r5a
+frames 600
+shot r5b
+frames 600
+shot r5c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+# ---- pack 6: Super 13 (native giant) with Cell Jr. and old Hercule (Buu-saga body)
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x0000011C
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000216
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000321
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+deref k1 mv+12
+deref e1 k1+0x138
+peek e1+0x188
+deref k2 mv+16
+deref e2 k2+0x138
+peek e2+0x188
+shot r6a
+frames 600
+shot r6b
+frames 600
+shot r6c
+peek mv+8
+peek e0+0x188
+peek mv+12
+peek e1+0x188
+peek mv+16
+peek e2+0x188
+peek mv+0x34 4
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+peek mv 22
+ents

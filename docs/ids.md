@@ -9,7 +9,8 @@ the code on 2026-10-19 (main e45c765).
 
 The tournament team (docs/tournament.md "The team") takes numbers only from its own row. Cross-piece calls go through
 `tourney_hooks.c` (weak defaults; dispatch of CoopCall 23-30, test commands 21-30 and the per-frame tick), so no
-piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own `.tny.<name>` section in
+piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made `is_coop_enemy` / `is_enemy` in
+`enemies.c` also count a fighter with a kit, through `tny_moves_base()`). RAM: each piece's own `.tny.<name>` section in
 `tourneyram` (0x0203EC00, 0x400 bytes; the heap cap now ends there). ROM: big generated art goes to `rom2`
 (0x08E00000, 2 MiB) with `TNY_ART` (`.rodata.art`), written by `patch_rom.py --art`.
 
@@ -20,7 +21,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them. RAM: each piece's own
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
 | engine | 446-459 | 160-219 | - | - | - | - | 23-27 | 21-25 | - | `.tny.eng` 0x240 |
-| moves | - | 220-229 | - | - | - | - | - | 26-27 | - | `.tny.mv` 0x80 |
+| moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
 | ui | - | - | - | - | 190-199 | - | 28-29 | 28-29 | ui_strings 380-399 | `.tny.ui` 0x100 |
 
 ## Allocations for the Cell Games and post-game build (2026-10-19)
@@ -129,11 +130,16 @@ sprite 72) for Roshi's gym.
 | 178-179 | free (the hercule-beam session's allocation, unused) | | |
 | 180 | Super Android 13 (Buu's Fury Broly recoloured; Perfect Cell's groups as a stand-in with `BUU=0`) | `tools/super13sprites.py` | `S13_SPRITE` |
 | 181-184 | Super 13's allocation, unused | | |
+| 235-244 | the tournament's player-layout LoG2 bodies (`tourney.h` `TS_P_*`): 235 Yamcha (156), 236 Tien (121), 237 Frieza (48), 238 Mecha Frieza (49 + 48's attacks), 239 Tao (50), 240 Android 13 (`a13_record`'s frames rebuilt), 241 Android 17 (9), 242 Android 18 (11), 243 Perfect Cell (30, 64 x 64), 244 Cooler (34, 64 x 64) | `tools/tnyplayables.py` (`TNY_ART`) | `TNY_PLAY_SPRITES` |
+| 245-249 | the playables' allocation, unused | | |
+| 195-222 | the tournament's Buu's Fury fighters (art-buu, `tourney.h` TS_*): 195 Spopovich (Buu r.242), 196 Yamu (293), 197 Pui Pui (224), 198 Yakon (290), 199 Kibito (148), 200 Pikkon (214), 201 Dabura (63), 202 Fat Buu (33), 203 Evil Buu (32), 204 Kid Buu (37), 205 / 206 / 207 Super Buu, Gotenks absorbed, Gohan absorbed (40 / 41 / 43), 208 Super Janemba (144), 209 Goten SSJ (114), 210 Kid Trunks SSJ (260), 211 / 212 / 213 Gotenks, SSJ, SSJ3 (116 / 119 / 120), 214 Vegito SSJ (92), 215 Uub (263), 216 / 217 / 218 Goku, SSJ, SSJ3 (105 / 108 / 110), 219 Majin Vegeta (274), 220 Mystic Gohan (100), 221 Great Saiyaman (101), 222 Piccolo with the cape (212); Hercule's 21-group layout, second ROM blob | `tools/buu2log2.py --spec data/tny_buu.txt --fit --section .rodata.art` | `TNY_BUU_IDS` (with `BUU=1`) |
+| 223-229 | art-buu's allocation, unused | | |
+| 230 | the World Tournament announcer (Buu r.8, NPC: idle, walk, mic raised in group 4; town NPC 80's 5-group layout) | `data/tny_buu.txt` `230=8 @80` | `TNY_BUU_IDS` |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
 
-## Display rows (`display_rows`, stock 0-21, 29 rows, row limit patched at file 0x42D6)
+## Display rows (`display_rows`, stock 0-21, 80 rows, row limit patched at file 0x42D6)
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
@@ -144,7 +150,9 @@ leaves copies out of step: grep for the number before moving one.
 | 26 | haloed Goku (links 27 / 27, as 19 / 20 do) | 176 | Goku's (63 / 14) | `spriteclone.py` `--halo-sprites` |
 | 27 | haloed Super Saiyan Goku (flags 1, links 26 / 26) | 177 | SSJ Goku's (65 / 15) | `spriteclone.py` `--halo-sprites` |
 | 28 | Super Saiyan 2 Gohan (party slot 8): Gohan's row 3 (standard class), a base form linking to itself | 58 | 61 / 12 (the stock Super Saiyan 2 Gohan's, from row 4) | `spriteclone.py` `SSJ2_ROW`, `ssj2gohan.h` |
-| 29+ | free (29 was allocated to Super Saiyan 2 Gohan, unused; raise the limit in `patch_rom.py` and `EXTRA_ROWS` in `spriteclone.py`) | | | |
+| 29-66 | the tournament's playables, one per `TR_BEAT` / `TR_CHALLENGER` fighter of `tourney_data.c` in `TFighterId` order (29 Yamcha ... 47 Super 13, 48-52 the Buu-saga five, 53-66 the challengers; the map `tny_play_rows`, `tny_play_row()`): Gohan's standard row, links to itself | the table's `play_sprite` (72 when that record is not in the build; 180 -> 243 with `BUU=0`) | the table's portrait (Hercule's 67 when 0) / Hercule's status portrait | `tools/tnyplayables.py` `display_rows` (via `spriteclone.py`), `tny_play.c` |
+| 67-79 | the playables' allocation, unused (Hercule's row as filler) | | | |
+| 80+ | free (raise the limit in `patch_rom.py`, an imm8, and `EXTRA_ROWS` in `spriteclone.py`) | | | |
 
 The stock row 4 (sprite 58, class `0x030021E4`: fixed combat bytes 100, HP regeneration, an aura sound
 loop; flags 3, links to row 2) stays the Cell Games' transformation (`SetCharacterTransformation 0, 58`
@@ -162,7 +170,10 @@ finds row 4 first).
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
 | 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
-| 127+ | free | `krillinsprites.py` asserts ids are unique |
+| 127-139 | art-new's allocation (tournament) | |
+| 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
+| 169-189 | art-buu's allocation, unused | |
+| 190-199 | ui's allocation (tournament) | |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).
@@ -176,7 +187,8 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
-| 24+ | free (24 allocated to Super Saiyan 2 Gohan, unused) | |
+| 24-40 | allocated to the tournament's playables, unused (their kits use 0-23: `tny_play.c`) | |
+| 41+ | free (24 was allocated to Super Saiyan 2 Gohan, unused) | |
 
 ## Party slots (`PARTY_SLOTS` = 9)
 
@@ -230,7 +242,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 5 | WARP | `arg` = zone \| area << 8, `arg2` = x \| y << 16 (pixels) |
 | 6 | DUEL | start a duel (`arg` packs slot, flags, end script) |
 | 7 | STORY_WIN | win every boss fight on the map |
-| 8 | SPAWN_RECORD | spawn the enemy record at address `arg` with a boss bar |
+| 8 | SPAWN_RECORD | spawn the enemy record at address `arg` with a boss bar; `arg` may be in EWRAM (since 2026-10-25: a test pokes a record into `coop2.boss_rec` 0x0203FD6C itself and passes that address, `tny_artbuu.txt`) |
 | 9 | PARTNER_WIN | only the boss twins fall (Broly's rage test) |
 | 10 | DOWN | player `arg` (0 / 1) goes down as from a lethal hit (`revive.c`) |
 | 11 | A16_PARTY | Krillin player 1, Android 16 player 2 |
@@ -246,6 +258,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 19+ | 19-20 allocated to the post-game chapter | |
 | 21-29 | the tournament team (`docs/ids.md` allocations above) | |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
+| 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
+| 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |
+| 27 | TNY_DRIVE (moves) | `arg` = op << 24: 0 force move (`reg << 8 \| move`: 1-6 his kit's slot, 0x80 \| kind a library kind, 0xFB-0xFF Multi-Form / self-KO / stun beam / stun projectile / big ball), 1 Rumble = `arg & 1`, 2 HP of kit `reg` := `arg2` (0x800000NN = NN %), 3 no specials for `arg2` frames, 4 every kit fighter leaves, 5 a passive on top (11 drain, 12 regen) |
 
 ## Zone 15 areas (new maps, `data/maps/*.json`, built by `tools/mapbuild.py`)
 

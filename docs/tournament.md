@@ -102,7 +102,7 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   Android 16 recipe), so your LoG2 strength carries over and a villain feels like himself.
 - **The director:** one list box (1v1 / 2v2 / Royal Rumble; 2v2 hidden in 1P), then Quick / Full for 1v1, then
   the select screen. No house rules beyond that.
-- **The announcer** (Buu record 207) is imported and calls every match; the crowd is LoG2's townspeople.
+- **The announcer** (Buu record 8; 207 is the Ox-King, 4e) is imported and calls every match; the crowd is LoG2's townspeople.
 - **Pop-up wording:** "New tournament fighter!" / "New tournament tier: Champion!" / "New division: Full
   bracket!", one line each, the journal pop-up's style.
 
@@ -177,27 +177,27 @@ specials in C (the Super 13 kind).
 | Mystic Gohan | 100 | O, **B** | Masenko, Kamehameha; no transform (already at full power), high stats | moderate |
 | Great Saiyaman | 101 | O, **B** | justice poses (the Taunt), Masenko; a joke fighter with Gohan's numbers | moderate |
 | Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
-| Goten (SSJ) | 92 | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
-| Kid Trunks (SSJ) | 93 | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
-| Gotenks | 277 base, 119 SSJ, 120 SSJ3 (confirmed by eye, `build/wm/buu_ids_x2.png`) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
-| Vegito | 273 (SSJ) (?) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
+| Goten (SSJ) | 114 (113 base; 92 was a guess, 4e) | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
+| Kid Trunks (SSJ) | 260 (259 base; 93 was a guess, 4e) | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
+| Gotenks | 116 base, 119 SSJ, 120 SSJ3 (4e: 277 is a red-haired kid) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
+| Vegito | 92 (SSJ; 93 has the same frames; 273 is a Vegeta, 4e) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
 | Uub | 263 | **C** (Champion Rumble, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
 | Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
 | Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
 | Dabura | 63 (giant, winged) | **C** (Adept 2v2: alone against your team) | Evil Flame (a fire cone: Super 13's wave), **Stone Spit** (a projectile that petrifies for 3 s), Darkness Sword (reach) | moderate; petrify big-ish |
 | Fat Buu | 33 (giant) | O, **C** (Z-Fighter 2v2, with Hercule) | **Candy Beam** (a thin beam that stuns), Angry Explosion (nova), **regeneration** (HP regen rule), Mouth Blast | moderate; regen cheap |
-| Super Buu | 39 / 40 base, 42 (Gotenks absorbed, vest) (?), 43 (Gohan absorbed, gi) (?) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
+| Super Buu | 40 base, 41 (Gotenks absorbed, vest), 43 (Gohan absorbed, gi) (4e) | O (Legend headliner), **B** (villain) | **Human Extinction Attack** (a volley), Vice Shout, absorb (heals on hit); **the Buu gauntlet: 40 -> 42 at 60 % -> 43 at 30 %**, each form stronger | moderate; the chain cheap once transforms exist |
 | Kid Buu | 37 (32 x 64) | **C** (Champion 1v1) | **Planet Burst** (a huge ball), Vanishing Ball, mad rush, regeneration | moderate |
 | Super Janemba | 144 (giant, horned, tail) | **C** (Z-Fighter Rumble) | Dimension Sword (reach), Rakshasa's Claw (teleport behind: Instant Transmission), Hell's Gate (a portal projectile) | moderate; portal big-ish |
-| Evil Buu | 62 (grey, thin, the cape frame is his spit) | O, **C** (Adept Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
-| Pikkon | 132 / 179 (two palettes; cap, red vest, green pants) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
-| Kibito | 32 (giant, partial set) | **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
+| Evil Buu | 32 (grey, thin, caped; 62 is a capped soldier, 4e) | O, **C** (Adept Rumble) | Mouth blast (beam), Vanishing Ball, regeneration; thinner and faster than Fat Buu | moderate |
+| Pikkon | 214 / 215 (two palettes: tall hat, white scarf; 132 / 179 are capped soldiers, 4e) | O, **C** (Adept 1v1) | Thunder Flash (beam), Hyper Tornado (a spin that hits around him), Burning Shoot | moderate |
+| Kibito | 148 (NPC set: idle, walk, casting, lying; 32 is Evil Buu, 4e) | **C** (Z-Fighter 1v1) | melee, **Heal** (restores his teammate in 2v2 / a Rumble ally) | moderate |
 | Pui Pui | 224 (32 x 64, partial set) | **C** (Rookie 1v1) | ki volley, melee | cheap |
 | Yakon | 290 (giant beast, partial set) | **C** (Rookie Rumble: a monster, story-neutral) | **Darkness Eater** (his hits drain your EP), claws | moderate |
 | Buu-era Vegeta base / Goku variants | 116 (Vegeta base), 269-272, 107, 109, 114; 99 (Goku's 64 x 64 Spirit Bomb / big-beam frames); 97 / 102 Gohan outfits; 113 Goku with the halo | skins and forms of the above | | |
 
 Not fighters (NPC grade in Buu's Fury): Supreme Kai 149, Babidi, Videl 56, Android 18 (Buu) 6, Future Trunks 4,
-the announcer 207, Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
+the announcer 8 (207 is the Ox-King, 216 Pintar), Yamu 21. Not in either ROM: Olibu, Bojack, Hirudegarn, Pan. Records 259 / 260 are a lavender-haired kid in Goku's gi
 (base / SSJ): kid Trunks in an alternate outfit, or Goten mis-palettised; a skin either way.
 
 ### 4c. Playable villains (Ryan: "some villains playable to make it cooler")
@@ -222,6 +222,48 @@ the Rookie Rumble (2 rounds of 3 and a headliner) 7 distinct fighters, later Rum
 | Z-Fighter | Gingertown done | + Imperfect Cell; after the island + Android 16 = **17-20** | + Trunks (chapter 5) | none new | Kibito (1v1), Fat Buu & Hercule (2v2), Super Janemba (Rumble) |
 | Champion | flag 191 (the wait) | + Semi-Perfect, Perfect Cell, Cell Jr; Cooler, the Namekian (Cooler beaten); Broly, Paragus (flag 402) = **24-27** | + Goku, Android 16 (flag 421) | Perfect Cell, Cooler, Broly | Kid Buu (1v1), Gotenks (2v2), Uub (Rumble, as Hercule) |
 | Legend | flag 382 | + the final Cell, Super 13, Buu-saga Goku / Vegeta / Gohan / Saiyaman / Goten / Trunks / Hercule / Piccolo, Super Buu = **about 40** | + SSJ2 Gohan | Super 13, Super Buu, the Buu-era heroes | Vegito (1v1), the forms (2v2), Super Buu's final form headlines the Rumble |
+
+## 4e. Buu's Fury imports: built (art-buu, 2026-10-25)
+
+Every Buu's Fury fighter of 4b and the announcer are converted (`data/tny_buu.txt`, `tools/buu2log2.py --spec --fit
+--section .rodata.art`, Makefile `TNY_BUU_IDS`) into Hercule's 21-group player layout at the sprite ids of `tourney.h`
+(195-222, 230: `docs/ids.md`), in the second ROM blob (about 950 KB of the 2 MiB; the code blob is unchanged), with
+their dialogue portraits (140-168, `tools/tnyportraits.py`) in `tourney_data.c`'s portrait column (Broly's 141 too).
+Test: `tools/headless/tny_artbuu.txt` (`docs/testing.md` "Tournament art").
+
+Our calls, made while building:
+- **Records checked by eye; several first guesses were wrong.** Each candidate was drawn at 3-6x (idle and attack
+  frames) and matched against Buu's own portraits: Kibito is 148 (32 is a grey caped Buu: Evil Buu), Pikkon 214 (132 /
+  179 / 62 are a small capped soldier), Goten SSJ 114 (92 / 93 are Super Saiyan Vegito: orange undershirt, blue gi;
+  102 / 104 are Gohan in the Saiyaman tunic), Kid Trunks SSJ 260 (259 base, the only lavender-haired kid), Gotenks
+  116 (277 is a red-haired kid; 117 / 118 are Gotenks NPC sets), Super Buu with Gotenks absorbed 41 (the vest; 42 / 43
+  both wear Gohan's gi top), the announcer 8 (blond, sunglasses, suit; 207 is the Ox-King and 216 Pintar). The ids in
+  `tourney.h` stay; their comments name the records.
+- **Partial sets are mapped by hand** (`data/tny_buu.txt`): Spopovich and Yamu lie down (anim 15) for the fall and
+  daze groups and power up (17) for shout and charge; Pui Pui has idle, walk, three attacks and hurt only (run =
+  walk, charge = his first attack); Yakon's darkness (18) is his beam group; Kibito has no attack frames at all,
+  so every attack, charge and beam group is his casting pose (anim 12) and his hurt / fall / daze is the lying one;
+  Evil Buu has no hurt anim (his lean, 7, stands in). The three forms of Super Buu, Gotenks and Goku use one map each,
+  so the moves piece's transform rule swaps sprites with no group surprises.
+- **Hurt boxes like LoG2's** (`--fit`): Buu's boxes are 2-5 px smaller than LoG2's, and at arm's length 20 of the
+  28 imports never took a punch that hits Android 17 or Cooler (the hit test). Normal bodies now carry LoG2's
+  standard (-2, -26, 18, 10) on every facing (raised to the head for tall Pui Pui); giants one box over the idle
+  frame's drawn body, at least 20 px either side of its centre (Cooler's is 48 wide). After it every import, and both
+  stock controls, lose HP to six punches.
+- **Yakon is recentred**: his 64 px body fills the frame from x + 0 (centre x + 32; the other giants centre near
+  x + 16), so his frames move 16 px left; without it he stood beside his own position and punches missed.
+- **Giants** (64 x 64 frames: the OBJ slot is 4 KB) are Spopovich, Yamu (lean, but his kicks need the 64 px frame),
+  Yakon, Dabura, Fat Buu, Evil Buu (the cape), the three Super Buus and Janemba: `tourney_data.c` marks Yamu and
+  Evil Buu `TR_GIANT` and no longer Kibito (148 is a 32 x 32 body). Kid Buu and Pui Pui are 32 x 64 (2 KB).
+  Two giants on screen with player 1 leave 12-21 KB of OBJ VRAM free, largest block 12 KB or more.
+- **The announcer** is a town NPC's 5-group layout (record 80): idle, walk, and the raised microphone in group 4.
+- **Portraits**: Buu's Fury's own, on LoG2's grey frame (old Hercule's 126 recipe); the forms have their own (Super
+  Buu 151-153, Gotenks 157-159, Goku 162-164) for the moves piece's transforms, though the roster row names the
+  first. Evil Buu has none in Buu's Fury: his row keeps 0 (the ui draws his face from the sprite). Without
+  `roms/buu.gba` every id gets LoG2's Hercule portrait so no id is empty.
+- **Colours**: the nearest LoG2 OBJ colour per Buu colour (`build/<dir>/gen/tny_buu_report.md`). Most move 8-24
+  colours by small distances; Yakon's greens come out darker and browner than Buu's (LoG2's palette has no matching
+  mid greens): readable, a re-tint later if Ryan dislikes it.
 
 ## 5. The move library (shared, each move written once)
 
@@ -274,7 +316,7 @@ fighter per tournament, shown on the board as a silhouette with its condition) i
   calls it. End: loser lying, winner's pose, the announcer calls the winner, fade. Bracket: the loser greys,
   the winner slides to the next column with a sound, the other matches of the round resolve with quick
   slides, the next match highlights. Full (16) shows two pages. The Rumble uses a board of faces instead.
-  Buu's Fury's announcer (record 207, NPC grade) is a cheap import.
+  Buu's Fury's announcer (record 8, NPC grade) is imported as sprite 230 (4e).
 - **The unlock board** (outside the arena, on the courtyard): a grid of silhouettes, one per unlockable
   tournament fighter (B and C of section 4), drawn in one dark colour (the duel's shadow remap technique, in
   black); the cursor on one shows its condition and nothing else: "Beat this fighter in a match", "Win the
@@ -409,3 +451,158 @@ opponents step 56 px in y); camera centre `TNY_RING_CENTER` (360, 384); the wait
 5. The move library's new kinds (teleport, stun, drain, regen, summon), then kits fighter by fighter.
 6. Roster imports (Buu's Fury), playable villains, portraits.
 7. Unlocks: beat-to-unlock, the challenger ladder with its cutscenes, the global record, the pop-ups.
+
+## 10. The playables (built 2026-10-25, branch `tny-playables`)
+
+Every `TR_BEAT` / `TR_CHALLENGER` fighter of the roster (38 today) plays on a display row of his own. Code:
+`src/coop/tny_play.c` (`tny_play_row`, `tny_play_entry`, the kits), `tools/tnyplayables.py` (the bodies and the
+rows), test `tools/headless/tny_play.txt` (generated by `tny_play_gen.py`; `docs/testing.md` "Tournament playables").
+
+**How the engine uses it:** for a match it borrows a party slot (7, as 16 and the duel clone do), writes
+`tny_play_entry(id, &slot, &lead)` there and binds the player to it, then warps into the ring. The entry: row
+`tny_play_row(id)`, the lead's EXP (his level), HP / EP / STR / POW / END as the fighter's percentages of the lead's
+(full HP and EP), flags 0x7B (in party, available, all four moves learned), four abilities, ability index 0. A
+fighter that is not a tournament playable gets a copy of the lead's entry (story playables play from their slot).
+Player 2 rebound to a body of another OBJ size (a 64 x 64 one) is rebuilt by `player.c` (`p2_bind`); player 1 must
+change body through a map load (a warp), never in place: `PlayerEntity_RefreshSprite` keeps the old VRAM slot.
+
+**Decisions (ours):**
+- *Rows by table order.* Row = 29 + the fighter's place among the table's playables in `TFighterId` order; the rows
+  and the map are generated from `tourney_data.c` at build time, so a role change in the table moves the rows with
+  it (both sides regenerate). Rows past the last fighter (67-79 today) are Hercule's row as filler.
+- *Missing art degrades, never crashes.* A row whose `play_sprite` record is not in the build (art-new / art-buu not
+  merged, `BUU=0`) shows Hercule (72); Super Android 13's 180 is Perfect Cell's enemy groups with `BUU=0`, so his row
+  uses the Perfect Cell player body (243) then. Broly (159) and Super 13 (180) play on their own records with
+  `BUU=1` (Buu imports are already in the player layout; giants need nothing more).
+- *Portraits:* row byte 2 = the table's dialogue portrait (Hercule's 67 when the table has 0), byte 3 = Hercule's
+  status portrait (the table holds no status portraits; a dialogue portrait there would show in the wrong palette).
+  When the art pieces give the table real portrait ids the rows pick them up at the next build.
+- *Bodies (sprites 235-244):* Goku's player header, groups filled the way Hercule's set is (0-8, 11, 12, 13, 17, 20)
+  from the body's enemy groups, every array padded to Goku's frame count, frames stay the ROM's (Android 13's are
+  rebuilt from `bossmodels.build_a13`); all of it `TNY_ART` (52 KB). Giants keep their 0x1000 VRAM size and hurt boxes.
+- *No new abilities (24-40 stay free).* Every kit is built from the table: beam abilities need the beam groups
+  18 / 19, so only Yamcha, Perfect Cell and Cooler (whose records have a group 18: Cell's own, the others' charge
+  pose) get the Kamehameha; Special Beam Cannon, Spirit Bomb, Sword Blast and Energy Punch are on nobody. Signature
+  moves the table lacks (Death Beam, Tri-Beam, Solar Flare, Candy Beam, energy steal...) are stand-ins below; the
+  moves piece's library (section 5) can replace a stand-in later by giving the fighter a new ability id from 24-40.
+
+**Bodies with missing or odd groups** (source group -> player group):
+
+| body | what is borrowed |
+|---|---|
+| Yamcha 156, Android 18 11 | nothing (full enemy set) |
+| Tien 121 | no attack 7: player 7 = his attack 8 |
+| Frieza 48 | no knock-back, death fall or shout: knock-down, lying and tumble = the hit-stun; shout = the charge pose |
+| Mecha Frieza 49 | no hit-stun and no attacks: Frieza's (48, the same body without the metal); his group 3 is his death (Trunks' sword cuts him in two), so his knock-down, lying and tumble are Frieza's hit-stun too |
+| Tao 50 | one attack only (6 = 7 = 8); no knock-back or death fall (hit-stun). The body looks like a red-armoured robot more than Tao: the roster's art call, to confirm by eye |
+| Android 13, 17, Perfect Cell 30 | no shout: the charge pose |
+| Cooler 34 | no knock-back: knock-down and tumble = his death fall (12); shout = the charge pose |
+| Broly 159, Super 13 180 | Buu-import player layout: nothing (180 with `BUU=0`: see above) |
+
+**Kits and multipliers** (percent of the lead's HP / EP / STR / POW / END; ability ids after the names):
+
+| fighter | abilities | HP EP STR POW END |
+|---|---|---|
+| Yamcha | Afterimage Rush (Wolf Fang Fist) 19, Kamehameha 3, Big Bang (Spirit Ball) 0, Ki Blast 2 | 100 100 100 95 100 |
+| Tien | Burning Attack (Tri-Beam) 1, Shockwave Punch (Solar Flare) 20, Big Bang 0, Ki Blast 2 | 105 100 100 105 105 |
+| Frieza | Ki Blast (Death Beam) 2, Big Bang (Death Ball) 0, Scatter Shot 8, Afterimage Rush 19 | 120 120 115 125 115 |
+| Mecha Frieza | Ki Blast 2, Afterimage Rush 19, Big Bang 0, Shockwave Punch 20 | 125 110 120 115 125 |
+| King Cold | Megaton Punch 16, Ki Blast (Death Beam) 2, Big Bang 0, Shockwave Punch 20 | 140 100 125 105 125 |
+| Master Roshi | Masenko (his Kamehameha wave) 4, Afterimage Rush (Drunken Fist) 19, Shockwave Punch (Thunder Shock) 20, Ki Blast 2 | 85 110 85 95 85 |
+| Mercenary Tao | Ki Blast (Dodon Ray) 2, Afterimage Rush (Crane rush) 19, Shockwave Punch 20, Big Bang 0 | 100 100 105 100 100 |
+| Spopovich | Rolling Hercule Punch 14, Megaton Punch 16, Shockwave Punch 20, Taunt 17 | 130 80 115 80 130 |
+| Yamu | Afterimage Rush 19, Rolling Hercule Punch 14, Ki Blast 2, Shockwave Punch 20 | 100 90 105 90 100 |
+| Chi-Chi | Rolling Hercule Punch (the frying pan) 14, Dynamite Kick 15, Afterimage Rush 19, Taunt 17 | 80 70 90 70 80 |
+| Videl | Afterimage Rush (Hawk Arrow) 19, Dynamite Kick 15, Rolling Hercule Punch 14, Ki Blast 2 | 85 80 95 80 85 |
+| Chiaotzu | Ki Blast (Dodon Ray) 2, Shockwave Punch (psychic hold) 20, Masenko 4, Big Bang 0 | 75 110 70 105 75 |
+| Android 13 | Big Bang (S.S. Deadly Bomber) 0, Afterimage Rush 19, Ki Blast 2, Shockwave Punch 20 | 125 115 120 115 125 |
+| Android 17 | Big Bang (Power Blitz) 0, Shockwave Punch (Energy Barrier) 20, Afterimage Rush 19, Ki Blast 2 | 120 120 120 120 115 |
+| Android 18 | Big Bang (Power Blitz) 0, Ki Blast (Finger Beam) 2, Scatter Shot (Infinity Bullet) 8, Afterimage Rush 19 | 115 120 115 120 110 |
+| Perfect Cell | Kamehameha 3, Shockwave Punch (Solar Flare) 20, Big Bang 0, Ki Blast 2 | 145 130 140 140 140 |
+| Cooler | Kamehameha (Death Flash) 3, Big Bang (Supernova) 0, Scatter Shot 8, Ki Blast 2 | 140 125 135 135 135 |
+| Broly | Big Bang (Eraser Cannon) 0, Scatter Shot (Blaster Shell) 8, Super Saiyan 2 Burst (Gigantic Meteor) 23, Afterimage Rush 19 | 160 120 150 135 150 |
+| Super Android 13 | Super Saiyan 2 Burst (the nova) 23, Big Bang (Deadly Bomber) 0, Scatter Shot (volley) 8, Ki Blast 2 | 155 120 145 140 145 |
+| Goku (Buu Saga) | Burning Attack (Kamehameha stand-in) 1, Afterimage Rush (Dragon Fist) 19, Super Saiyan 2 Burst 23, Ki Blast 2 | 140 140 140 145 135 |
+| Majin Vegeta | Big Bang 0, Burning Attack (Final Flash) 1, Super Saiyan 2 Burst (Final Explosion) 23, Ki Blast 2 | 140 135 145 140 135 |
+| Mystic Gohan | Masenko 4, Burning Attack (Kamehameha stand-in) 1, Afterimage Rush 19, Ki Blast 2 | 140 140 145 145 135 |
+| Great Saiyaman | Masenko 4, Dynamite Kick 15, Taunt (justice poses) 17, Ki Blast 2 | 110 110 105 105 105 |
+| Super Buu | Scatter Shot (Human Extinction) 8, Shockwave Punch (Vice Shout) 20, Big Bang 0, Super Saiyan 2 Burst 23 | 155 140 150 150 145 |
+| Pui Pui | Scatter Shot 8, Rolling Hercule Punch 14, Ki Blast 2, Afterimage Rush 19 | 100 100 100 100 100 |
+| Goten | Afterimage Rush 19, Masenko (Kamekameha stand-in) 4, Ki Blast 2, Dynamite Kick 15 | 105 110 110 110 100 |
+| Kid Trunks | Big Bang (Big Tree Cannon) 0, Burning Attack 1, Afterimage Rush 19, Ki Blast 2 | 105 110 110 110 100 |
+| Yakon | Rolling Hercule Punch (claws) 14, Megaton Punch 16, Shockwave Punch 20, Afterimage Rush 19 | 130 90 120 90 125 |
+| Pikkon | Burning Attack (Thunder Flash) 1, Shockwave Punch (Hyper Tornado) 20, Big Bang (Burning Shoot) 0, Ki Blast 2 | 125 120 125 120 120 |
+| Dabura | Scatter Shot (Evil Flame) 8, Ki Blast (Stone Spit) 2, Megaton Punch 16, Shockwave Punch 20 | 135 125 130 130 130 |
+| Evil Buu | Burning Attack (mouth blast) 1, Big Bang (Vanishing Ball) 0, Afterimage Rush 19, Ki Blast 2 | 130 125 130 130 125 |
+| Kibito | Rolling Hercule Punch 14, Shockwave Punch 20, Ki Blast 2, Afterimage Rush 19 | 115 110 110 110 115 |
+| Fat Buu | Ki Blast (Candy Beam) 2, Super Saiyan 2 Burst (Angry Explosion) 23, Burning Attack (mouth blast) 1, Megaton Punch 16 | 150 120 135 125 140 |
+| Super Janemba | Afterimage Rush (Rakshasa's Claw) 19, Big Bang (Hell's Gate) 0, Scatter Shot 8, Rolling Hercule Punch 14 | 145 130 140 135 140 |
+| Kid Buu | Big Bang (Planet Burst) 0, Scatter Shot 8, Afterimage Rush (mad rush) 19, Super Saiyan 2 Burst 23 | 145 140 145 150 135 |
+| Gotenks | Destructo Disc (Galactic Donut) 21, Big Bang (the ghosts) 0, Afterimage Rush 19, Ki Blast 2 | 130 130 135 135 125 |
+| Uub | Scatter Shot 8, Afterimage Rush 19, Ki Blast 2, Shockwave Punch 20 | 130 125 135 130 125 |
+| Vegito | Burning Attack (Final Kamehameha) 1, Afterimage Rush (Spirit Sword) 19, Big Bang 0, Super Saiyan 2 Burst 23 | 160 150 155 155 150 |
+
+The art pieces' bodies (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu, every Buu import) have no beam group as far as
+the contract says, so their kits avoid the beams; if a body arrives with a group 18, its fighter can take the
+Kamehameha (3) in `tny_play.c` (Roshi first). Tested on this branch with those bodies degraded to Hercule's.
+## 11. The moves (built 2026-10-25, branch `tny-moves`)
+
+`src/coop/tny_moves.c`; tests `tools/headless/tny_moves.txt` and `tny_rumble.txt` (`docs/testing.md` "Tournament
+moves"). What it does and the calls we made:
+
+- **`tny_moves_attach(e, fighter)`** works on any enemy entity (the ROM's vtable, the co-op copy, Android 16's or
+  Super 13's private one). The fighter gets a private vtable copy of the one he had (destroy, update, messages
+  wrapped; the rest untouched, so the co-op pair / both-down / rage rules still run) and a private stat copy
+  (`e->behaviour`). `enemies.c` counts him as before: `is_coop_enemy` / `is_enemy` also ask `tny_moves_base(e)`
+  (the one edit outside the piece, two lines). Up to 8 fighters with a kit at once; state on the heap, the
+  registry in `.tny.mv` (magic "MOVE"), dropped when a fighter leaves the entity list (a map change).
+- **The kit table `tny_kits[TF_COUNT]`**: one row per fighter, up to six moves `{kind, a, b, flags, power, cd}`;
+  every TR_OPPONENT and TR_CHALLENGER fighter has a row (sections 4a / 4b). Numbers are ours, to tune in play:
+  `power` is the 10.10 multiplier on the stock damage formula with the fighter's own stat (`stat_ranged` for
+  blasts, `stat_melee` for rush hits), `cd` the move's own cooldown in frames, plus a pace between specials (150-225
+  frames). A special starts only from idle or walking, with the target within 170 px; beams only when the target
+  is in line (they fire along the four facings, as the players' do).
+- **The library's kinds** (section 5), each written once: beam (the players' Kamehameha beam object with the
+  fighter as owner: an enemy's hit-type byte +0x16C is 0, so it hurts players only; thin = 112 px, stun = Candy
+  Beam, cost = Tri-Beam's 5 % HP), ball (Super 13's orbs; the large one is held over the head and thrown slowly
+  homing), homing (Android 16's rockets, or orbs: Spirit Ball, Gotenks' ghosts), volley (small orbs or Krillin's
+  blue ki blasts; converge = Hellzone Grenade), wave (Super 13's), nova (Super 13's; self-KO = Chiaotzu at 10 %,
+  Final Explosion at 10 %: the fighter takes his own remaining HP through his OnHit, so the engine sees a normal
+  defeat), rush (a dash with map collision and N hits; stun = a grab, a frying pan, a throw), teleport (a flash,
+  behind the target, a strike; dodge = hop away), stun (a flash round him: Solar Flare; the target at range:
+  psychic hold; a projectile: Stone Spit 3 s, Galactic Donut), heal (Kibito: the most hurt fighter of his side),
+  drain (passive: his melee hits heal him, or take a player's ki), regen (passive, permille of max a second),
+  transform (at N % HP, once: a power-up pose, the new body, + attack / defence), summon (helpers beside him; at N %
+  HP a copy of himself with half his health: Multi-Form).
+- **Stuns**: a stunned player's pad is dead (both pads read 0 in the input poll) with a ring of orbs over his head; a
+  stunned fighter stands in his hurt pose with no AI. A special cannot be stunned out of, and a hit during one
+  only does damage (Android 16's rule); KF_POISE fighters (giants, bruisers, Android 17, Super Perfect Cell...)
+  also get a 75-frame poise window after a stun.
+- **Transforms check the body** (our call): a body must have every pose group its AI set plays
+  (`tny_moves_body_fits(sprite, ai_set)`, the table in `docs/sprites.md`); Mecha Frieza's stock sprite 49 has only
+  groups 0, 1, 3, 5, and under Frieza's set 21 the first swing jumps to C002E560 (found by `tny_rumble.txt`). So a
+  transform takes the sprite if it fits, else the play body of the fighter shown by that sprite (Mecha Frieza ->
+  the playables' 238), else stays a stat boost on his own body. Same rule for spawns: test command 26 and the
+  summons skip a fighter whose body does not fit (`mv.spawn_fail` 4). **The engine should do the same** before it
+  spawns an opponent (Mecha Frieza needs TS_P_MECHA; sprite 49 as an opponent crashes).
+- **Summons** (our call): Cell Jr. helpers only in a Rumble or a 2v2 (`MF_TEAMONLY`, from `tny_bracket()`'s
+  division), Multi-Form copies in every division; helpers and copies never summon or transform. They spawn through
+  `enemy_spawn_hook` with co-op twins off and get a kit of their own, on the summoner's side.
+- **Rumble mode (`tny_rumble_mode`)**: a fighter's message wrapper takes a type-0 hit from a fighter of another side
+  as a player's (type 1) and gives it back as type 0 to the next receiver; his own blasts and projectiles never hit
+  him; helpers share their summoner's side. Targeting is done in the fighter's own update, not in
+  `coop_target()` (our call: `entities.c` only asks `coop_target()` when player 2 is present, and the Rumble must
+  work alone too): the nearest player 70 %, the nearest other fighter 30 %, re-rolled every 3 s, always a player
+  within 40 px; `g_PlayerObject` points at the target while the stock AI runs (as `entities.c` does for player 2).
+  **Prototype result**: every AI set of the roster ran against other fighters for 20 s per pack with no crash, in
+  co-op and alone (`tny_rumble.txt`: sets 21, 98, 129, 29, 80, 116, 148, the Namekian's, Paragus', Broly, Cooler,
+  Android 16, Dr. Gero, Android 13, Super 13, Cell Jr., old Hercule); no AI set had to stay player-only.
+  Android 16 and Super 13 keep their own specials and aim them at players only (natives: `KF_NATIVE`); they take
+  Rumble hits like everyone.
+- **Kill credit**: an NPC's killing blow gives nobody EXP (the stat copy's EXP is 0 during that hit);
+  `mv.npc_kos` counts NPC-vs-NPC eliminations, and `tny_moves_last_hitter(e)` gives the engine the player or fighter
+  behind the last hit a fighter took (beat-to-unlock in a Rumble: the last hit).
+- **Not done here**: no twin rule for opponents (the engine adds it; our test spawns set `COOP_OFF_TWINS` around the
+  spawn); speed changes on transform (the chase modules are built once; only attack and defence rise); Gohan /
+  Goku / Vegeta / Trunks / Piccolo transforms (story playables, never opponents); the engine's stats (160 + id) are
+  used when a build has them, else a stand-in stock stat per body (`stand_in_stat[]`).

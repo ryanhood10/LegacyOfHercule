@@ -70,7 +70,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o
 
 SSJ_TEST ?= 0
 
@@ -87,11 +87,22 @@ BUU_SPRITES ?= 158=128 159=28
 SSJ_SPRITE ?= 157
 # 72=herc_record: Hercule's stock record plus the Kamehameha pose (group 18, tools/herculesprites.py) replaces id 72;
 # 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
-EXTRA_SPRITES := 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+# 235-244: the tournament's player-layout LoG2 bodies (tools/tnyplayables.py; ids in src/coop/tourney.h TS_P_*)
+TNY_PLAY_SPRITES := 235=tnyp_yamcha_record 236=tnyp_tien_record 237=tnyp_frieza_record 238=tnyp_mecha_record 239=tnyp_tao_record 240=tnyp_a13_record 241=tnyp_a17_record 242=tnyp_a18_record 243=tnyp_pcell_record 244=tnyp_cooler_record
+EXTRA_SPRITES := $(TNY_PLAY_SPRITES) 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+
+# The tournament's Buu's Fury imports (art-buu): sprite ids 195-222 and 230 from data/tny_buu.txt (one line per
+# record: id, Buu record, group map, template), converted by buu2log2.py into the second ROM blob (TNY_ART); their
+# dialogue portraits (TNY_PORTRAITS "<portrait id>=<Buu portrait>", ids 140-189, tools/tnyportraits.py).
+TNY_BUU_SPEC := data/tny_buu.txt
+# the ids data/tny_buu.txt defines (buu2log2.py checks the spec emits exactly these: --expect)
+TNY_BUU_IDS := 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 230
+TNY_PORTRAITS ?= 140=10 141=16 142=126 143=160 144=119 145=116 146=83 147=113 148=24 149=92 150=85 151=127                  152=130 153=129 154=81 155=65 156=139 157=68 158=71 159=73 160=151 161=142 162=57 163=59 164=61                  165=148 166=42 167=47 168=112
 
 ifeq ($(BUU),1)
-OBJS += $(BUILD)/obj/buu_sprites_data.o
+OBJS += $(BUILD)/obj/buu_sprites_data.o $(BUILD)/obj/tny_buu_sprites_data.o
 EXTRA_SPRITES += $(foreach s,$(BUU_SPRITES),$(firstword $(subst =, ,$(s)))=buu_record_$(firstword $(subst =, ,$(s))))
+EXTRA_SPRITES += $(foreach i,$(TNY_BUU_IDS),$(i)=buu_record_$(i))
 endif
 CLONE_FLAGS := --extra $(subst $(space),$(comma),$(strip $(EXTRA_SPRITES)))
 CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
@@ -106,7 +117,7 @@ $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16
 	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
-$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags
+$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
 	$(PYTHON) tools/spriteclone.py $(ROM) $@ $(CLONE_FLAGS)
 
 # re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
@@ -123,6 +134,24 @@ $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
+# the tournament's Buu's Fury fighters and the announcer (never committed); previews in $(BUILD)/tny/
+$(BUILD)/gen/tny_buu_sprites_data.c: tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(TNY_BUU_SPEC) $(ROM) $(BUU_ROM)
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ --spec $(TNY_BUU_SPEC) --expect '$(TNY_BUU_IDS)' --fit --section .rodata.art --preview-dir $(BUILD)/tny --report $(BUILD)/gen/tny_buu_report.md
+
+$(BUILD)/obj/tny_buu_sprites_data.o: $(BUILD)/gen/tny_buu_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# their dialogue portraits (never committed; LoG2's Hercule for every id without roms/buu.gba)
+$(BUILD)/gen/tny_portraits_data.c: tools/tnyportraits.py tools/oldherculeportrait.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/tnyportraits.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview $(BUILD)/tny_portraits.png $(TNY_PORTRAITS)
+
+$(BUILD)/obj/tny_portraits_data.o: $(BUILD)/gen/tny_portraits_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
 # Android 16's fighting sprite and the rocket / explosion projectile frames (never committed)
 $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM)
 	$(PYTHON) tools/a16sprites.py $(ROM) $@ --preview $(BUILD)/a16_preview.png
@@ -130,6 +159,7 @@ $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu
 # Krillin's playable sprite, status portrait, ki blast / Destructo Disc frames and icons, the relocated UI
 # string table and portrait module table (never committed)
 EXTRA_PORTRAITS := --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait --extra-portrait $(S13_PORTRAIT)=s13_portrait --extra-portrait $(OLD_HERCULE_PORTRAIT)=old_hercule_portrait
+EXTRA_PORTRAITS += $(foreach p,$(TNY_PORTRAITS),--extra-portrait $(firstword $(subst =, ,$(p)))=tny_portrait_$(firstword $(subst =, ,$(p))))
 # the portrait list as a stamp: the table is regenerated when an extra portrait is added or renumbered
 $(BUILD)/gen/portraits.stamp: FORCE
 	@mkdir -p $(BUILD)/gen
@@ -193,6 +223,14 @@ $(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/buu2log2.py t
 	$(PYTHON) tools/super13sprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
 
 $(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# the tournament's player-layout bodies (sprites 235-244) and the fighter -> display row map (never committed); preview beside it
+$(BUILD)/gen/tny_play_sprites_data.c: tools/tnyplayables.py tools/bossmodels.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py src/coop/tourney.h src/coop/tourney_data.c $(ROM)
+	$(PYTHON) tools/tnyplayables.py $(ROM) $@ --preview-dir $(BUILD)
+
+$(BUILD)/obj/tny_play_sprites_data.o: $(BUILD)/gen/tny_play_sprites_data.c src/coop/rom.h src/coop/tourney.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

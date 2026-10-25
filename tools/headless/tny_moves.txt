@@ -1,0 +1,617 @@
+# The tournament's moves (src/coop/tny_moves.c, docs/testing.md "Tournament moves"): from the debug-menu state of a
+# DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_moves.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Map Test, two players, warp to New Planet Vegeta's open ground (zone 15 area 3). Test command 26 spawns a fighter with
+# his kit (arg = fighter | spot << 8 | flags << 16), 27 drives them (op << 24: 0 force a move, 1 Rumble, 2 HP, 3 no
+# specials for arg2 frames, 4 everyone leaves). "mv" = the moves state (found by its magic "MOVE"): +4 rumble / forced
+# move / reg / team, +8 the eight kits, +0x34 specials / fired, +0x38 hits / Rumble hits, +0x3C NPC KOs /
+# transforms, +0x40 summons / stuns, +0x44 drains / attached. A kit: +0x138 its entity, +0x15C fighter / team / copy.
+# An entity: +0x48 sprite record, +0x188 HP.
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01620114
+poke32 0x0203FD08 5
+frames 300
+# deep HP pools: the players stand still through every special (Piccolo slot 1, Hercule slot 5)
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+map
+# ---- 1. the library: every kind forced on Perfect Cell (fighter 21, 64 px right of player 1), no own specials
+poke32 0x0203FD0C 0x00040015
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek k0+0x15C
+peek e0+0x188
+peek8 e0+0x16C
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+shot m00_spawn
+# beam (Kamehameha class, his group 18 pose)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000081
+poke32 0x0203FD08 27
+frames 40
+shot m01_beam
+frames 20
+shot m02_beam
+peek 0x0203F028
+frames 60
+# ball (medium)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000082
+poke32 0x0203FD08 27
+frames 24
+shot m03_ball
+frames 60
+# big ball (held over his head, thrown homing)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x000000FF
+poke32 0x0203FD08 27
+frames 40
+shot m04_bigball_held
+frames 40
+shot m05_bigball_thrown
+frames 60
+shot m06_bigball
+frames 40
+# homing missiles (Android 16's class)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000083
+poke32 0x0203FD08 27
+frames 44
+shot m07_homing
+frames 80
+# volley
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000084
+poke32 0x0203FD08 27
+frames 30
+shot m08_volley
+frames 60
+# wave (a slow head and its trail)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000085
+poke32 0x0203FD08 27
+frames 70
+shot m09_wave
+frames 30
+shot m10_wave
+frames 120
+# nova
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000086
+poke32 0x0203FD08 27
+frames 30
+shot m11_nova
+frames 60
+# rush (dash and three hits)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000087
+poke32 0x0203FD08 27
+frames 22
+shot m12_rush
+frames 20
+shot m13_rush_hits
+frames 60
+# teleport behind the target and strike
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000088
+poke32 0x0203FD08 27
+frames 4
+shot m14_teleport
+frames 10
+shot m15_teleport_strike
+frames 40
+peek e0+0x158 2
+# stun: Solar Flare round him (a player within 72 px is frozen: mv+0x30 counts down)
+deref p1 0x03001FA8
+peek p1+0x158 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000089
+poke32 0x0203FD08 27
+frames 24
+shot m16_solarflare
+peek mv+0x28 3
+frames 30
+shot m17_stunned
+frames 70
+# stun projectile (Stone Spit)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x000000FE
+poke32 0x0203FD08 27
+frames 30
+shot m18_stonespit
+frames 40
+peek mv+0x28 3
+frames 120
+# stun beam (Candy Beam)
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x000000FD
+poke32 0x0203FD08 27
+frames 36
+shot m19_candybeam
+peek mv+0x28 3
+frames 120
+# heal (after a cut)
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 2000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x0000008A
+poke32 0x0203FD08 27
+frames 36
+shot m20_heal
+peek e0+0x188
+frames 30
+# transform with the same body: a stat boost (+0x160 attack bytes before / after)
+peek8 e0+0x160 3
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x0000008D
+poke32 0x0203FD08 27
+frames 30
+shot m21_powerup
+frames 40
+peek8 e0+0x160 3
+# Multi-Form: a copy of himself with half his health
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x000000FB
+poke32 0x0203FD08 27
+frames 34
+shot m22_multiform
+frames 30
+peek mv 21
+# ---- 2. kits fighter by fighter
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Frieza: Death Beam, Death Ball, Mecha Frieza at 40 %
+poke32 0x0203FD0C 0x00040002
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x48
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000001
+poke32 0x0203FD08 27
+frames 34
+shot k00_frieza_deathbeam
+frames 60
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000002
+poke32 0x0203FD08 27
+frames 50
+shot k01_frieza_deathball
+frames 100
+deref st e0+0x180
+peek st+4
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 0x80000023
+poke32 0x0203FD08 27
+frames 30
+shot k02_frieza_powerup
+frames 40
+shot k03_mecha_frieza
+peek e0+0x48
+peek8 e0+0x160 3
+frames 30
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Tien: Tri-Beam (costs HP), Solar Flare
+poke32 0x0203FD0C 0x00040001
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+peek e0+0x188
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000001
+poke32 0x0203FD08 27
+frames 50
+shot k04_tien_tribeam
+peek e0+0x188
+frames 60
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000002
+poke32 0x0203FD08 27
+frames 24
+shot k05_tien_solarflare
+peek mv+0x28 3
+frames 90
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Yamcha's Spirit Ball (a homing orb) and Wolf Fang Fist
+poke32 0x0203FD0C 0x00040000
+poke32 0x0203FD08 26
+frames 4
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000002
+poke32 0x0203FD08 27
+frames 50
+shot k06_yamcha_spiritball
+frames 60
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000001
+poke32 0x0203FD08 27
+frames 30
+shot k07_yamcha_wolffang
+frames 60
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Android 18's Infinity Bullet (blue ki volley), Android 13's Deadly Bomber
+poke32 0x0203FD0C 0x00040011
+poke32 0x0203FD08 26
+frames 4
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000003
+poke32 0x0203FD08 27
+frames 34
+shot k08_a18_infinitybullet
+frames 60
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x0004000F
+poke32 0x0203FD08 26
+frames 4
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000001
+poke32 0x0203FD08 27
+frames 50
+shot k09_a13_bomber
+frames 120
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Perfect Cell's Cell Jr. (a team-only summon: Rumble on) and Super Perfect at 30 %
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+poke32 0x0203FD0C 0x00040015
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x00000003
+poke32 0x0203FD08 27
+frames 40
+shot k10_cell_juniors
+peek mv+8 4
+peek mv+0x40
+frames 60
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+# Cell Jr. self-destructs (the self-KO nova): his HP goes to 0 and he leaves
+poke32 0x0203FD0C 0x00040016
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x000000FC
+poke32 0x0203FD08 27
+frames 26
+shot k11_selfdestruct
+frames 30
+peek mv+8
+peek mv 21
+# passives: Tien with regeneration (op 5 kind 12: 1 % of his max a second) at 60 % (above his Multi-Form); then with drain (kind 11:
+# his melee hits heal him 40 % of the damage and take 12 ki from a player; mv+0x44 counts drains), his stock AI
+# fighting the players for 10 s (Piccolo's EP at 0x0203F02C)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00040001
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+poke32 0x0203FD0C 0x0500000C
+poke32 0x0203FD08 27
+frames 2
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 0x8000003C
+poke32 0x0203FD08 27
+frames 2
+peek e0+0x188
+frames 300
+peek e0+0x188
+poke32 0x0203FD0C 0x0500000B
+poke32 0x0203FD08 27
+poke32 e0+0x158 0x12800
+poke32 e0+0x15C 0x16200
+poke16 0x0203F02C 100
+poke16 0x0203F09C 100
+frames 600
+shot k12_drain
+peek e0+0x188
+peek 0x0203F02C
+peek 0x0203F09C
+peek mv+0x44
+# ---- 3. a Rumble pack of three fighting each other for 20 s (players far away, Rumble targeting)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 0x0203FD0C 0x00000500
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000601
+poke32 0x0203FD08 26
+frames 2
+poke32 0x0203FD0C 0x00000016
+poke32 0x0203FD08 26
+frames 2
+deref k0 mv+8
+deref k1 mv+12
+deref k2 mv+16
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref e2 k2+0x138
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+peek e0+0x188
+peek e1+0x188
+peek e2+0x188
+shot r00_rumble
+frames 300
+shot r01_rumble
+frames 300
+shot r02_rumble
+peek e0+0x188
+peek e1+0x188
+peek e2+0x188
+frames 300
+shot r03_rumble
+frames 300
+shot r04_rumble
+peek mv 21
+peek mv+8 3
+peek 0x0203F028
+peek 0x0203F098
+ents
