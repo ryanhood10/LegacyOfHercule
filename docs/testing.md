@@ -19,6 +19,7 @@ inspection goes through the GDB stub.
 | WSL fork (wide ROM), Fork helpers | real-time play, the wide view, gdb peeks, pad keys, teleport |
 | Boss pairs, Android 16 boss fight, Super Android 13 | fights with the autopilot and hit logs; Super 13's specials, rage, explosion, rates against the twin Cells |
 | Krillin / old Hercule tests | the playable-character test triggers |
+| Tournament fighters (art-new) | the five new tournament bodies as opponents on AI set 21 and as player 1's body, portrait 127 |
 | New maps (zone 15) | building and warping to the new maps |
 | Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
 | Tournament grounds (headless) | Papaya Island: the world-map landing, the welcome, both pads, every exit, the board, the director, the waiting room's fighters |
@@ -654,6 +655,28 @@ grep -E "^hit|0202....: " build/art-buu/hl/artbuu.out | paste - -      # the hit
   through the getter's literal (0x0800BE10, word id + 1) and decodes every id: "29 portraits load" (2026-10-25).
 - Previews of every conversion (Buu colours left, ours right, the hurt box in red on group 0):
   `build/art-buu/tny/buu_preview_<id>.png`; portraits: `build/art-buu/tny_portraits.png`.
+## Tournament fighters (art-new, headless, 2026-10-25)
+
+```
+make BUILD=build/art-new DEBUG_MENU=1          # previews build/art-new/tny_preview_<name>.png (+ _x3)
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/art-new/log2-coop.gba --out build/art-new/hl
+python tools/headless/st_test.py tools/headless/tny_artnew.txt build/art-new/log2-coop.gba build/art-new/hl/menu.ss --out build/art-new/tny --cols 8
+```
+
+One player, Map Test 147, warped to New Planet Vegeta (zone 15 area 3) afresh before each fighter. King Cold (185),
+Roshi (186), Chi-Chi (187), Videl (188) and Chiaotzu (189) each spawn 48 px right of player 1 through
+`COOP_CMD_SPAWN_RECORD` (8) from the test enemy record after their sprite record (record + 0x1A0; the record is the
+sprite index entry: the word at 0x0800959C is `sprite_index + 0x1C`, entry id - 7), fight player 1 (Piccolo, 9000 HP,
+punching every 20 frames) for 10 s and fall to `COOP_CMD_WAVE_CLEAR` (13). Pass: no `CRASH`, `entrec` 1 while he stands
+and 0 after, and the 30 `peek e+0x48 2` lines per fighter (record, current group pointer: group = (pointer - record -
+0x4C) / 16) show the set-21 poses: 0 idle, 1 walk, 2 hit-stun, 5 charge, 6-8 attacks (2026-10-25: each showed idle, walk, charge
+and attacks, together all of 0, 1, 2, 5, 6, 7, 8; 2 when Piccolo's punch landed). Then the four normal bodies play as player 1 (his
+entity's record word +0x48 pointed at theirs): walk four ways, the A combo (group 6), B, a hit from Chi-Chi as an enemy
+(group 2). Last, portrait 127: `portrait_module` word 128 points at a kind-1 blob of 0x1000. Shots `<name>_0..6`,
+`<name>_ko`, `p<name>_*` in `build/<dir>/tny/`. Each spawn starts on a fresh map: in a first version, which spawned
+them one after another on the same map, a body spawned after the previous fighter's 10-s fight and knock-out showed in
+pieces or not at all for one to two seconds (not reproduced after a short fight; cause not found: the dead one's test
+boss bar, which stays in the entity list, or an OBJ VRAM slot of the fight's effects are the suspects).
 
 ## Haloed Goku (headless, 2026-10-19)
 

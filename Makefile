@@ -65,12 +65,20 @@ S13_SPRITE ?= 180
 S13_PORTRAIT ?= 122
 # OLD_HERCULE_PORTRAIT: the future timeline's old Hercule (Buu's Fury's Hercule portrait, tools/oldherculeportrait.py)
 OLD_HERCULE_PORTRAIT ?= 126
+# the tournament's five new fighters (tools/tnysprites.py, TNY_ART; src/coop/tourney.h TS_*): player-layout records that
+# also run on the melee boss AI set 21; VIDEL_PORTRAIT: her dialogue portrait (Buu's Fury's, LoG2 has none)
+KING_COLD_SPRITE ?= 185
+ROSHI_SPRITE ?= 186
+CHICHI_SPRITE ?= 187
+VIDEL_SPRITE ?= 188
+CHIAOTZU_SPRITE ?= 189
+VIDEL_PORTRAIT ?= 127
 CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin -fomit-frame-pointer \
            -ffunction-sections -fdata-sections -std=c11 -DP2_MODE=$(P2_MODE) -DWIDE_VIEW=$(WIDE) -DPARTY_SLOTS=$(PARTY_SLOTS) $(if $(filter 1,$(SSJ_TEST)),-DSSJ_TEST=1,) $(if $(filter 1,$(A16_TEST)),-DA16_TEST=1,) -DA16_SPRITE=$(A16_SPRITE) -DA16P_SPRITE=$(A16P_SPRITE) -DA13_SPRITE=$(A13_SPRITE) -DNAMEK_SPRITE=$(NAMEK_SPRITE) -DPARAGUS_SPRITE=$(PARAGUS_SPRITE) -DCELL2_SPRITE=$(CELL2_SPRITE) $(if $(filter 1,$(KR_TEST)),-DKR_TEST=1,) $(if $(filter 1,$(STORY_TEST)),-DSTORY_TEST=1,) $(if $(filter 1,$(SSJ2_TEST)),-DSSJ2_TEST=1,) $(if $(WIDE_TEST),-DWIDE_TEST=$(WIDE_TEST),) $(CFLAGS_EXTRA) -DS13_SPRITE=$(S13_SPRITE)
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o
 
 SSJ_TEST ?= 0
 
@@ -98,6 +106,7 @@ TNY_BUU_SPEC := data/tny_buu.txt
 # the ids data/tny_buu.txt defines (buu2log2.py checks the spec emits exactly these: --expect)
 TNY_BUU_IDS := 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 230
 TNY_PORTRAITS ?= 140=10 141=16 142=126 143=160 144=119 145=116 146=83 147=113 148=24 149=92 150=85 151=127                  152=130 153=129 154=81 155=65 156=139 157=68 158=71 159=73 160=151 161=142 162=57 163=59 164=61                  165=148 166=42 167=47 168=112
+EXTRA_SPRITES += $(KING_COLD_SPRITE)=tny_cold_record $(ROSHI_SPRITE)=tny_roshi_record $(CHICHI_SPRITE)=tny_chichi_record $(VIDEL_SPRITE)=tny_videl_record $(CHIAOTZU_SPRITE)=tny_chiaotzu_record
 
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o $(BUILD)/obj/tny_buu_sprites_data.o
@@ -160,6 +169,7 @@ $(BUILD)/gen/a16_sprites_data.c: tools/a16sprites.py tools/buu2log2.py tools/buu
 # string table and portrait module table (never committed)
 EXTRA_PORTRAITS := --extra-portrait $(PARAGUS_PORTRAIT)=paragus_portrait --extra-portrait $(S13_PORTRAIT)=s13_portrait --extra-portrait $(OLD_HERCULE_PORTRAIT)=old_hercule_portrait
 EXTRA_PORTRAITS += $(foreach p,$(TNY_PORTRAITS),--extra-portrait $(firstword $(subst =, ,$(p)))=tny_portrait_$(firstword $(subst =, ,$(p))))
+EXTRA_PORTRAITS += --extra-portrait $(VIDEL_PORTRAIT)=tny_videl_portrait
 # the portrait list as a stamp: the table is regenerated when an extra portrait is added or renumbered
 $(BUILD)/gen/portraits.stamp: FORCE
 	@mkdir -p $(BUILD)/gen
@@ -240,6 +250,15 @@ $(BUILD)/gen/oldherc_portrait_data.c: tools/oldherculeportrait.py tools/buu2log2
 	$(PYTHON) tools/oldherculeportrait.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
 
 $(BUILD)/obj/oldherc_portrait_data.o: $(BUILD)/gen/oldherc_portrait_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# the tournament's five new fighters and Videl's portrait (never committed); previews tny_preview_*.png beside them
+$(BUILD)/gen/tny_sprites_data.c: tools/tnysprites.py tools/oldherculeportrait.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM)) $(BUILD)/.spriteflags
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/tnysprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD) --ids $(KING_COLD_SPRITE),$(ROSHI_SPRITE),$(CHICHI_SPRITE),$(VIDEL_SPRITE),$(CHIAOTZU_SPRITE)
+
+$(BUILD)/obj/tny_sprites_data.o: $(BUILD)/gen/tny_sprites_data.c src/coop/rom.h src/coop/tourney.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

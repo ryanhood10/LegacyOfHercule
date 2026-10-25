@@ -135,6 +135,11 @@ sprite 72) for Roshi's gym.
 | 195-222 | the tournament's Buu's Fury fighters (art-buu, `tourney.h` TS_*): 195 Spopovich (Buu r.242), 196 Yamu (293), 197 Pui Pui (224), 198 Yakon (290), 199 Kibito (148), 200 Pikkon (214), 201 Dabura (63), 202 Fat Buu (33), 203 Evil Buu (32), 204 Kid Buu (37), 205 / 206 / 207 Super Buu, Gotenks absorbed, Gohan absorbed (40 / 41 / 43), 208 Super Janemba (144), 209 Goten SSJ (114), 210 Kid Trunks SSJ (260), 211 / 212 / 213 Gotenks, SSJ, SSJ3 (116 / 119 / 120), 214 Vegito SSJ (92), 215 Uub (263), 216 / 217 / 218 Goku, SSJ, SSJ3 (105 / 108 / 110), 219 Majin Vegeta (274), 220 Mystic Gohan (100), 221 Great Saiyaman (101), 222 Piccolo with the cape (212); Hercule's 21-group layout, second ROM blob | `tools/buu2log2.py --spec data/tny_buu.txt --fit --section .rodata.art` | `TNY_BUU_IDS` (with `BUU=1`) |
 | 223-229 | art-buu's allocation, unused | | |
 | 230 | the World Tournament announcer (Buu r.8, NPC: idle, walk, mic raised in group 4; town NPC 80's 5-group layout) | `data/tny_buu.txt` `230=8 @80` | `TNY_BUU_IDS` |
+| 185 | King Cold (tournament; Cooler's 64x64 set 34 recoloured, Cold's head from 74, a cape; player layout + AI set 21) | `tools/tnysprites.py` | `KING_COLD_SPRITE` (`tourney.h` `TS_KING_COLD`) |
+| 186 | Master Roshi (tournament; Krillin's 76 + Goku's 60 groups re-headed with Roshi's 88 head and beard, a shell) | `tools/tnysprites.py` | `ROSHI_SPRITE` (`TS_ROSHI`) |
+| 187 | Chi-Chi (tournament; Android 18's set 11 with Chi-Chi's 33 head, her LoG2 outfit) | `tools/tnysprites.py` | `CHICHI_SPRITE` (`TS_CHICHI`) |
+| 188 | Videl (tournament; Android 18's set 11 with Buu's Fury's Videl head, record 276, white shirt) | `tools/tnysprites.py` | `VIDEL_SPRITE` (`TS_VIDEL`) |
+| 189 | Chiaotzu (tournament; kid Gohan's set 53 with Chiaotzu's 32 head and outfit) | `tools/tnysprites.py` | `CHIAOTZU_SPRITE` (`TS_CHIAOTZU`) |
 
 Several ids are also written as literals in scripts and headers, so changing a Makefile default alone
 leaves copies out of step: grep for the number before moving one.
@@ -170,10 +175,13 @@ finds row 4 first).
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
 | 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
-| 127-139 | art-new's allocation (tournament) | |
+| 128-139 | art-new's allocation (tournament), unused | |
 | 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
 | 169-189 | art-buu's allocation, unused | |
 | 190-199 | ui's allocation (tournament) | |
+| 127 | Videl's dialogue portrait (Buu's Fury's short-haired Videl, module 0x086F393C id 153, on LoG2's frame; stock 43 Chi-Chi without `roms/buu.gba`); the tournament's other new fighters use stock portraits: King Cold 70, Roshi 80, Chi-Chi 43, Chiaotzu 42 (`tourney_data.c`) | Makefile `VIDEL_PORTRAIT`, `tools/tnysprites.py` `tny_videl_portrait`, `--extra-portrait` |
+| 128-139 | art-new's allocation, unused | |
+| 140+ | tournament allocations (art-buu 140-189, ui 190-199) | `krillinsprites.py` asserts ids are unique |
 
 Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule, 73 Krillin
 (more in `docs/scripts.md` 2.2).
