@@ -48,7 +48,7 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **No mirror matches** (Ryan, 2026-10-25): your own party never appears as opponents. The pool is other people.
 - **Rookie is the first tournament and must be exciting** (Ryan, 2026-10-25): the early pool is widened with
   fighters we build from existing bodies: **King Cold** (Ryan: "we will have to create him"), **Master Roshi** with a
-  strong Kamehameha, and (proposed) Chi-Chi, Videl and Chiaotzu; plus Mercenary Tao, Spopovich and Yamu as
+  strong Kamehameha, **Chi-Chi, Videl and Chiaotzu** (Ryan, 2026-10-25: build all three); plus Mercenary Tao, Spopovich and Yamu as
   canon tournament regulars from the start (section 4a).
 - **The unlock board** (Ryan, 2026-10-25): a notice board outside the arena lists every unlockable tournament
   fighter as a greyed silhouette, no name; pick one and it shows exactly what to do ("Win the Rookie
@@ -114,9 +114,9 @@ specials in C (the Super 13 kind).
 | **King Cold** | to build: Cooler's 64 x 64 fight set (34) recoloured and re-headed (the Paragus method), Cold's armour and cape; 74 keeps the cutscenes | O, **B** (villain) | start (Ryan: in the Rookie bracket) | melee giant with reach, Death Beam, a throw | moderate-big (a recolour + head; new frames only if the body reads wrong) |
 | Mercenary Tao | 50, stat 44 (AI 129) | O, **B** | start (a 23rd Budokai finalist) | Dodon Ray (thin beam), Crane rush, the hidden blade (a one-off heavy hit); the ROM's own AI | moderate (4 groups) |
 | **Master Roshi** | to build: a stock human fight set (Krillin's 76 or Hercule's 72) re-headed with Roshi's head (bald, beard, sunglasses, 75 for the face), orange shirt | O, **B** | start | **MAX Power** (bulks up at 50 %: +attack, slower), a slow heavy Kamehameha, Thunder Shock Surprise (a short stun), Drunken Fist (a rush) | moderate-big |
-| Chi-Chi (proposed) | to build: Android 18's fight set (11) re-headed, Chi-Chi's dress; Buu's 55 for the face | O, **B** | start | a frying-pan heavy hit (stun), a fast combo, no ki | moderate-big |
-| Videl (proposed) | to build: Android 18's set (11) re-headed; Buu's 56 for the face | O, **B** | start (a 25th Budokai fighter) | fast combo, Hawk Arrow (a rush), flight dodge | moderate-big |
-| Chiaotzu (proposed) | 102 (tiny NPC) + drawn poses | O, **B** | start | Dodon Ray, **psychic hold** (a stun), self-destruct at 10 % (a nova that costs him the match) | big (tiny body, poses from scratch) |
+| Chi-Chi | to build: Android 18's fight set (11) re-headed, Chi-Chi's dress; Buu's 55 for the face | O, **B** | start | a frying-pan heavy hit (stun), a fast combo, no ki | moderate-big |
+| Videl | to build: Android 18's set (11) re-headed; Buu's 56 for the face | O, **B** | start (a 25th Budokai fighter) | fast combo, Hawk Arrow (a rush), flight dodge | moderate-big |
+| Chiaotzu | 102 (tiny NPC) + drawn poses | O, **B** | start | Dodon Ray, **psychic hold** (a stun), self-destruct at 10 % (a nova that costs him the match) | big (tiny body, poses from scratch) |
 | Spopovich | Buu r.242 (bald giant in black trunks, partial set) | O, **B** | start (he fought Hercule in the 24th; pre-Majin here) | brawler, toughness (poise), a bear hug (grab) | cheap |
 | Yamu | Buu r.293 (lean, purple belt, partial set) | O, **B** | start (his 25th Budokai partner) | brawler, **energy steal** (drains EP) | cheap |
 | Piccolo | 103 | P | West City (flag 26 / 362) | Special Beam Cannon, Scatter Shot, cape off = Transformation at 50 % | cheap |
@@ -189,7 +189,7 @@ the Rookie Rumble (2 rounds of 3 and a headliner) 7 distinct fighters, later Rum
 
 | tier | opens | opponents in the pool (count) | playable now | unlock by beating | hidden challengers |
 |---|---|---|---|---|---|
-| Rookie | the first flight | Yamcha, Tien, Frieza, Mecha Frieza, King Cold, Hercule, Master Roshi, Mercenary Tao, Spopovich, Yamu, (+ Chi-Chi, Videl, Chiaotzu if built) = **10-13** | Gohan, Krillin | all ten but Hercule | Pui Pui (1v1), Goten & Kid Trunks (2v2), Yakon (Rumble) |
+| Rookie | the first flight | Yamcha, Tien, Frieza, Mecha Frieza, King Cold, Hercule, Master Roshi, Mercenary Tao, Spopovich, Yamu, Chi-Chi, Videl, Chiaotzu = **13** | Gohan, Krillin | all but Hercule (twelve) | Pui Pui (1v1), Goten & Kid Trunks (2v2), Yakon (Rumble) |
 | Adept | the 19 + 13 fight won | + Android 19, Dr. Gero, Android 13; after the road + 17, 18 = **15-18** (Full 16 opens after the road) | + Piccolo, Hercule (West City), Vegeta (chapter 3) | 13, 17, 18 | Pikkon (1v1), Dabura (2v2), Evil Buu (Rumble) |
 | Z-Fighter | Gingertown done | + Imperfect Cell; after the island + Android 16 = **17-20** | + Trunks (chapter 5) | none new | Kibito (1v1), Fat Buu & Hercule (2v2), Super Janemba (Rumble) |
 | Champion | flag 191 (the wait) | + Semi-Perfect, Perfect Cell, Cell Jr; Cooler, the Namekian (Cooler beaten); Broly, Paragus (flag 402) = **24-27** | + Goku, Android 16 (flag 421) | Perfect Cell, Cooler, Broly | Kid Buu (1v1), Gotenks (2v2), Uub (Rumble, as Hercule) |
