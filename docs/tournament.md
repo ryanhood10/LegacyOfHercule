@@ -1,8 +1,8 @@
 # Tournament mode: design in progress (Ryan, 2026-10-24)
 
-Status: **being planned in chat, nothing built.** Ryan wants the plan settled before any code ("no stone left
-unturned on triggers and characters"). This page records what is decided, what is proposed, and the engine
-facts the plan rests on. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
+Status: **plan done (Ryan, 2026-10-25), nothing built yet.** Every decision below is Ryan's unless marked "our
+call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
+EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
 for LoG2, `buu_fighters.png` and `buu_part*.png` for Buu's Fury: idle and attack frame of every record with an
 attack set), and the world-map photos (`build/wm/mosaic_half.png`).
@@ -88,8 +88,23 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   line. Fights pay **a small EXP trickle** (about a tenth of a story boss of that tier; tuned so a full run
   nudges a level, never jumps one). LoG2 has no money.
 
-## 2. Proposed, not yet decided
+## 2. Our calls when the plan closed (2026-10-25)
 
+- **Kits:** sections 4a / 4b as written are the move plan for every fighter; tuned in play like the dojo.
+- **Venue:** everything plays at Papaya Island. The Other World Stadium (Buu 1/20) stays rendered as a possible
+  later venue (a Legend variant), not part of this build.
+- **Select screen tabs:** Z Fighters (the party), Tournament (Roshi, Chi-Chi, Videl, Chiaotzu, Yamcha, Tien,
+  Tao, Spopovich, Yamu, Hercule), Villains (Frieza to Super 13), Buu Saga (the Legend imports).
+- **Co-op 1v1 flow:** the two players' matches alternate round by round, the other watches from the ring's
+  edge in solo mode; the final between them is a duel.
+- **Stats:** opponents have fixed numbers per tier (the difficulty setting still multiplies them); a
+  tournament-only playable derives his numbers from the lead's level with per-fighter multipliers (the
+  Android 16 recipe), so your LoG2 strength carries over and a villain feels like himself.
+- **The director:** one list box (1v1 / 2v2 / Royal Rumble; 2v2 hidden in 1P), then Quick / Full for 1v1, then
+  the select screen. No house rules beyond that.
+- **The announcer** (Buu record 207) is imported and calls every match; the crowd is LoG2's townspeople.
+- **Pop-up wording:** "New tournament fighter!" / "New tournament tier: Champion!" / "New division: Full
+  bracket!", one line each, the journal pop-up's style.
 
 ## 3. Tiers and their story triggers
 

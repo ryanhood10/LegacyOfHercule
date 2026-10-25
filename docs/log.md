@@ -2,6 +2,14 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-10-25
+
+- **Tournament plan closed** (Ryan): no mirror matches; Rookie's pool of 13 (King Cold, Master Roshi, Chi-Chi,
+  Videl, Chiaotzu to build; Tao, Spopovich, Yamu as regulars); the unlock board (silhouettes with conditions);
+  a global unlock record; Quick (8) / Full (16) at the director; no ring-outs; full heal every round; capsules,
+  Senzu and a small EXP trickle; the Rumble's rounds and headliners per tier; the hidden challengers re-dealt.
+  `docs/tournament.md` is the plan; nothing built yet.
+
 ## 2026-10-24
 
 - **Buu's Fury's map table read (branch `buu-maps`):** its MapEntry table (0x0808E2E0, 452 rows, LoG2's layout) and
