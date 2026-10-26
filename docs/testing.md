@@ -935,6 +935,11 @@ python tools/headless/tny_film.py ... --opp 195 --name spo          # an opponen
   labelled with his pose group and frame (`E+0x4C` against the record, `E+0x14`).
 - Result (2026-10-25, rows 29-66): no head off its body; Chi-Chi's head over her shoulders with its face whole in all
   four facings. Spopovich (`--opp 195`): the lean-forward charge firing his ki, the grab, the walk's full cycle.
+- The regression scripts on this branch (2026-10-25): `tny_play` (every ability changes EP, 76 blocks), `tny_artnew`
+  (set-21 poses 0, 1, 2, 5-8 seen; entrec 1 then 0), `tny_artbuu`, `tny_engine`, `tny_polish` (every stepz reached; the
+  loser's group 12 for 16, Super 13's 23; no CRASH). `tny_artbuu`'s hit test is history-dependent: in the full run
+  Goku (216) took no punch; run from fighter 214 on, Uub (215) takes none and 216 does, on main's build exactly the
+  same (the AI walks him 28 px off between the test's repositioning pokes), so it is not this branch's.
 - `tools/headcheck.py` on 185-189 / 235-244 flags only Chiaotzu's halo (group 17, a ring above the head by design) and
   one swing arc over Roshi's back-view kick.
 
