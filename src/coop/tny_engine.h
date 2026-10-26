@@ -43,6 +43,7 @@ int tny_resolve_stat(int stat_index, EnemyStat *out);
 const BossRule *tny_boss_rule(int stat_index);
 
 int  tny_ring_active(void);                                     // a tournament runs and the players are in the ring
+int  tny_fight_on(void);                                        // ... and a fight runs (no walk-in, line or end pose)
 int  tny_ko_check(int k, s32 dmg);                              // duel.c / player.c: player k (0 / 1) takes a
                                                                 // lethal hit in a tournament fight: 1 = he stays
                                                                 // at 1 HP and is out (the caller trims the hit)

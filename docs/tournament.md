@@ -1054,9 +1054,8 @@ read as it was before the tournament (a carrier's backup); the fighter's percent
 tournament copy uses the same lead. Measured (co-op, Map Test party): Yamu 1216 HP (Goku's), 178 ki (110 % of
 Krillin's 162), STR 105 % of Hercule's; Spopovich 1702 HP (140 %), no longer built on Yamu.
 
-**Seen, not fixed:** in a co-op 1 v 1 with Yamu as player 1, his body draws as scrambled tiles at the fight's start
-(the same on `main`; alone, or Spopovich in his place, it draws right). Spopovich's and Yamu's bodies look alike
-(both bald and big); the art pieces should check Yamu's import (`TS_YAMU` 196, Buu r.293).
+**Seen, not fixed (fixed in section 23):** in a co-op 1 v 1 with Yamu as player 1, his body draws as scrambled tiles at
+the fight's start. Spopovich's and Yamu's bodies look alike (both bald and big; section 22).
 
 
 ## 22. Sprite leftovers (polish2-art, 2026-10-25, branch `tny-polish2-art`)
@@ -1074,3 +1073,78 @@ Art only (generators and `data/tny_buu.txt`; no engine code). Details and eviden
 - **Victory pose:** Fat Buu, Kid Buu and the three Super Buus no longer cheer under the steam cloud of their shout.
 - **Yamu:** the import was the right record (293; Buu's Fury has no other Yamu: every record checked); he keeps his
   map and gets a painted black hair tuft, so he no longer reads as a second Spopovich.
+
+## 23. Polish pass 2: the tournament as scenes (2026-10-25, branch `tny-polish2`)
+
+Ryan: "add a pass to polish and clean all our animations, transitions, and cutscenes". Every flow was filmed frame
+by frame (`tools/headless/tny_flow.py`, `docs/testing.md` "Tournament flow films": 1 v 1, Rumble, 2 v 2, co-op 1 v 1
+with the duel final), judged by eye, fixed, filmed again. Code: `src/coop/tny_engine.c` (the curtain, the steps),
+`tny_ui.c` (`ui_run` honours the curtain), `tny_ui_bracket.c`, `tny_hpbars.c`, `tools/buu2log2.py`.
+
+**The curtain.** Every change of the ring's scene now happens behind black: the stock fades the ui's screens use
+(0x0802462C fades the map's palettes to black, 0x08024334 fades them back in, 16 frames each, modal) close and open it;
+while closed, the engine writes the blend darkening (`BLDCNT` 0x00FF, `BLDY` 16) every frame, because a map load or a
+screen brings the palettes back; opening first blackens the palettes under the darkening, clears it, then fades in.
+`tny_curtain()` (tourney.h) tells the ui: a screen opened behind it neither fades the map out nor back in. The flow:
+- *The director:* the waiting room fades out once; the tier / division / size lists and the select screens follow each
+  other through black; the warp into the ring happens in the dark (B anywhere: the waiting room fades back in).
+  Before: a frame of the waiting room's tiles scrambled by the map load, and a hard cut to the ring.
+- *Before a fight:* the bracket (or the Rumble board) opens from black and closes to black; the players are placed on
+  their side, the opponents spawned off the right edge, the announcer put in view, 8 dark frames (new bodies decode, the
+  camera settles), then the fade in, the walk-in, the call. Before: the bracket faded back into the old ring (the
+  announcer of the last line still standing, the player alone), then the opponent popped in and the player snapped
+  40 px to his mark.
+- *After a fight:* the boss bars slide up and away when the fight is decided (before: an empty bar sat over the end's
+  poses and vanished after it); the loser keeps lying and the winner posing through the announcer's line and the
+  pop-ups ("New tournament fighter!"), then the curtain closes on them and they leave in the dark. Before: the
+  fallen body and the bar popped off the ring with the line, the announcer stayed for the pop-ups. A cleared Rumble
+  round keeps its fallen too (unless the announcer needs their OBJ VRAM).
+- *The Rumble:* the pack walks in from the right after the announcer leaves (before: popped in on their marks); a
+  fallen fighter blinks out over his last 24 frames before his body leaves at 60 (an all-transparent remap at entity
+  +0x24 every 4 frames, the field the duel's shadow uses; before: he vanished).
+- *The co-op 1 v 1:* a turn change's ring reload happens in the dark (before: a hard cut between two bodies, then 90
+  frames of the new one standing alone); the duel final stages player 1 left and player 2 right facing each other,
+  opens the curtain, calls it, and only then starts the duel (before: both stood one above the other and the duel was
+  live during the call).
+- *The trophy:* behind the curtain the winner(s) stand in the middle of the ring facing the crowd (a co-op 1 v 1 winner
+  alone, through a reload when he is player 2), then the curtain opens on the pose and the line. *The challenger:* the
+  curtain closes after "a challenger appears", opens on the players at their mark and the challenger walking in.
+- *The way out:* the curtain closes on the last line, the entries are restored and the warp happens in the dark; the
+  waiting room fades in (before: a hard cut, and a body change visible in the ring).
+
+**Smaller fixes:**
+- *The announcer in view:* he stands where the camera shows him whole (`ann_fit`: 60 px below the view's top, between
+  the ring's top edge and 20 px above the players' row); in a co-op floor or the duel only his feet showed.
+- *Input:* A is masked too while no fight runs and no line shows, so a player no longer punches through the 90 frames
+  after the knock-out or at a posed body (A still closes every line: it is free while a scene runs).
+- *Overhead HP bars* (section 19) only while a fight runs (`tny_fight_on()`): they showed over a walking-in opponent and
+  over the 1 v 1 opponent for the frames before his boss bar bound.
+- *The bracket screen* no longer blanks for a frame when it draws the next match's boxes on the page it shows (it
+  cleared and redrew the whole bitmap; now it draws the boxes, lines and names in place; a Full bracket's page turn
+  still rebuilds).
+- *Yamu scrambled (section 21's "seen, not fixed"):* his side-facing idle (group 0 facings 2 / 3, and group 17) was a
+  single Buu's Fury part copied with its own OAM attributes, 4bpp, while every converted blob is 8bpp; the body drew as
+  4bpp garbage wherever he stood facing sideways (co-op or not; it showed at the fight's start). `buu2log2.py` sets the
+  8bpp bit on every converted frame; a scan of sprites 150-249 finds no 4bpp descriptor left (Kid Buu's victory pose,
+  group 4, had the same fault).
+
+*Found on the way:* the end's poses (rewritten every frame) must let the players go before the fight's EXP: a level-up
+plays the player's own animation and waits for it to end, so a held pose hung the game in a co-op Rumble's challenge
+(`tny_engine.txt`); the players' poses end there (the fallen keep lying), the rest at the curtain.
+
+**The dialogue seat** (Ryan approved planning pre-fight dialogue; written separately). `int tny_talk_hook(const
+TTalkSeat *seat)` (tourney.h, weak default in `tourney_hooks.c` returning 0 = nothing shown) is called twice per
+fight with the scene staged and lit, from `tny_engine.c`:
+- `TALK_BEFORE`: `step_intro` right after the walk-in and before the announcer's call ("Round 1: ... Begin!"); the
+  duel final's `step_duel` after the curtain opens, before the call.
+- `TALK_AFTER`: `step_match_end` after the end poses and the announcer's result line, before the results (unlocks,
+  EXP) and before the curtain closes; the duel final after its winner line.
+It receives `when`, the division and tier, `kind` (`TALK_MATCH` a bracket match, `TALK_RUMBLE` a Rumble round: the
+announcer only, `TALK_CHALLENGE` the hidden fight, `TALK_FINAL` the co-op final), the players' fighters on the floor
+(`mine`, TF ids, 1 or 2), the other side (`opp`, up to 6; the final: player 2's pick), the round (bracket or Rumble,
+0-based) with `last` for the final / the headliner round, and after the fight the `result` (1 won, 2 lost; the final:
+the winning player). A hook that starts a dialogue sequence returns 1: the engine's next step waits until no scene
+runs, so the call (or the results) follow the dialogue. The poses hold through an after-line. No RAM is taken.
+
+**RAM:** `.tny.eng` keeps its size: one byte of its padding is the curtain (`dark`).
+

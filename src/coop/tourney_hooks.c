@@ -13,6 +13,8 @@ WEAK int  tny_in_pool(int id) { (void)id; return 0; }
 WEAK int  tny_unlocked(int id) { (void)id; return 0; }
 WEAK int  tny_challenge_tried(int id) { (void)id; return 0; }
 WEAK void tny_notify(const char *line) { (void)line; }
+WEAK int  tny_curtain(void) { return 0; }
+WEAK int  tny_talk_hook(const TTalkSeat *seat) { (void)seat; return 0; }   // the dialogue seat: nothing shown
 
 WEAK int  tny_ui_call(int fn, s32 a, s32 b, s32 c, s32 *push) { (void)fn; (void)a; (void)b; (void)c; (void)push; return 0; }
 WEAK void tny_ui_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }

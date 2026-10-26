@@ -373,7 +373,9 @@ class Converter:
                     px = touch(px, view)
                 self.blob_cache[key] = self.encode(px, w, h, w, h, remap)
             ow, oh, blob, raw = self.blob_cache[key]
-            return (x, y, ow, oh, attr, blob, raw)
+            # our blobs are always 8bpp (encode): the part's own attr may be a 4bpp one (Yamu's 32 x 64 side idle,
+            # Buu r.293, drew as scrambled tiles: polish2)
+            return (x, y, ow, oh, attr | 0x2000, blob, raw)
         key = (tuple(p[5] for p in parts), tuple(p[0:4] for p in parts), bu_rec, view)
         if key not in self.blob_cache:
             (xo, yo, w, h), px = self.bu.frame_pixels(d)                 # composite, flips applied
@@ -385,7 +387,7 @@ class Converter:
                 px = touch(px, view)
             ow, oh = obj_size(w, h)
             shape, size = OBJ_SHAPES[(ow, oh)]
-            attr = (parts[0][4] & 0x0FFF0FFF & ~0xC000) | (shape << 14) | (size << 30)
+            attr = (parts[0][4] & 0x0FFF0FFF & ~0xC000) | (shape << 14) | (size << 30) | 0x2000   # 8bpp (encode)
             self.blob_cache[key] = (xo, yo, attr) + self.encode(px, w, h, ow, oh, remap)
         xo, yo, attr, ow, oh, blob, raw = self.blob_cache[key]
         return (xo, yo, ow, oh, attr, blob, raw)

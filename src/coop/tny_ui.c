@@ -566,13 +566,17 @@ int ui_run(void (*on_open)(Ui *), void (*on_step)(Ui *), void (*on_close)(Ui *),
     u->ctx = ctx;
     u->pads = (u8)pads;
     u->qmark_tile = 0xFFFF;
-    run_fade(UI_FADE_OUT_VT, 0x100, 0x10);
+    // behind the engine's curtain (tny_curtain: the screen is black already) the screen neither fades the map out
+    // first nor back in after: the engine stages the next scene in the dark and fades it in itself
+    int dark = tny_curtain();
+    if (!dark) run_fade(UI_FADE_OUT_VT, 0x100, 0x10);
     UiModal_Run(u);
     ui_st.ready = 0;
     Arena_Free(u);
     UiMap_Refresh(UI_WORLD, 1);
     coop.hud2.hp_px = 0xFF;           // player 2's panel tiles were drawn over: compose it again
-    run_fade(UI_FADE_IN_VT, 0, 0x10);
+    if (dark) { REG_BLDCNT = 0x00FF; REG_BLDY = 16; }   // stays black
+    else run_fade(UI_FADE_IN_VT, 0, 0x10);
     g_InputSystem->pressed = 0;       // the button that closed the screen does nothing on the map
     coop.input2.pressed = 0;
     ui_st.vram_after = (u16)UiObjVram_Largest(g_EntityList);

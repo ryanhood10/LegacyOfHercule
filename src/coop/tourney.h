@@ -162,6 +162,29 @@ int  tny_in_pool(int id);                                        // in this save
 int  tny_unlocked(int id);                                       // pickable (story / beaten / challenger won)
 int  tny_challenge_tried(int id);                                // the record notes an attempt
 void tny_notify(const char *line);                               // queue a pop-up for the next safe frame
+// The curtain (tny_engine.c, docs/tournament.md 23): 1 while the engine holds the screen black to change the ring's
+// scene. A ui screen opened then starts from black (no fade-out of the map) and ends black (no fade-in): the
+// engine stages the next scene behind it and fades it in itself.
+int  tny_curtain(void);
+// The fighters' dialogue seat (docs/tournament.md 23): called with the scene staged and lit, once after the walk-in
+// (before the announcer's call: TALK_BEFORE) and once after the end pose and the announcer's result line
+// (TALK_AFTER). Returns 1 when it started a scene of its own (a dialogue sequence: the engine waits until no scene
+// runs before going on), 0 when it showed nothing (the weak default). Nothing is written for it yet.
+enum { TALK_BEFORE, TALK_AFTER };
+enum { TALK_MATCH, TALK_RUMBLE, TALK_CHALLENGE, TALK_FINAL };       // TTalkSeat.kind (TALK_FINAL: the co-op duel)
+typedef struct TTalkSeat {
+    u8 when;            // TALK_BEFORE / TALK_AFTER
+    u8 division, tier;  // DIV_*, TIER_*
+    u8 kind;            // TALK_MATCH a bracket match, TALK_RUMBLE a Rumble round, TALK_CHALLENGE the hidden fight,
+                        // TALK_FINAL the co-op 1 v 1 final (player 1 against player 2)
+    u8 mine[2], nmine;  // the players' fighters on the floor (TF_*: their picks)
+    u8 opp[6], nopp;    // the other side (TF_*); TALK_FINAL: player 2's pick
+    u8 round;           // the bracket round (0-based; the final is rounds - 1) or the Rumble round (0-based)
+    u8 last;            // 1: the final / the headliner round
+    u8 result;          // TALK_AFTER: 1 the players won, 2 they lost (TALK_FINAL: the winner, player 1 / 2)
+    u8 _p;
+} TTalkSeat;
+int  tny_talk_hook(const TTalkSeat *seat);
 // The bracket the engine runs and the ui draws. seat[] holds fighter ids (TF_*), 0xFF = empty; a player sits in
 // a seat with his pick's id and p1_seat / p2_seat say which (0xFF = none). winner[r][m] is the winning seat of
 // match m in round r (0xFF = not played yet). Quick: size 8, 3 rounds; Full: size 16, 4 rounds.
