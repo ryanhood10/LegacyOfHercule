@@ -347,11 +347,17 @@ int tny_in_pool(int id) {
     return 1;
 }
 
-// The pool of a tier: everyone in the pool whose own tier is at or below it
+// A fighter a player picked for this tournament: never also drawn as an opponent (Ryan, 2026-10-25: he picked Yamcha and
+// met Yamcha in the first round)
+static int picked(int id) {
+    for (int k = 0; k < eng.players && k < 2; k++) if (eng.pick[k] == id) return 1;
+    return 0;
+}
+// The pool of a tier: everyone in the pool whose own tier is at or below it, but the players' picks
 static int pool_of(int tier, u8 *out) {
     int n = 0;
     for (int id = 0; id < TF_GOHAN; id++)
-        if (tny_fighters[id].tier <= tier && tny_in_pool(id)) { if (out) out[n] = (u8)id; n++; }
+        if (tny_fighters[id].tier <= tier && tny_in_pool(id) && !picked(id)) { if (out) out[n] = (u8)id; n++; }
     return n;
 }
 
@@ -1286,7 +1292,7 @@ static void rumble_round(void) {
         if (eng.force_opp != NO) { ids[n++] = eng.force_opp; use(eng.force_opp); }   // test command 21
         for (int i = 0; n == 0 && i < 2; i++) {
             int id = headliners[eng.tier][i];
-            if (id != NO && tny_in_pool(id) && !used(id)) { ids[n++] = (u8)id; use(id); }
+            if (id != NO && tny_in_pool(id) && !picked(id) && !used(id)) { ids[n++] = (u8)id; use(id); }
         }
         if (!n) {                                   // his art or his story flag is missing: the strongest left
             u8 pool[TF_GOHAN];
@@ -1389,6 +1395,7 @@ static void begin_tournament(void) {
 static void step_director(void) {
     int players = (coop.p2 || p2_present()) && !companion_active() ? 2 : 1;
     eng.players = (u8)players;
+    eng.pick[0] = eng.pick[1] = NO;                 // last tournament's picks: not out of the pool counts below
     if (!eng.preset) {
         // the tier (when more than one is open), the division, Quick / Full
         const char *lines[TIER_COUNT];

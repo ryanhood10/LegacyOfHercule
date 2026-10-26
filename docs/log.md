@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **No mirror matches with a tournament pick (Ryan: picked Yamcha, met Yamcha in round one):** the engine's pool
+  (`pool_of`) and the Rumble's headliner skip the players' picks; last tournament's picks are cleared first
+  (`tools/headless/tny_nomirror.txt`: three seeds, Yamcha only in player 1's seat).
 - **Second pass on Ryan's playtest:** a fighter knocked out mid-fight now lies in the same pose as at the line
   (`tny_lie_pose()` in tny_engine.c, used by tny_moves.c `fallen()`: the lying table first; before, bodies without a
   lying group 12 stood in their old group-12 / knock-down frame, "the flying animation", once the line ended). Krillin's

@@ -1,0 +1,58 @@
+# A player's tournament pick is never also an opponent (Ryan, 2026-10-25: he picked Yamcha and met Yamcha in round one).
+# Three seeds of a Rookie 1 v 1 as Yamcha (TF 0): the bracket's seats (eng +0x6C: size, rounds, round, match, seat[16])
+# hold 00 only at p1_seat (+0x6C + 0x34); a Rookie Rumble as King Cold (TF 4): the headliner round is not King Cold
+# (by code: the strongest left instead; not filmed). Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_nomirror.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 4
+poke32 0x0203FD08 23
+frames 10
+save nm_setup.ss
+echo == 1. seed 1, Yamcha: seats (no 00 but p1's), p1_seat
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFF00
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 20
+peek8 0x0203ECA0 2
+shot nm1
+echo == 2. seed 7
+load nm_setup.ss
+frames 2
+poke32 0x0203FD0C 7
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFF00
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 20
+peek8 0x0203ECA0 2
+echo == 3. seed 23
+load nm_setup.ss
+frames 2
+poke32 0x0203FD0C 23
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0xFF00
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 20
+peek8 0x0203ECA0 2
