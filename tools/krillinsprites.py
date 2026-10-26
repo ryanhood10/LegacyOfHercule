@@ -343,10 +343,17 @@ def main():
                     if blob not in done:
                         _, _, px = sp.frame_pixels(arr, fi)
                         flip = bool(attr & HFLIP)
-                        work = hflip(px) if flip else px
+                        work = hflip(px) if flip else px          # the frame as drawn
+                        # right-facing frames are swapped as their left-facing mirror with the left head, then
+                        # mirrored back (2026-10-25: Goku's dash has right frames drawn natively, not as flipped left
+                        # ones; the left head pasted on those faced the wrong way and sat off the body)
+                        if d == 3:
+                            work = hflip(work)
                         face = 2 if d == 3 else d
                         new, ok = swap_head(work, w, h, heads[face], chins[face])
                         stats["swapped" if ok else "kept"] += 1
+                        if d == 3:
+                            new = hflip(new)
                         if flip:
                             new = hflip(new)
                         done[blob] = new
