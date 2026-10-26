@@ -3,7 +3,8 @@
 Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13), polished (14), then Ryan's playtest rounds: 15
 the scenes, 16 the grounds' people, 17 the easter eggs, 18 the plaza's flight spot, 19 the overhead HP bars, 20 the
 art fixes, 21 the fight fixes, 22 the sprite leftovers, 23 the second polish pass (the curtain, the talk seat); the
-fighters' dialogue in `docs/tournament-dialogue.md` (approved and built); 24 what is still open.** Every decision below is Ryan's unless marked "our
+fighters' dialogue in `docs/tournament-dialogue.md` (approved and built); 24 what is still open and the plan to fix
+it (the next session starts there).** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -1150,26 +1151,110 @@ runs, so the call (or the results) follow the dialogue. The poses hold through a
 
 **RAM:** `.tny.eng` keeps its size: one byte of its padding is the curtain (`dark`).
 
-## 24. Open points (2026-10-25, after the dialogue merged)
+## 24. Open points and the plan to fix them (2026-10-25; next session starts here)
 
-Known, not done (each one waits for Ryan's word; none is a regression):
-- **The Rumble announcer's calls during a round** (`docs/tournament-dialogue.md` 8: a fighter down, a flurry, a
-  partner down, Super Buu's form change): the game's dialogue box stops the fight while it shows, so these need a way
-  to show a line without pausing (a caption like the map-name banner). The round, headliner, cleared and result calls
-  are in.
-- **Dialogue portraits** for Android 13, Cell Jr., the Namekian Warrior and Evil Buu: their lines show the name only
-  (a dialogue box takes a real portrait, not a face drawn from the sprite).
-- **Yakon's lying pose** still reads oddly (Buu's Fury draws him from the front only; section 22).
-- **The announcer** vanishes as a fight starts and reappears at its end (no walk off / on).
-- **A co-op turn change** in the 1 v 1 holds about 1.6 s of black (the 90-frame wait after a ring reload, left as it was).
-- **Papaya Island has no world-map landmark** (the 3D town seen while flying): it needs the landmark table behind the
-  on-load's FindCharacterEntity 2-12 decoded (section 18; offered, not asked for).
-- **Walking speed** is the same for every tournament playable (they share Gohan's class): Spopovich is slow and Yamu
-  quick only through their numbers and Yamu's dash.
-- **Section 10 of the dialogue plan** stands at its defaults: the winner's line only, 2 v 2 opponent teams drawn at
-  random (a known team meets you only by chance), Start skips.
-- **Real-time play:** the second polish pass and the dialogue are tested headless and filmed; Ryan's play is the first
-  real-time run.
-- **Worktrees:** the merged branches' worktrees (`log2-artfix`, `log2-fightfix`, `log2-polish2`, `log2-polish2-art`
-  and the build team's) stay on disk with their evidence films under `build/`; `git worktree remove <dir>` when no
-  longer needed (their branches are merged into main).
+Ryan is play-testing this build and will come back with notes (late October / early November). **Next session: read
+his notes first, fix what he found, then work down this list in order** (each item: what is wrong, how to fix it, how
+to test it, a rough size). Nothing below is a regression; all of it is tested headless except where it says so.
+Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, run it before handing Ryan a build.
+
+### 24.1 The Rumble announcer's calls during a round (dialogue plan section 8)
+
+- **Wrong:** "[Name] is down!", "Two fighters down!", "[Name] is down! Can the partner hold on?" and Super Buu's form
+  change aren't called. The game's dialogue box (`say_go`, a dialogue sequence) stops the fight while it shows.
+- **Fix:** a **caption** that doesn't pause: one line of text drawn into OBJ tiles at the bottom of the screen for about
+  90 frames, then gone.
+  - The font is already in hand: `tny_ui.c` renders text with the dialogue font through the stock canvas
+    (`ui_text_width`, CV_W 240 x CV_H 16).
+  - Copy those pixels into a 240 x 16 OBJ strip, drawn from the HUD hook like the HP bars (`tny_hpbars.c`: tiles
+    allocated while shown, freed when gone).
+  - New file `src/coop/tny_caption.c`: `tny_caption(const char *line)` queues up to 3 lines, each shown in turn, never
+    over a scene. RAM about 0x10 in `.tny`; budget is about 0x50 left of 0x400.
+- **Triggers:**
+  - **A fighter falls:** `tny_moves.c` `fallen()` first frame -> a weak `tny_on_fall(id)` -> the engine picks
+    "[Name] is down!" / "hits the floor!" / "That's it for [Name]!" / "Down goes [Name]!" (frame-counter pick, never
+    `rnd()`: it shifts the seeded draws the tests rely on).
+  - **Two falls within 60 frames:** "What a flurry!  Two fighters down!" instead.
+  - **A player goes down in a co-op Rumble:** `revive.c` `revive_hit` while `tny_ring_active()` -> "[Name] is down!
+    Can the partner hold on?".
+  - **Super Buu changes form:** the MK_TRANSFORM move firing on his kit (`tny_moves.c`) -> "He's changing!  Look at
+    that power!" / "Not again!  Another form!".
+- **Test:** `tny_fightfix.txt` part C already finishes a Rumble by real hits; a new `tny_caption.txt` films it
+  (captions show, the fight never pauses: player x keeps changing under a caption). Size: half a day.
+
+### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu
+
+- **Wrong:** their lines show the name with no face (roster portrait 0).
+- **Fix:** four new portraits, ids **169-172** (art-buu's unused range 169-189; record them in `docs/ids.md`).
+  - Evil Buu: look for his own portrait in Buu's Fury first (art-buu's portrait import, `tools/buu2log2.py` /
+    `tny_portraits_data`).
+  - The other three: a 64 x 64 portrait made from the sprite's face (the idle facing-down frame's head, cropped 32 x 32,
+    scaled x2, on the stock portrait background), the way `tools/oldherculeportrait.py` builds one.
+  - Set the roster's portrait field in `src/coop/tourney_data.c`.
+- **Test:** `tny_talk.txt` with each of the four opening (test command 31); the select screen still crops its own faces.
+  Size: a few hours.
+
+### 24.3 Yakon's lying pose
+
+- **Wrong:** it reads like a crab seen from above (Buu's Fury draws him from the front only; `tools/lying.py` turns a
+  front recoil frame).
+- **Fix:** try two candidates on `tools/tnysheet.py --lying` and keep the better:
+  - (a) A face-down sprawl: the front frame squashed to about 45 % height, the arms spread, a long shadow; LoG2's camera
+    looks down at an angle, so a body flat on the floor is short and wide.
+  - (b) A hand-painted 32 x 32 lying frame stored as a small pixel table in `tools/lying.py`.
+- **Test:** the lying sheet plus `tny_polish.txt`'s end poses. Size: an hour or two.
+
+### 24.4 The announcer walks off and on
+
+- **Wrong:** he vanishes as a fight starts and appears at its end.
+- **Fix:** in `tny_engine.c`, after "Begin!", queue a walk command (`Cmd_Walk`, as `walk_in` does) from his mark to the
+  ring's edge (40 px past the stands' side), then remove him when he arrives. The fight runs meanwhile; he's an
+  actor, not a target.
+  - At the end, place him at the edge in the dark (the curtain) and walk him to his mark before the result line.
+  - The trophy keeps its own placement (section 23).
+- **Test:** `tools/headless/tny_flow.py` films (`docs/testing.md` "Tournament flow films"): no pop at Begin!, he walks.
+  Size: a few hours.
+
+### 24.5 The co-op turn change's black screen (about 1.6 s)
+
+- **Wrong:** in a co-op 1 v 1, swapping who fights reloads the ring behind the curtain and holds 90 frames of black.
+- **Fix:** find the fixed 90-frame wait after the reload (`P_RESTAGE` in `tny_engine.c` and the curtain's open
+  condition, section 23). Replace it with a readiness check: the ring arrived, player 1 controllable, the bodies
+  placed, OBJ VRAM settled; then a minimum of about 20 frames.
+- **Test:** `tny_flow.py --p2 --div 0` (the turns); `tny_engine.txt`'s co-op parts and `duel_end.txt`. Size: an hour.
+
+### 24.6 Papaya Island's world-map landmark
+
+- **Wrong:** flying over the island shows no town model (other sites draw a 3D landmark).
+- **Fix:**
+  - Decompile (Ghidra headless) how a world-map site's on-load draws its landmark: the scripts call
+    FindCharacterEntity 2-12, one per site.
+  - Find the landmark table those ids index (model/sprite, position) and append an entry for Papaya (zone 15 world-map
+    site, `tny_grounds.c` / `data/maps`) reusing a fitting town model (Gingertown's or West City's), or a recoloured
+    copy.
+  - Record the table in `docs/maps.md`.
+- **Test:** headless world-map flight past the site (the arctic route test's world-map steps are the model); screenshot.
+  Size: a day (mostly the decoding). Offered to Ryan, not asked for: **ask before starting**.
+
+### 24.7 Walking speed per tournament playable
+
+- **Wrong:** every tournament playable walks at Gohan's speed (they share his behaviour class); Spopovich should be
+  slow, small fighters quick.
+- **Fix:**
+  - Decompile the walk and dash control states to find where the speed comes from (the class or the display row).
+  - Give `tools/tnyplayables.py` a speed column (about 85 % for the giants, 110 % for Goten, Kid Trunks, Chiaotzu and
+    Videl) and emit per-row class copies (or a per-row speed table read by a hook).
+- **Test:** `tny_play.txt` measuring x after 30 frames of walking per row. Size: half a day to a day.
+
+### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
+
+- A loser's line after a fight too (now only the winner speaks)?
+- 2 v 2 opponent teams: draw known teams together (17 & 18, Goten & Trunks...) when both are in the pool (now random)?
+- Start skips the talk: keep?
+
+### 24.9 Housekeeping
+
+- The merged branches' worktrees (`log2-artfix`, `log2-fightfix`, `log2-polish2`, `log2-polish2-art` and the build
+  team's) hold the evidence films under their `build/` folders. Once Ryan has played this build, remove them with
+  `git worktree remove <dir>` (their branches are merged into main).
+- Real-time play of the second polish pass and the dialogue: Ryan's session is the first.

@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Plan for the open points** (`docs/tournament.md` 24): the Rumble's non-pausing captions, four portraits, Yakon's
+  lying pose, the announcer walking off and on, the co-op turn's black, Papaya's landmark, walking speeds, Ryan's three
+  dialogue decisions. Ryan play-tests this build first; the next session starts with his notes.
 - **Docs wrap-up:** CLAUDE.md's current phase, `docs/tournament.md` status and its open points (24), the full
   regression in the repo (`tools/headless/regfull.sh`, `docs/testing.md` "Full regression"), INDEX entries for
   `tny_hpbars.c`, `regfull.sh`, `ch1_room_forest.txt`.
