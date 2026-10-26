@@ -17,6 +17,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | maps / strings | RAM |
 |---|---|---|---|---|---|---|---|---|---|---|
 | grounds | 441-445 (441, 442 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (all used); ui_strings 357-379 (357-359 used) | `.tny.gr` 0x40 (0x24 used) |
+| hpbars (main) | - | - | - | - | - | - | - | - | - | `.tny.hp` 8 |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |

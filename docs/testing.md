@@ -860,6 +860,11 @@ with the sprite index), won: the record's `extra` bit 0 (+0x38); the select's Vi
 `build/<dir>/hl/tny_polish.png`. Pass: every `stepz` / `waitnz` reached, no CRASH, the peeks as the echoes say.
 `tny_ui.txt`'s bracket shots (`u18`-`u29`) show King Cold and the other giants at half size.
 
+**Overhead HP bars** (`docs/tournament.md` 19): `tools/headless/tny_hpbars.txt` on a `DEBUG_MENU=1` build's
+`menu.ss` (`--out` the folder holding it): a Rookie Rumble (`hb_rumble*`: a small bar over each fighter), kits 0-2
+set to 60 / 40 / 15 % (`hb_hit`: green, yellow, red, shorter; one may be off screen), a 2 v 2 (`hb_2v2`: boss bars
+only) and a Champion Rumble (`hb_champ*`). Pass: every `stepz` reached, no CRASH, the shots as described.
+
 ## Reading screenshots
 
 `win_shot.ps1` captures the window at 2x. For a region, crop and upscale with PIL (`Image.open(...)

@@ -1,0 +1,70 @@
+# Overhead HP bars over the ring's kit fighters (src/coop/tny_hpbars.c): a Royal Rumble (every fighter gets one) and a
+# 2 v 2 (the opponents keep their boss bars; no overhead bar on them). Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_hpbars.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Look at the shots: hb_rumble* show small bars over the Rumble fighters, hb_hit the struck ones shorter; hb_2v2 the
+# two boss bars at the top and no small bars over those two.
+p2 off
+maptest 13
+frames 300
+echo == setup: stand-in bodies, the record wiped, seed 3
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 3
+poke32 0x0203FD08 21
+frames 10
+save hb_setup.ss
+echo == 1. Rookie Royal Rumble: a bar over each fighter
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 60
+shot hb_rumble
+frames 240
+shot hb_rumble2
+echo -- kits 0 / 1 / 2 to 60 % / 40 % / 15 %: green, yellow, red, shorter
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 0x8000003C
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x02000100
+poke32 0x0203FD54 0x80000028
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x02000200
+poke32 0x0203FD54 0x8000000F
+poke32 0x0203FD08 27
+frames 10
+shot hb_hit
+echo == 2. 2 v 2 Rookie: boss bars at the top, no small bars over the opponents
+load hb_setup.ss
+frames 2
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 120
+shot hb_2v2
+echo == 3. Champion Royal Rumble (every tier open): bars over the bigger fighters too
+load hb_setup.ss
+frames 2
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x302
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 120
+shot hb_champ
+frames 300
+shot hb_champ2

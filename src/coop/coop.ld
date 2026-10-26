@@ -75,6 +75,7 @@ SECTIONS
         KEEP(*(.tny.ui))     /* ui (<= 0x100) */
         KEEP(*(.tny.mv))     /* moves (<= 0x80) */
         KEEP(*(.tny.gr))     /* grounds (<= 0x40) */
+        KEEP(*(.tny.hp))     /* overhead HP bars (8 bytes) */
     } > tourneyram
 
     .bss (NOLOAD) : {

@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Overhead HP bars in the ring (Ryan: "should we display the hp of the other fighters during the royal
+  rumble?"):** a small bar over each Rumble fighter's head (and a 2 v 2 partner's), green / yellow / red as it drains;
+  1 v 1 keeps the big boss bar (`src/coop/tny_hpbars.c`, `docs/tournament.md` 19).
 - **Heads stay on (Ryan: Krillin's head popped off in his dash):** `krillinsprites.py` measures the chin per frame (the
   lowest face skin under Goku's hair) instead of reusing the idle frame's, so leaning and crouched frames no longer
   float the head. `tools/headcheck.py` flags detached heads; a dash film of every playable row (22-66) checked by eye.

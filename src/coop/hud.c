@@ -84,9 +84,13 @@ static void hud2_ensure_tiles(void) {
     coop.hud2.icon = 0;
 }
 
+void tny_hpbars_draw(u32 **oam);   // tny_hpbars.c
+void tny_hpbars_gone(void);
+
 void hud_draw_hook(Hud *h, u32 **oam) {
     Hud_Draw(h, oam);
     revive_draw(oam);   // revive.c: the countdown and revive bars over a downed player
+    tny_hpbars_draw(oam);   // tny_hpbars.c: small HP bars over the tournament ring's fighters
     if (!coop.p2 || companion_active()) return;   // no panel for the prologue's companion (companion.c)
     hud2_ensure_tiles();
     coop.hud2.y = h->y;
@@ -101,6 +105,7 @@ void hud_update_hook(Hud *h) {
 
 void hud_destroy_hook(Hud *h, int free_it, u32 a, u32 b) {
     revive_hud_gone();
+    tny_hpbars_gone();
     if (coop.hud2.tile) {
         ObjVram_Free(g_ObjVramList, coop.hud2.tile);
         coop.hud2.tile = 0;

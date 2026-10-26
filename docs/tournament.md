@@ -948,3 +948,14 @@ above the beach, and the flight trigger sits on it ((216, 344)-(264, 376)). The 
 beach below. (World-map landmarks, the 3D towns seen while flying, are drawn per site by the on-load's
 FindCharacterEntity 2-12; Papaya Island has none: adding one needs that landmark table decoded.)
 
+## 19. Overhead HP bars in the ring (2026-10-25)
+
+Ryan: "should we display the hp of the other fighters during the royal rumble?" `src/coop/tny_hpbars.c`, drawn from
+the HUD's draw hook next to the revive bars: while `tny_ring_active()` and no scene runs, every kit fighter standing
+in the ring (`tny_moves_base(e)`, HP > 0) that has no boss bar bound to it gets a 16 x 8 sprite 36 px above its
+origin: a black frame round a 14 x 2 fill, green, yellow under half, red under a quarter. So a Royal Rumble shows one
+over every fighter, a 2 v 2 partner of the players gets one, and 1 v 1 / the 2 v 2 opponents keep only their boss bars.
+A fighter at 0 HP loses its bar. 4bpp in palette bank 0 (the game's one OBJ palette: 1 black, 4 green, 5 red,
+8 yellow, 14 dark grey), 64 bytes a fighter, eight at most (0x200 bytes of OBJ VRAM, taken while bars show and freed
+when none do and when the HUD goes). State: `.tny.hp` (8 bytes). Test: `tools/headless/tny_hpbars.txt`.
+
