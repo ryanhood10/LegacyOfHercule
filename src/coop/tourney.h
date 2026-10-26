@@ -148,6 +148,7 @@ extern const u16 tny_tier_flag[TIER_COUNT];
 // facing arrays) when set. Ends with sprite 0.
 typedef struct { u16 sprite; s8 group, frame; const void *const *grp; } TnyLie;
 extern const TnyLie tny_lie[];
+const u32 *tny_lie_pose(const Entity *e, int *frame);   // tny_engine.c: a body's lying pose (group arrays) and frame
 int tny_fighter_ok(int id);          // his sprite record exists in this build (tourney_data.c)
 static inline int tny_tourney_index(int tier, int div) { return tier * DIV_COUNT + div; }
 

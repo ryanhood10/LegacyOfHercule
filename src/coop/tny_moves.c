@@ -1519,6 +1519,7 @@ static void fallen(TKit *k) {
         k->stun = 0;
         k->poise = 0;
         E32(e, 0x168) = 0;                          // the stock message handler's "hittable" word
+        e->facing = (e->facing == 1 || e->facing == 3) ? 3 : 2;   // he lies in a side facing (as at the line)
         mv.falls++;
     }
     if (k->down_t < 0x7FFF) k->down_t++;
@@ -1530,6 +1531,16 @@ static void fallen(TKit *k) {
         int f = (k->down_t - 1) * n / FALL_FRAMES;
         pose(k, 3, f < n ? f : n - 1);
     } else {
+        int f = 0;                                  // the engine's lying pose: the lying table first (tny_engine.c)
+        const u32 *lg = tny_lie_pose(e, &f);
+        if (lg) {
+            k->group = 12;
+            E32(e, 0x4C) = (u32)lg;
+            E16(e, 0x14) = (u16)f;
+            E16(e, 0x12) = 0;
+            Entity_BaseUpdate(e);
+            return;
+        }
         static const s8 lie[3][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };   // group, frame (-1 = the last)
         for (int i = 0; i < 3; i++) {
             const u32 *g = group_of(e, lie[i][0]);

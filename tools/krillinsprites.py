@@ -190,6 +190,11 @@ def swap_head(px, w, h, head, chin_off):
                     stack.append((ny, nx))
     chin = max(y for y, _ in seen) if len(seen) >= 6 else top + chin_off
     chin = min(h - 1, max(chin, top + chin_off - 3))
+    # ... and never above THIS frame's shoulders (2026-10-25, Ryan again: the dash still lost his head): the back
+    # view has no face to find, and the idle offset left the head floating over a body that dips in its stride
+    neck = next((y for y in range(top + 6, h) if sum(1 for x in range(x0, x1 + 1) if px[y][x] in GI) >= 3), None)
+    if neck is not None and chin < neck - 1:
+        chin = neck - 1
     band = [(y, x) for y in range(top, chin + 1) for x in range(x0, x1 + 1)]
     face = [x for y, x in band if px[y][x] in (114, 115, 116)]
     cx = (sum(face) / len(face)) if len(face) >= 6 else (sum(xs) / len(xs))

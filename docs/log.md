@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Second pass on Ryan's playtest:** a fighter knocked out mid-fight now lies in the same pose as at the line
+  (`tny_lie_pose()` in tny_engine.c, used by tny_moves.c `fallen()`: the lying table first; before, bodies without a
+  lying group 12 stood in their old group-12 / knock-down frame, "the flying animation", once the line ended). Krillin's
+  dash: the pasted head never sits above that frame's own shoulders (`krillinsprites.py`; the back-view dash had no
+  face to find and floated a row above a dipping body); `headcheck.py` on 161: 0 floating frames.
 - **Overhead HP bars in the ring (Ryan: "should we display the hp of the other fighters during the royal
   rumble?"):** a small bar over each Rumble fighter's head (and a 2 v 2 partner's), green / yellow / red as it drains;
   1 v 1 keeps the big boss bar (`src/coop/tny_hpbars.c`, `docs/tournament.md` 19).

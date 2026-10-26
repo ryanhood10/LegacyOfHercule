@@ -987,6 +987,11 @@ Code: `src/coop/tny_moves.c` (knock-back, the fall, Energy Steal for opponents),
 Energy Steal, the two kits), `src/coop/tny_engine.c` (`lead_entry`), `data/hercule.json` (ability 24). Test
 `tools/headless/tny_fightfix.txt` (`docs/testing.md` "Tournament fight fixes").
 
+The fallen lie in the engine's lying pose (`tny_lie_pose()`, tny_engine.c: the lying table `tny_lie` first, then
+group 12, 3, 2), in a side facing, from the end of the knock-down to the body's removal, so the pose at the
+announcer's line and the one before and after it are the same (Ryan, 2026-10-25: "it quickly turns to the flying
+animation again" once the line released the bodies whose group 12 is not a lying pose).
+
 **Knock-back** (Ryan: "im punching yamcha and hes unable to move, but its not actually knocking his player model back.
 making it easy for me to corner and keep punching him"). Decompiled: a player's punch (`Player_Attack` 0x08007DE8: hit
 message type 1, attack descriptor 2 of the table at 0x086DB2CC, the same for every punch of the A combo) reaches the

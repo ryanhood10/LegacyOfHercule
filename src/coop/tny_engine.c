@@ -912,6 +912,24 @@ static const u32 *lie_grp(const Entity *e, const TnyLie *l) {
     const u32 *g = (const u32 *)l->grp;
     return g[0] && g[1] && g[2] && g[3] && desc_ok((const u8 *)g[e->facing & 3]) ? g : 0;
 }
+// The lying pose of e's body, as the loser's below (the lying table's, else group 12's last frame, else 3's last, else
+// the hit-stun): its four facing arrays and the frame, or 0. The fallen of a fight lie in it too (tny_moves.c
+// fallen()), so a body knocked out mid-fight lies as it will at the line (Ryan, 2026-10-25: it lay, then stood in its
+// flying lean).
+const u32 *tny_lie_pose(const Entity *e, int *frame) {
+    const TnyLie *l = lie_entry(e);
+    const u32 *lg = lie_grp(e, l);
+    if (lg) { *frame = l->frame < 0 ? frames_of(e, lg) - 1 : l->frame; return lg; }
+    static const s8 lie[][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };     // group, frame (-1 = the last)
+    for (int i = 0; i < 3; i++) {
+        const u32 *g = grp_of(e, lie[i][0]);
+        if (!g) continue;
+        *frame = lie[i][1] < 0 ? frames_of(e, g) - 1 : lie[i][1];
+        return g;
+    }
+    return 0;
+}
+
 // Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd). The loser lies
 // in a side facing (the down / up facings of the lying groups are front views of a body half sitting up); the
 // lying group is group 12 (every tournament body has a real lying pose there: docs/sprites.md "Lying poses"),
