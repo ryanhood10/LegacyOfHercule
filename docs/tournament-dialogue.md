@@ -1,6 +1,8 @@
 # Tournament dialogue: the plan for Ryan's review (2026-10-25)
 
-Status: **draft for review. Nothing here is in the game yet.** Ryan asked for Budokai-style lines between the
+Status: **plan done (Ryan, 2026-10-25: "done as written"); to be built after the polish pass merges.** Section 10's
+questions stand as the plan has them: the winner's line only, 2 v 2 opponent teams drawn at random, Start skips.
+Original brief: Ryan asked for Budokai-style lines between the
 fighters on the ring, planned for every combination in 1 v 1 and 2 v 2, and **the announcer only in the Royal
 Rumble**. Mark any line to change, cut or replace. Lines you dictate go in word for word. When you say the plan is
 done, it gets built into the hook the polish pass leaves in the engine (right after the walk-in, and right after the
