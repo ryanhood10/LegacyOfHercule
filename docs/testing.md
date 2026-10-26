@@ -13,6 +13,7 @@ inspection goes through the GDB stub.
 |---|---|
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
+| Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -419,6 +420,29 @@ free OBJ VRAM seen.
 - `tny_rumble.txt`: seven packs of three, 20 s each, covering every AI set of the roster in the build (Mecha
   Frieza's pack plays with two: his sprite 49 is refused). No CRASH line = pass. Run 2026-10-25: no crash in co-op
   or alone.
+
+## Tournament fight fixes (headless, branch `tny-fightfix`, 2026-10-25)
+
+```
+make BUILD=build/fightfix DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/fightfix/log2-coop.gba --out build/fightfix/hl
+python tools/headless/st_test.py tools/headless/tny_fightfix.txt build/fightfix/log2-coop.gba build/fightfix/hl/menu.ss --out build/fightfix/hl --cols 6
+```
+
+`tools/headless/tny_fightfix.txt` (`docs/tournament.md` 18), seven parts from the debug-menu state (`load menu.ss`
+between them): A. knock-back: a tournament Yamcha (test command 26, no specials) in the ring takes three combos of
+three punches; test command 27 op 6 throws player 1's real punch (the A button's routine) after standing him 16 px to
+the fighter's left, so each punch lands; his x (8.8, `e0+0x158`) after each: the finisher's jump is ~40 px. B. the
+fall: Tien at 4 HP, one punch: HP 0, `mv+0x58` (falls) 1, lying (`fb1`, `fb2`), two more punches leave `mv+0x54`
+(players' hits taken) unchanged. C. a Rookie Royal Rumble (engine, test command 25) with every kit fighter's HP poked
+to 4 each round: punches (op 6 on kits 0-2) and the fighters' own hits end it; each round `eng+0x26..` (opp_in) all 2,
+phase 5, result 1, then "The headliner is down!". D / E. Spopovich / Yamu: 600 frames at full HP with no steal
+(`mv+0x5A` 0), then HP 40 % (op 2): one Energy Steal, both players 150 -> 125 ki, his HP +10 % per player, `mv+0x78`
+(ki stolen) 50. F. the players' Energy Steal (ability 24, selected as ability index): player 1 as Spopovich (row 36 on
+slot 7, a warp) at 400 / 1000 HP: 480 HP, ki 20 -> 60; above half HP only the ki; a miss nothing. Player 2 as Yamu (row
+37): ki 30 -> 60. G. the engine's lead (co-op, both unlocked with test command 23): Yamu on slot 1 at the party's best
+(HP 1216), Spopovich on slot 5 at 140 % of it. Pass: no CRASH, every stepz reached, the numbers as the echoes say.
+Before the fix (the stock reaction alone) A's x stays put after the first punch (`docs/tournament.md` 18).
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 

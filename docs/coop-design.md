@@ -356,6 +356,17 @@ approach `0x0801B15F` (`0x08023D88`). Wolves: set 8 = patrol until a player is w
 chase. Every module reads the target from `g_PlayerObject`, which is why the per-entity swap in
 entities.c retargets them.
 
+**Hit reaction** (decompiled 2026-10-25, `docs/tournament.md` 18): the type-0 message hands the hit to the top AI
+set's *second* word (`0x0801AB2A`; the set table's entries are `{main class, hit class}`). The hit classes are
+PARALLEL lists (first nonzero result stops): `0x0801A6E0` calls OnHit (slot 14) and stores the hit's facing at
++0x18C, `0x0801A804` matches the attack descriptor id (9 / 15: special reactions), `0x0801ACD4` tests the space behind
+the target and pushes the knock-back set: free -> sets 2 / 17 (`0x0801A946`: slide away while the hit state lasts,
+param 0x10 / 0x20), blocked -> sets 1 / 16 (`0x0801ACB6`: the other way, unhittable +0x168 = 0, param 0x28 / 0x30).
+Regular enemies (set 8 -> 3 -> 7) use 1 / 2, set 21 (the dojo Yamcha, Frieza-class bosses, tournament opponents) 16 /
+17; set 16's own hit class is the boss class object, whose word 1 returns 0 (hits ignored during it). Every punch of
+the player's A combo is the same hit (`Player_Attack` 0x08007DE8, descriptor id 2 of the table at 0x086DB2CC, power
+0x400); the descriptor's second byte is its id in that table, not a strength.
+
 **Death**: the stat class' handler (regular enemies `0x0801A74D`) awards EXP (`0x0800E4D2`, our
 hook), queues a 0x14-byte popup event (vtable `0x080238FC`, fire slot `0x080109AD` runs the record's
 action object: defeat dialogues and scripts fire here), removes the entity, spawns dust and plays

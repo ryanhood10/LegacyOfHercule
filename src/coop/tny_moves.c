@@ -19,7 +19,8 @@
 //   stun      freeze the target N frames: a flash round him (Solar Flare), a held target (psychic hold) or a
 //             projectile (Stone Spit, Galactic Donut); players' pads go dead, a fighter's AI stops
 //   heal      restore the most hurt fighter of his side (Kibito)
-//   drain     passive: his melee hits heal him (HP) or empty the victim's ki (EP)
+//   drain     passive: his melee hits heal him (HP) or empty the victim's ki (EP); Energy Steal (a rush flag) takes
+//             ki only from half HP down and turns it into HP (Spopovich, Yamu)
 //   regen     passive: HP ticks back every second
 //   transform at N % HP: power-up pose, the new sprite record (Frieza -> Mecha Frieza, the Buu chain...) and
 //             more attack / defence; same sprite = a stat boost (Roshi's MAX Power, Broly's rage)
@@ -28,7 +29,8 @@
 // accepts type-0 hits from a fighter of another side (tny_rumble_mode). Enemies have no EP: cooldowns pace the
 // specials; damage comes from the fighter's stat through the stock damage calculation. A special cannot be
 // stunned out of, and a hit during one only does damage (no AI hit reaction); KF_POISE fighters also get a
-// poise window after every stun (the Android 16 rule).
+// poise window after every stun (the Android 16 rule). A player's hit pushes him away (the combo's third melee hit
+// far: knock()); at HP 0 he falls and stays down, out of the fight (fallen()), until the engine clears the body.
 //
 // Rumble mode: fighters target the nearest player 70 % of the time and the nearest fighter of another side
 // 30 %, re-rolled every RUMBLE_REROLL frames, always a player within RUMBLE_CLOSE px. A fighter's update points
@@ -61,7 +63,7 @@
 #define STEAL_HP_PM     4       // ... and per point of it, this many permille of his max HP back (25 ki = 10 %)
 #define KB_COMBO_GAP    45      // frames: a hit this soon after the last one continues the combo
 #define KB_FINISHER     3       // the combo's nth melee hit pushes him away
-#define KB_LIGHT_PX     3       // px: every other hit (over KB_LIGHT_T frames)
+#define KB_LIGHT_PX     3       // px: the combo's second hit, or a shot (over KB_LIGHT_T frames)
 #define KB_LIGHT_T      3
 #define KB_FINISH_PX    40      // px: the finisher (over KB_FINISH_T frames)
 #define KB_FINISH_T     12
@@ -1444,10 +1446,11 @@ static void schedule(TKit *k, Entity *t) {
 // The stock reaction to a player's punch (decompiled 2026-10-25: the enemy message 0x0800E5B8 hands the hit to the
 // AI's hit tree; set 21's is a GOTO 21 plus set 18's tree: OnHit, then 0x0801ACD4 pushes AI set 17 (0x0801A946, a
 // slide of 0x20) or, with a wall behind him, set 16 (0x0801ACB6: the other way, unhittable)) moved a set-21 fighter
-// about 7 px and then held him in place for ~35 frames, so every punch of a combo landed on a man who could not
-// move: he was pinned. On top of it the kit now pushes him away from the hitter: a light push for each hit, a long
-// one for the combo's finisher (the third melee hit within KB_COMBO_GAP frames of each other); a wall behind him
-// turns the push along the wall (out of the corner). KF_POISE bodies are pushed half as far.
+// about 7-12 px and then held him in place for ~35 frames, so every punch of a combo landed on a man who could not
+// move: he was pinned. On top of it the kit now pushes him away from the hitter: nothing more on a combo's first
+// punch (the stock slide), a light push on the second, a long one on the finisher (the third melee hit, each within
+// KB_COMBO_GAP frames of the last; a shot always gives the light push); a wall behind him turns the push along the
+// wall (out of the corner). KF_POISE bodies are pushed half as far.
 static int frames_in(const Entity *e, const u32 *grp) {     // as the engine's frames_of (tny_engine.c)
     const u8 *rec = (const u8 *)e->sprite_record, *d = (const u8 *)grp[e->facing & 3];
     int n = 1;
@@ -1469,6 +1472,7 @@ static void knock(TKit *k, const Entity *from, int melee, int lethal) {
         k->combo = (u16)(now - k->last_hit_f) <= KB_COMBO_GAP ? k->combo : 0;
         if (melee) k->combo++;
         if (melee && k->combo >= KB_FINISHER) { px = KB_FINISH_PX; t = KB_FINISH_T; k->combo = 0; }
+        else if (melee && k->combo == 1) { k->last_hit_f = now; return; }   // the opener: the stock slide is enough
         else { px = KB_LIGHT_PX; t = KB_LIGHT_T; }
     }
     k->last_hit_f = now;
@@ -1545,6 +1549,9 @@ static void kit_destroy(Entity *e, int free_it, u32 a, u32 b) {
     TKit *k = (TKit *)e->vtable;
     const u32 *base = k->base;
     beam_end(k);
+    EntityList *l = g_EntityList;                   // a thin beam still ending runs on this kit's vtable copy: back to
+    for (int i = 0; i < l->count; i++)              // the stock one before the kit's memory goes (a crash in tny_rumble)
+        if (l->items[i] && l->items[i]->vtable == k->beam_vt) l->items[i]->vtable = (u32 *)BEAM_VTABLE;
     for (int i = 0; i < KIT_LIVE; i++) if (k->live[i]) { k->live[i]->kit = 0; k->live[i] = 0; }
     if (k->held) { k->held->kit = 0; k->held = 0; }
     unregister(k);

@@ -16,7 +16,7 @@ SLOT = 7
 E = 0xC + SLOT * 0x1C            # slot 7's entry in the party block
 LEAD = dict(hp=400, ep=300, str=12000, pow=12000, end=12000, exp=1000000)   # a level-40-ish lead
 AB = dict(BB=0, BURN=1, KI=2, KAME=3, MAS=4, SCAT=8, HPUNCH=14, HKICK=15, MEGA=16, TAUNT=17, RUSH=19, SHOCK=20,
-          DISC=21, BURST=23)
+          DISC=21, BURST=23, STEAL=24)
 
 
 def kits():
