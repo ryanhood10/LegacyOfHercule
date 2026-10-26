@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **The fighters' dialogue is in (Ryan's approved plan, `docs/tournament-dialogue.md`):** before every 1 v 1 / 2 v 2 /
+  challenge / co-op final the other side opens and your fighters answer (rivals, meeting yourself, teams, defaults);
+  the winner speaks after the result; Start skips. The Rumble's announcer has the plan's round, headliner, cleared and
+  result calls (the calls during a round wait: a dialogue box stops the fight). `tny_talk_hook` in `tny_talk.c`.
 - **Tournament dialogue planned (for Ryan's review, not built):** `docs/tournament-dialogue.md`: Budokai-style lines in 1 v 1
   and 2 v 2 (every fighter's own, rival exchanges, meeting yourself, team lines), the announcer only in the Rumble.
 - **Polish pass 2: the tournament as scenes (branch `tny-polish2`):** every scene change in the ring happens behind

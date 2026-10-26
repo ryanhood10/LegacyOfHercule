@@ -165,3 +165,15 @@ void tny_talk_test(u32 cmd, u32 arg, u32 arg2) {
     const u8 a[2] = { (u8)arg, (u8)(arg >> 8) }, b[2] = { (u8)arg2, (u8)(arg2 >> 8) };
     tny_talk_pre(a, a[1] == 0xFF ? 1 : 2, b, b[1] == 0xFF ? 1 : 2);
 }
+
+// The engine's talk seat (tny_engine.c, docs/tournament.md 23): before a fight the other side opens and the players'
+// fighters answer; after it the winner speaks. The Rumble has the announcer only (the engine's own calls).
+int tny_talk_hook(const TTalkSeat *s) {
+    if (s->kind == TALK_RUMBLE) return 0;
+    if (s->when == TALK_BEFORE)
+        return tny_talk_pre(s->opp, s->nopp > 2 ? 2 : s->nopp, s->mine, s->nmine > 2 ? 2 : s->nmine);
+    int id;
+    if (s->kind == TALK_FINAL) id = s->result == 2 ? s->opp[0] : s->mine[0];
+    else id = s->result == 1 ? s->mine[0] : s->opp[0];
+    return tny_talk_win(id);
+}

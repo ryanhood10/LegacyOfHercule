@@ -1440,8 +1440,24 @@ static void rumble_round(void) {
     tny_ui_rumble_board(ids, down, n);
     if (!n) { eng.result = R_WON; eng.kind = K_RUMBLE; eng.phase = P_MATCH_END; eng.timer = 90; return; }
     char num[2] = { (char)('1' + eng.rb_round), 0 };
-    if (eng.rb_round < regular) ann_prep("Royal Rumble, round ", num, "!  Last ones standing win!", 0, 0);
-    else ann_prep("And now, the headliner: ", fname(ids[n - 1]), "!  Begin!", 0, 0);
+    // the announcer's calls (docs/tournament-dialogue.md 8: the Rumble has no fighter lines)
+    int head = ids[n - 1], alt = (int)rnd(2);
+    if (eng.rb_round == 0) {
+        if (alt) ann_prep("Royal Rumble, round ", num, "!  Last ones standing win!", 0, 0);
+        else ann_prep("Into the ring!  Every fighter for themselves!", 0, 0, 0, 0);
+    } else if (eng.rb_round < regular) {
+        ann_prep("Round ", num, alt ? "!  The pack gets tougher!" : "!  Fresh fighters, fresh trouble!", 0, 0);
+    } else if (head == TF_KING_COLD) ann_prep("The king of the universe himself!  ", fname(head), "!", 0, 0);
+    else if (head == TF_A17 || head == TF_A18) {
+        int other = 0;
+        for (int i = 0; i < n; i++) if (ids[i] == (head == TF_A17 ? TF_A18 : TF_A17)) other = 1;
+        if (other) ann_prep("Twin terrors!  ", fname(TF_A17), " and ", fname(TF_A18), "!");
+        else ann_prep("And now, the headliner: ", fname(head), "!  Begin!", 0, 0);
+    }
+    else if (head == TF_A16) ann_prep("The silent giant!  ", fname(head), "!", 0, 0);
+    else if (head == TF_BROLY) ann_prep("The Legendary Super Saiyan, ", fname(head), "!", 0, 0);
+    else if (head == TF_SUPER_BUU) ann_prep("The final menace!  ", fname(head), "!", 0, 0);
+    else ann_prep("And now, the headliner: ", fname(head), "!  Begin!", 0, 0);
     start_fight(K_RUMBLE, eng.players == 2 ? 2 : 0, ids, n);
 }
 
@@ -1681,9 +1697,12 @@ static void end_show(void) {
         if (won) ann_prep("", me, " defeats ", chal_name(0), eng.nchal > 1 ? " and partner!" : "!");
         else ann_prep("", chal_name(0), eng.nchal > 1 ? " and partner win!" : " wins!", 0, 0);
     } else if (eng.kind == K_RUMBLE) {
-        if (won) ann_prep(eng.rb_round + 1 < eng.rb_rounds ? "Round cleared!  " : "The headliner is down!  ", me,
-                          team ? " stand tall!" : " stands tall!", 0, 0);
-        else ann_prep("", me, team ? " are out of the Royal Rumble!" : " is out of the Royal Rumble!", 0, 0);
+        if (won && eng.rb_round + 1 < eng.rb_rounds) {
+            if (rnd(2)) ann_prep("Round cleared!  ", me, team ? " stand tall!" : " stands tall!", 0, 0);
+            else ann_prep("The ring is clear!  On to the next round!", 0, 0, 0, 0);
+        }
+        else if (won) ann_prep("The headliner is down!  ", me, team ? " win it all!" : " wins it all!", 0, 0);
+        else ann_prep("", me, team ? " are out!  What a battle!" : " is out!  What a battle!", 0, 0);
     } else {
         if (won) ann_prep("The winner...  ", me, "!", 0, 0);
         else ann_prep("", eng.nopp > 1 ? "your opponents" : fname(eng.opp_id[0]), eng.nopp > 1 ? " win!  " : " wins!  ",
