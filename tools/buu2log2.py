@@ -11,7 +11,9 @@ usage: buu2log2.py roms/log2.gba roms/buu.gba build/gen/buu_sprites_data.c 158=1
                converted record keeps the template's frame counts, cycling the Buu frames)
   --map        per-id override of the LoG2 group -> Buu animation table (see GROUP_MAP)
   --spec       a file of more pairs, one per line: `<id>=<buu record> [g:a,g:a,...] [@<template>]`
-               (the group map override and a per-id template; `#` starts a comment)
+               (the group map override and a per-id template; `#` starts a comment); a group's value may also be
+               `lie` (the lying pose, see GROUP_MAP) or a frame list `a.f+a.f+...` (Buu anim a frame f, in order,
+               the last one held to the template's count)
   --expect     the ids the caller expects (space-separated); a mismatch with the spec is an error
   --section    put every emitted object in this section (`.rodata.art`: the second ROM blob, tourney.h
                TNY_ART), so big imports stay out of the code blob
@@ -45,8 +47,17 @@ import buu_sprites as B  # noqa: E402
 # (Buu: 0 idle, 1 walk, 2 run, 3 charge, 4-6 attacks, 7 flex, 9 hurt, 12 shout, 13 stand,
 #  17 fall, 18 fist up; LoG2: 0 idle, 1 walk, 2 run, 3 fall, 4 shout, 5 charge/attack (3 frames),
 #  6-8 attacks, 11 hurt, 12 dazed, 13 shout, 14 fidget, 17 halo, 18/19 beams, 20 tumble)
-GROUP_MAP = {0: 0, 1: 1, 2: 2, 3: 17, 4: 12, 5: 3, 6: 4, 7: 5, 8: 6, 9: 18, 11: 9, 12: 9, 13: 13,
+# 12 "lie": the lying pose (the player's knock-out, the tournament loser; docs/sprites.md "Lying poses"): the last frame
+# of the lie-down animation 15, else of the fall 17 when it ends on the ground (wider than tall), else the hurt anim's
+# recoil frame turned to lie on the ground (tools/lying.py); every frame of the group is that one frame. (It was the
+# hurt anim 9 until 2026-10-25: the tournament's losers stood in their recoil, arms out, "their flying sprites".)
+# 2 is LoG2's hit-stun (Goku 60, Hercule 72 and the enemy sets show the hit sparks there; docs/sprites.md
+# "Tournament fighters (art-new)"): Buu's hurt anim 9, not its run (until 2026-10-25 a hit fighter ran on the spot).
+GROUP_MAP = {0: 0, 1: 1, 2: 9, 3: 17, 4: 12, 5: 3, 6: 4, 7: 5, 8: 6, 9: 18, 11: 9, 12: "lie", 13: 13,
              14: 7, 16: 7, 17: 13, 18: 19, 19: 21, 20: 17}
+# looping groups (walk, run, dash): a Buu cycle longer than the template's count is sampled evenly over the whole
+# cycle (Spopovich's 6-frame walk played its first 4 frames and jerked back to the start, 2026-10-25)
+LOOPS = (1, 2, 13)
 OBJ_SHAPES = {  # (w, h) -> (shape, size)
     (8, 8): (0, 0), (16, 16): (0, 1), (32, 32): (0, 2), (64, 64): (0, 3),
     (16, 8): (1, 0), (32, 8): (1, 1), (32, 16): (1, 2), (64, 32): (1, 3),
@@ -273,6 +284,35 @@ class Converter:
         xo, yo, attr, ow, oh, blob, raw = self.blob_cache[key]
         return (xo, yo, ow, oh, attr, blob, raw)
 
+    def lying(self, rec, anims, bu_id, count):
+        """The lying group (GROUP_MAP 12 "lie"): 4 facings x count copies of one lying frame."""
+        import lying as LY
+        self.lie_anim = getattr(self, "lie_anim", {})
+        for a in (15, 17):
+            if a < len(anims) and anims[a]:
+                last = anims[a][-1]
+                (x0, y0, w, h), px = self.bu.frame_pixels(last[2])
+                pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
+                bw = max(x for _, x in pts) - min(x for _, x in pts) + 1
+                bh = max(y for y, _ in pts) - min(y for y, _ in pts) + 1
+                if bw > bh * 1.15:
+                    self.lie_anim[bu_id] = (a, "last")
+                    return [[self.convert_frame(last[d], rec["remap"], bu_id)] * count for d in range(4)]
+        src = 9 if 9 < len(anims) and anims[9] else (7 if 7 < len(anims) and anims[7] else 0)
+        frame = anims[src][min(1, len(anims[src]) - 1)]          # the recoil (a hurt anim: shout, recoil, crouch)
+        self.lie_anim[bu_id] = (src, "turned")
+        dirs = []
+        for d in range(4):
+            box, parts = self.bu.descriptor(frame[d])
+            key = ("lie", frame[d], d == 3, bu_id)
+            if key not in self.blob_cache:
+                (x0, y0, w, h), px = self.bu.frame_pixels(frame[d])
+                nxo, nyo, ow, oh, npx = LY.lie(px, x0, y0, face_left=(d != 3))
+                ow, oh, blob, raw = self.encode(npx, ow, oh, ow, oh, rec["remap"])
+                self.blob_cache[key] = (nxo, nyo, ow, oh, LY.attr_for(parts[0][4], ow, oh), blob, raw)
+            dirs.append([self.blob_cache[key]] * count)
+        return dirs
+
     def encode(self, px, w, h, ow, oh, remap):
         """Remap a [h][w] index map onto an ow x oh OBJ, compress: (ow, oh, blob, raw)."""
         out = [[0] * ow for _ in range(oh)]
@@ -301,7 +341,17 @@ class Converter:
                 groups.append(None)
                 continue
             src = group_map.get(gi, 0)
+            if src == "lie":
+                groups.append(self.lying(rec, anims, bu_id, count))
+                continue
+            if isinstance(src, str):                 # "a.f+a.f+...": these frames in this order, the last held
+                seq = [tuple(int(v) for v in p.split(".")) for p in src.split("+")]
+                groups.append([[self.convert_frame(anims[a][f][d], rec["remap"], bu_id)
+                                for a, f in (seq[min(k, len(seq) - 1)] for k in range(count))] for d in range(4)])
+                continue
             frames = anims[src] if src < len(anims) and anims[src] else anims[0]
+            if gi in LOOPS and len(frames) > count:   # a longer walk / run cycle: evenly sampled, not cut short
+                frames = [frames[k * len(frames) // count] for k in range(count)]
             dirs = []
             for d in range(4):
                 dirs.append([self.convert_frame(frames[fi % len(frames)][d], rec["remap"], bu_id) for fi in range(count)])
@@ -433,9 +483,16 @@ def preview(conv, sid, bu_id, header, groups, rec, path, gmap=GROUP_MAP):
         if not g:
             continue
         src = gmap.get(gi, 0)
+        fi = 0
+        if src == "lie":                       # the anim it came from (its last frame, or the turned recoil)
+            src, how = getattr(conv, "lie_anim", {}).get(bu_id, (0, ""))
+            fi = -1 if how == "last" else 1
+        elif isinstance(src, str):             # a frame list: its first frame
+            src, fi = (int(v) for v in src.split("+")[0].split("."))
         frames = anims[src] if src < len(anims) and anims[src] else anims[0]
+        fi = fi if fi < 0 else min(fi, len(frames) - 1)
         for d in range(4):
-            conv.bu.draw(cv, 40 + d * cell + cell // 2, y + cell - 4, frames[0][d], rec["remap"])
+            conv.bu.draw(cv, 40 + d * cell + cell // 2, y + cell - 4, frames[fi][d], rec["remap"])
             xo, yo, w, h, attr, blob, raw = g[d][0]
             hflip, vflip = attr & 0x10000000, attr & 0x20000000
             ox = 40 + 4 * cell + 24 + d * cell + cell // 2
@@ -467,7 +524,7 @@ def main():
         a = args[i]
         if a == "--map":
             sid = int(args[i + 1])
-            maps[sid] = {int(k): int(v) for k, v in (kv.split(":") for kv in args[i + 2].split(","))}
+            maps[sid] = {int(k): (int(v) if v.lstrip("-").isdigit() else v) for k, v in (kv.split(":") for kv in args[i + 2].split(","))}
             i += 3
         elif a == "--fit":
             opts["--fit"] = True
@@ -494,7 +551,7 @@ def main():
                 if w.startswith("@"):
                     templates[sid] = int(w[1:])
                 else:
-                    maps[sid] = {int(k): int(v) for k, v in (kv.split(":") for kv in w.split(","))}
+                    maps[sid] = {int(k): (int(v) if v.lstrip("-").isdigit() else v) for k, v in (kv.split(":") for kv in w.split(","))}
     assert len({p[0] for p in pairs}) == len(pairs), "a sprite id is listed twice"
     if opts["--expect"] is not None:   # the Makefile's own list of the ids (it appends them to the sprite index)
         want = sorted(int(x) for x in opts["--expect"].split())

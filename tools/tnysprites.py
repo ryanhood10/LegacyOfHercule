@@ -24,7 +24,10 @@ Sources (docs/sprites.md "Tournament fighters (art-new)"; ids in src/coop/tourne
   Chiaotzu   (189) kid Gohan's complete fight set (LoG2 53, the smallest playable body) re-headed with Chiaotzu's
                    head from his NPC sprite 32 (white face, red cheeks, cap with the red ball) and recoloured to
                    his outfit there (light blue shirt, purple collar, red sash, black trousers).
-Frames that show no upright head (lying, tumbling) are recoloured only (18's blonde hair black, kid Gohan's hair
+Heads sit over the body as on the donor sprite (the face anchor corrected per facing by the idle frames' face-to-body
+offsets) and a 16 px frame a head would stick out of is widened to 32 x 32 (Ryan, 2026-10-25: Chi-Chi's head was cut
+off and shifted forward); the run prints the head pixels still cut by a frame edge. King Cold's lying pose (12) is his
+hit-stun turned (tools/lying.py). Frames that show no upright head (lying, tumbling) are recoloured only (18's blonde hair black, kid Gohan's hair
 Chiaotzu's cap colour...). Without roms/buu.gba Videl's head is Chi-Chi's without the bun (black bob).
 """
 import os
@@ -125,13 +128,18 @@ class Head:
     def __init__(self, pts, chin, cx):
         self.pts = {(int(y - chin), int(round(x - cx))): v for (y, x), v in pts.items()}
 
+    clipped = 0         # head pixels that fell outside a frame (a head cut off by its frame's edge)
+
     def paste(self, px, chin, cx, under=False):
         h, w = len(px), len(px[0])
         cx, chin = int(round(cx)), int(chin)
         for (dy, dx), v in self.pts.items():
             y, x = chin + dy, cx + dx
-            if 0 <= y < h and 0 <= x < w and (not under or not px[y][x]):
-                px[y][x] = v
+            if 0 <= y < h and 0 <= x < w:
+                if not under or not px[y][x]:
+                    px[y][x] = v
+            else:
+                Head.clipped += 1
 
     def flipped(self):
         out = Head({}, 0, 0)
@@ -146,7 +154,31 @@ def cut_head(px, rows, keep, cx_colours, extra=None):
     if extra:
         pts.update(extra)
     xs = [x for (y, x), v in pts.items() if v in cx_colours and y <= r1]
-    return Head(pts, r1, sum(xs) / len(xs))
+    head = Head(pts, r1, sum(xs) / len(xs))
+    head.cx0, head.chin0, head.src = sum(xs) / len(xs), r1, px     # the anchor in the donor frame; the frame (its body)
+    return head
+
+
+def settle(out, head, chin, cx, most=4):
+    """Paste `head` on a copy of `out` with its chin 0..most rows lower, the first placement where it touches the body
+    (tools/headcheck.py's test: no part of the frame floats above the rest with empty rows between); else at chin."""
+    import headcheck as HC
+    h, w = len(out), len(out[0])
+    for off in range(most + 1):
+        before = Head.clipped
+        test = copy(out)
+        head.paste(test, chin + off, cx)
+        if not HC.floating(test, w, h):
+            return test
+        Head.clipped = before
+    head.paste(out, chin, cx)
+    return out
+
+
+def body_x(px, chin, skip=()):
+    """Mean x of the body under a head: the opaque pixels 2-8 rows below the chin (neck, shoulders, chest)."""
+    xs = [x for y in range(chin + 2, min(len(px), chin + 9)) for x, v in enumerate(px[y]) if v and v not in skip]
+    return sum(xs) / len(xs) if xs else None
 
 
 class Source:
@@ -223,6 +255,39 @@ class A18Base(Fighter):
             neck = next(y for y in range(top + 6, len(px)) if sum(1 for v in px[y] if v in (79, 80, 81)) >= 2)
             self.chin_off.append(neck - 1 - top)
         self.heads = [self.donor(f) for f in range(3)]
+        # the head sits over the body as on the donor (2026-10-25, Ryan: "chichi's head has been cut off and shifted
+        # to the right"): anchored on 18's face alone, Chi-Chi's head sat a pixel or two forward of 18's (her face is
+        # nearer the middle of her head than 18's is) and its front fell off the 16 px side frames. The anchor is
+        # corrected per facing by the idle frames' face-to-body offsets (18's against the donor's).
+        self.fix = [0.0, 0.0, 0.0]
+        for f in range(3):
+            px = src.canon(A18, 0, f, 0)
+            got = self.anchor(px, 0, f)
+            hd = self.heads[f]
+            bd = body_x(hd.src, hd.chin0)
+            if got and bd is not None:
+                chin, cx, mask = got
+                b18 = body_x(px, chin, A18_HAIR)
+                self.fix[f] = (hd.cx0 - bd) - (cx - b18)
+        print(f"  {type(self).__name__.lower()}: head anchor fix per facing {[round(v, 2) for v in self.fix]}")
+
+    def anchor(self, px, gi, f):
+        """(chin row, face centre x, hair mask) of an upright frame, else None."""
+        core, mask = self.hair_mask(px)
+        if not core:
+            return None
+        h, w = len(px), len(px[0])
+        ys = [y for y, _ in core]
+        top = min(ys)
+        body = [(y, x) for y in range(h) for x in range(w) if px[y][x] and (y, x) not in mask]
+        if not body or sum(ys) / len(ys) > sum(y for y, _ in body) / len(body) - 4 or gi in (3, 12, 20):
+            return None
+        chin = min(h - 1, top + self.chin_off[f])
+        band = [(y, x) for y in range(top, chin + 1) for x in range(w)]
+        face = [x for y, x in band if px[y][x] in SKIN]
+        xs = [x for _, x in core]
+        cx = (sum(face) / len(face)) if len(face) >= 5 else (sum(xs) / len(xs))
+        return chin, cx, mask
 
     def hair_mask(self, px):
         core = {(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v in A18_HAIR}
@@ -235,31 +300,33 @@ class A18Base(Fighter):
                     mask.add((y, x))
         return core, mask
 
+    vest4 = {}          # 18's vest above the waist in upright frames: its dark ramp (all of it in group 4, the shout
+                        # and the tournament's victory pose; the side views' shading) is otherwise the trousers' blue
+
     def transform(self, sid, gi, px, f):
         core, mask = self.hair_mask(px)
         px = recolour(px, A18_SKIN4)
+        if gi not in (3, 12, 20) and self.vest4:
+            rows = [y for y, row in enumerate(px) if any(row)]
+            waist = rows[0] + 0.8 * (rows[-1] - rows[0])          # 18: vest to row 24 of 31, then belt, boots
+            px = [[self.vest4.get(v, v) if y < waist and (y, x) not in mask else v for x, v in enumerate(row)]
+                  for y, row in enumerate(px)]
         out = [[(self.hair.get(v, v) if (y, x) in mask else self.body.get(v, v)) for x, v in enumerate(row)]
                for y, row in enumerate(px)]
-        if not core:
-            return out
-        h, w = len(px), len(px[0])
-        ys = [y for y, _ in core]
-        top = min(ys)
         # upright: the hair sits on top of the body (its centroid in the top part of the opaque area)
-        body = [(y, x) for y in range(h) for x in range(w) if px[y][x] and (y, x) not in mask]
-        if not body or sum(ys) / len(ys) > sum(y for y, _ in body) / len(body) - 4 or gi in (3, 12, 20):
+        got = self.anchor(px, gi, f)
+        if not got:
             return out
-        chin = min(h - 1, top + self.chin_off[f])
+        chin, cx, mask = got
+        h, w = len(px), len(px[0])
+        top = min(y for y, _ in core)
         band = [(y, x) for y in range(top, chin + 1) for x in range(w)]
-        face = [x for y, x in band if px[y][x] in SKIN]
-        xs = [x for _, x in core]
-        cx = (sum(face) / len(face)) if len(face) >= 5 else (sum(xs) / len(xs))
         for y, x in mask:
             out[y][x] = 0
         for y, x in band:
             if abs(x - cx) <= 6 and px[y][x] in SKIN | {65, 203, 2, 1, 10, 9, 20, 23}:
                 out[y][x] = 0
-        self.heads[f].paste(out, chin, cx)
+        self.heads[f].paste(out, chin, cx + self.fix[f])
         self.stats["heads"] += 1
         return out
 
@@ -267,6 +334,9 @@ class A18Base(Fighter):
 class ChiChi(A18Base):
     # 18's blue vest -> Chi-Chi's orange tabard, the navy shading -> her blue trousers, brown boots -> dark shoes
     body = {79: 37, 80: 39, 81: 33, 215: 73, 33: 14, 34: 15, 35: BLACK, 65: BLACK, 203: BLACK, 24: 39, 26: 39}
+    # her winning pose and her side views wore 18's navy vest (its dark ramp mapped to her trousers' blue): the
+    # tabard there too, as her NPC sprite 33 has it
+    vest4 = {215: 81, 80: 79, 79: 79}
 
     def donor(self, f):
         px = self.src.canon(33, 0, f, 0)
@@ -299,8 +369,11 @@ class Videl(A18Base):
 # King Cold from Cooler (34) --------------------------------------------------------------------------------------
 COOLER = 34
 COLD = 74
+# 12 (the lying pose): Cooler's own 12 is his death drawn feet-first from above, which stood upright on the ground at
+# the end of a tournament match ("their flying sprites", Ryan 2026-10-25); King Cold lies as his hit-stun (head and
+# cape on) turned on its back (tools/lying.py)
 COLD_PLAN = {0: (COOLER, 0), 1: (COOLER, 1), 2: (COOLER, 2), 3: (COOLER, 12), 4: (COOLER, 5), 5: (COOLER, 5),
-             6: (COOLER, 6), 7: (COOLER, 7), 8: (COOLER, 8), 11: (COOLER, 2), 12: (COOLER, 12), 13: (COOLER, 1),
+             6: (COOLER, 6), 7: (COOLER, 7), 8: (COOLER, 8), 11: (COOLER, 2), 12: (COOLER, 2, "lie"), 13: (COOLER, 1),
              16: (COOLER, 7), 17: (COOLER, 0), 18: (COOLER, 5), 20: (COOLER, 12)}
 COLD_BODY = {9: 2, 10: 166, 11: 12, 12: 13, 13: 14, 211: 97, 229: 95, 231: 101, 238: 99, 215: 211, 77: 64}
 CAPE = (25, 26, 27)                 # red, mid, dark (74's cape)
@@ -371,6 +444,12 @@ class KingCold(Fighter):
         if gi not in (3, 12, 20):
             self.cape(out, px, f, top, mouth, gx)
         self.heads[f].paste(out, mouth, gx + (0 if f != 2 else 1))
+        # bits of Cooler cut off by the head's removal (his tail tip swinging over his head in the hit-stun) float
+        # alone above the new head: small pieces above the mouth row touching nothing else go
+        for c in components(out, lambda y, x, v: v != 0, N8):
+            if len(c) < 30 and max(y for y, _ in c) < mouth - 12:
+                for y, x in c:
+                    out[y][x] = 0
         self.stats["heads"] += 1
         return out
 
@@ -437,6 +516,37 @@ class Roshi(Fighter):
                 neck = next(y for y in range(top + 6, len(px)) if sum(1 for v in px[y] if v in GI) >= 3)
                 self.chin_off[(sid, f)] = neck - 1 - top
         self.heads = [self.donor(f) for f in range(3)]
+        # the head over the body as on Roshi's own sprite (2026-10-25, the Chi-Chi fix): the face anchor alone put his
+        # head two pixels back on Krillin's side frames (Krillin's "face" skin is his whole bald head)
+        self.fix = {}
+        for sid in (KRILLIN, GOKU):
+            for f in range(3):
+                px = src.canon(sid, 0, f, 0)
+                got = self.anchor(sid, px, f)
+                hd = self.heads[f]
+                if got:
+                    chin, cx, _ = got
+                    self.fix[(sid, f)] = (hd.cx0 - body_x(hd.src, 15)) - (cx - body_x(px, chin))
+        print(f"  roshi: head anchor fix {{(sprite, facing): px}} {({k: round(v, 2) for k, v in self.fix.items()})}")
+
+    def anchor(self, sid, px, f):
+        """(chin row, face centre x, hair to erase) of an upright frame, else None."""
+        h, w = len(px), len(px[0])
+        if sid == GOKU:
+            hair = self.goku_hair(px)
+            if not hair:
+                return None
+            top = min(y for y, _ in hair)
+            erase = set(hair)
+        else:
+            top = top_row(px)
+            erase = set()
+        chin = min(h - 1, top + self.chin_off[(sid, f)])
+        face = [x for y in range(top, chin + 1) for x in range(w) if px[y][x] in (114, 115, 116)]
+        if len(face) < 4 and sid == KRILLIN and f != 1:
+            return None
+        cx = sum(face) / len(face) if face else sum(x for _, x in erase) / max(1, len(erase))
+        return chin, cx, erase
 
     def donor(self, f):
         px = self.src.canon(88, 0, f, 0)
@@ -456,6 +566,7 @@ class Roshi(Fighter):
                         extra.setdefault(q, 13)
         skin = [x for (y, x), v in head.items() if v in (114, 115, 116, 117)]
         h = Head({**head, **extra}, 15, sum(skin) / len(skin))
+        h.cx0, h.chin0, h.src = sum(skin) / len(skin), 15, px
         return h
 
     def head_top(self, sid, px):
@@ -478,21 +589,12 @@ class Roshi(Fighter):
         rows = [y for y in range(h) if any(px[y])]
         if gi == 12 or (gi in (3, 20) and rows[-1] - rows[0] < 22):     # lying / falling: no upright head
             return out
-        if sid == GOKU:
-            hair = self.goku_hair(px)
-            if not hair:
-                return out
-            top = min(y for y, _ in hair)
-            erase = set(hair)
-        else:
-            top = top_row(px)
-            erase = set()
-        chin = min(h - 1, top + self.chin_off[(sid, f)])
-        band = [(y, x) for y in range(top, chin + 1) for x in range(w)]
-        face = [x for y, x in band if px[y][x] in (114, 115, 116)]
-        if len(face) < 4 and sid == KRILLIN and f != 1:
+        got = self.anchor(sid, px, f)
+        if not got:
             return out
-        cx = sum(face) / len(face) if face else sum(x for _, x in erase) / max(1, len(erase))
+        chin, cx, erase = got
+        top = chin - self.chin_off[(sid, f)]
+        band = [(y, x) for y in range(top, chin + 1) for x in range(w)]
         for y, x in erase:
             out[y][x] = 0
         # raised hands: skin components touching a wristband (blue) away from the face stay
@@ -502,12 +604,24 @@ class Roshi(Fighter):
                     near(px, y, x, {79, 80, 195, 215}, N4) for y, x in c):
                 keep |= flood(px, list(c), lambda y, x, v: v in (114, 115, 116, 117, 23, 1), N4) & set(band)
         r = 9 if f == 2 else 7
+        # back views show no face: skin by the head is a raised arm (Goku's back kick), kept so it stays joined to
+        # its fist (2026-10-25: the fist floated alone above the head)
+        arm = {114, 115, 116, 117} if f == 1 else set()
         for y, x in band:
-            if abs(x - cx) <= r and px[y][x] not in GI | {79, 80, 195, 215} and (y, x) not in keep:
+            if abs(x - cx) <= r and px[y][x] not in GI | {79, 80, 195, 215} | arm and (y, x) not in keep:
                 out[y][x] = 0
-        if f == 1:
-            self.shell(out, px, f, (chin, cx))
-        self.heads[f].paste(out, chin, cx)
+        if f == 1:      # the shell on the back: centred on the body under the head (it hung off a leaning body)
+            self.shell(out, px, f, (chin, body_x(out, chin) or cx))
+        # settled onto the shoulders: on Goku's back-view attack and dash frames his hair reached lower than Roshi's
+        # head, which floated a row or two above the body (tools/headcheck.py, 2026-10-25)
+        out = settle(out, self.heads[f], chin, cx + self.fix.get((sid, f), 0))
+        # a fist or wristband cut off from its arm by the hair's removal (Goku's raised arm in his back-view kick and
+        # special melee) floated alone over the head: small coloured pieces above the head go (white swing arcs stay)
+        head_top = chin + min(dy for dy, _ in self.heads[f].pts)
+        for c in components(out, lambda y, x, v: v not in (0, 2, 9, 10, 11, 12, 13), N8):
+            if len(c) < 24 and max(y for y, _ in c) < head_top + 2:
+                for y, x in c:
+                    out[y][x] = 0
         self.stats["heads"] += 1
         return out
 
@@ -644,7 +758,20 @@ def build(fighter, src, template_counts):
         if gi not in fighter.plan or not count:
             groups.append(None)
             continue
-        sid, sg = fighter.plan[gi]
+        sid, sg = fighter.plan[gi][:2]
+        if len(fighter.plan[gi]) > 2:              # "lie": the source group's first frame, made up, turned to lie
+            import lying as LY
+            dirs = []
+            for d in range(4):
+                xo, yo, w, h, attr, blob, _ = src.frame(sid, sg, d, 0)
+                f = 2 if d == 3 else d
+                new = fighter.transform(sid, sg, copy(src.canon(sid, sg, d, 0)), f)
+                disp = hflip(new) if d == 3 else new
+                nxo, nyo, ow, oh, npx = LY.lie(disp, xo, yo, face_left=(d != 3))
+                dirs.append([(nxo, nyo, ow, oh, LY.attr_for(attr, ow, oh), npx)] * count)
+                fighter.stats["frames"] += 1
+            groups.append(dirs)
+            continue
         dirs = []
         for d in range(4):
             frames = []
@@ -657,10 +784,21 @@ def build(fighter, src, template_counts):
                 key = (sid, blob, bool(attr & HF), d == 3, gi in (3, 12, 20))
                 if key not in cache:
                     canon = src.canon(sid, sg, d, fi)
+                    before = Head.clipped
                     new = fighter.transform(sid, gi, copy(canon), f)
-                    cache[key] = to_stored(new, attr, d)
+                    geo = (xo, w, attr)
+                    if Head.clipped > before and (w, h) == (16, 32):
+                        # the pasted head sticks out of the 16 px frame: the frame becomes 32 x 32 (8 px of air either
+                        # side, same centre, the 0x400 slot every 32 x 32 body has) so nothing is cut off
+                        Head.clipped = before
+                        wide = [[0] * 8 + row + [0] * 8 for row in canon]
+                        new = fighter.transform(sid, gi, wide, f)
+                        geo = (xo - 8, 32, attr & ~0xC000)          # attr0 shape 0 (square), size 2: 32 x 32
+                        fighter.stats["widened"] = fighter.stats.get("widened", 0) + 1
+                    cache[key] = (geo, to_stored(new, attr, d))
                     fighter.stats["frames"] += 1
-                frames.append((xo, yo, w, h, attr, cache[key]))
+                (fxo, fw, fattr), fpx = cache[key]
+                frames.append((fxo, yo, fw, h, fattr, fpx))
             dirs.append(frames)
         groups.append(dirs)
     return groups
@@ -820,6 +958,7 @@ def main():
     for name in FIGHTERS:
         if name not in only:
             continue
+        Head.clipped = 0
         f = classes[name](src)
         groups = build(f, src, template_counts)
         hdr = header_for(src, f, groups)
@@ -827,8 +966,8 @@ def main():
         if pdir:
             os.makedirs(pdir, exist_ok=True)
             write_preview(os.path.join(pdir, f"tny_preview_{name}.png"), src.sp, groups)
-        print(f"  {name}: {f.stats['frames']} frames, {f.stats['heads']} re-headed, {len(groups)} groups, "
-              f"largest frame {struct.unpack_from('<H', hdr, 0)[0]:#x}")
+        print(f"  {name}: {f.stats['frames']} frames, {f.stats['heads']} re-headed, {f.stats.get('widened', 0)} widened, {len(groups)} groups, "
+              f"largest frame {struct.unpack_from('<H', hdr, 0)[0]:#x}, {Head.clipped} head pixels cut by a frame edge")
     portrait = videl_portrait(log, buu)
     nb, total = write_c(out_c, records, portrait)
     if pdir:

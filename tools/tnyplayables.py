@@ -18,6 +18,9 @@ point at the stock frame blobs, so a record costs a few hundred bytes. Exception
     group 3 is his death (Trunks' sword cuts him in two), so the knock-down, lying and tumble are Frieza's too.
   * 64 x 64 bodies (Perfect Cell 30, Cooler 34) keep their own OBJ VRAM size (header bytes 0-1: 0x1000) and
     their own hurt boxes; the map box (byte 3) stays Goku's 16 px so they fit through doors.
+  * Group 12 is a real lying pose on every body (the tournament's loser lies in it): a body without one gets its
+    hit-stun turned to lie on the ground (tools/lying.py). The engine's lying table tny_lie (LIE below) covers the
+    stock records whose 12 is no lying pose. docs/sprites.md "Lying poses".
   * Perfect Cell keeps his beam group 18 (7 frames) as player group 18; Yamcha and Cooler get one made of their
     charge pose (OVERRIDE), so the Kamehameha (ability 3) plays on the three of them.
 
@@ -58,7 +61,7 @@ PLAYER_FROM = {
     7: [7, 8, 6],         # attacks
     8: [8, 7, 6],
     11: [2, 3],           # hurt: the hit-stun
-    12: [12, "3L", 2],    # lying
+    12: [12, "3L", "ROT"],  # lying; "ROT" = the hit-stun turned to lie on the ground (tools/lying.py)
     13: [1],              # dash / flight: the walk
     17: [0],              # halo (never shown for them): idle
     18: [18],             # beam pose (only Perfect Cell has one)
@@ -192,7 +195,10 @@ def source_groups(sp, src):
 SKIP = {49: {3}}     # source groups never used: Mecha Frieza's 3 is the sword cutting him in two
 # per-body player groups taken from other source groups: a beam pose (group 18, what the Kamehameha's charge and
 # firing states play) made of the charge pose, for the fighters whose kit has the Kamehameha (src/coop/tny_play.c)
-OVERRIDE = {156: {18: [5]}, 34: {18: [5]}}
+# Lying (group 12, what the tournament's loser lies in; docs/sprites.md "Lying poses"): Cooler's own 12 is his death
+# drawn feet-first from above (it read as flying, Ryan 2026-10-25) and Perfect Cell's 12 a half-risen lean: Cooler
+# lies as his turned hit-stun, Perfect Cell as his knock-back's last frame.
+OVERRIDE = {156: {18: [5]}, 34: {18: [5], 12: ["ROT"]}, 30: {12: ["3L"]}}
 
 
 def build_record(sp, src, borrow):
@@ -221,6 +227,12 @@ def build_record(sp, src, borrow):
                     choice = ([[f[-1]] for f in g], f"{who}:3L")
                     break
                 continue
+            if cand == "ROT":
+                g, who = get(2)
+                if g:
+                    choice = (lying_group(sp, g, src if who == src else borrow), f"{who}:2 turned")
+                    break
+                continue
             g, who = get(cand)
             if g:
                 choice = (g, f"{who}:{cand}")
@@ -240,6 +252,32 @@ def build_record(sp, src, borrow):
         out.append(dirs)
         used[pg] = tag
     return out, used
+
+
+def lying_group(sp, g, src):
+    """4 facings x 1 frame: each facing's first frame of g (a hit-stun) turned to lie on the ground (tools/lying.py);
+    facing right falls the other way. The frames fit the source record's OBJ slot (header +0)."""
+    import lying as LY
+    limit = struct.unpack_from("<H", sp.rom, sp.record(src) - S.ROM_BASE)[0] if isinstance(src, int) else 0x400
+    out = []
+    for d in range(4):
+        xo, yo, w, h, attr, blob = (g[d] or g[0])[0]
+        px = sp.frame_pixels_blob(blob, w, h) if isinstance(blob, int) else blob
+        if attr & A.HFLIP:
+            px = A.hflip(px)
+        nxo, nyo, ow, oh, npx = LY.lie(px, xo, yo, face_left=(d != 3), max_bytes=limit)
+        out.append([(nxo, nyo, ow, oh, LY.attr_for(attr, ow, oh), npx)])
+    return out
+
+
+# The tournament engine's lying table (tny_engine.c pose_hold, `tny_lie`): bodies whose group 12 is not a lying pose.
+# sprite -> ("own", group, frame): the sprite's own record (frame -1 = the last); ("body", stem): that player body's
+# group 12 (below); ("lie", source sprite): a lying group built here from the source's hit-stun. The stock playables'
+# group 12 is a dazed sit (Hercule, Gohan, Trunks) or a half-risen lean (Gohan, Super Saiyan 2 Gohan's from 59): they
+# lie in their knock-down's last frame; the Cells' 12 are risen leans too. Checked by eye on tools/tnysheet.py --lying.
+LIE = {72: ("own", 3, -1), 57: ("own", 3, -1), 135: ("own", 3, -1), 58: ("own", 3, -1), 29: ("own", 3, -1),
+       30: ("own", 3, -1), 48: ("body", "frieza"), 49: ("body", "mecha"), 50: ("body", "tao"), 34: ("body", "cooler"),
+       31: ("lie", 31)}
 
 
 def header_for(sp, src):
@@ -296,6 +334,27 @@ class Writer:
         t = f"tp_{stem}_t"
         self.lines.append(f"typedef struct {{ u8 header[0x4C]; const TpDesc *groups[{len(groups)}][4]; u32 end; }} {t};")
         self.lines.append(f"const {t} tnyp_{stem}_record TNY_ART = {{{{{hdr}}}, {{{', '.join(names)}}}, 0}};")
+
+    def lie_table(self, sp):
+        """tny_lie[]: {sprite, group, frame, group pointer or 0} (tourney.h TnyLie) for the engine's end poses."""
+        ent = []
+        for sid, how in LIE.items():
+            if how[0] == "own":
+                ent.append(f"{{{sid}, {how[1]}, {how[2]}, 0}}")
+            elif how[0] == "body":
+                ent.append(f"{{{sid}, 12, 0, (const void *const *)tnyp_{how[1]}_record.groups[12]}}")
+            else:
+                g = source_groups(sp, how[1])
+                lie = lying_group(sp, g[2], how[1])
+                arrs = []
+                for d, frames in enumerate(lie):
+                    ent2 = [f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {self.blob(px, w, h)}}}" for xo, yo, w, h, attr, px in frames]
+                    name = f"tp_lie{sid}_d{d}"
+                    self.lines.append(f"static const TpDesc {name}[1] TNY_ART = {{{', '.join(ent2)}}};")
+                    arrs.append(name)
+                self.lines.append(f"static const void *const tp_lie{sid}[4] TNY_ART = {{{', '.join(arrs)}}};")
+                ent.append(f"{{{sid}, 12, 0, tp_lie{sid}}}")
+        self.lines.append(f"const TnyLie tny_lie[] TNY_ART = {{{', '.join(ent)}, {{0, 0, 0, 0}}}};")
 
     def rows(self):
         m = playable_rows()
@@ -376,6 +435,7 @@ def main():
         missing = [pg for pg in FRAMES if pg not in used]
         print(f"  {sid} {stem:7s} " + " ".join(f"{pg}<{t}" for pg, t in used.items())
               + (f"  (empty: {missing})" if missing else ""))
+    w.lie_table(sp)
     w.rows()
     w.save(out_c)
     if pdir:

@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Art fixes from Ryan's playtest (branch `tny-artfix`):** Chi-Chi's head sits over her body, whole, in every facing
+  (anchored by the body, frames widened where it stuck out; her tabard in side views and the victory pose); Roshi's head
+  anchor and back-view kicks fixed the same way. Every tournament body lies down for real at a match's end (Buu lie-down
+  frames, turned hit-stuns via `tools/lying.py`, the generated table `tny_lie`; the loser lies in a side facing).
+  Spopovich's animation remapped (full walk, side-view crouch and grab, flex); every Buu import's hit-stun is its hurt
+  anim, not its run. Sheets `tools/tnysheet.py`, films `tools/headless/tny_film.py`. `docs/tournament.md` 18.
 - **Heads stay on (Ryan: Krillin's head popped off in his dash):** `krillinsprites.py` measures the chin per frame (the
   lowest face skin under Goku's hair) instead of reusing the idle frame's, so leaning and crouched frames no longer
   float the head. `tools/headcheck.py` flags detached heads; a dash film of every playable row (22-66) checked by eye.

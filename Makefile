@@ -136,7 +136,7 @@ $(BUILD)/.spriteflags: FORCE
 FORCE:
 
 # Buu's Fury records converted to LoG2 format (never committed); preview PNGs and a colour report beside them
-$(BUILD)/gen/buu_sprites_data.c: tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUU_ROM) $(BUILD)/.spriteflags
+$(BUILD)/gen/buu_sprites_data.c: tools/buu2log2.py tools/lying.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUU_ROM) $(BUILD)/.spriteflags
 	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ $(BUU_SPRITES) --preview-dir $(BUILD) --report $(BUILD)/gen/buu_sprites_report.md
 
 $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
@@ -144,7 +144,7 @@ $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # the tournament's Buu's Fury fighters and the announcer (never committed); previews in $(BUILD)/tny/
-$(BUILD)/gen/tny_buu_sprites_data.c: tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(TNY_BUU_SPEC) $(ROM) $(BUU_ROM)
+$(BUILD)/gen/tny_buu_sprites_data.c: tools/buu2log2.py tools/lying.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(TNY_BUU_SPEC) $(ROM) $(BUU_ROM)
 	@mkdir -p $(BUILD)/gen
 	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ --spec $(TNY_BUU_SPEC) --expect '$(TNY_BUU_IDS)' --fit --section .rodata.art --preview-dir $(BUILD)/tny --report $(BUILD)/gen/tny_buu_report.md
 
@@ -237,7 +237,7 @@ $(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coo
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # the tournament's player-layout bodies (sprites 235-244) and the fighter -> display row map (never committed); preview beside it
-$(BUILD)/gen/tny_play_sprites_data.c: tools/tnyplayables.py tools/bossmodels.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py src/coop/tourney.h src/coop/tourney_data.c $(ROM)
+$(BUILD)/gen/tny_play_sprites_data.c: tools/tnyplayables.py tools/lying.py tools/bossmodels.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py src/coop/tourney.h src/coop/tourney_data.c $(ROM)
 	$(PYTHON) tools/tnyplayables.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/tny_play_sprites_data.o: $(BUILD)/gen/tny_play_sprites_data.c src/coop/rom.h src/coop/tourney.h
@@ -254,7 +254,7 @@ $(BUILD)/obj/oldherc_portrait_data.o: $(BUILD)/gen/oldherc_portrait_data.c src/c
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # the tournament's five new fighters and Videl's portrait (never committed); previews tny_preview_*.png beside them
-$(BUILD)/gen/tny_sprites_data.c: tools/tnysprites.py tools/oldherculeportrait.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM)) $(BUILD)/.spriteflags
+$(BUILD)/gen/tny_sprites_data.c: tools/tnysprites.py tools/lying.py tools/headcheck.py tools/oldherculeportrait.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM)) $(BUILD)/.spriteflags
 	@mkdir -p $(BUILD)/gen
 	$(PYTHON) tools/tnysprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD) --ids $(KING_COLD_SPRITE),$(ROSHI_SPRITE),$(CHICHI_SPRITE),$(VIDEL_SPRITE),$(CHIAOTZU_SPRITE)
 

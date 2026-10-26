@@ -870,22 +870,47 @@ static int frames_of(const Entity *e, const u32 *grp) {
     }
     return n;
 }
-// Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd)
+// The lying table's entry for e's body (tny_lie, generated: bodies whose group 12 is no lying pose), or 0
+extern const TnyLie tny_lie[] __attribute__((weak));
+#define POSE_LIE_TABLE 0xFF                  // pose_g: the group comes from tny_lie
+static const TnyLie *lie_entry(const Entity *e) {
+    if (!tny_lie) return 0;
+    for (const TnyLie *l = tny_lie; l->sprite; l++)
+        if (sprite_ok(l->sprite) && (const void *)Character_GetSpriteRecord(l->sprite) == e->sprite_record) return l;
+    return 0;
+}
+static const u32 *lie_grp(const Entity *e, const TnyLie *l) {
+    if (!l) return 0;
+    if (!l->grp) return grp_of(e, l->group);
+    const u32 *g = (const u32 *)l->grp;
+    return g[0] && g[1] && g[2] && g[3] && desc_ok((const u8 *)g[e->facing & 3]) ? g : 0;
+}
+// Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd). The loser lies
+// in a side facing (the down / up facings of the lying groups are front views of a body half sitting up); the
+// lying group is group 12 (every tournament body has a real lying pose there: docs/sprites.md "Lying poses"),
+// else the lying table's, else the knock-down's last frame, else the hit-stun.
 static void pose_hold(Entity *e, int win) {
     if (!e || !in_list(e) || eng.npose >= 4) return;
     if (win) e->facing = 0;
+    else e->facing = (e->facing == 1 || e->facing == 3) ? 3 : 2;
     static const s8 lie[][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };     // group, frame (-1 = the last)
     static const s8 cheer[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };
     const s8 (*tab)[2] = win ? cheer : lie;
     int g = -1, f = 0;
     if (!win && is_s13(e)) { g = S13_G_POWER; f = 0; }          // Super 13's group 12 is his death light: he kneels
+    const TnyLie *l = win || g >= 0 ? 0 : lie_entry(e);
+    const u32 *lg = lie_grp(e, l);
+    if (lg) {
+        g = l->grp ? POSE_LIE_TABLE : l->group;
+        f = l->frame < 0 ? frames_of(e, lg) - 1 : l->frame;
+    }
     for (int i = 0; g < 0 && i < 3; i++) {
         const u32 *grp = grp_of(e, tab[i][0]);
         if (!grp) continue;
         g = tab[i][0];
         f = tab[i][1] < 0 ? frames_of(e, grp) - 1 : tab[i][1];
     }
-    if (g < 0 || !grp_of(e, g)) return;
+    if (g < 0 || !(g == POSE_LIE_TABLE ? lg : grp_of(e, g))) return;
     int k = eng.npose++;
     eng.pose_e[k] = e;
     eng.pose_g[k] = (u8)g;
@@ -894,7 +919,8 @@ static void pose_hold(Entity *e, int win) {
 static void poses_apply(int still) {
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
-        const u32 *grp = e && in_list(e) ? grp_of(e, eng.pose_g[k]) : 0;
+        const u32 *grp = !e || !in_list(e) ? 0
+                       : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : grp_of(e, eng.pose_g[k]);
         if (!grp) continue;
         E32(e, 0x4C) = (u32)grp;
         E16(e, 0x14) = eng.pose_f[k];
