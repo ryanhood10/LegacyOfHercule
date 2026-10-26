@@ -18,6 +18,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 |---|---|---|---|---|---|---|---|---|---|---|
 | grounds | 441-445 (441, 442 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (all used); ui_strings 357-379 (357-359 used) | `.tny.gr` 0x40 (0x24 used) |
 | hpbars (main) | - | - | - | - | - | - | - | - | - | `.tny.hp` 8 |
+| talk (main) | - | - | - | - | - | - | - | 31 | - | `.tny.talk` 0x58 |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
@@ -275,6 +276,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 24 | TNY_FORCE_POOL (engine) | `arg` = tiers forced open (bits 0-4); `arg2` bit 0 ignore the fighters' story flags, bit 1 a fighter without art fights with Tien's body (121); no story notices while anything is forced |
 | 25 | TNY_START (engine) | a tournament without the director's screens, from where player 1 stands (the way back): `arg` = division \| full << 4 \| tier << 8, `arg2` = player 1's pick \| player 2's << 8 (0xFF = his own character) |
 | 28-29 | the tournament ui (below / `docs/tournament.md` 12) | |
+| 31 | TNY_TALK (dialogue, main) | the fighters' dialogue (`tny_talk.c`): `arg` = the opening side (fighter \| fighter << 8, 0xFF nobody), `arg2` = the answering side; `arg` bit 31: fighter `arg & 0xFF`'s win line instead (`tools/headless/tny_talk.txt`) |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
 | 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |

@@ -193,6 +193,8 @@ void tny_moves_final_form(Entity *e);                            // every transf
 // grounds
 int  tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push);  // CoopCall 30
 void tny_grounds_test(u32 cmd, u32 arg, u32 arg2);               // test command 30
+void tny_talk_test(u32 cmd, u32 arg, u32 arg2);                  // test command 31 (tny_talk.c)
+void tny_talk_frame(void);                                       // tny_talk.c: Start skips a talk
 void tny_grounds_frame(void);                                    // every frame (held poses on the grounds)
 // playables
 int  tny_play_row(int id);                                       // display row of a tournament playable (0 = none)

@@ -40,6 +40,8 @@ WEAK void tny_moves_final_form(Entity *e) { (void)e; }
 WEAK int  tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push) { (void)fn; (void)a; (void)b; (void)c; (void)push; return 0; }
 WEAK void tny_grounds_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }
 WEAK void tny_grounds_frame(void) {}
+WEAK void tny_talk_frame(void) {}
+WEAK void tny_talk_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }
 
 WEAK int  tny_play_row(int id) { (void)id; return 0; }
 WEAK const u32 *tny_lie_pose(const Entity *e, int *frame) { (void)e; *frame = 0; return 0; }
@@ -58,10 +60,12 @@ void tny_test_cmd(u32 cmd, u32 arg, u32 arg2) {
     else if (cmd >= 26 && cmd <= 27) tny_moves_test(cmd, arg, arg2);
     else if (cmd >= 28 && cmd <= 29) tny_ui_test(cmd, arg, arg2);
     else if (cmd == 30) tny_grounds_test(cmd, arg, arg2);
+    else if (cmd == 31) tny_talk_test(cmd, arg, arg2);
 }
 
 void tny_frame(void) {
     tny_grounds_frame();
+    tny_talk_frame();
     tny_engine_frame();
     tny_moves_frame();
     tny_ui_frame();

@@ -2,6 +2,10 @@
 
 Status: **plan done (Ryan, 2026-10-25: "done as written"); to be built after the polish pass merges.** Section 10's
 questions stand as the plan has them: the winner's line only, 2 v 2 opponent teams drawn at random, Start skips.
+Built so far: `src/coop/tny_talk.c` (choosing and showing the lines), the data generated from this doc's tables by
+`tools/tnytalk.py` (an edit here is an edit in the game: the build reads sections 4-7), test command 31 and
+`tools/headless/tny_talk.txt`. Still to do: calling it from the engine's talk hook (the polish pass's) and the
+Rumble announcer's calls (section 8).
 Original brief: Ryan asked for Budokai-style lines between the
 fighters on the ring, planned for every combination in 1 v 1 and 2 v 2, and **the announcer only in the Royal
 Rumble**. Mark any line to change, cut or replace. Lines you dictate go in word for word. When you say the plan is

@@ -1,0 +1,88 @@
+# The fighters' dialogue (src/coop/tny_talk.c, docs/tournament-dialogue.md), by test command 31 (TNY_TALK: arg = the
+# opening side id | id << 8, arg2 = the answering side, 0xFF nobody; bit 31 a winner's line). From Map Test 13; each
+# box gets 90 frames to type out, then A. Look at the shots: t1 Yamcha opens, Trunks replies (the defaults); t2 Frieza / Goku (a rival exchange,
+# three boxes); t3 Goku meets Goku (Buu Saga); t4 17 & 18 vs Goten & Kid Trunks (team vs team); t5 SSJ2 Gohan vs
+# Perfect Cell (Gohan's exchange, SSJ2's portrait); t6 your Hercule's win line (the shared voice); t7 Start skips:
+# after Start and one A the talk is over (no box).
+#   python tools/headless/st_test.py tools/headless/tny_talk.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+p2 off
+maptest 13
+frames 300
+echo == t1 Yamcha (0) vs Trunks (54)
+poke32 0x0203FD0C 0xFF00
+poke32 0x0203FD54 0xFF36
+poke32 0x0203FD08 31
+frames 90
+shot t1a
+key 1 6
+frames 90
+shot t1b
+key 1 6
+frames 90
+echo == t2 Frieza (2) vs Goku (55)
+poke32 0x0203FD0C 0xFF02
+poke32 0x0203FD54 0xFF37
+poke32 0x0203FD08 31
+frames 90
+shot t2a
+key 1 6
+frames 90
+shot t2b
+key 1 6
+frames 90
+shot t2c
+key 1 6
+frames 90
+echo == t3 Goku (Buu Saga) (29) vs Goku (55)
+poke32 0x0203FD0C 0xFF1D
+poke32 0x0203FD54 0xFF37
+poke32 0x0203FD08 31
+frames 90
+shot t3a
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot t3c
+key 1 6
+frames 90
+echo == t4 17 & 18 (16, 17) vs Goten & Kid Trunks (37, 38)
+poke32 0x0203FD0C 0x1110
+poke32 0x0203FD54 0x2625
+poke32 0x0203FD08 31
+frames 90
+shot t4a
+key 1 6
+frames 90
+shot t4b
+key 1 6
+frames 90
+echo == t5 Perfect Cell (21) vs SSJ2 Gohan (58)
+poke32 0x0203FD0C 0xFF15
+poke32 0x0203FD54 0xFF3A
+poke32 0x0203FD08 31
+frames 90
+shot t5a
+key 1 6
+frames 90
+shot t5b
+key 1 6
+frames 90
+echo == t6 your Hercule's (56) win line
+poke32 0x0203FD0C 0x80000038
+poke32 0x0203FD08 31
+frames 90
+shot t6
+key 1 6
+frames 90
+echo == t7 Start skips: Goku (55) vs Vegeta (53), Start on the first box, one A
+poke32 0x0203FD0C 0xFF37
+poke32 0x0203FD54 0xFF35
+poke32 0x0203FD08 31
+frames 90
+shot t7a
+key 8 4
+frames 4
+key 1 6
+frames 90
+shot t7b
