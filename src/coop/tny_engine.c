@@ -1441,7 +1441,7 @@ static void rumble_round(void) {
     if (!n) { eng.result = R_WON; eng.kind = K_RUMBLE; eng.phase = P_MATCH_END; eng.timer = 90; return; }
     char num[2] = { (char)('1' + eng.rb_round), 0 };
     // the announcer's calls (docs/tournament-dialogue.md 8: the Rumble has no fighter lines)
-    int head = ids[n - 1], alt = (int)rnd(2);
+    int head = ids[n - 1], alt = (int)(g_FrameCounter & 1);   // not rnd(): the draws stay as seeded
     if (eng.rb_round == 0) {
         if (alt) ann_prep("Royal Rumble, round ", num, "!  Last ones standing win!", 0, 0);
         else ann_prep("Into the ring!  Every fighter for themselves!", 0, 0, 0, 0);
@@ -1698,7 +1698,7 @@ static void end_show(void) {
         else ann_prep("", chal_name(0), eng.nchal > 1 ? " and partner win!" : " wins!", 0, 0);
     } else if (eng.kind == K_RUMBLE) {
         if (won && eng.rb_round + 1 < eng.rb_rounds) {
-            if (rnd(2)) ann_prep("Round cleared!  ", me, team ? " stand tall!" : " stands tall!", 0, 0);
+            if (g_FrameCounter & 1) ann_prep("Round cleared!  ", me, team ? " stand tall!" : " stands tall!", 0, 0);
             else ann_prep("The ring is clear!  On to the next round!", 0, 0, 0, 0);
         }
         else if (won) ann_prep("The headliner is down!  ", me, team ? " win it all!" : " wins it all!", 0, 0);
