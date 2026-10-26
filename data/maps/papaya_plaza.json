@@ -1,5 +1,5 @@
 {
- "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is on the beach below the plaza (the world-map landing arrives there). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
+ "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is West City's light-blue cloud marker on the paving just above the beach (the world-map landing arrives on the beach below it). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
  "name": "papaya_plaza",
  "zone": 15,
  "area": 11,
@@ -66,6 +66,33 @@
     9
    ],
    "_": "the grass behind the right brick wall"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    27,
+    43
+   ],
+   "src": {
+    "map": [
+     4,
+     3
+    ],
+    "rect": [
+     43,
+     153,
+     6,
+     4
+    ]
+   },
+   "layers": [
+    3
+   ],
+   "to_layers": [
+    2
+   ],
+   "collision": false,
+   "_": "the flight spot's marker: West City's light-blue cloud on the paving (Ryan, 2026-10-25: no visible way back to the world map)"
   }
  ],
  "triggers": [
@@ -82,16 +109,16 @@
   {
    "type": "flight",
    "rect": [
-    200,
-    368,
+    216,
+    344,
     264,
-    416
+    376
    ],
    "world": [
     1260,
     1820
    ],
-   "_": "the beach: back to the world map at the landing"
+   "_": "the light-blue cloud above the beach: back to the world map at the landing"
   },
   {
    "type": "dialogue",

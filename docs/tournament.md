@@ -939,3 +939,12 @@ their winners.
 - CoopCall 30 (grounds) gained op 3 (player 1's name in capitals), op 4 (the courtyard's unlocked crowd), op 5 (an
   item with its pop-up), op 6 (every entity on a sprite plays a group). Test: `tools/headless/tny_eggs.txt`.
 
+## 18. The plaza's flight spot is visible (2026-10-25)
+
+Ryan: "there's no visible indicator ... to go and fly on the world map". LoG2 marks its towns' flight spots with a
+light-blue cloud painted into the ground (West City: zone 4 area 3, around (352, 1240), in BG3); the plaza now has
+the same cloud (a stamp of those 6 x 4 tiles into the plaza's BG2, which draws over its BG3 paving) on the paving just
+above the beach, and the flight trigger sits on it ((216, 344)-(264, 376)). The world-map landing still arrives on the
+beach below. (World-map landmarks, the 3D towns seen while flying, are drawn per site by the on-load's
+FindCharacterEntity 2-12; Papaya Island has none: adding one needs that landmark table decoded.)
+
