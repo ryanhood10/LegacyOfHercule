@@ -913,3 +913,38 @@ that still touches, is filmed in the ring for every playable row: poke slot 1's 
 1 (`PARTY` = 1), warp to zone 15 area 16 at (248, 384), then `keys 0x10` / `frames 4` / `keys 0` / `frames 6` / `keys 0x10`
 (a double tap; the runner's `key` releases after each press, so holds need `keys`) and shots every few frames.
 
+## Tournament bodies: sheets and films (headless, 2026-10-25, branch `tny-artfix`)
+
+Two tools check every body the tournament shows by eye (Ryan's playtest: Chi-Chi's head, the lying poses, Spopovich):
+
+```
+python -I tools/tnysheet.py build/<dir>/log2-coop.gba build/<dir>/coop.sym build/<dir>/sheet_lying.png --lying
+python -I tools/tnysheet.py ... sheet_cheer.png --cheer             # the winner's pose
+python -I tools/tnysheet.py ... last.png --last 12,3 --ids 72,57    # candidates: each group's last frame per facing
+python -I tools/tnysheet.py ... groups.png --groups 1,13 --ids 187  # every frame of these groups
+python tools/headless/tny_film.py build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss build/<dir>/film --rows 29-66 --name rows
+python tools/headless/tny_film.py ... --opp 195 --name spo          # an opponent on AI set 21, his pose per shot
+```
+
+- `tnysheet.py` reads the built ROM (the relocated sprite index through `coop.sym`; the engine's lying table `tny_lie`
+  from the ROM) and draws, per body, the frame the engine would show, h-flip applied, at the descriptor's offset on a
+  ground line with a grey cross at the entity's position. Bodies: the roster's opponent sprite and play sprite
+  (`tourney_data.c`) and the story playables. `--lying` mirrors `tny_engine.c` `pose_hold` (side facings only);
+  `--cheer` the winner's (facing down). Result (2026-10-25): every body lies on the ground but Super 13 (kneels by
+  design); before, the Buu imports stood in their recoil and Cooler / King Cold stood on end.
+- `tny_film.py --rows`: each display row played as player 1 in the ring (zone 15 area 16): idle, walk, a double-tap dash
+  each way, up, down, the A combo; every shot cropped around the entity's own screen position (entity +0x158 / +0x15C
+  minus the view at camera +0x1C, the camera object through 0x081DA974), so a lagging camera never cuts a body (giants
+  need `--big`: 80 px). Six rows per headless run; a row takes about 1.5 s. `--opp`: the sprite spawned on AI set 21
+  (stat 29, test command 8 from `coop2.boss_rec`) on New Planet Vegeta for 6 s, player 1 punching; each shot is
+  labelled with his pose group and frame (`E+0x4C` against the record, `E+0x14`).
+- Result (2026-10-25, rows 29-66): no head off its body; Chi-Chi's head over her shoulders with its face whole in all
+  four facings. Spopovich (`--opp 195`): the lean-forward charge firing his ki, the grab, the walk's full cycle.
+- The regression scripts on this branch (2026-10-25): `tny_play` (every ability changes EP, 76 blocks), `tny_artnew`
+  (set-21 poses 0, 1, 2, 5-8 seen; entrec 1 then 0), `tny_artbuu`, `tny_engine`, `tny_polish` (every stepz reached; the
+  loser's group 12 for 16, Super 13's 23; no CRASH). `tny_artbuu`'s hit test is history-dependent: in the full run
+  Goku (216) took no punch; run from fighter 214 on, Uub (215) takes none and 216 does, on main's build exactly the
+  same (the AI walks him 28 px off between the test's repositioning pokes), so it is not this branch's.
+- `tools/headcheck.py` on 185-189 / 235-244 flags only Chiaotzu's halo (group 17, a ring above the head by design) and
+  one swing arc over Roshi's back-view kick.
+

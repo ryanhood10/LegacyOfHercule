@@ -120,13 +120,14 @@ Pose indices differ between the games (read off the sheets of the playables):
 
 | pose | LoG2 group (frames) | Buu anim (frames) |
 |---|---|---|
-| idle, walk, run | 0 (2), 1 (4), 2 (4) | 0 (2), 1 (4), 2 (4) |
+| idle, walk | 0 (2), 1 (4) | 0 (2), 1 (4) (run: 2) |
 | fall / knocked-down sequence | 3 (4) | 17 (4) |
 | shout (open mouth) | 4 (4), 13 (4) | 12 (2) |
 | charge / raised fist | 5 (3) | 3 (3) |
 | attacks | 6, 7, 8 (4 each) | 4, 5, 6 (4 each) |
+| hit-stun | 2 (4) | 9 (3) |
 | hurt | 11 (2) | 9 (3) |
-| dazed sitting | 12 (4) | - |
+| dazed sitting (the stock playables; the enemy sets' 12 is a knock-down / death; ours are all lying poses: "Lying poses" below) | 12 (4) | 15 (lie down), else 17's last frame |
 | fidget | 14 (5) | 7 (1, flex) |
 | halo (dead) | 17 (2) | - (13 = plain stand, 2) |
 | beams | 18, 19 (7) | 19, 21 (Broly: 8, 6) |
@@ -681,7 +682,7 @@ facings x every frame, and `tny_preview_videl_portrait.png`.
 |---|---|---|---|
 | 185 | King Cold | Cooler's 64x64 fight set (34: groups 0-2, 5-8, 12; header and hurt boxes Cooler's, largest frame 0x1000) | Cooler's armour greys -> Cold's white / mint plates, his purples -> Cold's purple skin (74's palette), the gems teal; Cooler's spiked head (found from the forehead gem 77: the head is the 8-connected opaque area from 12 rows above the gem to the mouth row, gem + 6, within 12 px) replaced by Cold's head cut from 74 (horns, teal dome, face; back view: the dome over purple skin), mouth on Cooler's mouth row; a red cape drawn per frame from the shoulders to the knees (vertical folds, a ragged hem; behind the body in front and side views, over the back in back views, arms stay in front). Lying frames (12) get the head too (the face toward the viewer), no cape. Cooler's attack frames kept: Cold has Cooler's build, smaller than his cutscene sprite 74 (about 44 px against 62) |
 | 186 | Master Roshi | Krillin's: his NPC set 76 (0 idle, 1 walk, 2 hit, 3 knock-down, 4 shout, 5 ki pose, 6 punch combo, 12 lying, 20 = 3) and Goku's 60 (7, 8 attacks, 11 hurt, 13 flight, 16 special melee, 18 Kamehameha pose); Goku's header | upright frames re-headed with Roshi's head from his NPC sprite 88 (bald, red sunglasses, white eyebrows) and his beard (the greys under the chin, joined to it, with a grey outline), chin on the old chin row (Goku: largest black hair component + chin offset from his idle; Krillin: the top opaque row + offset), raised hands that touch a wristband away from the face kept; the turtle shell (green oval, darker plate lines, black rim) on every back view. The gi stays orange / blue (his fighting gi) |
-| 187 | Chi-Chi | Android 18's fight set (11: 0-8, 12; 11 hurt = 18's 3, 3 / 12 / 20 = 18's fall 12, 13 = walk); Hercule's header | upright frames: 18's gold hair (and her group 4's dimmer ramp) and face cleared, Chi-Chi's head from her NPC sprite 33 pasted (bun with the pink ring, black hair; chin on 18's chin row, face centre on 18's); the rest of 18's hair black. Her LoG2 outfit: the blue vest -> orange-yellow tabard, its navy shading blue (the trousers), boots dark, the Red Ribbon logo on the back gone |
+| 187 | Chi-Chi | Android 18's fight set (11: 0-8, 12; 11 hurt = 18's 3, 3 / 12 / 20 = 18's fall 12, 13 = walk); Hercule's header | upright frames: 18's gold hair (and her group 4's dimmer ramp) and face cleared, Chi-Chi's head from her NPC sprite 33 pasted (bun with the pink ring, black hair; chin on 18's chin row, face centre on 18's corrected to sit over the body as on sprite 33; a frame the head would stick out of widened to 32 x 32: "Lying poses, Chi-Chi's head" below); the rest of 18's hair black. Her LoG2 outfit: the blue vest (its dark ramp too, above the waist) -> orange-yellow tabard, the navy below it blue (the trousers), boots dark, the Red Ribbon logo on the back gone |
 | 188 | Videl | Android 18's fight set, as Chi-Chi | Videl's head from Buu's Fury (record 276, her short hair at the 25th Budokai, blue eyes; Buu's tan face onto LoG2's skin ramp), a white shirt (vest and sleeves white, plainer stripes), black shorts / leggings (18's own), white shoes. Without `roms/buu.gba`: Chi-Chi's head without the bun |
 | 189 | Chiaotzu | kid Gohan's complete set (53, the smallest playable body; his header) | Chiaotzu's head from his NPC sprite 32 (white face, red cheeks, black cap with the red ball), his outfit there: the shirt (greys above the sash touching it or its outline) light blue, the sash red, the trousers black, the skin white. Lying / tumbling frames: Gohan's hair cut back to a round cap around the face |
 
@@ -699,3 +700,51 @@ ki), take hits and fall to `COOP_CMD_WAVE_CLEAR`; Roshi, Chi-Chi, Videl and Chia
 take hits as player 1's body. King Cold as a player body needs a display row (his 0x1000 OBJ VRAM slot comes from the
 bind); that is the playables piece's.
 
+
+## Lying poses, Chi-Chi's head, Spopovich (Ryan's playtest, 2026-10-25, branch `tny-artfix`)
+
+**Lying poses.** The tournament poses its loser in a lying frame at a match's end (`tny_engine.c` `pose_hold`). Ryan:
+"the fainting / laying down at the end, you used their flying sprites instead". Checked on every body the tournament
+shows (`python -I tools/tnysheet.py BUILT.gba coop.sym OUT.png --lying`, `docs/testing.md` "Tournament bodies"), the
+"lying" group was no lying pose for many: the Buu imports' group 12 was their hurt recoil (arms out, upright), Cooler's
+and King Cold's 12 is Cooler's death drawn feet-first from above (it stood on the ground like a flying body), Frieza,
+Mecha Frieza, General Tao and Cell Jr. have no lying frame at all (the hit-stun stood in), and the stock playables'
+12 is a dazed sit (Hercule, Gohan, Trunks) or a half-risen lean (Gohan, Super Saiyan 2 Gohan, Perfect Cell). Now:
+
+| body | lying pose (group 12 unless said) |
+|---|---|
+| Buu imports (`buu2log2.py` `GROUP_MAP` 12 = `lie`) | the last frame of the lie-down anim 15, else of the fall 17 when it ends wider than tall (Uub, Majin Vegeta, old Hercule 158, Dabura), else the hurt recoil (anim 9 frame 1; Evil Buu his lean 7) turned to lie (`tools/lying.py`): Broly 159, Pui Pui, Yakon, Evil Buu, Janemba; every frame of the group is that one frame |
+| King Cold 185 (`tnysprites.py`) | his hit-stun (head and cape on) turned to lie, face down so the tail curls up |
+| player bodies (`tnyplayables.py`) | `PLAYER_FROM` 12 = [12, the knock-back's last frame, `ROT`: the hit-stun turned]; Frieza 237, Mecha 238, Tao 239 turned; Cooler 244 turned (override); Perfect Cell 243 the knock-back's last frame |
+| stock records (the generated table `tny_lie`, `tnyplayables.py` `LIE`) | Hercule 72, Gohan 57, Trunks 135, Super Saiyan 2 Gohan 58, Semi-Perfect 29 and Perfect Cell 30: their knock-down's (group 3) last frame; Frieza 48, Mecha Frieza 49, Tao 50, Cooler 34: their player body's group 12; Cell Jr. 31: his hit-stun turned (a lying group of its own) |
+| Super 13 180 | kneels in group 23 (unchanged: his 12 is the death light) |
+
+`tools/lying.py` `lie(px, xo, yo, face_left)`: hit sparks dropped (8-connected pieces under a fifth of the largest), the
+body turned a quarter (head away from the facing; facing right the mirror), on its back or face down (whichever has more
+of the body in its lower half: Cooler's tail curls up, not under him), trimmed to the smallest OBJ shape, one row below
+the upright body's feet and centred where it stood; `attr_for` keeps 8bpp and clears the flip. The engine lays the loser
+in a side facing (left for down / left, right for up / right): the down / up frames of the stock lying groups are front
+views half sitting up. Its order: the `tny_lie` entry, else group 12's last frame, else 3's last, else 2's first.
+
+**Chi-Chi's head** ("cut off and shifted to the right"): her head from her NPC sprite 33 was anchored on Android 18's
+face pixels; 18's face sits further forward in her head than Chi-Chi's, so the head landed 1-1.5 px forward (to the right
+facing right) and its front fell off the 16 px side frames (135 head pixels cut by frame edges over her record). Now
+the anchor is corrected per facing by the idle frames' face-to-body offsets (18's against the NPC's: the head sits over
+the body as on her own sprite), and a 16 x 32 frame whose pasted head would stick out is widened to 32 x 32 (same
+centre; 11 of Chi-Chi's frames, 18 of Videl's, 3 of Roshi's, 5 of Chiaotzu's). The generator prints the pixels still cut
+by a frame edge (0, but Videl's 8: one column of her hair on two 32-wide charge frames). Her outfit follows her NPC
+sprite too: 18's vest above the waist, including its dark ramp (her side views and the shout / victory pose, which had
+stayed navy), is her orange tabard. Roshi had the same anchor fault on Krillin's side frames (2 px back): corrected the
+same way; his head now settles onto the shoulders when Goku's hair reached lower (back-view kick and dash), his shell
+centres on the body, a raised arm in back views is kept, and a fist cut off by the hair's removal no longer floats.
+King Cold's hit-stun lost a floating piece of Cooler's tail. Videl and Chiaotzu: checked, no fault beyond the above.
+
+**Spopovich** ("he just has a weird animation"): his Buu record (242) is a partial set and its first map drew the
+charge / shout / dash from anim 17, a front view in every facing, cut his 6-frame walk to its first 4 frames, and (as
+every import) played his run as the hit-stun. Now (`data/tny_buu.txt`): the walk sampled over the whole cycle, hurt 9 as
+the hit-stun, the knock-down hurt then lying (a frame list), the grappler's lean (7) as the charge (the bear hug's crouch
+and his ki), the grab (18) as an attack and the special melee, his punch for the others, the front flex (19) as the
+shout / victory pose, his run as the dash. `buu2log2.py` gained, for every import: group 2 = hurt 9 (LoG2's group 2 is the
+hit-stun: Goku, Hercule and the enemy sets show the sparks there), walk / run / dash cycles longer than the template
+sampled evenly (`LOOPS`), and spec values `lie` and `a.f+a.f+...` (a frame list). Yamu's dash is his run too, Pui Pui's
+his walk (was his idle), Kibito's hit-stun his stand (was his walk).

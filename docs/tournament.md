@@ -848,9 +848,9 @@ GOHAN versus FRIEZA!  Begin!" ("The final: ...", "Royal Rumble, round 2!  Last o
 headliner: BROLY!  Begin!", "PUI PUI challenges you!  Begin!"). A closes the line and he leaves before the first blow;
 the boss bars come then. A Rumble round has no walk: the players stand on their marks, he calls the round, leaves, and
 only then does the pack come in (he never shares OBJ VRAM with a fight). The co-op final (the duel): he calls it and
-leaves when the duel starts. At the end (90 frames after the last blow) the loser lies down (his lying group 12, else
-the knock-down 3, else the hit-stun; Super 13 kneels in his power-up crouch, group 23, because his 12 is the death
-light), the winner shows his victory pose facing the crowd (the shout group 4's last frame, else the fidget 14, else the
+leaves when the duel starts. At the end (90 frames after the last blow) the loser lies down in a side facing (the lying table `tny_lie`, else his
+lying group 12, else the knock-down 3, else the hit-stun: section 20; Super 13 kneels in his power-up crouch, group 23,
+because his 12 is the death light), the winner shows his victory pose facing the crowd (the shout group 4's last frame, else the fidget 14, else the
 ki pose 5), the announcer comes back and calls it ("The winner...  GOHAN!", "FRIEZA wins!  GOHAN is out of the
 tournament!", "Round cleared!  GOHAN stands tall!", "GOHAN defeats PUI PUI!"); the poses hold while the line shows,
 then the bracket screen. The trophy: the players' pose and "Ladies and gentlemen...  GOHAN wins the Rookie
@@ -958,4 +958,21 @@ over every fighter, a 2 v 2 partner of the players gets one, and 1 v 1 / the 2 v
 A fighter at 0 HP loses its bar. 4bpp in palette bank 0 (the game's one OBJ palette: 1 black, 4 green, 5 red,
 8 yellow, 14 dark grey), 64 bytes a fighter, eight at most (0x200 bytes of OBJ VRAM, taken while bars show and freed
 when none do and when the HUD goes). State: `.tny.hp` (8 bytes). Test: `tools/headless/tny_hpbars.txt`.
+
+## 20. Ryan's playtest: the art fixes (2026-10-25, branch `tny-artfix`)
+
+- **"chichi's head has been cut off and shifted to the right"**: her NPC head (sprite 33) sat 1-1.5 px forward of 18's
+  body and its front was cut by the 16 px side frames. The head is placed over the body as on her own sprite and frames
+  it would stick out of are widened; her tabard covers her side views and her victory pose too. Roshi had the same
+  anchor fault (corrected) and a head floating on back-view kicks (settled); Videl, Chiaotzu and King Cold checked
+  (King Cold lost a floating tail tip). `docs/sprites.md` "Lying poses, Chi-Chi's head, Spopovich".
+- **"the fainting/laying down at the end, you used their flying sprites instead"**: every body now has a real lying
+  pose where the engine looks (`tny_lie`, group 12): the Buu imports' lie-down frames or a turned recoil, King Cold,
+  Cooler, Frieza, Mecha Frieza, Tao and Cell Jr. turned hit-stuns, the stock playables and the Cells their knock-down's
+  last frame. The engine lays the loser in a side facing. Sheet: `tools/tnysheet.py --lying` (`docs/testing.md`
+  "Tournament bodies").
+- **"spopavich is great, he just has a weird animation"**: his partial set is remapped (full walk cycle, a side-view
+  grappler's crouch for the charge and the bear hug, the grab as an attack, his flex for the victory pose, his run for
+  the dash; every import's hit-stun is its hurt animation now, not its run). Yamu, Pui Pui and Kibito got the dash /
+  hit-stun parts of the same fix.
 
