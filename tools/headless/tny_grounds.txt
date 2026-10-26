@@ -261,9 +261,9 @@ keys 0
 frames 300
 map
 shot gr18_plaza_again
-# 18. the flight spot on the beach -> the world map at the landing
+# 18. the flight spot (the cloud on the paving above the beach, (216,344)-(264,376)) -> the world map at the landing
 poke32 0x0203FD0C 0x0B0F
-poke32 0x0203FD54 0x017800E8
+poke32 0x0203FD54 0x016800F0
 poke32 0x0203FD08 5
 frames 300
 key 0x80 10
