@@ -13,7 +13,7 @@ usage: buu2log2.py roms/log2.gba roms/buu.gba build/gen/buu_sprites_data.c 158=1
   --spec       a file of more pairs, one per line: `<id>=<buu record> [g:a,g:a,...] [@<template>]`
                (the group map override and a per-id template; `#` starts a comment); a group's value may also be
                `lie` (the lying pose, see GROUP_MAP) or a frame list `a.f+a.f+...` (Buu anim a frame f, in order,
-               the last one held to the template's count)
+               the last one held to the template's count; `lie` in the list = the lying pose's frame)
   --expect     the ids the caller expects (space-separated); a mismatch with the spec is an error
   --section    put every emitted object in this section (`.rodata.art`: the second ROM blob, tourney.h
                TNY_ART), so big imports stay out of the code blob
@@ -58,6 +58,105 @@ GROUP_MAP = {0: 0, 1: 1, 2: 9, 3: 17, 4: 12, 5: 3, 6: 4, 7: 5, 8: 6, 9: 18, 11: 
 # looping groups (walk, run, dash): a Buu cycle longer than the template's count is sampled evenly over the whole
 # cycle (Spopovich's 6-frame walk played its first 4 frames and jerked back to the start, 2026-10-25)
 LOOPS = (1, 2, 13)
+# Buu records without a lie-down whose hurt anim's recoil (9.1) turned to lie read as a sprawl seen from above
+# (Ryan's polish list, 2026-10-25): the frame to turn instead, (anim, frame, tuck): Broly's head-back recoil 9.0 (his 9.1
+# is a crouch: turned, the hair stood up off the ground), Janemba's straight recoil 9.2 (on his back, the tail curled
+# up), Yakon's 9.1 with the limbs drawn in (lying.tuck_limbs: he is drawn only from the front, so any turned frame is a
+# spread-eagle seen from above)
+LIE_FRAME = {28: (9, 0, None), 144: (9, 2, None), 290: (9, 1, (0.2, 0.3))}
+
+
+def is_lying(bu, d):
+    """A Buu frame that lies on the ground: its drawn body wider than tall (by 15 %)."""
+    (x0, y0, w, h), px = bu.frame_pixels(d)
+    pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
+    bw = max(x for _, x in pts) - min(x for _, x in pts) + 1
+    bh = max(y for y, _ in pts) - min(y for y, _ in pts) + 1
+    return bw > bh * 1.15
+
+
+def falls(bu, anims):
+    """Whether the record's anim 17 is a fall (ends lying); else it is a death glow or a regrowth."""
+    return 17 < len(anims) and bool(anims[17]) and is_lying(bu, anims[17][-1][2])
+
+
+# Yamu (Buu record 293): Buu's Fury drew Babidi's two thugs both bald, so beside Spopovich (242) he read as a second
+# Spopovich (Ryan's playtest: "Spopovich's and Yamu's bodies look alike"). No other record in the ROM is Yamu (every
+# record was drawn and checked, 2026-10-25, polish2-art: 293 is the only lean, shirtless one in black trousers with the
+# purple sash; the small bald 74 / 163 / 164 are a plain enemy). His black hair tuft is painted on instead.
+YAMU_SKIN = {16, 18, 19, 20, 21, 23, 30}          # Buu palette: his skin ramp and its brown outline
+HAIR_INK, HAIR_FILL = 1, 112                       # black, dark grey (both exact in LoG2's palette: his trousers)
+
+
+def find_head(px, skin):
+    """The head of an upright Buu frame: a skin blob from the top (rows y0..y0+8) at least 8 px wide five rows down
+    (a raised fist is narrower); the first one holding two or more black face pixels (eyes, brows: a fist and its arm
+    have none) wins, else (a back view) the first one. Returns its pixel set, or None."""
+    h, w = len(px), len(px[0])
+    tried, first = set(), None
+    for y0 in range(h):
+        for x0 in range(w):
+            if px[y0][x0] not in skin or (y0, x0) in tried:
+                continue
+            blob, stack = {(y0, x0)}, [(y0, x0)]
+            while stack:
+                y, x = stack.pop()
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        q = (y + dy, x + dx)
+                        if (0 <= q[0] < min(h, y0 + 9) and 0 <= q[1] < w and q not in blob
+                                and (px[q[0]][q[1]] in skin or px[q[0]][q[1]] in (1, 2))):
+                            blob.add(q)
+                            stack.append(q)
+            tried |= blob
+            row = [x for y, x in blob if y == y0 + 5]
+            if not row or max(row) - min(row) + 1 < 8:
+                continue
+            if sum(1 for y, x in blob if px[y][x] == 1) >= 2:
+                return blob
+            first = first or blob
+    return first
+
+
+def yamu_tuft(px, view):
+    """Yamu's hair: a black tuft on his scalp, 5 px wide and up to two rows high seen from the front or back, a crest
+    along the top of his head seen from the side (two rows at its middle, one at its ends); outlined in black where it
+    meets the air, dark grey where it lies on the head; upright frames only (his lying frames stay bald)."""
+    pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
+    if not pts:
+        return px
+    if max(x for _, x in pts) - min(x for _, x in pts) > (max(y for y, _ in pts) - min(y for y, _ in pts)) * 1.15:
+        return px
+    head = find_head(px, YAMU_SKIN)
+    if not head:
+        return px
+    y0 = min(y for y, _ in head)
+    top = {}
+    for y, x in head:
+        top[x] = min(top.get(x, y), y)
+    near = [x for y, x in head if y <= y0 + 3]
+    cx = sum(near) / len(near)
+    half = 2.5 if view == "front" else 4.0
+    out = [row[:] for row in px]
+    hair = set()
+    for x in top:
+        dx = abs(x + 0.5 - (cx + 0.5))
+        if dx > half:
+            continue
+        up = 2 if dx <= half - 1.5 else 1                 # higher in the middle, tapering at the ends
+        for y in range(top[x] - up, top[x] + (2 if up == 2 else 1)):
+            if 0 <= y < len(out):
+                hair.add((y, x))
+    for y, x in hair:
+        air = any(not (0 <= y + dy < len(px) and 0 <= x + dx < len(px[0])) or
+                  ((y + dy, x + dx) not in hair and not px[y + dy][x + dx]) for dy, dx in ((-1, 0), (0, -1), (0, 1)))
+        out[y][x] = HAIR_INK if air else HAIR_FILL
+    return out
+
+
+RETOUCH = {293: yamu_tuft}
+
+
 OBJ_SHAPES = {  # (w, h) -> (shape, size)
     (8, 8): (0, 0), (16, 16): (0, 1), (32, 32): (0, 2), (64, 64): (0, 3),
     (16, 8): (1, 0), (32, 8): (1, 1), (32, 16): (1, 2), (64, 32): (1, 3),
@@ -259,59 +358,71 @@ class Converter:
         self.template = template
         self.t_counts, self.t_header = self.templates[template]
 
-    def convert_frame(self, d, remap, bu_rec):
-        """Buu descriptor -> (xo, yo, w, h, attr, blob bytes, raw tile bytes) in LoG2 form."""
+    def convert_frame(self, d, remap, bu_rec, facing=None):
+        """Buu descriptor -> (xo, yo, w, h, attr, blob bytes, raw tile bytes) in LoG2 form. `facing` (0-3) lets a
+        record's RETOUCH see which view it draws; None (the lying pose) leaves the frame as Buu drew it."""
         box, parts = self.bu.descriptor(d)
+        touch = RETOUCH.get(bu_rec) if facing is not None else None
+        view = None if touch is None else ("side" if facing >= 2 else "front")
         if len(parts) == 1:
             x, y, w, h, attr, b = parts[0]
-            key = (b, bu_rec)                                            # left/right share one blob
+            key = (b, bu_rec, view)                                      # left/right share one blob
             if key not in self.blob_cache:
                 px = self.bu.part_pixels(w, h, attr & ~0x30000000, b)   # unflipped data, flip stays in attr
+                if touch:
+                    px = touch(px, view)
                 self.blob_cache[key] = self.encode(px, w, h, w, h, remap)
             ow, oh, blob, raw = self.blob_cache[key]
-            return (x, y, ow, oh, attr, blob, raw)
-        key = (tuple(p[5] for p in parts), tuple(p[0:4] for p in parts), bu_rec)
+            # our blobs are always 8bpp (encode): the part's own attr may be a 4bpp one (Yamu's 32 x 64 side idle,
+            # Buu r.293, drew as scrambled tiles: polish2)
+            return (x, y, ow, oh, attr | 0x2000, blob, raw)
+        key = (tuple(p[5] for p in parts), tuple(p[0:4] for p in parts), bu_rec, view)
         if key not in self.blob_cache:
             (xo, yo, w, h), px = self.bu.frame_pixels(d)                 # composite, flips applied
             if w > 64 or h > 64:
                 print(f"  warning: frame {d:#x} is {w}x{h}, cropped to 64x64")
                 px = [row[:64] for row in px[:64]]
                 w, h = min(w, 64), min(h, 64)
+            if touch:
+                px = touch(px, view)
             ow, oh = obj_size(w, h)
             shape, size = OBJ_SHAPES[(ow, oh)]
-            attr = (parts[0][4] & 0x0FFF0FFF & ~0xC000) | (shape << 14) | (size << 30)
+            attr = (parts[0][4] & 0x0FFF0FFF & ~0xC000) | (shape << 14) | (size << 30) | 0x2000   # 8bpp (encode)
             self.blob_cache[key] = (xo, yo, attr) + self.encode(px, w, h, ow, oh, remap)
         xo, yo, attr, ow, oh, blob, raw = self.blob_cache[key]
         return (xo, yo, ow, oh, attr, blob, raw)
 
-    def lying(self, rec, anims, bu_id, count):
-        """The lying group (GROUP_MAP 12 "lie"): 4 facings x count copies of one lying frame."""
+    def lie_frames(self, rec, anims, bu_id):
+        """The lying pose, one converted frame per facing (GROUP_MAP 12 "lie", and `lie` in a frame list)."""
         import lying as LY
         self.lie_anim = getattr(self, "lie_anim", {})
         for a in (15, 17):
             if a < len(anims) and anims[a]:
                 last = anims[a][-1]
-                (x0, y0, w, h), px = self.bu.frame_pixels(last[2])
-                pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
-                bw = max(x for _, x in pts) - min(x for _, x in pts) + 1
-                bh = max(y for y, _ in pts) - min(y for y, _ in pts) + 1
-                if bw > bh * 1.15:
+                if is_lying(self.bu, last[2]):
                     self.lie_anim[bu_id] = (a, "last")
-                    return [[self.convert_frame(last[d], rec["remap"], bu_id)] * count for d in range(4)]
+                    return [self.convert_frame(last[d], rec["remap"], bu_id) for d in range(4)]
         src = 9 if 9 < len(anims) and anims[9] else (7 if 7 < len(anims) and anims[7] else 0)
-        frame = anims[src][min(1, len(anims[src]) - 1)]          # the recoil (a hurt anim: shout, recoil, crouch)
-        self.lie_anim[bu_id] = (src, "turned")
-        dirs = []
+        fi, tuck = min(1, len(anims[src]) - 1), None          # the recoil (a hurt anim: shout, recoil, crouch)
+        if bu_id in LIE_FRAME:
+            src, fi, tuck = LIE_FRAME[bu_id]
+        frame = anims[src][fi]
+        self.lie_anim[bu_id] = (src, "turned", fi)
+        out = []
         for d in range(4):
             box, parts = self.bu.descriptor(frame[d])
             key = ("lie", frame[d], d == 3, bu_id)
             if key not in self.blob_cache:
                 (x0, y0, w, h), px = self.bu.frame_pixels(frame[d])
-                nxo, nyo, ow, oh, npx = LY.lie(px, x0, y0, face_left=(d != 3))
+                nxo, nyo, ow, oh, npx = LY.lie(px, x0, y0, face_left=(d != 3), tuck=tuck)
                 ow, oh, blob, raw = self.encode(npx, ow, oh, ow, oh, rec["remap"])
                 self.blob_cache[key] = (nxo, nyo, ow, oh, LY.attr_for(parts[0][4], ow, oh), blob, raw)
-            dirs.append([self.blob_cache[key]] * count)
-        return dirs
+            out.append(self.blob_cache[key])
+        return out
+
+    def lying(self, rec, anims, bu_id, count):
+        """The lying group: 4 facings x count copies of the one lying frame."""
+        return [[f] * count for f in self.lie_frames(rec, anims, bu_id)]
 
     def encode(self, px, w, h, ow, oh, remap):
         """Remap a [h][w] index map onto an ow x oh OBJ, compress: (ow, oh, blob, raw)."""
@@ -344,17 +455,24 @@ class Converter:
             if src == "lie":
                 groups.append(self.lying(rec, anims, bu_id, count))
                 continue
+            if gi in (3, 20) and src == 17 and not falls(self.bu, anims):
+                # the knock-down / tumble from an anim 17 that is no fall (Broly's and Janemba's 17 is their death
+                # glow, Kid Buu's a regrowth): the recoil, then down into the lying pose
+                src = "9.0+9.1+lie" if 9 < len(anims) and anims[9] else "0.0+lie"
+                self.fall_fixed = src
             if isinstance(src, str):                 # "a.f+a.f+...": these frames in this order, the last held
-                seq = [tuple(int(v) for v in p.split(".")) for p in src.split("+")]
-                groups.append([[self.convert_frame(anims[a][f][d], rec["remap"], bu_id)
-                                for a, f in (seq[min(k, len(seq) - 1)] for k in range(count))] for d in range(4)])
+                seq = [p if p == "lie" else tuple(int(v) for v in p.split(".")) for p in src.split("+")]
+                lie = self.lie_frames(rec, anims, bu_id) if "lie" in seq else None
+                groups.append([[lie[d] if q == "lie" else
+                                self.convert_frame(anims[q[0]][q[1]][d], rec["remap"], bu_id, d)
+                                for q in (seq[min(k, len(seq) - 1)] for k in range(count))] for d in range(4)])
                 continue
             frames = anims[src] if src < len(anims) and anims[src] else anims[0]
             if gi in LOOPS and len(frames) > count:   # a longer walk / run cycle: evenly sampled, not cut short
                 frames = [frames[k * len(frames) // count] for k in range(count)]
             dirs = []
             for d in range(4):
-                dirs.append([self.convert_frame(frames[fi % len(frames)][d], rec["remap"], bu_id) for fi in range(count)])
+                dirs.append([self.convert_frame(frames[fi % len(frames)][d], rec["remap"], bu_id, d) for fi in range(count)])
             groups.append(dirs)
         # header +0 (u16) is the record's largest frame in bytes: the entity's OBJ VRAM slot and staging
         # buffer are sized from it (stock: 0x400 for 32x32 bodies, 0x1000 for 64x64 ones), so a 64x64
@@ -485,8 +603,8 @@ def preview(conv, sid, bu_id, header, groups, rec, path, gmap=GROUP_MAP):
         src = gmap.get(gi, 0)
         fi = 0
         if src == "lie":                       # the anim it came from (its last frame, or the turned recoil)
-            src, how = getattr(conv, "lie_anim", {}).get(bu_id, (0, ""))
-            fi = -1 if how == "last" else 1
+            src, how, *turned = getattr(conv, "lie_anim", {}).get(bu_id, (0, ""))
+            fi = -1 if how == "last" else (turned[0] if turned else 1)
         elif isinstance(src, str):             # a frame list: its first frame
             src, fi = (int(v) for v in src.split("+")[0].split("."))
         frames = anims[src] if src < len(anims) and anims[src] else anims[0]
@@ -566,6 +684,7 @@ def main():
         gmap.update(maps.get(sid, {}))
         conv.used = {}
         conv.shifted = 0
+        conv.fall_fixed = None
         conv.set_template(templates.get(sid, default_template))
         header, groups, rec = conv.convert(bu_id, gmap)
         records.append((sid, header, groups))
@@ -577,6 +696,9 @@ def main():
         if conv.shifted:
             report.append(f"- frames moved {conv.shifted:+d} px in x (the drawn body back over the position)")
             print(f"  sprite {sid}: frames moved {conv.shifted:+d} px in x")
+        if conv.fall_fixed:
+            report.append(f"- anim 17 is no fall: groups 3 / 20 = {conv.fall_fixed}")
+            print(f"  sprite {sid}: knock-down {conv.fall_fixed} (its anim 17 is no fall)")
         report.append(f"- boxes {rec['boxes']} -> {[struct.unpack_from('<iiii', header, 0x0C + 16 * k) for k in range(4)]}")
         changed = [(ci, n) for ci, n in sorted(conv.used.items(), key=lambda kv: -kv[1]) if conv.table[ci][1] > 0]
         exact = sum(n for ci, n in conv.used.items() if conv.table[ci][1] == 0)

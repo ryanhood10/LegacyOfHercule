@@ -6,6 +6,22 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - **Tournament dialogue planned (for Ryan's review, not built):** `docs/tournament-dialogue.md`: Budokai-style lines in 1 v 1
   and 2 v 2 (every fighter's own, rival exchanges, meeting yourself, team lines), the announcer only in the Rumble.
+- **Polish pass 2: the tournament as scenes (branch `tny-polish2`):** every scene change in the ring happens behind
+  a curtain (fade to black, change, fade in): the trip from the waiting room (its menus chain through black, no
+  scrambled frame of the map load), the bracket back to a staged ring (players on their side, the opponent walking in
+  from off screen; no snap, no pop), the end (bars slide away, the fallen keep lying through the line and the pop-ups,
+  they leave in the dark), the co-op turn reloads, the trophy (the winner centred, facing the crowd), the challenger,
+  the way out. The Rumble's pack walks in, the fallen blink out; the duel final faces the two players off before it
+  starts; the announcer stands where the camera shows him; A no longer punches between fights; overhead HP bars only
+  in a fight; the bracket screen's one blank frame is gone; Yamu's scrambled body (4bpp attributes on 8bpp frames,
+  Kid Buu's victory pose too) is fixed in `buu2log2.py`. The dialogue seat `tny_talk_hook` (before the call, after
+  the result line) is in place, doing nothing yet. Films: `tools/headless/tny_flow.py`. `docs/tournament.md` 23.
+- **Sprite leftovers (polish2-art):** Yakon, Broly and Janemba lie on their side (Broly / Janemba turn another
+  recoil frame, Yakon, drawn only from the front, a turned frame with the limbs drawn in: `lying.tuck_limbs`); King
+  Cold's and Cooler's knock-down (groups 3 / 20) is their recoil then that lying frame, not Cooler's feet-first death;
+  so is every import whose anim 17 is no fall (Broly, Janemba, Kid Buu) and Yakon's, Pui Pui's, Evil Buu's; Videl's
+  hair column is back; Roshi's floating fists by the head are gone; the Buus' victory pose has no steam cloud; Yamu
+  (293 is the only Yamu in Buu's Fury) gets his black hair tuft. `docs/sprites.md` "Sprite leftovers".
 - **No mirror matches with a tournament pick (Ryan: picked Yamcha, met Yamcha in round one):** the engine's pool
   (`pool_of`) and the Rumble's headliner skip the players' picks; last tournament's picks are cleared first
   (`tools/headless/tny_nomirror.txt`: three seeds, Yamcha only in player 1's seat).

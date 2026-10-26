@@ -14,6 +14,7 @@ inspection goes through the GDB stub.
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
+| Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -888,6 +889,28 @@ with the sprite index), won: the record's `extra` bit 0 (+0x38); the select's Vi
 `menu.ss` (`--out` the folder holding it): a Rookie Rumble (`hb_rumble*`: a small bar over each fighter), kits 0-2
 set to 60 / 40 / 15 % (`hb_hit`: green, yellow, red, shorter; one may be off screen), a 2 v 2 (`hb_2v2`: boss bars
 only) and a Champion Rumble (`hb_champ*`). Pass: every `stepz` reached, no CRASH, the shots as described.
+
+## Tournament flow films (headless, 2026-10-25, branch `tny-polish2`)
+
+```
+python tools/headless/tny_flow.py build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss build/<dir>/flow --len 4000 --name r1v1
+python tools/headless/tny_flow.py ... --div 2 --name rumble               # Royal Rumble (1P)
+python tools/headless/tny_flow.py ... --div 1 --p2 --name t2v2           # 2 v 2 (co-op)
+python tools/headless/tny_flow.py ... --div 0 --p2 --len 6000 --name c1v1  # co-op 1 v 1: turns, the duel final
+python tools/headless/tny_flow.py ... --div 0 --p2 --pick1 9 --unlock 9 --win 100000 --every 3 --name yamu   # a pick
+```
+
+A whole tournament as the players see it (`docs/tournament.md` 23): Map Test 13, stand-in bodies, the record wiped,
+seed 42, the waiting room's director spot, then test command 25 (`--div`, `--tier`, `--full`, `--pick1` / `--pick2`;
+`--director` talks to him instead and takes the first choice of every menu; `--unlock` sets record bits first). While
+filming, A goes in on both pads every `--a` frames (60: a player closing the lines) and test command 22 every `--win`
+frames (240: a fight lasts up to that; `--lose` loses it). A shot every `--every` frames (4), each labelled with its
+index, frame, the engine's phase (`eng` +4) and sub-step (`pres`). Out: `<name>_NN.png` (48 shots a sheet),
+`<name>.txt` (per shot: phase, pres, `t_nofight`, `t_busy`, the mean change from the shot before; JUMP / CUT mark the
+big ones, a lead to look at, not a verdict: the camera scrolling shows as change too). A 4000-frame film takes about a
+minute; four run side by side. The phase numbers: 1 director, 2 to the ring, 3 next, 4 fight, 5 the end, 6 the duel,
+7 trophy, 8 prize, 9 challenge, 10 intro, 11 restage, 12 exit, 13 exiting.
+Run 2026-10-25 (before / after `tny-polish2`): `build/polish2/flow/` and `build/polish2/flow2/` (not committed).
 
 ## Reading screenshots
 

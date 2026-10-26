@@ -146,7 +146,8 @@ typedef struct TnyEng {
     u8 force_opp;                        // test command 21 arg2: the players' next opponent / headliner (NO = none)
     u8 npose;                            // poses held (pose_e)
     u8 chal_final;                       // the hidden fight is Super Buu's final form (the Legend Rumble's)
-    u8 _p4[20];
+    u8 dark;                             // the curtain is closed: the screen is held black (scene changes behind it)
+    u8 _p4[19];
     TRecord rec;                         // the record as last read or written (tests peek it)
     u8 down_t[MAX_OPP];                  // frames a Rumble fighter has lain down (his body leaves at 60)
     u8 br_shown;                         // the bracket screen has shown this draw (then phase 1 with the results)
@@ -756,9 +757,9 @@ static int spawn_waiting(int budget, int alone) {
         int w = weight(eng.opp_id[i]);
         if (load && load + w > budget) break;
         if (!(alone && !load) && ObjVram_Largest(g_EntityList) < (w == 2 ? 0x1400 : 0x800)) break;   // wait for a free block
-        // a bracket match's opponents enter on their side of the platform and walk in (step_intro); the Rumble's
-        // fighters and later entrants appear on their marks
-        int x0 = eng.kind != K_RUMBLE && eng.phase != P_MATCH ? TNY_RING_OPP_X : FIGHT_O_X;
+        // a fight's opponents (a bracket match's, a challenge's, a Rumble round's pack) enter on their side of the
+        // platform and walk in (step_intro); later entrants mid-fight appear on their marks
+        int x0 = eng.phase != P_MATCH ? TNY_RING_OPP_X : FIGHT_O_X;   // a Rumble's pack too (polish2)
         int x = x0 + opp_spot[i][0], y = TNY_RING_OPP_Y + opp_spot[i][1];
         if (x > TNY_RING_X1 - 16) x = TNY_RING_X1 - 16;
         if (y < TNY_RING_Y0 + 8) y = TNY_RING_Y0 + 8;
@@ -871,6 +872,17 @@ static void ann_show(void) {
     EntityList_Add(g_SceneTable[1], a);
     eng.ann = a;
 }
+// He stands at the ring's top edge, but never above the view: the camera follows player 1 (in co-op the pair), so a
+// co-op floor or the duel's line-up would cut him off at the screen's top (polish2: only his feet showed). Called
+// before the curtain opens or the line shows, once the camera has settled on the staged players.
+static void ann_fit(void) {
+    Entity *a = eng.ann;
+    if (!a || !in_list(a)) return;
+    int y = CAMERA_CELL[8] + 60;                    // his head (about 32 px above his feet) below the HUD panels
+    if (y < ANN_Y) y = ANN_Y;
+    if (y > TNY_RING_P1_Y - 20) y = TNY_RING_P1_Y - 20;
+    a->y = y << 8;
+}
 static void ann_hide(void) {
     Entity *a = eng.ann;
     eng.ann = 0;
@@ -982,6 +994,18 @@ static void poses_apply(int still) {
     g_InputSystem->current = g_InputSystem->pressed = 0;
     coop.input2.current = coop.input2.pressed = 0;
 }
+// The players' poses only (the fallen keep lying): before the fight's EXP, whose level-up plays the player's own
+// animation and waits for it to end; a held pose never ends it and the game hung in the level-up (found headless:
+// tny_engine.txt's co-op Rumble challenge)
+static void poses_release_players(void) {
+    int n = 0;
+    for (int k = 0; k < eng.npose; k++) {
+        Entity *e = eng.pose_e[k];
+        if (e && in_list(e) && (e == g_PlayerObject || e == coop.p2)) { Entity_SetAnimation(e, 0); continue; }
+        eng.pose_e[n] = e; eng.pose_g[n] = eng.pose_g[k]; eng.pose_f[n] = eng.pose_f[k]; n++;
+    }
+    eng.npose = (u8)n;
+}
 static void poses_release(void) {
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
@@ -999,8 +1023,8 @@ static void walk_cmd(Entity *e, int x, int y) {
     void *c = Cmd_Walk(0, xy);
     if (c) Cmd_Queue(CMD_BATCH, c, e);
 }
-static void walk_in(void) {
-    Entity *p1 = g_PlayerObject, *p2 = eng.fighter == 2 && !coop_solo() ? coop.p2 : 0;
+static void walk_in(int players) {
+    Entity *p1 = players ? g_PlayerObject : 0, *p2 = players && eng.fighter == 2 && !coop_solo() ? coop.p2 : 0;
     Cmd_Begin(CMD_BATCH);
     walk_cmd(p1, FIGHT_P_X, TNY_RING_P1_Y);
     if (p2) walk_cmd(p2, FIGHT_P_X, TNY_RING_P2_Y);
@@ -1012,9 +1036,80 @@ static void walk_in(void) {
     for (int i = 0; i < eng.nopp; i++) if (eng.opp_in[i] == 1 && eng.opp[i] && in_list(eng.opp[i])) eng.opp[i]->facing = 2;
 }
 
+// ---- the curtain: the ring's scene changes behind black (polish2, docs/tournament.md 23) --------------------------
+// Every change of the scene (the last fight's bodies leaving, the next fighters placed, the announcer coming back, a
+// ring reload, the warps in and out) happens while the screen is black: the stock fade objects the ui's screens use
+// (0x0802462C {vt, 0x100, 0x10} fades the map to black, 0x08024334 {vt, 0, 0x10} fades it back in, 16 frames each,
+// modal) close and open it; while it is closed the darkening is written again every frame (a map load resets the
+// blend registers) and a ui screen opened then starts and ends black (tny_curtain(), tny_ui.c ui_run).
+ROM_FN(int, Curtain_Modal, (void *screen), 0x0801F2F5);   // UiModal_Run
+#define FADE_TO_BLACK_VT    0x0802462Cu
+#define FADE_FROM_BLACK_VT  0x08024334u
+#define REG_BLDCNT          (*(volatile u16 *)0x04000050)
+#define REG_BLDY            (*(volatile u16 *)0x04000054)
+#define REVEAL_WAIT         8               // dark frames after the staging: new bodies decode, the camera settles
+static void fade_modal(u32 vt, int from) {
+    u32 *f = Arena_Alloc(12);
+    if (!f) return;
+    f[0] = vt; f[1] = (u32)from; f[2] = 0x10;
+    Curtain_Modal(f);                       // the fade frees itself when it closes
+}
+static void dark_regs(void) { REG_BLDCNT = 0x00FF; REG_BLDY = 16; }
+static void curtain_close(void) {
+    if (eng.dark) return;
+    fade_modal(FADE_TO_BLACK_VT, 0x100);
+    eng.dark = 1;
+    dark_regs();
+}
+static void curtain_open(void) {
+    if (!eng.dark) return;
+    eng.dark = 0;
+    // the stock fades work on the palettes, the hold on the blend registers (a map load or a ui screen brings the
+    // palettes back): black palettes first, under the hold, then the hold off and the stock fade back in
+    fade_modal(FADE_TO_BLACK_VT, 0);
+    REG_BLDCNT = 0;
+    REG_BLDY = 0;
+    fade_modal(FADE_FROM_BLACK_VT, 0);
+}
+int tny_curtain(void) { return eng.magic == ENG_MAGIC && eng.dark; }
+
 // ---- the fight ---------------------------------------------------------------------------------------------
 static const char *pname(int k) { return tny_fighters[eng.pick[k]].name; }
 static const char *fname(int id) { return id < TF_COUNT ? tny_fighters[id].name : "?"; }
+
+// The dialogue seat (tourney.h tny_talk_hook): who stands on each side of this fight. 1 = a scene was started
+static int talk(int when) {
+    TTalkSeat t;
+    memset(&t, 0, sizeof t);
+    t.when = (u8)when;
+    t.division = eng.division;
+    t.tier = eng.tier;
+    t.result = eng.result;
+    if (eng.phase == P_DUEL) {
+        t.kind = TALK_FINAL;
+        t.mine[0] = eng.pick[0]; t.nmine = 1;
+        t.opp[0] = eng.pick[1]; t.nopp = 1;
+        t.result = coop2.duel_winner;
+    } else {
+        t.kind = eng.kind == K_RUMBLE ? TALK_RUMBLE : eng.kind == K_CHALLENGE ? TALK_CHALLENGE : TALK_MATCH;
+        if (eng.fighter == 2) { t.mine[0] = eng.pick[0]; t.mine[1] = eng.pick[1]; t.nmine = eng.players; }
+        else { t.mine[0] = eng.pick[eng.fighter]; t.nmine = 1; }
+        for (int i = 0; i < eng.nopp && i < 6; i++) t.opp[t.nopp++] = eng.opp_id[i];
+    }
+    if (eng.division == DIV_RUMBLE) { t.round = eng.rb_round; t.last = eng.rb_round + 1 >= eng.rb_rounds; }
+    else if (eng.br.rounds && eng.br.round < eng.br.rounds) { t.round = eng.br.round; t.last = eng.br.round == eng.br.rounds - 1; }
+    return tny_talk_hook(&t);
+}
+
+// The last scene off the floor, behind the curtain: the fade to black (the bodies still lying and posing), then the
+// poses let go, the announcer, the fallen and the bars leave
+static void scene_clear(void) {
+    curtain_close();
+    poses_release();
+    ann_hide();
+    clear_opps();
+    shadow_off();
+}
 
 static int opp_budget(void);
 static void start_fight(int kind, int who, const u8 *ids, int n) {
@@ -1043,24 +1138,32 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
         if (eng.chal_final && kind == K_CHALLENGE)
             for (int i = 0; i < eng.nopp; i++) if (eng.opp[i]) tny_moves_final_form(eng.opp[i]);
     }
+    ann_show();                                      // on the ring's edge before the curtain opens
     eng.lone = 0;
     eng.timer = 0;
     eng.pres = 0;
     eng.phase = P_INTRO;
 }
 
-// The walk-in and the announcer's call (the line was prepared by the caller: ann_prep), then the fight
+// The curtain opens on the staged ring, the walk-in, the dialogue seat, the announcer's call (the line was prepared by
+// the caller: ann_prep), then the fight: he leaves, a Rumble's pack walks in from the right, the bars come
 static void step_intro(void) {
     if (eng.pres == 0) {
         ann_show();
-        if (eng.kind != K_RUMBLE) walk_in();
-        say_go();
+        ann_fit();
+        curtain_open();
+        if (eng.kind != K_RUMBLE) walk_in(1);
         eng.pres = 1;
+        if (talk(TALK_BEFORE)) return;               // the fighters' lines (the seat): the call waits for them
+    }
+    if (eng.pres == 1) {
+        say_go();
+        eng.pres = 2;
         return;
     }
     eng.pres = 0;
     ann_hide();
-    if (eng.kind == K_RUMBLE) spawn_waiting(opp_budget(), 1);
+    if (eng.kind == K_RUMBLE && spawn_waiting(opp_budget(), 1)) walk_in(0);   // the pack from the entry side
     bars();
     if (eng.kind == K_RUMBLE) tny_rumble_mode(1);
     eng.timer = 0;
@@ -1068,6 +1171,24 @@ static void step_intro(void) {
 }
 
 static int opp_budget(void) { return eng.kind == K_RUMBLE ? 5 : MAX_OPP * 2; }
+
+// A fallen Rumble fighter blinks out over his last 24 frames before his body leaves (polish2: he vanished at once):
+// every 4 frames his frame is decoded through an all-transparent remap (the field the duel's shadow uses)
+static const u8 clear_remap[256];
+static void blink(Entity *e, int off) {
+    const u8 *want = off ? clear_remap : 0, *now = *(const u8 **)((u8 *)e + 0x24);
+    if (now == want || (now && now != clear_remap)) return;   // never over another remap
+    *(const u8 **)((u8 *)e + 0x24) = want;
+    E32(e, 0x20) = 0;                                          // the next frame is decoded through it
+}
+// The fight is over: its boss bars slide up and away (they stayed, empty or full, through the end's poses)
+static void bars_out(void) {
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        BossBar *b = (BossBar *)l->items[i];
+        if (b && (b->vtable == (u32 *)BOSSBAR_VTABLE || b->vtable == coop2.bar_vtable)) b->step = -1;
+    }
+}
 
 static void fight_frame(void) {
     if (eng.timer < 0xFFFF) eng.timer++;
@@ -1077,7 +1198,8 @@ static void fight_frame(void) {
         if (eng.opp_in[i] == 2 && eng.kind == K_RUMBLE && eng.opp[i]) {   // a fallen Rumble fighter's body leaves: its
             Entity *d = eng.opp[i];                                       // OBJ VRAM goes to the next entrant
             if (!in_list(d)) eng.opp[i] = 0;
-            else if (++eng.down_t[i] >= 60) {
+            else if (++eng.down_t[i] >= 36 && eng.down_t[i] < 60) blink(d, (eng.down_t[i] >> 2) & 1);
+            else if (eng.down_t[i] >= 60) {
                 EntityList_Broadcast(g_SceneTable[1], 0xF, d);
                 EntityList_Remove(g_SceneTable[1], d, 0);
                 eng.opp[i] = 0;
@@ -1103,12 +1225,15 @@ static void fight_frame(void) {
     if (eng.result != R_NONE) {
         eng.phase = P_MATCH_END;
         eng.timer = 0;
+        bars_out();
     }
 }
 
 int tny_ring_active(void) {
     return eng.magic == ENG_MAGIC && eng.phase >= P_TO_RING && eng.phase < P_EXITING && in_ring();
 }
+// a fight runs (the overhead HP bars show only then: not over the walk-in, the lines or the end's poses)
+int tny_fight_on(void) { return tny_ring_active() && eng.phase == P_MATCH; }
 
 int tny_ko_check(int k, s32 dmg) {
     if (eng.magic != ENG_MAGIC || coop2.duel_active || !tny_ring_active()) return 0;
@@ -1396,6 +1521,9 @@ static void step_director(void) {
     int players = (coop.p2 || p2_present()) && !companion_active() ? 2 : 1;
     eng.players = (u8)players;
     eng.pick[0] = eng.pick[1] = NO;                 // last tournament's picks: not out of the pool counts below
+    // the waiting room fades out once: the choices and the select screens follow each other through black, and the
+    // warp into the ring happens in the dark (B anywhere: P_IDLE opens the curtain on the waiting room again)
+    curtain_close();
     if (!eng.preset) {
         // the tier (when more than one is open), the division, Quick / Full
         const char *lines[TIER_COUNT];
@@ -1448,12 +1576,14 @@ static void step_director(void) {
 static int champion_seat(void) { return eng.br.rounds ? eng.br.winner[eng.br.rounds - 1][0] : NO; }
 
 static void step_next(void) {
+    scene_clear();                                   // the curtain closes on the last scene
     if (eng.division == DIV_RUMBLE) {
-        if (eng.rb_round >= eng.rb_rounds) { eng.phase = P_TROPHY; return; }
+        if (eng.rb_round >= eng.rb_rounds) { eng.phase = P_TROPHY; eng.pres = 0; return; }
         rumble_round();
         return;
     }
     if (!find_next()) {                              // the bracket is played out
+        eng.pres = 0;
         tny_ui_bracket(eng.br_shown ? 1 : 0);
         eng.br_shown = 1;
         eng.results = 0;
@@ -1477,12 +1607,11 @@ static void step_next(void) {
         coop2.call_slot = (s8)eng.slot[1];            // duel_start binds player 2 there
         coop2.call_flags = (u8)(eng.pick[0] == eng.pick[1] ? DUEL_SHADOW : 0);   // the same fighter twice: the shadow
         coop2.duel_winner = 0;
-        coop2.call_state = 1;                        // vmcall.c starts it once player 2 stands (the CoopCall 1 path)
-        eng.phase = P_DUEL;
+        eng.phase = P_DUEL;                          // step_duel: the curtain opens on the two, the call, then the duel
+        eng.pres = 0;
         eng.timer = 0;
         ann_show();                                  // he leaves when the duel starts (the frame tick)
         ann_prep(round, pname(0), " versus ", pname(1), "!  Begin!");
-        say_go();
         return;
     }
     int lead = pa ? b : a;                           // the opponents' unit
@@ -1502,6 +1631,28 @@ static void step_next(void) {
     start_fight(K_MATCH, who, ids, n);
 }
 
+// The co-op final (polish2): pres 0 the two face each other across the ring (player 2 placed once his entity is back),
+// the curtain opens, the dialogue seat; 1 the announcer's call; 2 the duel starts (vmcall.c's CoopCall 1 path, once
+// player 2 stands); 3 after the duel's winner line: the seat again, then the bracket
+static void step_duel(void) {
+    if (eng.pres == 0) {
+        place(g_PlayerObject, FIGHT_P_X, TNY_RING_P1_Y + 16, 3);
+        place(coop.p2, FIGHT_O_X, TNY_RING_P1_Y + 16, 2);
+        ann_fit();
+        curtain_open();
+        eng.pres = 1;
+        if (talk(TALK_BEFORE)) return;
+    }
+    if (eng.pres == 1) { say_go(); eng.pres = 2; return; }
+    if (eng.pres == 2) { coop2.call_state = 1; eng.pres = 4; return; }   // 4: the duel runs (the frame tick)
+    if (eng.pres == 3) {
+        eng.pres = 0;
+        if (talk(TALK_AFTER)) { eng.pres = 5; return; }
+    }
+    eng.pres = 0;
+    eng.phase = P_NEXT;
+}
+
 // ---- the end of a fight ---------------------------------------------------------------------------------------
 static const char *chal_name(int i);
 static Entity *floor_p2(void) { return eng.fighter == 2 && coop.p2 && !coop_solo() ? coop.p2 : 0; }
@@ -1512,7 +1663,10 @@ static void end_show(void) {
     int won = eng.result == R_WON, k = eng.fighter == 2 ? 0 : eng.fighter;
     const char *team = eng.division == DIV_2V2 || (eng.fighter == 2 && eng.players == 2) ? "your team" : 0;
     const char *me = team ? team : pname(k);
-    if (eng.kind == K_RUMBLE && won) clear_opps();  // a cleared round: the fallen leave before he comes in
+    // a cleared round: the fallen stay lying through the line (they leave behind the curtain), unless the announcer
+    // needs their OBJ VRAM
+    if (eng.kind == K_RUMBLE && won && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
+    for (int i = 0; i < eng.nopp; i++) if (eng.opp[i] && in_list(eng.opp[i])) blink(eng.opp[i], 0);
     Entity *pl[2] = { g_PlayerObject, floor_p2() };
     for (int i = 0; i < 2; i++) if (pl[i]) pose_hold(pl[i], won);
     for (int i = 0; i < eng.nopp; i++) {
@@ -1522,6 +1676,7 @@ static void end_show(void) {
         else if (e->hp > 0) pose_hold(e, 1);
     }
     ann_show();
+    ann_fit();
     if (eng.kind == K_CHALLENGE) {
         if (won) ann_prep("", me, " defeats ", chal_name(0), eng.nchal > 1 ? " and partner!" : "!");
         else ann_prep("", chal_name(0), eng.nchal > 1 ? " and partner win!" : " wins!", 0, 0);
@@ -1538,15 +1693,20 @@ static void end_show(void) {
     eng.pres = 1;
 }
 
+// pres 0: the end's poses and the announcer's line; 1: the dialogue seat; 2: the results. The bodies stay as they lie
+// and pose (the pop-ups show over them) until the next step closes the curtain (scene_clear)
 static void step_match_end(void) {
     if (eng.pres == 0) { end_show(); return; }
+    if (eng.pres == 1) {
+        eng.pres = 2;
+        if (talk(TALK_AFTER)) return;
+    }
     eng.pres = 0;
     int won = eng.result == R_WON;
+    if (won) poses_release_players();                // before the EXP (a level-up animates the player)
     if (eng.kind == K_RUMBLE) tny_rumble_mode(0);
     if (won) for (int i = 0; i < eng.nopp; i++)
         if (eng.opp_by[i] && (tny_fighters[eng.opp_id[i]].role & TR_BEAT)) unlock(eng.opp_id[i]);
-    clear_opps();
-    shadow_off();
     heal_all();
     if (won) {
         if (eng.fighter == 2 || eng.players == 1) { exp_trickle(exp_slot(0)); if (eng.players == 2) exp_trickle(exp_slot(1)); }
@@ -1594,17 +1754,34 @@ static int winner_player(void) {                     // 0 / 1, or 2 = both (team
     return p == 2 ? 1 : 0;
 }
 
+// pres 0 (behind the curtain): the winner(s) in the middle of the ring facing the crowd, the announcer; 1: the curtain
+// opens on them, his line
 static void step_trophy(void) {
     int t = tny_tourney_index(eng.tier, eng.division);
-    rec_load();
-    if (eng.rec.wins[t] < 255) eng.rec.wins[t]++;
-    if (eng.full && eng.rec.full_wins[eng.tier] < 255) eng.rec.full_wins[eng.tier]++;
-    rec_save();
     int w = winner_player();
+    if (eng.pres == 0) {
+        scene_clear();
+        if (needs_reload(w)) { stage_players(w, TNY_RING_CENTER_X); restage(P_TROPHY); return; }
+        rec_load();
+        if (eng.rec.wins[t] < 255) eng.rec.wins[t]++;
+        if (eng.full && eng.rec.full_wins[eng.tier] < 255) eng.rec.full_wins[eng.tier]++;
+        rec_save();
+        stage_players(w, TNY_RING_CENTER_X);
+        Entity *p2 = coop.p2 && !coop_solo() ? coop.p2 : 0;
+        place(g_PlayerObject, TNY_RING_CENTER_X - (p2 ? 16 : 0), TNY_RING_P1_Y, 0);   // the announcer in view above
+        if (p2) place(p2, TNY_RING_CENTER_X + 16, TNY_RING_P1_Y, 0);
+        pose_hold(g_PlayerObject, 1);
+        if (p2) pose_hold(p2, 1);
+        ann_show();
+        if (eng.ann) eng.ann->x = (TNY_RING_CENTER_X + 48) << 8;   // beside the winner(s), presenting them
+        eng.pres = 1;
+        eng.timer = 0;
+        return;
+    }
+    eng.pres = 0;
+    ann_fit();
+    curtain_open();
     const char *who = w == 2 ? (eng.players == 2 ? "your team" : pname(0)) : pname(w);
-    pose_hold(g_PlayerObject, 1);
-    if (coop.p2 && !coop_solo()) pose_hold(coop.p2, 1);
-    ann_show();
     char *o = say_open(ann_speaker());
     o = cat(o, "Ladies and gentlemen...  ");
     o = catu(o, who, 1);
@@ -1666,6 +1843,7 @@ static int pick_challengers(int t) {
 // second one with no player KO); then the hidden fight, if one is still locked
 static void step_prize(void) {
     int t = tny_tourney_index(eng.tier, eng.division);
+    poses_release();                                 // the trophy pose gives way to the prize's pick-up
     static const u8 capsule[3] = { ITEM_STR3, ITEM_PWR3, ITEM_END3 };
     rec_load();
     int paid = 0;
@@ -1684,6 +1862,7 @@ static void step_prize(void) {
 
 static void step_challenge(void) {
     int w = winner_player();
+    scene_clear();                                   // the challenger is staged behind the curtain
     if (needs_reload(w)) { stage_players(w, FIGHT_P_X); restage(P_CHALLENGE); return; }
     ann_prep("", chal_name(0), eng.nchal > 1 ? " and " : " challenges you!  Begin!", eng.nchal > 1 ? chal_name(1) : 0,
              eng.nchal > 1 ? " challenge you!  Begin!" : 0);
@@ -1709,6 +1888,7 @@ static void cleanup(int restore) {
 }
 
 static void step_exit(void) {
+    scene_clear();                                   // the entries and bodies change behind the curtain
     cleanup(1);
     if (eng.ret_zone && !on_map(eng.ret_zone, eng.ret_area)) {
         warp(eng.ret_zone, eng.ret_area, eng.ret_x, eng.ret_y);
@@ -1730,9 +1910,13 @@ static int popup_step(void) {
 }
 
 static void run_step(void) {
-    if (eng.npose) poses_release();                  // the poses held for the last line
+    // the poses held for the last line stay until the curtain closes (scene_clear) or the prize's pick-up
     switch (eng.phase) {
-    case P_IDLE: popup_step(); break;
+    case P_IDLE:
+        if (eng.dark) curtain_open();                // back where the director was: the curtain opens
+        else popup_step();
+        break;
+    case P_DUEL: step_duel(); break;
     case P_DIRECTOR: step_director(); break;
     case P_NEXT: if (!(popup_is_stub() && popup_step())) step_next(); break;
     case P_MATCH_END: step_match_end(); break;
@@ -1796,9 +1980,13 @@ void tny_engine_frame(void) {
     case P_MATCH_END:
         if (eng.timer < 90) eng.timer++;
         break;
+    case P_INTRO: case P_TROPHY:
+        if (eng.timer < 0xFFFF) eng.timer++;         // the dark frames before the curtain opens
+        break;
     case P_DUEL:
+        if (eng.timer < 0xFFFF) eng.timer++;
         if (eng.ann && coop2.duel_active) ann_hide();   // the announcer leaves when the duel begins
-        if (coop2.call_state == 0 && coop2.duel_winner && !coop2.duel_active) {
+        if (eng.pres == 4 && coop2.call_state == 0 && coop2.duel_winner && !coop2.duel_active) {
             duel_clear();
             heal_all();
             int r = eng.br.round, m = eng.br.match;
@@ -1807,11 +1995,11 @@ void tny_engine_frame(void) {
             set_winner(r, m, coop2.duel_winner == 1 ? p1side : (p1side == a ? b : a));
             eng.out |= (u8)(coop2.duel_winner == 1 ? 2 : 1);
             exp_trickle(exp_slot(coop2.duel_winner - 1));
-            eng.phase = P_NEXT;
+            eng.pres = 3;                            // the dialogue seat, then the bracket (step_duel)
         }
         break;
     case P_EXITING:
-        if (arrived(eng.ret_zone, eng.ret_area) || eng.timer > 1200) eng.phase = P_IDLE;
+        if (arrived(eng.ret_zone, eng.ret_area) || eng.timer > 1200) eng.phase = P_IDLE;   // P_IDLE opens the curtain
         break;
     default:
         break;
@@ -1821,7 +2009,10 @@ void tny_engine_frame(void) {
         cleanup(g_PlayerObject != 0 && !rv.over);
         eng.phase = P_IDLE;
         eng.pending = 0;
+        eng.dark = 0;                                // the game's own transition (a reload, a game over) owns the screen
     }
+    if (eng.dark && !g_PlayerObject && eng.absent > 600) eng.dark = 0;   // the title / a load: no curtain to keep
+    if (eng.dark) dark_regs();                       // the curtain holds through map loads (they reset the blend)
     eng.t_nofight = !((eng.phase == P_MATCH && eng.timer > 20) || (eng.phase == P_DUEL && coop2.duel_active)) || scene_running();
     // pause and saving are blocked in the ring (and player 2's Select switch); between fights (the walk-in, the
     // announcer's lines, the poses, the bracket's turn) nobody moves or attacks either: the tournament runs as
@@ -1829,25 +2020,29 @@ void tny_engine_frame(void) {
     if (eng.phase >= P_TO_RING && eng.phase < P_EXITING && in_ring() && p1_in_play()) {
         u16 lock = KEY_START | KEY_SELECT;
         if (eng.t_nofight) lock |= KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT | KEY_B | KEY_L | KEY_R;
+        if (eng.t_nofight && !scene_running()) lock |= KEY_A;   // no punches into the end's pause (A closes lines only)
         g_InputSystem->pressed &= (u16)~lock;
         g_InputSystem->current &= (u16)~(lock & ~KEY_SELECT);
         coop.input2.pressed &= (u16)~lock;
         coop.input2.current &= (u16)~(lock & ~KEY_SELECT);
     }
     if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
-    eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold;
+    eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
     int want = 0;
     switch (eng.phase) {
-    case P_IDLE: want = eng.qn != 0; break;
-    case P_DIRECTOR: case P_NEXT: case P_TROPHY: case P_PRIZE: case P_CHALLENGE: case P_EXIT: case P_INTRO: want = 1; break;
+    case P_IDLE: want = eng.qn != 0 || eng.dark; break;
+    case P_DIRECTOR: case P_NEXT: case P_PRIZE: case P_CHALLENGE: case P_EXIT: want = 1; break;
+    case P_INTRO: want = eng.pres || !eng.dark || eng.timer >= REVEAL_WAIT; break;   // a few dark frames first
+    case P_TROPHY: want = eng.pres == 0 || eng.timer >= REVEAL_WAIT; break;           // staged, then the dark frames
+    case P_DUEL: want = eng.pres == 0 ? eng.timer >= REVEAL_WAIT && (coop.p2 || eng.timer > 120) : eng.pres != 4; break;
     case P_MATCH_END: want = eng.timer >= 90; break;
     default: break;
     }
     // the pop-up queue: shown here, in the frame tick, at the safe moment (the ui's tny_popup_show runs its own
     // modal line), between the tournament's steps (idle, or before the next match / the way out)
-    if (eng.qn && (eng.phase == P_IDLE || eng.phase == P_NEXT || eng.phase == P_EXIT) && !popup_is_stub()) {
+    if (eng.qn && (eng.phase == P_IDLE || eng.phase == P_NEXT || eng.phase == P_EXIT) && !eng.dark && !popup_is_stub()) {
         eng.step_sp = (u32)__builtin_frame_address(0);
         stepping = 1;
         popup_step();

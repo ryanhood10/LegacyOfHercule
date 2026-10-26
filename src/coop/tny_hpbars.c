@@ -69,7 +69,7 @@ void tny_hpbars_draw(u32 **oam) {
     if (hb.magic != HB_MAGIC) { hb.magic = HB_MAGIC; hb.tile = 0; }
     Entity *who[HB_MAX];
     int n = 0;
-    if (tny_ring_active() && !SCENE_RUNNING) {
+    if (tny_fight_on() && !SCENE_RUNNING) {   // never over the walk-in, a line or the end poses (polish2)
         const EntityList *l = g_EntityList;
         for (int i = 0; i < l->count && n < HB_MAX; i++) {
             Entity *e = l->items[i];

@@ -186,11 +186,7 @@ static void face_state(Br *br, int s) {
     ui_face_look(e, in_vs && dim, is_out(br, s) ? UI_REMAP_GREY : (dim && !in_vs) ? UI_REMAP_DIM : 0);
 }
 
-static void build_page(Ui *u, Br *br, int page) {
-    for (int s = 0; s < 16; s++) { ui_face_kill(br->face[s]); br->face[s] = 0; }
-    br->page = (u8)page;
-    bm_clear();
-    draw_title(u, br);
+static void vs_boxes(Br *br, int page) {
     if (br->vs_a != 0xFF && page_of_match(br, br->b.round, br->b.match) == page) {   // the next match's boxes
         for (int k = 0; k < 2; k++) {
             int s = k ? br->vs_b : br->vs_a, x, y;
@@ -199,6 +195,14 @@ static void build_page(Ui *u, Br *br, int page) {
             bm_frame(x - 14, y - 16, 30, 32, C_GOLD);
         }
     }
+}
+
+static void build_page(Ui *u, Br *br, int page) {
+    for (int s = 0; s < 16; s++) { ui_face_kill(br->face[s]); br->face[s] = 0; }
+    br->page = (u8)page;
+    bm_clear();
+    draw_title(u, br);
+    vs_boxes(br, page);
     draw_lines(br);
     draw_names(u, br);
     for (int s = 0; s < br->b.size; s++) {
@@ -368,7 +372,10 @@ static void bracket_step(Ui *u) {
         int champ = champion(br);
         if (br->vs_a == 0xFF && champ == 0xFF) { br->state = S_WAIT; br->t = 0; break; }
         int pg = champ != 0xFF ? (full(br) ? 2 : 0) : page_of_match(br, br->b.round, br->b.match);
-        build_page(u, br, pg);
+        // the page already shown gets the boxes drawn in place (polish2: a full rebuild cleared the bitmap and the
+        // screen showed one frame without names or lines); another page is built anew
+        if (pg == br->page) { vs_boxes(br, pg); draw_lines(br); draw_names(u, br); }
+        else build_page(u, br, pg);
         if (champ != 0xFF) {
             const char *name = tny_fighters[br->b.seat[champ]].name;
             char line[40];
