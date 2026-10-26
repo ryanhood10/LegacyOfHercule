@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Docs wrap-up:** CLAUDE.md's current phase, `docs/tournament.md` status and its open points (24), the full
+  regression in the repo (`tools/headless/regfull.sh`, `docs/testing.md` "Full regression"), INDEX entries for
+  `tny_hpbars.c`, `regfull.sh`, `ch1_room_forest.txt`.
 - **The fighters' dialogue is in (Ryan's approved plan, `docs/tournament-dialogue.md`):** before every 1 v 1 / 2 v 2 /
   challenge / co-op final the other side opens and your fighters answer (rivals, meeting yourself, teams, defaults);
   the winner speaks after the result; Start skips. The Rumble's announcer has the plan's round, headliner, cleared and

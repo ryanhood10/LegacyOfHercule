@@ -1,7 +1,9 @@
-# Tournament mode: design in progress (Ryan, 2026-10-24)
+# Tournament mode (planned 2026-10-24, built 2026-10-25, in Ryan's playtest rounds)
 
-Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13) and polished (14: the ring presentation, the hidden
-fight's alternatives, 16 and Super 13 as opponents, the giants' faces).** Every decision below is Ryan's unless marked "our
+Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13), polished (14), then Ryan's playtest rounds: 15
+the scenes, 16 the grounds' people, 17 the easter eggs, 18 the plaza's flight spot, 19 the overhead HP bars, 20 the
+art fixes, 21 the fight fixes, 22 the sprite leftovers, 23 the second polish pass (the curtain, the talk seat); the
+fighters' dialogue in `docs/tournament-dialogue.md` (approved and built); 24 what is still open.** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -1148,3 +1150,26 @@ runs, so the call (or the results) follow the dialogue. The poses hold through a
 
 **RAM:** `.tny.eng` keeps its size: one byte of its padding is the curtain (`dark`).
 
+## 24. Open points (2026-10-25, after the dialogue merged)
+
+Known, not done (each one waits for Ryan's word; none is a regression):
+- **The Rumble announcer's calls during a round** (`docs/tournament-dialogue.md` 8: a fighter down, a flurry, a
+  partner down, Super Buu's form change): the game's dialogue box stops the fight while it shows, so these need a way
+  to show a line without pausing (a caption like the map-name banner). The round, headliner, cleared and result calls
+  are in.
+- **Dialogue portraits** for Android 13, Cell Jr., the Namekian Warrior and Evil Buu: their lines show the name only
+  (a dialogue box takes a real portrait, not a face drawn from the sprite).
+- **Yakon's lying pose** still reads oddly (Buu's Fury draws him from the front only; section 22).
+- **The announcer** vanishes as a fight starts and reappears at its end (no walk off / on).
+- **A co-op turn change** in the 1 v 1 holds about 1.6 s of black (the 90-frame wait after a ring reload, left as it was).
+- **Papaya Island has no world-map landmark** (the 3D town seen while flying): it needs the landmark table behind the
+  on-load's FindCharacterEntity 2-12 decoded (section 18; offered, not asked for).
+- **Walking speed** is the same for every tournament playable (they share Gohan's class): Spopovich is slow and Yamu
+  quick only through their numbers and Yamu's dash.
+- **Section 10 of the dialogue plan** stands at its defaults: the winner's line only, 2 v 2 opponent teams drawn at
+  random (a known team meets you only by chance), Start skips.
+- **Real-time play:** the second polish pass and the dialogue are tested headless and filmed; Ryan's play is the first
+  real-time run.
+- **Worktrees:** the merged branches' worktrees (`log2-artfix`, `log2-fightfix`, `log2-polish2`, `log2-polish2-art`
+  and the build team's) stay on disk with their evidence films under `build/`; `git worktree remove <dir>` when no
+  longer needed (their branches are merged into main).

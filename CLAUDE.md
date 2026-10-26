@@ -39,14 +39,19 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-25): the tournament mode is built; Ryan playtests it next
+## Current phase (2026-10-25): the tournament is in Ryan's playtest rounds
 
-The World Tournament on Papaya Island (`docs/tournament.md`: the plan, then sections 9b-13 what each piece built)
-was built by a seven-piece team on 2026-10-25 and merged: grounds (zone 15 areas 11-16, world-map landing),
-art (sprites 185-189, 195-230, 235-244; portraits 127, 140-168), playables (rows 29-79), moves (kits, Rumble
-mode), ui (list box, select, bracket, boards, pop-ups), engine (pool, brackets, all divisions, the global record on
-the save chip at EEPROM 0x1E00, unlocks, challengers). Contract: `src/coop/tourney.h`. Tests: `tools/headless/tny_*.txt`.
-Drop-ins F8 (Papaya Island, early) and F9 (waiting room, every tier open).
+The World Tournament on Papaya Island is built and merged (`docs/tournament.md`: the plan, 9b-13 the seven-piece
+build, 14-23 every playtest round since; 24 the open points). Contract: `src/coop/tourney.h`; tests
+`tools/headless/tny_*.txt`. Since the build: overhead HP bars in the Rumble (`tny_hpbars.c`), real lying and
+knock-down poses, knock-back, the fallen stay down, Energy Steal (ability 24), playables built on the party's best
+numbers, your pick never drawn as an opponent, every scene change behind a fade (the "curtain"), and the fighters'
+dialogue: `docs/tournament-dialogue.md` is both Ryan's approved plan and the game's data (`tools/tnytalk.py` reads
+its tables at build time, so edit a line there to change it in the game; `tny_talk.c` picks and shows them).
+Full regression: `bash tools/headless/regfull.sh build/<dir>` (`docs/testing.md` "Full regression"). Drop-ins F8
+(Papaya Island, early) and F9 (waiting room, every tier open) carry a powered-up party (`dropins.py` `boost`).
+Swapping a build into `build/play`: if mGBA's window lingers after Ryan closes it, close it with
+`CloseMainWindow` (never kill it), back up the `.sav` and the `.ss1-.ss9` into `build/play/backup/` first.
 
 ## Earlier phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
 

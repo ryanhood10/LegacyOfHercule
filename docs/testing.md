@@ -11,6 +11,7 @@ inspection goes through the GDB stub.
 
 | section | use it for |
 |---|---|
+| Full regression | before merging or handing Ryan a build: every chapter and tournament script, both modes, one command |
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
@@ -31,6 +32,23 @@ inspection goes through the GDB stub.
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
 
 Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
+
+## Full regression (headless, `tools/headless/regfull.sh`)
+
+Every chapter and tournament script on a `DEBUG_MENU=1` build, co-op as written plus `arctic_summit`, `postgame` and
+`ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`). About 15 minutes;
+run it in the background.
+
+```
+make BUILD=build/<dir> DEBUG_MENU=1 && make
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/<dir>/log2-coop.gba --out build/<dir>/hl
+bash tools/headless/regfull.sh build/<dir>
+```
+
+Out: `build/<dir>/hl/reg.log` (a `## name` block per script with its echoes, map lines and peeks). Pass: no
+TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25). A new script goes into its
+list. Known flaky: `tny_artbuu`'s hit test (one fighter may take no punch). Tests that depend on a seeded draw break
+when code adds `rnd()` calls in the engine (2026-10-25: the Rumble announcer's variety now uses the frame counter).
 
 ## Savestates
 
