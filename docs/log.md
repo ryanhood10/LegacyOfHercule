@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Team combos in scope** (Ryan): two players hitting one opponent fast trigger a frozen-frame combo move by that
+  pair; the plan and Ryan's open questions are `docs/tournament.md` 24.10, to detail with him when he resumes.
 - **Plan for the open points** (`docs/tournament.md` 24): the Rumble's non-pausing captions, four portraits, Yakon's
   lying pose, the announcer walking off and on, the co-op turn's black, Papaya's landmark, walking speeds, Ryan's three
   dialogue decisions. Ryan play-tests this build first; the next session starts with his notes.

@@ -1258,3 +1258,66 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   team's) hold the evidence films under their `build/` folders. Once Ryan has played this build, remove them with
   `git worktree remove <dir>` (their branches are merged into main).
 - Real-time play of the second polish pass and the dialogue: Ryan's session is the first.
+
+### 24.10 Team combos (Ryan's idea, 2026-10-25: in scope; the details are planned with him when he resumes)
+
+**The idea (Ryan):** in the tournament, when a certain pair of fighters on the players' side both hit the **same
+opponent** rapidly within a short time, a team combo fires:
+- the frame freezes;
+- an animation plays where both fighters hit that one opponent with a special combo move of their own;
+- the fight resumes with everyone where the animation left them.
+
+Which pairs get one comes from who fights together most in the anime.
+
+**Where it applies:** co-op only (both players on the floor): 2 v 2, the Rumble, a co-op challenge. 1P has no
+partner on the floor.
+
+**What we already have to build on:**
+- Each player's hits: the players' hit counters and the last hitter of an opponent in `tny_moves.c`
+  (`tny_moves_last_hitter`, the hit messages).
+- Freezing the fight: a scene running (the engine already waits on it), and the curtain's fades (section 23).
+- Posing bodies frame by frame: `pose()` / `poses_apply` (engine and moves), the walk commands (`Cmd_Walk`, the
+  walk-in) to move them, camera shake, sound effects.
+- Damage on one target: the kit's hit message (`StealMsg` / HitMsg) aimed at one entity, as Energy Steal does.
+- Each pair's identity: the players' picks (`eng.pick[]`) and the 2 v 2 team table (`tny_talk_teams`, dialogue
+  plan section 7) as the starting list of pairs.
+
+**Plan (to refine with Ryan):**
+1. **Trigger:** each opponent remembers the last hit time from each player. When both players land hits on the same
+   opponent within a short window (for example 3 hits each within 90 frames), and this pair has a combo, it fires. A
+   cooldown (for example once per fight, or once per 30 s) keeps it special. Open with Ryan: a fixed hit count, a
+   meter that fills, or a button press when the prompt shows.
+2. **The pair list:** a table in `tny_moves.c` (or generated like the dialogue, from a doc table Ryan can edit):
+   pair -> combo id. A first cut from the anime and the dialogue teams: Goku & Vegeta, Goku & Gohan, Goku & Krillin,
+   Goku & Piccolo, Gohan & Piccolo, Gohan & Videl, Krillin & 18, Krillin & Yamcha, Tien & Chiaotzu, Tien & Yamcha,
+   Vegeta & Trunks, Goten & Kid Trunks, 17 & 18, Hercule & Videl, Hercule & Fat Buu, Great Saiyaman & Videl.
+   **A generic combo** for any other pair, so every team has one.
+3. **The cinematic (a scripted sequence in C, about 2-3 s):**
+   - the fight frozen (AI and pads off);
+   - both fighters dash in from their sides of the target;
+   - alternate strikes using poses they already have (melee groups 7 / 8, the dash 13, the special melee 16, the beam
+     poses 18 / 19);
+   - a finisher: a joint beam, a double kick that launches him, a ki volley, with shake, flashes and the hit sparks;
+   - a caption naming the move (24.1's caption);
+   - the target takes the combo's damage and lands knocked down where the animation ends;
+   - control returns.
+   Each combo is a short table of steps (who moves where, which pose for how many frames, when the damage lands), so a
+   new pair's combo is data, not code.
+4. **Positions after:** nobody snaps back; the players end where their last step put them, inside the ring's walls
+   (the steps clamp to the floor, the way the knock-back's wall slide does).
+5. **Names and moves per pair:** Ryan decides (for example Goku & Vegeta's joint beam, Tien & Chiaotzu's
+   psychic-hold-then-Tri-Beam, Goten & Trunks's trading-places rush, 17 & 18's double barrier slam). Planned with him
+   like the dialogue: a doc table first, built after he says the plan is done.
+
+**Questions for Ryan when he resumes:**
+- The trigger: automatic (hits in a window), a meter, or a button prompt?
+- How often: once per fight or on a cooldown?
+- Damage: a fixed share of the target's HP, or the players' stats?
+- Can opponent pairs (17 & 18 against you) do combos to the players too?
+- Does the Rumble get them (many targets), or only 2 v 2 and challenges?
+- Which pairs and moves first?
+
+**Size:** big. The trigger and the frozen-fight scene runner is about a day. The generic combo is half a day. Each
+pair's own combo is an hour or two of step tables and testing once the runner exists. Test: a headless script that
+makes both players hit one opponent (test command 27's punch routine for player 1, the pad for player 2), checks the
+combo fires once, films it, and checks the positions and HP after.
