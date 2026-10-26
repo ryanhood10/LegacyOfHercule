@@ -534,6 +534,32 @@ static void a16_entry(CharacterEntry *a, const CharacterEntry *k) {
     for (int i = 0; i < 4; i++) a->ability_list[i] = ab[i];
 }
 
+// The lead a tournament playable is built from: the party's best (story slots 0-6 in the party, each read as it was
+// before the tournament: a carrier already holding the other player's pick reads from its backup), number by number:
+// the highest EXP (his level), max HP, max ki, strength, power and endurance of any of them. It was player 1's own
+// slot, so a weak or low-level player-1 character (Hercule's HP is the party's lowest) gave a weak playable (Ryan:
+// Spopovich / Yamu "like he got a default level 1"), and player 2's pick was built on player 1's already-written
+// pick (found 2026-10-25). The fighters' percentages (tny_play.c) then apply to this best-of-the-party.
+static const CharacterEntry *orig_entry(int s) {
+    for (int k = 0; k < 2; k++) if ((eng.backed & (1 << k)) && eng.bslot[k] == s) return &eng.backup[k];
+    return entry_of(s);
+}
+static void lead_entry(CharacterEntry *out) {
+    *out = *orig_entry(eng.own[0] < PARTY_SLOTS ? eng.own[0] : g_Party->active_slot);
+    for (int s = 0; s < PARTY_SLOTS && s < DUEL_SLOT; s++) {
+        const CharacterEntry *c = orig_entry(s);
+        if (!(c->flags & 1) || !c->max_hp) continue;
+        if (c->exp > out->exp) out->exp = c->exp;
+        if (c->max_hp > out->max_hp) out->max_hp = c->max_hp;
+        if (c->max_ep > out->max_ep) out->max_ep = c->max_ep;
+        if (c->str > out->str) out->str = c->str;
+        if (c->pow > out->pow) out->pow = c->pow;
+        if (c->end > out->end) out->end = c->end;
+    }
+    out->hp = out->max_hp;
+    out->ep = out->max_ep;
+}
+
 // Write the picks' entries into their carriers (backed up first) for the fight
 static void apply_entry(int k) {
     int id = eng.pick[k], s = eng.slot[k];
@@ -549,10 +575,11 @@ static void apply_entry(int k) {
     eng.backup[k] = *c;
     eng.backed |= (u8)(1 << k);
     if (story) { *c = *entry_of(f->story_slot); c->flags |= 3; return; }       // the same character twice: a copy
-    const CharacterEntry *lead = entry_of(eng.own[0] < PARTY_SLOTS ? eng.own[0] : g_Party->active_slot);
-    if (id == TF_P_A16) { a16_entry(c, lead); return; }
+    CharacterEntry lead;
+    lead_entry(&lead);
+    if (id == TF_P_A16) { a16_entry(c, &lead); return; }
     CharacterEntry out = *c;
-    tny_play_entry(id, &out, lead);
+    tny_play_entry(id, &out, &lead);
     out.flags |= 3;
     *c = out;
 }

@@ -159,6 +159,13 @@
       "icons": 11,
       "is_ready": "fn:ssj2_burst_ready",
       "on_use": "fn:ssj2_burst_use"
+    },
+    {
+      "name": "EnergySteal",
+      "_": "entry 24: Energy Steal (the tournament's Spopovich and Yamu as players, src/coop/tny_play.c): a short dash, the punch and a grab; a hit gives back 20 % of his ki (Spopovich at half HP or lower: 8 % HP too)",
+      "icons": 6,
+      "is_ready": "fn:tny_steal_ready",
+      "on_use": "fn:tny_steal_use"
     }
   ],
   "patches": [

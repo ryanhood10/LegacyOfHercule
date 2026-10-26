@@ -22,7 +22,7 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
 | engine | 446-459 (none used yet) | 160-219 (160-209 used: 160 + fighter id) | - | - | - | - | 23 (24-27 free) | 21-25 | EEPROM 0x1E00-0x1E3F (the global record) | `.tny.eng` 0x240 (0x21C used) |
-| moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x54 used (`MvGlobal`, magic 0x4D4F5645 "MOVE"); kit state on the heap |
+| moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x7C used (`MvGlobal`, magic 0x4D4F5645 "MOVE"; +0x54 the fight-fix counters, docs/testing.md); kit state on the heap |
 | ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
 
 ## Allocations for the Cell Games and post-game build (2026-10-19)
@@ -198,7 +198,8 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
-| 24-40 | allocated to the tournament's playables, unused (their kits use 0-23: `tny_play.c`) | |
+| 24 | Energy Steal (the tournament's Spopovich and Yamu as players) | `tny_play.c` |
+| 25-40 | allocated to the tournament's playables, unused | |
 | 41+ | free (24 was allocated to Super Saiyan 2 Gohan, unused) | |
 
 ## Party slots (`PARTY_SLOTS` = 9)
@@ -277,7 +278,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
 | 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |
-| 27 | TNY_DRIVE (moves) | `arg` = op << 24: 0 force move (`reg << 8 \| move`: 1-6 his kit's slot, 0x80 \| kind a library kind, 0xFB-0xFF Multi-Form / self-KO / stun beam / stun projectile / big ball), 1 Rumble = `arg & 1`, 2 HP of kit `reg` := `arg2` (0x800000NN = NN %), 3 no specials for `arg2` frames, 4 every kit fighter leaves, 5 a passive on top (11 drain, 12 regen) |
+| 27 | TNY_DRIVE (moves) | `arg` = op << 24: 0 force move (`reg << 8 \| move`: 1-6 his kit's slot, 0x80 \| kind a library kind, 0xFB-0xFF Multi-Form / self-KO / stun beam / stun projectile / big ball), 1 Rumble = `arg & 1`, 2 HP of kit `reg` := `arg2` (0x800000NN = NN %), 3 no specials for `arg2` frames, 4 every kit fighter leaves, 5 a passive on top (11 drain, 12 regen), 6 player 1 throws one punch at kit `reg` (`reg << 8 \| gap << 16 \| step`: step 1 = first stand `gap` px (0 = 20) on his left; the A button's own routine 0x08007DE8) |
 
 ## Zone 15 areas (new maps, `data/maps/*.json`, built by `tools/mapbuild.py`)
 

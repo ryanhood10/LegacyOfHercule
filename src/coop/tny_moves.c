@@ -19,7 +19,8 @@
 //   stun      freeze the target N frames: a flash round him (Solar Flare), a held target (psychic hold) or a
 //             projectile (Stone Spit, Galactic Donut); players' pads go dead, a fighter's AI stops
 //   heal      restore the most hurt fighter of his side (Kibito)
-//   drain     passive: his melee hits heal him (HP) or empty the victim's ki (EP)
+//   drain     passive: his melee hits heal him (HP) or empty the victim's ki (EP); Energy Steal (a rush flag) takes
+//             ki only from half HP down and turns it into HP (Spopovich, Yamu)
 //   regen     passive: HP ticks back every second
 //   transform at N % HP: power-up pose, the new sprite record (Frieza -> Mecha Frieza, the Buu chain...) and
 //             more attack / defence; same sprite = a stat boost (Roshi's MAX Power, Broly's rage)
@@ -28,7 +29,8 @@
 // accepts type-0 hits from a fighter of another side (tny_rumble_mode). Enemies have no EP: cooldowns pace the
 // specials; damage comes from the fighter's stat through the stock damage calculation. A special cannot be
 // stunned out of, and a hit during one only does damage (no AI hit reaction); KF_POISE fighters also get a
-// poise window after every stun (the Android 16 rule).
+// poise window after every stun (the Android 16 rule). A player's hit pushes him away (the combo's third melee hit
+// far: knock()); at HP 0 he falls and stays down, out of the fight (fallen()), until the engine clears the body.
 //
 // Rumble mode: fighters target the nearest player 70 % of the time and the nearest fighter of another side
 // 30 %, re-rolled every RUMBLE_REROLL frames, always a player within RUMBLE_CLOSE px. A fighter's update points
@@ -55,6 +57,19 @@
 #define KIT_LIVE        16      // projectiles tracked per fighter
 #define KIT_MAX         8       // fighters with a kit at once (the ring holds 2 players + 4 normal bodies)
 #define TNY_MV_MAGIC    0x4D4F5645u   // "MOVE"
+// knock-back from the players' hits (Ryan, 2026-10-25: the stock boss reaction of AI set 21 slides him ~7 px and
+// then freezes him in place, so a combo pinned him; docs/tournament.md 18)
+#define STEAL_KI        25      // Energy Steal: ki taken from a player per hit (all he has, if less)
+#define STEAL_HP_PM     4       // ... and per point of it, this many permille of his max HP back (25 ki = 10 %)
+#define KB_COMBO_GAP    45      // frames: a hit this soon after the last one continues the combo
+#define KB_FINISHER     3       // the combo's nth melee hit pushes him away
+#define KB_LIGHT_PX     3       // px: the combo's second hit, or a shot (over KB_LIGHT_T frames)
+#define KB_LIGHT_T      3
+#define KB_FINISH_PX    40      // px: the finisher (over KB_FINISH_T frames)
+#define KB_FINISH_T     12
+#define KB_FALL_PX      24      // px: the blow that knocks him out
+#define FALL_FRAMES     18      // frames of the knock-down (pose group 3) before he lies still
+#define HELPER_GONE     90      // frames a fallen helper / copy lies before he leaves (the engine clears its own)
 
 // ---- ROM functions and layouts -----------------------------------------------------------------------------------
 typedef struct Desc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } Desc;
@@ -136,6 +151,8 @@ enum { MK_NONE, MK_BEAM, MK_BALL, MK_HOMING, MK_VOLLEY, MK_WAVE, MK_NOVA, MK_RUS
 #define MF_TARGET   MF_THIN // stun: the target only, at range (psychic hold)
 #define MF_KI       MF_THIN // volley / homing: blue ki blasts
 #define MF_DODGE    MF_THIN // teleport: hop away instead of striking
+#define MF_STEAL    MF_COST // rush: each hit takes STEAL_KI from a player and turns it into HP (Energy Steal)
+#define MF_LOWHP    MF_SELFKO   // rush: only once his HP is at half or below, and then before his other moves
 
 typedef struct TMove {
     u8 kind, a, b, flags;   // a / b per kind (below)
@@ -160,6 +177,7 @@ typedef struct TMove {
 #define STUNP(p, f4, fl, cd)            { MK_STUN, f4, 0, fl, p, cd }
 #define HEAL(pct, cd)                   { MK_HEAL, pct, 0, 0, 0, cd }
 #define DRAIN(hp, ep)                   { MK_DRAIN, hp, ep, MF_PASSIVE, 0, 0 }
+#define STEAL(p, dist, hits, cd)        { MK_RUSH, dist, hits, MF_STEAL | MF_LOWHP, p, cd }
 #define REGEN(pm)                       { MK_REGEN, pm, 0, MF_PASSIVE, 0, 0 }
 #define XFORM(pct, sprite, atk, def)    { MK_TRANSFORM, atk, def, MF_TRIGGER, sprite, pct }
 #define SUMMON(n, who, fl, cd)          { MK_SUMMON, n, who, fl, 0, cd }
@@ -192,8 +210,10 @@ const TKitDef tny_kits[TF_COUNT] = {
                                     RUSH(0x2C0, 56, 3, 0, 300), XFORM(50, 0, 12, 0) } },              // Drunken Fist, MAX Power at 50 %
     [TF_TAO]      = { 0, 0, 0, 0, { BEAM(0x2C0, 28, MF_THIN, 360), RUSH(0x300, 72, 2, 0, 300),         // Dodon Ray, Crane rush,
                                     RUSH(0x600, 12, 1, 0, 720) } },                                   // the hidden blade
-    [TF_SPOPOVICH] = { KF_POISE, 0, 0, 0, { RUSH(0x400, 16, 1, MF_STUN, 420) } },                    // bear hug
-    [TF_YAMU]     = { 0, 0, 0, 0, { DRAIN(0, 12), RUSH(0x2C0, 48, 2, 0, 360) } },                    // energy steal
+    // Energy Steal (Ryan, 2026-10-25: "when he is at half health he does it and all the ki he takes goes into his
+    // health"): no drain above half HP; from half, a grab that takes ki and heals him, on its own cooldown
+    [TF_SPOPOVICH] = { KF_POISE, 0, 0, 0, { RUSH(0x400, 16, 1, MF_STUN, 420), STEAL(0x300, 72, 1, 360) } },   // bear hug
+    [TF_YAMU]     = { 0, 0, 0, 0, { RUSH(0x2C0, 48, 2, 0, 360), STEAL(0x2C0, 80, 1, 300) } },
     [TF_CHICHI]   = { 0, 0, 0, 0, { RUSH(0x480, 12, 1, MF_STUN, 420), RUSH(0x220, 48, 4, 0, 300) } },  // frying pan, combo
     [TF_VIDEL]    = { 0, 0, 0, 0, { RUSH(0x220, 48, 4, 0, 300), RUSH(0x300, 96, 1, 0, 360), TELE(0, MF_DODGE, 480) } },   // Hawk Arrow, flight dodge
     [TF_CHIAOTZU] = { 0, 0, 0, 0, { BEAM(0x260, 24, MF_THIN, 300), STUN(20, 0, MF_TARGET, 540),     // Dodon Ray, psychic hold,
@@ -312,7 +332,12 @@ typedef struct TKit {
     s16 timer, gcd, poise, stun;
     s16 cd[KIT_MOVES];
     s16 fired, regen_t, retarget, beam_left;
-    s16 rush_left, _p;
+    s16 rush_left;
+    u8 log_i, log_t;      // tests: his entry in mv.klog and the frames until its x20
+    s32 push_vx, push_vy; // knock-back (8.8 px per frame) for push_t frames
+    s16 push_t, down_t;   // down_t: frames since he fell (HP 0)
+    u16 last_hit_f;       // g_FrameCounter of the last hit that pushed him
+    u8 combo, down;       // melee hits in this combo; 1 = he fell
     Entity *target;       // the special's target
     Entity *rtarget;      // the Rumble target (re-rolled)
     Entity *last_hitter;  // the last accepted hit's player or fighter (tny_moves_last_hitter)
@@ -334,6 +359,11 @@ typedef struct MvGlobal {
     TKit *dying;          // set by a fighter's destroy (a hit that killed him: do not touch his state after)
     u32 spawn_frame;
     u16 spawn_fail, vram_min;   // test command 26: 1 no player, 2 no art, 3 no stat / entity, 4 body lacks the AI set's groups; least free OBJ VRAM seen
+    u16 p_hits, knocks;   // +0x54 players' hits a fighter accepted / pushes given (tests)
+    u16 falls, steals;    // +0x58 fighters that fell (HP 0) / Energy Steal hits that took ki
+    u8 last_react[2], last_set, last_depth;   // +0x5C the last player hit's attack bytes (kind, id), his AI's top set and depth after it
+    struct { u16 frame; s16 x0, x20; u8 react, set; } klog[3];   // +0x60 the last three players' hits: frame, his x (px) then and 20 frames later
+    u16 stolen, _p1;      // +0x78 ki taken by Energy Steal (total)
 } MvGlobal;
 _Static_assert(sizeof(MvGlobal) <= 0x80, ".tny.mv is 0x80 bytes");
 static MvGlobal mv TNY_SECTION("mv");
@@ -511,6 +541,7 @@ static int box_hits(const Entity *t, s32 x1, s32 y1, s32 x2, s32 y2) {
 }
 
 static void fx_on(Entity *t, int frames);
+static void flash(s32 x, s32 y, int art, int frames);
 static void stun_entity(Entity *t, int frames) {
     if (!t || frames <= 0) return;
     TKit *o = kit_of(t);
@@ -541,6 +572,24 @@ static CharacterEntry *entry_of(const Entity *p) {
 // A hit landed on t (damage dmg): drain moves (HP to him, EP from a player).
 static void on_hit_effects(TKit *k, Entity *t, s32 dmg) {
     if (!alive_kit(k)) return;
+    if (k->cur && k->cur->kind == MK_RUSH && (k->cur->flags & MF_STEAL)) {   // Energy Steal: his ki into my HP
+        CharacterEntry *c = entry_of(t);
+        s32 take = c ? ((s16)c->ep < STEAL_KI ? (s16)c->ep : STEAL_KI) : 0;
+        if (take > 0) {
+            Entity *e = k->e;
+            c->ep = (u16)(c->ep - take);
+            s32 hp = e->hp + k->stat.max_hp * take * STEAL_HP_PM / 1000;
+            e->hp = hp > k->stat.max_hp ? k->stat.max_hp : hp;
+            s32 x, y;
+            centre(e, &x, &y);
+            flash(x, y - 8, ART_ORB_M, 24);        // the heal's light on him (Kibito's)
+            centre(t, &x, &y);
+            flash(x, y - 8, ART_ORB_S, 12);         // and a spark where the ki left
+            mv.drains++;
+            mv.steals++;
+            mv.stolen += (u16)take;
+        }
+    }
     for (int i = 0; i <= KIT_MOVES; i++) {
         const TMove *m = i < KIT_MOVES ? &k->def->m[i] : k->extra;
         if (!m || m->kind != MK_DRAIN) continue;
@@ -1379,6 +1428,11 @@ static void schedule(TKit *k, Entity *t) {
         if (m->kind == MK_BEAM && !aligned(e, t)) continue;
         if (m->kind == MK_RUSH && m->a < 24 && dist2(e, t) > 40 * 40) continue;    // a grab / a pan wants him close
         if (m->kind == MK_HEAL && e->hp * 100 / max > 70) continue;
+        if (m->kind == MK_RUSH && (m->flags & MF_LOWHP)) {
+            if (pct > 50) continue;                 // Energy Steal: only from half HP down (a dash, then the grab)
+            pick[0] = m; n = 1;                     // and then first, whenever it is ready
+            break;
+        }
         pick[n++] = m;
     }
     if (!n) return;
@@ -1388,6 +1442,105 @@ static void schedule(TKit *k, Entity *t) {
 }
 
 // ---- the vtable wrappers ----------------------------------------------------------------------------------------------
+// ---- knock-back and the fall --------------------------------------------------------------------------------------------
+// The stock reaction to a player's punch (decompiled 2026-10-25: the enemy message 0x0800E5B8 hands the hit to the
+// AI's hit tree; set 21's is a GOTO 21 plus set 18's tree: OnHit, then 0x0801ACD4 pushes AI set 17 (0x0801A946, a
+// slide of 0x20) or, with a wall behind him, set 16 (0x0801ACB6: the other way, unhittable)) moved a set-21 fighter
+// about 7-12 px and then held him in place for ~35 frames, so every punch of a combo landed on a man who could not
+// move: he was pinned. On top of it the kit now pushes him away from the hitter: nothing more on a combo's first
+// punch (the stock slide), a light push on the second, a long one on the finisher (the third melee hit, each within
+// KB_COMBO_GAP frames of the last; a shot always gives the light push); a wall behind him turns the push along the
+// wall (out of the corner). KF_POISE bodies are pushed half as far.
+static int frames_in(const Entity *e, const u32 *grp) {     // as the engine's frames_of (tny_engine.c)
+    const u8 *rec = (const u8 *)e->sprite_record, *d = (const u8 *)grp[e->facing & 3];
+    int n = 1;
+    for (; n < 8; n++) {
+        const u8 *q = d + 12 * n;
+        for (int g = 0; g < rec[2]; g++)
+            for (int f = 0; f < 4; f++) if (*(const u8 *const *)(rec + 0x4C + 0x10 * g + 4 * f) == q) return n;
+        if (!desc_ok((const Desc *)q)) return n;
+    }
+    return n;
+}
+
+static void knock(TKit *k, const Entity *from, int melee, int lethal) {
+    Entity *e = k->e;
+    u16 now = (u16)g_FrameCounter;
+    int px, t;
+    if (lethal) { px = KB_FALL_PX; t = KB_FINISH_T; k->combo = 0; }
+    else {
+        k->combo = (u16)(now - k->last_hit_f) <= KB_COMBO_GAP ? k->combo : 0;
+        if (melee) k->combo++;
+        if (melee && k->combo >= KB_FINISHER) { px = KB_FINISH_PX; t = KB_FINISH_T; k->combo = 0; }
+        else if (melee && k->combo == 1) { k->last_hit_f = now; return; }   // the opener: the stock slide is enough
+        else { px = KB_LIGHT_PX; t = KB_LIGHT_T; }
+    }
+    k->last_hit_f = now;
+    if (k->def->flags & KF_POISE) px /= 2;
+    s32 ex, ey, fx, fy, dx = 0, dy = 0;
+    centre(e, &ex, &ey);
+    if (from && from != e && !melee) { centre(from, &fx, &fy); dx = ex - fx; dy = ey - fy; }   // a shot: away from its owner
+    if (!dx && !dy) {                               // a blow: along the hitter's facing, as the stock reaction (else his back)
+        static const s8 vec[4][2] = { { 0, 1 }, { 0, -1 }, { -1, 0 }, { 1, 0 } };
+        int f = from && from != e ? from->facing & 3 : (e->facing & 3) ^ 1;
+        dx = vec[f][0]; dy = vec[f][1];
+    }
+    set_len(dx, dy, (px << 8) / t, &k->push_vx, &k->push_vy);
+    k->push_t = (s16)t;
+    mv.knocks++;
+}
+
+// One frame of the push, map collision checked; blocked, it slides along the wall (the side that is open).
+static void push_step(TKit *k) {
+    if (k->push_t <= 0) return;
+    k->push_t--;
+    Entity *e = k->e;
+    s32 vx = k->push_vx, vy = k->push_vy;
+    const s32 try_v[3][2] = { { vx, vy }, { -vy, vx }, { vy, -vx } };
+    for (int i = 0; i < 3; i++) {
+        s32 nx = e->x + try_v[i][0], ny = e->y + try_v[i][1];
+        if (!walkable(e, nx >> 8, ny >> 8)) continue;
+        e->x = nx; e->y = ny;
+        if (i) { k->push_vx = try_v[i][0]; k->push_vy = try_v[i][1]; }   // keep sliding that way
+        return;
+    }
+    k->push_t = 0;                                  // boxed in
+}
+
+// He fell (HP 0; not Android 16 / Super 13, whose own code ends them): no special, no AI, no hits, not a target
+// (alive_kit); the blow's push, the knock-down (pose group 3) and then the engine's lying pose (group 12's last
+// frame, else 3's last, else the hit-stun: pose_hold in tny_engine.c), held until the engine clears the body.
+static void fallen(TKit *k) {
+    Entity *e = k->e;
+    if (!k->down) {
+        k->down = 1;
+        k->down_t = 0;
+        if (k->cur) { beam_end(k); if (k->held) { k->held->kind = K_SHOT; k->held->fuse = 1; k->held = 0; } k->cur = 0; }
+        k->stun = 0;
+        k->poise = 0;
+        E32(e, 0x168) = 0;                          // the stock message handler's "hittable" word
+        mv.falls++;
+    }
+    if (k->down_t < 0x7FFF) k->down_t++;
+    if (e->ctrl_state != &k->ctrl) Entity_SetCtrlState(e, &k->ctrl);
+    push_step(k);
+    const u32 *g3 = group_of(e, 3);
+    if (g3 && k->down_t <= FALL_FRAMES) {
+        int n = frames_in(e, g3);
+        int f = (k->down_t - 1) * n / FALL_FRAMES;
+        pose(k, 3, f < n ? f : n - 1);
+    } else {
+        static const s8 lie[3][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };   // group, frame (-1 = the last)
+        for (int i = 0; i < 3; i++) {
+            const u32 *g = group_of(e, lie[i][0]);
+            if (!g) continue;
+            pose(k, lie[i][0], lie[i][1] < 0 ? frames_in(e, g) - 1 : lie[i][1]);
+            break;
+        }
+    }
+    Entity_BaseUpdate(e);
+}
+
 static void unregister(TKit *k) {
     for (int i = 0; i < KIT_MAX; i++) if (mv.reg[i] == k) mv.reg[i] = 0;
 }
@@ -1396,6 +1549,9 @@ static void kit_destroy(Entity *e, int free_it, u32 a, u32 b) {
     TKit *k = (TKit *)e->vtable;
     const u32 *base = k->base;
     beam_end(k);
+    EntityList *l = g_EntityList;                   // a thin beam still ending runs on this kit's vtable copy: back to
+    for (int i = 0; i < l->count; i++)              // the stock one before the kit's memory goes (a crash in tny_rumble)
+        if (l->items[i] && l->items[i]->vtable == k->beam_vt) l->items[i]->vtable = (u32 *)BEAM_VTABLE;
     for (int i = 0; i < KIT_LIVE; i++) if (k->live[i]) { k->live[i]->kit = 0; k->live[i] = 0; }
     if (k->held) { k->held->kit = 0; k->held = 0; }
     unregister(k);
@@ -1409,11 +1565,13 @@ static void kit_update(Entity *e) {
     TKit *k = (TKit *)e->vtable;
     const u32 *base = k->base;
     void (*base_update)(Entity *) = (void (*)(Entity *))((u32)base + base[2]);
-    if (e->hp <= 0 || k->native) {
+    if (k->native) {
         if (e->hp <= 0 && k->cur) { beam_end(k); k->cur = 0; }
-        base_update(e);                             // natives (Android 16, Super 13) aim at players themselves
+        base_update(e);                             // natives (Android 16, Super 13) aim at players and end themselves
         return;
     }
+    if (e->hp <= 0 || k->down) { fallen(k); return; }   // he fell: no AI (it kept fighting at HP 0 before)
+    push_step(k);
     Entity *saved = g_PlayerObject;
     Entity *t = g_PlayerObject;
     if (mv.rumble) {
@@ -1423,6 +1581,7 @@ static void kit_update(Entity *e) {
     } else if (!t || revive_is_down(t) || kit_of(t)) {
         t = nearest_player_of(e);
     }
+    if (k->log_t && !--k->log_t) mv.klog[k->log_i].x20 = (s16)(e->x >> 8);   // tests: where the hit left him
     // passives
     if (k->poise > 0) k->poise--;
     for (int i = 0; i < KIT_MOVES; i++) if (k->cd[i] > 0) k->cd[i]--;
@@ -1465,6 +1624,7 @@ static void kit_update(Entity *e) {
 // during a special or poise only does damage (the stock box test, the damage calculation and OnHit).
 static int kit_message(Entity *e, int msg, u8 *m) {
     TKit *k = (TKit *)e->vtable;
+    if (msg == 0 && (e->hp <= 0 || k->down) && !k->native) return 0;   // a fallen fighter takes no more hits
     if (msg != 0 || e->hp <= 0) return base_call9(k, e, msg, m);
     Entity *att = *(Entity **)(m + 0x20);
     TKit *ak = kit_of(att);
@@ -1473,10 +1633,11 @@ static int kit_message(Entity *e, int msg, u8 *m) {
     if (conv) m[0] = 1;
     s32 exp = k->stat.exp;
     if (conv) k->stat.exp = 0;                      // an NPC's kill gives nobody EXP
-    int r;
+    int r, pushed_only_damage = 0;
     mv.dying = 0;
     if (!k->native && (m[0] == 1 || m[0] == 2) && (k->cur || k->poise > 0)) {
         r = 0;
+        pushed_only_damage = 1;                     // a special / the poise window: damage only, no push
         if (E32(e, 0x168)) {                        // hittable right now (as the stock test)
             s32 b[4];
             const s32 *mb = (const s32 *)(m + 4);
@@ -1490,6 +1651,23 @@ static int kit_message(Entity *e, int msg, u8 *m) {
     } else {
         r = base_call9(k, e, msg, m);
         if (r && mv.dying != k && (k->def->flags & KF_POISE) && !k->native) k->poise = POISE_FRAMES;
+        if (r && mv.dying != k && !conv) {
+            const u8 *atk = *(const u8 **)(m + 0x1C);
+            int depth = (int)E32(e, 0x1A0);
+            mv.p_hits++;
+            mv.last_react[0] = atk ? atk[0] : 0xFF;
+            mv.last_react[1] = atk ? atk[1] : 0xFF;
+            mv.last_depth = (u8)depth;
+            mv.last_set = depth > 0 && depth <= 5 ? (u8)((E32(e, 0x1A0 + 8 * depth) - 0x086D5194u) / 8) : 0xFF;
+            int li = mv.p_hits % 3;
+            mv.klog[li].frame = (u16)g_FrameCounter;
+            mv.klog[li].x0 = (s16)(e->x >> 8);
+            mv.klog[li].x20 = 0;
+            mv.klog[li].react = mv.last_react[1];
+            mv.klog[li].set = mv.last_set;
+            k->log_i = (u8)li;
+            k->log_t = 20;
+        }
     }
     if (conv) m[0] = 0;
     if (mv.dying == k) {                            // he fell to it and is gone
@@ -1502,6 +1680,10 @@ static int kit_message(Entity *e, int msg, u8 *m) {
         Entity *who = att;
         if (who && !is_player(who) && !ak) who = *(Entity **)((u8 *)att + 0x1C);   // a projectile: its owner
         k->last_hitter = who;
+        if (!pushed_only_damage) {                  // the stock reaction ran: push him away from the hitter
+            const u8 *atk = *(const u8 **)(m + 0x1C);
+            knock(k, who, atk && atk[0] == 0, e->hp <= 0);
+        }
     }
     return r;
 }
@@ -1585,6 +1767,13 @@ void tny_moves_frame(void) {
         for (int j = 0; j < l->count && !found; j++) found = l->items[j] == k->e && l->items[j]->vtable == (u32 *)k;
         if (!found) mv.reg[i] = 0;
     }
+    for (int i = 0; i < KIT_MAX; i++) {             // a fallen helper or Multi-Form copy leaves (the engine clears its own)
+        TKit *k = mv.reg[i];
+        if (!k || !k->down || !k->copy || k->down_t < HELPER_GONE) continue;
+        EntityList_Broadcast(g_SceneTable[1], 0xF, k->e);
+        EntityList_Remove(g_SceneTable[1], k->e, 0);
+        mv.reg[i] = 0;
+    }
     for (int i = 0; i < 2; i++) {
         if (mv.stun_t[i] <= 0) continue;
         mv.stun_t[i]--;
@@ -1610,6 +1799,9 @@ void tny_moves_frame(void) {
 //      op 3  reg << 8: no specials for arg2 frames (his stock AI still runs)
 //      op 4  every kit fighter leaves, Rumble off
 //      op 5  reg << 8 | kind: a passive on top of his kit (11 drain, 12 regen; 0 = none)
+//      op 6  reg << 8 | step: player 1 turns to him and throws one punch (the A button's own hit routine 0x08007DE8:
+//            the box in front of him, the hit message, the punch animation), as a pad press would; step 1 = first
+//            step in to (arg >> 16 & 0xFF, 0 = 20) px on his left (a player following him up); knock-back tests
 void tny_moves_test(u32 cmd, u32 arg, u32 arg2) {
     mv_init();
     Entity *p1 = g_PlayerObject;
@@ -1653,6 +1845,11 @@ void tny_moves_test(u32 cmd, u32 arg, u32 arg2) {
     } else if (op == 5 && k) {
         int kind = (int)(arg & 0xFF);
         k->extra = (kind == MK_DRAIN || kind == MK_REGEN) ? &lib_default[kind] : 0;
+    } else if (op == 6 && k && p1) {
+        int gap = (arg >> 16) & 0xFF;
+        if (arg & 1) { p1->x = k->e->x - ((gap ? gap : 20) << 8); p1->y = k->e->y; }
+        face(p1, k->e);
+        ((void (*)(Entity *))0x08007DE9u)(p1);
     } else if (op == 4) {                           // every kit fighter leaves (the next test starts clean)
         tny_rumble_mode(0);
         for (int i = 0; i < KIT_MAX; i++) {

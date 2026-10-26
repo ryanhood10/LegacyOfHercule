@@ -497,19 +497,19 @@ frames 16
 p2 0
 frames 50
 peek16 PARTY+0xd4 1
-echo == P2 TF_SPOPOVICH row 36 abilities [14, 16, 20, 17]
-poke16 PARTY+0xd0 520
-poke16 PARTY+0xd2 520
+echo == P2 TF_SPOPOVICH row 36 abilities [14, 16, 24, 20]
+poke16 PARTY+0xd0 560
+poke16 PARTY+0xd2 560
 poke16 PARTY+0xd4 240
 poke16 PARTY+0xd6 240
 poke8 PARTY+0xd8 36
 poke8 PARTY+0xd9 0
-poke16 PARTY+0xda 13800
-poke16 PARTY+0xdc 9600
-poke16 PARTY+0xde 15600
+poke16 PARTY+0xda 15000
+poke16 PARTY+0xdc 9000
+poke16 PARTY+0xde 16200
 poke32 PARTY+0xe0 1000000
 poke32 PARTY+0xe4 0x7B
-poke32 PARTY+0xe8 0x1114100e
+poke32 PARTY+0xe8 0x1418100e
 frames 30
 peek8 0x0203FF84 1
 peek PARTY+0xd0 7
@@ -566,19 +566,19 @@ frames 16
 p2 0
 frames 50
 peek16 PARTY+0xd4 1
-echo == P2 TF_YAMU row 37 abilities [19, 14, 2, 20]
+echo == P2 TF_YAMU row 37 abilities [19, 24, 2, 20]
 poke16 PARTY+0xd0 400
 poke16 PARTY+0xd2 400
-poke16 PARTY+0xd4 270
-poke16 PARTY+0xd6 270
+poke16 PARTY+0xd4 330
+poke16 PARTY+0xd6 330
 poke8 PARTY+0xd8 37
 poke8 PARTY+0xd9 0
 poke16 PARTY+0xda 12600
-poke16 PARTY+0xdc 10800
-poke16 PARTY+0xde 12000
+poke16 PARTY+0xdc 12600
+poke16 PARTY+0xde 11400
 poke32 PARTY+0xe0 1000000
 poke32 PARTY+0xe4 0x7B
-poke32 PARTY+0xe8 0x14020e13
+poke32 PARTY+0xe8 0x14021813
 frames 30
 peek8 0x0203FF84 1
 peek PARTY+0xd0 7
@@ -3130,18 +3130,18 @@ keys 0
 frames 50
 peek16 PARTY+0xd4 1
 echo == P1 TF_SPOPOVICH row 36
-poke16 PARTY+0xd0 520
-poke16 PARTY+0xd2 520
+poke16 PARTY+0xd0 560
+poke16 PARTY+0xd2 560
 poke16 PARTY+0xd4 240
 poke16 PARTY+0xd6 240
 poke8 PARTY+0xd8 36
 poke8 PARTY+0xd9 0
-poke16 PARTY+0xda 13800
-poke16 PARTY+0xdc 9600
-poke16 PARTY+0xde 15600
+poke16 PARTY+0xda 15000
+poke16 PARTY+0xdc 9000
+poke16 PARTY+0xde 16200
 poke32 PARTY+0xe0 1000000
 poke32 PARTY+0xe4 0x7B
-poke32 PARTY+0xe8 0x1114100e
+poke32 PARTY+0xe8 0x1418100e
 poke32 0x0203FD0C 0x0702
 poke32 0x0203FD54 0x1ae01d0
 poke32 0x0203FD08 5
@@ -3202,16 +3202,16 @@ peek16 PARTY+0xd4 1
 echo == P1 TF_YAMU row 37
 poke16 PARTY+0xd0 400
 poke16 PARTY+0xd2 400
-poke16 PARTY+0xd4 270
-poke16 PARTY+0xd6 270
+poke16 PARTY+0xd4 330
+poke16 PARTY+0xd6 330
 poke8 PARTY+0xd8 37
 poke8 PARTY+0xd9 0
 poke16 PARTY+0xda 12600
-poke16 PARTY+0xdc 10800
-poke16 PARTY+0xde 12000
+poke16 PARTY+0xdc 12600
+poke16 PARTY+0xde 11400
 poke32 PARTY+0xe0 1000000
 poke32 PARTY+0xe4 0x7B
-poke32 PARTY+0xe8 0x14020e13
+poke32 PARTY+0xe8 0x14021813
 poke32 0x0203FD0C 0x0702
 poke32 0x0203FD54 0x1ae01d0
 poke32 0x0203FD08 5

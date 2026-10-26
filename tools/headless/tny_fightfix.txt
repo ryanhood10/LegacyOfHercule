@@ -1,0 +1,1034 @@
+# Tournament fight fixes (Ryan's playtest, 2026-10-25; docs/tournament.md 18, docs/testing.md "Tournament fight fixes"):
+#   A. knock-back: player 1 (Piccolo) punches a tournament Yamcha (no specials) three times a combo, following him up
+#      to 16 px before each punch (test command 27 op 6: the A button's own punch routine); his x (8.8) after each.
+#      Before the fix his x stayed put after the first punch (276.0 -> 286.0 -> 288.3 px, then 288.3 through every
+#      later punch); now a combo moves him ~90 px: 276.0 -> 286.0 -> 296.0 -> 340.3 (the finisher) -> 365.3.
+#   B. the fall: Tien at 4 HP, one punch: HP 0, mv.falls 1, lying (shots), later punches do nothing (p_hits unchanged).
+#   C. a Rookie Royal Rumble (engine, test command 25) with every fighter's HP poked to 4: player punches and the
+#      fighters' own hits finish them; every round clears (phase 5, result 1) and the headliner round ends it.
+#   D. Spopovich's Energy Steal: none at full HP; at 40 % one steal (both players -25 ki, him +10 % per player).
+#   E. Yamu's the same.  F. the players' Energy Steal (ability 24): player 1 as Spopovich, player 2 as Yamu.
+#   G. the engine's lead for a tournament playable: the party's best numbers (co-op: Yamu and Spopovich).
+# From a debug-menu savestate (--out = the folder holding menu.ss):
+#   python tools/headless/st_test.py tools/headless/tny_fightfix.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# mv (the moves state, magic "MOVE"): +0x54 players' hits taken / pushes, +0x58 falls / Energy Steal hits,
+# +0x78 ki stolen in all. Kit k = mv+8+4k, its entity at k+0x138; entity x +0x158 (8.8), HP +0x188.
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+echo == A. knock-back: Yamcha 64 px right, no specials
+poke32 0x0203FD0C 0x00050000
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 e0+0x158 0x11400
+poke32 e0+0x15C 0x18000
+frames 2
+echo == A combo 0: his x before, after each of three punches, 15 frames later; hits / pushes
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+frames 15
+peek e0+0x158
+peek mv+0x54
+shot fa0
+echo == A combo 1: his x before, after each of three punches, 15 frames later; hits / pushes
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+frames 15
+peek e0+0x158
+peek mv+0x54
+shot fa1
+echo == A combo 2: his x before, after each of three punches, 15 frames later; hits / pushes
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+peek e0+0x158
+frames 15
+peek e0+0x158
+peek mv+0x54
+shot fa2
+
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+echo == B. the fall: Tien at 4 HP beside player 1, one punch
+poke32 0x0203FD0C 0x00040001
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 e0+0x188 4
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 6
+shot fb0
+frames 30
+shot fb1
+echo expect HP 0, falls 1; then two more punches: p_hits unchanged, HP 0
+peek e0+0x188
+peek mv+0x54 2
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 60
+peek e0+0x188
+peek mv+0x54 2
+peek e0+0x4C
+peek16 e0+0x14
+shot fb2
+
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD08 21
+frames 10
+echo == C. Rookie Royal Rumble as player 1's own, every fighter at 4 HP; expect each round: opp_in (+0x26) all 2, phase 5 result 1
+poke32 0x0203FD0C 0x0002
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+echo == round 0: eng +0x10..
+peek8 0x0203EC10 0x30
+find mv 0x4D4F5645
+peek mv+8 8
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 e0+0x188 4
+deref k1 mv+12
+deref e1 k1+0x138
+poke32 e1+0x188 4
+deref k2 mv+16
+deref e2 k2+0x138
+poke32 e2+0x188 4
+deref k3 mv+20
+deref e3 k3+0x138
+poke32 e3+0x188 4
+deref k4 mv+24
+deref e4 k4+0x138
+poke32 e4+0x188 4
+deref k5 mv+28
+deref e5 k5+0x138
+poke32 e5+0x188 4
+frames 30
+shot r0a
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+shot r0b
+peek mv+0x54 2
+peek8 0x0203EC10 0x30
+frames 300
+shot r0c
+peek8 0x0203EC00 8
+stepz 0x0203ECFC 200
+echo == round 1: eng +0x10..
+peek8 0x0203EC10 0x30
+find mv 0x4D4F5645
+peek mv+8 8
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 e0+0x188 4
+deref k1 mv+12
+deref e1 k1+0x138
+poke32 e1+0x188 4
+deref k2 mv+16
+deref e2 k2+0x138
+poke32 e2+0x188 4
+deref k3 mv+20
+deref e3 k3+0x138
+poke32 e3+0x188 4
+deref k4 mv+24
+deref e4 k4+0x138
+poke32 e4+0x188 4
+deref k5 mv+28
+deref e5 k5+0x138
+poke32 e5+0x188 4
+frames 30
+shot r1a
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+shot r1b
+peek mv+0x54 2
+peek8 0x0203EC10 0x30
+frames 300
+shot r1c
+peek8 0x0203EC00 8
+stepz 0x0203ECFC 200
+echo == round 2: eng +0x10..
+peek8 0x0203EC10 0x30
+find mv 0x4D4F5645
+peek mv+8 8
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 e0+0x188 4
+deref k1 mv+12
+deref e1 k1+0x138
+poke32 e1+0x188 4
+deref k2 mv+16
+deref e2 k2+0x138
+poke32 e2+0x188 4
+deref k3 mv+20
+deref e3 k3+0x138
+poke32 e3+0x188 4
+deref k4 mv+24
+deref e4 k4+0x138
+poke32 e4+0x188 4
+deref k5 mv+28
+deref e5 k5+0x138
+poke32 e5+0x188 4
+frames 30
+shot r2a
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+poke32 0x0203FD0C 0x06000001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000101
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06000201
+poke32 0x0203FD08 27
+frames 12
+poke16 0x0203F028 300
+shot r2b
+peek mv+0x54 2
+peek8 0x0203EC10 0x30
+frames 300
+shot r2c
+peek8 0x0203EC00 8
+
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+echo == D. Spopovich at full HP: 600 frames, no Energy Steal (steals, stolen)
+poke32 0x0203FD0C 0x00010008
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+peek k0+0x15C
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+peek e0+0x188
+peek16 mv+0x5A
+peek16 mv+0x78
+echo == D. at 40 %: Energy Steal from half HP (his HP, players' ki, steals, stolen)
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 0x80000028
+poke32 0x0203FD08 27
+frames 4
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot s2
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot s5
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot s8
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot s11
+
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+echo == E. Yamu at full HP: 600 frames, no Energy Steal (steals, stolen)
+poke32 0x0203FD0C 0x00010009
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+peek e0+0x188
+peek k0+0x15C
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+poke16 0x0203F02C 150
+poke16 0x0203F09C 150
+frames 100
+peek e0+0x188
+peek16 mv+0x5A
+peek16 mv+0x78
+echo == E. Yamu at 40 %: Energy Steal from half HP (his HP, players' ki, steals, stolen)
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 0x80000028
+poke32 0x0203FD08 27
+frames 4
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot y2
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot y5
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot y8
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+frames 50
+peek e0+0x188
+peek16 0x0203F02C
+peek16 0x0203F09C
+peek16 mv+0x5A
+peek16 mv+0x78
+shot y11
+
+load menu.ss
+p2 off
+maptest 147
+frames 300
+echo == F. player 1 as Spopovich (row 36) on slot 7 at 40 % HP, ki 20 / 200, Energy Steal selected (index 2)
+poke16 PARTY+0xd0 400
+poke16 PARTY+0xd2 1000
+poke16 PARTY+0xd4 20
+poke16 PARTY+0xd6 200
+poke8 PARTY+0xd8 36
+poke8 PARTY+0xd9 2
+poke16 PARTY+0xda 12000
+poke16 PARTY+0xdc 8000
+poke16 PARTY+0xde 12000
+poke32 PARTY+0xe0 1000000
+poke32 PARTY+0xe4 0x7B
+poke32 PARTY+0xe8 0x1418100E
+poke8 PARTY 7
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+map
+peek PARTY+0xd0 7
+poke32 0x0203FD0C 0x00040000
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+deref p1 0x03001FA8
+echo == Yamcha 36 px to his right; B: dash, punch, grab (his HP, then slot 7 hp / ep)
+poke32 e0+0x158 0x11C00
+poke32 e0+0x15C 0x18000
+poke32 p1+0x158 0xF800
+poke32 p1+0x15C 0x18000
+key 0x10 1
+peek e0+0x188
+poke32 0x0300208C 1
+poke32 p1+0x168 0
+keys 2
+frames 1
+peek p1+0x1C
+peek p1+0x158
+frames 4
+shot fp1
+keys 0
+frames 20
+shot fp2
+peek e0+0x188
+peek16 PARTY+0xd0 3
+echo == again at full ki and above half HP: no HP, ki capped
+poke16 PARTY+0xd0 900
+poke32 e0+0x158 0x11C00
+poke32 e0+0x15C 0x18000
+poke32 p1+0x158 0xF800
+poke32 p1+0x15C 0x18000
+key 0x10 1
+poke32 0x0300208C 1
+poke32 p1+0x168 0
+keys 2
+frames 4
+keys 0
+frames 20
+peek e0+0x188
+peek16 PARTY+0xd0 3
+echo == a miss (nobody in front): no ki
+poke16 PARTY+0xd4 20
+poke32 e0+0x158 0x15C00
+poke32 0x0300208C 1
+keys 2
+frames 4
+keys 0
+frames 20
+peek16 PARTY+0xd0 3
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+echo == F. player 2 as Yamu (row 37) on slot 7, ki 30 / 150, Energy Steal selected (index 1)
+poke16 PARTY+0xd0 600
+poke16 PARTY+0xd2 600
+poke16 PARTY+0xd4 30
+poke16 PARTY+0xd6 150
+poke8 PARTY+0xd8 37
+poke8 PARTY+0xd9 1
+poke16 PARTY+0xda 12000
+poke16 PARTY+0xdc 12000
+poke16 PARTY+0xde 11000
+poke32 PARTY+0xe0 1000000
+poke32 PARTY+0xe4 0x7B
+poke32 PARTY+0xe8 0x14021813
+poke8 0x0203FF84 7
+frames 30
+peek8 0x0203FF84 1
+poke32 0x0203FD0C 0x00040000
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+deref q 0x0203FF08
+peek q+0x48
+poke32 e0+0x158 0x11C00
+poke32 e0+0x15C 0x18000
+poke32 q+0x158 0xF800
+poke32 q+0x15C 0x18000
+p2 0x10
+frames 1
+p2 0
+frames 2
+poke32 q+0x158 0xF800
+peek e0+0x188
+poke32 0x0300208C 1
+poke32 q+0x168 0
+p2 2
+frames 4
+shot fq1
+p2 0
+frames 20
+peek q+0x158
+peek e0+0x188
+peek16 PARTY+0xd0 3
+
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 8
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 9
+poke32 0x0203FD08 23
+frames 10
+echo == G. the lead: player 1 Yamu (9), player 2 Spopovich (8), both unlocked; before: active slot, slot 1
+peek8 PARTY 1
+peek PARTY+0x28 7
+poke32 0x0203FD0C 0x0000
+poke32 0x0203FD54 0x0809
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+echo == G. in the ring: slot 1 = Yamu at the party's best (HP 1216 = Goku's max, ki 110 % of the best), slot 5 = Spopovich (HP 140 %), not built on Yamu
+peek8 PARTY 1
+peek PARTY+0x28 7
+peek PARTY+0xD0 7
+peek PARTY+0x98 7
+peek8 0x0203FF84 1
+deref q 0x0203FF08
+peek8 q+0x160 5
+deref p1 0x03001FA8
+peek8 p1+0x160 5
+shot fg

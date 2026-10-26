@@ -27,6 +27,7 @@
 #define TNY_FLAG_ENGINE0    446
 // Stats: engine 160-219 (one per fighter as an opponent; tier scaling in code). moves may add rows 220-229.
 #define TNY_STAT0           160
+#define TNY_AB_STEAL        24      // ability: Energy Steal (Spopovich, Yamu as players; tny_play.c, data/hercule.json)
 // CoopCall: engine 23-27, ui 28-29, grounds 30.
 // Test commands (coop2.cmd): engine 21-25, moves 26-27, ui 28-29, grounds 30.
 // Zone 15 areas 11-17: grounds. UI strings 357-379: grounds (place names, banner), 380-399: ui.

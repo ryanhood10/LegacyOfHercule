@@ -13,6 +13,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
   frames, turned hit-stuns via `tools/lying.py`, the generated table `tny_lie`; the loser lies in a side facing).
   Spopovich's animation remapped (full walk, side-view crouch and grab, flex); every Buu import's hit-stun is its hurt
   anim, not its run. Sheets `tools/tnysheet.py`, films `tools/headless/tny_film.py`. `docs/tournament.md` 20.
+- **Tournament fight fixes (Ryan's playtest, branch `tny-fightfix`):** tournament opponents get knocked back by
+  player combos (the stock set-21 reaction slid them 7-12 px on the first punch and then held them in place: Yamcha
+  stayed at 288 px through five more punches; now three punches move him ~90 px, the finisher 40); a fighter at HP 0
+  falls, lies still and is out of the fight (he kept fighting at HP 0: Rumble zombies; a Rumble is now finished by real
+  hits round by round); Spopovich and Yamu steal ki only from half HP down and turn it into HP (25 ki = 10 % of max HP);
+  as players both have Energy Steal (new ability 24: a dash and a grab, 20 % ki back, Spopovich at half HP 8 % HP) and
+  new numbers; a tournament playable is built on the party's best numbers (it was player 1's own slot; player 2's pick
+  was built on player 1's pick); a thin beam outliving its fighter no longer jumps through his freed kit. Seen, not fixed: Yamu as player 1 in a co-op 1 v 1 draws scrambled (also on main).
+  `docs/tournament.md` 21, `tny_fightfix.txt`.
 - **Heads stay on (Ryan: Krillin's head popped off in his dash):** `krillinsprites.py` measures the chin per frame (the
   lowest face skin under Goku's hair) instead of reusing the idle frame's, so leaning and crouched frames no longer
   float the head. `tools/headcheck.py` flags detached heads; a dash film of every playable row (22-66) checked by eye.

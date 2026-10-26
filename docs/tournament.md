@@ -519,7 +519,7 @@ change body through a map load (a warp), never in place: `PlayerEntity_RefreshSp
 - *Bodies (sprites 235-244):* Goku's player header, groups filled the way Hercule's set is (0-8, 11, 12, 13, 17, 20)
   from the body's enemy groups, every array padded to Goku's frame count, frames stay the ROM's (Android 13's are
   rebuilt from `bossmodels.build_a13`); all of it `TNY_ART` (52 KB). Giants keep their 0x1000 VRAM size and hurt boxes.
-- *No new abilities (24-40 stay free).* Every kit is built from the table: beam abilities need the beam groups
+- *No new abilities (24-40 stay free)* (since section 21: 24 is Energy Steal, Spopovich's and Yamu's). Every kit is built from the table: beam abilities need the beam groups
   18 / 19, so only Yamcha, Perfect Cell and Cooler (whose records have a group 18: Cell's own, the others' charge
   pose) get the Kamehameha; Special Beam Cannon, Spirit Bomb, Sword Blast and Energy Punch are on nobody. Signature
   moves the table lacks (Death Beam, Tri-Beam, Solar Flare, Candy Beam, energy steal...) are stand-ins below; the
@@ -549,8 +549,8 @@ change body through a map load (a warp), never in place: `PlayerEntity_RefreshSp
 | King Cold | Megaton Punch 16, Ki Blast (Death Beam) 2, Big Bang 0, Shockwave Punch 20 | 140 100 125 105 125 |
 | Master Roshi | Masenko (his Kamehameha wave) 4, Afterimage Rush (Drunken Fist) 19, Shockwave Punch (Thunder Shock) 20, Ki Blast 2 | 85 110 85 95 85 |
 | Mercenary Tao | Ki Blast (Dodon Ray) 2, Afterimage Rush (Crane rush) 19, Shockwave Punch 20, Big Bang 0 | 100 100 105 100 100 |
-| Spopovich | Rolling Hercule Punch 14, Megaton Punch 16, Shockwave Punch 20, Taunt 17 | 130 80 115 80 130 |
-| Yamu | Afterimage Rush 19, Rolling Hercule Punch 14, Ki Blast 2, Shockwave Punch 20 | 100 90 105 90 100 |
+| Spopovich | Rolling Hercule Punch 14, Megaton Punch 16, Energy Steal 24, Shockwave Punch 20 | 140 80 125 75 135 (section 21) |
+| Yamu | Afterimage Rush 19, Energy Steal 24, Ki Blast 2, Shockwave Punch 20 | 100 110 105 105 95 (section 21) |
 | Chi-Chi | Rolling Hercule Punch (the frying pan) 14, Dynamite Kick 15, Afterimage Rush 19, Taunt 17 | 80 70 90 70 80 |
 | Videl | Afterimage Rush (Hawk Arrow) 19, Dynamite Kick 15, Rolling Hercule Punch 14, Ki Blast 2 | 85 80 95 80 85 |
 | Chiaotzu | Ki Blast (Dodon Ray) 2, Shockwave Punch (psychic hold) 20, Masenko 4, Big Bang 0 | 75 110 70 105 75 |
@@ -610,9 +610,12 @@ moves"). What it does and the calls we made:
   defeat), rush (a dash with map collision and N hits; stun = a grab, a frying pan, a throw), teleport (a flash,
   behind the target, a strike; dodge = hop away), stun (a flash round him: Solar Flare; the target at range:
   psychic hold; a projectile: Stone Spit 3 s, Galactic Donut), heal (Kibito: the most hurt fighter of his side),
-  drain (passive: his melee hits heal him, or take a player's ki), regen (passive, permille of max a second),
+  drain (passive: his melee hits heal him, or take a player's ki; Spopovich and Yamu instead have Energy Steal, a rush
+  that only fires from half HP and turns the ki it takes into HP: section 21), regen (passive, permille of max a second),
   transform (at N % HP, once: a power-up pose, the new body, + attack / defence), summon (helpers beside him; at N %
   HP a copy of himself with half his health: Multi-Form).
+- **Knock-back and the fall** (section 21): a player's hit pushes him away (the finisher far); at HP 0 he falls and
+  stays down, out of the fight (no AI, no hits, no target) until the engine clears the body.
 - **Stuns**: a stunned player's pad is dead (both pads read 0 in the input poll) with a ring of orbs over his head; a
   stunned fighter stands in his hurt pose with no AI. A special cannot be stunned out of, and a hit during one
   only does damage (Android 16's rule); KF_POISE fighters (giants, bruisers, Android 17, Super Perfect Cell...)
@@ -734,7 +737,8 @@ froze). The director's lists answer B by ending the talk (nothing changed).
    `tny_ui_select` for player 1 and player 2. B anywhere ends it quietly. A pick that is not pickable (locked, or a
    tournament fighter without a display row) falls back to the player's own character.
 2. *The characters* are set once for the whole tournament: a story pick plays from his party slot (player 1 switches
-   with the SetActiveCharacter step), a tournament playable's entry (`tny_play_entry`, at the lead's level) is
+   with the SetActiveCharacter step), a tournament playable's entry (`tny_play_entry`, on the party's best numbers:
+   section 21) is
    written into a *carrier* slot: the player's own slot, else the duel clone's slot 7 when nobody is in it (backed
    up in `.tny.eng`, restored on the way out). The same story fighter twice: player 2 gets a copy in a carrier. 16
    after his chapter (flag 421) plays as a copy of his entry (the `a16_join` recipe). Then the warp into the ring:
@@ -976,3 +980,75 @@ when none do and when the HUD goes). State: `.tny.hp` (8 bytes). Test: `tools/he
   the dash; every import's hit-stun is its hurt animation now, not its run). Yamu, Pui Pui and Kibito got the dash /
   hit-stun parts of the same fix.
 
+
+## 21. Fight fixes from Ryan's playtest (2026-10-25, branch `tny-fightfix`)
+
+Code: `src/coop/tny_moves.c` (knock-back, the fall, Energy Steal for opponents), `src/coop/tny_play.c` (the players'
+Energy Steal, the two kits), `src/coop/tny_engine.c` (`lead_entry`), `data/hercule.json` (ability 24). Test
+`tools/headless/tny_fightfix.txt` (`docs/testing.md` "Tournament fight fixes").
+
+**Knock-back** (Ryan: "im punching yamcha and hes unable to move, but its not actually knocking his player model back.
+making it easy for me to corner and keep punching him"). Decompiled: a player's punch (`Player_Attack` 0x08007DE8: hit
+message type 1, attack descriptor 2 of the table at 0x086DB2CC, the same for every punch of the A combo) reaches the
+enemy message 0x0800E5B8, which runs the damage calculation and hands the hit to the AI's hit tree (0x0801AB2A: the
+top AI set's second word). Set 21's tree (every tournament opponent, the dojo Yamcha stat 106 and many bosses) is
+"go to set 21" plus set 18's: OnHit, then 0x0801ACD4, which tests the space behind him and pushes AI set 17 (0x0801A946,
+a slide of 0x20 away from the hitter while his hit state lasts) or, against a wall, set 16 (0x0801ACB6: the other way,
+unhittable). Regular enemies (set 3) push sets 1 / 2 the same way with smaller numbers (wolves: about 2 px a punch). For
+a set-21 fighter the slide is 7-12 px on the first punch; then he is held in place about 35 frames and every further
+punch lands on a man who does not move. Measured (a tournament Yamcha, player 1 following him up to 16 px before each
+punch, test command 27 op 6): before, 276.0 -> 286.0 -> 288.3 px, then 288.3 through the next five punches until he
+fell; now, per combo of three punches: 276.0 -> 286.0 -> 296.0 -> 340.3 (the finisher) -> 365.3 settled, the next combo
+365.3 -> 373.4 -> 388.3 -> 431.3 -> 452.5. *Decided:* the kit adds its own push on top of the stock reaction: nothing
+more on a combo's first punch (the stock slide), 3 px on the second, 40 px over 12 frames on the third melee hit (each
+within 45 frames of the last), 3 px for a shot; along the hitter's facing for a blow, away from the shooter for a shot;
+a wall behind him turns the push along the wall (out of the corner), boxed in it stops. KF_POISE bodies are pushed
+half as far; a special in progress and the poise window still only take damage (no push).
+
+**The fall** (the main session found tournament fighters at HP 0 kept their AI and fought on: zombies in the Rumble;
+Ryan: "do people actually die in the royal rumble?"). The kit's update ran the stock update at HP 0 for everyone; the
+opponents' record has no action and the boss class (stat 29's) never removes the body. Now a fighter (not Android 16 /
+Super 13, whose own code ends them) at HP 0 falls: his special ends, the killing blow pushes him 24 px, his knock-down
+(group 3) plays over 18 frames, then the engine's lying pose (group 12's last frame, else group 3's, else the hit-stun:
+`pose_hold`'s table), held; no AI, no hits taken (the message returns 0 and the stock "hittable" word +0x168 is
+cleared), never a target (`alive_kit`). The engine counts him out at once (`fight_frame`: HP 0) and removes his body
+after 60 frames in a Rumble; a fallen helper or Multi-Form copy (not the engine's) leaves after 90 frames. Tested: a
+Rookie Rumble with every fighter at 4 HP is finished by player punches and the fighters' own hits, round by round to
+"The headliner is down!". Found on the way (`tny_rumble.txt`, a new timing): a thin beam still playing its end after
+its fighter left kept his kit's vtable copy (freed with the kit) and the next frame jumped to garbage; the kit's
+destroy now hands such a beam the stock beam vtable.
+
+**Energy Steal, opponents** (Ryan: "i like that he drains the other players ki, but maybe he should do it more
+strategically? like when he is at half health he does it and all the ki he takes goes into his health?"). Of Babidi's
+pair only Yamu drained (a passive: every melee hit took 12 ki); Spopovich had only the bear hug, so the drainer Ryan
+saw was Yamu (his later message calls him "yamu (spopavich)"). *Decided:* the rule for both. Above half HP neither
+drains; from half HP down a new rush (`STEAL`: Spopovich a 72 px dash, Yamu 80 px, one grab, cooldown 360 / 300 frames)
+is picked before his other moves whenever it is ready; each player it grabs loses 25 ki (all he has, if less) and every
+point becomes 4 permille of the thief's max HP (25 ki = 10 %, both players at once 20 %), capped at his max. Back above
+half he stops: not endless. Shown by the heal's light on him (Kibito's flash) and a spark at the victim. Measured:
+Spopovich (1330 HP) at 40 % = 532 grabbed both players: 798 HP, both 150 -> 125 ki; at full HP for 600 frames: no
+steal. Yamu (1190) at 40 % = 476: 714.
+
+**Energy Steal, players (ability 24)** (Ryan: "yamu (spopavich) isnt fun once you unlock and actually play as him.
+he's weak (like he got a default level 1), and he doesnt have ki draining ability when user plays as him"). A short
+dash (24 px, walls stop it), the punch and a grab in front of him (melee, power 0x500); when it lands he gets 20 % of
+his max ki back, and Spopovich at half HP or lower also 8 % of his max HP. No ki cost (it only pays when it lands); the
+stock ability gate paces it. HUD icon: the stock pair 6. Kits: Spopovich Rolling Hercule Punch, Megaton Punch, Energy
+Steal, Shockwave Punch (HP 140 %, ki 80, STR 125, POW 75, END 135: the slow brute; Taunt dropped, the steal refills
+ki); Yamu Afterimage Rush, Energy Steal, Ki Blast, Shockwave Punch (100 / 110 / 105 / 105 / 95: the quicker thief, the
+dash first). Their walking speed is the standard class's (rows 29+ share Gohan's), as every playable's. Measured:
+player 1 as Spopovich at 400 / 1000 HP, 20 / 200 ki: a grab on Yamcha -> 480 HP, 60 ki; above half HP the ki only; a
+miss nothing. Player 2 as Yamu, 30 / 150 ki: 60 ki, HP unchanged.
+
+**Why they played weak: the lead.** The engine built a playable from player 1's own slot (`apply_entry`). A weak or
+low-level player-1 character gave a weak playable (Hercule's HP is the party's lowest: 493 against Goku's 1216 in the
+Map Test party), and player 2's pick read player 1's slot after it already held player 1's pick (Spopovich's ki was
+80 % of Yamu's 90 % of the lead's). *Decided:* `lead_entry` takes the party's best, number by number: the highest EXP
+(his level), max HP, max ki, strength, power and endurance among the story fighters in the party (slots 0-6), each
+read as it was before the tournament (a carrier's backup); the fighter's percentages apply to that. Android 16's
+tournament copy uses the same lead. Measured (co-op, Map Test party): Yamu 1216 HP (Goku's), 178 ki (110 % of
+Krillin's 162), STR 105 % of Hercule's; Spopovich 1702 HP (140 %), no longer built on Yamu.
+
+**Seen, not fixed:** in a co-op 1 v 1 with Yamu as player 1, his body draws as scrambled tiles at the fight's start
+(the same on `main`; alone, or Spopovich in his place, it draws right). Spopovich's and Yamu's bodies look alike
+(both bald and big); the art pieces should check Yamu's import (`TS_YAMU` 196, Buu r.293).
