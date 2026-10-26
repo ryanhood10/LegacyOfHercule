@@ -4,7 +4,7 @@
 # The group map overrides buu2log2.GROUP_MAP (LoG2 groups: 0 idle, 1 walk, 2 hit-stun, 3 fall, 4 shout, 5 charge,
 # 6-8 attacks, 9 fist up, 11 hurt, 12 lying, 13 dash / flight, 14 / 16 fidget, 17 halo, 18 / 19 beams,
 # 20 tumble); a group whose Buu anim is missing falls back to the idle. A value may be `lie` (the lying pose) or a
-# frame list `a.f+a.f` (anim a frame f, in order, the last held). Records were identified by eye
+# frame list `a.f+a.f` (anim a frame f, in order, the last held; `lie` in it = the lying pose's frame). Records were identified by eye
 # (2026-10-25, art-buu): several differ from the plan's first guesses (docs/tournament.md 4e).
 
 # Rookie
@@ -14,19 +14,20 @@
 # (4, 5 = 6 are the same) for the others, the front flex (19) for the shout / victory pose, his run for the dash
 195=242 3:9.0+9.2+15.0,4:19,5:7,6:18.0+18.1+18.2,7:4,8:5,9:19,12:lie,13:2,16:18.0+18.1+18.2,17:0,18:7,19:7,20:9.0+9.2+15.0
 196=293 3:9.0+9.1+15.0,4:17,5:17,9:17,12:lie,13:2,17:0,18:18,19:17,20:9.0+9.1+15.0   # Yamu (partial set; dash = his run, 2026-10-25)
-197=224 3:9,4:0,5:4,9:4,12:lie,13:1,14:0,16:0,17:0,18:5,19:6,20:9      # Pui Pui (idle, walk, three attacks, hurt; dash = walk)
-198=290 3:9,4:19,5:19,8:4,9:19,12:lie,13:19,17:0,18:18,19:19,20:9          # Yakon (18 = fading into darkness)
+197=224 3:9.0+9.1+lie,4:0,5:4,9:4,12:lie,13:1,14:0,16:0,17:0,18:5,19:6,20:9.0+9.1+lie      # Pui Pui (idle, walk, three attacks, hurt; dash = walk)
+198=290 3:9.0+9.1+lie,4:19,5:19,8:4,9:19,12:lie,13:19,17:0,18:18,19:19,20:9.0+9.1+lie          # Yakon (18 = fading into darkness; knock-down: hurt, then down)
 # Adept / Z-Fighter
 199=148 2:0,3:15,4:12,5:12,6:12,7:12,8:12,9:12,11:15,12:lie,13:1,14:0,16:0,17:0,18:12,19:12,20:15   # Kibito (NPC set: casting pose for every attack; no hurt anim: the hit-stun is his stand)
 200=214 13:2                                                                # Pikkon (full set) (dash = its run, 2026-10-25)
 201=63 13:2                                                                 # Dabura (dash = its run, 2026-10-25)
-202=33 13:2                                                                 # Fat Buu (dash = its run, 2026-10-25)
-203=32 2:7,3:7,4:18,5:3,7:3,8:18,9:18,11:7,12:lie,13:18,17:0,18:18,19:3,20:7   # Evil Buu (grey, caped; partial set)
-204=37 13:2                                                                 # Kid Buu (dash = its run, 2026-10-25)
-# Super Buu's three forms: one map for all three (the moves piece chains them)
-205=40 13:2                                                                 # Super Buu (dash = its run, 2026-10-25)
-206=41 13:2                                                                 # Super Buu, Gotenks absorbed (the vest) (dash = its run, 2026-10-25)
-207=43 13:2                                                                 # Super Buu, Gohan absorbed (the gi top) (dash = its run, 2026-10-25)
+202=33 4:12.0+12.1+12.0,13:2                                                # Fat Buu (dash = its run; shout / victory pose without 12's steam clouds)
+203=32 2:7,3:7.0+lie,4:18,5:3,7:3,8:18,9:18,11:7,12:lie,13:18,17:0,18:18,19:3,20:7.0+lie   # Evil Buu (grey, caped; partial set)
+204=37 4:12.0+12.1+12.0,13:2                                                # Kid Buu (dash = its run; shout / victory pose without 12's steam clouds)
+# Super Buu's three forms: one map for all three (the moves piece chains them). The Buus' shout (anim 12) vents steam
+# from the head (frames 2-6, a cloud over him): group 4 (the shout, its last frame the winner's pose) stops before it
+205=40 4:12.0+12.1+18.0,13:2                                                # Super Buu (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
+206=41 4:12.0+12.1+18.0,13:2                                                # Super Buu, Gotenks absorbed (the vest) (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
+207=43 4:12.0+12.1+18.0,13:2                                                # Super Buu, Gohan absorbed (the gi top) (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
 208=144 13:2                                                                # Super Janemba (dash = its run, 2026-10-25)
 209=114 13:2                                                                # Goten (Super Saiyan) (dash = its run, 2026-10-25)
 210=260 13:2                                                                # Kid Trunks (Super Saiyan) (dash = its run, 2026-10-25)

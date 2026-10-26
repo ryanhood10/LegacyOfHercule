@@ -1057,3 +1057,20 @@ Krillin's 162), STR 105 % of Hercule's; Spopovich 1702 HP (140 %), no longer bui
 **Seen, not fixed:** in a co-op 1 v 1 with Yamu as player 1, his body draws as scrambled tiles at the fight's start
 (the same on `main`; alone, or Spopovich in his place, it draws right). Spopovich's and Yamu's bodies look alike
 (both bald and big); the art pieces should check Yamu's import (`TS_YAMU` 196, Buu r.293).
+
+
+## 22. Sprite leftovers (polish2-art, 2026-10-25, branch `tny-polish2-art`)
+
+Art only (generators and `data/tny_buu.txt`; no engine code). Details and evidence: `docs/sprites.md` "Sprite leftovers".
+- **Lying:** Yakon, Broly and Janemba lay as a turned recoil that read as a body sprawled seen from above; now Broly and
+  Janemba turn a straighter recoil (on the side / on the back) and Yakon, who has front views only, a turned recoil
+  with his arms and legs drawn in toward the body.
+- **Knock-down:** King Cold (185) and Cooler's player body (244) fell through Cooler's feet-first death frames (groups 3,
+  20); now two frames of the hit-stun's recoil, then their lying frame. The same for the imports whose anim 17 is a
+  death glow or a regrowth (Broly 159, Janemba 208, Kid Buu 204) and for Yakon, Pui Pui and Evil Buu (who stood in
+  their hurt pose). The stock Cooler opponent (34) has no group 3 and still goes straight to the lying table.
+- **Videl's hair, Roshi's fists:** fixed in `tnysprites.py` (a head cut by a 32 px frame now moves inside it; small
+  pieces left beside Roshi's head go).
+- **Victory pose:** Fat Buu, Kid Buu and the three Super Buus no longer cheer under the steam cloud of their shout.
+- **Yamu:** the import was the right record (293; Buu's Fury has no other Yamu: every record checked); he keeps his
+  map and gets a painted black hair tuft, so he no longer reads as a second Spopovich.

@@ -136,7 +136,7 @@ def draw(cv, sp, x, y, arr, fi, cell):
     if not fp:
         return
     _, _, px = fp
-    ox, oy = x + cell // 2, y + cell - 10
+    ox, oy = x + cell // 2, y + cell - (18 if cell > 44 else 10)    # Buu giants stand down to +15
     for yy in range(h):
         for xx in range(w):
             v = px[yy][w - 1 - xx] if attr & HF else px[yy][xx]

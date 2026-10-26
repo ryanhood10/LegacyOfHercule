@@ -371,10 +371,11 @@ COOLER = 34
 COLD = 74
 # 12 (the lying pose): Cooler's own 12 is his death drawn feet-first from above, which stood upright on the ground at
 # the end of a tournament match ("their flying sprites", Ryan 2026-10-25); King Cold lies as his hit-stun (head and
-# cape on) turned on its back (tools/lying.py)
-COLD_PLAN = {0: (COOLER, 0), 1: (COOLER, 1), 2: (COOLER, 2), 3: (COOLER, 12), 4: (COOLER, 5), 5: (COOLER, 5),
+# cape on) turned on its back (tools/lying.py). 3 / 20 (the knock-down, the tumble) were Cooler's 12 too, his feet-first
+# death in the middle of a fight: now his hit-stun's recoil, then down into that lying frame ("fall", build())
+COLD_PLAN = {0: (COOLER, 0), 1: (COOLER, 1), 2: (COOLER, 2), 3: (COOLER, 2, "fall"), 4: (COOLER, 5), 5: (COOLER, 5),
              6: (COOLER, 6), 7: (COOLER, 7), 8: (COOLER, 8), 11: (COOLER, 2), 12: (COOLER, 2, "lie"), 13: (COOLER, 1),
-             16: (COOLER, 7), 17: (COOLER, 0), 18: (COOLER, 5), 20: (COOLER, 12)}
+             16: (COOLER, 7), 17: (COOLER, 0), 18: (COOLER, 5), 20: (COOLER, 2, "fall")}
 COLD_BODY = {9: 2, 10: 166, 11: 12, 12: 13, 13: 14, 211: 97, 229: 95, 231: 101, 238: 99, 215: 211, 77: 64}
 CAPE = (25, 26, 27)                 # red, mid, dark (74's cape)
 
@@ -618,10 +619,26 @@ class Roshi(Fighter):
         # a fist or wristband cut off from its arm by the hair's removal (Goku's raised arm in his back-view kick and
         # special melee) floated alone over the head: small coloured pieces above the head go (white swing arcs stay)
         head_top = chin + min(dy for dy, _ in self.heads[f].pts)
-        for c in components(out, lambda y, x, v: v not in (0, 2, 9, 10, 11, 12, 13), N8):
-            if len(c) < 24 and max(y for y, _ in c) < head_top + 2:
+        # The same beside the head (polish2-art, 2026-10-25): the raised fists of Goku's back-view special melee (group
+        # 16, two fists 26-27 px) and the fist by his face in its front view were left floating level with Roshi's
+        # smaller head; a piece under 40 px touching nothing else that lies wholly at head height goes too
+        comps = components(out, lambda y, x, v: v not in (0, 2, 9, 10, 11, 12, 13), N8)
+        big = max((len(c) for c in comps), default=0)
+        for c in comps:
+            low = max(y for y, _ in c)
+            if (len(c) < 24 and low < head_top + 2) or (len(c) < 40 and len(c) < big and low <= chin + 2):
                 for y, x in c:
                     out[y][x] = 0
+        # and a stub of a wristband (3 px) left touching only the top of the head's outline: a coloured piece of 4 px
+        # or less, at or above the head's top row, touching no skin (a raised arm's wristband touches its fist)
+        hy = min((y for y in range(h) for x in range(w) if out[y][x] in (114, 115, 116, 117) and abs(x - cx) <= 7),
+                 default=None)
+        if hy is not None:
+            for c in components(out, lambda y, x, v: v not in (0, 2, 9, 10, 11, 12, 13, 23, 114, 115, 116, 117), N8):
+                if len(c) <= 4 and max(y for y, _ in c) <= hy and not any(
+                        near(out, y, x, {114, 115, 116, 117}, N8) for y, x in c):
+                    for y, x in c:
+                        out[y][x] = 0
         self.stats["heads"] += 1
         return out
 
@@ -748,8 +765,74 @@ class Chiaotzu(Fighter):
 
 
 # ---- record assembly --------------------------------------------------------------------------------------------
+def lie_dirs(fighter, src, sid, sg, count):
+    """[4 facings][count] of one frame: the source group's first frame, made up, turned to lie (tools/lying.py)."""
+    import lying as LY
+    dirs = []
+    for d in range(4):
+        xo, yo, w, h, attr, blob, _ = src.frame(sid, sg, d, 0)
+        f = 2 if d == 3 else d
+        new = fighter.transform(sid, sg, copy(src.canon(sid, sg, d, 0)), f)
+        disp = hflip(new) if d == 3 else new
+        nxo, nyo, ow, oh, npx = LY.lie(disp, xo, yo, face_left=(d != 3))
+        dirs.append([(nxo, nyo, ow, oh, LY.attr_for(attr, ow, oh), npx)] * count)
+        fighter.stats["frames"] += 1
+    return dirs
+
+
+def upright_dirs(fighter, src, sid, sg, tgi, count, cache):
+    """[4 facings][count] of the source group's frames (cycled), each made up by fighter.transform as group tgi."""
+    dirs = []
+    for d in range(4):
+        frames = []
+        nsrc = src.count(sid, sg, d)
+        assert nsrc, f"{type(fighter).__name__}: sprite {sid} group {sg} facing {d} missing"
+        for k in range(count):
+            fi = k % nsrc
+            xo, yo, w, h, attr, blob, _ = src.frame(sid, sg, d, fi)
+            f = 2 if d == 3 else d
+            key = (sid, blob, bool(attr & HF), d == 3, tgi in (3, 12, 20))
+            if key not in cache:
+                canon = src.canon(sid, sg, d, fi)
+                before = Head.clipped
+                new = fighter.transform(sid, tgi, copy(canon), f)
+                geo = (xo, w, attr)
+                if Head.clipped > before and (w, h) == (16, 32):
+                    # the pasted head sticks out of the 16 px frame: the frame becomes 32 x 32 (8 px of air either
+                    # side, same centre, the 0x400 slot every 32 x 32 body has) so nothing is cut off
+                    Head.clipped = before
+                    wide = [[0] * 8 + row + [0] * 8 for row in canon]
+                    new = fighter.transform(sid, tgi, wide, f)
+                    geo = (xo - 8, 32, attr & ~0xC000)          # attr0 shape 0 (square), size 2: 32 x 32
+                    fighter.stats["widened"] = fighter.stats.get("widened", 0) + 1
+                elif Head.clipped > before:
+                    # a wider frame cuts the head (Videl's hair on two 32 px charge frames lost a column): drawn on 8 px
+                    # of air either side, the body and head moved sideways inside the same frame size when they fit,
+                    # the descriptor's x offset moved back the other way, so the body stands where it stood
+                    after = Head.clipped
+                    Head.clipped = before
+                    wide = [[0] * 8 + row + [0] * 8 for row in canon]
+                    trial = fighter.transform(sid, tgi, wide, f)
+                    cols = [x for x in range(w + 16) if any(r[x] for r in trial)]
+                    if Head.clipped == before and cols and max(cols) - min(cols) < w:
+                        c = min(max(8, max(cols) - w + 1), min(cols))
+                        new = [row[c:c + w] for row in trial]
+                        geo = (xo - 8 + c if d != 3 else xo + 8 - c, w, attr)
+                        fighter.stats["moved"] = fighter.stats.get("moved", 0) + 1
+                    else:
+                        Head.clipped = after
+                cache[key] = (geo, to_stored(new, attr, d))
+                fighter.stats["frames"] += 1
+            (fxo, fw, fattr), fpx = cache[key]
+            frames.append((fxo, yo, fw, h, fattr, fpx))
+        dirs.append(frames)
+    return dirs
+
+
 def build(fighter, src, template_counts):
-    """groups[gi] = None or [4 facings][frames] of (xo, yo, w, h, attr, stored px)."""
+    """groups[gi] = None or [4 facings][frames] of (xo, yo, w, h, attr, stored px). A plan entry (sprite, group) takes
+    that group's frames; (sprite, group, "lie") its first frame turned to lie; (sprite, group, "fall") a knock-down:
+    the group's first two frames upright (a hit-stun's recoil), then that lying frame for the rest."""
     groups = []
     cache = {}
     n = max(len(template_counts), max(fighter.plan) + 1)
@@ -759,48 +842,15 @@ def build(fighter, src, template_counts):
             groups.append(None)
             continue
         sid, sg = fighter.plan[gi][:2]
-        if len(fighter.plan[gi]) > 2:              # "lie": the source group's first frame, made up, turned to lie
-            import lying as LY
-            dirs = []
-            for d in range(4):
-                xo, yo, w, h, attr, blob, _ = src.frame(sid, sg, d, 0)
-                f = 2 if d == 3 else d
-                new = fighter.transform(sid, sg, copy(src.canon(sid, sg, d, 0)), f)
-                disp = hflip(new) if d == 3 else new
-                nxo, nyo, ow, oh, npx = LY.lie(disp, xo, yo, face_left=(d != 3))
-                dirs.append([(nxo, nyo, ow, oh, LY.attr_for(attr, ow, oh), npx)] * count)
-                fighter.stats["frames"] += 1
-            groups.append(dirs)
-            continue
-        dirs = []
-        for d in range(4):
-            frames = []
-            nsrc = src.count(sid, sg, d)
-            assert nsrc, f"{type(fighter).__name__}: sprite {sid} group {sg} facing {d} missing"
-            for k in range(count):
-                fi = k % nsrc
-                xo, yo, w, h, attr, blob, _ = src.frame(sid, sg, d, fi)
-                f = 2 if d == 3 else d
-                key = (sid, blob, bool(attr & HF), d == 3, gi in (3, 12, 20))
-                if key not in cache:
-                    canon = src.canon(sid, sg, d, fi)
-                    before = Head.clipped
-                    new = fighter.transform(sid, gi, copy(canon), f)
-                    geo = (xo, w, attr)
-                    if Head.clipped > before and (w, h) == (16, 32):
-                        # the pasted head sticks out of the 16 px frame: the frame becomes 32 x 32 (8 px of air either
-                        # side, same centre, the 0x400 slot every 32 x 32 body has) so nothing is cut off
-                        Head.clipped = before
-                        wide = [[0] * 8 + row + [0] * 8 for row in canon]
-                        new = fighter.transform(sid, gi, wide, f)
-                        geo = (xo - 8, 32, attr & ~0xC000)          # attr0 shape 0 (square), size 2: 32 x 32
-                        fighter.stats["widened"] = fighter.stats.get("widened", 0) + 1
-                    cache[key] = (geo, to_stored(new, attr, d))
-                    fighter.stats["frames"] += 1
-                (fxo, fw, fattr), fpx = cache[key]
-                frames.append((fxo, yo, fw, h, fattr, fpx))
-            dirs.append(frames)
-        groups.append(dirs)
+        kind = fighter.plan[gi][2] if len(fighter.plan[gi]) > 2 else None
+        if kind == "lie":
+            groups.append(lie_dirs(fighter, src, sid, sg, count))
+        elif kind == "fall":
+            up = upright_dirs(fighter, src, sid, sg, sg, min(2, count), cache)
+            down = lie_dirs(fighter, src, sid, sg, max(0, count - 2))
+            groups.append([up[d] + down[d] for d in range(4)])
+        else:
+            groups.append(upright_dirs(fighter, src, sid, sg, gi, count, cache))
     return groups
 
 
