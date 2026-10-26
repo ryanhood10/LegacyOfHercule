@@ -197,8 +197,10 @@ SKIP = {49: {3}}     # source groups never used: Mecha Frieza's 3 is the sword c
 # firing states play) made of the charge pose, for the fighters whose kit has the Kamehameha (src/coop/tny_play.c)
 # Lying (group 12, what the tournament's loser lies in; docs/sprites.md "Lying poses"): Cooler's own 12 is his death
 # drawn feet-first from above (it read as flying, Ryan 2026-10-25) and Perfect Cell's 12 a half-risen lean: Cooler
-# lies as his turned hit-stun, Perfect Cell as his knock-back's last frame.
-OVERRIDE = {156: {18: [5]}, 34: {18: [5], 12: ["ROT"]}, 30: {12: ["3L"]}}
+# lies as his turned hit-stun, Perfect Cell as his knock-back's last frame. Cooler has no knock-back (group 3): his
+# knock-down and tumble (3, 20) were his 12 too, the feet-first death in the middle of a fight; "FALL" = the hit-stun's
+# first two frames (the recoil), then down into the turned lying frame (2026-10-25, polish2-art).
+OVERRIDE = {156: {18: [5]}, 34: {18: [5], 12: ["ROT"], 3: ["FALL"], 20: ["FALL"]}, 30: {12: ["3L"]}}
 
 
 def build_record(sp, src, borrow):
@@ -225,6 +227,13 @@ def build_record(sp, src, borrow):
                 g, who = get(3)
                 if g:
                     choice = ([[f[-1]] for f in g], f"{who}:3L")
+                    break
+                continue
+            if cand == "FALL":
+                g, who = get(2)
+                if g:
+                    down = lying_group(sp, g, src if who == src else borrow)
+                    choice = ([list((g[d] or g[0])[:2]) + down[d] for d in range(4)], f"{who}:2 then turned")
                     break
                 continue
             if cand == "ROT":

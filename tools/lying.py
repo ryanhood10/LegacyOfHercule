@@ -5,7 +5,7 @@ so the body lies with the head away from the way it faced, on its back or face d
 its lower half: a tail or a cape curls up, not under), trimmed, and set one row below the ground line the upright body stood on,
 centred where it stood.
 
-    lie(px, xo, yo, face_left=True) -> (xo, yo, w, h, px)    # px as displayed (no h-flip), w x h a GBA OBJ size
+    lie(px, xo, yo, face_left=True, tuck=None, squash=1.0) -> (xo, yo, w, h, px)   # px as displayed (no h-flip)
 
 `px` is the frame as displayed ([h][w] palette indices), `xo, yo` its offset from the entity's position. A body
 facing left falls back to the right (rotated clockwise: head to the right, front up); facing right, the mirror.
@@ -58,7 +58,45 @@ def body_only(px):
     return out
 
 
-def lie(px, xo, yo, face_left=True, max_bytes=None):
+def squash_rows(px, s):
+    """The frame's rows resampled to s of its height (nearest row). Tried on Yakon's turned front view (still a sprawl
+    seen from above, only flatter); tuck_limbs is what he uses."""
+    h = len(px)
+    nh = max(1, int(round(h * s)))
+    return [list(px[min(h - 1, int((j + 0.5) / s))]) for j in range(nh)]
+
+
+def tuck_limbs(px, half=0.2, k=0.3):
+    """A turned front view with its limbs drawn in: the rows within `half` of the body's height of its middle line (the
+    torso, head and face) are kept, the rows outside it (arms and legs splayed up and down, which read as a body
+    sprawled seen from above) are pulled toward that band to k of their distance. Rows nearer the middle are drawn
+    over the outer ones. A front-only body (Yakon) then lies on its side facing the viewer, limbs along the ground."""
+    import math
+    rows = [y for y, row in enumerate(px) if any(row)]
+    if not rows:
+        return px
+    y0, y1 = min(rows), max(rows)
+    c = (y0 + y1) / 2
+    hb = half * (y1 - y0 + 1)
+    put = {}
+    for y in range(y0, y1 + 1):
+        d = y - c
+        nd = d if abs(d) <= hb else math.copysign(hb + (abs(d) - hb) * k, d)
+        ny = int(math.floor(nd + c + 0.5))
+        for x, v in enumerate(px[y]):
+            if v:
+                put.setdefault((ny, x), (abs(d), v))
+                if abs(d) < put[(ny, x)][0]:
+                    put[(ny, x)] = (abs(d), v)
+    top = min(y for y, _ in put)
+    out = [[0] * len(px[0]) for _ in range(max(y for y, _ in put) - top + 1)]
+    for (y, x), (_, v) in put.items():
+        out[y - top][x] = v
+    return out
+
+
+def lie(px, xo, yo, face_left=True, max_bytes=None, squash=1.0, tuck=None):
+    """tuck: (half, k) for tuck_limbs (a body drawn only from the front); squash: the turned frame's height scaled."""
     px = body_only(px)
     pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
     if not pts:
@@ -78,6 +116,10 @@ def lie(px, xo, yo, face_left=True, max_bytes=None):
 
     if footing(flip) > footing(r) * 1.25:
         r = flip
+    if tuck:
+        r = tuck_limbs(r, *tuck)
+    if squash != 1.0:
+        r = squash_rows(r, squash)
     rp = [(y, x) for y, row in enumerate(r) for x, v in enumerate(row) if v]
     y0, y1 = min(y for y, _ in rp), max(y for y, _ in rp)
     x0, x1 = min(x for _, x in rp), max(x for _, x in rp)

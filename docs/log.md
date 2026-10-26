@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Sprite leftovers (polish2-art):** Yakon, Broly and Janemba lie on their side (Broly / Janemba turn another
+  recoil frame, Yakon, drawn only from the front, a turned frame with the limbs drawn in: `lying.tuck_limbs`); King
+  Cold's and Cooler's knock-down (groups 3 / 20) is their recoil then that lying frame, not Cooler's feet-first death;
+  so is every import whose anim 17 is no fall (Broly, Janemba, Kid Buu) and Yakon's, Pui Pui's, Evil Buu's; Videl's
+  hair column is back; Roshi's floating fists by the head are gone; the Buus' victory pose has no steam cloud; Yamu
+  (293 is the only Yamu in Buu's Fury) gets his black hair tuft. `docs/sprites.md` "Sprite leftovers".
 - **No mirror matches with a tournament pick (Ryan: picked Yamcha, met Yamcha in round one):** the engine's pool
   (`pool_of`) and the Rumble's headliner skip the players' picks; last tournament's picks are cleared first
   (`tools/headless/tny_nomirror.txt`: three seeds, Yamcha only in player 1's seat).

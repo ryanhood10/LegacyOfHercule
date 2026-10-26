@@ -748,3 +748,58 @@ shout / victory pose, his run as the dash. `buu2log2.py` gained, for every impor
 hit-stun: Goku, Hercule and the enemy sets show the sparks there), walk / run / dash cycles longer than the template
 sampled evenly (`LOOPS`), and spec values `lie` and `a.f+a.f+...` (a frame list). Yamu's dash is his run too, Pui Pui's
 his walk (was his idle), Kibito's hit-stun his stand (was his walk).
+
+## Sprite leftovers (polish2-art, 2026-10-25, branch `tny-polish2-art`)
+
+Seven leftovers from the art fixes above, each checked on `tools/tnysheet.py` sheets of the built ROM against the
+baseline (`build/polart/before_*.png` / `after_*.png`; frame-by-frame pixel diffs in entity coordinates).
+
+**Lying, Yakon / Broly / Janemba** (`buu2log2.py` `LIE_FRAME`, `lying.py`): the turned hurt recoil 9.1 read as a body
+sprawled seen from above (Broly's 9.1 is a crouch: turned, his hair stood up off the ground; Janemba's a twisted
+crouch). Their death anim 17 is a glow or an explosion, never a fall, so there is no lie-down frame to take. Now Broly
+turns his head-back recoil 9.0 (on his side, knees bent) and Janemba his straight recoil 9.2 (on his back, the tail
+curled up). Yakon is drawn only from the front (every anim, every facing), so any turned frame is a spread-eagle:
+`lying.tuck_limbs(px, half, k)` keeps the rows within `half` of the turned body's middle (head, face, chest) and pulls
+the rows outside it toward that band to `k` of their distance (`(0.2, 0.3)`: arms and legs drawn in along the ground),
+so he lies on his side facing the viewer. `lie()` takes `tuck=` and `squash=` (rows scaled; tried, not used). The Buu
+giants stand with their feet at +14 / +15 below the position; their lying frames sit there too (Spopovich's lie-down
+frame sits higher, at -3: Buu drew it so).
+
+**Knock-down (groups 3 / 20), King Cold and Cooler:** King Cold's plan took both from Cooler's 12 and Cooler's player
+body (244) took them from `PLAYER_FROM` 3 = [3, 12, 2]: stock Cooler (34) has no knock-back group 3, so both fell through
+Cooler's feet-first death mid-fight. Now `tnysprites.py` plan value `(COOLER, 2, "fall")` and `tnyplayables.py`
+`OVERRIDE` 34 `"FALL"`: the hit-stun's first two frames (the recoil, King Cold with his head and cape), then the turned
+lying frame of group 12 for the rest (the fall plays group 3 over 18 frames, `tny_moves.c` `fallen()`, then the lying
+pose: the same frame). The opponent Cooler is stock 34 (no group 3): he still goes straight to the lying table.
+**The same for the imports:** `buu2log2.py` maps a group 3 / 20 that would take anim 17 to `9.0+9.1+lie` when 17 does not
+end lying (`falls()`: Broly 159, Janemba 208, Kid Buu 204, whose 17 is a regrowth); `lie` may now be an element of a
+frame list (the lying pose's frame), and the spec gives Yakon and Pui Pui `9.0+9.1+lie`, Evil Buu `7.0+lie` (they stood
+in their hurt pose).
+
+**Videl's hair** (`tnysprites.py` `upright_dirs`): the two 32-wide charge frames (group 5, and group 18 which reuses
+them) cut one column of her hair at the frame edge (the generator's "8 head pixels cut"). A frame other than a 16 x 32
+one whose pasted head is cut is now made on 8 px of air either side and, when the body and head fit in the frame's
+width, cropped back to the same size moved sideways, the descriptor's x offset moved the other way: the 4 hair pixels
+come back, nothing else moves. The generator reports 0 cut pixels for all five fighters.
+
+**Roshi's special melee** (`tnysprites.py` `Roshi.transform`): Goku's back-view group 16 raises both fists over his hair;
+with the hair gone they floated beside Roshi's smaller head (two pieces of 26-27 px, over the old 24 px limit), and a
+fist by the face floated in the front view. Pieces under 40 px (not the body) lying wholly at head height go, and a
+3-4 px wristband stub touching only the top of the head's outline. 25 frames lose 2-47 floating pixels (groups 2, 7, 8,
+16, 18); nothing else changes. The black motion streak by his head in the back-view frame 1 is Goku's own (it joins
+the body) and stays.
+
+**Victory pose, the Buus** (`data/tny_buu.txt`): group 4 (the shout; its last frame is the winner's pose) took Buu's
+anim 12, whose frames 2-6 vent steam from the head into a cloud over him. Fat Buu and Kid Buu now play `12.0+12.1+12.0`
+(the roar), the three Super Buus `12.0+12.1+18.0` (the roar, then the fist-up flex as the pose).
+
+**Yamu** (`buu2log2.py` `RETOUCH`, `yamu_tuft`): every Buu's Fury record was drawn and checked; 293 is the only Yamu
+(lean, shirtless, black trousers, purple sash and wristbands, the M on his forehead) and Buu's Fury drew him bald, so
+beside Spopovich (242: the huge brute in the black singlet) he read as a second Spopovich. The import keeps 293 and his
+map (AI set 21 and the playable row unchanged); his upright frames get a black hair tuft (`find_head`: the first skin
+blob from the top 8 px wide five rows down holding the face's black pixels; 5 px wide and two rows high seen from the
+front or back, a crest along the top of the head from the side; Buu palette 1 / 112, exact in LoG2's). His lying
+frames stay bald. (The small bald 74 / 163 / 164 are a plain enemy; 231 / 233 a masked ninja; the old note "21 / 272
+Yamu with the energy container" is a cyborg and a Vegeta.)
+
+`tools/tnysheet.py` gives giants 18 px under the ground line (lying Buu giants were cut off at the sheet's edge).
