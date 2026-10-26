@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-25
 
+- **Tournament dialogue planned (for Ryan's review, not built):** `docs/tournament-dialogue.md`: Budokai-style lines in 1 v 1
+  and 2 v 2 (every fighter's own, rival exchanges, meeting yourself, team lines), the announcer only in the Rumble.
 - **No mirror matches with a tournament pick (Ryan: picked Yamcha, met Yamcha in round one):** the engine's pool
   (`pool_of`) and the Rumble's headliner skip the players' picks; last tournament's picks are cleared first
   (`tools/headless/tny_nomirror.txt`: three seeds, Yamcha only in player 1's seat).

@@ -25,6 +25,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the current story plan: status, standing rules, chapter table, Ryan's decisions per chapter, what is open | story work |
 | `docs/tournament.md` | the tournament mode (Papaya Island from Buu's Fury): decisions so far, the roster by chapter, the engine facts it rests on, the build order; planning in chat, nothing built | tournament work |
+| `docs/tournament-dialogue.md` | the tournament's fighter dialogue, planned for Ryan's review (not built): when lines play, how a line is chosen, every fighter's lines, rival exchanges, 2 v 2 team lines, the Rumble announcer's calls |
 | `src/coop/tny_play.c` | the tournament's playables: `tny_play_row` / `tny_play_entry` (row, kit, numbers from the lead), the kits table (`docs/tournament.md` 10) |
 | `src/coop/tourney.h`, `tourney_data.c`, `tourney_hooks.c` | the tournament team's contract: ids, the roster table, the cross-piece API with weak defaults, the CoopCall 23-30 / test command 21-30 / per-frame dispatchers (`docs/tournament.md` 9a) | tournament work |
 | `src/coop/tny_moves.c` | the tournament's moves: every opponent's kit (`tny_kits[]`), the move library (beam, ball, homing, volley, wave, nova, rush, teleport, stun, heal, drain, regen, transform, summon), Rumble mode (NPC-vs-NPC hits, target weights), test commands 26 / 27 (`docs/tournament.md` 10) | tournament fights |
