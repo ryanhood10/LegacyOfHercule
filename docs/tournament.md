@@ -4,7 +4,7 @@ Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13), polished (14)
 the scenes, 16 the grounds' people, 17 the easter eggs, 18 the plaza's flight spot, 19 the overhead HP bars, 20 the
 art fixes, 21 the fight fixes, 22 the sprite leftovers, 23 the second polish pass (the curtain, the talk seat); the
 fighters' dialogue in `docs/tournament-dialogue.md` (approved and built); 24 what is still open and the plan to fix
-it (the next session starts there).** Every decision below is Ryan's unless marked "our
+it (the next session starts there); 25 the team combos (built 2026-10-31).** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -1260,7 +1260,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   `git worktree remove <dir>` (their branches are merged into main).
 - Real-time play of the second polish pass and the dialogue: Ryan's session is the first.
 
-### 24.10 Team combos (Ryan's idea, 2026-10-25; decided with him 2026-10-31; the next thing to build)
+### 24.10 Team combos (Ryan's idea, 2026-10-25; decided with him 2026-10-31; **built 2026-10-31: section 25**)
 
 **The idea (Ryan):** in the tournament, when a certain pair of fighters on the players' side both hit the **same
 opponent** rapidly within a short time, a team combo fires:

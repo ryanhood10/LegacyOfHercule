@@ -39,19 +39,19 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-25): the tournament is in Ryan's playtest rounds
+## Current phase (2026-10-31): the tournament's team combos are built; Ryan playtests next
 
 The World Tournament on Papaya Island is built and merged (`docs/tournament.md`: the plan, 9b-13 the seven-piece
-build, 14-23 every playtest round since; 24 the open points and the plan to fix them: **the next session starts
-there, after Ryan's playtest notes**; 24.10 is the team combos, decided with him on 2026-10-31: the next thing to build after his playtest notes). Contract: `src/coop/tourney.h`; tests
-`tools/headless/tny_*.txt`. Since the build: overhead HP bars in the Rumble (`tny_hpbars.c`), real lying and
-knock-down poses, knock-back, the fallen stay down, Energy Steal (ability 24), playables built on the party's best
-numbers, your pick never drawn as an opponent, every scene change behind a fade (the "curtain"), and the fighters'
-dialogue: `docs/tournament-dialogue.md` is both Ryan's approved plan and the game's data (`tools/tnytalk.py` reads
-its tables at build time, so edit a line there to change it in the game; `tny_talk.c` picks and shows them).
-Full regression: `bash tools/headless/regfull.sh build/<dir>` (`docs/testing.md` "Full regression"). Drop-ins F8
-(Papaya Island, early) and F9 (waiting room, every tier open) carry a powered-up party (`dropins.py` `boost`).
-Swapping a build into `build/play`: if mGBA's window lingers after Ryan closes it, close it with
+build, 14-23 every playtest round since, 24 the open points and the plan to fix them, **25 the team combos**). The
+team combos (built 2026-10-31 by a lead plus three agents; Ryan's design in 24.10): a meter under the HP panels
+(Select fires it, full at a fight's start, 90 s cooldown), the frozen-fight runner, ten combos for Ryan's pairs. Their
+step tables live in `docs/tournament-combos.md`, which is both Ryan's doc and the game's data (`tools/tnycombo.py`), as
+`docs/tournament-dialogue.md` is for the dialogue (`tools/tnytalk.py`): edit a line there to change it in the game.
+Contracts: `src/coop/tourney.h`, `src/coop/tny_combo.h`; tests `tools/headless/tny_*.txt`; films of every combo in
+`build/combos/` (not committed). **Next session: Ryan's playtest notes first, then the rest of section 24.**
+Full regression: `bash tools/headless/regfull.sh build/<dir>` (`docs/testing.md` "Full regression"; exit 0 = clean).
+Drop-ins F8 (Papaya Island, early) and F9 (waiting room, every tier open) carry a powered-up party (`dropins.py`
+`boost`). Swapping a build into `build/play`: if mGBA's window lingers after Ryan closes it, close it with
 `CloseMainWindow` (never kill it), back up the `.sav` and the `.ss1-.ss9` into `build/play/backup/` first.
 
 ## Earlier phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
