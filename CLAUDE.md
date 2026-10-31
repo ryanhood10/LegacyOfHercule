@@ -43,7 +43,7 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 
 The World Tournament on Papaya Island is built and merged (`docs/tournament.md`: the plan, 9b-13 the seven-piece
 build, 14-23 every playtest round since; 24 the open points and the plan to fix them: **the next session starts
-there, after Ryan's playtest notes**; 24.10 is his team-combo idea, to plan in detail with him). Contract: `src/coop/tourney.h`; tests
+there, after Ryan's playtest notes**; 24.10 is the team combos, decided with him on 2026-10-31: the next thing to build after his playtest notes). Contract: `src/coop/tourney.h`; tests
 `tools/headless/tny_*.txt`. Since the build: overhead HP bars in the Rumble (`tny_hpbars.c`), real lying and
 knock-down poses, knock-back, the fallen stay down, Energy Steal (ability 24), playables built on the party's best
 numbers, your pick never drawn as an opponent, every scene change behind a fade (the "curtain"), and the fighters'

@@ -1249,7 +1249,8 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 ### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
 
 - A loser's line after a fight too (now only the winner speaks)?
-- 2 v 2 opponent teams: draw known teams together (17 & 18, Goten & Trunks...) when both are in the pool (now random)?
+- 2 v 2 opponent teams: draw known teams together when both are in the pool: **yes (Ryan, 2026-10-31, for the
+  team combos, 24.10)**; the dialogue's team-vs-team lines then show up too.
 - Start skips the talk: keep?
 
 ### 24.9 Housekeeping
@@ -1259,7 +1260,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   `git worktree remove <dir>` (their branches are merged into main).
 - Real-time play of the second polish pass and the dialogue: Ryan's session is the first.
 
-### 24.10 Team combos (Ryan's idea, 2026-10-25: in scope; the details are planned with him when he resumes)
+### 24.10 Team combos (Ryan's idea, 2026-10-25; decided with him 2026-10-31; the next thing to build)
 
 **The idea (Ryan):** in the tournament, when a certain pair of fighters on the players' side both hit the **same
 opponent** rapidly within a short time, a team combo fires:
@@ -1309,13 +1310,47 @@ partner on the floor.
    psychic-hold-then-Tri-Beam, Goten & Trunks's trading-places rush, 17 & 18's double barrier slam). Planned with him
    like the dialogue: a doc table first, built after he says the plan is done.
 
-**Questions for Ryan when he resumes:**
-- The trigger: automatic (hits in a window), a meter, or a button prompt?
-- How often: once per fight or on a cooldown?
-- Damage: a fixed share of the target's HP, or the players' stats?
-- Can opponent pairs (17 & 18 against you) do combos to the players too?
-- Does the Rumble get them (many targets), or only 2 v 2 and challenges?
-- Which pairs and moves first?
+**Decided with Ryan (2026-10-31):**
+
+- **Trigger: a meter.** A small bar under each player's HP panel, shown only while it matters: it appears on the
+  first shared hit, fills as the two players land hits on the **same** opponent, drains when they split up or stop,
+  flashes when full, and disappears after firing. **One player pressing the button fires it** (player 1 or 2, either).
+  **Full at the start of every fight**, then a **90-second cooldown**.
+- **Damage: a multiplier of the attackers' own moves**, never a share of the defender's HP, so story characters who
+  grew stronger feel it when they come back. Each partner's part is worth a set number of his normal hits (about six)
+  plus a finisher at about three times a special, from his real strength; villains the same from their tier stats.
+  Plus a knockdown. Tuned in play.
+- **Opponent pairs combo the players back**, only pairs on the list, same 90 seconds. **Easier for the AI** (the AI
+  keeps fighting exactly as now; only its trigger is looser): its bar fills from hits on **either** player and never
+  drains; it fires by itself when full and both are within reach of one player.
+- **Rumble: on.** 2 v 2 and challenges too; co-op only (both players on the floor).
+- **The draw puts known opponent pairs together** when both are in the pool (settles 24.8's second question); a
+  villain combo is otherwise luck.
+- **Only listed pairs have the bar.** Most teams have no combo. A *generic* animation exists (a barrage of ki blasts
+  from both sides) but is given to specific listed pairs, never to every team.
+
+**The pairs and their combos (Ryan's picks):**
+
+| side | pair | the combo |
+|---|---|---|
+| players | Gohan & Krillin | Krillin's Destructo Disc pins him; Gohan's Masenko finishes |
+| players | Piccolo & Hercule | Piccolo's Special Beam Cannon pose holds him; Hercule runs in with the Dynamite Kick and takes the credit |
+| players | Goku & Vegeta | both dash in from either side trading punches, then a joint Kamehameha / Big Bang |
+| players | Goku & Piccolo | Goku grabs the opponent from behind; Piccolo's Special Beam Cannon goes through both, hurting only the opponent (Ryan) |
+| players | Goku & Gohan | the father-son Kamehameha |
+| players | Hercule & Super Saiyan 2 Gohan | the father-son Kamehameha's animation again: Hercule strikes the pose beside Gohan and nothing comes out of him (the beam is Gohan's), so the showman rule holds (Ryan: "give that same animation"; Gohan if the SSJ2 row is not in the build) |
+| villains | Frieza & Cooler | Death Beam volley from both sides, then Cooler's Supernova |
+| villains | Broly & Paragus | Paragus's control flash freezes the target; Broly's Eraser Cannon |
+| villains | Mecha Frieza & King Cold | Death Beams from both (father and son arrive together) |
+| villains | Perfect Cell & Cell Jr. | the Juniors swarm him; Cell's Kamehameha |
+| villains | any two of Dr. Gero, Android 19, Android 13, Android 17, Android 18 | the generic barrage |
+| villains | Spopovich & Yamu | the generic barrage |
+
+Dropped by Ryan: Vegeta & Trunks, Krillin & 18, Tien & Chiaotzu, Goten & Kid Trunks, Hercule & Videl, Gohan & Videl,
+Pui Pui & Yakon ("not special enough"). More pairs are one step table each once the runner exists.
+
+**Still to settle:** whether an AI pair's combo has a tell (half a second of charging a good player can dash out of)
+or just lands.
 
 **Size:** big. The trigger and the frozen-fight scene runner is about a day. The generic combo is half a day. Each
 pair's own combo is an hour or two of step tables and testing once the runner exists. Test: a headless script that
