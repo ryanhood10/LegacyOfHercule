@@ -61,9 +61,19 @@ blows can be critical hits as any punch. On a player the co-op multiplier of the
 and the revive and the tournament's KO rules hold.
 
 Per 24.10 each partner's part is worth **about six of his normal hits plus a finisher at about three times a special**:
-the tables give each partner six blows of weight 1 and a finisher of weight 6 (a special counted as 2: a player's
-strongest single blow, the Destructo Disc, is twice the ki blast's base power; section 25.2 of `docs/tournament.md` has
-the measured numbers and the comparison with two players punching for the same time).
+the tables give each partner six blows of weight 1 and a finisher of weight 6 (a special counted as two blows: the
+players' strongest single ability hit, the Destructo Disc, is twice the ki blast's base power). Measured headless
+(2026-10-31, `tools/headless/tny_combo_run.txt`, co-op Goku & Vegeta on a Rookie opponent, 264 frames):
+
+| what | damage in 264 frames |
+|---|---|
+| the Goku & Vegeta combo | 4111 (Goku 2180, Vegeta 1931) |
+| both players mashing A and chasing him (the third punch pushes him 40 px) | 947 (6 hits landed) |
+| player 1 punching as fast as the A button's routine can, stepped back beside him before every punch (no human can) | 2747 (14 hits) |
+| the same combo with both players' combat bytes at 0x20 / at 0x50 (STR / POW 0x2000 / 0x5000) | 1359 / 7286 |
+
+So a combo is about four times what the pair could punch in the same time, plus a knock-down, and it grows with the
+attackers' strength. Hercule's pairs deal the same total (his weight goes into his partner's blows).
 
 ## 3. The combos
 
@@ -383,7 +393,8 @@ Name: Perfect Kamehameha
 | 0 | A | walk | 80 0 16 |
 | 0 | B | teleport | 16 0 |
 | 0 | T | pose | hurt 0 |
-| 8 | B | punch | 1 |
+| 4 | B | punch | 1 |
+| +6 | B | punch | 1 |
 | +8 | B | teleport | -16 0 |
 | +2 | B | punch | 1 kick |
 | +8 | B | teleport | 16 -8 |

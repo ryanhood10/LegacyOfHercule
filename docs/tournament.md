@@ -1406,3 +1406,80 @@ DRAIN 3 a frame, COOLDOWN 5400, AI_REACH 80 px, AI_RETRY 30, captions 90 frames 
 **State** `.combo.meter` 0x0203EA00 (0x80) and `.combo.cap` 0x0203EA80 (0x30), both exactly their size so the runner's
 `.combo.run` starts at 0x0203EAB0; offsets in `docs/ids.md` (test command 32). Test: `tools/headless/tny_combo_meter.txt`
 (`docs/testing.md` "Team combo meter").
+
+### 25.2 The runner (built 2026-10-31, branch `tny-combo-run`, `src/coop/tny_combo_run.c`)
+
+**What a player sees.** When the bar fires (or an opponent pair's does), everything else in the fight stops dead: the
+other opponents, a ki blast or a beam in mid-air, the partner who is not in it (side 1), even their animation. The
+pair plays its combo on the target (the caption shows its name at the bottom), the target ends knocked down, lies a
+moment and gets up, and the fight goes on with everyone where the animation left him: no snapping back, every spot kept
+on the ring's floor. A target pinned against a wall is first driven out a little (hurt) so both fighters have room
+on either side. A blast frozen in flight finishes its flight afterwards.
+- **Generic barrage** (the androids, Spopovich & Yamu): both fighters vanish and reappear on either side of the
+  target, throw twelve ki blasts in turn (six each), charge together with a shake and a power-up sound, and throw a big
+  orb each at once; the double blast knocks him down. 232 frames (3.9 s).
+- **Goku & Vegeta**: both dash in from either side and trade twelve punches and kicks with him between them (the
+  special melee to close), spring back out, charge (Goku in the Kamehameha pose, Vegeta's hands up), then Goku's
+  Kamehameha from one side and Vegeta's Big Bang from the other meet on him; he falls, lies and gets up. 264 frames.
+- The other eight combos (Gohan & Krillin, Piccolo & Hercule, Goku & Piccolo, the father-son Kamehameha, Frieza &
+  Cooler, Broly & Paragus, Mecha Frieza & King Cold, Cell & Cell Jr.) have first-draft tables in
+  `docs/tournament-combos.md` (they play and are tested end to end; a follow-up piece tunes their look).
+
+**The step tables are Ryan's doc.** `docs/tournament-combos.md` section 3 holds one table per combo (`| at | who | does |
+how |`: a frame, A / B / T, a verb such as `dash 18 0 10`, `punch 1 kick`, `beam 6 40`, `knockdown 40 12`); its section
+1 is the format. `tools/tnycombo.py` turns it into `build/gen/tny_combo_data.c` at build time (a Makefile rule like
+`tny_talk_data`'s; `src/coop/tny_combo_run.h` the step layout: 12 bytes, `{at, who, op, a, b, c, d}`); a row that does
+not parse stops the build with its line. The pair table stays in `tny_combo.c` (the lead's, used by the draw too); the
+doc's section 4 lists it for reference.
+
+**The freeze: the game's command modal** (decompiled 2026-10-31). `CommitCommandBatch` (0x0800E038) runs the modal
+0x0800DE20 (vtable 0x08025150: update 0x08004EA8 draws the entity list without updating it, the late update 0x0800DE6E
+broadcasts message 10 and ends when no entity answers 1). The base entity message 0x08019B70 answers 10 by stepping
+the entity's command (+0x150: `{vtable, next, done}`, slots 1 start, 2 step, 3 done?, 4 stay; popped by 0x0800E078)
+and animating it (control state slot 1, aux state slot 1); with no command it only animates. Nothing's update (slot 2)
+runs: no AI, no kit special, no player state reads a pad, no knock-back slides. So `tny_combo_start` checks the bodies and
+returns 1; the same frame tick (`tny_combo_run_frame`, after the meter's) queues one **director** command on fighter 0
+and commits the batch: the whole combo plays inside that modal, one frame per message 10, and the command reports done
+at its `end` row. Two gaps it closes itself:
+- **What flies:** the projectile class's message (0x08013D68) answers 10 by calling its update (slot 10), as the beam's
+  (0x0801D91C), the players' ki blast's (0x0800EA3A) and the NPC ki blast's do, so a shot in flight would go on. Every
+  such object (by its message handler) gets a vtable copy whose message swallows 10 (`Frozen`, on the heap) and its own
+  back at the end.
+- **Animation:** every player and kit fighter (the pair, the target, the bystanders; not the fallen, not Android 16 /
+  Super 13 whose own code owns their states: those only animate) is put in a hold control state (the kits' stun
+  recipe: an idle-state vtable copy with empty enter / animate, in `comboram` so a fallen target may still sit in it
+  until his kit's next frame lays him down); at the end each goes back to his idle state where he stands. Player 1 in
+  the hold also makes `p1_in_play()` 0, so the engine starts no step and player 2's pad reads nothing meanwhile.
+- The engine's fight tick still runs (its frame hook is the input poll): it only counts the fallen, so a KO in the
+  combo is seen at once. A Rumble entrant spawned meanwhile only animates.
+
+**The poses** are written into the frame fields (+0x4C the group's four facing arrays, +0x14 the frame) every frame of
+the combo; a pose kind falls back to the next group a body has (`kinds[]`: punch 7, 6, 8; beam 18, 19, 5; ...). The
+knock-down plays group 3 over 18 frames, the engine's lying pose (`tny_lie_pose`), then group 3 backwards.
+
+**Damage: a multiplier of the attackers' own moves** (Ryan). Each blow builds the game's hit message with the
+attacking fighter as attacker and runs the game's own damage formula (`damage_calc_hook`: his combat bytes, the
+punch's or the ki blast's descriptor of 0x086DB2CC with base 0x400, times the step's weight; melee crits as any punch;
+the difficulty's co-op multiplier on a player) and then the target's own OnHit (vtable slot 14: HP, the damage number,
+for a player take-damage with the revive and the tournament's KO rules), the way a kit's special takes a hit: no AI hit
+reaction, no knock-back, no poise. Only the target: nothing is broadcast, a beam's owner hit type is made 3 (players
+take 0 / 2, enemies 1 / 2) while its update runs, so Goku & Piccolo's beam passes through Goku. Players' combat bytes
+are their party entry's STR / POW high bytes (the class init 0x08016FD8), villains' their tier stat: a stronger story
+character hits harder. Each partner: six blows of weight 1 and a finisher of 6 (24.10's "six normal hits plus a finisher
+at about three times a special", a special counted as two blows). Measured: 4111 in 264 frames for Goku & Vegeta on
+a Rookie, against 947 for both players mashing A for the same time; 1359 / 7286 with both players' combat bytes at
+0x20 / 0x50 (`docs/tournament-combos.md` section 2). At HP 0 the combo ends at once: a kit falls as usual (`fallen()`,
+counted out by the engine), a player is downed by the revive (or the KO rules). **Hercule** never hurts anyone: his
+steps are poses and shouts, and their weight goes into his partner's next blow (Piccolo & Hercule, Hercule & SSJ2
+Gohan's father-son Kamehameha: nothing comes out of him).
+
+**Numbers** (top of `tny_combo_run.c`): shots 6 px a frame (balls 4, the disc 5), a big orb's blast 24 x 100 shake, a
+punch 4 x 30; ROOM 72 px each side; at most 8 shots, 16 frozen objects, 10 held bodies; a combo stopped ticking for 30
+frames is over (a reset). Working state on the heap (`Run`, about 1 KB, plus 104 bytes per frozen object, freed at the end); `.combo.run` 0x0203EAB0
+(0x88 of 0x140, magic 0xC0B0A001): offsets in `docs/ids.md` (test command 33).
+
+**Test:** `tools/headless/tny_combo_run.txt` (`docs/testing.md` "Team combos: the runner"): both combos filmed in a
+co-op 2 v 2, an opponent pair on a player, Frieza & Cooler's own, two strengths, the mashing comparison, a lethal combo
+both ways, a frozen volley and beam, the meter firing it end to end (Select), Hercule's two pairs, every combo once.
+Not done: the other eight tables are first drafts (a follow-up piece tunes them); the Cell Jr. swarm uses the one
+Junior beside Cell (no extra helpers spawn).

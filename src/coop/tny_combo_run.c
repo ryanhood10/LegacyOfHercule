@@ -340,6 +340,11 @@ static int flies(const Entity *e) {
     u32 m = (u32)vslot(e, 9);
     return m == PROJ_MESSAGE || m == NPC_KI_MESSAGE || m == KI_BLAST_MESSAGE || m == BEAM_MESSAGE;
 }
+// what a frozen object's stillness is checked on: a projectile's position (+0x20, +0x24, 8.8), a beam's origin and length
+static u32 where_of(const Entity *e, const u32 *vt, int k) {
+    if ((u32)vt + vt[9] == BEAM_MESSAGE) return k ? E32(e, 0x34) : E32(e, 0x1C) ^ (E32(e, 0x20) << 16);
+    return E32(e, 0x20 + 4 * k);
+}
 static void freeze(Run *r, Entity *e) {
     if (r->nfrz >= MAX_FROZEN) return;
     Frozen *f = Arena_Alloc(sizeof *f);
@@ -350,8 +355,8 @@ static void freeze(Run *r, Entity *e) {
     f->obj = e;
     f->orig = ov;
     e->vtable = f->vt;
-    r->fx[r->nfrz] = E32(e, 0x20);                  // the projectile class's position (beams: their origin)
-    r->fy[r->nfrz] = E32(e, 0x24);
+    r->fx[r->nfrz] = (s32)where_of(e, ov, 0);
+    r->fy[r->nfrz] = (s32)where_of(e, ov, 1);
     r->frz[r->nfrz++] = f;
 }
 static void unfreeze_all(Run *r) {
@@ -359,7 +364,7 @@ static void unfreeze_all(Run *r) {
         Frozen *f = r->frz[i];
         if (!f) continue;
         if (in_list(f->obj) && f->obj->vtable == f->vt) {
-            if (E32(f->obj, 0x20) != (u32)r->fx[i] || E32(f->obj, 0x24) != (u32)r->fy[i]) ram.moved++;
+            if (where_of(f->obj, f->orig, 0) != (u32)r->fx[i] || where_of(f->obj, f->orig, 1) != (u32)r->fy[i]) ram.moved++;
             f->obj->vtable = (u32 *)f->orig;
         }
         Arena_Free(f);
@@ -664,9 +669,11 @@ static void go(Run *r, Actor *a, int i, const TComboStep *s, int instant) {
         s32 sx = r->act[0].e->x < e->x ? 1 : -1;
         x = (e->x >> 8) + sx * s->a;
         y = (e->y >> 8) + s->b;
-    } else {
-        x = (t->x >> 8) + a->sign * s->a;
-        y = (t->y >> 8) + s->b;
+    } else {                                        // from where the target stands (or is being moved to)
+        Actor *ta = &r->act[2];
+        s32 tx = ta->go_n > 0 ? ta->x1 : t->x, ty = ta->go_n > 0 ? ta->y1 : t->y;
+        x = (tx >> 8) + a->sign * s->a;
+        y = (ty >> 8) + s->b;
     }
     clamp_floor(&x, &y);
     if (!walkable(e, x, y)) {                       // a rock: no closer than the walkable floor allows
@@ -769,8 +776,10 @@ static void actor_frame(Run *r, Actor *a) {
         e->y = a->y0 + (a->y1 - a->y0) * a->go_t / a->go_n;
         if (a->go_t >= a->go_n) {
             a->go_n = 0;
-            if (a->go_kind != CP_KEEP) pose_set(a, CP_IDLE, 0, 0, 0);
-            if (a != &r->act[2]) face(e, r->act[2].e);
+            if (a != &r->act[2]) {                  // the target keeps his pose (a push, the hurt)
+                if (a->go_kind != CP_KEEP) pose_set(a, CP_IDLE, 0, 0, 0);
+                face(e, r->act[2].e);
+            }
         }
     }
     if (a->knock_t > 0) {                           // the target: fall, lie, get up
@@ -828,6 +837,30 @@ static void finish(Run *r, int reason) {
     r->cmd.done = 1;
 }
 
+// Room: a target against a wall would leave a fighter no spot on his side; he is first driven (10 frames, hurt) to the
+// nearest spot along x with ROOM px of floor on either side (the ring's floor, else the map's collision)
+#define ROOM 72
+static int room_at(Entity *e, s32 x, s32 y) {
+    s32 l = x - ROOM, rr = x + ROOM, yy = y;
+    if (tny_ring_active() && (l < TNY_RING_X0 + RING_MARGIN || rr > TNY_RING_X1 - RING_MARGIN)) return 0;
+    return walkable(e, l, yy) && walkable(e, rr, yy) && walkable(e, x, yy);
+}
+static void make_room(Run *r) {
+    Actor *a = &r->act[2];
+    Entity *e = a->e;
+    s32 x = e->x >> 8, y = e->y >> 8;
+    if (room_at(e, x, y)) return;
+    for (s32 d = 8; d <= 160; d += 8)
+        for (int sgn = -1; sgn <= 1; sgn += 2) {
+            s32 nx = x + sgn * d;
+            if (!room_at(e, nx, y)) continue;
+            a->x0 = e->x; a->y0 = e->y; a->x1 = nx << 8; a->y1 = e->y;
+            a->go_t = 0; a->go_n = 10; a->go_kind = CP_HURT;
+            pose_set(a, CP_HURT, 0, 0, 0);
+            return;
+        }
+}
+
 // The director: one frame of the combo (from fighter 0's command, message 10 of the modal)
 static void director(Run *r) {
     ram.tick = g_FrameCounter;
@@ -835,6 +868,7 @@ static void director(Run *r) {
     for (int i = 0; i < 2; i++) if (down(r->act[i].e)) { finish(r, 3); return; }
     if (down(r->act[2].e)) { finish(r, 2); return; }
     const TComboDef *d = r->def;
+    if (r->t == 0) make_room(r);
     while (r->si < d->n && d->steps[r->si].at <= r->t) {
         const TComboStep *s = &d->steps[r->si++];
         if (s->op == CO_END) { finish(r, 1); return; }

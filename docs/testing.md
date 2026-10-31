@@ -16,6 +16,7 @@ inspection goes through the GDB stub.
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
+| Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -488,6 +489,38 @@ an AI slot). 10. one player: no bar, no AI slots. 11. a co-op Rookie Rumble: rou
 round-1 cooldown gone). Pass: no CRASH, the numbers as the echoes say. The script runs on the runner's weak default
 (`tny_combo_start` returns 0); with the runner merged a try starts a combo (the cooldown follows), so parts 2 and 6 then
 show starts instead of tries.
+
+## Team combos: the runner (headless, branch `tny-combo-run`, 2026-10-31)
+
+```
+make BUILD=build/crun DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/crun/log2-coop.gba --out build/crun/hl
+python tools/headless/st_test.py tools/headless/tny_combo_run.txt build/crun/log2-coop.gba build/crun/hl/menu.ss --out build/crun/hl --cols 8
+```
+
+`tools/headless/tny_combo_run.txt` (`docs/tournament.md` 25.2), about 20 s. Fights are co-op Rookie 2 v 2s as Goku &
+Vegeta (test command 25, `arg2` 0x3537, stand-in bodies), the opponents' specials off (27 op 3) and the target's HP
+poked up (27 op 2) so a combo plays out; a combo starts with test command 33 (`docs/ids.md`) and is filmed with a shot
+every 10 frames (`gv_*` Goku & Vegeta, `gb_*` the generic barrage, `vs_*` an opponent pair on player 1, `fc_*` / `fg_*`
+Frieza & Cooler's own and the generic one, `bm_*` a frozen beam, `ph_*` Piccolo & Hercule, `hs_*` Hercule & Gohan's
+father-son, `ko_*` / `pk_*` the lethal ones). The runner's state `cr` is found by its magic 0xC0B0A001 after the first
+start; its `results` lines: busy / combo / side / reason (1 played out, 2 target down, 3 cut short), runs / frames,
+the target's HP before / after, the damage of fighter 0 / 1, their positions and the target's after, hits / bodies
+held / objects frozen / bystanders that moved. Parts: 1 Goku & Vegeta (`busy` 2 mid-combo, the other opponent's x / y
+unchanged mid-combo, `moved` 0; after it nobody is back at his start spot; player 1's real punch lands after: `mv+0x54`
++1; the AI moves again); 2 the generic barrage with the other opponent's volley in flight (`frozen` 4, `moved` 0: the
+shots hang in `gb_*`); 3 the opponents' generic barrage on player 1 (side 1; player 2 held where he was); 4 Frieza &
+Cooler spawned by test command 26 on the ring map outside a tournament, player 1 against the wall (driven out first):
+their own combo (6) and the generic one; 5 two strengths (both players' STR / POW and combat bytes 0x20, then 0x50:
+1359 against 7286); 6 player 1's punch as fast as test 27 op 6 throws it, 264 frames (the comparison of
+`docs/tournament-combos.md` section 2); 7 a target at 60 HP: reason 2, `mv+0x58` (falls) +1, the engine's `opp_in`
+2; 8 a beam in flight frozen (`frozen` 1, `moved` 0) and going on after; 9 the meter end to end (test command 32: both
+players punch, the bar full, player 1's Select: the meter's last call combo 3 / side 0 / result 1, the runner played
+combo 3); 10 Piccolo & Hercule (damage B 0); 11 Hercule & Gohan on the father-son table (damage A 0, Gohan's beam);
+12 every combo once (reason 1 each); 13 player 1 at 30 HP under the opponents' combo: reason 2, the revive takes the
+KO, the fight goes on (phase 4). Pass: every `stepz` reached, no CRASH, the numbers as the echoes say. The same script
+on a build without the runner (the weak default) shows the "before": nothing stops, the opponents keep fighting.
+Run 2026-10-31: `build/crun/hl/` (after) and `build/crun/base/hl/` (before), not committed.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 
