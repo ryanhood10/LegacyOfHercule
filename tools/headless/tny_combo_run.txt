@@ -1162,7 +1162,7 @@ echo -- combo 0
 poke32 0x0203FD0C 0x10000
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_0
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1178,7 +1178,7 @@ echo -- combo 1
 poke32 0x0203FD0C 0x10001
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_1
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1194,7 +1194,7 @@ echo -- combo 2
 poke32 0x0203FD0C 0x10002
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_2
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1210,7 +1210,7 @@ echo -- combo 3
 poke32 0x0203FD0C 0x10003
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_3
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1226,7 +1226,7 @@ echo -- combo 4
 poke32 0x0203FD0C 0x10004
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_4
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1242,7 +1242,7 @@ echo -- combo 5
 poke32 0x0203FD0C 0x10005
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_5
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1258,7 +1258,7 @@ echo -- combo 6
 poke32 0x0203FD0C 0x10006
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_6
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1274,7 +1274,7 @@ echo -- combo 7
 poke32 0x0203FD0C 0x10007
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_7
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1290,7 +1290,7 @@ echo -- combo 8
 poke32 0x0203FD0C 0x10008
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_8
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
@@ -1306,7 +1306,7 @@ echo -- combo 9
 poke32 0x0203FD0C 0x10009
 poke32 0x0203FD54 0x2
 poke32 0x0203FD08 33
-frames 300
+frames 360
 find cr 0xC0B0A001
 shot all_9
 echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
