@@ -1,0 +1,431 @@
+# Team combos: the meter (src/coop/tny_combo_meter.c; docs/tournament.md 25.1, docs/testing.md "Team combo meter").
+# State at 0x0203EA00 (.combo.meter, docs/ids.md test command 32): +4 bytes on / pstate (0 ready, 1 cooldown, 2 filling) /
+# pcombo (0xFF none) / hold (peek prints the word: hold pcombo pstate on, high to low), +8 fill (0x3C0 full) / cooldown frames, +0xC button tries / starts, +0x10 players' hits on
+# kits / shared, +0x14 splits / kit hits on players, +0x2C press / drawn (1 the bars are up) / AI slots / kits,
+# +0x40 the last start call's combo / side / result, +0x44 AI slots (0x10 each: ida idb combo state, fill / cool,
+# tries / starts, hits). Caption at 0x0203EA80: +0x10 queued / sprites / frames left, +0x14 tile / shown, +0x18 fails /
+# drops. Runs on the runner's weak default (tny_combo_start returns 0: the bar stays full, the tries count).
+# Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_combo_meter.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+p2 0
+maptest 13
+frames 400
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 1
+poke32 0x0203FD08 24
+frames 10
+save cm_setup.ss
+echo == 1. co-op Rookie 2 v 2 as Goku and Vegeta (seed 9): the bar full at the start (expect 00030001 000003c0: on, ready, combo 3 = Goku & Vegeta, fill 0x3c0; drawn 01)
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0x3537
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+frames 30
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+shot cm1_full
+echo -- opponents: AI slot 0 (expect 01000809: Spopovich 08 and Yamu 09, combo 0 the generic barrage, state 1 filling)
+peek 0x0203EA44 12
+echo == 2. Select on player 1's pad, then player 2's: tries 1, 2; the start returns 0 (weak runner) so the bar stays full
+key 4 4
+frames 2
+peek 0x0203EA04 4
+peek 0x0203EA40 1
+p2 4
+frames 4
+p2 0
+frames 4
+peek 0x0203EA04 4
+peek 0x0203EA34 3
+echo -- R does not fire it: player 2 presses R (player 1's R is the stock area map); tries stay 2
+p2 0x100
+frames 4
+p2 0
+frames 4
+peek 0x0203EA04 4
+shot cm2_after_select
+echo == 3. cooldown 5400 frames: hidden (drawn 0), 600 frames later about 4800 left
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 5400
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+frames 600
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+shot cm3_cooldown
+echo -- a 60-frame cooldown ends: filling (2), fill 0, still hidden until a shared hit
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 60
+poke32 0x0203FD08 32
+frames 10
+frames 80
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+poke16 PARTY+0x44 9999
+poke16 PARTY+0x46 9999
+poke16 PARTY+0x7C 9999
+poke16 PARTY+0x7E 9999
+poke16 PARTY+0x28 9999
+poke16 PARTY+0x2A 9999
+poke16 PARTY+0x60 9999
+poke16 PARTY+0x62 9999
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x02000100
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 1
+poke32 0x0203FD08 32
+frames 10
+echo == 4. refill: players alternate punches on kit 0 (each hit after the partner's within 1.5 s is shared, +88; 11 fill it)
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+shot cm4_filling
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000001
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+echo -- full again: ready (0), fill 0x3c0, flashing
+peek8 0x0203EA2C 4
+shot cm5_full_again
+echo == 5. split: fill set to 400, player 1 hits kit 0 while player 2 hits kit 1: splits count, the bar drains
+poke32 0x0203FD0C 8
+poke32 0x0203FD54 400
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000101
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000101
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 10
+poke32 0x0203FD54 0x1000101
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 4
+frames 200
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+shot cm6_drained
+echo -- they stop: fill 400 holds for a second (60 frames), then drains about 3 a frame
+poke32 0x0203FD0C 8
+poke32 0x0203FD54 400
+poke32 0x0203FD08 32
+frames 2
+frames 40
+peek 0x0203EA04 4
+frames 100
+peek 0x0203EA04 4
+echo == 6. the AI pair: from a fresh fight start their bar is empty and fills from their hits on the players
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 10
+frames 900
+peek 0x0203EA04 4
+peek 0x0203EA44 12
+echo -- slot 0 forced full, both stood 30 / 50 px from player 1: it fires by itself (tries, side 1, target = player 1)
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 1
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0xFF
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0x1E00
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0x3201
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 3
+peek 0x0203EA44 12
+peek 0x0203EA34 4
+deref p1 0x03001FA8
+echo -- player 1:
+peek 0x03001FA8
+frames 70
+echo -- refused (weak runner): tried again every 30 frames
+peek 0x0203EA44 12
+echo -- far away (kit 1 moved 200 px): no more tries
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0xC801
+poke32 0x0203FD08 32
+frames 2
+peek 0x0203EA44 12
+frames 60
+peek 0x0203EA44 12
+echo == 7. the caption: three lines queued, a fourth dropped; player 1 walks right under it (x keeps changing)
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 2
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 1
+poke32 0x0203FD08 32
+frames 2
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 2
+poke32 0x0203FD08 32
+frames 2
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 3
+poke32 0x0203FD08 32
+frames 2
+peek 0x0203EA90 3
+keys 0x10
+frames 25
+peek p1+0x158
+peek 0x0203EA90 3
+frames 25
+peek p1+0x158
+peek 0x0203EA90 3
+shot cm7_caption
+frames 25
+peek p1+0x158
+peek 0x0203EA90 3
+frames 25
+peek p1+0x158
+peek 0x0203EA90 3
+keys 0
+frames 300
+echo -- all three shown, none left (+0x10 0, +0x14 shown 3, +0x18 drops 1)
+peek 0x0203EA90 3
+echo == 8. Frieza and Cooler: co-op Champion 2 v 2, seed 16 draws them as the first opponents (eng +0x1A: 02 17)
+load cm_setup.ss
+frames 2
+p2 0
+frames 10
+poke32 0x0203FD0C 16
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x301
+poke32 0x0203FD54 0x3537
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC18 4
+frames 30
+peek 0x0203EA44 12
+poke16 PARTY+0x44 9999
+poke16 PARTY+0x46 9999
+poke16 PARTY+0x7C 9999
+poke16 PARTY+0x7E 9999
+poke16 PARTY+0x28 9999
+poke16 PARTY+0x2A 9999
+poke16 PARTY+0x60 9999
+poke16 PARTY+0x62 9999
+poke32 0x0203FD0C 0x02000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x02000100
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 10
+frames 900
+echo -- their hits fill the slot (hits, fill)
+peek 0x0203EA44 12
+peek 0x0203EA14 1
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 1
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0xFF
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0x2800
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 11
+poke32 0x0203FD54 0x2801
+poke32 0x0203FD08 32
+frames 10
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 32
+frames 3
+echo -- forced full and in reach: tries, the call's combo 6 (Frieza and Cooler) side 1 (+0x40)
+peek 0x0203EA44 12
+peek 0x0203EA34 4
+shot cm8_frieza_cooler
+echo == 9. no combo for Gohan and Vegeta: pcombo ff, drawn 0, Select does nothing (tries 0); their opponents still have an AI slot
+load cm_setup.ss
+frames 2
+p2 0
+frames 10
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0x3532
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+frames 30
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+key 4 4
+frames 4
+peek 0x0203EA04 4
+shot cm9_unlisted
+echo == 10. one player (2 v 2 as Goku with an AI partner): no bar, no AI slots
+load cm_setup.ss
+frames 2
+p2 off
+frames 400
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0xFF37
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+frames 30
+peek 0x0203EA04 4
+peek8 0x0203EA2C 4
+key 4 4
+frames 4
+peek 0x0203EA04 4
+shot cm10_1p
+echo == 11. co-op Rookie Royal Rumble as Goku and Vegeta: every round is a fight; a round's cooldown ends with it
+load cm_setup.ss
+frames 2
+p2 0
+frames 10
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 2
+poke32 0x0203FD54 0x3537
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+frames 30
+echo -- round 1: ready, fights seen (+0x2A); the AI slots of the pack
+peek 0x0203EA04 2
+peek16 0x0203EA2A 1
+peek8 0x0203EA2C 4
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 5400
+poke32 0x0203FD08 32
+frames 10
+peek 0x0203EA04 2
+shot cm11_round1
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+frames 30
+echo -- round 2: ready and full again (cooldown gone), fights + 1
+peek 0x0203EA04 2
+peek16 0x0203EA2A 1
+peek8 0x0203EA2C 4
+shot cm11_round2

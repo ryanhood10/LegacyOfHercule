@@ -54,10 +54,13 @@ int player_msg_hook(Entity *e, int id, u8 *msg) {
 }
 
 static void duel_end(int loser);
+void tny_combo_on_hit(Entity *target, Entity *attacker);   // tny_combo_meter.c
 
 // Player 1's take-damage: in a duel the final blow leaves 1 HP and ends the duel.
 int p1_take_damage_hook(Entity *e, u8 *hit) {
     int (*orig)(Entity *, u8 *) = (int (*)(Entity *, u8 *))P1_TAKE_DAMAGE;
+    // team combos (tny_combo.h): a kit fighter's hit; the hit is the message's +0x24, its attacker the word before
+    if (*(s32 *)(hit + 8) > 0) tny_combo_on_hit(e, *(Entity **)(hit - 4));
     if (coop2.duel_active) {
         CharacterEntry *c = &g_Party->chars[g_Party->active_slot];
         s32 *dmg = (s32 *)(hit + 8);

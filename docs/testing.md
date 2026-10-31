@@ -463,6 +463,32 @@ slot 7, a warp) at 400 / 1000 HP: 480 HP, ki 20 -> 60; above half HP only the ki
 (HP 1216), Spopovich on slot 5 at 140 % of it. Pass: no CRASH, every stepz reached, the numbers as the echoes say.
 Before the fix (the stock reaction alone) A's x stays put after the first punch (`docs/tournament.md` 21).
 
+## Team combo meter (headless, branch `tny-combo-meter`, 2026-10-31)
+
+```
+make BUILD=build/cmeter DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/cmeter/log2-coop.gba --out build/cmeter/hl
+python tools/headless/st_test.py tools/headless/tny_combo_meter.txt build/cmeter/log2-coop.gba build/cmeter/hl/menu.ss --out build/cmeter/hl --cols 6
+```
+
+`tools/headless/tny_combo_meter.txt` (`docs/tournament.md` 25.1; state offsets at test command 32 in `docs/ids.md`), from
+Map Test 13 with every tier forced open: 1. a co-op Rookie 2 v 2 as Goku and Vegeta (test command 25 `arg2` 0x3537,
+seed 9: Spopovich and Yamu, a listed pair): the bar full at the start (`cm1_full`), the AI slot. 2. Select on player 1's
+pad, then player 2's: two tries, the weak runner refuses, the bar stays full; R does not fire it. 3. a 5400-frame
+cooldown: hidden, 600 frames later 4800 left; a short one ends into filling, still hidden. 4. both players' real
+punches (op 10: the A button's routine, each stood beside kit 0) alternate: +0x58 per shared hit, full again at the
+11th (`cm4_filling` cyan, `cm5_full_again`). 5. a split (player 1 on kit 0, player 2 on kit 1): splits count, the bar
+drains and hides; stopped, it holds 60 frames, then drains. 6. the AI pair from a fresh start fills from its hits on
+the players (about 9 in 900 frames); forced full and stood 30 / 50 px from player 1 it fires by itself (side 1, target
+player 1), retried every 30 frames while refused, not when one is 200 px away. 7. four captions: three shown 90 frames
+each while player 1 walks right under them (his x keeps changing), the fourth dropped (`cm7_caption`). 8. co-op
+Champion 2 v 2, seed 16: Frieza and Cooler drawn as the first opponents, their slot (combo 6) fills from their hits and
+fires when forced full in reach. 9. Gohan and Vegeta: no combo, no bar, Select does nothing (their opponents still get
+an AI slot). 10. one player: no bar, no AI slots. 11. a co-op Rookie Rumble: round 2 is a new fight (full again, the
+round-1 cooldown gone). Pass: no CRASH, the numbers as the echoes say. The script runs on the runner's weak default
+(`tny_combo_start` returns 0); with the runner merged a try starts a combo (the cooldown follows), so parts 2 and 6 then
+show starts instead of tries.
+
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 
 The fork's window and GDB link were too flaky for long scripted scenes (the stub dropped connections
