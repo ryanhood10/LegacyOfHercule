@@ -24,4 +24,4 @@ echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt build/log2-coop.gba --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"
 grep -c "^## " "$LOG"
-grep -nE "TIMEOUT|CRASH|FAIL" "$LOG"
+if grep -nE "TIMEOUT|CRASH|FAIL" "$LOG"; then exit 1; fi   # a failure: exit 1; clean: exit 0
