@@ -17,6 +17,9 @@
 // Damage is a multiplier of the attackers' own moves (Ryan): a step's weight in tenths of one of his punches (melee)
 // or ki blasts (ranged), so a stronger story character or a higher tier hits harder; never a share of the target's HP.
 // Hercule is the showman: his steps are poses only, and their weight goes to his partner's next blow.
+// The tuned combos (docs/tournament.md 25.3) added Piccolo's own Special Beam Cannon object (CO_SBC), shots held over
+// the head / in front before they fly and a disc that pins (CO_BALL / CO_DISC options), copies of a body drawn from its
+// own tiles (CO_COPY: the Cell Jr. swarm) and spots that step round the bystanders held in the freeze (step_round).
 #include "tny_combo_run.h"
 #include "tny_engine.h"
 #include "revive.h"
@@ -26,6 +29,9 @@
 #define MAX_SHOTS       8
 #define MAX_FROZEN      16
 #define MAX_HELD        10
+#define MAX_COPIES      3           // copies of a fighter's body at once (CO_COPY: the Cell Jr. swarm)
+#define SBC_GROW        6           // px a frame: the Special Beam Cannon's drill (the game's own grows 3 while it hits)
+#define NEAR_TARGET     16          // px: a mover stepping round a bystander stays at least this far from the target (x)
 #define RING_MARGIN     20          // px: an entity's position stops about this short of the ring's blocked edges
 #define SHOT_SPEED      (6 << 8)    // ki blasts, 8.8 px per frame
 #define BALL_SPEED      (4 << 8)
@@ -64,6 +70,22 @@ ROM_FN(void, Cmd_Commit, (u32 *batch), 0x0800E039);
 #define BEAM_VTABLE         0x08025830u
 #define BEAM_UPDATE         0x0801D88Bu
 #define BEAM_OFFSETS        ((const s32 *)0x08701DF0)
+// Piccolo's Special Beam Cannon (decompiled 2026-10-31): the object 0x4C bytes, OBJ VRAM 0x300; FUN_080157E0(mem, pos,
+// prio, owner) makes it charging (state 0: the spark at his fingers), 0x0801585A(o, facing, pos) fires it (state 1, its
+// sound), 0x0801592E ends it (state 0: gone at once; 1: state 2, it slides off and removes itself). Its message
+// 0x08015EE0 answers 10 with the update 0x0801594C(o, 10): with a nonzero second argument the drill grows 3 px a
+// frame and hits every enemy on it (type 1); with 0 it only animates. Spots per facing (the player's SBC state
+// 0x0801533A / 0x0801539A): the charge at the entity's x / y + {x, y, prio} of 0x086E382C (12 bytes), the shot at
+// + {x, y} of 0x086E385C (8 bytes).
+ROM_FN(void *, Sbc_Init, (void *mem, s32 *pos, int prio, Entity *owner), 0x080157E1);
+ROM_FN(void, Sbc_Fire, (void *o, int facing, s32 *pos), 0x0801585B);
+ROM_FN(void, Sbc_End, (void *o), 0x0801592F);
+#define SBC_VTABLE          0x080259F0u
+#define SBC_MESSAGE         0x08015EE1u
+#define SBC_UPDATE          0x0801594Du
+#define SBC_CHARGE_SPOT     ((const s32 *)0x086E382C)
+#define SBC_FIRE_SPOT       ((const s32 *)0x086E385C)
+#define SBC_VRAM            0x300
 #define IDLE_STATE_VTABLE   0x08024BA0u
 #define OBJ_PALETTE         ((volatile const u16 *)0x05000200)
 #define REG_BLDCNT          (*(volatile u16 *)0x04000050)
@@ -103,7 +125,7 @@ static const u32 atk_punch[2] = { 0x0200, 0x400 };   // the players' punch (desc
 static const u32 atk_ki[2]    = { 0x0101, 0x400 };   // the ki blast (descriptor 1: ranged, 0x400)
 
 // ---- the runner's own projectiles (the ROM projectile class, as tny_moves.c's) -----------------------------------
-enum { PK_SHOT = 1, PK_BALL, PK_DISC, PK_BOOM };
+enum { PK_SHOT = 1, PK_BALL, PK_DISC, PK_BOOM, PK_COPY };
 typedef struct CProj {
     u32 *vtable; s32 sort; u8 prio, _p0[3]; u16 tile, size; const Desc *loaded;
     u8 owner_facing, _p1[3];
@@ -115,7 +137,10 @@ typedef struct CProj {
     s32 vx, vy;
     s16 timer, fuse;
     u8 kind, art, from, size_class;
-    s16 w10, _p2;
+    s16 w10, hold;          // hold: frames it waits at the thrower's spot (over his head / in front) before it flies
+    u8 front, pin, pinned, flip;    // pin: it stays on the target once it lands (pinned: it has); flip: a copy faces
+    s16 hx, hy;             // the held spot (px from the thrower's centre)
+    Entity *src;            // a copy: the body it shows
     u32 vt[24];
 } CProj;
 
@@ -157,7 +182,9 @@ typedef struct Actor {
     u8 go_kind, hercule;    // the pose while moving; 1 = Hercule (the showman: poses only)
     s16 bank;               // weight banked from his Hercule partner's steps (tenths)
 } Actor;
-typedef struct BeamRec { Beam *b; u8 from, done, through, _p; s16 w10, left; u32 vt[16]; } BeamRec;
+// a beam the combo fired: the stock beam (kind 0) or the Special Beam Cannon (kind 1: the same fields for state, origin,
+// direction and length; charge counts down to the shot)
+typedef struct BeamRec { Beam *b; u8 from, done, through, kind; s16 w10, left, charge, _p; u32 vt[16]; } BeamRec;
 typedef struct Run {
     Cmd cmd;
     u32 cmd_vt[6];
@@ -165,6 +192,7 @@ typedef struct Run {
     const TComboDef *def;
     u16 t, si;
     CProj *shot[MAX_SHOTS];
+    CProj *copy[MAX_COPIES];
     BeamRec beam[2];
     u8 white[256];
     Frozen *frz[MAX_FROZEN];
@@ -338,11 +366,12 @@ static int frozen_msg(Entity *obj, int msg, void *arg) {
 }
 static int flies(const Entity *e) {
     u32 m = (u32)vslot(e, 9);
-    return m == PROJ_MESSAGE || m == NPC_KI_MESSAGE || m == KI_BLAST_MESSAGE || m == BEAM_MESSAGE;
+    return m == PROJ_MESSAGE || m == NPC_KI_MESSAGE || m == KI_BLAST_MESSAGE || m == BEAM_MESSAGE || m == SBC_MESSAGE;
 }
 // what a frozen object's stillness is checked on: a projectile's position (+0x20, +0x24, 8.8), a beam's origin and length
 static u32 where_of(const Entity *e, const u32 *vt, int k) {
-    if ((u32)vt + vt[9] == BEAM_MESSAGE) return k ? E32(e, 0x34) : E32(e, 0x1C) ^ (E32(e, 0x20) << 16);
+    u32 m = (u32)vt + vt[9];
+    if (m == BEAM_MESSAGE || m == SBC_MESSAGE) return k ? E32(e, 0x34) : E32(e, 0x1C) ^ (E32(e, 0x20) << 16);
     return E32(e, 0x20 + 4 * k);
 }
 static void freeze(Run *r, Entity *e) {
@@ -426,6 +455,7 @@ static const Desc *proj_frame(const CProj *p) {
     }
 }
 static void proj_update(CProj *p) {
+    if (p->kind == PK_COPY) return;                 // a copy stands where the step put it
     p->timer++;
     if (p->kind == PK_BOOM) {
         if (p->timer >= 22) { EntityList_Remove(g_SceneTable[1], p, 0); return; }
@@ -444,9 +474,37 @@ static void proj_destroy(CProj *p, int free_it, u32 a, u32 b) {
     untrack(p);
     ((void (*)(CProj *, int, u32, u32))PROJ_DESTROY)(p, free_it, a, b);
 }
+// A copy of a body (CO_COPY) draws the body's own tiles (the frame he shows now, uploaded by his own draw) at its spot:
+// the entity draw's recipe (0x08007A84 the spot and the on-screen test, 0x08007772 the OAM words), turned round when
+// it faces the other way; it never uploads anything (its own VRAM is the allocator's smallest block, 0x40: a size
+// under 0x40 is a block of 0 and breaks the allocator's list)
+static int copy_vis(CProj *p) {
+    Entity *e = p->src;
+    const Desc *d = e && in_list(e) ? (const Desc *)E32(e, 0x3C) : 0;
+    if (!d) return 0;
+    s32 left = (p->x >> 8) + (p->flip ? -(d->xo + d->w) : d->xo), top = (p->y >> 8) + d->yo;
+    const s32 *cam = CAMERA_CELL;
+    p->sx = left - cam[7];
+    p->sy = top - cam[8];
+    p->sort = top + d->h;
+    p->prio = E8(e, 8);
+    return left < cam[5] && cam[3] < left + d->w && top < cam[6] && cam[4] < top + d->h;
+}
+static int copy_draw(CProj *p, u32 **oam) {
+    Entity *e = p->src;
+    const Desc *d = e && in_list(e) ? (const Desc *)E32(e, 0x3C) : 0;
+    if (!d) return 0;
+    u32 *o = *oam;
+    *oam = o + 2;
+    u32 a = (d->attr & 0xFE00FFFFu) | (((u32)p->sx & 0x1FF) << 16) | ((u32)p->sy & 0xFF);
+    if (p->flip) a ^= 0x10000000u;
+    o[0] = a;
+    o[1] = (o[1] & 0xFFFFF000u) | ((u32)(E8(e, 8) & 0x3F) >> 4) << 10 | (E16(e, 0x0C) & 0x3FF);
+    return 0;
+}
 static CProj *proj_new(int kind, int art, s32 x, s32 y) {
     static const u16 vram_of[6] = { 0x100, 0x100, 0x400, 0x1000, 0x100, 0x400 };
-    int vram = vram_of[art < 6 ? art : 5];
+    int vram = kind == PK_COPY ? 0x40 : vram_of[art < 6 ? art : 5];   // (the allocator counts 64-byte blocks)
     if (ObjVram_Largest(g_EntityList) < vram + 0x100) return 0;   // keep room for the bodies
     CProj *p = Arena_Alloc(sizeof *p);
     if (!p) return 0;
@@ -459,6 +517,10 @@ static CProj *proj_new(int kind, int art, s32 x, s32 y) {
     p->vt[2] = (u32)proj_update - base;
     p->vt[9] = PROJ_MESSAGE - base;
     p->vt[10] = (u32)proj_update - base;
+    if (kind == PK_COPY) {
+        p->vt[3] = (u32)copy_vis - base;
+        p->vt[4] = (u32)copy_draw - base;
+    }
     p->vtable = p->vt;
     p->kind = (u8)kind;
     p->art = (u8)art;
@@ -473,6 +535,16 @@ static CProj *proj_new(int kind, int art, s32 x, s32 y) {
 static void boom(s32 x, s32 y) { proj_new(PK_BOOM, 5, x, y); }
 
 // ---- damage ---------------------------------------------------------------------------------------------------------
+// A shot pinned on the target (a disc with `pin`) goes when the other fighter's blow lands
+static void unpin(Run *r, int from) {
+    for (int i = 0; i < MAX_SHOTS; i++) {
+        CProj *p = r->shot[i];
+        if (!p || !p->pinned || p->from == from) continue;
+        r->shot[i] = 0;
+        boom(p->x >> 8, p->y >> 8);
+        if (in_list(p)) EntityList_Remove(g_SceneTable[1], p, 0);
+    }
+}
 // One blow of fighter `from` on the target, `w10` tenths of his own punch (melee) or ki blast (ranged): the game's
 // damage formula with his combat bytes (players: their party entry's; kits: their tier stat), the defender's
 // defence, the co-op multiplier on players, then the target's own OnHit (HP, the number, a player's revive / KO
@@ -500,12 +572,14 @@ static void deal(Run *r, int from, s32 w10, int ranged) {
     if (in_list(te) && !down(te)) hold(te);          // a player's OnHit starts his hurt state: back to the hold
     ram.dmg[from] += before - hp_of(te);
     ram.hits++;
+    unpin(r, from);
 }
 
 // ---- beams -----------------------------------------------------------------------------------------------------------
 // The players' / kits' beam object with the attacker as owner; its update runs with the owner's hit type made one
 // nobody takes (3: players take 0 and 2, enemies 1 and 2), so it only shows; the runner deals the damage when its
 // tip reaches the target, and caps its length there (or just past him: a beam through a partner)
+static void beam_reach(Run *r, BeamRec *br, Beam *b);
 static void beam_update(Beam *b, int run) {
     Run *r = (Run *)ram.run;
     BeamRec *br = 0;
@@ -515,20 +589,7 @@ static void beam_update(Beam *b, int run) {
     ((void (*)(Beam *, int))BEAM_UPDATE)(b, run);
     if (b->owner) E8(b->owner, 0x16C) = save;
     if (!br || !r || b->state != 1) return;
-    Entity *t = r->act[2].e;
-    s32 tx, ty, d;
-    centre(t, &tx, &ty);
-    d = b->dx ? (tx - b->x) * b->dx : (ty - b->y) * b->dy;   // along the beam
-    s32 cap = d + (br->through ? 48 : 4);
-    if (cap < 8) cap = 8;
-    if (b->len > cap) { b->len = cap; b->impact = 1; }
-    if (!br->done && b->len >= d - 8) {
-        br->done = 1;
-        deal(r, br->from, br->w10, 1);
-        boom(tx, ty);
-        camera_shake_safe(16, 70);
-        sfx(SFX_BOOM);
-    }
+    beam_reach(r, br, b);
 }
 static void beam_fire(Run *r, int from, s32 w10, int frames, int through) {
     BeamRec *br = !r->beam[0].b ? &r->beam[0] : !r->beam[1].b ? &r->beam[1] : 0;
@@ -546,6 +607,8 @@ static void beam_fire(Run *r, int from, s32 w10, int frames, int through) {
     br->vt[10] = (u32)beam_update - (u32)br->vt;
     b->vtable = br->vt;
     br->b = b;
+    br->kind = 0;
+    br->charge = 0;
     br->from = (u8)from;
     br->done = 0;
     br->through = (u8)through;
@@ -559,14 +622,85 @@ static void beam_fire(Run *r, int from, s32 w10, int frames, int through) {
     Beam_Fire(b, f, pos);
     sfx(SFX_LAUNCH);
 }
+// The tip of a combo beam (either kind) against the target: capped on him (or just past him: through a partner) and
+// the blow dealt when it reaches him
+static void beam_reach(Run *r, BeamRec *br, Beam *b) {
+    Entity *t = r->act[2].e;
+    s32 tx, ty, d;
+    centre(t, &tx, &ty);
+    d = b->dx ? (tx - b->x) * b->dx : (ty - b->y) * b->dy;   // along the beam
+    s32 cap = d + (br->through ? 48 : 4);
+    if (cap < 8) cap = 8;
+    if (b->len > cap) { b->len = cap; b->impact = 1; }
+    if (!br->done && b->len >= d - 8) {
+        br->done = 1;
+        deal(r, br->from, br->w10, 1);
+        boom(tx, ty);
+        camera_shake_safe(16, 70);
+        sfx(SFX_BOOM);
+    }
+}
+
+// ---- the Special Beam Cannon (the game's own object, Piccolo's; see SBC_* at the top) -----------------------------------
+// Its message 10 (the modal's frame) runs its update with 0: the art only (the charge spark, the drill turning; an
+// ending one slides off and removes itself), never its own hits; the runner grows it and lands the blow
+static int sbc_msg(Beam *o, int msg, void *arg) {
+    if (msg != 10) return ((int (*)(Beam *, int, void *))SBC_MESSAGE)(o, msg, arg);
+    Run *r = (Run *)ram.run;
+    BeamRec *br = 0;
+    if (r && ram.magic == RUN_MAGIC) for (int i = 0; i < 2; i++) if (r->beam[i].b == o) br = &r->beam[i];
+    int state = o->state;
+    ((void (*)(Beam *, int))SBC_UPDATE)(o, 0);
+    if (state != 1 || !br) return 0;                 // (an ending one may be gone now)
+    o->len += SBC_GROW;
+    beam_reach(r, br, o);
+    return 0;
+}
+static void sbc_upd(Beam *o) { sbc_msg(o, 10, 0); }
+static void sbc_start(Run *r, int from, s32 w10, int frames, int through, int charge) {
+    BeamRec *br = !r->beam[0].b ? &r->beam[0] : !r->beam[1].b ? &r->beam[1] : 0;
+    Entity *e = r->act[from].e;
+    if (!br || ObjVram_Largest(g_EntityList) < SBC_VRAM + 0x100) { beam_fire(r, from, w10, frames, through); return; }
+    int f = e->facing & 3;
+    s32 pos[2] = { (e->x >> 8) + SBC_CHARGE_SPOT[f * 3], (e->y >> 8) + SBC_CHARGE_SPOT[f * 3 + 1] };
+    Beam *o = Sbc_Init(0, pos, (u8)SBC_CHARGE_SPOT[f * 3 + 2], e);
+    if (!o) { beam_fire(r, from, w10, frames, through); return; }
+    const s32 *vt = (const s32 *)SBC_VTABLE;
+    for (int i = 0; i < 16; i++) br->vt[i] = SBC_VTABLE + vt[i] - (u32)br->vt;
+    br->vt[2] = (u32)sbc_upd - (u32)br->vt;
+    br->vt[9] = (u32)sbc_msg - (u32)br->vt;
+    o->vtable = br->vt;
+    br->b = o;
+    br->kind = 1;
+    br->from = (u8)from;
+    br->done = 0;
+    br->through = (u8)through;
+    br->w10 = (s16)w10;
+    br->left = (s16)frames;
+    br->charge = (s16)(charge > 0 ? charge : 1);
+    EntityList_Add(g_EntityList, (Entity *)o);
+    sfx(0x37);                                      // the charge's power-up
+}
+static void sbc_fire(Run *r, BeamRec *br) {
+    Entity *e = r->act[br->from].e;
+    int f = e->facing & 3;
+    s32 pos[2] = { (e->x >> 8) + SBC_FIRE_SPOT[f * 2], (e->y >> 8) + SBC_FIRE_SPOT[f * 2 + 1] };
+    Sbc_Fire(br->b, f, pos);                        // (its own sound)
+    camera_shake_safe(10, 40);
+}
+
 static void beams_frame(Run *r) {
     for (int i = 0; i < 2; i++) {
         BeamRec *br = &r->beam[i];
         if (!br->b) continue;
         if (!in_list(br->b)) { br->b = 0; continue; }
+        if (br->charge > 0) {                       // the Special Beam Cannon's charge
+            if (--br->charge == 0) sbc_fire(r, br);
+            continue;
+        }
         if (br->left > 0 && --br->left == 0) {
             if (!br->done) { br->done = 1; deal(r, br->from, br->w10, 1); }   // it never reached him: it lands anyway
-            Beam_End(br->b);
+            if (br->kind) Sbc_End(br->b); else Beam_End(br->b);
         }
     }
 }
@@ -575,6 +709,14 @@ static void beams_gone(Run *r) {
     for (int i = 0; i < 2; i++) {
         Beam *b = r->beam[i].b;
         if (b && in_list(b)) {
+            if (r->beam[i].kind) {                  // the Special Beam Cannon: its own vtable, sliding off (or gone)
+                if (!r->beam[i].done) deal(r, r->beam[i].from, r->beam[i].w10, 1);
+                r->beam[i].done = 1;
+                if (b->vtable == r->beam[i].vt) b->vtable = (u32 *)SBC_VTABLE;
+                if (b->state != 2) Sbc_End(b);
+                r->beam[i].b = 0;
+                continue;
+            }
             if (b->state != 2) Beam_End(b);
             if (b->vtable == r->beam[i].vt) b->vtable = (u32 *)BEAM_VTABLE;
         }
@@ -583,12 +725,31 @@ static void beams_gone(Run *r) {
 }
 
 // ---- shots (ki blasts, orbs, the disc): damage when they reach him ----------------------------------------------------
-static void shoot(Run *r, int from, int kind, int art, s32 w10) {
+// where a held shot waits: over his head (a Supernova, the disc) or in front of his hands (an Eraser Cannon)
+static void hold_spot(const CProj *p, const Entity *e, s32 *x, s32 *y) {
+    centre(e, x, y);
+    *x += p->hx;
+    *y += p->hy;
+}
+static void aim(CProj *p, Entity *t) {
+    s32 tx, ty, speed = p->kind == PK_BALL ? BALL_SPEED : p->kind == PK_DISC ? DISC_SPEED : SHOT_SPEED;
+    centre(t, &tx, &ty);
+    set_len(((tx << 8) - p->x), ((ty << 8) - p->y), speed, &p->vx, &p->vy);
+}
+static void shoot(Run *r, int from, int kind, int art, s32 w10, int hold, int front, int pin) {
     Entity *e = r->act[from].e, *t = r->act[2].e;
     s32 x, y, tx, ty;
     centre(e, &x, &y);
     centre(t, &tx, &ty);
-    x += (e->facing == 2 ? -12 : e->facing == 3 ? 12 : 0);
+    s32 hx = 0, hy = 0;
+    if (hold > 0) {
+        s32 b[4];
+        Entity_GetBox(b, e);
+        if (front) hx = (e->facing == 2 ? -1 : 1) * (art == 3 ? 24 : art == 2 ? 18 : 14), hy = -2;
+        else hy = b[1] - y - (art == 3 ? 10 : art == 2 ? 8 : 6);   // just over his head
+    } else hx = (e->facing == 2 ? -12 : e->facing == 3 ? 12 : 0);
+    x += hx;
+    y += hy;
     CProj *p = 0;
     int slot = -1;
     for (int i = 0; i < MAX_SHOTS && slot < 0; i++) if (!r->shot[i]) slot = i;
@@ -597,16 +758,19 @@ static void shoot(Run *r, int from, int kind, int art, s32 w10) {
         if (!p && art == 3) p = proj_new(kind, art = 2, x, y);   // no room for the large orb: the medium one
     }
     if (!p) { deal(r, from, w10, 1); return; }     // no room: the blow lands without its art
-    s32 speed = kind == PK_BALL ? BALL_SPEED : kind == PK_DISC ? DISC_SPEED : SHOT_SPEED;
-    set_len((tx - x) << 8, (ty - y) << 8, speed, &p->vx, &p->vy);
     p->from = (u8)from;
     p->w10 = (s16)w10;
-    p->fuse = 60;
     p->size_class = (u8)(art == 3 ? 2 : art == 2 ? 1 : 0);
+    p->hold = (s16)(hold > 0 ? hold : 0);
+    p->hx = (s16)hx; p->hy = (s16)hy;
+    p->front = (u8)front;
+    p->pin = (u8)pin;
+    p->fuse = (s16)(60 + p->hold);
+    if (!p->hold) aim(p, t);
     p->desc = proj_frame(p);
     r->shot[slot] = p;
     ram.shots++;
-    sfx(SFX_LAUNCH + Rand_Range(2));
+    sfx(p->hold ? 0x37 : SFX_LAUNCH + Rand_Range(2));     // held: the power-up's hum first
 }
 static void shots_frame(Run *r) {
     Entity *t = r->act[2].e;
@@ -615,9 +779,29 @@ static void shots_frame(Run *r) {
     for (int i = 0; i < MAX_SHOTS; i++) {
         CProj *p = r->shot[i];
         if (!p) continue;
+        if (p->pinned) { p->x = tx << 8; p->y = (ty + 2) << 8; continue; }   // spinning on him
+        if (p->hold > 0) {                              // waiting at the thrower's spot
+            s32 hx, hy;
+            hold_spot(p, r->act[p->from].e, &hx, &hy);
+            p->x = hx << 8; p->y = hy << 8;
+            if (--p->hold == 0) { aim(p, t); sfx(SFX_LAUNCH + Rand_Range(2)); }
+            continue;
+        }
         s32 dx = (p->x >> 8) - tx, dy = (p->y >> 8) - ty;
         int reach = p->size_class == 2 ? 14 : p->size_class == 1 ? 10 : 6;
         if (dx * dx + dy * dy > reach * reach && --p->fuse > 0) continue;
+        if (p->pin) {                                   // it lands and stays on him
+            p->pinned = 1;
+            p->vx = p->vy = 0;
+            s16 w = p->w10;
+            p->w10 = 0;
+            deal(r, p->from, w, 1);
+            boom(tx, ty);
+            camera_shake_safe(12, 60);
+            sfx(SFX_HIT + Rand_Range(3));
+            if (!down(t) && r->act[2].knock_t == 0) { face(t, r->act[p->from].e); pose_set(&r->act[2], CP_HURT, 0, 1, 6); r->act[2].flash = 6; }
+            continue;
+        }
         r->shot[i] = 0;
         deal(r, p->from, p->w10, 1);
         boom(p->x >> 8, p->y >> 8);
@@ -635,7 +819,7 @@ static void shots_gone(Run *r) {
         CProj *p = r->shot[i];
         r->shot[i] = 0;
         if (!p) continue;
-        deal(r, p->from, p->w10, 1);                 // still flying at the end: it lands
+        if (!p->pinned) deal(r, p->from, p->w10, 1); // still flying at the end: it lands
         if (in_list(p)) EntityList_Remove(g_SceneTable[1], p, 0);
     }
 }
@@ -661,7 +845,81 @@ static void screen_frame(Run *r) {
     if (!r->screen_t) { REG_BLDCNT = r->bldcnt; REG_BLDY = 0; }
 }
 
+// ---- copies of a body (the Cell Jr. swarm) ------------------------------------------------------------------------------
+// Copy k of fighter i at a spot (as a dash's: px from the target on his side, px down), appearing (or moving) with a
+// flash at both ends; it shows his pose frame for frame, facing the target
+static void copy_flip(Run *r, CProj *p) {
+    Entity *src = p->src, *t = r->act[2].e;
+    int right = (p->x >> 8) < (t->x >> 8);          // the copy faces right when it stands left of him
+    p->flip = (u8)((src->facing == 3) != right && (src->facing & 2));
+}
+static void copy_set(Run *r, int i, const TComboStep *s) {
+    Actor *a = &r->act[i];
+    int k = s->a - 1;
+    if (s->d || k < 0) {                            // gone (k < 0: all of them)
+        for (int j = 0; j < MAX_COPIES; j++) {
+            CProj *p = r->copy[j];
+            if (!p || (k >= 0 && j != k)) continue;
+            r->copy[j] = 0;
+            boom(p->x >> 8, (p->y >> 8) - 12);
+            if (in_list(p)) EntityList_Remove(g_SceneTable[1], p, 0);
+        }
+        sfx(SFX_LAUNCH);
+        return;
+    }
+    if (k >= MAX_COPIES) return;
+    Entity *t = r->act[2].e;
+    s32 x = (t->x >> 8) + a->sign * s->b, y = (t->y >> 8) + s->c;
+    clamp_floor(&x, &y);
+    CProj *p = r->copy[k];
+    if (p && !in_list(p)) p = r->copy[k] = 0;
+    if (p) boom(p->x >> 8, (p->y >> 8) - 12);
+    else if (!(p = r->copy[k] = proj_new(PK_COPY, 6, x, y))) return;   // no room: no copy
+    p->src = a->e;
+    p->x = x << 8;
+    p->y = y << 8;
+    copy_flip(r, p);
+    boom(x, y - 12);
+    sfx(SFX_LAUNCH);
+}
+static void copies_frame(Run *r) {
+    for (int j = 0; j < MAX_COPIES; j++) if (r->copy[j]) { if (in_list(r->copy[j])) copy_flip(r, r->copy[j]); else r->copy[j] = 0; }
+}
+static void copies_gone(Run *r) {
+    for (int j = 0; j < MAX_COPIES; j++) {
+        CProj *p = r->copy[j];
+        r->copy[j] = 0;
+        if (p && in_list(p)) { boom(p->x >> 8, (p->y >> 8) - 12); EntityList_Remove(g_SceneTable[1], p, 0); }
+    }
+}
+
 // ---- the step table -----------------------------------------------------------------------------------------------------
+// A spot where the mover's body would cover a held bystander's (their boxes meet; a giant's is large) is moved just
+// clear of him: towards the target first (no nearer than NEAR_TARGET), else below him, else above him, wherever the
+// floor is walkable; else it stays (the step's own spot)
+static int boxes_meet(const s32 *a, const s32 *b) { return a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3]; }
+static void step_round(Run *r, Entity *e, s32 *px, s32 *py) {
+    s32 mb[4], tx = r->act[2].e->x >> 8;
+    Entity_GetBox(mb, e);
+    for (int k = 0; k < r->nheld; k++) {
+        Entity *h = r->held[k];
+        s32 hb[4], db[4], ox = *px - (e->x >> 8), oy = *py - (e->y >> 8);
+        Entity_GetBox(hb, h);
+        db[0] = mb[0] + ox; db[2] = mb[2] + ox; db[1] = mb[1] + oy; db[3] = mb[3] + oy;
+        if (!boxes_meet(db, hb)) continue;
+        int dir = tx > (h->x >> 8) ? 1 : -1;
+        s32 cx[3] = { *px + (dir > 0 ? hb[2] - db[0] + 2 : -(db[2] - hb[0] + 2)), *px, *px };
+        s32 cy[3] = { *py, *py + hb[3] - db[1] + 2, *py - (db[3] - hb[1] + 2) };
+        for (int c = 0; c < 3; c++) {
+            s32 x = cx[c], y = cy[c];
+            clamp_floor(&x, &y);
+            if (c == 0 && (x - tx < NEAR_TARGET && tx - x < NEAR_TARGET)) continue;
+            if (!walkable(e, x, y)) continue;
+            *px = x; *py = y;
+            break;
+        }
+    }
+}
 static void go(Run *r, Actor *a, int i, const TComboStep *s, int instant) {
     Entity *e = a->e, *t = r->act[2].e;
     s32 x, y;
@@ -676,6 +934,7 @@ static void go(Run *r, Actor *a, int i, const TComboStep *s, int instant) {
         y = (ty >> 8) + s->b;
     }
     clamp_floor(&x, &y);
+    if (i < 2) step_round(r, e, &x, &y);
     if (!walkable(e, x, y)) {                       // a rock: no closer than the walkable floor allows
         for (int k = 0; k < 8 && !walkable(e, x, y); k++) { x = (x + (e->x >> 8)) / 2; y = (y + (e->y >> 8)) / 2; }
         if (!walkable(e, x, y)) { x = e->x >> 8; y = e->y >> 8; }
@@ -733,20 +992,26 @@ static void do_step(Run *r, const TComboStep *s) {
             face(e, t);
             pose_set(a, CP_KI, 0, 1, 6);
             if (a->hercule) { deal(r, i, s->a, 1); break; }   // banked: the pose only
-            shoot(r, i, PK_SHOT, s->b ? 1 : 0, s->a);
+            shoot(r, i, PK_SHOT, s->b ? 1 : 0, s->a, 0, 0, 0);
             break;
-        case CO_BALL:
+        case CO_BALL:                               // (a held one: the table poses him meanwhile)
             face(e, t);
-            pose_set(a, CP_KI, 1, 1, 0);
+            if (!s->c) pose_set(a, CP_KI, 1, 1, 0);
             if (a->hercule) { deal(r, i, s->a, 1); break; }
-            shoot(r, i, PK_BALL, s->b >= 2 ? 3 : 2, s->a);
+            shoot(r, i, PK_BALL, s->b >= 2 ? 3 : 2, s->a, s->c, s->d, 0);
             break;
         case CO_DISC:
             face(e, t);
-            pose_set(a, CP_KI, 1, 1, 0);
+            if (!s->b) pose_set(a, CP_KI, 1, 1, 0);
             if (a->hercule) { deal(r, i, s->a, 1); break; }
-            shoot(r, i, PK_DISC, 4, s->a);
+            shoot(r, i, PK_DISC, 4, s->a, s->b, 0, s->c);
             break;
+        case CO_SBC:                                // (the table poses him: beam 0-1 loop 8, as the game's own)
+            face(e, t);
+            if (a->hercule) { deal(r, i, s->a, 1); break; }
+            sbc_start(r, i, s->a, s->b > 0 ? s->b : 30, s->c, s->d);
+            break;
+        case CO_COPY: if (i < 2) copy_set(r, i, s); break;
         case CO_BEAM:
             face(e, t);
             pose_set(a, CP_BEAM, 1, 2, -8);
@@ -816,6 +1081,7 @@ static void finish(Run *r, int reason) {
     ram.reason = (u8)reason;
     shots_gone(r);
     beams_gone(r);
+    copies_gone(r);
     if (r->screen_t) { r->screen_t = 0; REG_BLDCNT = r->bldcnt; REG_BLDY = 0; }
     thaw_world(r);
     for (int i = 0; i < 3; i++) {
@@ -877,6 +1143,7 @@ static void director(Run *r) {
     }
     shots_frame(r);
     beams_frame(r);
+    copies_frame(r);
     if (down(r->act[2].e)) { finish(r, 2); return; }
     for (int i = 0; i < 3; i++) actor_frame(r, &r->act[i]);
     screen_frame(r);

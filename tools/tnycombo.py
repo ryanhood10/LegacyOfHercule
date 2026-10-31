@@ -16,7 +16,8 @@ import re
 import sys
 
 OPS = ["END", "GO", "TELE", "POSE", "FACE", "PUNCH", "BLAST", "BALL", "BEAM", "DISC", "SHAKE", "SOUND", "FLASH",
-       "SCREEN", "KNOCK", "CAPTION"]
+       "SCREEN", "KNOCK", "CAPTION", "SBC", "COPY"]
+ATTACKS = ("PUNCH", "BLAST", "BALL", "BEAM", "DISC", "SBC")
 POSES = ["idle", "walk", "hurt", "fall", "shout", "charge", "punch", "kick", "dash", "special", "beam", "beam2", "ki",
          "lie"]
 CP_RAW, CP_KEEP = 0x40, 0xFF
@@ -117,17 +118,62 @@ def step(verb, args, where):
             fail(where, "blast W [blue]")
         return "BLAST", weight(args[0], where), 1 if n == 2 and args[1].lower() == "blue" else 0, 0, 0
     if v == "ball":
-        if not 1 <= n <= 2 or (n == 2 and args[1].lower() not in ("large", "medium")):
-            fail(where, "ball W [large]")
-        return "BALL", weight(args[0], where), 2 if n == 2 and args[1].lower() == "large" else 1, 0, 0
+        usage = "ball W [large | medium] [hold N] [front]"
+        if n < 1:
+            fail(where, usage)
+        size, hold, front, rest = 1, 0, 0, [a.lower() for a in args[1:]]
+        while rest:
+            t = rest.pop(0)
+            if t in ("large", "medium"):
+                size = 2 if t == "large" else 1
+            elif t == "hold" and rest:
+                hold = num(rest.pop(0), where, 1, 240)
+            elif t == "front":
+                front = 1
+            else:
+                fail(where, usage)
+        if front and not hold:
+            fail(where, "ball: front is where a held orb waits (hold N front)")
+        return "BALL", weight(args[0], where), size, hold, front
     if v == "beam":
         if not 2 <= n <= 3 or (n == 3 and args[2].lower() != "through"):
             fail(where, "beam W N [through]")
         return "BEAM", weight(args[0], where), num(args[1], where, 1, 240), 1 if n == 3 else 0, 0
     if v == "disc":
-        if n != 1:
-            fail(where, "disc W")
-        return "DISC", weight(args[0], where), 0, 0, 0
+        usage = "disc W [hold N] [pin]"
+        if n < 1:
+            fail(where, usage)
+        hold, pin, rest = 0, 0, [a.lower() for a in args[1:]]
+        while rest:
+            t = rest.pop(0)
+            if t == "hold" and rest:
+                hold = num(rest.pop(0), where, 1, 240)
+            elif t == "pin":
+                pin = 1
+            else:
+                fail(where, usage)
+        return "DISC", weight(args[0], where), hold, pin, 0
+    if v == "sbc":
+        usage = "sbc W N [through] [charge C]"
+        if n < 2:
+            fail(where, usage)
+        through, charge, rest = 0, 1, [a.lower() for a in args[2:]]
+        while rest:
+            t = rest.pop(0)
+            if t == "through":
+                through = 1
+            elif t == "charge" and rest:
+                charge = num(rest.pop(0), where, 1, 240)
+            else:
+                fail(where, usage)
+        return "SBC", weight(args[0], where), num(args[1], where, 1, 240), through, charge
+    if v == "copy":
+        usage = "copy K X Y (copy K of his body there: K 1-3) | copy K off (K 0: all)"
+        if n == 2 and args[1].lower() == "off":
+            return "COPY", num(args[0], where, 0, 3), 0, 0, 1
+        if n != 3:
+            fail(where, usage)
+        return "COPY", num(args[0], where, 1, 3), num(args[1], where), num(args[2], where), 0
     if v == "shake":
         if n != 2:
             fail(where, "shake N S (frames, strength)")
@@ -168,7 +214,7 @@ def who_bits(cell, op, where):
         bits |= b
     if op in ("KNOCK",) and bits != 4:
         fail(where, "knockdown is the target's (T)")
-    if op in ("PUNCH", "BLAST", "BALL", "BEAM", "DISC") and bits & 4:
+    if (op in ATTACKS or op == "COPY") and bits & 4:
         fail(where, "the target does not attack (A or B)")
     return bits
 
@@ -235,7 +281,7 @@ def totals(steps):
     """the damage weights per fighter (hits), for the generated file's comment and the build log"""
     out = {1: 0, 2: 0}
     for at, who, op, a, b, c, d in steps:
-        if op in ("PUNCH", "BLAST", "BALL", "BEAM", "DISC"):
+        if op in ATTACKS:
             for bit in (1, 2):
                 if who & bit:
                     out[bit] += a

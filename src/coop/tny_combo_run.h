@@ -17,15 +17,21 @@ enum {
     CO_FACE,        // a = 0 the target (the target: fighter 0), 1 the target faces fighter 1, 2 turn away
     CO_PUNCH,       // a melee hit: a = weight (tenths of one of his own punches), b = pose kind (punch / kick / special)
     CO_BLAST,       // a ki blast flying at the target: a = weight (tenths of his own ki blast), b = art (0 orb, 1 blue)
-    CO_BALL,        // a big orb thrown slowly: a = weight, b = size (1 medium, 2 large)
+    CO_BALL,        // a big orb thrown slowly: a = weight, b = size (1 medium, 2 large), c = frames held first (over his
+                    // head, or d = 1 in front of his hands) before it flies
     CO_BEAM,        // his beam: a = weight, b = frames held, c = 1 it goes through to the far side (else it ends on him)
-    CO_DISC,        // a Destructo Disc: a = weight
+    CO_DISC,        // a Destructo Disc: a = weight, b = frames held over his head first, c = 1 it pins him (stays
+                    // spinning on him until the partner's next blow lands)
     CO_SHAKE,       // a = frames, b = strength
     CO_SOUND,       // a = sound id (the game's effect table)
     CO_FLASH,       // whoever: a white flash a frames long
     CO_SCREEN,      // the whole screen flashes white, fading over a frames
     CO_KNOCK,       // the target falls (pose group 3), lies a frames, gets up over b frames
     CO_CAPTION,     // the move's name at the bottom (tny_caption)
+    CO_SBC,         // Piccolo's Special Beam Cannon (the game's own object): a = weight, b = frames held once fired,
+                    // c = 1 through (as CO_BEAM), d = frames of charge (the spark at his fingers) before it fires
+    CO_COPY,        // a copy of the fighter's body (it shows his pose, frame for frame): a = copy 1-3 (0 = all), b / c =
+                    // the spot (as CO_GO), d = 1 the copy vanishes
     CO_COUNT
 };
 // pose kinds: a group and its stand-ins for bodies that lack it (tny_combo_run.c `kinds`)

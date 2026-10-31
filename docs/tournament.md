@@ -1422,8 +1422,8 @@ on either side. A blast frozen in flight finishes its flight afterwards.
   special melee to close), spring back out, charge (Goku in the Kamehameha pose, Vegeta's hands up), then Goku's
   Kamehameha from one side and Vegeta's Big Bang from the other meet on him; he falls, lies and gets up. 264 frames.
 - The other eight combos (Gohan & Krillin, Piccolo & Hercule, Goku & Piccolo, the father-son Kamehameha, Frieza &
-  Cooler, Broly & Paragus, Mecha Frieza & King Cold, Cell & Cell Jr.) have first-draft tables in
-  `docs/tournament-combos.md` (they play and are tested end to end; a follow-up piece tunes their look).
+  Cooler, Broly & Paragus, Mecha Frieza & King Cold, Cell & Cell Jr.) were first drafts here; 25.3 is how they were
+  tuned.
 
 **The step tables are Ryan's doc.** `docs/tournament-combos.md` section 3 holds one table per combo (`| at | who | does |
 how |`: a frame, A / B / T, a verb such as `dash 18 0 10`, `punch 1 kick`, `beam 6 40`, `knockdown 40 12`); its section
@@ -1481,5 +1481,79 @@ frames is over (a reset). Working state on the heap (`Run`, about 1 KB, plus 104
 **Test:** `tools/headless/tny_combo_run.txt` (`docs/testing.md` "Team combos: the runner"): both combos filmed in a
 co-op 2 v 2, an opponent pair on a player, Frieza & Cooler's own, two strengths, the mashing comparison, a lethal combo
 both ways, a frozen volley and beam, the meter firing it end to end (Select), Hercule's two pairs, every combo once.
-Not done: the other eight tables are first drafts (a follow-up piece tunes them); the Cell Jr. swarm uses the one
-Junior beside Cell (no extra helpers spawn).
+Not done here: the other eight tables were first drafts (tuned in 25.3, with the Cell Jr. swarm).
+
+### 25.3 The combos as built (2026-10-31, branch `tny-combo-tune`: Ryan's pairs and moves made to look and play as he described them)
+
+**What a player sees** (each table in `docs/tournament-combos.md` section 3; 206 to 276 frames, 3.4 to 4.6 s):
+- **Gohan & Krillin, "Disc and Masenko"**: both dash in and trade eight punches and kicks with him between them, spring
+  back and throw four ki blasts (Krillin's blue). Krillin raises his hand and the Destructo Disc spins over it while
+  Gohan lifts his arm for the Masenko; the disc flies, lands on him and stays there spinning: he is pinned in his hurt
+  pose. Gohan thrusts both hands and the beam hits; the disc bursts with it and he goes down.
+- **Piccolo & Hercule, "Special Beam Dynamite"**: Piccolo takes his spot and pelts him with six blue ki blasts while
+  Hercule, across the ring, shadow-boxes and shouts. Piccolo puts two fingers to his forehead (the game's own Special
+  Beam Cannon: its spark crackles there almost a second) and the opponent freezes. Hercule winds up, runs in with the
+  dust flying and lands his Dynamite Kick at the very moment the drill hits; the opponent goes down, Hercule waves to
+  the crowd and laughs, Piccolo stands with his arms crossed. The kick is a pose: Piccolo's blasts and beam do every
+  point of damage.
+- **Goku & Piccolo, "Special Beam Cannon"**: Goku appears behind him in a flash and pounds him (six blows and a ki
+  burst at point-blank range) while Piccolo throws ki blasts from the other side; then Goku grabs him from behind,
+  pressed against his back with his arms round him, and holds him while he struggles. Piccolo charges the Special Beam
+  Cannon and fires: the drill goes through the opponent and on through Goku, who flashes white and is not hurt; Goku
+  lets go and hops back as the opponent falls.
+- **The father-son Kamehameha**: father and son run to the same side, the son a step ahead and below, and throw twelve
+  ki blasts in turn; both crouch into the Kamehameha, the charge flashes and shakes the ring, and two beams go out side
+  by side as one. With Hercule and Super Saiyan 2 Gohan: Hercule waves to the crowd where Goku throws, strikes the
+  Kamehameha pose beside Gohan and nothing comes out of him; Gohan's beam does it all.
+- **Frieza & Cooler, "Death Beam Supernova"** (on a player): the brothers appear on either side in a flash and fire
+  twelve Death Beams in turn, finger pointed (quick blue shots crossing from both sides). Cooler lifts the Supernova
+  over his head (the big orb hums and the ring shakes), Frieza points for one last Death Beam (the beam) and Cooler
+  throws; both land together and he goes down.
+- **Broly & Paragus, "Eraser Cannon"** (on a player): Paragus steps out to the other side and raises the control
+  device: it glows, the screen flashes white and the target freezes in his hurt pose, flashing. Broly walks in with six
+  blows while Paragus throws blue ki; the device flashes again with a heavier blast of Paragus's. Broly steps back, the
+  Eraser Cannon (his kit's orb) grows in his palm for over half a second and he throws it.
+- **Mecha Frieza & King Cold, "Father and Son"** (on a player): father and son arrive together in a flash, one on
+  each side, and fire six pairs of Death Beams at once, fingers pointed; both point and charge, the ring shakes, and
+  their two beams meet on him.
+- **Perfect Cell & Cell Jr., "Perfect Kamehameha"** (on a player): Cell stays back; three Juniors appear round the
+  target in flashes, punch and kick him from three sides, vanish and reappear on other sides (twelve blows); they leap
+  back to stand round Cell, Cell throws six ki blasts, crouches into the Kamehameha and fires; when the target is down
+  the two extra Juniors vanish in a flash.
+
+**The runner's additions** (`src/coop/tny_combo_run.c`, the doc's verbs in its section 1):
+- `sbc W N [through] [charge C]`: **Piccolo's real Special Beam Cannon** (decompiled 2026-10-31: the object 0x4C
+  bytes, OBJ VRAM 0x300; `0x080157E0` makes it charging at his fingers, `0x0801585A` fires it, `0x0801592E` ends it;
+  its message `0x08015EE0` answers 10 with the update `0x0801594C(o, 10)`, which grows the drill 3 px a frame and hits
+  every enemy on it, and with a second argument 0 only animates). The runner gives it a vtable copy whose message 10
+  runs the update with 0 (the art only), grows it 6 px a frame and lands the blow on the target (`beam_reach`, shared
+  with the stock beam); at the end it gets its own vtable back and slides off. The charge and shot spots per facing are
+  the player's SBC state's (`0x086E382C`, `0x086E385C`). A player's own SBC in flight is now frozen during a combo like
+  any beam.
+- `ball ... hold N [front]` and `disc ... hold N [pin]`: a shot that waits over the thrower's head (the Supernova, the
+  disc) or in front of his hands (the Eraser Cannon) before it flies; a pinned disc stays spinning on the target after
+  it lands (its blow dealt) until the partner's next blow, then bursts.
+- `copy K X Y` / `copy K off`: **copies of a body** (the Cell Jr. swarm; no extra fighters spawn). A copy is a runner
+  projectile whose on-screen test and draw are the entity draw's recipe (`0x08007A84`: the frame's descriptor and the
+  screen spot from the camera cell; `0x08007772`: the OAM words) pointed at the source body's own tiles, so it shows
+  his current frame (turned round when it faces the other way) and uploads nothing: OBJ VRAM 0x40 each (the
+  allocator's smallest block: it counts 64-byte blocks, and a smaller size is a block of 0 that breaks its list, found
+  when freeing the first copy made the next allocation loop forever), no heap beyond the projectile. At most three;
+  all removed at the end.
+- **Bystanders:** a fighter's spot whose body would cover a body held in the freeze (box against box: a giant's is
+  large) moves just clear of it: nearer the target (never within 16 px of him), else below, else above.
+
+**Damage** (`docs/tournament-combos.md` section 2, measured by `tools/headless/tny_combo_tune.txt` with every attacker's
+combat bytes at 0x30): the players' pairs 2413 to 2517 on the same Rookie opponent (Goku & Vegeta 2503), the villains'
+1593 to 1644 on player 1: within 4 % and 3 %. Each partner's weights sum to 12; finishers of 6 are ranged everywhere
+(one melee finisher's critical hit had put Goku & Piccolo 23 % above the rest). Hercule's damage is 0 in both his
+pairs.
+
+**Test:** `tools/headless/tny_combo_tune.txt` (`docs/testing.md` "Team combos: the tuned eight"), in `regfull.sh`; it also prints each combo's slowdown (the game's frame counter against the frames played: 0 to 7 %).
+
+**Not done:** beam colours: every kit's beam (Death Beam, Masenko, Kamehameha) is the stock Kamehameha object, and so
+are the combos' (only the Special Beam Cannon has its own object); a yellow Masenko or a purple Death Beam would need
+new art. The copies show the source's frame only (a copy cannot pose differently from Cell Jr. himself), and a copy
+turned round mirrors his tiles. Spots are fixed distances from the target: on the 240 px screen a fighter 64 px or
+more away on the side where the camera has least room may stand at its edge (the villains' spots were pulled in to 64
+and 56 for that).

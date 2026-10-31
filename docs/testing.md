@@ -17,6 +17,7 @@ inspection goes through the GDB stub.
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
+| Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -517,10 +518,34 @@ their own combo (6) and the generic one; 5 two strengths (both players' STR / PO
 2; 8 a beam in flight frozen (`frozen` 1, `moved` 0) and going on after; 9 the meter end to end (test command 32: both
 players punch, the bar full, player 1's Select: the meter's last call combo 3 / side 0 / result 1, the runner played
 combo 3); 10 Piccolo & Hercule (damage B 0); 11 Hercule & Gohan on the father-son table (damage A 0, Gohan's beam);
-12 every combo once (reason 1 each); 13 player 1 at 30 HP under the opponents' combo: reason 2, the revive takes the
+12 every combo once (reason 1 each; 360 frames each since the tuned tables: here Goku & Vegeta's bodies play every table, and the game slows down by up to a fifth in some of them, so Cell & Cell Jr.'s 276 frames once overran 300); 13 player 1 at 30 HP under the opponents' combo: reason 2, the revive takes the
 KO, the fight goes on (phase 4). Pass: every `stepz` reached, no CRASH, the numbers as the echoes say. The same script
 on a build without the runner (the weak default) shows the "before": nothing stops, the opponents keep fighting.
 Run 2026-10-31: `build/crun/hl/` (after) and `build/crun/base/hl/` (before), not committed.
+
+## Team combos: the tuned eight (headless, branch `tny-combo-tune`, 2026-10-31)
+
+```
+make BUILD=build/ctune DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/ctune/log2-coop.gba --out build/ctune/hl
+python tools/headless/st_test.py tools/headless/tny_combo_tune.txt build/ctune/log2-coop.gba build/ctune/hl/menu.ss --out build/ctune/hl --cols 8
+```
+
+`tools/headless/tny_combo_tune.txt` (`docs/tournament.md` 25.3), about 35 s: every combo plays once, filmed with a shot
+every 8 frames (`TAG_start`, `TAG_00`..`TAG_36`, `TAG_after` one second after the end), and prints its damage. Tags:
+`gk` Gohan & Krillin, `ph` Piccolo & Hercule, `gp` Goku & Piccolo, `fs` Goku & Gohan, `hs` Hercule & Super Saiyan 2
+Gohan (slot 8 poked into the party first, as `ssj2_join` would: row 28, flags 0x7F), `gv` Goku & Vegeta: the players'
+pair (test command 25's picks) on the first Rookie opponent, side 0; `fc` Frieza & Cooler, `bp` Broly & Paragus, `mc`
+Mecha Frieza & King Cold, `cj` Perfect Cell & Cell Jr., `gn` Spopovich & Yamu (the generic barrage): spawned by test
+command 26 on the ring map outside a tournament (as `tny_combo_run.txt` part 4) and run on player 1, side 1. Every
+attacker's combat bytes are poked to 0x30 (players: their entry's STR / POW 0x3000 too) so the damage lines compare
+the tables: the `0203eac0` line is the target's HP before / after, `0203eac8` fighter 0's / 1's damage; `0203eab4`
+ends in reason 1 (played out) for each; the two `0203eab8` lines are the game's frame counter at the start and at the combo's last frame: their difference against the frames played (`0203eabc`'s second number) is the slowdown (2026-10-31: 0 to 7 %, the most in Goku & Piccolo and the generic barrage). The table of the 2026-10-31 run is `docs/tournament-combos.md` section 2. For
+one sheet per combo, tile `TAG_start`, `TAG_NN` and `TAG_after` (`tools/headless/st_shots.py SHEET TAG_*.ppm --cols
+8`). Pass: every `stepz` reached, no CRASH, reason 1 everywhere, Hercule's damage 0 in `ph` (B) and `hs` (A). Run
+2026-10-31: `build/ctune/after/` (the tuned tables, sheets `sheet_TAG.png`) against `build/ctune/before/` (the first
+drafts on the runner as merged; `hs` did not start there: its first version did not put Super Saiyan 2 Gohan in the
+party), not committed.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 

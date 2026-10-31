@@ -1,0 +1,1608 @@
+# Team combos as tuned (docs/tournament.md 25.3, docs/testing.md "Team combos: the tuned eight"). Generated (a shot every
+# 8 frames per combo); edit directly. From a debug-menu savestate of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_combo_tune.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+# Each combo once, filmed (tag_NN), with every attacker's combat bytes at 0x30 (players: their party entry's STR / POW
+# 0x3000 too), so the damage lines compare the tables: the players' pairs on the same Rookie opponent (kit 0, HP
+# 30000), the villains' on player 1 (HP 9000). Pass: every stepz reached, no CRASH, each combo reason 1 (played out).
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD08 23
+frames 10
+save ct_setup.ss
+echo == gk: Gohan and Krillin: Disc and Masenko
+load ct_setup.ss
+frames 2
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3332
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f016 0x3000
+poke16 0x203f018 0x3000
+poke16 0x203f0be 0x3000
+poke16 0x203f0c0 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot gk_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot gk_00
+frames 8
+shot gk_01
+frames 8
+shot gk_02
+frames 8
+shot gk_03
+frames 8
+shot gk_04
+frames 8
+shot gk_05
+frames 8
+shot gk_06
+frames 8
+shot gk_07
+frames 8
+shot gk_08
+frames 8
+shot gk_09
+frames 8
+shot gk_10
+frames 8
+shot gk_11
+frames 8
+shot gk_12
+frames 8
+shot gk_13
+frames 8
+shot gk_14
+frames 8
+shot gk_15
+frames 8
+shot gk_16
+frames 8
+shot gk_17
+frames 8
+shot gk_18
+frames 8
+shot gk_19
+frames 8
+shot gk_20
+frames 8
+shot gk_21
+frames 8
+shot gk_22
+frames 8
+shot gk_23
+frames 8
+shot gk_24
+frames 8
+shot gk_25
+frames 8
+shot gk_26
+frames 8
+shot gk_27
+frames 8
+shot gk_28
+frames 8
+shot gk_29
+frames 8
+shot gk_30
+frames 8
+shot gk_31
+frames 8
+shot gk_32
+frames 8
+shot gk_33
+frames 8
+shot gk_34
+frames 8
+shot gk_35
+frames 8
+shot gk_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- gk damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot gk_after
+echo == ph: Piccolo and Hercule: Special Beam Dynamite (Hercule's damage 0)
+load ct_setup.ss
+frames 2
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3834
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f032 0x3000
+poke16 0x203f034 0x3000
+poke16 0x203f0a2 0x3000
+poke16 0x203f0a4 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot ph_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot ph_00
+frames 8
+shot ph_01
+frames 8
+shot ph_02
+frames 8
+shot ph_03
+frames 8
+shot ph_04
+frames 8
+shot ph_05
+frames 8
+shot ph_06
+frames 8
+shot ph_07
+frames 8
+shot ph_08
+frames 8
+shot ph_09
+frames 8
+shot ph_10
+frames 8
+shot ph_11
+frames 8
+shot ph_12
+frames 8
+shot ph_13
+frames 8
+shot ph_14
+frames 8
+shot ph_15
+frames 8
+shot ph_16
+frames 8
+shot ph_17
+frames 8
+shot ph_18
+frames 8
+shot ph_19
+frames 8
+shot ph_20
+frames 8
+shot ph_21
+frames 8
+shot ph_22
+frames 8
+shot ph_23
+frames 8
+shot ph_24
+frames 8
+shot ph_25
+frames 8
+shot ph_26
+frames 8
+shot ph_27
+frames 8
+shot ph_28
+frames 8
+shot ph_29
+frames 8
+shot ph_30
+frames 8
+shot ph_31
+frames 8
+shot ph_32
+frames 8
+shot ph_33
+frames 8
+shot ph_34
+frames 8
+shot ph_35
+frames 8
+shot ph_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- ph damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot ph_after
+echo == gp: Goku and Piccolo: Special Beam Cannon through Goku's hold
+load ct_setup.ss
+frames 2
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3437
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f086 0x3000
+poke16 0x203f088 0x3000
+poke16 0x203f032 0x3000
+poke16 0x203f034 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot gp_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot gp_00
+frames 8
+shot gp_01
+frames 8
+shot gp_02
+frames 8
+shot gp_03
+frames 8
+shot gp_04
+frames 8
+shot gp_05
+frames 8
+shot gp_06
+frames 8
+shot gp_07
+frames 8
+shot gp_08
+frames 8
+shot gp_09
+frames 8
+shot gp_10
+frames 8
+shot gp_11
+frames 8
+shot gp_12
+frames 8
+shot gp_13
+frames 8
+shot gp_14
+frames 8
+shot gp_15
+frames 8
+shot gp_16
+frames 8
+shot gp_17
+frames 8
+shot gp_18
+frames 8
+shot gp_19
+frames 8
+shot gp_20
+frames 8
+shot gp_21
+frames 8
+shot gp_22
+frames 8
+shot gp_23
+frames 8
+shot gp_24
+frames 8
+shot gp_25
+frames 8
+shot gp_26
+frames 8
+shot gp_27
+frames 8
+shot gp_28
+frames 8
+shot gp_29
+frames 8
+shot gp_30
+frames 8
+shot gp_31
+frames 8
+shot gp_32
+frames 8
+shot gp_33
+frames 8
+shot gp_34
+frames 8
+shot gp_35
+frames 8
+shot gp_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- gp damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot gp_after
+echo == fs: Goku and Gohan: the father-son Kamehameha
+load ct_setup.ss
+frames 2
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3237
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f086 0x3000
+poke16 0x203f088 0x3000
+poke16 0x203f016 0x3000
+poke16 0x203f018 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot fs_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot fs_00
+frames 8
+shot fs_01
+frames 8
+shot fs_02
+frames 8
+shot fs_03
+frames 8
+shot fs_04
+frames 8
+shot fs_05
+frames 8
+shot fs_06
+frames 8
+shot fs_07
+frames 8
+shot fs_08
+frames 8
+shot fs_09
+frames 8
+shot fs_10
+frames 8
+shot fs_11
+frames 8
+shot fs_12
+frames 8
+shot fs_13
+frames 8
+shot fs_14
+frames 8
+shot fs_15
+frames 8
+shot fs_16
+frames 8
+shot fs_17
+frames 8
+shot fs_18
+frames 8
+shot fs_19
+frames 8
+shot fs_20
+frames 8
+shot fs_21
+frames 8
+shot fs_22
+frames 8
+shot fs_23
+frames 8
+shot fs_24
+frames 8
+shot fs_25
+frames 8
+shot fs_26
+frames 8
+shot fs_27
+frames 8
+shot fs_28
+frames 8
+shot fs_29
+frames 8
+shot fs_30
+frames 8
+shot fs_31
+frames 8
+shot fs_32
+frames 8
+shot fs_33
+frames 8
+shot fs_34
+frames 8
+shot fs_35
+frames 8
+shot fs_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- fs damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot fs_after
+echo == hs: Hercule and Super Saiyan 2 Gohan: the father-son Kamehameha (Hercule's damage 0)
+load ct_setup.ss
+frames 2
+echo -- Super Saiyan 2 Gohan joins (slot 8, as ssj2_join: row 28, flags 0x7F) so he can be picked
+poke32 0x203f0ec 0xbb80bb8
+poke32 0x203f0f0 0x12c012c
+poke32 0x203f0f4 0x3000001c
+poke32 0x203f0f8 0x30003000
+poke32 0x203f0fc 0x10000
+poke32 0x203f100 0x7f
+poke32 0x203f104 0x2170403
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3a38
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f0a2 0x3000
+poke16 0x203f0a4 0x3000
+poke16 0x203f0f6 0x3000
+poke16 0x203f0f8 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot hs_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot hs_00
+frames 8
+shot hs_01
+frames 8
+shot hs_02
+frames 8
+shot hs_03
+frames 8
+shot hs_04
+frames 8
+shot hs_05
+frames 8
+shot hs_06
+frames 8
+shot hs_07
+frames 8
+shot hs_08
+frames 8
+shot hs_09
+frames 8
+shot hs_10
+frames 8
+shot hs_11
+frames 8
+shot hs_12
+frames 8
+shot hs_13
+frames 8
+shot hs_14
+frames 8
+shot hs_15
+frames 8
+shot hs_16
+frames 8
+shot hs_17
+frames 8
+shot hs_18
+frames 8
+shot hs_19
+frames 8
+shot hs_20
+frames 8
+shot hs_21
+frames 8
+shot hs_22
+frames 8
+shot hs_23
+frames 8
+shot hs_24
+frames 8
+shot hs_25
+frames 8
+shot hs_26
+frames 8
+shot hs_27
+frames 8
+shot hs_28
+frames 8
+shot hs_29
+frames 8
+shot hs_30
+frames 8
+shot hs_31
+frames 8
+shot hs_32
+frames 8
+shot hs_33
+frames 8
+shot hs_34
+frames 8
+shot hs_35
+frames 8
+shot hs_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- hs damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot hs_after
+echo == gv: Goku and Vegeta (the finished one, for the damage table)
+load ct_setup.ss
+frames 2
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD54 0x3537
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 20
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke32 0x0203FD0C 0x3000000
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x3000100
+poke32 0x0203FD54 0xbb8
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x2000000
+poke32 0x0203FD54 0x7530
+poke32 0x0203FD08 27
+frames 10
+echo -- the picks' party slots (eng+0x0E)
+peek8 0x0203EC0E 2
+poke16 0x203f086 0x3000
+poke16 0x203f088 0x3000
+poke16 0x203f04e 0x3000
+poke16 0x203f050 0x3000
+frames 4
+poke8 pa+0x160 0x30
+poke8 pa+0x161 0x30
+poke8 pb+0x160 0x30
+poke8 pb+0x161 0x30
+frames 2
+echo -- combat bytes: player 1, player 2 (0x30 0x30 each); the target's defence
+peek8 pa+0x160 2
+peek8 pb+0x160 2
+peek8 e0+0x162 1
+shot gv_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 2
+poke32 0x0203FD0C 0x100ff
+poke32 0x0203FD54 0x2
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot gv_00
+frames 8
+shot gv_01
+frames 8
+shot gv_02
+frames 8
+shot gv_03
+frames 8
+shot gv_04
+frames 8
+shot gv_05
+frames 8
+shot gv_06
+frames 8
+shot gv_07
+frames 8
+shot gv_08
+frames 8
+shot gv_09
+frames 8
+shot gv_10
+frames 8
+shot gv_11
+frames 8
+shot gv_12
+frames 8
+shot gv_13
+frames 8
+shot gv_14
+frames 8
+shot gv_15
+frames 8
+shot gv_16
+frames 8
+shot gv_17
+frames 8
+shot gv_18
+frames 8
+shot gv_19
+frames 8
+shot gv_20
+frames 8
+shot gv_21
+frames 8
+shot gv_22
+frames 8
+shot gv_23
+frames 8
+shot gv_24
+frames 8
+shot gv_25
+frames 8
+shot gv_26
+frames 8
+shot gv_27
+frames 8
+shot gv_28
+frames 8
+shot gv_29
+frames 8
+shot gv_30
+frames 8
+shot gv_31
+frames 8
+shot gv_32
+frames 8
+shot gv_33
+frames 8
+shot gv_34
+frames 8
+shot gv_35
+frames 8
+shot gv_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- gv damage: the target's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot gv_after
+echo == fc: Frieza and Cooler on player 1: Death Beam Supernova
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40002
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60717
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+shot fc_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot fc_00
+frames 8
+shot fc_01
+frames 8
+shot fc_02
+frames 8
+shot fc_03
+frames 8
+shot fc_04
+frames 8
+shot fc_05
+frames 8
+shot fc_06
+frames 8
+shot fc_07
+frames 8
+shot fc_08
+frames 8
+shot fc_09
+frames 8
+shot fc_10
+frames 8
+shot fc_11
+frames 8
+shot fc_12
+frames 8
+shot fc_13
+frames 8
+shot fc_14
+frames 8
+shot fc_15
+frames 8
+shot fc_16
+frames 8
+shot fc_17
+frames 8
+shot fc_18
+frames 8
+shot fc_19
+frames 8
+shot fc_20
+frames 8
+shot fc_21
+frames 8
+shot fc_22
+frames 8
+shot fc_23
+frames 8
+shot fc_24
+frames 8
+shot fc_25
+frames 8
+shot fc_26
+frames 8
+shot fc_27
+frames 8
+shot fc_28
+frames 8
+shot fc_29
+frames 8
+shot fc_30
+frames 8
+shot fc_31
+frames 8
+shot fc_32
+frames 8
+shot fc_33
+frames 8
+shot fc_34
+frames 8
+shot fc_35
+frames 8
+shot fc_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- fc damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot fc_after
+echo == bp: Broly and Paragus on player 1: Eraser Cannon
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40019
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x6071a
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+shot bp_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot bp_00
+frames 8
+shot bp_01
+frames 8
+shot bp_02
+frames 8
+shot bp_03
+frames 8
+shot bp_04
+frames 8
+shot bp_05
+frames 8
+shot bp_06
+frames 8
+shot bp_07
+frames 8
+shot bp_08
+frames 8
+shot bp_09
+frames 8
+shot bp_10
+frames 8
+shot bp_11
+frames 8
+shot bp_12
+frames 8
+shot bp_13
+frames 8
+shot bp_14
+frames 8
+shot bp_15
+frames 8
+shot bp_16
+frames 8
+shot bp_17
+frames 8
+shot bp_18
+frames 8
+shot bp_19
+frames 8
+shot bp_20
+frames 8
+shot bp_21
+frames 8
+shot bp_22
+frames 8
+shot bp_23
+frames 8
+shot bp_24
+frames 8
+shot bp_25
+frames 8
+shot bp_26
+frames 8
+shot bp_27
+frames 8
+shot bp_28
+frames 8
+shot bp_29
+frames 8
+shot bp_30
+frames 8
+shot bp_31
+frames 8
+shot bp_32
+frames 8
+shot bp_33
+frames 8
+shot bp_34
+frames 8
+shot bp_35
+frames 8
+shot bp_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- bp damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot bp_after
+echo == mc: Mecha Frieza and King Cold on player 1: Father and Son
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40003
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60704
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+shot mc_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot mc_00
+frames 8
+shot mc_01
+frames 8
+shot mc_02
+frames 8
+shot mc_03
+frames 8
+shot mc_04
+frames 8
+shot mc_05
+frames 8
+shot mc_06
+frames 8
+shot mc_07
+frames 8
+shot mc_08
+frames 8
+shot mc_09
+frames 8
+shot mc_10
+frames 8
+shot mc_11
+frames 8
+shot mc_12
+frames 8
+shot mc_13
+frames 8
+shot mc_14
+frames 8
+shot mc_15
+frames 8
+shot mc_16
+frames 8
+shot mc_17
+frames 8
+shot mc_18
+frames 8
+shot mc_19
+frames 8
+shot mc_20
+frames 8
+shot mc_21
+frames 8
+shot mc_22
+frames 8
+shot mc_23
+frames 8
+shot mc_24
+frames 8
+shot mc_25
+frames 8
+shot mc_26
+frames 8
+shot mc_27
+frames 8
+shot mc_28
+frames 8
+shot mc_29
+frames 8
+shot mc_30
+frames 8
+shot mc_31
+frames 8
+shot mc_32
+frames 8
+shot mc_33
+frames 8
+shot mc_34
+frames 8
+shot mc_35
+frames 8
+shot mc_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- mc damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot mc_after
+echo == cj: Perfect Cell and Cell Jr. on player 1: Perfect Kamehameha
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40015
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60716
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+shot cj_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot cj_00
+frames 8
+shot cj_01
+frames 8
+shot cj_02
+frames 8
+shot cj_03
+frames 8
+shot cj_04
+frames 8
+shot cj_05
+frames 8
+shot cj_06
+frames 8
+shot cj_07
+frames 8
+shot cj_08
+frames 8
+shot cj_09
+frames 8
+shot cj_10
+frames 8
+shot cj_11
+frames 8
+shot cj_12
+frames 8
+shot cj_13
+frames 8
+shot cj_14
+frames 8
+shot cj_15
+frames 8
+shot cj_16
+frames 8
+shot cj_17
+frames 8
+shot cj_18
+frames 8
+shot cj_19
+frames 8
+shot cj_20
+frames 8
+shot cj_21
+frames 8
+shot cj_22
+frames 8
+shot cj_23
+frames 8
+shot cj_24
+frames 8
+shot cj_25
+frames 8
+shot cj_26
+frames 8
+shot cj_27
+frames 8
+shot cj_28
+frames 8
+shot cj_29
+frames 8
+shot cj_30
+frames 8
+shot cj_31
+frames 8
+shot cj_32
+frames 8
+shot cj_33
+frames 8
+shot cj_34
+frames 8
+shot cj_35
+frames 8
+shot cj_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- cj damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot cj_after
+echo == gn: Spopovich and Yamu on player 1: the generic barrage (for the damage table)
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40008
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60709
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+shot gn_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+shot gn_00
+frames 8
+shot gn_01
+frames 8
+shot gn_02
+frames 8
+shot gn_03
+frames 8
+shot gn_04
+frames 8
+shot gn_05
+frames 8
+shot gn_06
+frames 8
+shot gn_07
+frames 8
+shot gn_08
+frames 8
+shot gn_09
+frames 8
+shot gn_10
+frames 8
+shot gn_11
+frames 8
+shot gn_12
+frames 8
+shot gn_13
+frames 8
+shot gn_14
+frames 8
+shot gn_15
+frames 8
+shot gn_16
+frames 8
+shot gn_17
+frames 8
+shot gn_18
+frames 8
+shot gn_19
+frames 8
+shot gn_20
+frames 8
+shot gn_21
+frames 8
+shot gn_22
+frames 8
+shot gn_23
+frames 8
+shot gn_24
+frames 8
+shot gn_25
+frames 8
+shot gn_26
+frames 8
+shot gn_27
+frames 8
+shot gn_28
+frames 8
+shot gn_29
+frames 8
+shot gn_30
+frames 8
+shot gn_31
+frames 8
+shot gn_32
+frames 8
+shot gn_33
+frames 8
+shot gn_34
+frames 8
+shot gn_35
+frames 8
+shot gn_36
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- gn damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40
+shot gn_after

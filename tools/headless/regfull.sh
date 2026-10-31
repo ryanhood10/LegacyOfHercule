@@ -13,7 +13,7 @@ run() { echo "## $1" >> "$LOG"; python tools/headless/st_test.py "$2" "$ROM" "$O
 for t in a16_moves tny_eggs tny_crowd tny_npcs tny_polish tny_engine tny_ui tny_moves tny_rumble tny_play tny_artnew \
          tny_artbuu tny_grounds cell_games cell_games_1p arctic_summit postgame ch9_gero p2_special revive difficulty \
          journal dropout ch1_room_forest scene_actor exp_credit a16_gone broly_ride duel_end tny_hpbars tny_fightfix \
-         tny_nomirror tny_talk tny_combo_draw tny_combo_meter tny_combo_run; do
+         tny_nomirror tny_talk tny_combo_draw tny_combo_meter tny_combo_run tny_combo_tune; do
   run $t tools/headless/$t.txt
 done
 for t in arctic_summit postgame ch9_gero; do
