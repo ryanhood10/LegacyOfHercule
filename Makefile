@@ -78,7 +78,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o $(BUILD)/obj/tny_combo_data.o
 
 SSJ_TEST ?= 0
 
@@ -250,6 +250,15 @@ $(BUILD)/gen/tny_talk_data.c: tools/tnytalk.py docs/tournament-dialogue.md src/c
 	$(PYTHON) tools/tnytalk.py docs/tournament-dialogue.md src/coop/tourney_data.c $@
 
 $(BUILD)/obj/tny_talk_data.o: $(BUILD)/gen/tny_talk_data.c src/coop/rom.h src/coop/tourney.h src/coop/tny_talk.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# the team combos' step tables, from Ryan's doc (docs/tournament-combos.md; tools/tnycombo.py)
+$(BUILD)/gen/tny_combo_data.c: tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $@
+
+$(BUILD)/obj/tny_combo_data.o: $(BUILD)/gen/tny_combo_data.c src/coop/rom.h src/coop/tourney.h src/coop/tny_combo.h src/coop/tny_combo_run.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
