@@ -1349,8 +1349,8 @@ partner on the floor.
 Dropped by Ryan: Vegeta & Trunks, Krillin & 18, Tien & Chiaotzu, Goten & Kid Trunks, Hercule & Videl, Gohan & Videl,
 Pui Pui & Yakon ("not special enough"). More pairs are one step table each once the runner exists.
 
-**Still to settle:** whether an AI pair's combo has a tell (half a second of charging a good player can dash out of)
-or just lands.
+- **No tell before an AI pair's combo** (Ryan, 2026-10-31): when their bar is full and both are in reach of a player,
+  it just lands.
 
 **Size:** big. The trigger and the frozen-fight scene runner is about a day. The generic combo is half a day. Each
 pair's own combo is an hour or two of step tables and testing once the runner exists. Test: a headless script that

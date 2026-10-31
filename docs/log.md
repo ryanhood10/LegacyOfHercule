@@ -7,7 +7,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - **Team combos decided** (`docs/tournament.md` 24.10): a meter under the HP panels (full at the start, 90 s
   cooldown, one button fires it), damage as a multiplier of the attackers' moves, listed pairs only (six hero pairs,
   six villain entries), the AI combos back with a looser trigger, Rumble on, known opponent pairs drawn together.
-  Open: a tell before an AI combo. Ryan is play-testing the 2026-10-25 build meanwhile.
+  No tell before an AI combo. Nothing open; it is the next build. Ryan is play-testing the 2026-10-25 build meanwhile.
 
 ## 2026-10-25
 
