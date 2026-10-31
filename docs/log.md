@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-31
 
+- **Team combos started (lead):** the contract `src/coop/tny_combo.h`, the pair table (`tny_combo.c`, Ryan's picks),
+  `comboram` (0x0203EA00, 0x200 bytes; the heap cap lowered to 0xF87E words), test commands 32 / 33 for the meter
+  and the runner, and the draw: known pairs share a 2 v 2 team, a Rumble pack, and the headliner brings his partner
+  (Broly with Paragus) (`tools/headless/tny_combo_draw.txt`).
 - **Team combos decided** (`docs/tournament.md` 24.10): a meter under the HP panels (full at the start, 90 s
   cooldown, one button fires it), damage as a multiplier of the attackers' moves, listed pairs only (six hero pairs,
   six villain entries), the AI combos back with a looser trigger, Rumble on, known opponent pairs drawn together.

@@ -101,8 +101,10 @@ ENTRY_JUMPS = [
 # overlap coop2's magic word at 0x0203FB00; nothing wrote them, so it never showed.)
 # Since 2026-10-25 the cap ends at 0x0203EC00 instead, below the tournament team's `tourneyram` region (0x400
 # bytes, coop.ld): (0x0203EC00 - 0x02000808) / 4 = 0xF8FE words.
+# Since 2026-10-31 it ends at 0x0203EA00, below the team combos' `comboram` (0x200 bytes): (0x0203EA00 - 0x02000808) / 4
+# = 0xF87E words.
 WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000F8FE),
+    (0x01F20C, 0x0000FDFE, 0x0000F87E),
 ]
 
 # The 27 pointer words that hold the party block's address (g_PartyState, 0x03000E90): the static

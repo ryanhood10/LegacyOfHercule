@@ -463,7 +463,7 @@ void coop_debug_tick(void) {
     u32 cmd = coop2.cmd;
     if (!cmd) return;
     coop2.cmd = 0;
-    if (cmd >= 21 && cmd <= 31) {          // the tournament team's test commands (tourney_hooks.c)
+    if (cmd >= 21 && cmd <= 33) {          // the tournament team's test commands (tourney_hooks.c)
         tny_test_cmd(cmd, coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == COOP_CMD_SPAWN_SCRIPT) {
         Map_SpawnScript(g_MapState, (int)coop2.cmd_arg);

@@ -1283,32 +1283,7 @@ partner on the floor.
 - Each pair's identity: the players' picks (`eng.pick[]`) and the 2 v 2 team table (`tny_talk_teams`, dialogue
   plan section 7) as the starting list of pairs.
 
-**Plan (to refine with Ryan):**
-1. **Trigger:** each opponent remembers the last hit time from each player. When both players land hits on the same
-   opponent within a short window (for example 3 hits each within 90 frames), and this pair has a combo, it fires. A
-   cooldown (for example once per fight, or once per 30 s) keeps it special. Open with Ryan: a fixed hit count, a
-   meter that fills, or a button press when the prompt shows.
-2. **The pair list:** a table in `tny_moves.c` (or generated like the dialogue, from a doc table Ryan can edit):
-   pair -> combo id. A first cut from the anime and the dialogue teams: Goku & Vegeta, Goku & Gohan, Goku & Krillin,
-   Goku & Piccolo, Gohan & Piccolo, Gohan & Videl, Krillin & 18, Krillin & Yamcha, Tien & Chiaotzu, Tien & Yamcha,
-   Vegeta & Trunks, Goten & Kid Trunks, 17 & 18, Hercule & Videl, Hercule & Fat Buu, Great Saiyaman & Videl.
-   **A generic combo** for any other pair, so every team has one.
-3. **The cinematic (a scripted sequence in C, about 2-3 s):**
-   - the fight frozen (AI and pads off);
-   - both fighters dash in from their sides of the target;
-   - alternate strikes using poses they already have (melee groups 7 / 8, the dash 13, the special melee 16, the beam
-     poses 18 / 19);
-   - a finisher: a joint beam, a double kick that launches him, a ki volley, with shake, flashes and the hit sparks;
-   - a caption naming the move (24.1's caption);
-   - the target takes the combo's damage and lands knocked down where the animation ends;
-   - control returns.
-   Each combo is a short table of steps (who moves where, which pose for how many frames, when the damage lands), so a
-   new pair's combo is data, not code.
-4. **Positions after:** nobody snaps back; the players end where their last step put them, inside the ring's walls
-   (the steps clamp to the floor, the way the knock-back's wall slide does).
-5. **Names and moves per pair:** Ryan decides (for example Goku & Vegeta's joint beam, Tien & Chiaotzu's
-   psychic-hold-then-Tri-Beam, Goten & Trunks's trading-places rush, 17 & 18's double barrier slam). Planned with him
-   like the dialogue: a doc table first, built after he says the plan is done.
+**How it works** is what was decided below; section 25 describes what was built.
 
 **Decided with Ryan (2026-10-31):**
 
@@ -1356,3 +1331,22 @@ Pui Pui & Yakon ("not special enough"). More pairs are one step table each once 
 pair's own combo is an hour or two of step tables and testing once the runner exists. Test: a headless script that
 makes both players hit one opponent (test command 27's punch routine for player 1, the pad for player 2), checks the
 combo fires once, films it, and checks the positions and HP after.
+
+## 25. Team combos (built 2026-10-31, a three-piece team; the design is 24.10)
+
+Contract: `src/coop/tny_combo.h` (lead). Pieces, each on its own branch and worktree, merged by the lead:
+
+| piece | branch | files | owns |
+|---|---|---|---|
+| lead | main | `tny_combo.c`, `tny_combo.h`, the hooks (`tourney_hooks.c`, `hud.c`), `comboram` (`coop.ld`, the heap cap in `patch_rom.py`), the draw (known opponent pairs together, `tny_engine.c`) | the pair table: `tny_combo_of`, `tny_combo_lead` |
+| meter | `tny-combo-meter` | `tny_combo_meter.c` | the shared-hit tracking, the bars under the HP panels, full at a fight's start, the 90 s cooldown, the button, the AI pairs' looser trigger, `tny_caption` (a line that never pauses) |
+| runner | `tny-combo-run` | `tny_combo_run.c`, `tools/tnycombo.py`, `docs/tournament-combos.md` | the frozen fight, the step-table interpreter, damage from the attackers' stats, the knockdown, the combos' step tables (Ryan's doc is their data, as the dialogue's is) |
+
+RAM `comboram` 0x0203EA00 (0x200): `.combo.meter`, `.combo.cap`, `.combo.run`. Test commands 32 (meter), 33 (runner).
+Each piece adds its own subsection here (25.1 meter, 25.2 runner, 25.3 the combos as built).
+
+**The draw (lead):** a 2 v 2 draw puts a fighter's combo partner in the seat beside him (`pair_up`: pool places two at
+a time, the first seat's partner else the second's), a Rumble pack takes a drawn fighter's partner when there is room
+(`add_partner`), and a headliner's partner is his first helper (Broly brings Paragus, King Cold Mecha Frieza). Test:
+`tools/headless/tny_combo_draw.txt` (a Champion Rumble: Cell & Cell Jr., android pairs, Broly with Paragus and Frieza;
+three co-op Champion 2 v 2 draws: every opponent team a known pair).

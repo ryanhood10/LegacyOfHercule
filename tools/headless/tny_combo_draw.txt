@@ -1,0 +1,97 @@
+# Known combo pairs drawn together (docs/tournament.md 24.10 / 25: tny_engine.c pair_up, add_partner, the headliner's
+# partner). Every tier forced open, every fighter's story flag ignored. Part 1: a Champion Royal Rumble played
+# through by test command 22 to its headliner round: eng +0x18 nopp, +0x19 nwait, +0x1A opp_id[6]; expect Broly
+# (0x19) with Paragus (0x1A) among his helpers (pool permitting). Part 2: co-op Champion 2 v 2 with three seeds: the
+# bracket's seats (eng +0x6C: size, rounds, round, match, seat[8]); a team is seats 2u, 2u + 1; expect a combo pair
+# (Frieza 02 / Cooler 17, Mecha Frieza 03 / King Cold 04, Perfect Cell 15 / Cell Jr 16, Broly 19 / Paragus 1A, the
+# androids 0d 0e 0f 10 11, Spopovich 08 / Yamu 09) sitting as one team when both were drawn.
+# Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_combo_draw.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 1
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+save cd_setup.ss
+echo == 1. Champion Rumble (seed 5): every regular round won by command 22, then the headliner round's ids
+poke32 0x0203FD0C 5
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x302
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC18 8
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC18 8
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC18 8
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC18 8
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+echo -- the headliner round: expect 19 (Broly) last, 1a (Paragus) among the helpers
+peek8 0x0203EC18 8
+shot cd_headliner
+echo == 2. co-op Champion 2 v 2, seed 3: seats
+load cd_setup.ss
+frames 2
+p2 0
+frames 400
+poke32 0x0203FD0C 3
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x301
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 12
+peek8 0x0203ECA0 2
+echo == 2b. seed 9
+load cd_setup.ss
+frames 2
+p2 0
+frames 400
+poke32 0x0203FD0C 9
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x301
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 12
+peek8 0x0203ECA0 2
+echo == 2c. seed 21
+load cd_setup.ss
+frames 2
+p2 0
+frames 400
+poke32 0x0203FD0C 21
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x301
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC6C 12
+peek8 0x0203ECA0 2

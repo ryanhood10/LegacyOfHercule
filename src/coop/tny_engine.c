@@ -19,6 +19,7 @@
 // A map change away from the ring (a game over, a reload) drops the tournament: entries are restored only while
 // the same game is still running (player 1 present), never into a freshly loaded party.
 #include "tny_engine.h"
+#include "tny_combo.h"
 #include "revive.h"
 #include "super13.h"
 #include "difficulty.h"
@@ -353,6 +354,19 @@ int tny_in_pool(int id) {
 static int picked(int id) {
     for (int k = 0; k < eng.players && k < 2; k++) if (eng.pick[k] == id) return 1;
     return 0;
+}
+// Known pairs drawn together (Ryan, 2026-10-31: a team combo needs its pair on one side; docs/tournament.md 24.10):
+// in a 2 v 2 draw a fighter's combo partner in the pool takes the seat beside him (the team), in pool order from the
+// front, two at a time (a team is two consecutive pool places)
+static void pair_up(u8 *pool, int n) {
+    for (int i = 0; i + 1 < n; i += 2) {
+        if (tny_combo_of(pool[i], pool[i + 1]) >= 0) continue;
+        int j = i + 2;
+        while (j < n && tny_combo_of(pool[i], pool[j]) < 0) j++;
+        if (j < n) { u8 t = pool[i + 1]; pool[i + 1] = pool[j]; pool[j] = t; continue; }
+        for (j = i + 2; j < n && tny_combo_of(pool[i + 1], pool[j]) < 0; j++) {}   // the second seat's partner instead
+        if (j < n) { u8 t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+    }
 }
 // The pool of a tier: everyone in the pool whose own tier is at or below it, but the players' picks
 static int pool_of(int tier, u8 *out) {
@@ -1234,6 +1248,17 @@ int tny_ring_active(void) {
 }
 // a fight runs (the overhead HP bars show only then: not over the walk-in, the lines or the end's poses)
 int tny_fight_on(void) { return tny_ring_active() && eng.phase == P_MATCH; }
+static Entity *floor_p2(void);
+// The players on the ring's floor in a fight (team combos, tny_combo.h): count, their picks and their bodies
+int tny_floor_picks(u8 *ids, Entity **ents) {
+    if (!tny_fight_on()) return 0;
+    int n = 0;
+    Entity *p2 = floor_p2();
+    if (eng.fighter != 1 && g_PlayerObject) { ids[n] = eng.pick[eng.fighter == 2 ? 0 : eng.fighter]; ents[n++] = g_PlayerObject; }
+    else if (eng.fighter == 1 && g_PlayerObject) { ids[n] = eng.pick[1]; ents[n++] = g_PlayerObject; }
+    if (p2) { ids[n] = eng.pick[1]; ents[n++] = p2; }
+    return n;
+}
 
 int tny_ko_check(int k, s32 dmg) {
     if (eng.magic != ENG_MAGIC || coop2.duel_active || !tny_ring_active()) return 0;
@@ -1343,6 +1368,7 @@ static void draw_bracket(void) {
         for (; j > 0; j--) pool[j] = pool[j - 1];
         pool[0] = eng.force_opp;
     }
+    if (w == 2) pair_up(pool, n);
     // fill unit by unit so a bye is a whole unit at the end of the draw (a 2 v 2 team is never half empty)
     for (int u = 0; u < nu; u++)
         for (int i = 0; i < w; i++) {
@@ -1378,6 +1404,17 @@ static int is_headliner(int id) {
     return 0;
 }
 
+// A drawn fighter's combo partner joins the same pack when he is in the pool, unused and there is room (24.10)
+static int add_partner(u8 *out, int k, int *slots, int id, const u8 *pool, int n, int giant) {
+    for (int j = 0; j < n && *slots > 0 && k < MAX_OPP; j++) {
+        int p = pool[j];
+        if (used(p) || is_headliner(p) || p == eng.force_opp || tny_combo_of(id, p) < 0) continue;
+        if (weight(p) == 2 && (giant < 0 || *slots < 2)) continue;
+        out[k++] = (u8)p; use(p); *slots -= weight(p);
+        break;
+    }
+    return k;
+}
 // Draw `slots` worth of fighters (a giant counts double) from the pool, none twice in this Rumble
 static int draw_pack(u8 *out, int slots, int giant) {
     u8 pool[TF_GOHAN];
@@ -1396,7 +1433,9 @@ static int draw_pack(u8 *out, int slots, int giant) {
         if (used(id) || is_headliner(id) || id == eng.force_opp) continue;
         if (weight(id) == 2 && (giant < 0 || slots < 2)) continue;
         out[k++] = (u8)id; use(id); slots -= weight(id);
+        k = add_partner(out, k, &slots, id, pool, n, giant);
     }
+    if (giant >= 0 && k == 1) k = add_partner(out, k, &slots, out[0], pool, n, giant);   // the giant's partner (Paragus)
     return k;
 }
 
@@ -1427,7 +1466,16 @@ static void rumble_round(void) {
             if (best >= 0) { ids[n++] = (u8)best; use(best); }
         }
         u8 help[MAX_OPP];
-        int h = draw_pack(help, 3 - n, -1);
+        int h = 0;
+        if (n == 1) {                               // his combo partner first, when the pool has him (24.10)
+            u8 pool[TF_GOHAN];
+            int np = pool_of(eng.tier, pool);
+            for (int i = 0; i < np && !h; i++)
+                if (!used(pool[i]) && pool[i] != eng.force_opp && tny_combo_of(ids[0], pool[i]) >= 0 && weight(pool[i]) == 1) {
+                    help[h++] = pool[i]; use(pool[i]);
+                }
+        }
+        h += draw_pack(help + h, 3 - n - h, -1);
         // the headliner enters last: helpers first in the list (spawn order)
         u8 all[MAX_OPP];
         int a = 0;

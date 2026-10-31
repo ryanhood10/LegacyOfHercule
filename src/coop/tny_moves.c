@@ -382,6 +382,7 @@ static TKit *kit_of(const Entity *e) {
 // enemies.c: the vtable a kit fighter had (is_coop_enemy, is_enemy keep counting him), 0 for others
 const u32 *tny_moves_base(const Entity *e) { TKit *k = kit_of(e); return k ? k->base : 0; }
 Entity *tny_moves_last_hitter(const Entity *e) { TKit *k = kit_of(e); return k ? k->last_hitter : 0; }
+int tny_moves_fighter(const Entity *e) { TKit *k = kit_of(e); return k ? k->fighter : -1; }
 
 static int base_call9(TKit *k, Entity *e, int msg, u8 *m) {
     const u32 *vt = k->base;

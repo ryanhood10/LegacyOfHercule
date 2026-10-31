@@ -11,7 +11,8 @@ The tournament team (docs/tournament.md "The team") takes numbers only from its 
 `tourney_hooks.c` (weak defaults; dispatch of CoopCall 23-30, test commands 21-30 and the per-frame tick), so no
 piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made `is_coop_enemy` / `is_enemy` in
 `enemies.c` also count a fighter with a kit, through `tny_moves_base()`). RAM: each piece's own `.tny.<name>` section in
-`tourneyram` (0x0203EC00, 0x400 bytes; the heap cap now ends there). ROM: big generated art goes to `rom2`
+`tourneyram` (0x0203EC00, 0x400 bytes); the team combos' sections in `comboram` (0x0203EA00, 0x200 bytes; the heap cap
+now ends there, `patch_rom.py` 0xF87E words). ROM: big generated art goes to `rom2`
 (0x08E00000, 2 MiB) with `TNY_ART` (`.rodata.art`), written by `patch_rom.py --art`.
 
 | piece | flags | stats | sprites | rows | portraits | abilities | CoopCall | test cmds | maps / strings | RAM |
@@ -19,6 +20,9 @@ piece edits `vmcall.c`, `enemies.c` or `input.c` for them (exception: moves made
 | grounds | 441-445 (441, 442 used) | - | NPC crowd reuses stock ids | - | - | - | 30 | 30 | zone 15 areas 11-17 (all used); ui_strings 357-379 (357-359 used) | `.tny.gr` 0x40 (0x24 used) |
 | hpbars (main) | - | - | - | - | - | - | - | - | - | `.tny.hp` 8 |
 | talk (main) | - | - | - | - | - | - | - | 31 | - | `.tny.talk` 0x58 |
+| combo lead (main, 2026-10-31) | - | - | - | - | - | - | - | - | - | the pair table (`tny_combo.c`), `comboram` itself |
+| combo meter (`tny-combo-meter`) | - | - | - | - | - | - | - | 32 | - | `.combo.meter` <= 0x80, `.combo.cap` <= 0x30 |
+| combo runner (`tny-combo-run`) | - | - | - | - | - | - | - | 33 | - | `.combo.run` <= 0x140 |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
@@ -276,6 +280,8 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 24 | TNY_FORCE_POOL (engine) | `arg` = tiers forced open (bits 0-4); `arg2` bit 0 ignore the fighters' story flags, bit 1 a fighter without art fights with Tien's body (121); no story notices while anything is forced |
 | 25 | TNY_START (engine) | a tournament without the director's screens, from where player 1 stands (the way back): `arg` = division \| full << 4 \| tier << 8, `arg2` = player 1's pick \| player 2's << 8 (0xFF = his own character) |
 | 28-29 | the tournament ui (below / `docs/tournament.md` 12) | |
+| 32 | TNY_COMBO_METER (team combos: the meter, `tny_combo_meter.c`) | the meter piece defines its ops (`docs/tournament.md` 25) |
+| 33 | TNY_COMBO_RUN (team combos: the runner, `tny_combo_run.c`) | the runner piece defines its ops (`docs/tournament.md` 25) |
 | 31 | TNY_TALK (dialogue, main) | the fighters' dialogue (`tny_talk.c`): `arg` = the opening side (fighter \| fighter << 8, 0xFF nobody), `arg2` = the answering side; `arg` bit 31: fighter `arg & 0xFF`'s win line instead (`tools/headless/tny_talk.txt`) |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
@@ -344,6 +350,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
 | 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
+| 0x0203EA00 | 0x200 region | `comboram` (team combos, `tny_combo.h`, NOLOAD): `.combo.meter` (<= 0x80), `.combo.cap` (<= 0x30), `.combo.run` (<= 0x140); the heap cap ends here since 2026-10-31 |
 | 0x0203EC00 | 0x21C of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |

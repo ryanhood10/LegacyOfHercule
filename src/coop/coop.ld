@@ -22,7 +22,8 @@ MEMORY
 {
     rom   (rx)  : ORIGIN = 0x08800000, LENGTH = 0x00100000
     rom2  (r)   : ORIGIN = 0x08E00000, LENGTH = 0x00200000   /* big generated art (.rodata.art*): tools/patch_rom.py --art */
-    tourneyram (rw) : ORIGIN = 0x0203EC00, LENGTH = 0x00000400   /* the tournament team's state (tourney.h); the heap cap ends here */
+    comboram (rw) : ORIGIN = 0x0203EA00, LENGTH = 0x00000200     /* the team combos' state (tny_combo.h); the heap cap ends here */
+    tourneyram (rw) : ORIGIN = 0x0203EC00, LENGTH = 0x00000400   /* the tournament team's state (tourney.h) */
     ewram (rw)  : ORIGIN = 0x0203FF00, LENGTH = 0x00000100
     vtram (rw)  : ORIGIN = 0x0203FE00, LENGTH = 0x00000100   /* below the pinned block, above the heap */
     ewram2 (rw) : ORIGIN = 0x0203FB00, LENGTH = 0x00000300   /* co-op difficulty state (enemies.c) */
@@ -78,6 +79,12 @@ SECTIONS
         KEEP(*(.tny.hp))     /* overhead HP bars (8 bytes) */
         KEEP(*(.tny.talk))   /* the fighters' dialogue (tny_talk.c, 0x58) */
     } > tourneyram
+
+    .combo (NOLOAD) : {
+        KEEP(*(.combo.meter))  /* the meter (<= 0x80) */
+        KEEP(*(.combo.cap))    /* the caption (<= 0x30) */
+        KEEP(*(.combo.run))    /* the runner (<= 0x140) */
+    } > comboram
 
     .bss (NOLOAD) : {
         *(.bss*)
