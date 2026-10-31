@@ -209,7 +209,7 @@ static void ai_hit(int id) {
 // Every hit that lands: tny_moves.c kit_message (a player's hit on a kit fighter), the players' take-damage hooks
 // (duel.c player 1, player.c player 2: the attacker word before the hit, a projectile's owner at +0x1C)
 void tny_combo_on_hit(Entity *target, Entity *attacker) {
-    if (!target || !ram_ptr(attacker)) return;
+    if (!target || !ram_ptr(attacker) || tny_combo_busy()) return;   // a combo's own blows fill no bar
     m_init();
     u8 ids[2];
     Entity *ents[2];
