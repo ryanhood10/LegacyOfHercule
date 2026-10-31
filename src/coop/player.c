@@ -247,12 +247,15 @@ static void p2_change_hp(Entity *e, int delta) {
 
 ROM_FN(void, Player_Knockback, (Entity *e, void *hit), 0x0800F833);
 
+void tny_combo_on_hit(Entity *target, Entity *attacker);   // tny_combo_meter.c
+
 // Returns 0 (survived) so OnHit plays the hurt animation. A lethal hit downs player 2 (revive.c); where
 // that does not apply (a duel, no player 1) player 2 gets up at half HP beside player 1 as before.
 static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
     if (companion_active()) return 1;            // the companion takes no hits (companion.c)
+    if (dmg > 0) tny_combo_on_hit(e, *(Entity *const *)(hit - 4));   // team combos (tny_combo.h): the attacker word before the hit
     if (tny_ko_check(1, dmg)) {                  // a tournament fight: 1 HP and out (tny_engine.c)
         Player_Knockback(e, (void *)hit);
         g_Party->chars[coop.p2_slot].hp = 1;
