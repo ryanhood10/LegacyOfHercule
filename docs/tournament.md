@@ -1428,9 +1428,9 @@ on either side. A blast frozen in flight finishes its flight afterwards.
 **The step tables are Ryan's doc.** `docs/tournament-combos.md` section 3 holds one table per combo (`| at | who | does |
 how |`: a frame, A / B / T, a verb such as `dash 18 0 10`, `punch 1 kick`, `beam 6 40`, `knockdown 40 12`); its section
 1 is the format. `tools/tnycombo.py` turns it into `build/gen/tny_combo_data.c` at build time (a Makefile rule like
-`tny_talk_data`'s; `src/coop/tny_combo_run.h` the step layout: 12 bytes, `{at, who, op, a, b, c, d}`); a row that does
+`tny_talk_data`'s; `src/coop/tny_combo_run.h` the step layout: 14 bytes since 25.4, `{at, who, op, a, b, c, d, col}`); a row that does
 not parse stops the build with its line. The pair table stays in `tny_combo.c` (the lead's, used by the draw too); the
-doc's section 4 lists it for reference.
+doc's section 5 lists it for reference.
 
 **The freeze: the game's command modal** (decompiled 2026-10-31). `CommitCommandBatch` (0x0800E038) runs the modal
 0x0800DE20 (vtable 0x08025150: update 0x08004EA8 draws the entity list without updating it, the late update 0x0800DE6E
@@ -1551,9 +1551,67 @@ pairs.
 
 **Test:** `tools/headless/tny_combo_tune.txt` (`docs/testing.md` "Team combos: the tuned eight"), in `regfull.sh`; it also prints each combo's slowdown (the game's frame counter against the frames played: 0 to 7 %).
 
-**Not done:** beam colours: every kit's beam (Death Beam, Masenko, Kamehameha) is the stock Kamehameha object, and so
-are the combos' (only the Special Beam Cannon has its own object); a yellow Masenko or a purple Death Beam would need
-new art. The copies show the source's frame only (a copy cannot pose differently from Cell Jr. himself), and a copy
+**Not done** (beam colours and the screen edge: done in 25.4): every kit's beam (Death Beam, Masenko, Kamehameha) is
+still the stock blue Kamehameha object. The copies show the source's frame only (a copy cannot pose differently from Cell Jr. himself), and a copy
 turned round mirrors his tiles. Spots are fixed distances from the target: on the 240 px screen a fighter 64 px or
 more away on the side where the camera has least room may stand at its edge (the villains' spots were pulled in to 64
 and 56 for that).
+
+### 25.4 The colour pass (2026-10-31, after Ryan's look at the build: "mix up the beam colors ... really really professional")
+
+**What a player sees now** (`docs/tournament-combos.md` sections 3 and 4):
+- Every fighter's energy has its own colour: Goku's ki blue, Gohan's yellow (and his **Masenko a yellow beam**),
+  Piccolo's yellow, Krillin's his own blue ki and yellow-orange Disc; Frieza's Death Beams pink (his last one a pink
+  beam), Cooler's purple and his **Supernova a golden sun**; Paragus's ki yellow and Broly's **Eraser Cannon green**;
+  Mecha Frieza's Death Beams pink and King Cold's red (their last two beams pink and red); Cell's ki yellow. The
+  Kamehamehas (Goku, Gohan, Cell) stay the game's blue, the Special Beam Cannon its own yellow and violet; the generic
+  barrage keeps the red orbs (Ryan: "for the generic combo, i dont care").
+- **Vegeta's Big Bang is the game's own**: his arm goes out with an open palm, a ball of light grows in it for half a
+  second, and the cyan comet the player's Big Bang uses flies at the target (it was Super 13's red orb).
+- A body that vanishes or appears (a teleport, Cell Jr.'s copies) does so in a small white spark with a flash of the
+  body, not an explosion; plain punches and kicks land with a white impact spark (the special blow still bursts).
+  Before, every punch of a rush threw a full explosion, so a rush read as one fireball.
+- Nobody stands off screen: every spot is kept inside the camera's view (below the HUD), and a target too near the
+  screen's edge is first pushed to where both partners fit (Hercule used to walk off the right edge in his combo).
+- A giant partner by a wall no longer lands on the target: a spot that is a wall for his feet is replaced by the
+  nearest floor on his own side (never across the target, never within 24 px of him), and the opening push tests each
+  side with the feet of the fighter who will stand there (before: Cooler and King Cold were walked onto the target, and
+  King Cold's beam, aimed at a target right under him, went down the screen). Beams always fire sideways.
+- A phantom second Destructo Disc (a 32 x 32 disc given the VRAM of a 16 x 16 shot, so it wrote over the next
+  object's tiles: an explosion showed a disc) is gone.
+
+**How** (`src/coop/tny_combo_run.c`, `tools/tnycombo.py`):
+- One 256-colour OBJ palette is shared by everything, so a colour is a remap of palette indices. The doc's section 4
+  names each colour's five entries (core, highlight, middle, shadow, edge); `tnycombo.py` builds a 256-byte remap per
+  colour that sends the energy arts' own ramps onto them (`FAMILIES`: Super 13's orbs 2 106 247 252 26, the blue ki
+  2 184 191 76 196, the Kamehameha beam 43 67 68 74 76) and puts them in ROM (`tny_combo_tints`). A step's `col`
+  picks one; `white` (required) is the sparks'.
+- The runner's orbs and ki: a coloured shot's vtable slot 5 (the upload: the ROM's `0x08013D40` DMAs the descriptor's
+  tiles) is `proj_upload`, which writes the same tiles through the remap.
+- Beams (decompiled 2026-10-31): `Beam_Fire` (`0x08014478`) takes the facing's frame set from `0x086E3458 + facing *
+  0x60` (eight 12-byte descriptors {geometry, attr, tiles}; the alternate art's sets at `0x08704604`) into +0x44 /
+  +0x48 (+0x40 the current frame) and DMAs three blobs (descriptors 0, 2, 1 to the beam's VRAM + 0, 0x100, 0x200); the
+  update (`0x08014556`) and the end (`0x0801451C`) DMA later frames from the same set. With `--rom` the generator
+  writes the four sets with every tile redrawn in each colour a `beam` row uses (`tny_combo_beams`, 2.7 KB of tiles a
+  colour); `beam_paint` points the beam's +0x40 / +0x44 / +0x48 at them right after `Beam_Fire` and puts the three
+  blobs up again, so every later upload reads coloured tiles. No RAM, nothing in the ROM's own data changes, and a
+  build without the ROM keeps the stock blue.
+- The Big Bang (decompiled: the player's ability state `0x080258B4`, enter `0x08015018` makes the object
+  `FUN_08013E48`, 0x5C bytes, OBJ VRAM 0x400; its update `0x08013FDA` animates the charge with the three descriptors at
+  `0x086DEB6C` and the flight with four at `0x086E0B90 + facing * 0x30`, frames 0 1 2 1 every 8 frames): the runner's
+  `ball ... bigbang` shows the same descriptors in its own shot (`ART_BIGBANG`), so the damage stays the runner's.
+- The screen's edge: `clamp_view` keeps a body's box (`Entity_GetBox`) inside the camera's view (`CAMERA_CELL` +0x0C
+  left, +0x10 top, +0x14 right, +0x18 bottom, world px), 6 px in and 28 below the top; `room_at` also wants the target's
+  72 px either side on screen, each side walkable for its own fighter (`room_at`), else 48 px; `find_floor` replaces a
+  far spot (24 px or more from the target) that is a wall for the mover with the nearest floor on his side; `face_side`
+  turns a beam's firer left or right.
+- Also found: the Makefile's object rule listed headers by hand, without `tny_combo_run.h`, so a changed step struct
+  left the runner's object stale (every combo played but dealt nothing); objects now carry the compiler's own
+  dependency files (`-MMD -MP`).
+
+**Damage**: unchanged by the colours (`docs/tournament-combos.md` section 2: the players' pairs 2389 to 2517, the
+villains' 1590 to 1626). Slowdown 1 to 7 % (it was 0 to 7 %): the coloured uploads cost nothing visible.
+
+**Still not done**: Cell Jr.'s copies show his own frame (a turned copy mirrors it); Android 16 and Super 13 as
+bystanders keep animating; the kits' own beams outside the combos are still the stock blue (the same frame sets could
+colour them: Frieza's Death Beam, Mystic Gohan's Masenko).

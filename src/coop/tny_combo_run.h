@@ -16,10 +16,11 @@ enum {
                     // every -d frames)
     CO_FACE,        // a = 0 the target (the target: fighter 0), 1 the target faces fighter 1, 2 turn away
     CO_PUNCH,       // a melee hit: a = weight (tenths of one of his own punches), b = pose kind (punch / kick / special)
-    CO_BLAST,       // a ki blast flying at the target: a = weight (tenths of his own ki blast), b = art (0 orb, 1 blue)
-    CO_BALL,        // a big orb thrown slowly: a = weight, b = size (1 medium, 2 large), c = frames held first (over his
-                    // head, or d = 1 in front of his hands) before it flies
+    CO_BLAST,       // a ki blast flying at the target: a = weight (tenths of his own ki blast), b = art (0 orb, 1 ki)
+    CO_BALL,        // a big orb thrown slowly: a = weight, b = size (1 medium, 2 large, 3 the game's Big Bang), c = frames
+                    // held first (over his head, or d = 1 in front of his hands) before it flies
     CO_BEAM,        // his beam: a = weight, b = frames held, c = 1 it goes through to the far side (else it ends on him)
+                    // (CO_BLAST, CO_BALL, CO_BEAM: the step's col, a colour of the doc's section 4; 0 = the art's own)
     CO_DISC,        // a Destructo Disc: a = weight, b = frames held over his head first, c = 1 it pins him (stays
                     // spinning on him until the partner's next blow lands)
     CO_SHAKE,       // a = frames, b = strength
@@ -38,6 +39,16 @@ enum {
 enum { CP_IDLE, CP_WALK, CP_HURT, CP_FALL, CP_SHOUT, CP_CHARGE, CP_PUNCH, CP_KICK, CP_DASH, CP_SPECIAL, CP_BEAM,
        CP_BEAM2, CP_KI, CP_LIE, CP_COUNT, CP_RAW = 0x40, CP_KEEP = 0xFF };   // CP_RAW + g: group g as it is
 
-typedef struct TComboStep { u16 at; u8 who, op; s16 a, b, c, d; } TComboStep;
+typedef struct TComboStep { u16 at; u8 who, op; s16 a, b, c, d; u8 col; } TComboStep;
 typedef struct TComboDef { const char *name; const TComboStep *steps; u16 n, len; } TComboDef;
 extern const TComboDef tny_combo_defs[COMBO_COUNT];     // build/gen/tny_combo_data.c
+
+// Colours (the doc's section 4; tools/tnycombo.py): one shared 256-colour OBJ palette, so a colour is a remap of the
+// palette indices the energy arts use (the runner's orbs and ki, the Kamehameha beam) to five of another ramp.
+// tny_combo_tints[c]: colour c's remap (c 0: none); tny_combo_beams[c]: the Kamehameha beam's four facings' frame sets
+// (8 descriptors each, as the ROM's at 0x086E3458) drawn in colour c, or 0 (no beam in that colour, or no ROM at build)
+#define TCOL_MAX 12
+typedef struct TBeamDesc { u32 geom, attr; const u8 *src; } TBeamDesc;
+extern const u8 *const tny_combo_tints[TCOL_MAX];
+extern const TBeamDesc *const tny_combo_beams[TCOL_MAX];
+extern const u8 *const tny_combo_spark;                  // the colour `white` (where a body vanishes: a spark)

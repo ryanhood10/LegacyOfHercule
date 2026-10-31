@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-31
 
+- **Team combos: the colour pass** (`docs/tournament.md` 25.4): each fighter's ki and beams in his own colour (a
+  yellow Masenko, pink and purple Death Beams, a golden Supernova, a green Eraser Cannon, King Cold's red), Vegeta's
+  Big Bang drawn with the game's own art, white sparks at teleports and punches, every spot kept on screen, a phantom
+  second disc fixed (VRAM too small); the Makefile now tracks every header (`-MMD`).
 - **Team combos built and merged** (`docs/tournament.md` 25): the meter (Select fires it), the frozen-fight runner,
   all ten combos tuned and filmed (`build/combos/`), the draw pairing known partners; full regression clean.
 - **Team combos: the eight tuned** (branch `tny-combo-tune`, `docs/tournament.md` 25.3): Ryan's pairs now play as he described them: Krillin's disc pins the target for Gohan's Masenko; Piccolo's real Special Beam Cannon (the game's own object, decompiled) holds him while Hercule's Dynamite Kick lands with it and Hercule takes the credit (0 damage); Goku grabs him from behind and the drill goes through both; the father-son Kamehameha side by side (Hercule's pose, no beam); Death Beam volleys and Cooler's Supernova held overhead; Paragus's control device freezes the target for Broly's Eraser Cannon; Mecha Frieza & King Cold's crossed Death Beams; three Juniors swarm him (copies of Cell Jr.'s body drawn from his own tiles) before Cell's Kamehameha. Runner verbs `sbc`, `copy`, held / pinned shots; fighters step round frozen bystanders. Every combo within 4 % of the others' damage at equal stats (`docs/tournament-combos.md` section 2). Test `tools/headless/tny_combo_tune.txt`.

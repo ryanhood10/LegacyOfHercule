@@ -1,9 +1,9 @@
 # Team combos: the step tables (Ryan's doc, the game's data)
 
-The team combos of the World Tournament (`docs/tournament.md` 24.10: the design decided with Ryan; 25.2: the runner; 25.3: the combos as built).
+The team combos of the World Tournament (`docs/tournament.md` 24.10: the design decided with Ryan; 25.2: the runner; 25.3: the combos as built; 25.4: the colour pass).
 This page is both the plan and the data: `tools/tnycombo.py` reads section 3's tables at build time into
-`build/gen/tny_combo_data.c`, so **an edit here is an edit in the game** (rebuild to see it). A table that does not parse
-stops the build with the row's line number and what is wrong.
+`build/gen/tny_combo_data.c`, so **an edit here is an edit in the game** (rebuild to see it); section 4's colours too. A
+table that does not parse stops the build with the row's line number and what is wrong.
 
 ## 1. The format
 
@@ -12,7 +12,7 @@ A combo is a heading `### <who> (`ID`)`, a `Name:` line (the caption shown at th
 | column | what |
 |---|---|
 | at | the frame the step starts, counted from the combo's start (60 frames = 1 second), or `+N`: N frames after the row above. Rows may follow one fighter and then the other: they are played by frame (rows of one frame in table order) |
-| who | `A` the pair's first fighter (the lead: the first of the pair in section 4), `B` the second, `T` the target, several (`A B`), or `-` for a screen step |
+| who | `A` the pair's first fighter (the lead: the first of the pair in section 5), `B` the second, `T` the target, several (`A B`), or `-` for a screen step |
 | does | the step (below) |
 | how | its numbers and words |
 
@@ -28,16 +28,16 @@ last row left him.
 | `dash` | X Y N | runs (the dash pose) to X px from the target, Y px down, in N frames |
 | `walk` | X Y N | the same at a walk |
 | `slide` | X Y N | the same, keeping whatever pose he has (a knock-back) |
-| `teleport` | X Y | vanishes and appears there at once, a flash at both spots |
+| `teleport` | X Y | vanishes and appears there at once: a white spark at both spots and his body flashes |
 | `pose` | NAME [F or F-G] [N, or loop N] | shows that pose: frame F; F-G runs through the frames in N frames, `loop N` repeats them, a frame every N frames |
 | `face` | [A, B, him, away] | turns: A and B to the target; the target to A (or B); `away` the other way |
 | `punch` | W [kick, special] | a melee blow worth W of his own punches (the punch pose, or the kick, or the special melee) |
-| `blast` | W [blue] | a ki blast flying at the target, worth W of his own ki blasts when it reaches him (a yellow orb, or blue ki) |
-| `ball` | W [large] [hold N] [front] | a big orb thrown slowly; W ki blasts, a big blast when it lands. `hold N`: it first waits N frames just over his head (a Supernova), or with `front` in front of his hands (an Eraser Cannon), then flies (pose him meanwhile with a `pose` row) |
-| `beam` | W N [through] | his beam (the Kamehameha's object), held N frames; W ki blasts when its tip reaches the target; `through`: it goes on past him (through a partner on the far side, who is never hurt) |
+| `blast` | W [ki, orb] [COLOUR] | a ki blast flying at the target, worth W of his own ki blasts when it reaches him: a round orb (Super 13's, red), or with `ki` the blue ki shot; a colour (section 4) redraws it in that colour (with a colour it is the ki shot unless `orb`) |
+| `ball` | W [large, bigbang] [hold N] [front] [COLOUR] | a big orb thrown slowly; W ki blasts, a big blast when it lands. `large`: the large orb; `bigbang`: Vegeta's Big Bang, the game's own (a ball of light in his palm while held, then the comet; its own colours). `hold N`: it first waits N frames just over his head (a Supernova), or with `front` in front of his hands (an Eraser Cannon, the Big Bang), then flies (pose him meanwhile with a `pose` row) |
+| `beam` | W N [through] [COLOUR] | his beam (the Kamehameha's object), held N frames; W ki blasts when its tip reaches the target; `through`: it goes on past him (through a partner on the far side, who is never hurt); a colour draws it in that colour (the stock beam is blue) |
 | `disc` | W [hold N] [pin] | a Destructo Disc. `hold N`: it spins over his head N frames first; `pin`: when it lands it stays spinning on the target (he is pinned) until the partner's next blow lands, then bursts |
 | `sbc` | W N [through] [charge C] | Piccolo's Special Beam Cannon, the game's own object: the spark at his fingers for C frames (pose him `beam 0-1 loop 8`, as the game's own SBC), then the drill; W ki blasts when its tip reaches the target, held N frames, then it slides off; `through` as `beam` |
-| `copy` | K X Y, or K `off` | copy K (1-3) of the fighter's body appears there (a flash; X / Y as a dash's), facing the target; it shows his pose frame for frame (it strikes as he strikes) and never hurts anyone: Cell Jr.'s swarm. Again: it moves there; `off` (K 0: all of them) it vanishes; any left vanish at the end |
+| `copy` | K X Y, or K `off` | copy K (1-3) of the fighter's body appears there (a spark; X / Y as a dash's), facing the target; it shows his pose frame for frame (it strikes as he strikes) and never hurts anyone: Cell Jr.'s swarm. Again: it moves there; `off` (K 0: all of them) it vanishes; any left vanish at the end |
 | `knockdown` | LIE UP | the target falls (his knock-down pose), lies LIE frames, gets up in UP frames |
 | `flash` | [N] | a white flash on whoever, N frames (4) |
 | `screen` | N | the whole screen flashes white and fades back over N frames |
@@ -89,17 +89,18 @@ weights stay in blows of 1.
 |---|---:|---|
 | Gohan & Krillin (players) | 274 | 2517 (1212, 1305) |
 | Piccolo & Hercule | 206 | 2447 (Piccolo 2447, Hercule 0) |
-| Goku & Vegeta | 264 | 2503 (1179, 1324) |
-| Goku & Piccolo | 224 | 2513 (1307, 1206) |
+| Goku & Vegeta | 264 | 2503 (1209, 1294) |
+| Goku & Piccolo | 224 | 2389 (1191, 1198) |
 | Goku & Gohan (father-son) | 250 | 2413 (1203, 1210) |
 | Hercule & Super Saiyan 2 Gohan (father-son) | 250 | 2477 (Hercule 0, Gohan 2477) |
-| Frieza & Cooler (villains, on player 1) | 228 | 1644 (819, 825) |
-| Broly & Paragus | 232 | 1618 (813, 805) |
+| Frieza & Cooler (villains, on player 1) | 228 | 1616 (812, 804) |
+| Broly & Paragus | 232 | 1590 (798, 792) |
 | Mecha Frieza & King Cold | 224 | 1601 (804, 797) |
 | Perfect Cell & Cell Jr. | 276 | 1624 (819, 805) |
-| the generic barrage (Spopovich & Yamu) | 232 | 1593 (786, 807) |
+| the generic barrage (Spopovich & Yamu) | 232 | 1626 (813, 813) |
 
-The players' pairs lie within 4 % of each other, the villains' within 3 %: no pair is stronger than another except
+(The colour pass's run, 2026-10-31; the punches' critical hits fall on other blows from run to run, so a pair moves by
+a few per cent.) The players' pairs lie within 5 % of each other, the villains' within 3 %: no pair is stronger than another except
 through the attackers' own numbers.
 
 ## 3. The combos
@@ -141,7 +142,8 @@ Name: Team Barrage
 ### Goku & Vegeta (`GOKU_VEGETA`)
 
 Both dash in from either side and trade punches with him between them, spring back out, and fire together: Goku's
-Kamehameha from one side, Vegeta's Big Bang from the other.
+Kamehameha from one side, Vegeta's Big Bang from the other (the game's own: a ball of light grows in his open palm,
+then the comet flies).
 
 Name: Kamehameha and Big Bang
 
@@ -163,12 +165,12 @@ Name: Kamehameha and Big Bang
 | +8 | B | punch | 1 special |
 | 108 | A B | dash | 64 0 10 |
 | 120 | A | pose | beam 0 |
-| 120 | B | pose | charge 0-1 loop 4 |
+| 120 | B | pose | ki 1-2 8 |
+| 120 | B | ball | 6 bigbang hold 30 front |
 | 120 | A B | flash | 4 |
 | 120 | - | shake | 36 25 |
 | 120 | - | sound | 55 |
 | 150 | A | beam | 6 40 |
-| 150 | B | ball | 6 large |
 | 192 | T | knockdown | 40 12 |
 | 194 | A B | pose | idle |
 | 264 | - | end | |
@@ -177,8 +179,8 @@ Name: Kamehameha and Big Bang
 
 Both dash in from either side and trade punches and kicks with him between them, spring back out and throw ki blasts
 in turn. Krillin raises his hand: the Destructo Disc spins over it while Gohan lifts his arm for the Masenko; the disc
-flies, pins him (it stays spinning on him, he is stuck in his hurt pose) and Gohan's Masenko finishes him (the disc
-bursts as the beam lands).
+flies, pins him (it stays spinning on him, he is stuck in his hurt pose) and Gohan's Masenko, a yellow beam, finishes
+him (the disc bursts as the beam lands). Gohan's ki is yellow, Krillin's blue.
 
 Name: Disc and Masenko
 
@@ -196,9 +198,9 @@ Name: Disc and Masenko
 | +8 | B | punch | 1 special |
 | 76 | A | dash | 64 0 10 |
 | 76 | B | dash | 76 0 10 |
-| 90 | A | blast | 1 |
+| 90 | A | blast | 1 yellow |
 | +6 | B | blast | 1 blue |
-| +6 | A | blast | 1 |
+| +6 | A | blast | 1 yellow |
 | +6 | B | blast | 1 blue |
 | 116 | B | pose | shout 3 |
 | 116 | B | disc | 6 hold 28 pin |
@@ -210,7 +212,7 @@ Name: Disc and Masenko
 | 166 | A | pose | beam 0 |
 | 166 | A | flash | 4 |
 | 166 | - | shake | 20 25 |
-| 172 | A | beam | 6 30 |
+| 172 | A | beam | 6 30 yellow |
 | 202 | T | knockdown | 40 12 |
 | 204 | A B | pose | idle |
 | 274 | - | end | |
@@ -230,12 +232,12 @@ Name: Special Beam Dynamite
 | 0 | A | dash | 64 0 12 |
 | 0 | B | walk | 100 0 20 |
 | 0 | T | pose | hurt 0 |
-| 14 | A | blast | 1 blue |
-| +8 | A | blast | 1 blue |
-| +8 | A | blast | 1 blue |
-| +8 | A | blast | 1 blue |
-| +8 | A | blast | 1 blue |
-| +8 | A | blast | 1 blue |
+| 14 | A | blast | 1 yellow |
+| +8 | A | blast | 1 yellow |
+| +8 | A | blast | 1 yellow |
+| +8 | A | blast | 1 yellow |
+| +8 | A | blast | 1 yellow |
+| +8 | A | blast | 1 yellow |
 | 24 | B | punch | 1 |
 | +8 | B | punch | 1 |
 | +8 | B | punch | 1 |
@@ -277,13 +279,13 @@ Name: Special Beam Cannon
 | +8 | A | punch | 1 |
 | +8 | A | punch | 1 kick |
 | 54 | A | pose | ki 1 |
-| 54 | A | ball | 6 |
-| 14 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
+| 54 | A | ball | 6 blue |
+| 14 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
 | 66 | A | slide | 8 -1 4 |
 | 66 | A | pose | beam 1 |
 | 66 | T | face | B |
@@ -304,7 +306,8 @@ Father and son run to the same side of him, side by side (the son a step ahead),
 both crouch into the Kamehameha together, the charge flashes and shakes the ring, and the two beams go out side by side
 as one. Goku & Gohan: both beams. Hercule & Super Saiyan 2 Gohan: the same animation; Hercule waves to the crowd
 where Goku throws (his ki pose is his wave), strikes the Kamehameha pose beside Gohan and nothing comes out of him: the
-beam is Gohan's, and Hercule's weight goes into Gohan's blows.
+beam is Gohan's, and Hercule's weight goes into Gohan's blows. Goku's ki is blue, Gohan's yellow; the Kamehamehas
+are the game's blue.
 
 Name: Father-Son Kamehameha
 
@@ -313,18 +316,18 @@ Name: Father-Son Kamehameha
 | 0 | A | dash | 72 -10 12 |
 | 0 | B | dash | -58 10 12 |
 | 0 | T | pose | hurt 0 |
-| 16 | A | blast | 1 |
-| +6 | B | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | B | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | B | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | B | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | B | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | B | blast | 1 |
+| 16 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
+| +6 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
+| +6 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
+| +6 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
+| +6 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
+| +6 | A | blast | 1 blue |
+| +6 | B | blast | 1 yellow |
 | 92 | A B | pose | beam 0 |
 | 92 | A B | flash | 4 |
 | 92 | - | shake | 40 25 |
@@ -338,8 +341,9 @@ Name: Father-Son Kamehameha
 ### Frieza & Cooler (`FRIEZA_COOLER`)
 
 (Villains on a player.) The brothers appear on either side of him and fire Death Beams in turn, finger pointed: a
-volley of quick blue shots from both sides. Cooler lifts a big orb over his head (the Supernova), the ring shakes,
-Frieza points for one last Death Beam; Cooler throws the Supernova and both land together.
+volley of quick shots from both sides, Frieza's pink, Cooler's purple. Cooler lifts a big golden orb over his head (the
+Supernova), the ring shakes, Frieza points for one last Death Beam (pink); Cooler throws the Supernova and both land
+together.
 
 Name: Death Beam Supernova
 
@@ -348,37 +352,37 @@ Name: Death Beam Supernova
 | 0 | A B | flash | 6 |
 | 0 | A B | teleport | 64 0 |
 | 0 | T | pose | hurt 0 |
-| 10 | A | blast | 1 blue |
+| 10 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
-| +7 | A | blast | 1 blue |
+| +7 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
-| +7 | A | blast | 1 blue |
+| +7 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
-| +7 | A | blast | 1 blue |
+| +7 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
-| +7 | A | blast | 1 blue |
+| +7 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
-| +7 | A | blast | 1 blue |
+| +7 | A | blast | 1 pink |
 | +0 | A | pose | ki 2 |
-| +7 | B | blast | 1 blue |
+| +7 | B | blast | 1 purple |
 | +0 | B | pose | ki 2 |
 | 98 | B | pose | ki 1 |
-| 98 | B | ball | 6 large hold 36 |
+| 98 | B | ball | 6 large hold 36 gold |
 | 98 | - | shake | 36 30 |
 | 98 | - | sound | 55 |
 | 104 | A | pose | ki 2 |
 | 104 | A | flash | 4 |
-| 126 | A | beam | 6 24 |
+| 126 | A | beam | 6 24 pink |
 | 134 | B | pose | ki 2 |
 | 156 | T | knockdown | 40 12 |
 | 158 | A B | pose | idle |
@@ -388,8 +392,8 @@ Name: Death Beam Supernova
 
 (Villains on a player.) Paragus steps out to the other side and raises the control device: it glows, the screen
 flashes and the target freezes in place (he flashes white and stays in his hurt pose). Broly walks into him with six
-blows while Paragus throws ki from his spot; the device flashes again with a bigger blast of Paragus's. Broly steps
-back, an Eraser Cannon (his kit's: the medium orb) grows in his palm and he throws it.
+blows while Paragus throws ki (yellow) from his spot; the device flashes again with a bigger blast of Paragus's. Broly
+steps back, an Eraser Cannon (a green orb) grows in his palm and he throws it.
 
 Name: Eraser Cannon
 
@@ -409,21 +413,21 @@ Name: Eraser Cannon
 | +8 | A | punch | 1 |
 | +8 | A | punch | 1 kick |
 | +8 | A | punch | 1 special |
-| 32 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
-| +8 | B | blast | 1 blue |
+| 32 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
+| +8 | B | blast | 1 yellow |
 | 50 | T | flash | 6 |
 | 82 | B | pose | g14 0-4 6 |
 | 82 | B | flash | 8 |
 | 82 | - | screen | 12 |
 | 82 | T | flash | 12 |
-| 88 | B | blast | 6 blue |
+| 88 | B | blast | 6 yellow |
 | 88 | A | dash | 56 0 10 |
 | 102 | A | pose | ki 2 |
-| 102 | A | ball | 6 hold 36 front |
+| 102 | A | ball | 6 hold 36 front green |
 | 102 | - | shake | 36 40 |
 | 102 | - | sound | 55 |
 | 138 | A | flash | 4 |
@@ -434,7 +438,8 @@ Name: Eraser Cannon
 ### Mecha Frieza & King Cold (`MECHA_COLD`)
 
 (Villains on a player.) Father and son arrive together in a flash, one on each side, and fire Death Beams at once,
-fingers pointed, six times; then both point and charge, the ring shakes, and their two Death Beams meet on him.
+fingers pointed, six times (Mecha Frieza's pink, King Cold's red); then both point and charge, the ring shakes, and
+their two Death Beams meet on him.
 
 Name: Father and Son
 
@@ -444,23 +449,30 @@ Name: Father and Son
 | 0 | A | teleport | 64 0 |
 | 0 | B | teleport | 84 0 |
 | 0 | T | pose | hurt 0 |
-| 14 | A B | blast | 1 blue |
+| 14 | A | blast | 1 pink |
+| 14 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
-| +10 | A B | blast | 1 blue |
+| +10 | A | blast | 1 pink |
+| +0 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
-| +10 | A B | blast | 1 blue |
+| +10 | A | blast | 1 pink |
+| +0 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
-| +10 | A B | blast | 1 blue |
+| +10 | A | blast | 1 pink |
+| +0 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
-| +10 | A B | blast | 1 blue |
+| +10 | A | blast | 1 pink |
+| +0 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
-| +10 | A B | blast | 1 blue |
+| +10 | A | blast | 1 pink |
+| +0 | B | blast | 1 red |
 | +0 | A B | pose | ki 2 |
 | 80 | A B | pose | beam 0 |
 | 80 | A B | flash | 6 |
 | 80 | - | shake | 40 30 |
 | 80 | - | sound | 55 |
-| 120 | A B | beam | 6 30 |
+| 120 | A | beam | 6 30 pink |
+| 120 | B | beam | 6 30 red |
 | 152 | T | knockdown | 40 12 |
 | 154 | A B | pose | idle |
 | 224 | - | end | |
@@ -470,7 +482,7 @@ Name: Father and Son
 (Villains on a player.) Cell stays back; the Juniors swarm him: Cell Jr. and two more (copies of his body, striking as
 he strikes) appear round him in flashes, punch and kick from three sides, vanish and reappear on other sides. The
 Juniors leap back to stand round Cell, Cell throws a volley of ki blasts, crouches into the Kamehameha and fires; when
-the target is down the extra Juniors vanish.
+the target is down the extra Juniors vanish. Cell's ki is yellow, his Kamehameha the game's blue.
 
 Name: Perfect Kamehameha
 
@@ -503,12 +515,12 @@ Name: Perfect Kamehameha
 | 102 | B | copy | 1 -40 28 |
 | 102 | B | copy | 2 -84 26 |
 | 102 | B | pose | idle |
-| 108 | A | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | A | blast | 1 |
-| +6 | A | blast | 1 |
+| 108 | A | blast | 1 yellow |
+| +6 | A | blast | 1 yellow |
+| +6 | A | blast | 1 yellow |
+| +6 | A | blast | 1 yellow |
+| +6 | A | blast | 1 yellow |
+| +6 | A | blast | 1 yellow |
 | 146 | A | pose | beam 0 |
 | 146 | A | flash | 4 |
 | 146 | - | shake | 30 25 |
@@ -519,7 +531,30 @@ Name: Perfect Kamehameha
 | 236 | B | copy | 0 off |
 | 276 | - | end | |
 
-## 4. The pairs (reference)
+## 4. Colours
+
+One 256-colour palette is shared by every sprite, so a colour is five of its entries, brightest first: the core, the
+highlight, the middle, the shadow and the edge. A shot or a beam in a colour has its own ramp (the orbs' white core,
+pink, rose, red and dark red; the blue ki's; the beam's white, two cyans and two blues) redrawn onto those five, the
+orbs and ki as their tiles go up, the beam from copies of its tiles the build makes in each colour a `beam` row uses
+(`tools/tnycombo.py`; the index of every palette entry is in `docs/sprites.md`'s palette dump, or `tools/sprites.py`).
+`white` is required: it is the spark where a body vanishes.
+
+| colour | core | hi | mid | lo | edge | who |
+|---|---|---|---|---|---|---|
+| blue | 2 | 184 | 191 | 76 | 196 | Goku's ki (the blue ki shot's own colours) |
+| yellow | 43 | 44 | 45 | 46 | 37 | Gohan (the Masenko: the game's own Masenko is these five), Piccolo, Paragus, Cell |
+| gold | 44 | 36 | 38 | 32 | 33 | Cooler's Supernova |
+| red | 114 | 29 | 31 | 24 | 25 | King Cold |
+| pink | 106 | 107 | 108 | 109 | 102 | Frieza's Death Beams (and Mecha Frieza's) |
+| purple | 220 | 98 | 99 | 100 | 94 | Cooler's Death Beams |
+| green | 123 | 51 | 53 | 47 | 48 | Broly's Eraser Cannon |
+| white | 2 | 43 | 66 | 67 | 74 | the spark where a body vanishes or appears |
+
+Krillin's ki (blue) and Disc (yellow), Piccolo's Special Beam Cannon (yellow and violet), Vegeta's Big Bang (cyan) and
+the Kamehamehas (blue) keep the game's own colours; the generic barrage keeps the red orbs.
+
+## 5. The pairs (reference)
 
 Which pairs have a combo is Ryan's list (`docs/tournament.md` 24.10); the table the game uses is `src/coop/tny_combo.c`
 (`tny_combo_of`, `tny_combo_lead`: the lead's piece), kept there because the draw uses it too. A pair's first fighter is

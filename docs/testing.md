@@ -531,7 +531,7 @@ python tools/headless/st_test.py tools/headless/mkmenu.txt build/ctune/log2-coop
 python tools/headless/st_test.py tools/headless/tny_combo_tune.txt build/ctune/log2-coop.gba build/ctune/hl/menu.ss --out build/ctune/hl --cols 8
 ```
 
-`tools/headless/tny_combo_tune.txt` (`docs/tournament.md` 25.3), about 35 s: every combo plays once, filmed with a shot
+`tools/headless/tny_combo_tune.txt` (`docs/tournament.md` 25.3, the colours 25.4), about 35 s: every combo plays once, filmed with a shot
 every 8 frames (`TAG_start`, `TAG_00`..`TAG_36`, `TAG_after` one second after the end), and prints its damage. Tags:
 `gk` Gohan & Krillin, `ph` Piccolo & Hercule, `gp` Goku & Piccolo, `fs` Goku & Gohan, `hs` Hercule & Super Saiyan 2
 Gohan (slot 8 poked into the party first, as `ssj2_join` would: row 28, flags 0x7F), `gv` Goku & Vegeta: the players'
@@ -546,6 +546,11 @@ one sheet per combo, tile `TAG_start`, `TAG_NN` and `TAG_after` (`tools/headless
 2026-10-31: `build/ctune/after/` (the tuned tables, sheets `sheet_TAG.png`) against `build/ctune/before/` (the first
 drafts on the runner as merged; `hs` did not start there: its first version did not put Super Saiyan 2 Gohan in the
 party), not committed.
+
+The colour pass (25.4) was filmed with the same script: `build/combos/colour/` (sheets `sheet_TAG.png` and zoomed
+strips `z_*.png`) against `build/combos/after/` (before it), not committed. Look for: each fighter's shots in his
+colour (section 4 of the combos doc), the yellow Masenko, the Big Bang in Vegeta's palm then the cyan comet, white
+sparks at teleports and punches, every body on screen, one disc only.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 

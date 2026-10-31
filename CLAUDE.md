@@ -42,10 +42,11 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 ## Current phase (2026-10-31): the tournament's team combos are built; Ryan playtests next
 
 The World Tournament on Papaya Island is built and merged (`docs/tournament.md`: the plan, 9b-13 the seven-piece
-build, 14-23 every playtest round since, 24 the open points and the plan to fix them, **25 the team combos**). The
+build, 14-23 every playtest round since, 24 the open points and the plan to fix them, **25 the team combos**, 25.4 their
+colour pass). The
 team combos (built 2026-10-31 by a lead plus three agents; Ryan's design in 24.10): a meter under the HP panels
 (Select fires it, full at a fight's start, 90 s cooldown), the frozen-fight runner, ten combos for Ryan's pairs. Their
-step tables live in `docs/tournament-combos.md`, which is both Ryan's doc and the game's data (`tools/tnycombo.py`), as
+step tables and colours live in `docs/tournament-combos.md`, which is both Ryan's doc and the game's data (`tools/tnycombo.py`), as
 `docs/tournament-dialogue.md` is for the dialogue (`tools/tnytalk.py`): edit a line there to change it in the game.
 Contracts: `src/coop/tourney.h`, `src/coop/tny_combo.h`; tests `tools/headless/tny_*.txt`; films of every combo in
 `build/combos/` (not committed). **Next session: Ryan's playtest notes first, then the rest of section 24.**

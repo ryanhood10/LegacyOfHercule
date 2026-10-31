@@ -123,7 +123,10 @@ all: $(OUT)
 $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16.h src/coop/krillin.h src/coop/bosses.h src/coop/a16player.h src/coop/ssj2gohan.h src/coop/super13.h
 
 	@mkdir -p $(BUILD)/obj
-	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -c $< -o $@
+	$(CC) $(CFLAGS) -DOLD_HERCULE_SPRITE=$(OLD_HERCULE_SPRITE) -MMD -MP -c $< -o $@
+
+# every header a source includes (the list above is the old hand-kept one): the compiler's own dependency files
+-include $(patsubst src/coop/%.c,$(BUILD)/obj/%.d,$(SRCS))
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
 $(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
@@ -254,9 +257,9 @@ $(BUILD)/obj/tny_talk_data.o: $(BUILD)/gen/tny_talk_data.c src/coop/rom.h src/co
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # the team combos' step tables, from Ryan's doc (docs/tournament-combos.md; tools/tnycombo.py)
-$(BUILD)/gen/tny_combo_data.c: tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h
+$(BUILD)/gen/tny_combo_data.c: tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $(ROM)
 	@mkdir -p $(BUILD)/gen
-	$(PYTHON) tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $@
+	$(PYTHON) tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $@ --rom $(ROM)
 
 $(BUILD)/obj/tny_combo_data.o: $(BUILD)/gen/tny_combo_data.c src/coop/rom.h src/coop/tourney.h src/coop/tny_combo.h src/coop/tny_combo_run.h
 	@mkdir -p $(BUILD)/obj
