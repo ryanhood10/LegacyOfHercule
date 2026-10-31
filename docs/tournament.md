@@ -1350,3 +1350,59 @@ a time, the first seat's partner else the second's), a Rumble pack takes a drawn
 (`add_partner`), and a headliner's partner is his first helper (Broly brings Paragus, King Cold Mecha Frieza). Test:
 `tools/headless/tny_combo_draw.txt` (a Champion Rumble: Cell & Cell Jr., android pairs, Broly with Paragus and Frieza;
 three co-op Champion 2 v 2 draws: every opponent team a known pair).
+
+### 25.1 The meter (built 2026-10-31, branch `tny-combo-meter`, `src/coop/tny_combo_meter.c`)
+
+**What a player sees.** In a co-op fight (2 v 2, a Rumble round, a co-op challenge) whose two picks are a listed pair
+(24.10), a thin bar sits under each player's HP panel (48 x 5 px, under player 1's panel at the top left and player 2's
+at `wide_w() - 96`; both show the same shared meter). It is **full at the start of every fight** (each Rumble round
+counts as a fight) and flashes yellow / white while full. **Select on either pad** fires it. After a combo it
+disappears for **90 seconds** (counted only while the fight runs: not while a combo plays, a scene or line holds the
+fight, or behind the curtain). Then it comes back on the first **shared hit** (one player hits the opponent the other
+hit at most 1.5 s before) and fills in cyan, one step per shared hit; 11 shared hits fill it (each player lands about
+six on one target: a deliberate focus, more than one three-punch combo each, less than a whole round). If they stop
+or split up (each hits a different opponent) it starts draining after one second, about 5 s from full to empty, and
+hides again when empty. It never shows in 1P, for an unlisted pair, during scenes, lines, the curtain or a combo.
+
+**The button: Select, not R.** Player 1's R opens the stock area map in the field (headless, 2026-10-31: `key 0x100`
+in the jungle shows the map screen) and Select the scouter radar; player 1's control states never read R (idle /
+walk / diagonal are ours in `player.c`, the stock dash, charge and attack states `0x080083C3` / `0x08008277` test A,
+B and the D-pad, the HUD update `0x08008B89` cycles the ability on L). Every button has a field use, but the ring
+already takes Start and Select from both pads during a fight (`tny_engine.c`'s lock: no pause, no scouter, no player
+2 character switch), so Select is the one button free in a fight. The lock removes Select from `pressed` and keeps it
+in `current`, so the meter takes the edge of `current` itself (it runs after the engine in `tny_frame`). L + R chords
+stay the debug triggers'.
+
+**Firing.** `tny_combo_start(combo, lead, partner, target, 0)`, ordered by `tny_combo_lead`; the target is the
+opponent they last hit together while he stands, else the last one either player hit, else the kit fighter nearest
+the one who pressed. Not while either player is down (revive). If it returns 0 (the runner refused, or is not merged:
+the weak default) the bar stays full and the try is counted.
+
+**The AI pairs.** Every frame the fight's living kit fighters pair up greedily (list order; a fighter whose id already
+has a slot is taken) into up to three slots when their ids are a listed pair (`tny_combo_of`): Spopovich & Yamu, Frieza
+& Cooler, Cell & a Junior, two androids... A slot's bar is never drawn: it starts empty at each fight, fills 96 (10
+hits) from either fighter's hits on either player (a projectile counts by its owner), never drains, and when full fires
+by itself as soon as both are within 80 px of one standing player (the nearest of each id to him):
+`tny_combo_start(combo, lead, partner, player, 1)`. No tell. Refused: tried again 30 frames later; started: the same
+90 s cooldown, then empty again. Co-op fights only (1P has no slots).
+
+**The caption** `tny_caption(line)`: queued (3 at most; a fourth is dropped and counted), each shown for 90 frames,
+centred 20 px above the bottom, in the dialogue font (the stock canvas, as the ui's text) white on a black box, as
+32 x 16 4bpp OBJ strips allocated while it shows. It is only sprites, so the fight never pauses; it waits (its frames
+do not count) while a scene runs (unless a combo plays: the combo's name shows over the runner's frozen fight) or the
+curtain is down. The line is kept as a pointer until it shows: pass ROM strings (`tny_combo_name`, the announcer's
+lines). The HUD going away (a map change, a screen) clears the queue and frees the tiles.
+
+**Hooks (one line each, commented):** `tny_moves.c` `kit_message` after the hit is accepted (`k->last_hitter = who`):
+a player's hit (a projectile already resolved to its owner), not the Rumble's NPC-vs-NPC hits; `duel.c` player 1's
+take-damage and `player.c` `p2_take_damage`, at the top for any damage: the attacker is the word before the hit
+(the hit is the message's +0x24, `0x08008944` passes it to OnHit `0x08008807`, which passes it to take-damage
+`0x08008785`; the message's +0x20 is the attacker). The meter keeps only what it needs to know from them: who hit whom.
+
+**Numbers** (top of `tny_combo_meter.c`): FULL 960, P_STEP 88, AI_STEP 96, SHARE_WINDOW 90 frames, DRAIN_DELAY 60,
+DRAIN 3 a frame, COOLDOWN 5400, AI_REACH 80 px, AI_RETRY 30, captions 90 frames x 3. Colours from the one OBJ palette:
+1 black frame, 6 cyan filling, 8 yellow / 2 white full, 14 dark grey empty.
+
+**State** `.combo.meter` 0x0203EA00 (0x80) and `.combo.cap` 0x0203EA80 (0x30), both exactly their size so the runner's
+`.combo.run` starts at 0x0203EAB0; offsets in `docs/ids.md` (test command 32). Test: `tools/headless/tny_combo_meter.txt`
+(`docs/testing.md` "Team combo meter").

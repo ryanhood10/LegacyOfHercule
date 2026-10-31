@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-31
 
+- **Team combos: the meter** (branch `tny-combo-meter`, `docs/tournament.md` 25.1): a shared bar under both HP panels for a listed pair in a co-op fight, full at every fight's start, fired by **Select** on either pad (player 1's R opens the stock area map), a 90 s cooldown, then refilled by 11 shared hits on one opponent and drained when the players split or stop; listed opponent pairs fill an undrawn bar from 10 hits on either player and fire by themselves within 80 px of a player; `tny_caption` (a line at the bottom in a black box, 90 frames, three queued, never over a scene). Hooks: `kit_message` and both players' take-damage. Test `tools/headless/tny_combo_meter.txt` (test command 32).
 - **Team combos started (lead):** the contract `src/coop/tny_combo.h`, the pair table (`tny_combo.c`, Ryan's picks),
   `comboram` (0x0203EA00, 0x200 bytes; the heap cap lowered to 0xF87E words), test commands 32 / 33 for the meter
   and the runner, and the draw: known pairs share a 2 v 2 team, a Rumble pack, and the headliner brings his partner

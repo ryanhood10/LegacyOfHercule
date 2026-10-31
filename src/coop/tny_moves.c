@@ -1632,6 +1632,8 @@ static void kit_update(Entity *e) {
     if (g_PlayerObject == t) g_PlayerObject = saved;
 }
 
+void tny_combo_on_hit(Entity *target, Entity *attacker);   // tny_combo_meter.c: the shared-hit tracking
+
 // Messages. Rumble: a type-0 hit from a fighter of another side counts as a player's (type 1) for him. A hit
 // during a special or poise only does damage (the stock box test, the damage calculation and OnHit).
 static int kit_message(Entity *e, int msg, u8 *m) {
@@ -1692,6 +1694,7 @@ static int kit_message(Entity *e, int msg, u8 *m) {
         Entity *who = att;
         if (who && !is_player(who) && !ak) who = *(Entity **)((u8 *)att + 0x1C);   // a projectile: its owner
         k->last_hitter = who;
+        if (!conv && is_player(who)) tny_combo_on_hit(e, who);   // team combos (tny_combo.h): a player's hit landed
         if (!pushed_only_damage) {                  // the stock reaction ran: push him away from the hitter
             const u8 *atk = *(const u8 **)(m + 0x1C);
             knock(k, who, atk && atk[0] == 0, e->hp <= 0);
