@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Perfecting pass, tny piece** (branch `pp-tny`, `docs/tournament.md` 24.1 / 24.4 / 24.5 / 24.7): the Rumble
+  announcer's calls (a fall, the flurry, a co-op player down, Super Buu's forms) as a caption at the bottom that never
+  pauses the fight (`src/coop/tny_caption.c`, `.tny.cap`, test command 37); the announcer walks off after "Begin!" while
+  the fight runs and back on in the end's pause (a Rumble's pack waits for him); the co-op 1 v 1's turn change reloads
+  the ring in 21 frames of black instead of 90 (a readiness check); walking and dash speed per tournament row (giants
+  85 %, Goten, Kid Trunks, Chiaotzu and Videl 110 %). Tests `tny_caption.txt`, `tny_annwalk.txt`, `tny_turn.txt`,
+  `tny_walk.txt` (test command 38), all in `regfull.sh`.
 - **The combos' leftovers** (branch `pp-combo`, `docs/tournament.md` 25.5): Cell Jr.'s copies face the target from
   their own side (his pose in the copy's facing from the record, decoded into their own VRAM when it is not his blob);
   Android 16 and Super 13 hold still as bystanders while a combo plays (their kits swallow message 10); the kits' own

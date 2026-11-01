@@ -1,0 +1,77 @@
+# The co-op 1 v 1's turn change: a readiness check instead of 90 frames of black (docs/tournament.md 24.5,
+# src/coop/tny_engine.c arrived()). Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_turn.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Co-op Rookie 1 v 1 (test command 25), every fight won with test command 22. Player 1 plays his match, then player 2's
+# match needs player 2's pick on player 1's entity: the ring reloads behind the curtain (P_RESTAGE, phase 11). Before:
+# the reload held 90 frames whatever happened (the new player 1 had the old one's address); now it ends when the ring
+# is there, player 1 is a new body in a player state, no scene runs and 20 frames have passed. Engine `eng`
+# 0x0203EC00: +4 phase, +0x157 the last reload's frames, +0xFC 0 = a fight runs. Test command 38 arg 0 kind 0 (arg2 =
+# n) answers those frames into the arg word 0x0203FD0C when they are 1..n (else 0: the waitnz times out): n = 40.
+# Then the bracket on to the duel final (the reloads of the later turns too) and out: duel_end.txt / tny_engine.txt
+# cover the rest of the flow.
+p2 off
+maptest 13
+frames 300
+p2 0
+frames 200
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+echo == co-op Rookie 1 v 1: player 1's first match
+poke32 0x0203FD0C 0x0000
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC04 0x10
+shot t_p1fight
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+echo == player 2's match: the ring reloads (phase 11), then the bracket and his fight
+stepnz 0x0203ED57 20
+peek8 0x0203ED57 1
+stepz 0x0203ECFC 200
+peek8 0x0203EC04 0x10
+shot t_p2fight
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 40
+poke32 0x0203FD08 38
+stepz 0x0203FD08 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == the rest of the bracket: every turn's reload within 40 frames
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 40
+poke32 0x0203FD08 38
+stepz 0x0203FD08 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepz 0x0203ECFC 200
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 40
+poke32 0x0203FD08 38
+stepz 0x0203FD08 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+peek8 0x0203EC04 0x10
+shot t_later

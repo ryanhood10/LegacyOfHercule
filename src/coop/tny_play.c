@@ -86,6 +86,22 @@ int tny_play_row(int id) {
 
 static u16 pct(u32 v, u32 p) { v = v * p / 100; return (u16)(v > 0xFFFF ? 0xFFFF : v < 1 ? 1 : v); }
 
+// Walking speed per playable (docs/tournament.md 24.7, Ryan: Spopovich should be slow, small fighters quick). Every
+// tournament row runs Gohan's behaviour class, whose init writes the walk speeds (entity +0x188 / +0x18C: the class's
+// ROM literals, 0x08016FD8); player.c's walk and dash scale them by this percent of the row. The giants (TR_GIANT, the
+// 64 x 64 bodies) about 85 %, the small ones 110 %, everyone else (and every story row) 100.
+#define WALK_GIANT_PCT  85
+#define WALK_SMALL_PCT  110
+int tny_walk_pct(int row) {
+    if (row < 29) return 100;                    // the story's rows keep their own class
+    for (int id = 0; id < TF_COUNT; id++) {
+        if (tny_play_row(id) != row) continue;
+        if (id == TF_GOTEN || id == TF_KID_TRUNKS || id == TF_CHIAOTZU || id == TF_VIDEL) return WALK_SMALL_PCT;
+        return (tny_fighters[id].role & TR_GIANT) ? WALK_GIANT_PCT : 100;
+    }
+    return 100;
+}
+
 void tny_play_entry(int id, CharacterEntry *out, const CharacterEntry *lead) {
     int row = tny_play_row(id);
     if (!row) {                  // not a tournament playable: the lead's own entry, nothing invented

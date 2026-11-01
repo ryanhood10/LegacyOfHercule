@@ -92,6 +92,7 @@ static void go_down(int k, Entity *e, u8 *hit) {
     if (!rv.glow) rv.glow = Arena_Alloc(256);
     rv.downs++;
     sfx(SFX_DOWN);
+    if (tny_ring_active()) tny_on_player_down(e);  // a co-op Rumble: the announcer's call (tny_caption.c, 24.1)
 }
 
 static void get_up(int k) {

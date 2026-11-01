@@ -1,0 +1,181 @@
+# Walking speed per tournament playable (docs/tournament.md 24.7; src/coop/tny_play.c tny_walk_pct, player.c walk_speed).
+# Player 1 (alone; the debug party's active slot 1, Piccolo, row 6) on New Planet Vegeta's open ground (zone 2 area 7,
+# enemies cleared) walks right for 30 frames on his own row (100 %), then with slot 1's display row poked to a
+# tournament row: Yamcha (29, 100 %), Spopovich (36, a giant: 85 %), Goten (54, 110 %), Videl (39, 110 %), Cooler (45, a
+# giant: 85 %); the dash (a double tap: the 4-way state) first, on his row and as Spopovich (before the idle fidget, ~1000
+# idle frames, would take the second tap). Only the row changes, so the
+# class's speeds stay Piccolo's (side 1.25 px a frame: 36 px in 30 frames); the walk scales them by the row's percent.
+# Each walk starts from the same spot facing right (test command 38 arg 2 marks x); test command 38 arg 0 kind 2 (arg2
+# 0x20000 | px) answers the px walked when it is the expected one (+-1), else 0: the waitnz on the answer word (0x0203FD0C) times out on a wrong
+# speed. Expected: the dash 75 and 63; then 36, 36, 30, 39, 39, 30.
+#   python tools/headless/st_test.py tools/headless/tny_walk.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x1ae01f4
+poke32 0x0203FD08 5
+frames 200
+poke32 0x0203FD08 13
+frames 20
+map
+peek8 PARTY 1
+peek8 PARTY+0x30 1
+deref p1 0x03001FA8
+echo == priming: a walk right first, so every measured walk starts facing right
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+keys 0x10
+frames 20
+keys 0
+frames 4
+echo == the dash (double tap right, then held): his own row
+poke8 PARTY+0x30 6
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+key 0x10 3
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x2004b
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == the dash as Spopovich
+poke8 PARTY+0x30 36
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+key 0x10 3
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x2003f
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == his own row (6, 100 %): 30 frames right
+poke8 PARTY+0x30 6
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x20024
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+shot w_own
+echo == Yamcha (row 29, 100 %)
+poke8 PARTY+0x30 29
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x20024
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == Spopovich (row 36, giant: 85 %)
+poke8 PARTY+0x30 36
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x2001e
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+shot w_spopovich
+echo == Goten (row 54, 110 %)
+poke8 PARTY+0x30 54
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x20027
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == Videl (row 39, 110 %)
+poke8 PARTY+0x30 39
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x20027
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == Cooler (row 45, giant: 85 %)
+poke8 PARTY+0x30 45
+poke32 p1+0x158 0x1c200
+poke32 p1+0x15C 0x1ae00
+frames 4
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 38
+frames 10
+keys 0x10
+frames 30
+keys 0
+peek p1+0x158 1
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x2001e
+poke32 0x0203FD08 38
+frames 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+poke8 PARTY+0x30 6
+frames 4

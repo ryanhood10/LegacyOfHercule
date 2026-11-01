@@ -37,6 +37,8 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 - **A loser's line after a tournament fight: no.** Only the winner speaks (the default stays).
 - **Start skips the fighters' talk:** not decided; the default (it skips) stays until he says.
+- **Open (2026-11-01): Yamu's walking speed.** He is a 64 x 64 body, so 24.7 gives him the giants' 85 %, though his kit
+  calls him "the quicker thief". Exempting him is one line in `tny_walk_pct`.
 - **Super Saiyan Hercule: the same rules as the Super Saiyans** (section 4).
 - **The story polish:** all of it is to be addressed (section 3), after the playtest's notes are in.
 - **The combos' playtest notes** wait for the two-player session; the combos are not touched until then.
@@ -88,7 +90,7 @@ Test: `SSJ_TEST=1` (`docs/testing.md` "Super Saiyan Hercule"): transform as play
 
 ## 5. The open fixes (no decision needed)
 
-The tournament's, each already planned in `docs/tournament.md` 24 with its test and size: **24.1** the announcer's
+The tournament's (**24.1-24.7 all built and merged 2026-11-01**; what was built is in `docs/tournament.md` 24), each planned there with its test and size: **24.1** the announcer's
 calls during a Rumble as a non-pausing caption (half a day); **24.2** portraits for Android 13, Cell Jr., the Namekian
 Warrior and Evil Buu, ids 169-172 (hours); **24.3** Yakon's lying pose (an hour or two); **24.4** the announcer walks
 off and on (hours); **24.5** the co-op turn change's black screen, a readiness check instead of 90 frames (an hour);

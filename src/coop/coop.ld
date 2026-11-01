@@ -79,6 +79,7 @@ SECTIONS
         KEEP(*(.tny.gr))     /* grounds (<= 0x40) */
         KEEP(*(.tny.hp))     /* overhead HP bars (8 bytes) */
         KEEP(*(.tny.talk))   /* the fighters' dialogue (tny_talk.c, 0x58) */
+        KEEP(*(.tny.cap))    /* the Rumble announcer's calls (tny_caption.c, 0x10) */
     } > tourneyram
 
     .combo (NOLOAD) : {

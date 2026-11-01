@@ -1374,7 +1374,7 @@ static void step(TKit *k) {
         pose(k, G_CHARGE(k), (tt >> 3) & 1);
         s32 x, y;
         centre(e, &x, &y);
-        if (tt == 2) shake(40, 60);
+        if (tt == 2) { shake(40, 60); tny_on_transform(e, k->fighter); }   // the announcer's call (24.1)
         if ((tt & 7) == 4) { boom(x - 16 + Rand_Range(32), y - 16 + Rand_Range(32)); sfx(SFX_BOOM); }
         if (tt == 40) { transform(k, m); flash(x, y, ART_ORB_L, 12); }
         if (tt >= 56) finish(k);
@@ -1540,6 +1540,7 @@ static void fallen(TKit *k) {
         E32(e, 0x168) = 0;                          // the stock message handler's "hittable" word
         e->facing = (e->facing == 1 || e->facing == 3) ? 3 : 2;   // he lies in a side facing (as at the line)
         mv.falls++;
+        if (!k->copy) tny_on_fall(e, k->fighter);   // the Rumble announcer's call (tny_caption.c, 24.1)
     }
     if (k->down_t < 0x7FFF) k->down_t++;
     if (e->ctrl_state != &k->ctrl) Entity_SetCtrlState(e, &k->ctrl);
