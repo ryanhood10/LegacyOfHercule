@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **The combos' leftovers** (branch `pp-combo`, `docs/tournament.md` 25.5): Cell Jr.'s copies face the target from
+  their own side (his pose in the copy's facing from the record, decoded into their own VRAM when it is not his blob);
+  Android 16 and Super 13 hold still as bystanders while a combo plays (their kits swallow message 10); the kits' own
+  moves in their colours outside the combos (Frieza's and Mecha Frieza's Death Beam pink, King Cold's red, Cooler's
+  purple and his Supernova gold, Mystic Gohan's Masenko yellow, Broly's orbs green), their table in
+  `docs/tournament-combos.md` section 4 beside the combos' colours, the painting shared in `src/coop/tny_colours.c`.
+  Combo damage unchanged; test `tools/headless/tny_pp_combo.txt`.
 - **Super Saiyan Hercule: the Super Saiyans' rules** (branch `pp-ssj`, `docs/perfect-pass.md` 4, `docs/hercule.md`
   3b): the stock transformation decompiled into `docs/engine.md` "Super Saiyan transformation" (ability 12: ready at
   10 EP, no cost, a 160-frame power-up with its hum and sound, the Super Saiyan class's +10 combat bytes, faster legs,

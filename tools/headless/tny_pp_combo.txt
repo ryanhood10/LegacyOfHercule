@@ -1,0 +1,558 @@
+# The combos' leftovers (docs/perfect-pass.md 5, docs/tournament.md 25.5, docs/testing.md "Team combos: the leftovers"),
+# from the debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_pp_combo.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# 1. the kits' own beams and orbs in their colours (docs/tournament-combos.md section 4, the kits' table), filmed: each
+#    fighter spawned 64 px right of player 1 (test command 26), his move forced (27 op 0); shots kb_NAME_NN.
+# 2. Android 16 and Super 13 as bystanders in a Rumble hold still while a combo plays (their frame +0x14, its timer
+#    +0x12 and group +0x4C stay put; they animate before and after); shots by_NN.
+# 3. Cell Jr.'s copies: each faces the target from its side (cr+0x88: modes, facings, sides), and with Cell Jr. turned
+#    to face down (poked) they decode their own side frame (mode 2); shots cp_NN.
+# Pass: no CRASH; the kb shots show pink, purple, gold, red, yellow, green energy (the Kamehameha blue); part 2's
+# frame lines equal during the combo; part 3's copies left of him face 3, right of him 2, and mode 2 after the poke.
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x030F
+poke32 0x0203FD54 0x01620114
+poke32 0x0203FD08 5
+frames 300
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke16 0x0203F098 9000
+poke16 0x0203F09A 9000
+deref q 0x0203FF08
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+find mv 0x4D4F5645
+echo == 1. the kits' own beams and orbs
+echo -- frieza (fighter 2)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x40002
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD08 27
+frames 24
+shot kb_frieza_death_beam_00
+frames 6
+shot kb_frieza_death_beam_01
+frames 6
+shot kb_frieza_death_beam_02
+frames 6
+shot kb_frieza_death_beam_03
+frames 6
+shot kb_frieza_death_beam_04
+frames 6
+shot kb_frieza_death_beam_05
+frames 6
+shot kb_frieza_death_beam_06
+frames 90
+echo -- mecha (fighter 3)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x40003
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD08 27
+frames 24
+shot kb_mecha_death_beam_00
+frames 6
+shot kb_mecha_death_beam_01
+frames 6
+shot kb_mecha_death_beam_02
+frames 6
+shot kb_mecha_death_beam_03
+frames 6
+shot kb_mecha_death_beam_04
+frames 6
+shot kb_mecha_death_beam_05
+frames 6
+shot kb_mecha_death_beam_06
+frames 90
+echo -- cold (fighter 4)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x40004
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x2
+poke32 0x0203FD08 27
+frames 24
+shot kb_cold_death_beam_00
+frames 6
+shot kb_cold_death_beam_01
+frames 6
+shot kb_cold_death_beam_02
+frames 6
+shot kb_cold_death_beam_03
+frames 6
+shot kb_cold_death_beam_04
+frames 6
+shot kb_cold_death_beam_05
+frames 6
+shot kb_cold_death_beam_06
+frames 90
+echo -- cooler (fighter 23)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x40017
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD08 27
+frames 24
+shot kb_cooler_death_flash_00
+frames 6
+shot kb_cooler_death_flash_01
+frames 6
+shot kb_cooler_death_flash_02
+frames 6
+shot kb_cooler_death_flash_03
+frames 6
+shot kb_cooler_death_flash_04
+frames 6
+shot kb_cooler_death_flash_05
+frames 6
+shot kb_cooler_death_flash_06
+frames 90
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x2
+poke32 0x0203FD08 27
+frames 10
+shot kb_cooler_supernova_00
+frames 8
+shot kb_cooler_supernova_01
+frames 8
+shot kb_cooler_supernova_02
+frames 8
+shot kb_cooler_supernova_03
+frames 8
+shot kb_cooler_supernova_04
+frames 8
+shot kb_cooler_supernova_05
+frames 8
+shot kb_cooler_supernova_06
+frames 8
+shot kb_cooler_supernova_07
+frames 90
+echo -- mgohan (fighter 31)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x4001f
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD08 27
+frames 24
+shot kb_mgohan_masenko_00
+frames 6
+shot kb_mgohan_masenko_01
+frames 6
+shot kb_mgohan_masenko_02
+frames 6
+shot kb_mgohan_masenko_03
+frames 6
+shot kb_mgohan_masenko_04
+frames 6
+shot kb_mgohan_masenko_05
+frames 6
+shot kb_mgohan_masenko_06
+frames 90
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x2
+poke32 0x0203FD08 27
+frames 24
+shot kb_mgohan_kamehameha_00
+frames 8
+shot kb_mgohan_kamehameha_01
+frames 8
+shot kb_mgohan_kamehameha_02
+frames 8
+shot kb_mgohan_kamehameha_03
+frames 8
+shot kb_mgohan_kamehameha_04
+frames 8
+shot kb_mgohan_kamehameha_05
+frames 8
+shot kb_mgohan_kamehameha_06
+frames 8
+shot kb_mgohan_kamehameha_07
+frames 90
+echo -- broly (fighter 25)
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x40019
+poke32 0x0203FD54 0
+poke32 0x0203FD08 26
+frames 4
+deref k0 mv+8
+deref e0 k0+0x138
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 30000
+poke32 0x0203FD08 27
+frames 2
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x1
+poke32 0x0203FD08 27
+frames 16
+shot kb_broly_eraser_00
+frames 4
+shot kb_broly_eraser_01
+frames 4
+shot kb_broly_eraser_02
+frames 4
+shot kb_broly_eraser_03
+frames 4
+shot kb_broly_eraser_04
+frames 4
+shot kb_broly_eraser_05
+frames 4
+shot kb_broly_eraser_06
+frames 4
+shot kb_broly_eraser_07
+frames 90
+deref p1 0x03001FA8
+poke32 p1+0x158 0x11400
+poke32 p1+0x15C 0x16200
+poke32 q+0x158 0xE600
+poke32 q+0x15C 0x16200
+poke32 e0+0x158 0x15400
+poke32 e0+0x15C 0x16200
+poke32 0x0203FD0C 0x2
+poke32 0x0203FD08 27
+frames 10
+shot kb_broly_meteor_00
+frames 8
+shot kb_broly_meteor_01
+frames 8
+shot kb_broly_meteor_02
+frames 8
+shot kb_broly_meteor_03
+frames 8
+shot kb_broly_meteor_04
+frames 8
+shot kb_broly_meteor_05
+frames 8
+shot kb_broly_meteor_06
+frames 8
+shot kb_broly_meteor_07
+frames 8
+shot kb_broly_meteor_08
+frames 90
+poke32 0x0203FD0C 0x04000000
+poke32 0x0203FD08 27
+frames 10
+echo == 2. Android 16 and Super 13 in a Rumble while Spopovich and Yamu's combo plays on player 1
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40008
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60709
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x10113
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x1021c
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref k2 mv+16
+deref k3 mv+20
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref e2 k2+0x138
+deref e3 k3+0x138
+echo -- the four fighters' ids (kit +0x15C): Spopovich 8, Yamu 9, Android 16 19 (0x13), Super 13 28 (0x1c)
+peek8 k0+0x15C 1
+peek8 k1+0x15C 1
+peek8 k2+0x15C 1
+peek8 k3+0x15C 1
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+poke32 0x0203FD0C 0x01000001
+poke32 0x0203FD08 27
+frames 2
+echo -- before: 16 and 13 animate (timer +0x12, frame +0x14 | group +0x4C), twice 12 frames apart
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+frames 12
+peek16 e2+0x12 2
+peek16 e3+0x12 2
+shot by_start
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the combo plays (cr+4: busy 2), 16's and 13's frame lines every 40 frames: all equal
+peek8 cr+4 4
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+shot by_00
+frames 40
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+shot by_01
+frames 40
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+shot by_02
+frames 40
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+shot by_03
+frames 40
+peek16 e2+0x12 2
+peek e2+0x4C 1
+peek16 e3+0x12 2
+peek e3+0x4C 1
+shot by_04
+frames 40
+echo -- after it (busy 0, reason 1), they animate again
+frames 100
+peek8 cr+4 4
+peek16 e2+0x12 2
+peek16 e3+0x12 2
+frames 12
+peek16 e2+0x12 2
+peek16 e3+0x12 2
+shot by_after
+echo -- the runner's numbers: runs frames | hits held frozen moved
+peek16 cr+0x0C 2
+peek8 cr+0x2C 4
+echo == 3. Cell Jr.'s copies facing the target from their side, and decoding their own frame
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100f
+poke32 0x0203FD54 0x18000f8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x40015
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+poke32 0x0203FD0C 0x60716
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 26
+frames 10
+find mv 0x4D4F5645
+deref k0 mv+8
+deref k1 mv+12
+deref e0 k0+0x138
+deref e1 k1+0x138
+deref pa 0x03001FA8
+deref pb 0x0203FF08
+poke16 0x0203F028 9000
+poke16 0x0203F02A 9000
+frames 2
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+echo -- combat bytes: A, B (0x30 0x30 each); player 1's defence
+peek8 e0+0x160 2
+peek8 e1+0x160 2
+peek8 pa+0x162 1
+poke32 0x0203FD0C 0x10000ff
+poke32 0x0203FD08 33
+frames 1
+poke8 e0+0x160 0x30
+poke8 e0+0x161 0x30
+poke8 e1+0x160 0x30
+poke8 e1+0x161 0x30
+poke32 0x0203FD0C 0x302ff
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 33
+frames 4
+find cr 0xC0B0A001
+echo -- the game's frame counter at the start (cr+8)
+peek cr+8 1
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+shot cp_05
+peek8 cr+0x88 10
+frames 8
+echo -- Cell Jr. (e1) turned to face down: the copies (sideways) decode their own frame: modes 2
+poke8 e1+0x10 0
+frames 2
+peek8 cr+0x88 10
+shot cp_own
+frames 8
+frames 8
+shot cp_08
+peek8 cr+0x88 10
+frames 8
+frames 8
+frames 8
+shot cp_11
+peek8 cr+0x88 10
+frames 8
+frames 8
+frames 8
+shot cp_14
+peek8 cr+0x88 10
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 8
+frames 24
+echo -- and at the combo's last frame: the difference against its frames (cr+0x0E) is the slowdown
+peek cr+8 1
+echo -- runner: busy combo side reason | runs frames | HP before, after | damage A, B | A x y B x y T x y | hits held frozen moved | ids fail starts
+peek8 cr+4 4
+peek16 cr+0x0C 2
+peek cr+0x10 2
+peek cr+0x18 2
+peek16 cr+0x20 6
+peek8 cr+0x2C 4
+peek8 cr+0x30 4
+peek16 cr+0x84 2
+echo -- cj damage: player 1's HP before - after (cr+0x10), A, B (cr+0x18)
+frames 40

@@ -270,7 +270,7 @@ $(BUILD)/obj/tny_talk_data.o: $(BUILD)/gen/tny_talk_data.c src/coop/rom.h src/co
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # the team combos' step tables, from Ryan's doc (docs/tournament-combos.md; tools/tnycombo.py)
-$(BUILD)/gen/tny_combo_data.c: tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $(ROM)
+$(BUILD)/gen/tny_combo_data.c: tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h src/coop/tourney.h $(ROM)
 	@mkdir -p $(BUILD)/gen
 	$(PYTHON) tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h $@ --rom $(ROM)
 

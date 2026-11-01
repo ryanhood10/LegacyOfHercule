@@ -95,7 +95,8 @@ off and on (hours); **24.5** the co-op turn change's black screen, a readiness c
 **24.6** Papaya Island's world-map landmark (built 2026-11-01, branch `pp-map`: `docs/tournament.md` 24.6); **24.7** walking speed per playable (half a day
 to a day); **24.9** the merged worktrees removed once the films are not wanted.
 
-The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"):
+The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"; **all three built and merged 2026-11-01, `docs/tournament.md`
+25.5**; the kits' colours also give Cooler's own Supernova gold and Broly's orbs green, as he has no beam move):
 - **Cell Jr.'s copies mirror his frame**: a copy draws the source body's current frame; a copy facing the other way
   should draw that facing's frame from the record's direction array (`copy K X Y` gets a facing from X's sign). Test:
   `tny_combo_tune.txt`'s Cell film.

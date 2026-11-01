@@ -18,6 +18,7 @@ inspection goes through the GDB stub.
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
+| Team combos: the leftovers | the kits' own moves in their colours filmed, Android 16 and Super 13 held as bystanders, Cell Jr.'s copies' facings |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -570,6 +571,32 @@ The colour pass (25.4) was filmed with the same script: `build/combos/colour/` (
 strips `z_*.png`) against `build/combos/after/` (before it), not committed. Look for: each fighter's shots in his
 colour (section 4 of the combos doc), the yellow Masenko, the Big Bang in Vegeta's palm then the cyan comet, white
 sparks at teleports and punches, every body on screen, one disc only.
+
+The copies' state (2026-11-01, `docs/tournament.md` 25.5): the `cj` part peeks `.combo.run` +0x88 after `cj_05`, `08`,
+`11`, `14` and `17` (`0203eb38`: three modes, three facings, three "left of him" bytes, then the copies made with their
+own VRAM): a copy left of him faces 3 (right), right of him 2 (left); modes 1 (his tiles) for Cell Jr.'s side facings.
+
+## Team combos: the leftovers (headless, branch `pp-combo`, 2026-11-01)
+
+```
+make BUILD=build/pp-combo DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/pp-combo/log2-coop.gba --out build/pp-combo/hl
+python tools/headless/st_test.py tools/headless/tny_pp_combo.txt build/pp-combo/log2-coop.gba build/pp-combo/hl/menu.ss --out build/pp-combo/hl --cols 6
+```
+
+`tools/headless/tny_pp_combo.txt` (`docs/tournament.md` 25.5), about 50 s, in `regfull.sh`. Part 1 films the kits' own
+moves in their colours (`docs/tournament-combos.md` section 4, the kits' table) on New Planet Vegeta's open ground as
+`tny_moves.txt` does (the fighter 64 px right of player 1, his move forced by test command 27 op 0): `kb_frieza_*`,
+`kb_mecha_*`, `kb_cold_*` (pink, pink, red Death Beams), `kb_cooler_death_flash_*` (purple), `kb_cooler_supernova_*`
+(gold), `kb_mgohan_masenko_*` (yellow), `kb_mgohan_kamehameha_*` (blue: the control), `kb_broly_eraser_*`,
+`kb_broly_meteor_*` (green). Part 2 spawns Spopovich, Yamu, Android 16 and Super 13 on the ring map, turns the Rumble
+on and runs Spopovich & Yamu's combo on player 1 (test command 33): 16's and 13's animation timer and frame (`+0x12`,
+`+0x14`) and group (`+0x4C`) are peeked before (they change), five times during the combo (all equal) and after
+(they change again); shots `by_*`. Part 3 is the `cj` part of `tny_combo_tune.txt` with the copies' state peeked
+(`.combo.run` +0x88) and Cell Jr. poked to face down after `cj_06` (`cp_own`): the copies decode their own side frame
+(modes `02 02`). Pass: no CRASH; part 2's lines during the combo equal; part 3's facings as above and `02 02` after
+the poke. A build of the commit before (`build/pp-combo-base-src`, removed after) gave the same part 2 timers running
+through the combo (the bystanders animated) and blue beams in part 1.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 

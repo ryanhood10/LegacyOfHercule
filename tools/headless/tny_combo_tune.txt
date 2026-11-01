@@ -1364,6 +1364,7 @@ peek8 e0+0x160 2
 peek8 e1+0x160 2
 peek8 pa+0x162 1
 shot cj_start
+echo -- the copies (cr+0x88, docs/tournament.md 25.5): mode x3 (1 his tiles, 2 its own, 3 his mirrored), facing x3 (2 left, 3 right), left of him x3, made with their own VRAM: a copy left of him faces right (3), right of him left (2)
 poke32 0x0203FD0C 0x10000ff
 poke32 0x0203FD08 33
 frames 1
@@ -1390,30 +1391,35 @@ frames 8
 shot cj_04
 frames 8
 shot cj_05
+peek8 cr+0x88 10
 frames 8
 shot cj_06
 frames 8
 shot cj_07
 frames 8
 shot cj_08
+peek8 cr+0x88 10
 frames 8
 shot cj_09
 frames 8
 shot cj_10
 frames 8
 shot cj_11
+peek8 cr+0x88 10
 frames 8
 shot cj_12
 frames 8
 shot cj_13
 frames 8
 shot cj_14
+peek8 cr+0x88 10
 frames 8
 shot cj_15
 frames 8
 shot cj_16
 frames 8
 shot cj_17
+peek8 cr+0x88 10
 frames 8
 shot cj_18
 frames 8

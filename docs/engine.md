@@ -223,7 +223,17 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   `0x0801585A` fires it, `0x0801592E` ends it; its message `0x08015EE0` answers 10 with the update `0x0801594C(o,
   10)` (grows the drill 3 px a frame and hits every enemy on it; with 0 it only animates). Charge and shot spots per
   facing: `0x086E382C`, `0x086E385C`.
-- **Drawing a body.** `0x08007A84`: a frame's descriptor and its screen spot from the camera cell; `0x08007772`: the
-  OAM words.
+- **Drawing a body.** `0x08007A84`: a frame's descriptor and its screen spot from the camera cell (descriptor = the
+  group's array for the facing, `*(+0x4C)[facing +0x10] + frame +0x14 * 12`, kept at +0x3C); `0x08007772`: the OAM words,
+  and when the frame changed (+0x20 the last one) it unpacks it (`0x0801F394`, or `0x0801F3BA` through the remap +0x24)
+  into a 4 KB buffer on the stack (sp - 0x1004) and DMAs it to the entity's own buffer (+0x30); a plain (kind 0) frame is
+  DMA'd later straight from the ROM. The draw pass (`0x08006AD8`) calls every entity's slot 3 (on screen?), sorts, then
+  slot 4 (OAM); a nonzero slot 4 queues it, and the upload pass (`0x08006AA6`) calls the queued ones' slot 5. Records
+  share one blob between a side facing and its mirror (the right frame's attribute flips it; the offsets are the same).
+- **Android 16 and Super 13 in the tournament.** Their kits wrap the co-op enemy vtable (`coop2.enemy_vtable`), whose
+  message is the stock enemy's (`0x0800E5B8`, message 10 to the base entity message `0x08019B70`: with no command it
+  runs the control state's and the aux state's animate, slot 1); `android16.c`'s `a16_message` / `super13.c`'s
+  `s13_message` are the story bosses' only. Idle's animate `0x08007570` counts +0x12 and shows frame 1 for 15 of every
+  256 frames.
 - **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
   bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.
