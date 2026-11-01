@@ -61,9 +61,10 @@ LOOPS = (1, 2, 13)
 # Buu records without a lie-down whose hurt anim's recoil (9.1) turned to lie read as a sprawl seen from above
 # (Ryan's polish list, 2026-10-25): the frame to turn instead, (anim, frame, tuck): Broly's head-back recoil 9.0 (his 9.1
 # is a crouch: turned, the hair stood up off the ground), Janemba's straight recoil 9.2 (on his back, the tail curled
-# up), Yakon's 9.1 with the limbs drawn in (lying.tuck_limbs: he is drawn only from the front, so any turned frame is a
-# spread-eagle seen from above)
-LIE_FRAME = {28: (9, 0, None), 144: (9, 2, None), 290: (9, 1, (0.2, 0.3))}
+# up). Yakon is drawn only from the front, so any turned frame is a spread-eagle seen from above (his 9.1 turned with
+# the limbs drawn in, lying.tuck_limbs, still read as a crab): his recoil 9.3 (no hit sparks) squashed flat instead,
+# a body on its back seen down the camera's angle ("sprawl": lying.sprawl; docs/tournament.md 24.3, 2026-11-01)
+LIE_FRAME = {28: (9, 0, None), 144: (9, 2, None), 290: (9, 3, "sprawl")}
 
 
 def is_lying(bu, d):
@@ -414,7 +415,10 @@ class Converter:
             key = ("lie", frame[d], d == 3, bu_id)
             if key not in self.blob_cache:
                 (x0, y0, w, h), px = self.bu.frame_pixels(frame[d])
-                nxo, nyo, ow, oh, npx = LY.lie(px, x0, y0, face_left=(d != 3), tuck=tuck)
+                if tuck == "sprawl":
+                    nxo, nyo, ow, oh, npx = LY.sprawl(px, x0, y0, face_left=(d != 3))
+                else:
+                    nxo, nyo, ow, oh, npx = LY.lie(px, x0, y0, face_left=(d != 3), tuck=tuck)
                 ow, oh, blob, raw = self.encode(npx, ow, oh, ow, oh, rec["remap"])
                 self.blob_cache[key] = (nxo, nyo, ow, oh, LY.attr_for(parts[0][4], ow, oh), blob, raw)
             out.append(self.blob_cache[key])

@@ -2,6 +2,7 @@
 # (the announcer, the walk-in, the end poses), Android 16 and Super 13 as opponents on their own paths, the Z-Fighter
 # Rumble's headliner 16, the hidden fight's alternatives (Champion Rumble -> Majin Vegeta, Legend 1 v 1 -> Goku (Buu
 # saga), Legend Rumble -> Super Buu's final form, Legend 2 v 2 -> the pair) and the select grid's cropped giant faces.
+# Last, Yakon beaten (his lying pose, 24.3).
 #   python tools/headless/st_test.py tools/headless/tny_polish.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
 # Engine state `eng` 0x0203EC00 (tny_engine.c TnyEng): +4 phase (4 a fight, 5 its end, 10 the intro), +6 kind (2 a
 # challenge), +0x2C opp[0], +0x57 chal[0..1], +0x59 nchal, +0x14C the announcer entity (0 = none), +0x150 pres,
@@ -342,3 +343,24 @@ frames 10
 stepz 0x0203ECFD 80
 echo expect Goku (Buu saga) unlocked now (+0xB bit 5: 0x20, with Majin Vegeta's 0x40)
 peek8 0x0203ED68 0x40
+echo == 12. Yakon (drawn only from the front) as the first opponent, beaten: he lies flat on his back, face up, limbs spread (docs/tournament.md 24.3)
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0x7E000027
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x200
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 200
+shot p12_yakon_fight
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 130
+shot p12_yakon_down
+echo expect phase 5 (the end), Yakon (sprite 198) the opponent lying in his group 12
+peek8 0x0203EC04 4
+deref OPP 0x0203EC2C
+peek OPP+0x48 1
+peek OPP+0x4C 1

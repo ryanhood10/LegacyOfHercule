@@ -59,8 +59,8 @@ def body_only(px):
 
 
 def squash_rows(px, s):
-    """The frame's rows resampled to s of its height (nearest row). Tried on Yakon's turned front view (still a sprawl
-    seen from above, only flatter); tuck_limbs is what he uses."""
+    """The frame's rows resampled to s of its height (nearest row). On Yakon's turned front view it was still a sprawl
+    seen from above, only flatter; on his upright front view it is his lying pose (sprawl())."""
     h = len(px)
     nh = max(1, int(round(h * s)))
     return [list(px[min(h - 1, int((j + 0.5) / s))]) for j in range(nh)]
@@ -93,6 +93,37 @@ def tuck_limbs(px, half=0.2, k=0.3):
     for (y, x), (_, v) in put.items():
         out[y - top][x] = v
     return out
+
+
+def sprawl(px, xo, yo, face_left=True, s=0.45):
+    """A body drawn only from the front (Yakon) laid flat on its back: the upright frame's rows squashed to `s` of its
+    height (nearest row), as LoG2's camera, looking down at an angle, sees a body lying along the view: short and wide,
+    face up, arms and legs spread on the floor. Trimmed to the smallest OBJ shape, its lowest row one below the upright
+    body's feet, centred where it stood (as lie()); facing right, the mirror. Docs: docs/sprites.md "Lying poses"
+    (Yakon, 2026-11-01: chosen over the turned recoil with the limbs tucked, which read as a crab seen from above, and
+    over a frame painted from shapes, which did not match Buu's Fury's drawing)."""
+    px = body_only(px)
+    pts = [(y, x) for y, row in enumerate(px) for x, v in enumerate(row) if v]
+    if not pts:
+        return xo, yo, len(px[0]), len(px), px
+    ground = yo + max(y for y, _ in pts)
+    x0, x1 = min(x for _, x in pts), max(x for _, x in pts)
+    cx = xo + (x0 + x1 + 1) / 2
+    body = squash_rows([row[x0:x1 + 1] for row in px[min(y for y, _ in pts):max(y for y, _ in pts) + 1]], s)
+    if not face_left:
+        body = [row[::-1] for row in body]
+    bh, bw = len(body), len(body[0])
+    if bw > 64:
+        cut = (bw - 64) // 2
+        body = [row[cut:cut + 64] for row in body]
+        bw = 64
+    ow, oh = obj_size(bw, bh)
+    out = [[0] * ow for _ in range(oh)]
+    left = (ow - bw) // 2
+    for y in range(bh):
+        for x in range(bw):
+            out[oh - bh + y][left + x] = body[y][x]
+    return int(round(cx - ow / 2)), ground - oh + 1 + 1, ow, oh, out
 
 
 def lie(px, xo, yo, face_left=True, max_bytes=None, squash=1.0, tuck=None):

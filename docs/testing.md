@@ -799,6 +799,11 @@ grep -E "^hit|0202....: " build/art-buu/hl/artbuu.out | paste - -      # the hit
 - **Portraits load:** `python -I tools/tnyportraits.py roms/log2.gba /dev/null --buu roms/buu.gba --check
   build/art-buu/log2-coop.gba $(TNY_PORTRAITS)` (the pairs from the Makefile) reads the built ROM's portrait table
   through the getter's literal (0x0800BE10, word id + 1) and decodes every id: "29 portraits load" (2026-10-25).
+- **Portraits 169-172** (2026-11-01): `python -I tools/ppportraits.py roms/log2.gba /dev/null --buu roms/buu.gba
+  --check build/<dir>/log2-coop.gba $(PP_PORTRAITS)` ("4 portraits load"); `--compare BUILT.gba coop.sym OUT.png` draws
+  each beside its source, the sprite-face recipe and two stock portraits. In the game: `tny_talk.txt` t8 (Android 13,
+  Cell Jr.) and t9 (the Namekian Warrior, Evil Buu): each box shows the speaker's face. Yakon's lying pose:
+  `tny_polish.txt` section 12 (`p12_yakon_down`, his frame group = record + 0x10C) and `tnysheet.py --lying --ids 198`.
 - Previews of every conversion (Buu colours left, ours right, the hurt box in red on group 0):
   `build/art-buu/tny/buu_preview_<id>.png`; portraits: `build/art-buu/tny_portraits.png`.
 ## Tournament fighters (art-new, headless, 2026-10-25)
@@ -1002,7 +1007,8 @@ Z-Fighter Rumble with 16 as the headliner (`opp_id` ends 0x13), Janemba's challe
 Majin Vegeta challenges (`chal` 0x1E), unlocked, no Uub; the Legend 1 v 1 as Gohan: Goku (Buu saga, 0x1D), lost, no
 attempt recorded; the Legend Rumble: Super Buu's final form (`eng` +0x153 = 1, his body = sprite 207's record, compared
 with the sprite index), won: the record's `extra` bit 0 (+0x38); the select's Villains and Buu Saga tabs (cropped giants:
-`p10_*`); co-op Legend 2 v 2: Goku (Buu saga) alone challenges (Majin Vegeta is unlocked by then), won. The screens:
+`p10_*`); co-op Legend 2 v 2: Goku (Buu saga) alone challenges (Majin Vegeta is unlocked by then), won; Yakon forced
+as a first opponent and beaten (`p12_yakon_down`: flat on his back, group 12). The screens:
 `build/<dir>/hl/tny_polish.png`. Pass: every `stepz` / `waitnz` reached, no CRASH, the peeks as the echoes say.
 `tny_ui.txt`'s bracket shots (`u18`-`u29`) show King Cold and the other giants at half size.
 

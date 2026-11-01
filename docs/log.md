@@ -10,6 +10,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
   ring on a sandy island, the hall's red roof, a palm), the arctic decoration 13 (the stock snowy mountain, flag
   381). `tools/mapedit.py` `add_decorations`; test `tools/headless/wm_landmark.txt` (in `regfull.sh`, which takes
   `PLAY=` for a private play ROM).
+- **Tournament art: four dialogue portraits and Yakon's lying pose** (branch `pp-art`, `docs/tournament.md` 24.2 /
+  24.3): Android 13, Cell Jr., the Namekian Warrior and Evil Buu speak with a face now (portraits 169-172,
+  `tools/ppportraits.py`): each the stock portrait of the body his sprite was made from, repainted as the sprite was
+  (16's with a trucker cap and white hair, Perfect Cell's blue, Piccolo's teal with a maroon gi, Buu's Fury's Super
+  Buu grey; Buu's Fury has no Evil Buu portrait). The plan's sprite-face-at-2x recipe was built and compared and
+  looked like blocks beside the stock faces. Yakon, beaten, lies flat on his back (his front frame squashed to 45 %,
+  `lying.sprawl`), chosen over a frame painted from shapes. Tests `tny_talk.txt` t8 / t9, `tny_polish.txt` 12.
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.
