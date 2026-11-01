@@ -37,8 +37,8 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 - **A loser's line after a tournament fight: no.** Only the winner speaks (the default stays).
 - **Start skips the fighters' talk:** not decided; the default (it skips) stays until he says.
-- **Open (2026-11-01): Yamu's walking speed.** He is a 64 x 64 body, so 24.7 gives him the giants' 85 %, though his kit
-  calls him "the quicker thief". Exempting him is one line in `tny_walk_pct`.
+- **Yamu walks at normal speed (Ryan, 2026-11-01)**, though a 64 x 64 body (the giants walk at 85 %): "the quicker
+  thief" (`tny_walk_pct`).
 - **Super Saiyan Hercule: the same rules as the Super Saiyans** (section 4).
 - **The story polish:** all of it is to be addressed (section 3), after the playtest's notes are in.
 - **The combos' playtest notes** wait for the two-player session; the combos are not touched until then.
@@ -135,6 +135,7 @@ merges each branch, rebuilds and runs `regfull.sh`. Nobody touches the combos' s
 | art | 24.2 portraits 169-172, 24.3 Yakon's lying pose | the faces in `tny_talk.txt`; the lying sheet |
 | combo | the copies' facing, 16 / Super 13 holding during a combo, the kits' beams in their colours | the Cell film, a Rumble with 16, `tny_moves.txt` filmed |
 | map | 24.6 Papaya Island's world-map landmark | the landmark in a world-map flight |
+| reset (added 2026-11-01, `log2-reset`) | section 9: the soft-reset load crash (reproduced: two players, save, A+B+Select+Start, load) | a soft-reset load test in `regfull.sh` |
 
 ## 8. Ryan's one-player notes (2026-11-01, playing `build/play` alone)
 

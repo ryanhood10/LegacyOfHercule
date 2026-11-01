@@ -1319,10 +1319,10 @@ The plan as it was:
   (0x0800811F, 4-way: +0x18C along the facing plus +0x188 sideways) read the entity's speeds, which the behaviour
   class's init writes from ROM literals (0x08016FD8); every tournament row has Gohan's class. Both states are ours
   (`player.c` walk_update / diag_update, both players), so they scale the speeds by the row's percent:
-  `tny_play.c` `tny_walk_pct(row)` (a rule, no table column): TR_GIANT 85 %, Goten, Kid Trunks, Chiaotzu and Videl
+  `tny_play.c` `tny_walk_pct(row)` (a rule, no table column): TR_GIANT 85 % (except Yamu, "the quicker thief": 100 %, Ryan 2026-11-01), Goten, Kid Trunks, Chiaotzu and Videl
   110 %, the rest and every story row 100. The giants are King Cold, Spopovich, Yamu, Cooler, Broly, Super 13, Super
-  Buu, Yakon, Dabura, Evil Buu, Fat Buu and Janemba: Yamu ("the quicker thief" of his kit) is slow with them since he
-  is a 64 x 64 body; one line in `tny_walk_pct` exempts him if Ryan wants. Opponents keep the AI's chase speeds. Test:
+  Buu, Yakon, Dabura, Evil Buu, Fat Buu and Janemba, all but Yamu, a 64 x 64 body walking at 100 % as "the quicker
+  thief" of his kit (Ryan, 2026-11-01). Opponents keep the AI's chase speeds. Test:
   `tny_walk.txt` (its own script rather than `tny_play.txt`, which is generated).
 
 ### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
