@@ -157,6 +157,15 @@ punctuation only); owner in brackets.
    maps 11 / 12, zone 2 areas 5 / 6): drop "Gohan" so it fits Krillin as player 1: "Alright, it's about time to fly
    over to West City and meet up with Piccolo."
 
+9. **West City's parade, playing as Krillin** [story]: player 1's lines show "GOHAN:" (stock map 65, zone 4 area 3:
+   `#GOHAN: Sure!` is hard-coded on speaker 1; Piccolo's "Well Gohan" and "How's your training going, Gohan?" too).
+10. **Yajirobe's Senzu Bean, playing as Krillin** [story]: he says "What's up, Gohan?" and the player speaks as Gohan
+   (stock map 135, zone 4 area 94, and map 231: `PushActiveCharName`, step 12, gives "Gohan" for Krillin: find why,
+   likely the name comes from his display row, a copy of Gohan's).
+11. **A sweep for the same** [story]: every stock line that names Gohan, or speaks as him on speaker 1, in a scene
+   Krillin (or another character) can play as player 1; fix each to the player's own name or a neutral line, as in
+   item 8.
+
 ## 9. Found during the pass (not asked for; to fix or to ask Ryan)
 
 - **A soft reset, then loading a save, crashes** about 5 frames after the load's A (a jump through a null vtable from
