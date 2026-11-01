@@ -15,7 +15,7 @@ for t in a16_moves tny_eggs tny_crowd tny_npcs tny_polish tny_engine tny_ui tny_
          tny_artbuu tny_grounds cell_games cell_games_1p krillin_disc arctic_summit postgame ch9_gero p2_special revive difficulty \
          journal dropout ch1_room_forest scene_actor exp_credit a16_gone broly_ride duel_end tny_hpbars tny_fightfix \
          tny_nomirror tny_talk tny_combo_draw tny_combo_meter tny_combo_run tny_combo_tune wm_landmark tny_pp_combo \
-         tny_caption tny_annwalk tny_turn tny_walk gohan_ssj1 cell_juniors ch9_actors ch1_notes player_lines; do
+         tny_caption tny_annwalk tny_turn tny_walk gohan_ssj1 cell_juniors ch9_actors ch1_notes player_lines lead_scenes; do
   run $t tools/headless/$t.txt
 done
 for t in arctic_summit postgame ch9_gero; do

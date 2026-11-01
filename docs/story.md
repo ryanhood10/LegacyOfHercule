@@ -29,9 +29,43 @@ then the Buu's Fury phase (section 6), planned in chat.
 **Offered polish, all wanted since 2026-11-01 (the plan: `docs/perfect-pass.md` 3; build after the two-player playtest):** the story's lead
 missing from scenes other than the Frieza stretch when someone else plays; the Gero rubble and bunker
 scenes show no Krillin or 16; Gohan's Super Saiyan 1 only from the Cell Games (could start in the
-Time Chamber); real two-player testing; the six Cell Juniors' spawn not looked at. Ryan plans at a slow pace, one decision at a time, answered from the
+Time Chamber); real two-player testing; the six Cell Juniors' spawn not looked at. **Built 2026-11-01 on `pp-story`
+(the perfecting pass's story piece): all but the two-player testing; the table below.** Ryan plans at a slow pace, one decision at a time, answered from the
 player's point of view and grounded in ROM facts, with no suggestions he did not ask for. Record each
 decision in this file the same turn. Build a part of the story only after Ryan says its plan is done.
+
+**The story's lead in every scene (perfecting pass 3.1, 2026-11-01).** The lead is the character the story last
+made active (`companion.c`). When nobody plays him, an actor of his walks or flies in (CoopCall 22 guards), or, where
+the scene is his fight and his body carries the staging, he is made player 1 behind a 20-frame fade (the way Vegeta's
+Android 19 fight already did; player 2 on him takes player 1's character instead). Speaker 1 shows the lead's
+portrait only while he is in the scene (player 2 plays him or his actor stands), else player 1's own. Every scene
+looked at:
+
+| chapter / scene | lead | can nobody play him? | done |
+|---|---|---|---|
+| future prologue: the training, the knock-out, Gohan's death | Trunks | no (only Trunks) | old Hercule (player 2 / the companion) handed to an actor that walks into the knock-out and the death scene (Ryan's note 8.2, CoopCall 31) |
+| Krillin's visit (Gohan's room) | Gohan | no (Krillin joins in it) | none |
+| the forest spirit and its end | Gohan | yes, alone as Krillin | Gohan's actor (53) walks up, watches the fight from the edge, stands with him in the clearing, runs on to the cave |
+| Frieza's landing, the return, the Goku-arrival site, Trunks' talk | Gohan | yes | Gohan's actor (built 2026-10-20); now Krillin's actor too when nobody plays Krillin (alone as Gohan) |
+| home, the cave, the woods, the dream / phone / nap (dead), the missing children, the music shop | Gohan | yes | no scene staging him: the player's own lines (speaker 250, `player_lines.json`) |
+| West City: Goku's arrival, Piccolo's talk and exit, the mansion deal, Hercule's talk | Gohan | yes | the stock already stages "the other one" (Piccolo or Gohan) in Piccolo's exit; the player's own lines, Piccolo's without "Gohan" |
+| Triceratops Jungle and its end | Gohan (Piccolo plays) | Piccolo-only area | no change; speaker 1 now shows Piccolo there (was Gohan's portrait) |
+| Amenbo Island, "Oh no!  Yamcha!" | Gohan | yes | the stock stages Gohan (53) and Krillin (76) as actors itself; "%s" is the player's name and portrait |
+| Vegeta's chapter: space, the landing, zone 7, the 19 fight | Vegeta | no until the landing; the 19 fight makes Vegeta player 1 (2026-10-18) | none |
+| Piccolo's chapter: Gero's three stages, the lab cutaway, the road | Piccolo | yes (Gohan, Hercule, Krillin selectable) | Gero's stages: Piccolo's one line ("Hercule.  Get behind me.") is said off screen when he is not played (left, noted); the cutaway shows the lab only; the road makes Piccolo player 1 (stock) |
+| the Lookout, first visit (Kami defers) | Piccolo | yes | Piccolo made player 1 behind a fade (his body walks the scene) |
+| Gohan's house, Trunks' chapter (the capsule and the skin) | Trunks | alone as Gohan | the stock stages "the other one" (Trunks 128 or Gohan 53) itself; Trunks' lines name him explicitly |
+| the fusion (the Lookout) | Piccolo | no (the scene makes him player 1, stock) | none |
+| Gingertown: Cell's introduction, the fight, the end | Piccolo | yes (Hercule selectable) | Piccolo made player 1 behind a fade at the introduction (the arm, the Kamehameha are his body's) |
+| the lab basement: plans room, larva, computer, out of the lab | Trunks | yes, alone as Krillin | Trunks' actor (128) walks in, blasts the larva and the computer, runs out, flies off; Krillin's stock actor now only when nobody plays Krillin (alone as Krillin he stood twice); Trunks' "%s" lines name the lead |
+| Kame House: Goku wakes | Trunks | yes, alone as Krillin | Krillin stays home: player 1 Krillin hands over to Trunks in the fade (only Trunks stays selectable) |
+| the Lookout: the Time Chamber, the duel | Vegeta / Trunks | handled 2026-10-18 (Trunks walks as an actor when not player 1; the duel's players) | none |
+| Kame House: the androids land; the island fight with 16 | Piccolo | yes (Hercule, Krillin selectable at the yard's pad) | Piccolo made player 1 behind a fade (his deal, his fight; player 2 Hercule or Krillin as planned) |
+| zone 12: Semi-Perfect Cell, the kick | Vegeta | yes (Trunks selectable) | Vegeta made player 1 behind a fade (his fight, his kick); in co-op Trunks as player 2 |
+| Perfect Cell's second stage | Trunks | no (the scene makes him player 1) | none |
+| the ten-day wait: Briefs', the gym, the dojo, Cooler, the chamber, Broly, Gero's computer | anyone / Vegeta (Broly) / Krillin and 16 (Gero) | Broly: actors already; Gero: yes | Gero's computer: Krillin's and 16's actors (3.2); Cooler's lines on speaker 1 now show Piccolo |
+| the Cell Games: the grounds, the ring, every fight, the struggle | per fight (scripted player 1) | no (each fight makes its fighter player 1) | none; the six Juniors checked (3.4) |
+| the post-game: the wishes, the finale, the summit | Gohan / player 1 | no (the wishes make Gohan player 1; the finale's line is player 1's own) | none; speaker 1 now shows player 1 at the finale |
 
 **Standing rules (Ryan):**
 

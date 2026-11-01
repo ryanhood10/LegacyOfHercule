@@ -130,6 +130,12 @@ sequence ch1_spirit
         SetPlayerVisible 0
         WalkToPosition 0, 96, 176
         SetEntityFacing 0, 1
+        CoopCall 22, 1, 0, 0                  ; nobody plays Gohan (alone as Krillin): he walks up beside him (sprite 53)
+        JumpIfFalse G1
+        SpawnCharacterEntity 53, 128, 260
+        WalkToPosition 53, 128, 176
+        SetEntityFacing 53, 1
+      G1:
         PanCameraToPosition 0, 0, 2
         WaitFrames 40
         PlayAudio 50
@@ -144,7 +150,11 @@ sequence ch1_spirit
   text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
   text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
   stock @083b958c                        ; boss bar, battle music, control back
-  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
+  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top);
+        CoopCall 22, 2, 53, 0                 ; Gohan's actor steps back to the clearing's edge for the fight
+        JumpIfFalse G1
+        WalkToPosition 53, 168, 240
+      G1:
         SetActiveEntity 0
 end
 
@@ -162,6 +172,11 @@ sequence ch1_spirit_end
         SetStoryFlag 9
         FadeToWhite 120
         WarpToMapWithEntities 2, 3, 0, 96, 176
+        CoopCall 22, 1, 0, 0                  ; Gohan beside him in the real clearing (an actor when nobody plays him)
+        JumpIfFalse G1
+        SpawnCharacterEntity 53, 128, 176
+        SetEntityFacing 53, 2
+      G1:
         WhiteFadeOut 120
         PlayAudio 50
   text 0 "@^The two figures melted away into the mist..."
@@ -170,6 +185,11 @@ sequence ch1_spirit_end
   text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
   text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
   script
+        CoopCall 22, 2, 53, 0                 ; his actor runs on ahead, west to the forest and the cave
+        JumpIfFalse G1
+        WalkToPosition 53, 0, 176
+        DespawnEntity 53
+      G1:
         SetPlayerVisible 1
 end
 

@@ -738,6 +738,16 @@ stands in his own character's spot (x 168 Krillin, 196 16). `entrec` reads 0 whi
 scene list is swapped out): the birds are counted 100 frames after the map loads. Expected numbers are in each
 `echo` line.
 
+## The story's lead in the other chapters (headless, 2026-11-01)
+
+`tools/headless/lead_scenes.txt`: alone, Map Test 7 then a test warp into each scene's trigger with player 1 poked
+first: the forest spirit as Krillin (Gohan's actor, sprite 53, 1 through the fight and the clearing, 0 after he runs
+on), the lab basement's plans room and larva as Krillin (Trunks' actor 128: 1, Krillin's 76: 0; the lead noted as
+Trunks with flag 466), the larva as Trunks (128 counts player 1's own body: 1; Krillin's actor 1), and the scenes
+that hand their lead player 1: the Lookout's first visit as Gohan, Kame House's landing as Krillin and Gingertown as
+Hercule (each `0x0203F000` = 01), Semi-Perfect Cell in co-op with Trunks player 1 and Vegeta player 2 (02, player 2
+03). Actor records come from the sprite table (`deref TBL 0x0800959C`, entry (id - 7) * 4).
+
 ## Ryan's opening notes (headless, 2026-11-01)
 
 `tools/headless/ch1_notes.txt` (`docs/perfect-pass.md` 8; alone, old Hercule the companion: slot 5 on row 24 by

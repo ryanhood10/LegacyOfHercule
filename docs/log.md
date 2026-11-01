@@ -15,6 +15,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
   2's entity to an actor on his spot), Krillin's actor at the landing and the Goku-arrival site when nobody plays
   him, old Hercule's talk ("Oh, don't worry, kid, you'll find out!"), facing the talk, Ryan's "runnin' into guys
   like that" line, Goku's West City call without "Gohan". Test `ch1_notes.txt`.
+- **The story's lead in every scene (story piece, perfect-pass 3.1):** every chapter's scenes audited (the table in
+  `docs/story.md` 0): Gohan's actor in the forest spirit, Trunks' in the lab basement (and Krillin no longer doubled
+  there alone), Krillin handing over to Trunks when Krillin stays home; the scenes whose lead's body carries the
+  staging make him player 1 behind a short fade (the Lookout's first visit, Kame House and the island, Gingertown:
+  Piccolo; Semi-Perfect Cell: Vegeta). Test `lead_scenes.txt`.
 - **Player 1's own lines (story piece, notes 8.9-8.11):** speaker 1 shows the lead only while he is in the scene
   (player 2 or an actor), else player 1's own character; speaker 250 (new pseudo portrait id) is always player 1's;
   17 stock lines that named or spoke as Gohan now carry player 1's name or drop "Gohan"

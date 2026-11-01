@@ -4,22 +4,22 @@
   "maps": [
     {
       "map": {"zone": 8, "area": 61},
-      "_": "the plans room: Krillin's NPC walk only in single-player",
+      "_": "the plans room: Krillin's NPC walk when nobody plays him, Trunks' actor (128) when nobody plays Trunks (2026-11-01)",
       "triggers": {"2": {"payload": "seq:ch6_basement_enter"}}
     },
     {
       "map": {"zone": 8, "area": 62},
       "_": "Cell's larva",
-      "triggers": {"0": {"payload": "seq:ch6_larva"}}
+      "triggers": {"0": {"payload": "seq:ch6_larva"}}, "edits": [{"at": "trigger:0/entry:1", "replace": [["PushActiveCharNameUpper", "CoopCall 22, 3, 0, 0"]]}]
     },
     {
       "map": {"zone": 8, "area": 63},
       "_": "the master computer and the self-destruct",
-      "triggers": {"0": {"payload": "seq:ch6_computer"}}
+      "triggers": {"0": {"payload": "seq:ch6_computer"}}, "edits": [{"at": "trigger:0/entry:1", "replace": [["PushActiveCharNameUpper", "CoopCall 22, 3, 0, 0"]]}]
     },
     {
       "map": {"zone": 8, "area": 48},
-      "_": "out of the lab: Krillin's actor only in single-player; Piccolo stays unselectable",
+      "_": "out of the lab: Krillin's actor when nobody plays him, Trunks' when nobody plays Trunks; Piccolo stays unselectable",
       "triggers": {"1": {"payload": "seq:ch6_lab_exit"}},
       "records": {
         "0": {"condition": "script:ch6_a48_krillin_cond"}

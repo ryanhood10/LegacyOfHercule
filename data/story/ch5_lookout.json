@@ -5,7 +5,8 @@
     {
       "map": {"zone": 9, "area": 6},
       "_": "Kami defers; Hercule stays at the Lookout; Gohan's house: player 1 Trunks, player 2 Gohan",
-      "triggers": {"0": {"payload": "seq:ch5_lookout_first"}}
+      "triggers": {"0": {"payload": "seq:ch5_lookout_first"}},
+      "pre_edits": [{"at": "trigger:0/entry:0", "replace": [["PlayMusic 34", "PushActiveCharIndex\nPushByte 1\nCmpNe\nJumpIfFalse F9\nFadeOut 20\nCoopCall 8, 0, 0, 0\nPushByte 1\nCmpEq\nJumpIfFalse F1\nPushByte 6\nPushActiveCharIndex\nPushByte 0\nPushByte 0\nStep CoopCall\nF1:\nSetActiveCharacter 1\nFadeFromWhite 20\nF9:\nPlayMusic 34"]]}]
     },
     {
       "map": {"zone": 10, "area": 16},
@@ -15,7 +16,8 @@
     {
       "map": {"zone": 10, "area": 17},
       "_": "Gingertown: Cell's introduction; in co-op the Multi-Form lines",
-      "triggers": {"0": {"payload": "seq:ch5_gingertown"}}
+      "triggers": {"0": {"payload": "seq:ch5_gingertown"}},
+      "pre_edits": [{"at": "trigger:0/entry:0", "replace": [["SetPlayerVisible 0", "PushActiveCharIndex\nPushByte 1\nCmpNe\nJumpIfFalse F9\nFadeOut 20\nCoopCall 8, 0, 0, 0\nPushByte 1\nCmpEq\nJumpIfFalse F1\nPushByte 6\nPushActiveCharIndex\nPushByte 0\nPushByte 0\nStep CoopCall\nF1:\nSetActiveCharacter 1\nFadeFromWhite 20\nF9:\nSetPlayerVisible 0"]]}]
     },
     {
       "map": {"zone": 10, "area": 20},
