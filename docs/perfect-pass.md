@@ -112,7 +112,7 @@ The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"):
 
 ## 7. The team (2026-11-01, Ryan: "split off into a TEAM ... get these developments done")
 
-Six agents, each in its own worktree `F:/MeltyCreations/log2-<piece>` on branch `pp-<piece>`, building into
+Six agents, each in its own worktree `F:/MeltyCreations/log2-<piece>` (the story piece: `log2-pp-story`) on branch `pp-<piece>`, building into
 `build/pp-<piece>`; numbers from `docs/ids.md` "Allocations for the perfecting pass". The lead (the main session)
 merges each branch, rebuilds and runs `regfull.sh`. Nobody touches the combos' step tables or tuning.
 
