@@ -1,0 +1,47 @@
+# Krillin's Destructo Disc in a one-player game (src/coop/krillin.c, docs/hercule.md "Krillin"; Ryan 2026-11-01: "his
+# destructo-disc isnt really hitting enemies"). Alone, enemies keep the stock class, which the Disc's old
+# is_coop_enemy check refused: it flew through everything. East District 439 (Map Test 13): player 1 Piccolo (slot 1)
+# with the Disc as ability 0 and Krillin's new level-1 combat bytes (str 2.5 -> 2, pow 3.5 -> 3). Expected: the punched
+# snake 0x23 -> about 0x1D after three A presses (3 a hit; it was 1 at Krillin's old numbers); the Disc thrown left
+# cuts the far snake: its HP 0x20 -> about 0x15 (it stayed 0x20 before the fix), EP 40 -> 28 (0x1C). Entity
+# addresses are fixed by the Map Test.
+#   python tools/headless/st_test.py tools/headless/krillin_disc.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+p2 off
+maptest 13
+frames 300
+echo == Piccolo (slot 1) with Krillin's level-1 combat bytes and the Disc as ability 0
+poke8 PARTY+0x40 21
+poke8 PARTY+0x31 0
+poke16 PARTY+0x2C 40
+poke8 0x0202B1B4 2
+poke8 0x0202B1B5 3
+echo == punch: wolf ent 11 20 px right, facing right, A x3 (hp after each)
+poke32 0x0202BBA4 0x00024400
+poke32 0x0202BBA8 0x0001A800
+poke8 0x0202B064 3
+frames 2
+peek 0x0202BBD4 1
+key 0x01 4
+frames 24
+peek 0x0202BBD4 1
+key 0x01 4
+frames 24
+peek 0x0202BBD4 1
+key 0x01 4
+frames 24
+peek 0x0202BBD4 1
+shot kd_punch
+echo == disc: the other snake 60 px left, facing left, B (its HP before and after, then EP)
+poke32 0x0202C1D0 0x0001FC00
+poke32 0x0202C1D4 0x0001A800
+peek 0x0202C200 1
+poke8 0x0202B064 2
+frames 2
+key 0x02 4
+frames 6
+shot kd_disc1
+frames 6
+shot kd_disc2
+frames 40
+peek 0x0202C200 1
+peek16 PARTY+0x2C 1

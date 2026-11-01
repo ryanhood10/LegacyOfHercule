@@ -77,7 +77,28 @@ tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6), first 
 transforms through the game's own opcode-73 handler `{2, slot, 157}` (EP cost 50) and re-binds
 player 2's entity when the slot is player 2's; `src/coop/rom.h` `DISPLAY_DATA` is the relocated
 table. The hercule-hero session wired it as ability 18 in Hercule's third slot (`docs/hercule.md`).
-Verified in the fork: transform, gold afro, walk, attack, HUD intact.
+Verified in the fork: transform, gold afro, walk, attack, HUD intact. (The opcode-73 path and the cost of 50 were
+replaced on 2026-11-01 by the stock transformation, below.)
+
+### Super Saiyan Hercule: the transformation (2026-11-01, `tools/ssjhercule.py`)
+
+The stock transformation plays group 9 of the base record (the power-up) and group 21 of the transformed one (the
+turn back; `docs/engine.md` "Super Saiyan transformation"). Record 72 has no group 9 and 157 had only 21 groups, so
+the turn back read past the group table. `tools/ssjhercule.py` (a library; preview with `python -I
+tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercule_transform_preview.png`) builds:
+
+- **`herc_record` group 9** (`herculesprites.py` emits it beside group 18): four 32 x 32 frames at (-8, -24), one
+  array for all four facings, as Goku's (60): his victory pose (group 11 frame 1, both fists up), the same with a dim
+  orange outline (38, every other pixel), then the gold afro (`spriteclone.recolour`) in a yellow ring (46), and in
+  a white / yellow / amber double ring (2, 46, 37): frames 2 and 3 alternate every 16 frames, like teen Gohan's (59).
+- **`ssj_record` group 21** (`spriteclone.py`; the record's group count is now 22): his front idle with the afro gold
+  (120 / 46) -> dark gold (20 / 120) -> brown (23 / 20) -> black, like Super Saiyan Goku's (61).
+- **Row 22** takes the Super Saiyans' behaviour class from row 20 (bytes 16-19 = `0x030021EC`); flags, links,
+  sprite and portraits as before.
+- **Ability 18's HUD icons** `herc_ssj_icon_0 / _1` (`herculesprites.py` emits them): ability 12's Transformation
+  icon pair with the picture (rows 2-8, columns 13-28) remapped by `ICON_READY` / `ICON_COOLING`.
+
+A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
 
 ## Buu's Fury (roms/buu.gba, USA BG3E): format, tools, ids (2026-10-17)
 
@@ -689,6 +710,11 @@ facings x every frame, and `tny_preview_videl_portrait.png`.
 **Portraits:** King Cold 70, Roshi 80, Chi-Chi 43 and Chiaotzu 42 are stock dialogue portraits (set in `tourney_data.c`'s
 portrait column); Videl has none in LoG2, so **127** is Buu's Fury's short-haired Videl (portrait module id 153) on LoG2's
 grey frame (the `oldherculeportrait.py` method), appended to `portrait_module` through `--extra-portrait`.
+**169-172** (2026-11-01, `tools/ppportraits.py`, `docs/tournament.md` 24.2): Android 13, Cell Jr., the Namekian Warrior
+and Evil Buu, each a stock portrait of the body his sprite came from repainted as the sprite was (16's 26, Perfect
+Cell's 40, Piccolo's 94; Buu's Fury's Super Buu 127 for Evil Buu, who has none there). A recolour is an index map
+applied inside the 3 px frame, the background found by a flood from the top edge through its colours, so a body colour
+that is also a background colour (Piccolo's purple gi) keeps its own map.
 
 **Test records:** after each sprite record (record + 0x1A0, behind the 21 groups the engine reads) the generator puts an
 enemy record for `COOP_CMD_SPAWN_RECORD` (which takes ROM records only): stat 29 (Cooler, AI set 21) for King Cold, stat
@@ -803,3 +829,9 @@ frames stay bald. (The small bald 74 / 163 / 164 are a plain enemy; 231 / 233 a 
 Yamu with the energy container" is a cyborg and a Vegeta.)
 
 `tools/tnysheet.py` gives giants 18 px under the ground line (lying Buu giants were cut off at the sheet's edge).
+
+**Yakon, again (2026-11-01, `docs/tournament.md` 24.3):** the tucked turn still read as a crab from above. He now lies
+as `lying.sprawl(px, xo, yo, face_left, s=0.45)`: his recoil 9.3 (no sparks), upright, its rows squashed to 45 %
+(nearest row): LoG2's camera looks down at an angle, so a body on its back along the view is short and wide, face up,
+limbs spread on the floor. A frame painted from shapes (on his side) was tried on the same sheet and dropped: it did
+not look like Buu's Fury's Yakon. `tuck_limbs` stays in `lying.py` (unused).

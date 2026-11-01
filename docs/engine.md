@@ -137,6 +137,59 @@ so nothing in ROM references it by address.
 - Map entities are spawned from `MapEntry.mapScripts[]` by handlers `0x0800B711` (town NPC),
   `0x0800D6DF` (script actor), `0x0800E77F` (enemy); behaviour lists ticked by `0x0800D156`.
 
+## Super Saiyan transformation (decompiled 2026-11-01 for Super Saiyan Hercule)
+
+The stock rules, read from the ROM (thumb disassembly); what the build changes is at the end.
+
+- **Display rows.** Byte 0 is the form's flags: bit 0 = transformed, bit 1 = cannot transform (row 4, the Cell
+  Games' Super Saiyan 2 Gohan, flags 3). Byte 4 = the row the form transforms to, byte 5 = the row it turns back to
+  (Goku 19 <-> 20). Bytes 16-19 = the behaviour class: every transformed row (5, 11, 16, 17, 20) has the Super
+  Saiyan class `0x030021EC`. (An older note said the drain is in the flight / charge state `0x080083C3` against row
+  byte +7: wrong. That state is the dash; it reads row byte +8 as a bit mask of frames that leave a trail and the
+  word at +0xC as a speed. The drain is the class update below.)
+- **The abilities.** Everyone's Transformation is **ability 12** (Gohan 4 3 12 2, Goku 3 10 12 2, Vegeta 0 7 12 2,
+  Trunks 1 13 12 2 on the Map Test party); ability 11 is the same with another animation and is in nobody's list.
+  isReady `0x080134F2` (11 and 12): row bit 1 -> never; row bit 0 -> always (to turn back); else the ability gate
+  (`[[0x086DB284] + 0xC] != 0`, 0 on a Map Test), the party meter (`PartyState` +8) at 0 and **EP >= 10**. onUse
+  (12: `0x0801353C`, 11: `0x080134C0`) **costs nothing**: row bit 0 -> animation 0x24 (turn back), else 0x23 (11:
+  0x25). (Ability 13, `0x08013474`, is Trunks' 5-EP move, animation 0x32.)
+- **Transform, animation 0x23** (state `0x03002184`, vtable `0x08025D9C`): enter `0x080155A8` starts the power-up
+  hum (SFX_TABLE + 0x294, `0x0801FC9C(mixer + 0x5C4, sfx, 0x40, 0)`) and shows **group 9** of the entity's record
+  (`0x08011D38`: +0x4C = record + 0xDC, frame 0, counter 0). Update `0x080155E4`: the party meter +8 a frame, then
+  `0x08011D4A`: frames 0, 1 (16 frames each) then 2 / 3 alternating every 16 frames; at frame 160 the transform's
+  sound (SFX_TABLE + 0x114) and slot 5. Leave `0x080155F6` stops the hum. Slot 5 `0x0801563C`: SFX_TABLE + 0x114
+  again, then **`0x08014D58(entity, 1)`**. (Animation 0x25, ability 11: state `0x03002188`, vtable `0x08025CE0`, the
+  same group 9 for 64 frames, frame = counter / 16, the meter +20 a frame, the same slot 5; no hum.) The meter
+  ends full (1280, five HUD pips), so the charged attack is ready as the form starts.
+- **`0x08014D58(entity, up)`, the form change.** Uses the **active** party slot: its row's class slot 3 (the
+  Super Saiyan class stops the hum), row := byte 4 (up) or 5, entity +0x48 := that row's sprite record, animation
+  0, `PlayerEntity_RefreshSprite` (`0x080086A2`: the active slot's class into +0x180 and its init), the new class's
+  slot 2 (the Super Saiyan class starts the hum, SFX_TABLE + 0x294, looping while transformed).
+- **The Super Saiyan class** (`0x030021EC`, vtable `0x08024C58`): init `0x080172B0` writes the combat bytes from
+  the active slot's str / pow / end high bytes **+10 each** (base class `0x08016FD8`: +0), +0x163 / +0x164 = 0x80,
+  walk speed **1.75** px (base 1.25) and dash **3.0** (base 2.5), the accumulator +0x184 = 0. Update `0x08017306`:
+  nothing while in animation 0x24 (vtable slot 11 asks); else +0x184 += 0xCCD and at each overflow (**every 20
+  frames: 3 EP a second**) the active slot's EP -1 (not below 0), and **at EP 0 with HP above 0, animation 0x24**.
+  No regeneration and no meter decay while transformed.
+- **The base class's update** (`0x08017028`): the party meter -1 a frame (the cool-down: a transform's 1280 frames
+  before the next, less what the charged attack spends); +0x184 += 0x6E and at each overflow (about 10 s) the
+  active slot's EP +3 % of its maximum and every other stock slot (0-5) EP and HP +5 %.
+- **Turn back, animation 0x24** (state `0x03002180`, vtable `0x080256AC`): enter `0x0801579A` (+0x163 / +0x164 := 0,
+  restored to 0x80 by leave `0x080157BA`) and `0x08013578` (**group 21** of the record, +0x19C); update `0x0801358C`:
+  frame = counter / 16 for 64 frames; slot 5 `0x080157AE` = `0x08014D58(entity, 0)`. No sound. Goku's group 21
+  (record 61) fades the hair gold -> light -> brown -> black.
+- **`Party_DetransformOthers`** (`0x08003ED4`): every stock slot (0-5) but the active one whose row has bit 0 goes to
+  its byte-5 row. Called at a load (`save_menu_start_hook`) and at a save pad's switch (`switch.c`), so a transformed
+  player 1 stays transformed through a save and a reload (the class's slot 2 restarts the hum) and nobody else does.
+
+**The build** (`src/coop/ssj.c`, 2026-11-01): `0x08014D58` and the class update served only the active slot, so a
+player 2 who transformed changed player 1's row and drained player 1's EP. The transform's slot 5 (vtables
+`0x08025D9C`, `0x08025CE0`), the turn-back's slot 5 (`0x080256AC`) and the Super Saiyan class's update
+(`0x08024C58` slot 1) are replaced by C that does the same for the entity's own slot (player 2: `p2_refresh_sprite`
+for the sprite and class); the base class's update (`0x08024004` slot 1) is rewritten with one rule added, no
+regeneration for a slot on a transformed row (each player's base class otherwise feeds the other player's slot);
+and `ssj_frame` applies `Party_DetransformOthers`' rule to a slot player 2 leaves. For player 1 alone nothing changes.
+
 ## Messages, projectiles and beams (decompiled 2026-10-31 for the team combos)
 
 How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere below: 0 down, 1 up, 2 left, 3 right.
@@ -170,7 +223,17 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   `0x0801585A` fires it, `0x0801592E` ends it; its message `0x08015EE0` answers 10 with the update `0x0801594C(o,
   10)` (grows the drill 3 px a frame and hits every enemy on it; with 0 it only animates). Charge and shot spots per
   facing: `0x086E382C`, `0x086E385C`.
-- **Drawing a body.** `0x08007A84`: a frame's descriptor and its screen spot from the camera cell; `0x08007772`: the
-  OAM words.
+- **Drawing a body.** `0x08007A84`: a frame's descriptor and its screen spot from the camera cell (descriptor = the
+  group's array for the facing, `*(+0x4C)[facing +0x10] + frame +0x14 * 12`, kept at +0x3C); `0x08007772`: the OAM words,
+  and when the frame changed (+0x20 the last one) it unpacks it (`0x0801F394`, or `0x0801F3BA` through the remap +0x24)
+  into a 4 KB buffer on the stack (sp - 0x1004) and DMAs it to the entity's own buffer (+0x30); a plain (kind 0) frame is
+  DMA'd later straight from the ROM. The draw pass (`0x08006AD8`) calls every entity's slot 3 (on screen?), sorts, then
+  slot 4 (OAM); a nonzero slot 4 queues it, and the upload pass (`0x08006AA6`) calls the queued ones' slot 5. Records
+  share one blob between a side facing and its mirror (the right frame's attribute flips it; the offsets are the same).
+- **Android 16 and Super 13 in the tournament.** Their kits wrap the co-op enemy vtable (`coop2.enemy_vtable`), whose
+  message is the stock enemy's (`0x0800E5B8`, message 10 to the base entity message `0x08019B70`: with no command it
+  runs the control state's and the aux state's animate, slot 1); `android16.c`'s `a16_message` / `super13.c`'s
+  `s13_message` are the story bosses' only. Idle's animate `0x08007570` counts +0x12 and shows frame 1 for 15 of every
+  256 frames.
 - **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
   bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.

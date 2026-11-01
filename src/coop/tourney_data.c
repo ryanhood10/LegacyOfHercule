@@ -41,7 +41,7 @@ const TFighter tny_fighters[TF_COUNT] = {
 
     [TF_A19]           = { "Android 19",       12, 0,              30, TIER_ADEPT,    TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_GERO]          = { "Dr. Gero",         14, 0,              31, TIER_ADEPT,    TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
-    [TF_A13]           = { "Android 13",      165, TS_P_A13,        0, TIER_ADEPT,    TAB_VILLAINS,   BEAT, 0,   NO, NO, "Beat this fighter in a match" },
+    [TF_A13]           = { "Android 13",      165, TS_P_A13,      169, TIER_ADEPT,    TAB_VILLAINS,   BEAT, 0,   NO, NO, "Beat this fighter in a match" },
     [TF_A17]           = { "Android 17",        9, TS_P_A17,       28, TIER_ADEPT,    TAB_VILLAINS,   BEAT | TR_HEADLINER, 127, NO, NO, "Beat this fighter in a match" },
     [TF_A18]           = { "Android 18",       11, TS_P_A18,       29, TIER_ADEPT,    TAB_VILLAINS,   BEAT | TR_HEADLINER, 127, NO, NO, "Beat this fighter in a match" },
 
@@ -50,9 +50,9 @@ const TFighter tny_fighters[TF_COUNT] = {
 
     [TF_SEMI_CELL]     = { "Semi-Perfect Cell",29, 0,              39, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_PERFECT_CELL]  = { "Perfect Cell",     30, TS_P_PCELL,     40, TIER_CHAMPION, TAB_VILLAINS,   BEAT, 0,   NO, NO, "Beat this fighter in a match" },
-    [TF_CELL_JR]       = { "Cell Jr.",         31, 0,               0, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
+    [TF_CELL_JR]       = { "Cell Jr.",         31, 0,             170, TIER_CHAMPION, TAB_VILLAINS,   OPP,  0,   NO, NO, 0 },
     [TF_COOLER]        = { "Cooler",           34, TS_P_COOLER,    44, TIER_CHAMPION, TAB_VILLAINS,   BEAT | TR_GIANT, 301, NO, NO, "Beat this fighter in a match" },
-    [TF_NAMEKIAN]      = { "Namekian Warrior",166, 0,               0, TIER_CHAMPION, TAB_VILLAINS,   OPP,  301, NO, NO, 0 },
+    [TF_NAMEKIAN]      = { "Namekian Warrior",166, 0,             171, TIER_CHAMPION, TAB_VILLAINS,   OPP,  301, NO, NO, 0 },
     [TF_BROLY]         = { "Broly",           159, 159,             141, TIER_CHAMPION, TAB_VILLAINS,   BEAT | TR_GIANT | TR_HEADLINER, 402, NO, NO, "Beat this fighter in a match" },
     [TF_PARAGUS]       = { "Paragus",         170, 0,             120, TIER_CHAMPION, TAB_VILLAINS,   OPP,  402, NO, NO, 0 },
 
@@ -72,7 +72,7 @@ const TFighter tny_fighters[TF_COUNT] = {
     [TF_YAKON]         = { "Yakon",      TS_YAKON,    TS_YAKON,     145, TIER_ROOKIE,   TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ROOKIE, DIV_RUMBLE), "Win the Rookie Royal Rumble" },
     [TF_PIKKON]        = { "Pikkon",     TS_PIKKON,   TS_PIKKON,    147, TIER_ADEPT,    TAB_BUU,        CHAL, 0,   NO, T(TIER_ADEPT, DIV_1V1),       "Win the Adept tournament (1 v 1)" },
     [TF_DABURA]        = { "Dabura",     TS_DABURA,   TS_DABURA,    148, TIER_ADEPT,    TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ADEPT, DIV_2V2), "Win the Adept tournament (2 v 2)" },
-    [TF_EVIL_BUU]      = { "Evil Buu",   TS_EVIL_BUU, TS_EVIL_BUU,  0, TIER_ADEPT,    TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ADEPT, DIV_RUMBLE),    "Win the Adept Royal Rumble" },
+    [TF_EVIL_BUU]      = { "Evil Buu",   TS_EVIL_BUU, TS_EVIL_BUU, 172, TIER_ADEPT,    TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ADEPT, DIV_RUMBLE),    "Win the Adept Royal Rumble" },
     [TF_KIBITO]        = { "Kibito",     TS_KIBITO,   TS_KIBITO,    146, TIER_ZFIGHTER, TAB_BUU,        CHAL, 0, NO, T(TIER_ZFIGHTER, DIV_1V1), "Win the Z-Fighter tournament (1 v 1)" },
     [TF_FAT_BUU]       = { "Fat Buu",    TS_FAT_BUU,  TS_FAT_BUU,   149, TIER_ZFIGHTER, TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ZFIGHTER, DIV_2V2), "Win the Z-Fighter tournament (2 v 2)" },
     [TF_JANEMBA]       = { "Super Janemba", TS_JANEMBA, TS_JANEMBA, 154, TIER_ZFIGHTER, TAB_BUU,        CHAL | TR_GIANT, 0, NO, T(TIER_ZFIGHTER, DIV_RUMBLE), "Win the Z-Fighter Royal Rumble" },

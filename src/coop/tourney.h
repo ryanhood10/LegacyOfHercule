@@ -29,7 +29,8 @@
 #define TNY_STAT0           160
 #define TNY_AB_STEAL        24      // ability: Energy Steal (Spopovich, Yamu as players; tny_play.c, data/hercule.json)
 // CoopCall: engine 23-27, ui 28-29, grounds 30.
-// Test commands (coop2.cmd): engine 21-25, moves 26-27, ui 28-29, grounds 30.
+// Test commands (coop2.cmd): engine 21-25, moves 26-27, ui 28-29, grounds 30; the perfecting pass's tny piece 37
+// (tny_caption.c) and 38 (tny_engine.c's checks).
 // Zone 15 areas 11-17: grounds. UI strings 357-379: grounds (place names, banner), 380-399: ui.
 // Display rows 29-79: playables (raise the row limit at file 0x42D6 and EXTRA_ROWS in spriteclone.py).
 // Abilities 24-40: playables. Portraits 127-139 art-new, 140-189 art-buu, 190-199 ui.
@@ -222,3 +223,11 @@ void tny_grounds_frame(void);                                    // every frame 
 // playables
 int  tny_play_row(int id);                                       // display row of a tournament playable (0 = none)
 void tny_play_entry(int id, CharacterEntry *out, const CharacterEntry *lead);   // his entry at the lead's level
+int  tny_walk_pct(int row);                                      // tny_play.c: walking speed of a display row, % (24.7)
+// the Rumble announcer's calls during a round (tny_caption.c, docs/tournament.md 24.1): a caption that never pauses
+void tny_on_fall(Entity *e, int id);                             // tny_moves.c fallen(): a kit fighter's first frame down
+void tny_on_transform(Entity *e, int id);                        // tny_moves.c: a kit fighter's transformation starts
+void tny_on_player_down(Entity *e);                              // revive.c: a player goes down (the partner may revive)
+void tny_caption_draw(u32 **oam);                                // hud.c's draw hook: the caption's sprites
+void tny_caption_gone(void);                                     // the HUD goes: its tiles freed
+void tny_caption_test(u32 cmd, u32 arg, u32 arg2);               // test command 37

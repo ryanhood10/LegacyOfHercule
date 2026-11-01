@@ -39,22 +39,25 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 - Keep these docs current: when a build flag, tool, address, id or test recipe changes, update
   `docs/INDEX.md`, `docs/ids.md` and the owning doc in the same commit.
 
-## Current phase (2026-10-31): the tournament's team combos are built; Ryan playtests next
+## Current phase (2026-11-01): the perfecting pass (finish the LoG2 half before the Buu campaign)
 
-The World Tournament on Papaya Island is built and merged (`docs/tournament.md`: the plan, 9b-13 the seven-piece
-build, 14-23 every playtest round since, 24 the open points and the plan to fix them, **25 the team combos**, 25.4 their
-colour pass). The
-team combos (built 2026-10-31 by a lead plus three agents; Ryan's design in 24.10): a meter under the HP panels
-(Select fires it, full at a fight's start, 90 s cooldown), the frozen-fight runner, ten combos for Ryan's pairs. Their
-step tables and colours live in `docs/tournament-combos.md`, which is both Ryan's doc and the game's data (`tools/tnycombo.py`), as
-`docs/tournament-dialogue.md` is for the dialogue (`tools/tnytalk.py`): edit a line there to change it in the game.
-Contracts: `src/coop/tourney.h`, `src/coop/tny_combo.h`; tests `tools/headless/tny_*.txt`; films of every combo in
-`build/combos/` (not committed). **Next (2026-11-01): the perfecting pass, `docs/perfect-pass.md`: Ryan's two-player playtest notes first, then its
-sections in order; the Buu campaign (`docs/story-buu-rom.md`, chapters inside our ROM) waits for it.**
-Full regression: `bash tools/headless/regfull.sh build/<dir>` (`docs/testing.md` "Full regression"; exit 0 = clean).
-Drop-ins F8 (Papaya Island, early) and F9 (waiting room, every tier open) carry a powered-up party (`dropins.py`
-`boost`). Swapping a build into `build/play`: if mGBA's window lingers after Ryan closes it, close it with
-`CloseMainWindow` (never kill it), back up the `.sav` and the `.ss1-.ss9` into `build/play/backup/` first.
+Ryan: "perfect what we have FIRST". The plan and its state are `docs/perfect-pass.md`: the two-player playtest list
+(1), his decisions (2), the story polish (3), Super Saiyan Hercule (4), the tournament's and combos' open fixes (5),
+the team (7: six agents on `pp-*` branches in `F:/MeltyCreations/log2-<piece>`, numbers in `docs/ids.md`
+"Allocations for the perfecting pass"), his one-player notes (8) and bugs found on the way (9). Merged so far: the
+world-map landmark (24.6), the four portraits and Yakon (24.2-3), Super Saiyan Hercule by the stock rules, the combos'
+leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games. Still on branches: `pp-story`
+(section 3 and the notes of 8), `pp-tny` (24.1, 24.4, 24.5, 24.7). The combos' step tables wait for Ryan's two-player
+session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
+
+The World Tournament on Papaya Island (`docs/tournament.md`: the plan, 9b-13 the build, 14-23 playtest rounds, 24 open
+points, 25 the team combos, 25.4 colours, 25.5 the leftovers) and its team combos (`docs/tournament-combos.md`, both
+Ryan's doc and the game's data via `tools/tnycombo.py`, as `docs/tournament-dialogue.md` is via `tools/tnytalk.py`).
+Contracts: `src/coop/tourney.h`, `src/coop/tny_combo.h`. Full regression: `bash tools/headless/regfull.sh build/<dir>`
+(`PLAY=<rom>` for a private play ROM; `docs/testing.md` "Full regression"; exit 0 = clean). Drop-ins F1-F9 (F8 Papaya
+Island early, F9 the waiting room with every tier open; `dropins.py` `boost`). Swapping a build into `build/play`: Ryan
+saves and closes mGBA first; if its window lingers, close it with `CloseMainWindow` (never kill it); back up the
+`.sav` and the `.ss1-.ss9` into `build/play/backup/` first.
 
 ## Earlier phase (2026-10-21): Ryan is playtesting; feedback rounds land as they come
 

@@ -554,6 +554,22 @@ orbs and ki as their tiles go up, the beam from copies of its tiles the build ma
 Krillin's ki (blue) and Disc (yellow), Piccolo's Special Beam Cannon (yellow and violet), Vegeta's Big Bang (cyan) and
 the Kamehamehas (blue) keep the game's own colours; the generic barrage keeps the red orbs.
 
+**The kits' own moves** (outside the combos: a fighter's own special in any fight, `tny_moves.c`): which colour of the
+table above a move takes. `move` is its slot in his `tny_kits` row (1 = the first) with its name for reading; a beam is
+redrawn from the build's frame sets in that colour, an orb's tiles go through the remap. A move not listed keeps the
+game's colours: every other kit beam is the blue Kamehameha (the Kamehamehas stay blue).
+
+| fighter | move | colour |
+|---|---|---|
+| `FRIEZA` | 1 Death Beam | pink |
+| `MECHA_FRIEZA` | 1 Death Beam | pink |
+| `KING_COLD` | 2 Death Beam | red |
+| `COOLER` | 1 Death Flash | purple |
+| `COOLER` | 2 Supernova | gold |
+| `MYSTIC_GOHAN` | 1 Masenko | yellow |
+| `BROLY` | 1 Eraser Cannon | green |
+| `BROLY` | 2 Gigantic Meteor | green |
+
 ## 5. The pairs (reference)
 
 Which pairs have a combo is Ryan's list (`docs/tournament.md` 24.10); the table the game uses is `src/coop/tny_combo.c`

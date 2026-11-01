@@ -16,8 +16,10 @@ inspection goes through the GDB stub.
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
+| Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
+| Team combos: the leftovers | the kits' own moves in their colours filmed, Android 16 and Super 13 held as bystanders, Cell Jr.'s copies' facings |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
@@ -38,8 +40,9 @@ Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
 ## Full regression (headless, `tools/headless/regfull.sh`)
 
 Every chapter and tournament script on a `DEBUG_MENU=1` build, co-op as written plus `arctic_summit`, `postgame` and
-`ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`). About 15 minutes;
-run it in the background.
+`ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`, or `PLAY=<rom>`
+for a private one, e.g. `make BUILD=build/<dir>/play` then `PLAY=build/<dir>/play/log2-coop.gba bash ...`). About
+15 minutes; run it in the background.
 
 ```
 make BUILD=build/<dir> DEBUG_MENU=1 && make
@@ -48,7 +51,7 @@ bash tools/headless/regfull.sh build/<dir>
 ```
 
 Out: `build/<dir>/hl/reg.log` (a `## name` block per script with its echoes, map lines and peeks). Pass: no
-TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25). A new script goes into its
+TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25, 42 on 2026-11-01 with `wm_landmark`). A new script goes into its
 list. Known flaky: `tny_artbuu`'s hit test (one fighter may take no punch). Tests that depend on a seeded draw break
 when code adds `rnd()` calls in the engine (2026-10-25: the Rumble announcer's variety now uses the frame counter).
 
@@ -360,6 +363,11 @@ frame-stop makes emulated time lag real time, so wait longer before reading the 
 
 ## Krillin / old Hercule tests (fork slot 2, `KR_TEST=1`, 2026-10-18)
 
+**Headless, one player (2026-11-01):** `tools/headless/krillin_disc.txt` (in `regfull.sh`): Krillin's level-1 combat
+bytes punch a snake (3 a hit) and the Destructo Disc cuts a stock snake in a one-player game (HP 0x20 -> about 0x15,
+EP 40 -> 28); expected values in its header.
+
+
 ```
 make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
 tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute   # dbgmenu.ss3: a debug-menu state you make with this build (boot, idle on the title, save)
@@ -411,6 +419,19 @@ TOURNAMENT", the players question (a black screen, A twice), the game resumes on
 Pass: 14 `waitmap ... reached`, the arrival `map` lines of
 `docs/tournament.md` 9b, the shots show each line, no CRASH. Dialogue pages are pressed one A each (an extra A
 re-talks to the NPC in front, or flies off the beach's flight spot). Map previews: `build/grounds/maps/papaya_*.png`.
+## World-map landmarks (headless, 2026-11-01, branch `pp-map`)
+
+```
+python tools/headless/st_test.py tools/headless/wm_landmark.txt build/pp-map/log2-coop.gba build/pp-map/hl/menu.ss --out build/pp-map/hl --cols 3
+python -I tools/wmlandmark.py roms/log2.gba build/pp-map/landmark/preview.png     # the sheet's frames plus ours, x4
+```
+
+`wm_landmark.txt` (Map Test of the world map, test warps; `docs/maps.md` 9e): Papaya Island's landmark from 80 px
+south (small on the horizon) and at the landing (over the flyer, the cone under it); the arctic's snowy mountain with
+flag 381 set, the same two views, and gone with 381 clear; a stock landmark (Goku's house) unchanged; `ents` lists
+the 15 decorations (vtables 0x08025FB8, 0x08025E5C). Pass by eye on `build/pp-map/hl/wm_landmark.png`. The world
+map's free OBJ VRAM with the larger sheet: 10944 bytes (`peek8 0x03001120 8` + `peek 0x030017B4 330`, `objfree.py`).
+
 ## Tournament moves (headless, branch `tny-moves`, 2026-10-25)
 
 ```
@@ -551,6 +572,32 @@ The colour pass (25.4) was filmed with the same script: `build/combos/colour/` (
 strips `z_*.png`) against `build/combos/after/` (before it), not committed. Look for: each fighter's shots in his
 colour (section 4 of the combos doc), the yellow Masenko, the Big Bang in Vegeta's palm then the cyan comet, white
 sparks at teleports and punches, every body on screen, one disc only.
+
+The copies' state (2026-11-01, `docs/tournament.md` 25.5): the `cj` part peeks `.combo.run` +0x88 after `cj_05`, `08`,
+`11`, `14` and `17` (`0203eb38`: three modes, three facings, three "left of him" bytes, then the copies made with their
+own VRAM): a copy left of him faces 3 (right), right of him 2 (left); modes 1 (his tiles) for Cell Jr.'s side facings.
+
+## Team combos: the leftovers (headless, branch `pp-combo`, 2026-11-01)
+
+```
+make BUILD=build/pp-combo DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/pp-combo/log2-coop.gba --out build/pp-combo/hl
+python tools/headless/st_test.py tools/headless/tny_pp_combo.txt build/pp-combo/log2-coop.gba build/pp-combo/hl/menu.ss --out build/pp-combo/hl --cols 6
+```
+
+`tools/headless/tny_pp_combo.txt` (`docs/tournament.md` 25.5), about 50 s, in `regfull.sh`. Part 1 films the kits' own
+moves in their colours (`docs/tournament-combos.md` section 4, the kits' table) on New Planet Vegeta's open ground as
+`tny_moves.txt` does (the fighter 64 px right of player 1, his move forced by test command 27 op 0): `kb_frieza_*`,
+`kb_mecha_*`, `kb_cold_*` (pink, pink, red Death Beams), `kb_cooler_death_flash_*` (purple), `kb_cooler_supernova_*`
+(gold), `kb_mgohan_masenko_*` (yellow), `kb_mgohan_kamehameha_*` (blue: the control), `kb_broly_eraser_*`,
+`kb_broly_meteor_*` (green). Part 2 spawns Spopovich, Yamu, Android 16 and Super 13 on the ring map, turns the Rumble
+on and runs Spopovich & Yamu's combo on player 1 (test command 33): 16's and 13's animation timer and frame (`+0x12`,
+`+0x14`) and group (`+0x4C`) are peeked before (they change), five times during the combo (all equal) and after
+(they change again); shots `by_*`. Part 3 is the `cj` part of `tny_combo_tune.txt` with the copies' state peeked
+(`.combo.run` +0x88) and Cell Jr. poked to face down after `cj_06` (`cp_own`): the copies decode their own side frame
+(modes `02 02`). Pass: no CRASH; part 2's lines during the combo equal; part 3's facings as above and `02 02` after
+the poke. A build of the commit before (`build/pp-combo-base-src`, removed after) gave the same part 2 timers running
+through the combo (the bystanders animated) and blue beams in part 1.
 
 ## Story chapters, headless (`tools/headless/`, 2026-10-18)
 
@@ -808,6 +855,11 @@ grep -E "^hit|0202....: " build/art-buu/hl/artbuu.out | paste - -      # the hit
 - **Portraits load:** `python -I tools/tnyportraits.py roms/log2.gba /dev/null --buu roms/buu.gba --check
   build/art-buu/log2-coop.gba $(TNY_PORTRAITS)` (the pairs from the Makefile) reads the built ROM's portrait table
   through the getter's literal (0x0800BE10, word id + 1) and decodes every id: "29 portraits load" (2026-10-25).
+- **Portraits 169-172** (2026-11-01): `python -I tools/ppportraits.py roms/log2.gba /dev/null --buu roms/buu.gba
+  --check build/<dir>/log2-coop.gba $(PP_PORTRAITS)` ("4 portraits load"); `--compare BUILT.gba coop.sym OUT.png` draws
+  each beside its source, the sprite-face recipe and two stock portraits. In the game: `tny_talk.txt` t8 (Android 13,
+  Cell Jr.) and t9 (the Namekian Warrior, Evil Buu): each box shows the speaker's face. Yakon's lying pose:
+  `tny_polish.txt` section 12 (`p12_yakon_down`, his frame group = record + 0x10C) and `tnysheet.py --lying --ids 198`.
 - Previews of every conversion (Buu colours left, ours right, the hurt box in red on group 0):
   `build/art-buu/tny/buu_preview_<id>.png`; portraits: `build/art-buu/tny_portraits.png`.
 ## Tournament fighters (art-new, headless, 2026-10-25)
@@ -852,6 +904,33 @@ and transforms back, printing the row and the entity's sprite record (`halo_goku
 - Island 147 is a town (A talks, no attacks) and its floor's bottom edge is an exit: attacks were seen
   on the desert (Map Test 325, warp to (256, 320); Cell's beam interrupts after a few seconds).
 - Control: the same script with `poke8 0x0203F084 19` (Goku's stock rows 19 / 20).
+
+## Super Saiyan Hercule (headless, 2026-11-01)
+
+```
+make BUILD=build/<dir> DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/<dir>/log2-coop.gba --out build/<dir>/hl
+python tools/headless/st_expect.py tools/headless/ssj_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
+
+`tools/headless/st_expect.py` runs a script through `st_test.py` and checks it: each `echo EXPECT <regex>` line must
+be followed by an output line matching the regex (`{symbol}` = its address from the build's `coop.sym`); it prints
+`ok` / `FAIL` per check and a summary, exits 1 on a failure, and `regfull.sh` runs `ssj_hercule.txt` through it (56
+checks, about 3 minutes). The script, in the town (Map Test 7): **A** player 2 Hercule with ability 18 poked in
+(as `hercule_awaken` does): the stock transform state 0x23 on his group 9, row 22 / `ssj_record` / the Super Saiyan
+class / combat bytes +10 with no EP spent; 10 EP in 200 frames from his slot and none from player 1's; the ability
+again turns him back; refused while the party meter is not empty and under 10 EP; at 0 EP he turns back by himself.
+**B** the same as player 1 (active slot 5, a warp rebuilds the entity). **C** player 2 to Goku (Select x3), both
+transform (Goku: stock record 61), save at the pad (both Super Saiyans), power off and on (`reset`), Select Game,
+load, B (two players) and A: player 1 Hercule is still row 22 with the class, draining, and turns back; Goku is
+row 19 (`Party_DetransformOthers`). **D** player 2 to Goku, transform, Select on: Goku's slot turns back (the
+hand-off counter). Words to poke: the ability gate 0x0300208C := 1 before each use (0 on a Map Test), the party
+meter PARTY+8 := 0. `S` = `find S 0x53534A48` (`.party.ssj`, `docs/ids.md`).
+
+- A soft reset (`key 0xF 6`) then loading the save crashed at frame ~5 after the load's A (jump through a null
+  object's vtable from `0x080109AC`) with or without a transformation: the script uses `reset` (power cycle,
+  the cartridge save kept). `ssj2_save.txt` still uses the soft reset (not in `regfull.sh`).
+- `SSJ_TEST=1` builds: player 2's Start uses ability 18 (`input.c`).
 
 ## Frame counts (headless, 2026-10-19)
 
@@ -1030,7 +1109,8 @@ Z-Fighter Rumble with 16 as the headliner (`opp_id` ends 0x13), Janemba's challe
 Majin Vegeta challenges (`chal` 0x1E), unlocked, no Uub; the Legend 1 v 1 as Gohan: Goku (Buu saga, 0x1D), lost, no
 attempt recorded; the Legend Rumble: Super Buu's final form (`eng` +0x153 = 1, his body = sprite 207's record, compared
 with the sprite index), won: the record's `extra` bit 0 (+0x38); the select's Villains and Buu Saga tabs (cropped giants:
-`p10_*`); co-op Legend 2 v 2: Goku (Buu saga) alone challenges (Majin Vegeta is unlocked by then), won. The screens:
+`p10_*`); co-op Legend 2 v 2: Goku (Buu saga) alone challenges (Majin Vegeta is unlocked by then), won; Yakon forced
+as a first opponent and beaten (`p12_yakon_down`: flat on his back, group 12). The screens:
 `build/<dir>/hl/tny_polish.png`. Pass: every `stepz` / `waitnz` reached, no CRASH, the peeks as the echoes say.
 `tny_ui.txt`'s bracket shots (`u18`-`u29`) show King Cold and the other giants at half size.
 
@@ -1060,6 +1140,42 @@ big ones, a lead to look at, not a verdict: the camera scrolling shows as change
 minute; four run side by side. The phase numbers: 1 director, 2 to the ring, 3 next, 4 fight, 5 the end, 6 the duel,
 7 trophy, 8 prize, 9 challenge, 10 intro, 11 restage, 12 exit, 13 exiting.
 Run 2026-10-25 (before / after `tny-polish2`): `build/polish2/flow/` and `build/polish2/flow2/` (not committed).
+
+## Tournament perfecting pass: captions, the announcer's walks, the turn change, walking speed (headless, 2026-11-01, branch `pp-tny`)
+
+```
+make BUILD=build/pp-tny DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/pp-tny/log2-coop.gba --out build/pp-tny/hl
+for t in tny_caption tny_annwalk tny_turn tny_walk; do
+  python tools/headless/st_test.py tools/headless/$t.txt build/pp-tny/log2-coop.gba build/pp-tny/hl/menu.ss --out build/pp-tny/hl --cols 6
+done
+```
+
+All four are in `regfull.sh`. Their checks are test commands that answer into the argument word (0x0203FD0C) and a
+`waitnz` on it: a wrong answer (0) or a command never taken (the posted 0 stays) times out. Post a check while no line
+is up, or `stepz 0x0203FD08 10` first (a line holds the command until A closes it). `docs/tournament.md` 24.1 / 24.4
+/ 24.5 / 24.7 say what each item does; `docs/ids.md` test commands 37 / 38 the arguments and offsets.
+
+- `tny_caption.txt` (24.1): a 1P Rookie Royal Rumble with Super Buu forced as headliner (test command 21 arg2
+  0x7E000023): a fighter punched down at 4 HP shows "[NAME] IS DOWN!" (or one of the other three) at the bottom while
+  the other fights on (the fight's counter `eng` +0x16 keeps counting, +0xFC 0); two punched 12 frames apart: "WHAT A
+  FLURRY!"; the headliner round's kits to 55 % then 25 %: "HE'S CHANGING!", "NOT AGAIN!"; a player-down line queued
+  for SSJ2 Gohan (two rows); a co-op Rumble with player 2 downed (test command 10): "HERCULE IS DOWN!  CAN THE PARTNER
+  HOLD ON?". Shots `c_*` in `tny_caption.png`. The caption state is found by its magic (`find cap 0x504E5954`).
+- `tny_annwalk.txt` (24.4): a 1P Rookie 1 v 1: the fight runs while he walks off (he is gone by the first check: the
+  waits press A every 100 frames), back on in the end's pause (`eng` +0x155 1, x falling to his mark) before the result
+  line; a Rookie Rumble: the pack comes in after he is gone; the check answers walks off | on.
+- `tny_turn.txt` (24.5): a co-op Rookie 1 v 1: player 2's first match reloads the ring (P_RESTAGE); the check wants the
+  reload within 40 frames (it takes 21; it was 90), again for the later turns. The films: `tny_flow.py --div 0 --p2
+  --len 6000 --name c1v1` (the black between the two players' fights is 7 shots of 4 frames).
+- `tny_walk.txt` (24.7): player 1 (the debug party's Piccolo) walks right 30 frames from one spot with his own row and
+  with slot 1's display row poked to tournament rows: 36 px at 100 % (his own, Yamcha), 30 at 85 % (Spopovich, Cooler),
+  39 at 110 % (Goten, Videl); the double-tap dash 75 / 63 (own / Spopovich). The dash comes first: after about 1000 idle
+  frames the idle fidget takes the second tap.
+
+The films of 24.4 (`tny_flow.py` 1 v 1, Rumble and co-op): `build/pp-tny/flow/` (not committed): the announcer walks
+right along the ring's top edge after "Begin!" while the fight starts, comes back from the view's right edge in the
+end's pause, and leaves the duel final the same way.
 
 ## Reading screenshots
 

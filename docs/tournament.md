@@ -263,7 +263,7 @@ Our calls, made while building:
 - **The announcer** is a town NPC's 5-group layout (record 80): idle, walk, and the raised microphone in group 4.
 - **Portraits**: Buu's Fury's own, on LoG2's grey frame (old Hercule's 126 recipe); the forms have their own (Super
   Buu 151-153, Gotenks 157-159, Goku 162-164) for the moves piece's transforms, though the roster row names the
-  first. Evil Buu has none in Buu's Fury: his row keeps 0 (the ui draws his face from the sprite). Without
+  first. Evil Buu has none in Buu's Fury: his row kept 0 until 2026-11-01 (now 172, a grey Super Buu: 24.2). Without
   `roms/buu.gba` every id gets LoG2's Hercule portrait so no id is empty.
 - **Colours**: the nearest LoG2 OBJ colour per Buu colour (`build/<dir>/gen/tny_buu_report.md`). Most move 8-24
   colours by small distances; Yakon's greens come out darker and browner than Buu's (LoG2's palette has no matching
@@ -953,7 +953,7 @@ light-blue cloud painted into the ground (West City: zone 4 area 3, around (352,
 the same cloud (a stamp of those 6 x 4 tiles into the plaza's BG2, which draws over its BG3 paving) on the paving just
 above the beach, and the flight trigger sits on it ((216, 344)-(264, 376)). The world-map landing still arrives on the
 beach below. (World-map landmarks, the 3D towns seen while flying, are drawn per site by the on-load's
-FindCharacterEntity 2-12; Papaya Island has none: adding one needs that landmark table decoded.)
+FindCharacterEntity 2-12; Papaya Island has one since 2026-11-01: 24.6, `docs/maps.md` 9e.)
 
 ## 19. Overhead HP bars in the ring (2026-10-25)
 
@@ -1158,7 +1158,7 @@ his notes first, fix what he found, then work down this list in order** (each it
 to test it, a rough size). Nothing below is a regression; all of it is tested headless except where it says so.
 Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, run it before handing Ryan a build.
 
-### 24.1 The Rumble announcer's calls during a round (dialogue plan section 8)
+### 24.1 The Rumble announcer's calls during a round (dialogue plan section 8; **built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** "[Name] is down!", "Two fighters down!", "[Name] is down! Can the partner hold on?" and Super Buu's form
   change aren't called. The game's dialogue box (`say_go`, a dialogue sequence) stops the fight while it shows.
@@ -1181,8 +1181,40 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
     that power!" / "Not again!  Another form!".
 - **Test:** `tny_fightfix.txt` part C already finishes a Rumble by real hits; a new `tny_caption.txt` films it
   (captions show, the fight never pauses: player x keeps changing under a caption). Size: half a day.
+- **What was built:** `src/coop/tny_caption.c`. The team combos had meanwhile taken the name `tny_caption(const char *)`
+  for their move names (`tny_combo_meter.c`, a queue of string pointers), and a line with a name needs its text kept
+  until it shows, which 0x10 bytes cannot hold: so the calls have their own queue of {line, fighter} pairs (`.tny.cap`,
+  16 bytes) and make the text only when it shows, rendered like the combos' caption (the dialogue font through the
+  stock canvas, white on a black box, 32 x 16 OBJ sprites at the bottom, 90 frames each, three queued). The lines are
+  section 8's as written (names in capitals, the announcer's way): a fall picks one of the four by the frame counter;
+  a second fall while the first's line is queued or has shown under 60 frames turns it into "What a flurry!  Two
+  fighters down!"; a co-op player going down (`revive.c` go_down, so the test command's down too) "[Name] is down!
+  Can the partner hold on?"; Super Buu's first transformation "He's changing!  Look at that power!", the next "Not
+  again!  Another form!". Only in a Rumble round (`tny_rumble_live`: its fight, and the pause after the last fall until
+  the result line, which drops what is left). A line wider than 232 px goes on two rows, split at the announcer's pause
+  ("  "). The caption waits while a team combo plays and 90 frames after (its name's caption sits at the same place);
+  it is moved in front of every other OAM entry (a fighter at the screen's bottom drew over it; the entries' attr3
+  halves stay put: the affine matrices belong to the index). Hooks: `tny_moves.c` `fallen()`'s first frame (not for a
+  Multi-Form copy) and the MK_TRANSFORM's first frames; the HUD draw hook. Test command 37; test `tny_caption.txt`.
 
-### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu
+### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu (**built 2026-11-01**, branch `pp-art`)
+
+**What was built** (`tools/ppportraits.py`, Makefile `PP_PORTRAITS`, ids 169-172 in `tourney_data.c`): each is the
+stock portrait of the body his sprite was made from, repainted the way that sprite was, so face and body agree:
+Android 13 (169) is Android 16's 26 with a yellow trucker cap (crown, seam, button, the Red Ribbon dot, a peak with its
+shadow on the forehead), white hair at the temples and the back, the earring gone, his dark-yellow vest, a blue
+background; Cell Jr. (170) is Perfect Cell's 40 with a blue crest and dark-blue spots, blue-white face and body, the
+gold jaw kept, an orange background; the Namekian Warrior (171) is Piccolo's 94 in the sprite's teal-green with a
+maroon gi on the Namekians' purple; Evil Buu (172): Buu's Fury has no portrait of him (all 155 entries of its module
+read), so it is its Super Buu (127) grey with red eyes on a dark blue (his cape's) background; LoG2's Hercule without
+the Buu ROM. **Judged** side by side with the stock portraits at 3x (`--compare`: the source, ours, the plan's
+sprite-face recipe, stock Hercule and Goku) and in the game's box beside Yamcha's and Perfect Cell's: same frame,
+same drawing density, the colours from the same palette; the plan's recipe (the idle frame's top 32 x 32 at 2x) shows these
+small bodies whole, the head 10-12 px, in blocks of 2 x 2 pixels next to hand-drawn 64 px faces, so it was not used. The select screen's panel shows the
+portrait now (its grid cells still crop the sprite). Test: `tny_talk.txt` t8 (13 / Cell Jr.) and t9 (the Namekian
+Warrior / Evil Buu), `ppportraits.py --check`.
+
+The plan:
 
 - **Wrong:** their lines show the name with no face (roster portrait 0).
 - **Fix:** four new portraits, ids **169-172** (art-buu's unused range 169-189; record them in `docs/ids.md`).
@@ -1194,7 +1226,18 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 - **Test:** `tny_talk.txt` with each of the four opening (test command 31); the select screen still crops its own faces.
   Size: a few hours.
 
-### 24.3 Yakon's lying pose
+### 24.3 Yakon's lying pose (**built 2026-11-01**, branch `pp-art`)
+
+**What was built:** (a), as `lying.sprawl` (`buu2log2.py` `LIE_FRAME` 290 = his recoil 9.3, which has no hit sparks,
+`"sprawl"`): his front frame squashed to 45 % of its height, centred where he stood, one row under his feet. Both
+candidates were built and drawn by `tnysheet.py --lying` beside Hercule's lying pose. (a) keeps Buu's Fury's drawing
+(the muscles, the face, the claws) and reads as a body flat on its back seen down LoG2's angled camera: short and wide,
+face up, arms and legs spread on the floor. (b), a lying frame painted from shapes (head, torso, limbs on his side),
+read as lying too but looked like another creature (flat greens, no texture, a turtle's shape) beside his standing
+body. No shadow: no other lying body has one, and under a flat body it read as a puddle or as him standing. Test:
+`tny_polish.txt` section 12 (Yakon forced as the first opponent, beaten: group 12, shot `p12_yakon_down`).
+
+The plan:
 
 - **Wrong:** it reads like a crab seen from above (Buu's Fury draws him from the front only; `tools/lying.py` turns a
   front recoil frame).
@@ -1204,7 +1247,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - (b) A hand-painted 32 x 32 lying frame stored as a small pixel table in `tools/lying.py`.
 - **Test:** the lying sheet plus `tny_polish.txt`'s end poses. Size: an hour or two.
 
-### 24.4 The announcer walks off and on
+### 24.4 The announcer walks off and on (**built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** he vanishes as a fight starts and appears at its end.
 - **Fix:** in `tny_engine.c`, after "Begin!", queue a walk command (`Cmd_Walk`, as `walk_in` does) from his mark to the
@@ -1214,16 +1257,43 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - The trophy keeps its own placement (section 23).
 - **Test:** `tools/headless/tny_flow.py` films (`docs/testing.md` "Tournament flow films"): no pop at Begin!, he walks.
   Size: a few hours.
+- **What was built** (`tny_engine.c` `ann_walk`): not the stock walk command after all: decompiled, its commit runs the
+  command modal, which stops everything until every walker arrives, and the walk itself is only a mover (0x0800D584:
+  the walk animation, then x / y += a step each frame), so the engine's frame tick moves him (1.5 px a frame, his own
+  update animates the walk; nothing moves while a line shows or behind the curtain). After "Begin!" he walks right
+  along the ring's top edge and leaves once out of view (or 40 px past the platform): in a bracket match, a challenge
+  and the duel final the fight runs meanwhile; in a Rumble the pack walks in once he is gone (he never shares the floor
+  with a pack: OBJ VRAM). At a fight's end he enters from just past the view's right edge during the end's 90-frame
+  pause and walks to his mark (the ring's centre kept inside the view: a fight that ended at the platform's left end
+  showed him at the screen's edge); the result line waits until he is there; one still walking off turns round. No
+  OBJ VRAM for him at the end: he appears on his mark as before. The trophy keeps its own placement. Tests:
+  `tny_annwalk.txt`, the films.
 
-### 24.5 The co-op turn change's black screen (about 1.6 s)
+### 24.5 The co-op turn change's black screen (about 1.6 s; **built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** in a co-op 1 v 1, swapping who fights reloads the ring behind the curtain and holds 90 frames of black.
 - **Fix:** find the fixed 90-frame wait after the reload (`P_RESTAGE` in `tny_engine.c` and the curtain's open
   condition, section 23). Replace it with a readiness check: the ring arrived, player 1 controllable, the bodies
   placed, OBJ VRAM settled; then a minimum of about 20 frames.
 - **Test:** `tny_flow.py --p2 --div 0` (the turns); `tny_engine.txt`'s co-op parts and `duel_end.txt`. Size: an hour.
+- **What was built** (`tny_engine.c` `warp` / `arrived`): the 90 frames were `arrived()`'s fallback for a reload whose
+  new player 1 has the old one's address, and a ring-to-ring reload always does. Now the warp remembers its spot and
+  moves the old body 7 px off it (behind the curtain) when it stands there, so the new body is known by standing on
+  it; the arrival is the ring loaded, player 1 new, in a player state, no scene, the warp command taken, and at least
+  20 frames since the warp (the new bodies' frames decode, OBJ VRAM settles); 90 stays the fallback. The turn change's
+  black is now 21 frames (the trophy's and the challenge's reloads too). Test: `tny_turn.txt` (test command 38).
 
 ### 24.6 Papaya Island's world-map landmark
+
+**Built 2026-11-01** (branch `pp-map`). What was built: the landmarks are the world map's decorations (variation
+0x085C0814's list; `FindCharacterEntity N` shows decoration N; `docs/maps.md` 9e has the table and how it works).
+Papaya Island is decoration 14 with a frame of its own appended to the sheet (`tools/wmlandmark.py papaya`: the ring
+on a sandy island, the hall's red roof behind it, a palm, the stock cone), shown by the on-load under the landing's
+own check (`CoopCall 30, 2`), so flying over the island sea south-west of West City shows it like any town. The
+arctic landing lacked one too and got the stock snowy mountain (decoration 13, flag 381). `tools/mapedit.py` gained
+`"add_decorations"`. Test: `tools/headless/wm_landmark.txt` (in `regfull.sh`); shots `build/pp-map/hl/wm_landmark.png`.
+
+The plan as it was:
 
 - **Wrong:** flying over the island shows no town model (other sites draw a 3D landmark).
 - **Fix:**
@@ -1234,9 +1304,9 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
     copy.
   - Record the table in `docs/maps.md`.
 - **Test:** headless world-map flight past the site (the arctic route test's world-map steps are the model); screenshot.
-  Size: a day (mostly the decoding). Offered to Ryan, not asked for: **ask before starting**.
+  Size: a day (mostly the decoding). (Ryan put it in the perfecting pass, `docs/perfect-pass.md` 5.)
 
-### 24.7 Walking speed per tournament playable
+### 24.7 Walking speed per tournament playable (**built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** every tournament playable walks at Gohan's speed (they share his behaviour class); Spopovich should be
   slow, small fighters quick.
@@ -1245,6 +1315,15 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - Give `tools/tnyplayables.py` a speed column (about 85 % for the giants, 110 % for Goten, Kid Trunks, Chiaotzu and
     Videl) and emit per-row class copies (or a per-row speed table read by a hook).
 - **Test:** `tny_play.txt` measuring x after 30 frames of walking per row. Size: half a day to a day.
+- **What was built:** decompiled: the walk (0x08008031, diagonal: the side speed +0x188 per axis) and the dash / sprint
+  (0x0800811F, 4-way: +0x18C along the facing plus +0x188 sideways) read the entity's speeds, which the behaviour
+  class's init writes from ROM literals (0x08016FD8); every tournament row has Gohan's class. Both states are ours
+  (`player.c` walk_update / diag_update, both players), so they scale the speeds by the row's percent:
+  `tny_play.c` `tny_walk_pct(row)` (a rule, no table column): TR_GIANT 85 %, Goten, Kid Trunks, Chiaotzu and Videl
+  110 %, the rest and every story row 100. The giants are King Cold, Spopovich, Yamu, Cooler, Broly, Super 13, Super
+  Buu, Yakon, Dabura, Evil Buu, Fat Buu and Janemba: Yamu ("the quicker thief" of his kit) is slow with them since he
+  is a 64 x 64 body; one line in `tny_walk_pct` exempts him if Ryan wants. Opponents keep the AI's chase speeds. Test:
+  `tny_walk.txt` (its own script rather than `tny_play.txt`, which is generated).
 
 ### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
 
@@ -1612,6 +1691,49 @@ and 56 for that).
 **Damage**: unchanged by the colours (`docs/tournament-combos.md` section 2: the players' pairs 2389 to 2517, the
 villains' 1590 to 1626). Slowdown 1 to 7 % (it was 0 to 7 %): the coloured uploads cost nothing visible.
 
-**Still not done**: Cell Jr.'s copies show his own frame (a turned copy mirrors it); Android 16 and Super 13 as
-bystanders keep animating; the kits' own beams outside the combos are still the stock blue (the same frame sets could
-colour them: Frieza's Death Beam, Mystic Gohan's Masenko).
+**Still not done**: nothing from this pass (the three leftovers it listed, Cell Jr.'s turned copies, Android 16 and Super
+13 animating as bystanders and the kits' blue beams outside the combos, were built on 2026-11-01: 25.5).
+
+### 25.5 The combos' leftovers (2026-11-01, branch `pp-combo`, the perfecting pass: `docs/perfect-pass.md` 5)
+
+**What a player sees now:**
+- **Cell Jr.'s copies face him from their own side.** Each copy shows Cell Jr.'s pose frame for frame in its own
+  facing: right when it stands left of the target, left when it stands right (the step's X on the fighter's side), drawn
+  where the game draws that facing's frame. Before, a copy turned round mirrored Cell Jr.'s own frame about the wrong
+  point (16 px off, onto the target) and copied an up / down frame when he faced up or down.
+- **Android 16 and Super 13 stand still** while a combo plays near them (a Rumble), like every other bystander: they
+  hold the frame they had, even mid-special, and go on from it afterwards.
+- **The kits' own moves in their colours**, outside the combos too: Frieza's and Mecha Frieza's Death Beam pink, King
+  Cold's red, Cooler's Death Flash purple and his Supernova gold, Mystic Gohan's Masenko yellow (his Kamehameha stays
+  blue), Broly's Eraser Cannon and Gigantic Meteor green. Every other kit beam stays the blue Kamehameha.
+
+**How:**
+- **The copies** (`tny_combo_run.c` `copy_frame`): the frame is his group (+0x4C) and frame (+0x14) in the copy's own
+  facing's array of the record (clamped to that array's length; the entity draw `0x08007A84` reads +0x4C, the facing
+  +0x10 and the frame the same way). Where its blob is the one his own draw shows (a side facing and its mirror share
+  one blob, the right frame's attribute flips it: Cell Jr.'s record) the copy draws from his tiles with that frame's own
+  attribute and offset; else (he faces up or down) it decodes the frame into its own OBJ VRAM, sized at the copy's start
+  for his largest frame (0x400 for Cell Jr.), with the game's unpacker (`0x0801F394`) into a 4 KB stack buffer, as the
+  entity draw does (`0x08007772` unpacks a changed frame to sp - 0x1004 and DMAs it to the entity's buffer +0x30),
+  through his colour remap (+0x24, so his flashes show on the copies). With no VRAM to spare it falls back to his own
+  frame flipped (at the frame's own offset now).
+- **16 and 13** (`tny_combo_frozen`, checked in `tny_moves.c` `kit_message`): in the tournament their kits wrap the
+  co-op enemy vtable (`coop2.enemy_vtable`, whose message is the stock enemy's `0x0800E5B8`, which passes 10 to the base
+  entity message `0x08019B70`: with no command it runs the control state's and the aux state's animate). Android 16's
+  and Super 13's own code drives them through the update, so the hold state (which would end their specials) is not
+  theirs: a native kit's message 10 is swallowed while a combo plays and he is not in it. (android16.c's `a16_message`
+  is the story boss's only; the tournament's 16 never reaches it.)
+- **The kits' colours** live in `docs/tournament-combos.md` section 4 beside the combos' (its kits' table: fighter,
+  move slot, colour); `tools/tnycombo.py` turns it into `tny_kit_colours` (and builds the beam frame sets for those
+  colours too). The shared painting moved to `src/coop/tny_colours.c`: `tny_beam_paint` (the old `beam_paint`, right
+  after `Beam_Fire` in both the runner and the kits' beam move), `tny_tint_tiles` (a projectile's upload through a
+  remap: the runner's coloured shots and the kits' orbs), `tny_kit_colour`. In `tny_moves.c`: the beam move paints
+  after `Beam_Fire`, the ball move paints its orb (a `tint` field in the kit's projectile, its slot 5 the remap upload).
+
+**Damage**: unchanged (`tny_combo_tune.txt` on this branch: every combo's numbers equal section 2 of the combos doc,
+2389 to 2517 for the players' pairs, 1590 to 1626 for the villains'). No step table, timing or weight changed.
+
+**Test:** `tools/headless/tny_pp_combo.txt` (`docs/testing.md` "Team combos: the leftovers", in `regfull.sh`): the kits'
+moves filmed, 16 and 13 in a Rumble held through Spopovich & Yamu's combo (their animation timer +0x12 stays put, then
+runs again), the copies' facings and the decode path (Cell Jr. poked to face down: modes 2). `tny_combo_tune.txt` also
+prints the copies' state at four shots (`.combo.run` +0x88).

@@ -4,6 +4,7 @@
 #pragma once
 
 #define KRILLIN_SLOT        6
+#define KRILLIN_LIFT_FLAG   462   // set at a new game: the save already has Krillin's 2026-11-01 numbers
 #define KRILLIN_ROW         23     // display row (tools/spriteclone.py)
 #define KRILLIN_SPRITE_ID   161    // sprite index id of krillin_record (Makefile KRILLIN_SPRITE)
 #define KRILLIN_STATUS_PORTRAIT 119   // portrait_module id of his status portrait (row +3)
@@ -34,6 +35,7 @@
 // The melee hit of Krillin's abilities, shared with ssj2gohan.c: one hit message {kind, reaction, power} over
 // the box (cx +- rx, cy +- ry) to every entity of the scene list
 void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack);
+void krillin_lift(CharacterEntry *c);   // an older save's Krillin: the 2026-11-01 base numbers (party_save.c)
 
 // Destructo Disc (ability 22)
 #define DISC_EP          12
@@ -43,7 +45,8 @@ void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack);
 #define DISC_POWER       0x800   // attack base (the ki blast's is 0x400)
 #define DISC_MAX_HITS    12      // enemies one disc can cut (each once)
 #define DISC_HALF_W      12      // hit box half-size around the disc centre (px)
-#define DISC_HALF_H      7
+#define DISC_HALF_H      7       // above the disc's centre; below it the box reaches the thrower's feet line
+#define DISC_REACH_MAX   32      // (it flies at hand height: over a snake's or a wolf's body otherwise)
 
 // Melee pair (abilities 19, 20)
 #define RUSH_EP          4

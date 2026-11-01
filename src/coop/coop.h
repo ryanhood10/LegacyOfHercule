@@ -209,6 +209,7 @@ void waves_tick(void);
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
 int is_coop_enemy(const Entity *e);
+int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
 Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2);   // entities.c
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 #define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4
@@ -223,6 +224,7 @@ void coop_active_check(void);   // player 1 switched character: keep player 2 on
 void p2_cycle(void);            // player 2 picks the next available character (Select)
 void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
 void a16_frame(void);
+void ssj_frame(void);   // ssj.c: every input poll (a slot player 2 leaves turns back from Super Saiyan)
 int  tny_coop_call(int fn, s32 a, s32 b, s32 c, s32 *push);   // tourney_hooks.c: CoopCall 23-30
 void tny_test_cmd(u32 cmd, u32 arg, u32 arg2);                // tourney_hooks.c: test commands 21-30
 void tny_frame(void);                                         // tourney_hooks.c: every input poll                         // a16player.c, every input poll (an older save's 16: his four moves)

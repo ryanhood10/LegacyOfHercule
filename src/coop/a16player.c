@@ -188,7 +188,7 @@ static int hit_enemies(Fist *p, s32 x0, s32 y0, s32 x1, s32 y1, int first_only) 
     int n = 0;
     for (int i = list->count - 1; i >= 0; i--) {
         Entity *t = list->items[i];
-        if (!t || t == p->owner || t == p->first || !is_coop_enemy(t)) continue;
+        if (!t || t == p->owner || t == p->first || !is_any_enemy(t)) continue;
         m.out[0] = m.out[1] = m.out[2] = 0;
         if (((int (*)(Entity *, int, HitMsg *))vslot(t, 9))(t, 0, &m)) {
             n++;

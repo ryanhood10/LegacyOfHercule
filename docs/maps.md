@@ -5,7 +5,8 @@ checked against savestates and by rendering every map), and the tools that read 
 `tools/maplib.py` (format library, both games), `tools/mapexport.py` (render any map from either ROM),
 `tools/mapbuild.py` (build new maps from `data/maps/*.json`), `tools/patch_rom.py --maps` (place
 them and relocate the map table). The new maps (zone 15) are in section 9 (the arctic route 9a);
-world-map markers in 9b, the arctic landing on the world map in 9c; Buu's Fury's maps (its table, names,
+world-map markers in 9b, the arctic landing on the world map in 9c, Papaya Island's in 9d, the world map's 3D
+landmarks (its decorations) in 9e; Buu's Fury's maps (its table, names,
 the World Tournament grounds) in 10.
 
 Addresses are GBA addresses (file offset + 0x08000000). "Resource" means the loader format of
@@ -126,7 +127,7 @@ tiles); others are rain and fog. Three other layer classes exist only on the wor
   over its slots every few frames (`FUN_0800501E`). Animated slots may lie beyond the static table.
 - **Decorations** (+0x24/+0x28/+0x2C): 0x18-byte records `{s32 x1, y1, x2, y2, u16 0x2000, u16
   0x8000, u16 frame offset, u8 0x28, u8 1}`, OBJ graphics from the variation's sprite sheet (+0x2C,
-  a resource of 4bpp frames). The barriers ("only Vegeta may pass") are decorations.
+  a resource of 4bpp frames on field maps; the world map's are 8bpp 32 x 64, section 9e). The barriers ("only Vegeta may pass") are decorations.
 
 ## 6. Collision
 
@@ -371,9 +372,9 @@ flight spots land at (1100, 800), the rect's centre.
 - **The banner trigger** sends message 0x16 with the name id (`FUN_0801A6A0`); the receiver reads the
   name through literal 0x0801A688 (one of `ui_strings`' repointed literals). Flying into a stock site in
   the headless runner showed no text label either, so the label's look is unverified for every site.
-- **No ground marker:** the stock sites also show a landmark on the 3D ground (at zone 3's site a rock and
-  a purple cone, world-map decorations); the on-load's `FindCharacterEntity N` lines (N 2-12, one per
-  site, each behind its site's flag) look like the switches for those. The arctic site has none.
+- **The ground marker** (the 3D landmark every stock site shows): decoded 2026-11-01 (section 9e): the world map's
+  decorations, shown by the on-load's `FindCharacterEntity N`. The arctic now has one: decoration 13, the stock
+  snowy mountain, shown under flag 381.
 - **Test position:** `COOP_CMD_WARP` with zone 6 area 99 (`cmd_arg` 0x6306) puts the flyer anywhere,
   e.g. `cmd_arg2` 0x03200460 = (1120, 800); moving the flyer's entity position does not stick.
 
@@ -386,6 +387,63 @@ neither the maps nor the landing), and an on-load edit that appends the plain ma
 under the same check. The spot is the island sea south-west of West City: the plan's (1100-1200, 2000) is desert on our
 map, and at (1260, 1820) the flyer's shadow is on a small island among rocks (headless shots, `docs/testing.md`
 "Tournament grounds"). The plaza's flight spot lands back at (1260, 1820).
+
+## 9e. World-map landmarks: the 3D sites (decoded 2026-11-01; Papaya Island and the arctic added)
+
+Every stock landing site shows a landmark on the 3D world map (a house, a dome, the Lookout...) with a purple
+cone under it. **They are the world map's decorations**, the same variation list as a field map's barriers and
+rocks (section 3): zone 6 area 99's variation 0x085C0814 has 13 at +0x28 (0x085BEB20) on one sheet at +0x2C
+(0x085BEC58, compressed, 18432 bytes = nine 8bpp 32 x 64 frames).
+
+| record (0x18 bytes) | meaning (decompiled `FUN_08012C94`, the affine decoration class) |
+|---|---|
+| +0x00 s32 x1, y1, x2, y2 | world rect; the sprite stands on (x centre, y2): the cone's tip is y2, about 7 px below the site's centre |
+| +0x10 u16 0xA000, +0x12 u16 0xC000 | OAM attributes: 8bpp, tall 32 x 64 |
+| +0x14 u16 | frame: tile offset into the sheet (32-byte units, 0x40 per frame) |
+| +0x16 u8 0x28 | copied to the object's +8 (not decoded further) |
+| +0x17 u8 | shown at load (1) or hidden until a script shows it (0) |
+
+`Map_InitRenderer`'s decoration step (`FUN_08005FBA`) builds, for an affine map, one object per record into the
+entity list 0x03001120 (vtable 0x08025FB8 for record 0, which also allocates OBJ VRAM for the whole sheet
+(`FUN_080067AC`, size = the sheet's) and uploads it; 0x08025E5C for the rest, each at sheet base + its frame), with
+**its index in the list as its id** (+0xC). The message handler (`FUN_08012E78` / `FUN_0801306E`) takes message 4
+with `id * 2 + show`: script step 29 (`FindCharacterEntity N`, 0x08009741) sends `N * 2 + 1` (show), step 30
+(`FindEntityByType N`, 0x0800975F) `N * 2` (hide), to every entity (`FUN_08006E0A`). So the on-load's
+`FindCharacterEntity 2-12` lines are "show landmark N" behind each site's flag; 0 and 1 are shown at load. (The same
+pair shows and hides decorations on any map: the boulders in Gero's cave mouth, the level barriers.)
+
+| decoration | frame | site (trigger rect's map) | shown |
+|---|---|---|---|
+| 0 | 0 Goku's house | zone 2 (2888, 1848) | always |
+| 1 | 1 rock pillar | zone 3 (1616, 1128) | always |
+| 2 | 2 city | West City, zone 4 (1440, 1528) | flag 26 |
+| 3 | 2 city | zone 5 (1848, 2568) | flag 68 |
+| 4 | 3 Capsule Corp dome | zone 6 (1576, 1528) | flag 30 |
+| 5 | 1 rock pillar | zone 7 (1728, 2320) | flag 77 |
+| 6 | 4 snowy mountain | zone 8 (2560, 1000) | flag 86 |
+| 7 | 5 the Lookout | zone 9 (840, 1416) | flag 127 |
+| 8 | 2 city | zone 10 (1544, 1360) | flag 129 |
+| 9 | 6 Kame House | zone 11 (3088, 2040) | flag 69 |
+| 10 | 7 palm island | zone 12 (2496, 2400) | flag 149 |
+| 11 | 4 snowy mountain | zone 13 (3024, 768) | item 45 held |
+| 12 | 8 the Cell Games arena | zone 14 (1776, 1024) | flag 191 |
+| **13** | 4 snowy mountain | **the arctic** (1043, 739), `arctic_route.json` | flag 381 |
+| **14** | **9 Papaya Island** (ours) | **Papaya Island** (1204, 1760), `papaya_route.json` | the grounds in the build (`CoopCall 30, 2`) |
+
+(The last column is read off the on-load's `StackTestStoryFlag N; JumpIfFalse; FindCharacterEntity id` blocks:
+`python -I tools/script_asm.py dump script 0x083FB868`; `build/scripts/map_176_z6_a99.txt` stops at 512 bytes.)
+
+**Adding one** (`tools/mapedit.py` `"add_decorations"`): the list is copied to free ROM with the new records
+appended (variation +0x24 count and +0x28 pointer rewritten); `"index"` must be the next position (specs apply in
+`data/hercule.json`'s order: the arctic's 13, then Papaya's 14); `"frame"` reuses a stock frame, `"art"` names a
+drawing in `tools/wmlandmark.py` that is appended to the sheet (decompressed, extended, re-compressed into free
+ROM, variation +0x2C repointed); `"like"` copies a stock record's attribute bytes; `"visible": 0` plus a
+`FindCharacterEntity N` in the on-load under the site's condition. Papaya's frame (`wmlandmark.py papaya`, drawn
+from the stock palm island's leaves and the OBJ palette's stone greys and Kame House's reds: the World Tournament's
+ring on a sandy island, the hall's red roof behind it, a palm on the left, the stock cone under it) grows the sheet to
+20480 bytes; the world map still has 10944 bytes of OBJ VRAM free (`objfree.py`). Preview:
+`python -I tools/wmlandmark.py roms/log2.gba OUT.png`. Test: `tools/headless/wm_landmark.txt`
+(`docs/testing.md` "World-map landmarks").
 
 ## 10. Buu's Fury maps (table and names decoded 2026-10-24; two imported)
 

@@ -15,7 +15,48 @@ Newest first. One entry per landed piece or decision; details live in the linked
   2's entity to an actor on his spot), Krillin's actor at the landing and the Goku-arrival site when nobody plays
   him, old Hercule's talk ("Oh, don't worry, kid, you'll find out!"), facing the talk, Ryan's "runnin' into guys
   like that" line, Goku's West City call without "Gohan". Test `ch1_notes.txt`.
-
+- **Perfecting pass, tny piece** (branch `pp-tny`, `docs/tournament.md` 24.1 / 24.4 / 24.5 / 24.7): the Rumble
+  announcer's calls (a fall, the flurry, a co-op player down, Super Buu's forms) as a caption at the bottom that never
+  pauses the fight (`src/coop/tny_caption.c`, `.tny.cap`, test command 37); the announcer walks off after "Begin!" while
+  the fight runs and back on in the end's pause (a Rumble's pack waits for him); the co-op 1 v 1's turn change reloads
+  the ring in 21 frames of black instead of 90 (a readiness check); walking and dash speed per tournament row (giants
+  85 %, Goten, Kid Trunks, Chiaotzu and Videl 110 %). Tests `tny_caption.txt`, `tny_annwalk.txt`, `tny_turn.txt`,
+  `tny_walk.txt` (test command 38), all in `regfull.sh`.
+- **The combos' leftovers** (branch `pp-combo`, `docs/tournament.md` 25.5): Cell Jr.'s copies face the target from
+  their own side (his pose in the copy's facing from the record, decoded into their own VRAM when it is not his blob);
+  Android 16 and Super 13 hold still as bystanders while a combo plays (their kits swallow message 10); the kits' own
+  moves in their colours outside the combos (Frieza's and Mecha Frieza's Death Beam pink, King Cold's red, Cooler's
+  purple and his Supernova gold, Mystic Gohan's Masenko yellow, Broly's orbs green), their table in
+  `docs/tournament-combos.md` section 4 beside the combos' colours, the painting shared in `src/coop/tny_colours.c`.
+  Combo damage unchanged; test `tools/headless/tny_pp_combo.txt`.
+- **Super Saiyan Hercule: the Super Saiyans' rules** (branch `pp-ssj`, `docs/perfect-pass.md` 4, `docs/hercule.md`
+  3b): the stock transformation decompiled into `docs/engine.md` "Super Saiyan transformation" (ability 12: ready at
+  10 EP, no cost, a 160-frame power-up with its hum and sound, the Super Saiyan class's +10 combat bytes, faster legs,
+  1 EP every 20 frames, back at 0 EP or by the ability, `Party_DetransformOthers`). Ability 18 is now that ability on
+  Hercule's rows: row 22 has the class, `herc_record` a power-up group (his victory pose, the afro turning gold in a
+  yellow aura), `ssj_record` a turn-back group (it had none: the turn back read past its table), ability 18 its own
+  icon pair (the Transformation icon in his colours, `tools/ssjhercule.py`). The three stock routines that served only
+  player 1 (the form change, the drain, the revert) are replaced for the entity's own slot, so player 2 transforms
+  too (Goku, Gohan... as well); a Super Saiyan gets no regeneration from the partner's class; a slot player 2 leaves
+  turns back. When he gets it is unchanged (`hercule_awaken`). Test `tools/headless/ssj_hercule.txt` through the new
+  `st_expect.py` (56 checks), in `regfull.sh`.
+- **Krillin stronger at level 1, the Disc hits alone** (Ryan's one-player notes, `docs/perfect-pass.md` 8.7): 70 HP, str 2.5,
+  pow 3.5, end 2.0 (was 60, 1.5 / 2.5 / 1.5: a punch took 1 HP off a snake), older saves lifted once on load (flag 462).
+  The Destructo Disc and 16's Rocket Punch only hit co-op-wrapped enemies, so in a one-player game they hit nothing:
+  now `is_any_enemy`; the Disc's box also reaches down to the thrower's feet. Test `tools/headless/krillin_disc.txt`.
+- **Papaya Island's world-map landmark** (perfecting pass 24.6, branch `pp-map`; `docs/maps.md` 9e,
+  `docs/tournament.md` 24.6): the 3D towns over the world map's sites are its decorations (`FindCharacterEntity N`
+  shows decoration N; decoded); Papaya Island gets decoration 14, a frame of its own (`tools/wmlandmark.py`: the
+  ring on a sandy island, the hall's red roof, a palm), the arctic decoration 13 (the stock snowy mountain, flag
+  381). `tools/mapedit.py` `add_decorations`; test `tools/headless/wm_landmark.txt` (in `regfull.sh`, which takes
+  `PLAY=` for a private play ROM).
+- **Tournament art: four dialogue portraits and Yakon's lying pose** (branch `pp-art`, `docs/tournament.md` 24.2 /
+  24.3): Android 13, Cell Jr., the Namekian Warrior and Evil Buu speak with a face now (portraits 169-172,
+  `tools/ppportraits.py`): each the stock portrait of the body his sprite was made from, repainted as the sprite was
+  (16's with a trucker cap and white hair, Perfect Cell's blue, Piccolo's teal with a maroon gi, Buu's Fury's Super
+  Buu grey; Buu's Fury has no Evil Buu portrait). The plan's sprite-face-at-2x recipe was built and compared and
+  looked like blocks beside the stock faces. Yakon, beaten, lies flat on his back (his front frame squashed to 45 %,
+  `lying.sprawl`), chosen over a frame painted from shapes. Tests `tny_talk.txt` t8 / t9, `tny_polish.txt` 12.
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.

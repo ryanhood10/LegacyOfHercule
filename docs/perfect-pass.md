@@ -37,6 +37,8 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 - **A loser's line after a tournament fight: no.** Only the winner speaks (the default stays).
 - **Start skips the fighters' talk:** not decided; the default (it skips) stays until he says.
+- **Open (2026-11-01): Yamu's walking speed.** He is a 64 x 64 body, so 24.7 gives him the giants' 85 %, though his kit
+  calls him "the quicker thief". Exempting him is one line in `tny_walk_pct`.
 - **Super Saiyan Hercule: the same rules as the Super Saiyans** (section 4).
 - **The story polish:** all of it is to be addressed (section 3), after the playtest's notes are in.
 - **The combos' playtest notes** wait for the two-player session; the combos are not touched until then.
@@ -62,6 +64,11 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 ## 4. Super Saiyan Hercule (Ryan: the same rules as the Super Saiyans)
 
+**Built 2026-11-01** (branch `pp-ssj`): the rules as found are in `docs/engine.md` "Super Saiyan transformation" and
+what he now does in `docs/hercule.md` 3b; test `tools/headless/ssj_hercule.txt`. Two corrections to the plan below:
+everyone's Transformation is ability 12 (13 is Trunks' 5-EP move), and the drain is the Super Saiyan class's update
+(`0x08017306`), not the dash state `0x080083C3`. The stock transformation costs no EP (it needs 10).
+
 What he has (`src/coop/ssj.c`): ability 18 switches slot 5 to row 22 (sprite 157) for 50 EP through the game's
 transformation opcode; `hercule_awaken` puts it in his list late in the story; no aura, no drain, no revert.
 
@@ -83,14 +90,15 @@ Test: `SSJ_TEST=1` (`docs/testing.md` "Super Saiyan Hercule"): transform as play
 
 ## 5. The open fixes (no decision needed)
 
-The tournament's, each already planned in `docs/tournament.md` 24 with its test and size: **24.1** the announcer's
+The tournament's (**24.1-24.7 all built and merged 2026-11-01**; what was built is in `docs/tournament.md` 24), each planned there with its test and size: **24.1** the announcer's
 calls during a Rumble as a non-pausing caption (half a day); **24.2** portraits for Android 13, Cell Jr., the Namekian
 Warrior and Evil Buu, ids 169-172 (hours); **24.3** Yakon's lying pose (an hour or two); **24.4** the announcer walks
 off and on (hours); **24.5** the co-op turn change's black screen, a readiness check instead of 90 frames (an hour);
-**24.6** Papaya Island's world-map landmark (a day, mostly decoding); **24.7** walking speed per playable (half a day
+**24.6** Papaya Island's world-map landmark (built 2026-11-01, branch `pp-map`: `docs/tournament.md` 24.6); **24.7** walking speed per playable (half a day
 to a day); **24.9** the merged worktrees removed once the films are not wanted.
 
-The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"):
+The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"; **all three built and merged 2026-11-01, `docs/tournament.md`
+25.5**; the kits' colours also give Cooler's own Supernova gold and Broly's orbs green, as he has no beam move):
 - **Cell Jr.'s copies mirror his frame**: a copy draws the source body's current frame; a copy facing the other way
   should draw that facing's frame from the record's direction array (`copy K X Y` gets a facing from X's sign). Test:
   `tny_combo_tune.txt`'s Cell film.
@@ -145,8 +153,28 @@ punctuation only); owner in brackets.
 6. **Goku and Trunks' talk** [story]: old Hercule's interruption becomes Ryan's line: HERCULE: "Psst!  Trunks!  Is it
    safe to come out now?" then "Trunks! You didn't say we would be runnin' into guys like that on this trip! That Frieza
    fella isn't coming back, is he?" (replaces "That Frieza fellow isn't coming back, is he?" in `ch1_trunks_talk`).
-7. **Krillin at level 1 is too weak** [lead]: he cannot kill an animal. Still clearly weaker than Gohan, but slightly
+7. **Krillin at level 1 is too weak** [lead; **done 2026-11-01**: 70 HP, str 2.5, pow 3.5, end 2.0, old saves lifted once; the Disc missed every enemy of a one-player game, fixed, `krillin_disc.txt`]: he cannot kill an animal. Still clearly weaker than Gohan, but slightly
    stronger and with slightly more health. His **Destructo Disc does not really hit** enemies.
 8. **Goku's "Alright, Gohan, it's about time to fly over to West City and meet up with Piccolo."** [story] (stock,
    maps 11 / 12, zone 2 areas 5 / 6): drop "Gohan" so it fits Krillin as player 1: "Alright, it's about time to fly
    over to West City and meet up with Piccolo."
+
+9. **West City's parade, playing as Krillin** [story]: player 1's lines show "GOHAN:" (stock map 65, zone 4 area 3:
+   `#GOHAN: Sure!` is hard-coded on speaker 1; Piccolo's "Well Gohan" and "How's your training going, Gohan?" too).
+10. **Yajirobe's Senzu Bean, playing as Krillin** [story]: he says "What's up, Gohan?" and the player speaks as Gohan
+   (stock map 135, zone 4 area 94, and map 231: `PushActiveCharName`, step 12, gives "Gohan" for Krillin: find why,
+   likely the name comes from his display row, a copy of Gohan's).
+11. **A sweep for the same** [story]: every stock line that names Gohan, or speaks as him on speaker 1, in a scene
+   Krillin (or another character) can play as player 1; fix each to the player's own name or a neutral line, as in
+   item 8.
+
+## 9. Found during the pass (not asked for; to fix or to ask Ryan)
+
+- **A soft reset, then loading a save, crashes** about 5 frames after the load's A (a jump through a null vtable from
+  `0x080109AC`), with or without a transformation; found by the ssj piece (2026-11-01). `ssj2_save.txt` (not in
+  `regfull.sh`) still uses the soft reset. A real bug a player can hit: A+B+Select+Start, then Continue.
+- **The Super Saiyan cool-down is about half as long in co-op**: both players' base classes drain the shared party
+  meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
+- **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows
+  on him (90); both are older than the colour work (the combo piece's film, `build/pp-combo/films/kits/`).
+- **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.

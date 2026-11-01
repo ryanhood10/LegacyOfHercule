@@ -13,12 +13,12 @@ Each piece takes numbers only from its own row and says in its report if it need
 
 | piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
 |---|---|---|---|---|---|
-| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (31 used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAE0, the test win's record `cg_note_win`): `partyram` had only 0x20 left, so 0x10 remain after it |
-| ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
-| tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
-| art (`pp-art`) | - | - | - | 169-172 | - |
-| combo (`pp-combo`) | - | - | 39 | - | in `comboram`'s free 0xB8 |
-| map (`pp-map`) | 478-479 | - | - | - | - |
+| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (31 used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAF0, the test win's record `cg_note_win`, after `.party.ssj`): `partyram` is then full |
+| ssj (`pp-ssj`) | 476-477 (none used) | - | 36 (none used) | - | `.party.ssj` 0x10 (used: `ssj_state`, after `.party.bv`) |
+| tny (`pp-tny`) | - | - | 37-38 (both used) | - | `.tny.cap` 0x10 (used, 0x0203EFAC); `.tny.eng`'s old padding (the announcer's walks, the reload's frames: `TnyEng` +0x155..+0x167) |
+| art (`pp-art`) | - | - | - | 169-172 (used: the four portraits) | - |
+| combo (`pp-combo`) | - | - | 39 (not used) | - | in `comboram`'s free 0xB8: `.combo.run` +0x88..+0x91, the copies' state (`RunRam` 0x92 of 0x140) |
+| map (`pp-map`) | 478-479 (not needed: unused, free) | - | - | - | - |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
@@ -37,7 +37,7 @@ now ends there, `patch_rom.py` 0xF87E words). ROM: big generated art goes to `ro
 | talk (main) | - | - | - | - | - | - | - | 31 | - | `.tny.talk` 0x58 |
 | combo lead (main, 2026-10-31) | - | - | - | - | - | - | - | - | - | the pair table (`tny_combo.c`), `comboram` itself |
 | combo meter (built, `tny-combo-meter`) | - | - | - | - | - | - | - | 32 | - | `.combo.meter` 0x80 (0x0203EA00), `.combo.cap` 0x30 (0x0203EA80), both padded to exactly their size |
-| combo runner (built, `tny-combo-run`) | - | - | - | - | - | - | - | 33 | - | `.combo.run` 0x88 of 0x140 (0x0203EAB0) |
+| combo runner (built, `tny-combo-run`) | - | - | - | - | - | - | - | 33 | - | `.combo.run` 0x92 of 0x140 (0x0203EAB0; 0x88 until the perfecting pass) |
 | art-new | - | - | 185-189 (King Cold, Roshi, Chi-Chi, Videl, Chiaotzu) | - | 127-139 | - | - | - | - | - |
 | art-buu | - | - | 195-229 (`tourney.h` TS_*), 230 the announcer | - | 140-189 | - | - | - | - | - |
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
@@ -80,7 +80,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 441-445 | the tournament grounds (`data/story/papaya.lscript`, `tny_ring.h`) | 441 the plaza's first-visit welcome has played; 442 Pikkon's Senzu bean taken (the hidden arena); 443-445 free |
 | 446-459 | the tournament engine (`tourney.h` `TNY_FLAG_ENGINE0`) | |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
-| 462-463 | free | |
+| 462 | Krillin's numbers lifted (`krillin.h` `KRILLIN_LIFT_FLAG`): set at every new game; a save without it gets `krillin_lift` once on load (2026-11-01) | |
+| 463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
 | 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first "Training completed!" (`wait_chamber`); 469-475 free |
 | 476-479 | free (476-477 the ssj piece's, 478-479 the map piece's: the allocation table above) | |
@@ -136,7 +137,7 @@ sprite 72) for Roshi's gym.
 |---|---|---|---|
 | 58 | Super Saiyan 2 Gohan, **repointed**: `ssj2_record` = the stock record 58 (ROM groups) with hurt 11, lying 12 and tumble 20 from record 59 (party slot 8, row 28; the Cell Games' stock row 4 too) | `tools/ssj2sprites.py` | `EXTRA_SPRITES` `58=ssj2_record` |
 | 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
-| 157 | Super Saiyan Hercule | `tools/spriteclone.py` | `SSJ_SPRITE` |
+| 157 | Super Saiyan Hercule (22 groups: group 21 the turn back, `tools/ssjhercule.py`) | `tools/spriteclone.py` | `SSJ_SPRITE` |
 | 158 | Hercule from Buu's Fury (old Hercule's body) | `tools/buu2log2.py` | `BUU_SPRITES` |
 | 159 | Legendary Super Saiyan Broly (from Buu's Fury) | `tools/buu2log2.py` | `BUU_SPRITES` (hardcoded in `bosses.h`) |
 | 160 | Android 16 boss | `tools/a16sprites.py` | `A16_SPRITE` |
@@ -172,7 +173,7 @@ leaves copies out of step: grep for the number before moving one.
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
-| 22 | Super Saiyan Hercule | 157 | Hercule's | `spriteclone.py` |
+| 22 | Super Saiyan Hercule: transformed (flag bit 0, back to 21), the Super Saiyans' class `0x030021EC` | 157 | Hercule's | `spriteclone.py` |
 | 23 | Krillin | 161 | 73 / 119 | `spriteclone.py`, `krillin.h` |
 | 24 | old Hercule | 158 (72 when `BUU=0`) | Hercule's | `spriteclone.py`, `krillin.h` |
 | 25 | Android 16 (player) | 175 | 26 / 121 | `spriteclone.py`, `a16player.h` |
@@ -201,7 +202,8 @@ finds row 4 first).
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
 | 128-139 | art-new's allocation (tournament), unused | |
 | 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
-| 169-189 | art-buu's allocation, unused | |
+| 169-172 | dialogue portraits for the fighters that had none (the perfecting pass, `docs/tournament.md` 24.2): 169 Android 13 (Android 16's 26 with a trucker cap and white hair), 170 Cell Jr. (Perfect Cell's 40 in blue), 171 the Namekian Warrior (Piccolo's 94 teal, a maroon gi), 172 Evil Buu (Buu's Fury's Super Buu 127 grey; LoG2's Hercule 67 without `roms/buu.gba`) | Makefile `PP_PORTRAITS`, `tools/ppportraits.py` (`pp_portrait_<id>`, second ROM blob), `--extra-portrait`; `tourney_data.c`'s portrait column |
+| 173-189 | art-buu's allocation, unused | |
 | 190-199 | ui's allocation (tournament) | |
 | 127 | Videl's dialogue portrait (Buu's Fury's short-haired Videl, module 0x086F393C id 153, on LoG2's frame; stock 43 Chi-Chi without `roms/buu.gba`); the tournament's other new fighters use stock portraits: King Cold 70, Roshi 80, Chi-Chi 43, Chiaotzu 42 (`tourney_data.c`) | Makefile `VIDEL_PORTRAIT`, `tools/tnysprites.py` `tny_videl_portrait`, `--extra-portrait` |
 | 128-139 | art-new's allocation, unused | |
@@ -215,7 +217,7 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | id | ability | C |
 |---|---|---|
 | 14-17 | Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Hercule Taunt | `hercule.c` |
-| 18 | Super Hercule (transform) | `ssj.c` |
+| 18 | Super Hercule (the stock Transformation's rules; icons `herc_ssj_icon_0/1`) | `ssj.c` |
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
@@ -298,7 +300,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 25 | TNY_START (engine) | a tournament without the director's screens, from where player 1 stands (the way back): `arg` = division \| full << 4 \| tier << 8, `arg2` = player 1's pick \| player 2's << 8 (0xFF = his own character) |
 | 28-29 | the tournament ui (below / `docs/tournament.md` 12) | |
 | 32 | TNY_COMBO_METER (team combos: the meter, `tny_combo_meter.c`, `docs/tournament.md` 25.1) | `arg` = op, `arg2` = value: 0 as at a fight's start (players' bar full, AI bars cleared), 1 the players' bar full, 2 empty with the cooldown over, 3 end a running cooldown, 4 cooldown of `arg2` frames, 5 AI slot `arg2` full (0xFF all), 6 the button for player `arg2` (0 / 1) next frame, 7 a caption (`arg2` 0-2 test lines, 3 `tny_combo_name` of the players' combo), 8 the players' fill := `arg2` (filling; the drain's delay starts now), 9 `arg2` bit 0: AI pairs never fire by themselves, 10 player `arg2 & 1` throws his A punch at living kit fighter `arg2 >> 8 & 0xFF` (list order), standing `arg2 >> 16 & 0xFF` px (0 = 20) on his left (`arg2` bit 24: right), 11 kit fighter `arg2 & 0xFF` stands `arg2 >> 8 & 0xFFFF` px right of player `arg2 >> 24`. State `.combo.meter` 0x0203EA00 (magic 0x524D4354 "TCMR"): +4 bytes on, pstate (0 ready, 1 cooldown, 2 filling), pcombo (0xFF none), hold; +8 fill (s16, 0x3C0 full); +0xA cooldown frames; +0xC tries / starts; +0x10 players' hits on kits / shared; +0x14 splits / kit hits on players; +0x18 each player's last hit frame; +0x1C their last targets; +0x24 the shared target; +0x28 last shared frame / fights seen; +0x2C press, drawn (1 = the bars are up), AI slots, living kits; +0x30 the bars' tile / presses with no opponent; +0x34 the last `tny_combo_start` call: lead, partner, target; +0x40 its combo, side, result; +0x44 three AI slots of 0x10 (ida, idb, combo, state 0 free 1 filling 2 full 3 cooldown; fill; cool / retry; tries; starts; hits); +0x74 frames drained; +0x76 Select held. Caption `.combo.cap` 0x0203EA80 ("TCAP"): +4 queue (3 pointers), +0x10 queued, sprites, frames left (u16 +0x12); +0x14 tile / shown; +0x18 fails / drops; +0x1C frames drawn / width; +0x20 frames waited behind a scene |
-| 33 | TNY_COMBO_RUN (team combos: the runner, `tny_combo_run.c`, `docs/tournament.md` 25.2) | `arg` = op << 24 \| ...: op 0 `combo \| a << 8 \| b << 16`, `arg2` = `target \| side << 8`: start combo `combo` (0xFF: the pair's own, `tny_combo_of`) by a and b on the target; who: 0 player 1, 1 player 2, 2 + k the k-th kit fighter in the entity list (ids: a player's pick on the floor, else his slot's story fighter; a kit's fighter); it plays from the next frame tick (whole, inside the command modal). op 1: clear the counters. State `.combo.run` 0x0203EAB0 (magic 0xC0B0A001, `RunRam`): +4 busy (1 starting, 2 playing), combo, side, reason (1 played out, 2 target down, 3 cut short); +8 the frame of the last played frame; +0xC runs, frames of the last; +0x10 the target's HP before / after (a player: his entry's); +0x18 damage by fighter 0 / 1; +0x20 fighter 0, 1, the target: x, y after (s16 px); +0x2C hits, bodies held, objects frozen, bystanders moved; +0x30 the pair's ids, the last refusal (1 busy, 2 no table, 3 a body missing / down, 4 a scene or command batch, 5 no heap, 6 gone before the modal, 7 test: no combo for the pair), starts; +0x34 the three entities; +0x40 the working block (heap); +0x44 the hold state and its vtable; +0x78 start positions; +0x84 shots, knock-down frames |
+| 33 | TNY_COMBO_RUN (team combos: the runner, `tny_combo_run.c`, `docs/tournament.md` 25.2) | `arg` = op << 24 \| ...: op 0 `combo \| a << 8 \| b << 16`, `arg2` = `target \| side << 8`: start combo `combo` (0xFF: the pair's own, `tny_combo_of`) by a and b on the target; who: 0 player 1, 1 player 2, 2 + k the k-th kit fighter in the entity list (ids: a player's pick on the floor, else his slot's story fighter; a kit's fighter); it plays from the next frame tick (whole, inside the command modal). op 1: clear the counters. State `.combo.run` 0x0203EAB0 (magic 0xC0B0A001, `RunRam`): +4 busy (1 starting, 2 playing), combo, side, reason (1 played out, 2 target down, 3 cut short); +8 the frame of the last played frame; +0xC runs, frames of the last; +0x10 the target's HP before / after (a player: his entry's); +0x18 damage by fighter 0 / 1; +0x20 fighter 0, 1, the target: x, y after (s16 px); +0x2C hits, bodies held, objects frozen, bystanders moved; +0x30 the pair's ids, the last refusal (1 busy, 2 no table, 3 a body missing / down, 4 a scene or command batch, 5 no heap, 6 gone before the modal, 7 test: no combo for the pair), starts; +0x34 the three entities; +0x40 the working block (heap); +0x44 the hold state and its vtable; +0x78 start positions; +0x84 shots, knock-down frames; +0x88 the copies as last drawn (u8 x3: 0 none, 1 his tiles, 2 its own VRAM, 3 his frame mirrored), +0x8B their facings (2 left, 3 right), +0x8E 1 = left of the target, +0x91 copies made with their own VRAM (`docs/tournament.md` 25.5) |
+| 37 | TNY_CAPTION (tny, `tny_caption.c`, `docs/tournament.md` 24.1) | the Rumble announcer's calls: `arg` 0 answers the lines shown so far into the `cmd_arg` word when at least `arg2` (else 0), 1 queues line `arg2 & 0xFF` (0-3 the fall calls, 4 the flurry, 5 a player down, 6 / 7 Super Buu's first / next form) for fighter `arg2 >> 8` during a Rumble round, 2 clears the queue and the count. State `.tny.cap` 0x0203EFAC (magic 0x504E5954 "TYNP"): +4 the queue's lines, +7 their fighters, +0xA queued, +0xB shown, +0xC the head's frames left (no tiles: frames to wait after a combo), +0xD width / 2 \| (rows - 1) << 7, +0xE OBJ tiles |
+| 38 | TNY_CHECKS (tny, `tny_engine.c`, `docs/tournament.md` 24.4 / 24.5 / 24.7) | `arg` 0: a check, `arg2` = kind << 16 \| n, the answer replaces the `cmd_arg` word (0 = no; post `arg` 0 so a command not taken also reads 0): kind 0 the last ring reload took 1..n frames (answer: its frames, `eng` +0x157), 1 the announcer walked off and on at least once each (answer: offs \| ons << 8, `eng` +0x160 / +0x161), 2 player 1 stands n px (+-1) right of the mark (answer: the px). `arg` 2: mark player 1's x (`eng` +0x162); 4: clear the count of the announcer's walks started (`eng` +0x164) |
 | 31 | TNY_TALK (dialogue, main) | the fighters' dialogue (`tny_talk.c`): `arg` = the opening side (fighter \| fighter << 8, 0xFF nobody), `arg2` = the answering side; `arg` bit 31: fighter `arg & 0xFF`'s win line instead (`tools/headless/tny_talk.txt`) |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
@@ -327,6 +331,19 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 16 | `papaya_ring.json` | the ring with the stands (Buu 7/6, 720 x 720): the engine's stage (`src/coop/tny_ring.h`) |
 | 17 | `papaya_secret.json` | the hidden arena (Buu's Other World Stadium, 1/20 there): Pikkon, the Senzu (flag 442); an easter egg |
 | 18-19 | free | |
+
+## World-map landmarks (decorations of zone 6 area 99, `docs/maps.md` 9e)
+
+The id a world-map on-load passes to `FindCharacterEntity N` (show) / `FindEntityByType N` (hide) is the
+decoration's index in the world map's list. Stock 0-12 (one per stock site); ours are appended by
+`tools/mapedit.py` `"add_decorations"` in `data/hercule.json`'s spec order. Frames: stock 0-8 on the sheet, ours
+appended after them (`tools/wmlandmark.py` `ART`).
+
+| decoration | site | frame | spec |
+|---|---|---|---|
+| 13 | the arctic (post-game, flag 381) | 4 (stock snowy mountain) | `data/story/arctic_route.json` |
+| 14 | Papaya Island (the grounds built) | 9 (`wmlandmark.py papaya`) | `data/story/papaya_route.json` |
+| 15+ | free | | |
 
 ## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
 
@@ -360,8 +377,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
 | 0x0203FA54 | 0x8 | `.party.cp` companion state (`companion.c`) |
 | 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
-| 0x0203FA54 | 0x6 | `.party.cp` (2026-11-01 layout: then `.party.xp` 0x0203FA5C 0x44, `.party.bv` 0x0203FAA0 0x40) |
-| 0x0203FAE0 | 0x10 | `.party.pp` the test win's record (`cellgames.c` `cg_note_win`: magic "JRWN", enemies standing, stat, two positions; tests `find` it) |
+| 0x0203FAE0 | 0x10 | `.party.ssj` `ssj_state` (`ssj.c`, magic 0x53534A48 "HJSS": +4 player 2's last slot, the last transformed slot; +6 transforms; +8 reverts; +0xA hand-offs; +0xC EP drained, +0xE of it player 2's); after `.party.xp` 0x0203FA5C (0x44) and `.party.bv` 0x0203FAA0 (0x40) |
+| 0x0203FAF0 | 0x10 | `.party.pp` the test win's record (`cellgames.c` `cg_note_win`: magic "JRWN", enemies standing, stat, two positions; tests `find` it) |
 | 0x0203FAF0-0x0203FB00 | 0x10 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
@@ -370,7 +387,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
 | 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
 | 0x0203EA00 | 0x200 region | `comboram` (team combos, `tny_combo.h`, NOLOAD): `.combo.meter` 0x0203EA00 (0x80, the meter), `.combo.cap` 0x0203EA80 (0x30, the caption), `.combo.run` 0x0203EAB0 (0x88 of 0x140, the runner: test command 33); the heap cap ends here since 2026-10-31; offsets at test command 32 |
-| 0x0203EC00 | 0x21C of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
+| 0x0203EC00 | 0x21C of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, the fight's frames +0x16, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C, pop-ups queued / shown +0xEC, the tests' wait bytes +0xFC / +0xFD, the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the curtain +0x154, the announcer's walk +0x155 (1 on, 2 off; frames +0x156, target +0x158 / +0x15A), the last ring reload's frames +0x157, the last warp's spot +0x15C / +0x15E, walks off / on done +0x160 / +0x161, test mark x +0x162, walks started +0x164 (2026-11-01, `docs/tournament.md` 24.4 / 24.5), the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr` (`coop.map`) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
 | 0x0203FDC0 | 0x40 | `StoryTest` preset (headless `preset`, `STORY_TEST`) |
 | 0x0203FE00 | 0xC0 | player 2's vtable copy |

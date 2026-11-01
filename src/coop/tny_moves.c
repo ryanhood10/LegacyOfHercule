@@ -44,6 +44,7 @@
 #include "bosses.h"
 #include "android16.h"
 #include "super13.h"
+#include "tny_combo_run.h"   // the energy colours (tny_colours.c, docs/tournament-combos.md section 4)
 
 // ---- tuning ---------------------------------------------------------------------------------------------------
 #define FIRST_DELAY     90      // frames after the attach before the first special
@@ -308,6 +309,7 @@ typedef struct Proj {
     s16 home_at, stun;    // frames before steering starts; frames of stun on hit
     s32 mult;
     const u32 *attack;
+    const u8 *tint;       // its colour's remap (tny_kit_colour), or 0: its own colours
     u32 vt[24];
 } Proj;
 enum { K_SHOT = 1, K_HELD, K_TRAIL, K_BOOM, K_FX, K_FLASH };
@@ -856,6 +858,20 @@ static Proj *fire_at(TKit *k, int art, int size_class, Entity *t, s32 speed, int
     return fire(k, art, size_class, t, tx - x, ty - y, speed, turn, fuse, radius, mult, atk);
 }
 
+// ---- colours (docs/tournament-combos.md section 4, the kits' table: Frieza's Death Beam pink, Broly's orbs green...) ---
+static int move_colour(const TKit *k, const TMove *m) {
+    return m >= k->def->m && m < k->def->m + KIT_MOVES ? tny_kit_colour(k->fighter, (int)(m - k->def->m)) : 0;
+}
+static void kit_proj_upload(Proj *p) { tny_tint_tiles(p, p->tint); }
+static void paint(Proj *p, const TKit *k, const TMove *m) {
+    int col = move_colour(k, m);
+    const u8 *t = p && col > 0 && col < TCOL_MAX ? tny_combo_tints[col] : 0;
+    if (!t) return;
+    p->tint = t;
+    p->vt[5] = (u32)kit_proj_upload - (u32)p->vt;
+    p->loaded = 0;                                  // (its first frame again, through the colour)
+}
+
 // ---- beams ----------------------------------------------------------------------------------------------------------
 // A thin beam's length is capped in its own vtable copy's update (cellgames.c's capped beams): the drawing reads
 // +0x34, so it never shows longer.
@@ -889,6 +905,7 @@ static void beam_fire(TKit *k, const TMove *m) {
     pos[0] += BEAM_OFFSETS[f * 2];
     pos[1] += BEAM_OFFSETS[f * 2 + 1];
     Beam_Fire(b, f, pos);
+    tny_beam_paint(b, move_colour(k, m));           // his colour, if the doc gives his move one (tny_colours.c)
     k->beam = b;
     mv.fired++;
     if (m->flags & MF_COST) {                      // Tri-Beam: it costs him
@@ -1143,8 +1160,8 @@ static void step(TKit *k) {
             if (tt == 18) {
                 face(e, t);
                 pose(k, G_SWING(k), 0);
-                fire_at(k, m->a ? ART_ORB_M : ART_ORB_S, m->a, t, m->b * 16, (m->flags & MF_HOME) ? 40 : 0, 110,
-                        m->a ? 22 : 14, m->power, atk_heavy);
+                paint(fire_at(k, m->a ? ART_ORB_M : ART_ORB_S, m->a, t, m->b * 16, (m->flags & MF_HOME) ? 40 : 0, 110,
+                              m->a ? 22 : 14, m->power, atk_heavy), k, m);
             }
             if (tt >= 36) finish(k);
             break;
@@ -1158,6 +1175,7 @@ static void step(TKit *k) {
             int big = ObjVram_Largest(g_EntityList) >= 0x1100;
             k->held = proj_new(k, K_HELD, big ? ART_ORB_L : ART_ORB_M, x, bx[1] - 18);
             if (k->held) k->held->size_class = (u8)(big ? 2 : 1);
+            paint(k->held, k, m);
             shake(48, 30);
         }
         if (tt < 56) {
@@ -1356,7 +1374,7 @@ static void step(TKit *k) {
         pose(k, G_CHARGE(k), (tt >> 3) & 1);
         s32 x, y;
         centre(e, &x, &y);
-        if (tt == 2) shake(40, 60);
+        if (tt == 2) { shake(40, 60); tny_on_transform(e, k->fighter); }   // the announcer's call (24.1)
         if ((tt & 7) == 4) { boom(x - 16 + Rand_Range(32), y - 16 + Rand_Range(32)); sfx(SFX_BOOM); }
         if (tt == 40) { transform(k, m); flash(x, y, ART_ORB_L, 12); }
         if (tt >= 56) finish(k);
@@ -1522,6 +1540,7 @@ static void fallen(TKit *k) {
         E32(e, 0x168) = 0;                          // the stock message handler's "hittable" word
         e->facing = (e->facing == 1 || e->facing == 3) ? 3 : 2;   // he lies in a side facing (as at the line)
         mv.falls++;
+        if (!k->copy) tny_on_fall(e, k->fighter);   // the Rumble announcer's call (tny_caption.c, 24.1)
     }
     if (k->down_t < 0x7FFF) k->down_t++;
     if (e->ctrl_state != &k->ctrl) Entity_SetCtrlState(e, &k->ctrl);
@@ -1638,6 +1657,7 @@ void tny_combo_on_hit(Entity *target, Entity *attacker);   // tny_combo_meter.c:
 // during a special or poise only does damage (the stock box test, the damage calculation and OnHit).
 static int kit_message(Entity *e, int msg, u8 *m) {
     TKit *k = (TKit *)e->vtable;
+    if (msg == 10 && k->native && tny_combo_frozen(e)) return 0;   // a combo plays: 16 / 13 hold their frame (25.5)
     if (msg == 0 && (e->hp <= 0 || k->down) && !k->native) return 0;   // a fallen fighter takes no more hits
     if (msg != 0 || e->hp <= 0) return base_call9(k, e, msg, m);
     Entity *att = *(Entity **)(m + 0x20);

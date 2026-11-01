@@ -20,9 +20,17 @@ WEAK int  tny_combo_start(int combo, Entity *a, int a_id, Entity *b, int b_id, E
     (void)combo; (void)a; (void)a_id; (void)b; (void)b_id; (void)target; (void)side; return 0;
 }
 WEAK int  tny_combo_busy(void) { return 0; }
+WEAK int  tny_combo_frozen(const Entity *e) { (void)e; return 0; }
 WEAK void tny_combo_run_frame(void) {}
 WEAK const char *tny_combo_name(int combo) { (void)combo; return "Team combo"; }
 WEAK void tny_combo_run_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }
+// the Rumble announcer's calls (tny_caption.c, docs/tournament.md 24.1)
+WEAK void tny_on_fall(Entity *e, int id) { (void)e; (void)id; }
+WEAK void tny_on_transform(Entity *e, int id) { (void)e; (void)id; }
+WEAK void tny_on_player_down(Entity *e) { (void)e; }
+WEAK void tny_caption_draw(u32 **oam) { (void)oam; }
+WEAK void tny_caption_gone(void) {}
+WEAK void tny_caption_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }
 WEAK int  tny_moves_fighter(const Entity *e) { (void)e; return -1; }
 WEAK int  tny_floor_picks(u8 *ids, Entity **ents) { (void)ids; (void)ents; return 0; }
 WEAK int  tny_tier_open(int tier) { return tier == TIER_ROOKIE; }
@@ -82,6 +90,8 @@ void tny_test_cmd(u32 cmd, u32 arg, u32 arg2) {
     else if (cmd == 31) tny_talk_test(cmd, arg, arg2);
     else if (cmd == 32) tny_combo_meter_test(cmd, arg, arg2);
     else if (cmd == 33) tny_combo_run_test(cmd, arg, arg2);
+    else if (cmd == 37) tny_caption_test(cmd, arg, arg2);      // tny_caption.c: the Rumble announcer's calls (24.1)
+    else if (cmd == 38) tny_engine_test(cmd, arg, arg2);       // the engine's perfecting-pass checks (24.4, 24.5, 24.7)
 }
 
 void tny_frame(void) {

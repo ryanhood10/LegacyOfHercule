@@ -78,13 +78,14 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 | 15 | Dynamite Kick (Ki Blast icon) | 34, Ki Blast: one quick projectile | 3 | stock onUse `0x080131E1`, 1 EP extra |
 | 16 | Megaton Punch (Big Bang icon) | 46, Big Bang: the big slow projectile | 12 | stock onUse `0x08013179`, 2 EP extra |
 | 17 | Hercule Taunt (Transformation icon) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
-| 18 | Super Hercule (Hercule icon for now) | switches the slot to display row 22 (the recoloured clone of sprite 72, built by the parent session's `tools/spriteclone.py`) | 50 | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` |
+| 18 | Super Hercule (the Transformation icon in his colours, `herc_ssj_icon_0/1`) | the stock Transformation (ability 12): animation 0x23, then display row 22 (sprite 157); again: animation 0x24, back to row 21 | none (needs 10; drains 3 a second while transformed) | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` (section 3b) |
 
 Hercule's starting list is **14, 15, 16, 17** (punch, kick, Megaton Punch, taunt). Super Hercule (18)
 is kept out of it by Ryan's no-reveal rule (2026-10-18): the late-story script calls
 `hercule_awaken()` (src/coop/ssj.c), which puts 18 into the third slot in place of the Megaton
 Punch. (It was 14, 15, 18, 17 until then.) Verified as player 2 from `log2-run.ss1`: row 21 ->
-22, EP 100 -> 50, the entity's sprite record moved to the cloned sprite (`build/hc10_ssj.png`).
+22, EP 100 -> 50, the entity's sprite record moved to the cloned sprite (`build/hc10_ssj.png`). (Superseded by
+section 3b: no cost now, the stock rules.)
 
 The isReady gate copies the stock one (`[[0x086DB284] + 0xC] != 0`, the game's "abilities allowed"
 flag) plus the EP check. The stock 14 entries are untouched; the table is a relocated copy with the
@@ -92,8 +93,37 @@ four new rows and the two code literals repointed. Verified as player 2 from `lo
 50 -> 46 / 47 / 38 / 58 and the control states 0x08024810 (punch), 0x08025D48 (ki blast),
 0x080258B4 (big bang), 0x080258C8 (bump) each returned to idle (`build/hc5_*.png`).
 
-Later: proper icons (a 0x200-byte 4bpp tile pair each, a golden one for 18) once the sprite pipeline
-can draw them.
+Icons: 18 has its own pair since 2026-11-01 (section 3b); the others still borrow stock pairs.
+
+## 3b. Super Saiyan Hercule: the stock Super Saiyans' rules (2026-11-01, `src/coop/ssj.c`)
+
+Ryan: "same super saiyan rules". The stock rules are in `docs/engine.md` "Super Saiyan transformation"; Hercule now
+runs them, as player 1 or player 2:
+
+- **Ready** when he has 10 EP or more, the game allows abilities and the party meter is empty (a transformation fills
+  it and it drains 1 a frame: about 21 s before the next, sooner if the charged attack spends it). Using it costs
+  nothing. Old Hercule (row 24) cannot. Ability 18 is the stock Transformation's isReady / onUse (`0x080134F2`,
+  `0x0801353C`) behind `ssj_ready` / `ssj_use`.
+- **The power-up** (160 frames): the hum starts, he throws both fists up (his victory pose, `herc_record` group 9,
+  `tools/ssjhercule.py`) with a dim orange outline, then the afro turns gold inside a flickering yellow aura; the
+  transformation's sound, and he stands as Super Saiyan Hercule (row 22, sprite 157) with the hum looping.
+- **Transformed**: row 22 has the Super Saiyans' behaviour class (`0x030021EC`): +10 on each combat byte, walk 1.75
+  and dash 3.0 px a frame (base 1.25 / 2.5), **1 EP every 20 frames**, no regeneration. His moves stay his own
+  (punch, kick, Super Hercule, taunt).
+- **Back to Hercule** when the EP reaches 0 (alive) or when the ability is used again: the afro fades gold -> dark
+  gold -> brown -> black over 64 frames (`ssj_record` group 21), row 21.
+- **Player 2** gets the same: the form change, the drain and the revert read player 2's own slot (`ssj.c` replaces
+  the three stock routines that read only the active slot), the hum restarts for a partner still transformed, and
+  a Super Saiyan partner gets no regeneration from the other player's base class. As for every Super Saiyan, a save
+  keeps player 1's form through a reload (`Party_DetransformOthers` turns back every other slot), and a slot that
+  player 2 leaves (Select, dropping out) turns back.
+- **Icons**: the HUD shows the stock Transformation icon recoloured, its "Z" in his gold-afro ramp with a brown-gi
+  edge (cooling: dark browns). Ryan has not picked a design: to swap, edit `ICON_READY` / `ICON_COOLING` in
+  `tools/ssjhercule.py` (palette index -> palette index of the shared OBJ palette) or give ability 18 another pair in
+  `data/hercule.json` (`"icons": 12` is the stock Transformation icon, 17's too; two `"sym:"` names for new art).
+- **When he gets it** is unchanged: `hercule_awaken` (CoopCall 4) late in the story.
+
+Test: `tools/headless/ssj_hercule.txt` (`docs/testing.md` "Super Saiyan Hercule"), in `regfull.sh`.
 
 ## 4. Keep Goku after Cell
 
@@ -141,8 +171,11 @@ follow `docs/story.md`; the tool and the write path stay.
 Krillin is a real party member: his own row, sprite (`docs/sprites.md` "Krillin"), portraits, names,
 stats, growth and four abilities. Ids are in `src/coop/krillin.h`.
 
-**Stats** (`data/hercule.json` slot 6; Ryan's rule: weaker than the Z fighters, like Hercule): 60 HP,
-40 EP, str 1.5 / pow 2.5 / end 1.5, growth str 280..480, pow 330..530, end 300..500 per level (Gohan
+**Stats** (`data/hercule.json` slot 6; Ryan's rule: weaker than the Z fighters, like Hercule; raised 2026-11-01, Ryan:
+"level 1 krillin is SOOO weak he cant even kill an animal", from 60 HP and 1.5 / 2.5 / 1.5: a punch took 1 HP off a
+35-HP snake, now 3, Gohan's 5): 70 HP, 40 EP, str 2.5 / pow 3.5 / end 2.0 (combat bytes are the high bytes: 2 / 3
+against Gohan's 3 / 5); a save from before is lifted once on load (`krillin_lift`, `party_save.c`, flag 462, set
+at every new game); growth unchanged: growth str 280..480, pow 330..530, end 300..500 per level (Gohan
 318..518 / 302..502 / 256..456), flags 0x58 (0x40 like every stock row, plus bits 3 and 4 = his two
 status-screen technique pages). At the debug party's level 40 he lands near str 60 / pow 70 / end 60
 with about 60 % of Gohan's HP. A live level-up 40 -> 41 in the fork gave HP +7 %, EP +4, str +479,
@@ -152,7 +185,7 @@ pow +513, end +303 (inside the ranges) and showed "Krillin has achieved Level 41
 
 | idx | name (HUD icon) | what | EP |
 |---|---|---|---|
-| 21 | Destructo Disc (new disc icons) | animation 5 (the ki pose) and a disc of the ROM's projectile class flying along his facing at 4 px / frame for up to 90 frames or until it leaves the view; every frame it sends a type-1 hit message (attack `{1, 3, 0x800}`, twice the ki blast's base) with a 24x14 box to each enemy it has not hit yet (up to 12): it **pierces** and never hits the same enemy twice; walls do not stop it; players ignore it. Cooldown 150 frames per slot; while thrown, `coop.acting` = the thrower so kill EXP goes to him | 12 |
+| 21 | Destructo Disc (new disc icons; 2026-11-01: it aims at `is_any_enemy`, so it hits in a one-player game too, where enemies keep the stock class and the old `is_coop_enemy` check refused all of them; its hit box reaches from the hand down to his feet line, `DISC_REACH_MAX`, so it no longer flies over a snake; 16's Rocket Punch had the same one-player miss) | animation 5 (the ki pose) and a disc of the ROM's projectile class flying along his facing at 4 px / frame for up to 90 frames or until it leaves the view; every frame it sends a type-1 hit message (attack `{1, 3, 0x800}`, twice the ki blast's base) with a 24x14 box to each enemy it has not hit yet (up to 12): it **pierces** and never hits the same enemy twice; walls do not stop it; players ignore it. Cooldown 150 frames per slot; while thrown, `coop.acting` = the thrower so kill EXP goes to him | 12 |
 | 19 | Afterimage Rush (Energy Punch icon) | dashes up to 40 px along his facing (4 px steps, stops at walls), then the A attack plus a melee hit `{0, 3, 0x600}` in front of him | 4 |
 | 20 | Shockwave Punch (Hercule punch icon) | animation 5 and a melee burst `{0, 4, 0x500}` 36 px around him, small camera shake | 6 |
 | 2 | Ki Blast (stock) | the stock ability; `kiblast_spawn_hook` (entry jump on `0x0800EAD8`) gives every ki blast whose owner plays row 23 the blue frames | 2 |

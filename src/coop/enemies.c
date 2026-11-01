@@ -32,6 +32,9 @@ int is_coop_enemy(const Entity *e) { return e && (e->vtable == coop2.enemy_vtabl
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e) || tny_moves_base(e)); }
+// The players' own projectiles (Krillin's Disc, 16's Rocket Punch) aim at this: is_coop_enemy alone missed every
+// enemy of a one-player game (they keep the stock class there; found 2026-11-01, Ryan: "the Disc isn't hitting").
+int is_any_enemy(const Entity *e) { return is_enemy(e); }
 
 // Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
@@ -472,7 +475,7 @@ void coop_debug_tick(void) {
     u32 cmd = coop2.cmd;
     if (!cmd) return;
     coop2.cmd = 0;
-    if (cmd >= 21 && cmd <= 33) {          // the tournament team's test commands (tourney_hooks.c)
+    if ((cmd >= 21 && cmd <= 33) || cmd == 37 || cmd == 38) {   // the tournament team's test commands (tourney_hooks.c)
         tny_test_cmd(cmd, coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == COOP_CMD_SPAWN_SCRIPT) {
         Map_SpawnScript(g_MapState, (int)coop2.cmd_arg);

@@ -156,6 +156,9 @@ typedef struct CProj {
     u8 front, pin, pinned, flip;    // pin: it stays on the target once it lands (pinned: it has); flip: a copy faces
     s16 hx, hy;             // the held spot (px from the thrower's centre)
     Entity *src;            // a copy: the body it shows
+    u8 cface, mode;         // a copy: its own facing (the target's way); how it draws now (COPY_*)
+    u16 room;               // a copy: bytes of its own OBJ VRAM (0x40: none to speak of, it can only share his tiles)
+    const u8 *ltint;        // a copy: the colour remap its own tiles were last loaded through
     const u8 *tint;         // its colour's remap (tny_combo_tints, ROM), or 0: its own colours
     u32 vt[24];
 } CProj;
@@ -180,6 +183,10 @@ typedef struct RunRam {
     u32 hold_vt[12];        // +0x48
     s16 start_pos[3][2];    // +0x78 where they stood at the start
     u16 shots, kd;          // +0x84 projectiles thrown, frames of the knock-down
+    u8 cmode[MAX_COPIES];   // +0x88 each copy as last drawn (tests): 0 none, 1 his tiles, 2 its own, 3 his mirrored
+    u8 cface[MAX_COPIES];   // +0x8B its facing (2 left, 3 right)
+    u8 cleft[MAX_COPIES];   // +0x8E 1 = it stands left of the target
+    u8 cown;                // +0x91 copies made with their own VRAM
 } RunRam;
 _Static_assert(sizeof(RunRam) <= 0x140, ".combo.run is 0x140 bytes");
 static RunRam ram COMBO_SECTION("run");
@@ -330,8 +337,8 @@ static const u32 *group_of(const Entity *e, int g) {
     return grp[0] && grp[1] && grp[2] && grp[3] && desc_ok((const Desc *)grp[e->facing & 3]) ? grp : 0;
 }
 // frames in a group's array for his facing: its run of drawable descriptors up to the next array of the record
-static int frames_in(const Entity *e, const u32 *grp) {
-    const u8 *rec = (const u8 *)e->sprite_record, *d = (const u8 *)grp[e->facing & 3];
+static int frames_at(const Entity *e, const u32 *grp, int facing) {
+    const u8 *rec = (const u8 *)e->sprite_record, *d = (const u8 *)grp[facing & 3];
     int n = 1;
     for (; n < 8; n++) {
         const u8 *q = d + 12 * n;
@@ -341,6 +348,7 @@ static int frames_in(const Entity *e, const u32 *grp) {
     }
     return n;
 }
+static int frames_in(const Entity *e, const u32 *grp) { return frames_at(e, grp, e->facing); }
 // Each pose kind's group and its stand-ins (docs/sprites.md: player layout 21 groups; the enemy sets fewer)
 static const s8 kinds[CP_COUNT][4] = {
     [CP_IDLE] = { 0, -1, -1, -1 },   [CP_WALK] = { 1, 0, -1, -1 },    [CP_HURT] = { 2, 0, -1, -1 },
@@ -438,8 +446,8 @@ static void unfreeze_all(Run *r) {
 }
 
 // Everyone else on the floor: players and kit fighters are held where they stand (not the fallen: they lie in their
-// kit's own state; not Android 16 / Super 13, whose own code drives their states: they only animate), everything
-// that flies is frozen.
+// kit's own state; not Android 16 / Super 13, whose own code drives their states: their own message handlers hold them,
+// tny_combo_frozen), everything that flies is frozen.
 static int participant(const Run *r, const Entity *e) { return e == r->act[0].e || e == r->act[1].e || e == r->act[2].e; }
 static void freeze_world(Run *r) {
     for (int i = 0; i < 3; i++) hold(r->act[i].e);
@@ -514,45 +522,75 @@ static void proj_destroy(CProj *p, int free_it, u32 a, u32 b) {
     untrack(p);
     ((void (*)(CProj *, int, u32, u32))PROJ_DESTROY)(p, free_it, a, b);
 }
-// A copy of a body (CO_COPY) draws the body's own tiles (the frame he shows now, uploaded by his own draw) at its spot:
-// the entity draw's recipe (0x08007A84 the spot and the on-screen test, 0x08007772 the OAM words), turned round when
-// it faces the other way; it never uploads anything (its own VRAM is the allocator's smallest block, 0x40: a size
-// under 0x40 is a block of 0 and breaks the allocator's list)
-static int copy_vis(CProj *p) {
+// A copy of a body (CO_COPY) shows his pose (his group +0x4C and frame +0x14, frame for frame) in its own facing: the
+// frame of the record's array for that facing (the entity draw's recipe, 0x08007A84 the descriptor, the spot and the
+// on-screen test, 0x08007772 the OAM words). Where that frame is the one his own tiles hold (the same blob: a side
+// facing and its mirror share one, the right frame's attribute flips it) it draws from his tiles and uploads nothing;
+// else (he faces up or down, the copy sideways) it decodes the frame into its own OBJ VRAM, sized at the copy's start
+// for his largest frame. With no VRAM to spare it falls back to his own frame, flipped (the old copies).
+enum { COPY_NONE, COPY_SHARED, COPY_OWN, COPY_MIRROR };
+ROM_FN(void, Gfx_Decompress, (const void *src, void *dst), 0x0801F395);   // {u32 kind, u32 size, data}: 0 copy, 1 / 2 packed
+static const Desc *copy_frame(CProj *p) {
     Entity *e = p->src;
-    const Desc *d = e && in_list(e) ? (const Desc *)E32(e, 0x3C) : 0;
+    p->mode = COPY_NONE;
+    if (!e || !in_list(e)) return 0;
+    const u32 *grp = (const u32 *)E32(e, 0x4C);
+    const Desc *his = grp ? (const Desc *)grp[e->facing & 3] + E16(e, 0x14) : 0;   // what his own draw shows
+    if (!his) return 0;
+    int f = E16(e, 0x14), n = frames_at(e, grp, p->cface);   // (the facings' arrays may differ in length)
+    const Desc *d = (const Desc *)grp[p->cface & 3] + (f < n ? f : n - 1);
+    if (d->blob == his->blob && d->w == his->w && d->h == his->h) { p->mode = COPY_SHARED; return d; }
+    if (desc_ok(d) && d->w * d->h <= p->room) { p->mode = COPY_OWN; return d; }
+    p->mode = COPY_MIRROR;
+    return his;
+}
+static int copy_vis(CProj *p) {
+    const Desc *d = copy_frame(p);
     if (!d) return 0;
-    s32 left = (p->x >> 8) + (p->flip ? -(d->xo + d->w) : d->xo), top = (p->y >> 8) + d->yo;
+    Entity *e = p->src;
+    s32 left = (p->x >> 8) + d->xo, top = (p->y >> 8) + d->yo;   // (a flipped frame keeps its offset, as the engine's)
     const s32 *cam = CAMERA_CELL;
+    p->desc = d;
     p->sx = left - cam[7];
     p->sy = top - cam[8];
     p->sort = top + d->h;
     p->prio = E8(e, 8);
     return left < cam[5] && cam[3] < left + d->w && top < cam[6] && cam[4] < top + d->h;
 }
+// his frame for the copy's facing into its own OBJ VRAM, through his colour remap (+0x24: a white flash shows on the
+// copies too); the decode buffer is on the stack, as the entity draw's own (0x08007772: 4 KB below sp)
+static void __attribute__((noinline)) copy_load(CProj *p, const Desc *d, const u8 *t) {
+    u32 buf[0x400];
+    unsigned n = (unsigned)d->w * d->h;
+    if (n > sizeof buf || ((const u32 *)d->blob)[1] > sizeof buf) return;
+    Gfx_Decompress(d->blob, buf);
+    const u8 *b = (const u8 *)buf;
+    if (t) for (unsigned i = 0; i < n; i++) ((u8 *)buf)[i] = t[b[i]];
+    volatile u32 *v = (volatile u32 *)(OBJ_VRAM + (u32)p->tile * 32);
+    for (unsigned i = 0; i < n >> 2; i++) v[i] = buf[i];
+    p->loaded = d;
+    p->ltint = t;
+}
 static int copy_draw(CProj *p, u32 **oam) {
     Entity *e = p->src;
-    const Desc *d = e && in_list(e) ? (const Desc *)E32(e, 0x3C) : 0;
-    if (!d) return 0;
+    const Desc *d = p->desc;
+    if (!p->mode || !e || !in_list(e)) return 0;
+    if (p->mode == COPY_OWN) {
+        const u8 *t = (const u8 *)E32(e, 0x24);
+        if (p->loaded != d || p->ltint != t) copy_load(p, d, t);
+    }
     u32 *o = *oam;
     *oam = o + 2;
     u32 a = (d->attr & 0xFE00FFFFu) | (((u32)p->sx & 0x1FF) << 16) | ((u32)p->sy & 0xFF);
-    if (p->flip) a ^= 0x10000000u;
+    if (p->mode == COPY_MIRROR && p->flip) a ^= 0x10000000u;
     o[0] = a;
-    o[1] = (o[1] & 0xFFFFF000u) | ((u32)(E8(e, 8) & 0x3F) >> 4) << 10 | (E16(e, 0x0C) & 0x3FF);
+    o[1] = (o[1] & 0xFFFFF000u) | ((u32)(E8(e, 8) & 0x3F) >> 4) << 10
+           | ((p->mode == COPY_OWN ? p->tile : E16(e, 0x0C)) & 0x3FF);
     return 0;
 }
 // The ROM's upload (slot 5, 0x08013D40: the descriptor's tiles by DMA) with each pixel through the shot's colour
-static void proj_upload(CProj *p) {
-    const Desc *d = p->desc;
-    const u8 *src = (const u8 *)d->blob, *t = p->tint;
-    volatile u16 *v = (volatile u16 *)(OBJ_VRAM + (u32)p->tile * 32);
-    p->loaded = d;
-    for (int i = 0, n = d->w * d->h >> 1; i < n; i++) v[i] = (u16)(t[src[2 * i]] | t[src[2 * i + 1]] << 8);
-}
-static CProj *proj_new(int kind, int art, s32 x, s32 y) {
-    static const u16 vram_of[] = { 0x100, 0x100, 0x400, 0x1000, 0x400, 0x400, 0x40, 0x400, 0x100 };   // (the disc is 32 x 32)
-    int vram = vram_of[art];                        // (the allocator counts 64-byte blocks; a copy's is the smallest)
+static void proj_upload(CProj *p) { tny_tint_tiles(p, p->tint); }   // (tny_colours.c)
+static CProj *proj_new_v(int kind, int art, s32 x, s32 y, int vram) {
     if (ObjVram_Largest(g_EntityList) < vram + 0x100) return 0;   // keep room for the bodies
     CProj *p = Arena_Alloc(sizeof *p);
     if (!p) return 0;
@@ -583,6 +621,10 @@ static CProj *proj_new(int kind, int art, s32 x, s32 y) {
     ProjBase_UpdateBox(p);
     EntityList_Add(g_SceneTable[1], (Entity *)p);
     return p;
+}
+static CProj *proj_new(int kind, int art, s32 x, s32 y) {
+    static const u16 vram_of[] = { 0x100, 0x100, 0x400, 0x1000, 0x400, 0x400, 0x40, 0x400, 0x100 };   // (the disc is 32 x 32)
+    return proj_new_v(kind, art, x, y, vram_of[art]);   // (the allocator counts 64-byte blocks: never under 0x40)
 }
 static void boom(s32 x, s32 y) { proj_new(PK_BOOM, ART_BOOM, x, y); }
 static void spark(s32 x, s32 y) { proj_new(PK_BOOM, ART_SPARK, x, y); }
@@ -652,22 +694,6 @@ static void beam_update(Beam *b, int run) {
     if (!br || !r || b->state != 1) return;
     beam_reach(r, br, b);
 }
-// A beam in a colour: Beam_Fire took the facing's frame set from the ROM (+0x44 / +0x48, the frame +0x40) and put its
-// three blobs up (tile + 0, 0x100, 0x200: descriptors 0, 2, 1); the same from the set built in that colour, so every
-// later upload (the tip's flicker, the end) reads the coloured tiles too
-static void beam_paint(Beam *b, int col) {
-    const TBeamDesc *sets = col > 0 && col < TCOL_MAX ? tny_combo_beams[col] : 0;
-    if (!sets) return;
-    const TBeamDesc *set = sets + (b->facing & 3) * 8;
-    b->frame_set = b->frames = (const u8 *)set;
-    b->frame = (const u8 *)(set + 1);
-    static const u16 at[3] = { 0, 0x100, 0x200 }, k[3] = { 0, 2, 1 };
-    for (int i = 0; i < 3; i++) {
-        const u32 *s = (const u32 *)set[k[i]].src;
-        volatile u32 *v = (volatile u32 *)(OBJ_VRAM + (u32)b->tile * 32 + at[i]);
-        for (int w = 0; w < 0x40; w++) v[w] = s[w];
-    }
-}
 static void beam_fire(Run *r, int from, s32 w10, int frames, int through, int col) {
     BeamRec *br = !r->beam[0].b ? &r->beam[0] : !r->beam[1].b ? &r->beam[1] : 0;
     Entity *e = r->act[from].e;
@@ -697,7 +723,7 @@ static void beam_fire(Run *r, int from, s32 w10, int frames, int through, int co
     pos[0] += BEAM_OFFSETS[f * 2];
     pos[1] += BEAM_OFFSETS[f * 2 + 1];
     Beam_Fire(b, f, pos);
-    beam_paint(b, col);
+    tny_beam_paint(b, col);                         // (tny_colours.c)
     sfx(SFX_LAUNCH);
 }
 // The tip of a combo beam (either kind) against the target: capped on him (or just past him: through a partner) and
@@ -927,11 +953,24 @@ static void screen_frame(Run *r) {
 
 // ---- copies of a body (the Cell Jr. swarm) ------------------------------------------------------------------------------
 // Copy k of fighter i at a spot (as a dash's: px from the target on his side, px down), appearing (or moving) with a
-// flash at both ends; it shows his pose frame for frame, facing the target
+// flash at both ends; it shows his pose frame for frame, facing the target: right when it stands left of him (the
+// step's X on the fighter's side), else left
 static void copy_flip(Run *r, CProj *p) {
     Entity *src = p->src, *t = r->act[2].e;
-    int right = (p->x >> 8) < (t->x >> 8);          // the copy faces right when it stands left of him
-    p->flip = (u8)((src->facing == 3) != right && (src->facing & 2));
+    int right = (p->x >> 8) < (t->x >> 8);
+    p->cface = (u8)(right ? 3 : 2);
+    p->flip = (u8)((src->facing == 3) != right && (src->facing & 2));   // (the fallback: his own frame mirrored)
+}
+// a copy's own OBJ VRAM: his largest frame (every group's first frame in each facing), so any pose decodes into it
+static int copy_room(const Entity *e) {
+    const u8 *rec = (const u8 *)e->sprite_record;
+    int most = 0x40;
+    for (int g = 0; rec && g < rec[2]; g++)
+        for (int f = 0; f < 4; f++) {
+            const Desc *d = *(const Desc *const *)(rec + 0x4C + 0x10 * g + 4 * f);
+            if (d && desc_ok(d) && d->w * d->h > most) most = d->w * d->h;
+        }
+    return most > 0x1000 ? 0x1000 : most;
 }
 static void copy_set(Run *r, int i, const TComboStep *s) {
     Actor *a = &r->act[i];
@@ -955,7 +994,14 @@ static void copy_set(Run *r, int i, const TComboStep *s) {
     CProj *p = r->copy[k];
     if (p && !in_list(p)) p = r->copy[k] = 0;
     if (p) spark(p->x >> 8, (p->y >> 8) - 12);
-    else if (!(p = r->copy[k] = proj_new(PK_COPY, ART_COPY, x, y))) return;   // no room: no copy
+    else {                                          // its own VRAM for his largest frame, else the smallest block
+        int room = copy_room(a->e);
+        p = proj_new_v(PK_COPY, ART_COPY, x, y, room);
+        if (!p) p = proj_new_v(PK_COPY, ART_COPY, x, y, room = 0x40);
+        if (!(r->copy[k] = p)) return;              // no room: no copy
+        p->room = (u16)room;
+        if (room > 0x40) ram.cown++;
+    }
     p->src = a->e;
     p->x = x << 8;
     p->y = y << 8;
@@ -964,7 +1010,14 @@ static void copy_set(Run *r, int i, const TComboStep *s) {
     sfx(SFX_LAUNCH);
 }
 static void copies_frame(Run *r) {
-    for (int j = 0; j < MAX_COPIES; j++) if (r->copy[j]) { if (in_list(r->copy[j])) copy_flip(r, r->copy[j]); else r->copy[j] = 0; }
+    for (int j = 0; j < MAX_COPIES; j++) {
+        CProj *p = r->copy[j];
+        if (p && !in_list(p)) p = r->copy[j] = 0;
+        if (p) copy_flip(r, p);
+        ram.cmode[j] = p ? p->mode : 0;
+        ram.cface[j] = p ? p->cface : 0;
+        ram.cleft[j] = p ? (u8)((p->x >> 8) < (r->act[2].e->x >> 8)) : 0;
+    }
 }
 static void copies_gone(Run *r) {
     for (int j = 0; j < MAX_COPIES; j++) {
@@ -1274,6 +1327,14 @@ int tny_combo_busy(void) {
     return ram.magic == RUN_MAGIC && ram.busy && (u32)(g_FrameCounter - ram.tick) < RUN_STALE;
 }
 
+// A bystander whose own code owns his states (Android 16, Super 13: the hold state would break their specials) is held
+// by his kit's message handler instead (tny_moves.c kit_message: their kits wrap the co-op enemy vtable, whose message
+// 10 is the base entity's, the one that animates him): message 10 is swallowed while this is 1, so he stands in the
+// frame he had, mid-special or not, and his own update carries on after the combo
+int tny_combo_frozen(const Entity *e) {
+    return e && tny_combo_busy() && ram.busy == 2 && e != ram.ent[0] && e != ram.ent[1] && e != ram.ent[2];
+}
+
 const char *tny_combo_name(int combo) {
     if (combo < 0 || combo >= COMBO_COUNT || !tny_combo_defs[combo].name) return "Team combo";
     return tny_combo_defs[combo].name;
@@ -1340,6 +1401,7 @@ void tny_combo_run_frame(void) {
     ram.dmg[0] = ram.dmg[1] = 0;
     ram.hits = ram.moved = 0;
     ram.shots = ram.kd = 0;
+    ram.cown = 0;
     r->bldcnt = REG_BLDCNT;
     white_build(r);
     freeze_world(r);

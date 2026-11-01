@@ -329,6 +329,7 @@ typedef struct Disc {
     s32 sx, sy;           // +0x38
     s32 vx, vy;           // +0x40 8.8 px per frame
     s16 timer, nhit;
+    s16 reach, _p2;       // px below the centre the hit box reaches: the thrower's feet line
     Entity *hit[DISC_MAX_HITS];
     u32 vt[24];
 } Disc;
@@ -344,7 +345,7 @@ static void disc_update(Disc *p) {
     if (!p->owner || p->timer > DISC_LIFE || !Proj_InView(p)) { disc_remove(p); return; }
     s32 x = p->x >> 8, y = p->y >> 8;
     HitMsg m;
-    hit_msg(&m, p->owner, p, x - DISC_HALF_W, y - DISC_HALF_H, x + DISC_HALF_W, y + DISC_HALF_H, atk_disc);
+    hit_msg(&m, p->owner, p, x - DISC_HALF_W, y - DISC_HALF_H, x + DISC_HALF_W, y + p->reach, atk_disc);
     m.type = p->type;
     m.facing = p->facing;
     EntityList *list = g_EntityList;
@@ -352,7 +353,7 @@ static void disc_update(Disc *p) {
     coop.acting = p->owner;            // EXP for a kill goes to the thrower (exp.c), not the nearer player
     for (int i = list->count - 1; i >= 0 && p->nhit < DISC_MAX_HITS; i--) {
         Entity *t = list->items[i];
-        if (!t || t == p->owner || !is_coop_enemy(t)) continue;
+        if (!t || t == p->owner || !is_any_enemy(t)) continue;
         int seen = 0;
         for (int k = 0; k < p->nhit; k++) if (p->hit[k] == t) seen = 1;
         if (seen) continue;
@@ -383,6 +384,8 @@ static Disc *disc_new(Entity *owner, s32 x, s32 y) {
     p->y = y << 8;
     p->desc = &kr_disc[0];
     p->prio = 0x28;
+    s32 feet = (owner->y >> 8) - y;           // the launch point is his hand: reach down to the ground
+    p->reach = (s16)(feet < DISC_HALF_H ? DISC_HALF_H : feet > DISC_REACH_MAX ? DISC_REACH_MAX : feet);
     const Vec *v = &CTX_VECTORS[p->facing & 3];
     p->vx = v->dx * DISC_SPEED;
     p->vy = v->dy * DISC_SPEED;
@@ -406,6 +409,18 @@ void krillin_disc_use(CharacterEntry *c, Entity *e) {
     state()->discs++;
     Entity_SetAnimation(e, 5);
     sfx(SFX_LAUNCH + Rand_Range(2));
+}
+
+// Krillin's base numbers were raised on 2026-11-01 (60 -> 70 HP, str 1.5 -> 2.5, pow 2.5 -> 3.5, end 1.5 -> 2.0;
+// Ryan: at level 1 he could not kill an animal). A save from before gets the same lift once on load
+// (party_save.c, flag KRILLIN_LIFT_FLAG): the base differences added, HP scaled as the growth would have.
+void krillin_lift(CharacterEntry *c) {
+    c->str = (u16)(c->str + 0x100);
+    c->pow = (u16)(c->pow + 0x100);
+    c->end = (u16)(c->end + 0x80);
+    c->max_hp = (u16)(c->max_hp * 7 / 6);
+    c->hp = (u16)(c->hp * 7 / 6);
+    if (c->hp > c->max_hp) c->hp = c->max_hp;
 }
 
 // ---- old Hercule ---------------------------------------------------------------------------------
