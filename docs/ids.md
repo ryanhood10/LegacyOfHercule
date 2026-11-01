@@ -392,6 +392,9 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FF00 | 2 + 2 | `g_p2_remote`, `g_p1_remote` pad words |
 | 0x0203FF04 | 0xE4 | `coop` (`CoopState`): `p2` +4, `p2_slot` +0x80, `exp_awards` +0xD8 |
 
+All of it, 0x0203EA00-0x02040000 (`coop.ld` `__coop_ram_start` / `__coop_ram_end`), is zeroed before a soft reset
+(`input.c` `soft_reset`, `docs/coop-design.md` "Session logic"), as a power cycle leaves it.
+
 Save chip (8 KiB EEPROM, `party_save.c`): the header 0x0-0xF, three save slots of `SAVE_STRIDE` (0x10-0x54F with 9
 party slots), **the tournament's global record 0x1E00-0x1E3F** (`tny_engine.c` `TRecord`), the rest free.
 

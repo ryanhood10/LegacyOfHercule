@@ -4,6 +4,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **The soft reset no longer crashes a loaded save** (branch `pp-reset`, `docs/perfect-pass.md` 9): A+B+Select+Start
+  kept EWRAM, so after a game with player 2 in, `coop.p2` still pointed at his old entity; on the next load
+  `p2_sync_combat` re-ran the class init through it and overwrote a queued event's action pointer (the jump to
+  garbage from `0x080109AC`). `input.c` now zeroes all our RAM (`coop.ld` `__coop_ram_start`..`__coop_ram_end`,
+  0x0203EA00-0x02040000) before the stock reset, as a power cycle leaves it. Test `tools/headless/softreset.txt`
+  (two-player and one-player loads, a new game, after a soft reset; fails on the old build with the reported
+  registers) in `regfull.sh`; `ssj_hercule.txt` reloads through the soft reset again (`docs/testing.md` "Soft reset",
+  `docs/coop-design.md` "Session logic").
 - **Perfecting pass, tny piece** (branch `pp-tny`, `docs/tournament.md` 24.1 / 24.4 / 24.5 / 24.7): the Rumble
   announcer's calls (a fall, the flurry, a co-op player down, Super Buu's forms) as a caption at the bottom that never
   pauses the fight (`src/coop/tny_caption.c`, `.tny.cap`, test command 37); the announcer walks off after "Begin!" while

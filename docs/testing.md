@@ -22,6 +22,7 @@ inspection goes through the GDB stub.
 | Team combos: the leftovers | the kits' own moves in their colours filmed, Android 16 and Super 13 held as bystanders, Cell Jr.'s copies' facings |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
 | Hercule's beam pose | a sprite pose seen in a stock scene, other facings, player 2 in a control state |
+| Soft reset | A+B+Select+Start then a load (two players, one player) or a new game; the stale player-2 crash it fixed |
 | Several fork instances at once (slots) | running the WSL fork beside other sessions |
 | WSL fork (wide ROM), Fork helpers | real-time play, the wide view, gdb peeks, pad keys, teleport |
 | Boss pairs, Android 16 boss fight, Super Android 13 | fights with the autopilot and hit logs; Super 13's specials, rage, explosion, rates against the twin Cells |
@@ -51,7 +52,7 @@ bash tools/headless/regfull.sh build/<dir>
 ```
 
 Out: `build/<dir>/hl/reg.log` (a `## name` block per script with its echoes, map lines and peeks). Pass: no
-TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25, 42 on 2026-11-01 with `wm_landmark`). A new script goes into its
+TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25, 42 on 2026-11-01 with `wm_landmark`, 50 later that day, `softreset` the last). A new script goes into its
 list. Known flaky: `tny_artbuu`'s hit test (one fighter may take no punch). Tests that depend on a seeded draw break
 when code adds `rnd()` calls in the engine (2026-10-25: the Rumble announcer's variety now uses the frame counter).
 
@@ -214,7 +215,8 @@ menu and in-game movement take it; the save pad's Save/Switch dialog, the switch
 menu do not (they read the pad during a modal loop), so drive those with `win_keys.ps1` (arrows,
 X=A, Z=B, A=L, S=R, Enter=Start, Backspace=Select; 250-300 ms holds register, shorter ones drop).
 `win_keys.ps1` / `win_shot.ps1` restore a minimised window. `reset.sh` jumps the CPU to the ROM
-entry: EWRAM survives, so the co-op state's stale player-2 pointer crashes the next map; prefer a
+entry: EWRAM survives, so the co-op state's stale player-2 pointer crashes the next map (the game's own soft
+reset clears our RAM first since 2026-11-01, "Soft reset"; this jump does not); prefer a
 relaunch (the `.sav` keeps the EEPROM). mGBA starts the EEPROM as a 512-byte device and zero-extends
 it on the first wider access, so bytes beyond 0x200 read as zero until written. A `DEBUG_MENU=1` ROM
 turns a new game into the debug menu (the patch replaces the intro video). A stale
@@ -898,16 +900,42 @@ checks, about 3 minutes). The script, in the town (Map Test 7): **A** player 2 H
 class / combat bytes +10 with no EP spent; 10 EP in 200 frames from his slot and none from player 1's; the ability
 again turns him back; refused while the party meter is not empty and under 10 EP; at 0 EP he turns back by himself.
 **B** the same as player 1 (active slot 5, a warp rebuilds the entity). **C** player 2 to Goku (Select x3), both
-transform (Goku: stock record 61), save at the pad (both Super Saiyans), power off and on (`reset`), Select Game,
+transform (Goku: stock record 61), save at the pad (both Super Saiyans), a soft reset (`key 0xF 6`), Select Game,
 load, B (two players) and A: player 1 Hercule is still row 22 with the class, draining, and turns back; Goku is
 row 19 (`Party_DetransformOthers`). **D** player 2 to Goku, transform, Select on: Goku's slot turns back (the
 hand-off counter). Words to poke: the ability gate 0x0300208C := 1 before each use (0 on a Map Test), the party
 meter PARTY+8 := 0. `S` = `find S 0x53534A48` (`.party.ssj`, `docs/ids.md`).
 
-- A soft reset (`key 0xF 6`) then loading the save crashed at frame ~5 after the load's A (jump through a null
-  object's vtable from `0x080109AC`) with or without a transformation: the script uses `reset` (power cycle,
-  the cartridge save kept). `ssj2_save.txt` still uses the soft reset (not in `regfull.sh`).
+- C3 used `reset` (a power cycle) while a soft reset then a load crashed (fixed 2026-11-01, "Soft reset" below); it
+  is the soft reset again. `ssj2_save.txt` (an `SSJ2_TEST` build, not in `regfull.sh`) uses the soft reset too.
 - `SSJ_TEST=1` builds: player 2's Start uses ability 18 (`input.c`).
+
+## Soft reset (headless, 2026-11-01, branch `pp-reset`)
+
+```
+python tools/headless/st_expect.py tools/headless/softreset.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+```
+
+A+B+Select+Start (`key 0xF 6`) clears all our EWRAM before the stock reset (`input.c` `soft_reset`, `docs/coop-design.md`
+"Session logic"). The script (12 checks, about 3 minutes, in `regfull.sh`): **A** two players in the town, player 2
+Hercule a Super Saiyan, save at the pad, soft reset (`coop.p2` reads 0 on the title), load, B: a new player 2 on
+`g_p2_vtable`, no crash 600 frames on; **B** a soft reset with player 2 in, load, A (one player): no player 2; **C** a
+soft reset, then a new game in slot 2 (Down, A), B: player 2 joins in the prologue. After a reset: `key 8 6` twice
+(the intro), `key 8 6` (the title), `key 1 6` (Select Game), `key 1 6` (load slot 1); the players question then waits
+(`stepnz 0x0203FA49 10`): A or B, then A closes the answer's line. The town stays black under the question until
+then, after a power cycle too.
+
+- The bug (before the fix, same registers on every build): `CRASH ... r0=0 r1=e55ec002 r5=0202c3f0 r14=080109bf`
+  about 50 frames after the load's A. `r5` is an enemy-death event (vtable `0x080238FC`, fire slot 3
+  `0x080109AC`: copies its x, y and calls `action->func`) that `players_tick` had queued for the players question
+  (`coop_run_sequence`); it sat at the old player 2's entity + 0x174. `p2_sync_combat` (every input poll) saw the
+  loaded slot's stats differ from its key and ran `install_behaviour` (the class init) on the stale `coop.p2`:
+  entity + 0x180 (the class, `0x030021E0`) and + 0x184 (0) overwrote the event's y and its action pointer, and the
+  fire read address 0 (the BIOS, read-protected: `0xE55EC002`). Found with `breakpc 0x080109AC` (the caller: our
+  `entity_list_update_hook`'s event loop), the event's words against the old `coop.p2`, and `breakpc` on
+  `install_behaviour` (r0 = the old entity, lr in `p2_sync_combat`).
+- Needs player 2's entity at the reset (two players, or a Map Test with `p2 0`); a transformation plays no part.
+  One player (`coop.p2` 0) left nothing stale, which is why the one-player repro never crashed.
 
 ## Frame counts (headless, 2026-10-19)
 

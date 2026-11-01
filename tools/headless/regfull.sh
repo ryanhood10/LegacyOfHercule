@@ -25,6 +25,9 @@ done
 # Super Saiyan Hercule (docs/testing.md "Super Saiyan Hercule"): self-checking, st_expect.py prints FAIL on a mismatch
 echo "## ssj_hercule" >> "$LOG"
 python tools/headless/st_expect.py tools/headless/ssj_hercule.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+# A soft reset, then a two-player load, a one-player load and a new game (docs/testing.md "Soft reset"): self-checking
+echo "## softreset" >> "$LOG"
+python tools/headless/st_expect.py tools/headless/softreset.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt "$PLAY" --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"
