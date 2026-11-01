@@ -38,8 +38,9 @@ Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
 ## Full regression (headless, `tools/headless/regfull.sh`)
 
 Every chapter and tournament script on a `DEBUG_MENU=1` build, co-op as written plus `arctic_summit`, `postgame` and
-`ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`). About 15 minutes;
-run it in the background.
+`ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`, or `PLAY=<rom>`
+for a private one, e.g. `make BUILD=build/<dir>/play` then `PLAY=build/<dir>/play/log2-coop.gba bash ...`). About
+15 minutes; run it in the background.
 
 ```
 make BUILD=build/<dir> DEBUG_MENU=1 && make
@@ -48,7 +49,7 @@ bash tools/headless/regfull.sh build/<dir>
 ```
 
 Out: `build/<dir>/hl/reg.log` (a `## name` block per script with its echoes, map lines and peeks). Pass: no
-TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25). A new script goes into its
+TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25, 42 on 2026-11-01 with `wm_landmark`). A new script goes into its
 list. Known flaky: `tny_artbuu`'s hit test (one fighter may take no punch). Tests that depend on a seeded draw break
 when code adds `rnd()` calls in the engine (2026-10-25: the Rumble announcer's variety now uses the frame counter).
 
@@ -411,6 +412,19 @@ TOURNAMENT", the players question (a black screen, A twice), the game resumes on
 Pass: 14 `waitmap ... reached`, the arrival `map` lines of
 `docs/tournament.md` 9b, the shots show each line, no CRASH. Dialogue pages are pressed one A each (an extra A
 re-talks to the NPC in front, or flies off the beach's flight spot). Map previews: `build/grounds/maps/papaya_*.png`.
+## World-map landmarks (headless, 2026-11-01, branch `pp-map`)
+
+```
+python tools/headless/st_test.py tools/headless/wm_landmark.txt build/pp-map/log2-coop.gba build/pp-map/hl/menu.ss --out build/pp-map/hl --cols 3
+python -I tools/wmlandmark.py roms/log2.gba build/pp-map/landmark/preview.png     # the sheet's frames plus ours, x4
+```
+
+`wm_landmark.txt` (Map Test of the world map, test warps; `docs/maps.md` 9e): Papaya Island's landmark from 80 px
+south (small on the horizon) and at the landing (over the flyer, the cone under it); the arctic's snowy mountain with
+flag 381 set, the same two views, and gone with 381 clear; a stock landmark (Goku's house) unchanged; `ents` lists
+the 15 decorations (vtables 0x08025FB8, 0x08025E5C). Pass by eye on `build/pp-map/hl/wm_landmark.png`. The world
+map's free OBJ VRAM with the larger sheet: 10944 bytes (`peek8 0x03001120 8` + `peek 0x030017B4 330`, `objfree.py`).
+
 ## Tournament moves (headless, branch `tny-moves`, 2026-10-25)
 
 ```

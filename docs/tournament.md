@@ -953,7 +953,7 @@ light-blue cloud painted into the ground (West City: zone 4 area 3, around (352,
 the same cloud (a stamp of those 6 x 4 tiles into the plaza's BG2, which draws over its BG3 paving) on the paving just
 above the beach, and the flight trigger sits on it ((216, 344)-(264, 376)). The world-map landing still arrives on the
 beach below. (World-map landmarks, the 3D towns seen while flying, are drawn per site by the on-load's
-FindCharacterEntity 2-12; Papaya Island has none: adding one needs that landmark table decoded.)
+FindCharacterEntity 2-12; Papaya Island has one since 2026-11-01: 24.6, `docs/maps.md` 9e.)
 
 ## 19. Overhead HP bars in the ring (2026-10-25)
 
@@ -1225,6 +1225,16 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 
 ### 24.6 Papaya Island's world-map landmark
 
+**Built 2026-11-01** (branch `pp-map`). What was built: the landmarks are the world map's decorations (variation
+0x085C0814's list; `FindCharacterEntity N` shows decoration N; `docs/maps.md` 9e has the table and how it works).
+Papaya Island is decoration 14 with a frame of its own appended to the sheet (`tools/wmlandmark.py papaya`: the ring
+on a sandy island, the hall's red roof behind it, a palm, the stock cone), shown by the on-load under the landing's
+own check (`CoopCall 30, 2`), so flying over the island sea south-west of West City shows it like any town. The
+arctic landing lacked one too and got the stock snowy mountain (decoration 13, flag 381). `tools/mapedit.py` gained
+`"add_decorations"`. Test: `tools/headless/wm_landmark.txt` (in `regfull.sh`); shots `build/pp-map/hl/wm_landmark.png`.
+
+The plan as it was:
+
 - **Wrong:** flying over the island shows no town model (other sites draw a 3D landmark).
 - **Fix:**
   - Decompile (Ghidra headless) how a world-map site's on-load draws its landmark: the scripts call
@@ -1234,7 +1244,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
     copy.
   - Record the table in `docs/maps.md`.
 - **Test:** headless world-map flight past the site (the arctic route test's world-map steps are the model); screenshot.
-  Size: a day (mostly the decoding). Offered to Ryan, not asked for: **ask before starting**.
+  Size: a day (mostly the decoding). (Ryan put it in the perfecting pass, `docs/perfect-pass.md` 5.)
 
 ### 24.7 Walking speed per tournament playable
 

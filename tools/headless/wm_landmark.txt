@@ -1,0 +1,53 @@
+# World-map landmarks (docs/maps.md 9e, docs/tournament.md 24.6; docs/testing.md "World-map landmarks"), headless.
+# python tools/headless/st_test.py tools/headless/wm_landmark.txt build/pp-map/log2-coop.gba build/pp-map/hl/menu.ss --out build/pp-map/hl --cols 3
+# The world map's decorations 13 (the arctic: the stock snowy mountain, flag 381) and 14 (Papaya Island: our
+# 'papaya' frame, tools/wmlandmark.py; shown when the grounds are in the build) are added by data/story/
+# arctic_route.json and papaya_route.json. Warps: COOP_CMD_WARP (cmd 5, arg 0x6306 = zone 6 area 99, arg2 x | y << 16);
+# each warp reloads the world map, so its on-load (which shows the landmarks) runs again. The flyer faces north:
+# a site 80 px ahead sits small on the horizon; at the site the landmark stands over the flyer with its cone.
+# Pass (by eye on the sheet): wm01/wm02 the island, the hall's red roof, the ring and a palm over Papaya's spot;
+# wm03/wm04 the snowy mountain over the arctic; wm05 no mountain (381 clear); wm06 a stock landmark unchanged.
+# The entity list (ents) has the world map's 15 decorations (vt 08025fb8 for 0, 08025e5c for 1-14).
+maptest 176
+waitmap 6 99 2000
+frames 60
+p2 0
+flags -381 -382
+# 1. Papaya Island from 80 px south, then at the landing
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x076C04EC
+poke32 0x0203FD08 5
+frames 150
+map
+shot wm01_papaya_ahead
+ents
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x071C04EC
+poke32 0x0203FD08 5
+frames 150
+shot wm02_papaya_at
+# 2. the arctic with flag 381 set: from 80 px south, then at the landing
+flags +381
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x0370044C
+poke32 0x0203FD08 5
+frames 150
+shot wm03_arctic_ahead
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x0320044C
+poke32 0x0203FD08 5
+frames 150
+shot wm04_arctic_at
+# 3. flag 381 clear: no mountain (the post-game has not opened the arctic)
+flags -381
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x0370044C
+poke32 0x0203FD08 5
+frames 150
+shot wm05_arctic_hidden
+# 4. a stock landmark (Goku's house, decoration 0, always shown) unchanged
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x07780B82
+poke32 0x0203FD08 5
+frames 150
+shot wm06_stock_goku

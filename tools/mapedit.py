@@ -22,6 +22,8 @@ A spec (docs/scripts.md has the reference and examples):
       "add_records": [{"kind": "actor", "sprite": 76, "x": 400, "y": 300, "facing": 2, "condition": COND},
                       {"like": 4, "sprite": 72, "talk": "seq:NAME"}],
       "edits": [{"at": "trigger:3/entry:15", "replace": [["SetStoryFlag 145", "SetStoryFlag 146"]]}],
+      "add_decorations": [{"index": 13, "rect": [x1, y1, x2, y2], "art": "papaya", "visible": 0},
+                          {"index": 14, "rect": [..], "frame": 4, "like": 6}],
       "pre_edits": [...]                         as "edits", applied first (before the payload/record
                                                  changes, so stock/stockseq entries see them)
     }
@@ -38,6 +40,11 @@ deleting; new records are appended (the pointer array is copied to free ROM, the
 Record fields: condition, x, y, sprite; enemy: stat, action (REF: a sequence = defeat dialogue, a
 script = defeat script, "none"); NPC: talk (REF); actor/NPC/enemy built from scratch with "kind" get
 one FaceAndWait behaviour ("facing": 0 down, 1 up, 2 left, 3 right).
+Decorations (variation 1's list, docs/maps.md 9e: the world map's landmarks): each is appended (the list is
+copied to free ROM); "index" must equal its new position (on-load scripts show it with FindCharacterEntity N);
+"frame" is a stock frame of the variation's sheet, or "art" names a tools/wmlandmark.py drawing appended to the
+sheet (re-compressed into free ROM); "like" copies a stock record's sprite bytes (default 0); "visible" 0
+waits for FindCharacterEntity.
 Edit paths: "trigger:N", "record:N/defeat", "record:N/talk", "onload" (and the other map scripts),
 with "/entry:K" for one entry of a sequence. "replace" pairs match whole instruction or entry lines
 (whitespace-normalised, as tools/script_asm.py dump prints them; a replacement of "" deletes the
@@ -201,8 +208,46 @@ class MapEditor:
             self.edit_record(me, int(r), ch, tag)
         for r in m.get("add_records", []):
             self.add_record(me, r, tag)
+        if m.get("add_decorations"):
+            self.add_decorations(me, m["add_decorations"], tag)
         for e in m.get("edits", []):
             self.edit_path(me, e["at"], e["replace"], tag)
+
+    # -- decorations (docs/maps.md 9e) --
+    def add_decorations(self, me, decos, tag):
+        import wmlandmark as wl
+        from mapchunks import decompress
+        from buu2log2 import compress
+        var = self.w32(self.w32(me + 0x2C))                      # variation 1
+        count, arr, sheet = struct.unpack_from("<III", self.rom, off(var + 0x24))
+        recs = [bytes(self.rom[off(arr) + 0x18 * k:off(arr) + 0x18 * (k + 1)]) for k in range(count)]
+        pix = None
+        for d in decos:
+            if num(d["index"]) != len(recs):
+                raise AsmError(f"decoration index {d['index']}: the next one is {len(recs)}")
+            if "art" in d:
+                if pix is None:
+                    mode, size = struct.unpack_from("<II", self.rom, off(sheet))
+                    pix = bytearray(decompress(bytes(self.rom), off(sheet) + 8, mode)[:size])
+                art = wl.ART.get(d["art"])
+                if art is None:
+                    raise AsmError(f"decoration art {d['art']!r}: not in tools/wmlandmark.py ART")
+                frame = len(pix) // 32
+                pix += art(bytes(pix))
+            else:
+                frame = num(d["frame"]) * (wl.FRAME // 32)
+            like = recs[num(d.get("like", 0))]
+            x1, y1, x2, y2 = [num(q) for q in d["rect"]]
+            recs.append(struct.pack("<4i", x1, y1, x2, y2) + like[16:20] + struct.pack("<H", frame) + like[22:23]
+                        + bytes([num(d.get("visible", 1))]))
+        if pix is not None:
+            blob = compress(bytes(pix))
+            if decompress(blob, 8, 1)[:len(pix)] != bytes(pix):
+                raise AsmError("decoration sheet: the encoder's round trip failed")
+            new = self.put(blob + bytes(-len(blob) % 4), 4, f"{tag} decoration sheet ({len(pix) // wl.FRAME} frames)")
+            self.write(var + 0x2C, struct.pack("<I", new), f"{tag} decoration sheet -> {new:08x}")
+        new = self.put(b"".join(recs), 4, f"{tag} decorations ({len(recs)})")
+        self.write(var + 0x24, struct.pack("<II", len(recs), new), f"{tag} decorations {len(recs)} -> {new:08x}")
 
     # -- triggers --
     def trigger(self, me, t):

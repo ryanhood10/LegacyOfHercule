@@ -18,7 +18,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 | tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
 | art (`pp-art`) | - | - | - | 169-172 | - |
 | combo (`pp-combo`) | - | - | 39 | - | in `comboram`'s free 0xB8 |
-| map (`pp-map`) | 478-479 | - | - | - | - |
+| map (`pp-map`) | 478-479 (not needed: unused, free) | - | - | - | - |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
@@ -325,6 +325,19 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 16 | `papaya_ring.json` | the ring with the stands (Buu 7/6, 720 x 720): the engine's stage (`src/coop/tny_ring.h`) |
 | 17 | `papaya_secret.json` | the hidden arena (Buu's Other World Stadium, 1/20 there): Pikkon, the Senzu (flag 442); an easter egg |
 | 18-19 | free | |
+
+## World-map landmarks (decorations of zone 6 area 99, `docs/maps.md` 9e)
+
+The id a world-map on-load passes to `FindCharacterEntity N` (show) / `FindEntityByType N` (hide) is the
+decoration's index in the world map's list. Stock 0-12 (one per stock site); ours are appended by
+`tools/mapedit.py` `"add_decorations"` in `data/hercule.json`'s spec order. Frames: stock 0-8 on the sheet, ours
+appended after them (`tools/wmlandmark.py` `ART`).
+
+| decoration | site | frame | spec |
+|---|---|---|---|
+| 13 | the arctic (post-game, flag 381) | 4 (stock snowy mountain) | `data/story/arctic_route.json` |
+| 14 | Papaya Island (the grounds built) | 9 (`wmlandmark.py papaya`) | `data/story/papaya_route.json` |
+| 15+ | free | | |
 
 ## UI strings and place names (`ui_strings`, `tools/krillinsprites.py`, `src/coop/krillin.h`)
 
