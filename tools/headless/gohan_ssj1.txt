@@ -2,7 +2,8 @@
 # "Training completed!" before the Cell Games sets flag 468 and puts Gohan (slot 0) on the teen row 2 (sprite 56,
 # SetCharacterTransformation 0, 56), whose Transformation (ability 12) turns him Super Saiyan (row 5).
 # Two runs: player 1 as Gohan (transforms, fights round 1 transformed: his EXP goes up), and player 2 as Gohan (the row
-# only: player 2's B on a stock Transformation turns player 1's slot, a known engine gap left to the ssj piece).
+# row, then his own B: since the ssj piece the stock Transformation changes the presser's own slot, so Gohan goes to
+# row 5 and player 1's Piccolo stays row 6; it turned player 1's slot before).
 # Entry 0x0203F00C: row +8 (0x0203F014), ability index +9, EXP +0x10 (0x0203F01C); flag 468 = FLAGS+0x3A bit 4;
 # a Map Test leaves the transformation gate 0x0300208C at 0 (docs/testing.md "Goku's halo"): the script sets it.
 # waves (0x0203F914) +0x10 round / state / timer / standing. From a debug-menu savestate (--out its folder).
@@ -198,3 +199,15 @@ peek8 0x0203F924 1
 echo == player 2 Gohan: player 1's Piccolo untouched (row 06)
 peek8 0x0203F030 1
 shot g2_after
+echo == player 2 Gohan presses B on his Transformation (ability index 2): Gohan (slot 0) row 05, player 1's Piccolo still 06
+poke32 0x0300208C 1
+poke8 PARTY+8 0
+poke16 0x0203F010 100
+poke8 0x0203F015 2
+p2 2
+frames 4
+p2 0
+frames 220
+peek8 0x0203F014 1
+peek8 0x0203F030 1
+shot g2_b

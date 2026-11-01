@@ -193,3 +193,11 @@ punctuation only); owner in brackets.
   and the island for Piccolo, Gingertown, Semi-Perfect Cell for Vegeta) the lead is made player 1 behind a short fade,
   as Vegeta's Android 19 fight already did; the other way would be the lead as an actor watching his own fight.
 - **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
+
+## 10. State at the end of the team round (2026-11-01)
+
+All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM
+`build/main-final/play`) exits 0: 56 blocks, `ssj_hercule` 56/56, `softreset` 12/12, the prologue on the play ROM
+fine. Player 2's stock Transformation now changes his own slot (the story piece saw it turn player 1's before the ssj
+merge; `gohan_ssj1.txt` checks it). Not yet in `build/play`: Ryan asks for the swap. Open: section 9's items, the
+lead-made-player-1 choice, the two-player playtest (section 1).

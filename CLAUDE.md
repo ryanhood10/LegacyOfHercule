@@ -46,9 +46,9 @@ Ryan: "perfect what we have FIRST". The plan and its state are `docs/perfect-pas
 the team (7: six agents on `pp-*` branches in `F:/MeltyCreations/log2-<piece>`, numbers in `docs/ids.md`
 "Allocations for the perfecting pass"), his one-player notes (8) and bugs found on the way (9). Merged so far: the
 world-map landmark (24.6), the four portraits and Yakon (24.2-3), Super Saiyan Hercule by the stock rules, the combos'
-leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games. Still on branches: `pp-story`
-(section 3 and the notes of 8), `pp-tny` (24.1, 24.4, 24.5, 24.7). The combos' step tables wait for Ryan's two-player
-session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
+leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games, the story polish and Ryan's notes
+(`pp-story`), the tournament fixes 24.1-24.7 (`pp-tny`), the soft-reset crash (`pp-reset`): all seven pieces merged,
+full regression clean (section 10). The combos' step tables wait for Ryan's two-player session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
 
 The World Tournament on Papaya Island (`docs/tournament.md`: the plan, 9b-13 the build, 14-23 playtest rounds, 24 open
 points, 25 the team combos, 25.4 colours, 25.5 the leftovers) and its team combos (`docs/tournament-combos.md`, both
