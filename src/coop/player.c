@@ -142,6 +142,14 @@ void p2_sync_combat(void) {
     else install_behaviour(p2, slot);
 }
 
+// Walking speed per tournament playable (docs/tournament.md 24.7): the speeds come from the behaviour class's init
+// (+0x188 side, +0x18C along the facing: ROM literals of the class, 0x08016FD8), and every tournament playable shares
+// Gohan's class, so the walk and the dash below scale them by the row's percent (tny_play.c tny_walk_pct)
+static s32 walk_speed(const Entity *e, s32 v) {
+    int pct = tny_walk_pct(g_Party->chars[slot_for(e)].display_row);
+    return pct == 100 ? v : v * pct / 100;
+}
+
 // ---- walk (vtable 0x080256C4 slot 2, original 0x0800811F): the 4-way walk the sprint uses (anim 0xD,
 // state 0x03001F48); plain walking is the diagonal state below (anim 1, 0x03001F44) ----------------
 void walk_update(void *st, Entity *e) {
@@ -150,8 +158,9 @@ void walk_update(void *st, Entity *e) {
     u16 cur = in->current;
     if ((*last_dir_for(e) & ~cur) == 0) {
         const Vec *v = &CTX_VECTORS[e->facing];
-        s32 nx = e->x + v->dx * e->speed;
-        s32 ny = e->y + v->dy * e->speed;
+        s32 sp = walk_speed(e, e->speed), side = walk_speed(e, e->side_speed);
+        s32 nx = e->x + v->dx * sp;
+        s32 ny = e->y + v->dy * sp;
         s32 px[2] = { nx >> 8, ny >> 8 };
         if (!Collision_Check(COLLISION_MAP, px, (u8 *)e + 0x154)) {   // the stock passes the entity's box (+0x154)
                                                                     // here too: 0 read a box from address 0 and the sprint bumped
@@ -161,10 +170,10 @@ void walk_update(void *st, Entity *e) {
         } else {
             e->x = nx;
             e->y = ny;
-            if ((cur & KEY_UP) && e->facing != 1) ny -= e->side_speed;
-            if ((cur & KEY_DOWN) && e->facing != 0) ny += e->side_speed;
-            if ((cur & KEY_LEFT) && e->facing != 2) nx -= e->side_speed;
-            if ((cur & KEY_RIGHT) && e->facing != 3) nx += e->side_speed;
+            if ((cur & KEY_UP) && e->facing != 1) ny -= side;
+            if ((cur & KEY_DOWN) && e->facing != 0) ny += side;
+            if ((cur & KEY_LEFT) && e->facing != 2) nx -= side;
+            if ((cur & KEY_RIGHT) && e->facing != 3) nx += side;
             px[0] = nx >> 8;
             px[1] = ny >> 8;
             if (Collision_Check(COLLISION_MAP, px, (u8 *)e + 0x154)) {
@@ -188,19 +197,19 @@ void diag_update(void *st, Entity *e) {
         Entity_SetAnimation(e, ANIM_IDLE);
     } else {
         int k = 0;
-        s32 xy[2];
+        s32 xy[2], side = walk_speed(e, e->side_speed);
         if (cur & KEY_LEFT) {
-            xy[0] = e->x - e->side_speed; xy[1] = e->y;
+            xy[0] = e->x - side; xy[1] = e->y;
             Player_StepAxis(e, xy, 2); k = 1;
         } else if (cur & KEY_RIGHT) {
-            xy[0] = e->x + e->side_speed; xy[1] = e->y;
+            xy[0] = e->x + side; xy[1] = e->y;
             Player_StepAxis(e, xy, 2); k = 2;
         }
         if (cur & KEY_UP) {
-            xy[0] = e->x; xy[1] = e->y - e->side_speed;
+            xy[0] = e->x; xy[1] = e->y - side;
             Player_StepAxis(e, xy, 1); k += 3;
         } else if (cur & KEY_DOWN) {
-            xy[0] = e->x; xy[1] = e->y + e->side_speed;
+            xy[0] = e->x; xy[1] = e->y + side;
             Player_StepAxis(e, xy, 1); k += 6;
         }
         e->facing = CTX_FACING[e->facing + k * 4];

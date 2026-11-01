@@ -23,6 +23,7 @@
 #include "revive.h"
 #include "super13.h"
 #include "difficulty.h"
+#include "wide.h"
 
 // ---- ROM ------------------------------------------------------------------------------------------------
 ROM_FN(void, Step_SetActiveCharacter, (s32 *st), 0x0800A785);        // VM step 70: player 1 plays party slot st[top]
@@ -148,7 +149,15 @@ typedef struct TnyEng {
     u8 npose;                            // poses held (pose_e)
     u8 chal_final;                       // the hidden fight is Super Buu's final form (the Legend Rumble's)
     u8 dark;                             // the curtain is closed: the screen is held black (scene changes behind it)
-    u8 _p4[19];
+    // the announcer's walks (24.4) and the ring reload's readiness (24.5), in the old padding
+    u8 ann_walk;                         // he walks: 1 on to his mark, 2 off the ring (then he leaves)
+    u8 ann_t;                            // frames of this walk (it ends by 250 whatever happens)
+    u8 restage_t;                        // frames the last ring reload (P_RESTAGE) held the curtain (tests)
+    s16 ann_tx, ann_ty;                  // where he walks to
+    s16 warp_x, warp_y;                  // where the last warp puts player 1 (arrived())
+    u8 ann_offs, ann_ons;                // walks off / on completed (tests, test command 38)
+    s16 mark_x;                          // test command 38: player 1's x at the mark (the walking-speed test)
+    u32 ann_starts;                      // walks started (tests: a waitnz on it catches the first frame of one)
     TRecord rec;                         // the record as last read or written (tests peek it)
     u8 down_t[MAX_OPP];                  // frames a Rumble fighter has lain down (his body leaves at 60)
     u8 br_shown;                         // the bracket screen has shown this draw (then phase 1 with the results)
@@ -889,19 +898,90 @@ static void ann_show(void) {
 // He stands at the ring's top edge, but never above the view: the camera follows player 1 (in co-op the pair), so a
 // co-op floor or the duel's line-up would cut him off at the screen's top (polish2: only his feet showed). Called
 // before the curtain opens or the line shows, once the camera has settled on the staged players.
-static void ann_fit(void) {
-    Entity *a = eng.ann;
-    if (!a || !in_list(a)) return;
+static int ann_fit_y(void) {
     int y = CAMERA_CELL[8] + 60;                    // his head (about 32 px above his feet) below the HUD panels
     if (y < ANN_Y) y = ANN_Y;
     if (y > TNY_RING_P1_Y - 20) y = TNY_RING_P1_Y - 20;
-    a->y = y << 8;
+    return y;
+}
+static void ann_fit(void) {
+    Entity *a = eng.ann;
+    if (!a || !in_list(a)) return;
+    a->y = ann_fit_y() << 8;
 }
 static void ann_hide(void) {
     Entity *a = eng.ann;
     eng.ann = 0;
+    eng.ann_walk = 0;
     if (a && in_list(a) && a->sprite_record == Character_GetSpriteRecord(eng.ann_rec.sprite))
         EntityList_Remove(g_SceneTable[1], a, 0);
+}
+
+// He walks off after "Begin!" and back on at a fight's end (docs/tournament.md 24.4; before: he vanished as the fight
+// began and popped in at its end). Not the stock walk command: its modal (CommitCommandBatch) stops everything else
+// until every walker arrives, and the fight runs meanwhile here. The stock command is only a mover (0x0800D584,
+// decompiled 2026-11-01: it sets the walk animation, then x / y += a fixed step each frame to the target), so the
+// engine's frame tick moves him itself while his own update animates him; nothing moves him while a line shows (the
+// world is frozen) or behind the curtain. He is an actor (no hits, no target). Off: 40 px past the platform's right
+// edge, the stands' side (out of view), then he leaves; on: from there to his mark (the line waits for him).
+#define ANN_EDGE_X      (TNY_RING_X1 + 40)
+#define ANN_SPEED       0x180                       // 1.5 px a frame (8.8), a fighter's walk
+#define ANN_WALK_MAX    250                         // frames: a walk ends by then whatever happens
+static void ann_walk(int x, int y, int leave) {
+    Entity *a = eng.ann;
+    if (!a || !in_list(a)) return;
+    eng.ann_tx = (s16)x;
+    eng.ann_ty = (s16)y;
+    eng.ann_walk = (u8)(leave ? 2 : 1);
+    eng.ann_t = 0;
+    eng.ann_starts++;
+    a->facing = (u8)(x < (a->x >> 8) ? 2 : 3);
+    Entity_SetAnimation(a, 1);                      // the actor's walk (what the stock mover sets)
+}
+static s32 toward(s32 v, s32 to) { return v < to - ANN_SPEED ? v + ANN_SPEED : v > to + ANN_SPEED ? v - ANN_SPEED : to; }
+static void ann_walk_frame(void) {
+    if (!eng.ann_walk) return;
+    Entity *a = eng.ann;
+    if (!a || !in_list(a)) { eng.ann = 0; eng.ann_walk = 0; return; }
+    if (scene_running() || eng.dark) return;
+    s32 tx = eng.ann_tx << 8, ty = eng.ann_ty << 8;
+    a->x = toward(a->x, tx);
+    a->y = toward(a->y, ty);
+    int gone = eng.ann_walk == 2 && (a->x >> 8) > CAMERA_CELL[7] + wide_w() + 24;   // off: out of view is far enough
+    if (!gone && (a->x != tx || a->y != ty) && ++eng.ann_t < ANN_WALK_MAX) return;
+    a->x = tx;
+    a->y = ty;
+    if (eng.ann_walk == 2) {                        // off the ring: gone
+        if (eng.ann_offs < 255) eng.ann_offs++;
+        ann_hide();
+        return;
+    }
+    eng.ann_walk = 0;                               // on his mark: he faces the ring
+    if (eng.ann_ons < 255) eng.ann_ons++;
+    a->facing = 0;
+    Entity_SetAnimation(a, 0);
+}
+static void ann_walk_off(void) {
+    Entity *a = eng.ann;
+    if (!a || !in_list(a)) { eng.ann = 0; return; }
+    ann_walk(ANN_EDGE_X, a->y >> 8, 1);
+}
+// At a fight's end: back on from just past the view's right edge (or turned round when he is still walking off) to his
+// mark, the ring's centre kept inside the view (the camera follows the players: a fight that ended at the platform's
+// left end showed him at the screen's edge); none when OBJ VRAM is short (the end's line then shows him on his mark)
+static void ann_show(void);
+static void ann_enter(void) {
+    int y = ann_fit_y(), left = CAMERA_CELL[7], x = ANN_X;
+    if (x < left + 40) x = left + 40;
+    if (x > left + wide_w() - 40) x = left + wide_w() - 40;
+    if (!eng.ann || !in_list(eng.ann)) {
+        eng.ann = 0;
+        ann_show();
+        if (!eng.ann) return;
+        eng.ann->x = (left + wide_w() + 16) << 8;
+        eng.ann->y = y << 8;
+    }
+    ann_walk(x, y, 0);
 }
 
 // Pose groups (a record's group = 4 facing arrays of 12-byte frames): a frame's descriptor is drawable, and an
@@ -1160,7 +1240,8 @@ static void start_fight(int kind, int who, const u8 *ids, int n) {
 }
 
 // The curtain opens on the staged ring, the walk-in, the dialogue seat, the announcer's call (the line was prepared by
-// the caller: ann_prep), then the fight: he leaves, a Rumble's pack walks in from the right, the bars come
+// the caller: ann_prep), then the fight: he walks off (24.4; a bracket match's fight runs meanwhile, a Rumble's pack
+// walks in from the right once he is gone: he never shares the floor with a pack), the bars come
 static void step_intro(void) {
     if (eng.pres == 0) {
         ann_show();
@@ -1175,8 +1256,13 @@ static void step_intro(void) {
         eng.pres = 2;
         return;
     }
+    if (eng.pres == 2) {
+        ann_walk_off();
+        if (eng.kind == K_RUMBLE && eng.ann) { eng.pres = 3; return; }   // the pack waits until he is off
+    }
+    if (eng.pres == 3 && eng.ann_walk) return;
     eng.pres = 0;
-    ann_hide();
+    if (eng.kind == K_RUMBLE) ann_hide();
     if (eng.kind == K_RUMBLE && spawn_waiting(opp_budget(), 1)) walk_in(0);   // the pack from the entry side
     bars();
     if (eng.kind == K_RUMBLE) tny_rumble_mode(1);
@@ -1240,6 +1326,7 @@ static void fight_frame(void) {
         eng.phase = P_MATCH_END;
         eng.timer = 0;
         bars_out();
+        ann_enter();                                 // back on during the end's pause (24.4)
     }
 }
 
@@ -1248,6 +1335,12 @@ int tny_ring_active(void) {
 }
 // a fight runs (the overhead HP bars show only then: not over the walk-in, the lines or the end's poses)
 int tny_fight_on(void) { return tny_ring_active() && eng.phase == P_MATCH; }
+// The Rumble's announcer calls (tny_caption.c, 24.1): 1 while a Rumble round's fight runs, 2 in its end's pause until
+// the result line (the last fighter's fall can come a frame after the round is decided), else 0
+int tny_rumble_live(void) {
+    if (!tny_ring_active() || eng.kind != K_RUMBLE) return 0;
+    return eng.phase == P_MATCH ? 1 : eng.phase == P_MATCH_END && eng.pres == 0 ? 2 : 0;
+}
 static Entity *floor_p2(void);
 // The players on the ring's floor in a fight (team combos, tny_combo.h): count, their picks and their bodies
 int tny_floor_picks(u8 *ids, Entity **ents) {
@@ -1548,16 +1641,29 @@ static void warp(int zone, int area, int x, int y) {
     coop2.cmd_arg2 = (u32)(x | y << 16);
     coop2.cmd = COOP_CMD_WARP;
     eng.from = g_PlayerObject;
+    eng.warp_x = (s16)x;
+    eng.warp_y = (s16)y;
+    // the map reloaded onto itself (the ring, a co-op 1 v 1's turn change): the new player 1 may get the old one's
+    // address, so the old body steps off the warp's spot behind the curtain and arrived() knows the new one by it
+    if (g_PlayerObject && on_map(zone, area) && g_PlayerObject->x == x << 8 && g_PlayerObject->y == y << 8)
+        g_PlayerObject->x += 7 << 8;
     eng.timer = 0;
 }
 static void warp_ring(void) { warp(TNY_RING_ZONE, TNY_RING_AREA, FIGHT_P_X, TNY_RING_P1_Y); }
 static void restage(int back) { eng.back = (u8)back; eng.phase = P_RESTAGE; }
+// The warp has landed (24.5: a readiness check instead of a fixed wait): the map is the target, player 1 is a new body
+// (another address, or the old address on the warp's spot: warp() moved the old body off it), in a player state, no
+// scene, the warp command taken; and at least ARRIVE_MIN frames since the warp, for the new bodies' frames to decode
+// and the OBJ VRAM to settle. Before: a ring-to-ring reload waited 90 frames whenever the address repeated (it always
+// did), so a co-op 1 v 1's turn change held 90 frames of black. 90 stays the fallback.
+#define ARRIVE_MIN      20
 static int arrived(int zone, int area) {
     if (eng.timer < 0xFFFF) eng.timer++;
-    // a ring-to-ring reload may give the new player 1 the old one's address: then 90 frames settle it
-    int in = eng.timer > 20 && on_map(zone, area) && g_PlayerObject && (g_PlayerObject != eng.from || eng.timer > 90)
+    Entity *p1 = g_PlayerObject;
+    int fresh = p1 && (p1 != eng.from || (p1->x == eng.warp_x << 8 && p1->y == eng.warp_y << 8));
+    int in = eng.timer > ARRIVE_MIN && on_map(zone, area) && p1 && (fresh || eng.timer > 90)
              && !coop2.cmd && p1_in_play() && !scene_running();
-    if (in) { eng.ann = 0; eng.npose = 0; }          // a new map: the announcer and the posed bodies are gone
+    if (in) { eng.ann = 0; eng.ann_walk = 0; eng.npose = 0; }   // a new map: the announcer and the posed bodies are gone
     return in;
 }
 
@@ -1729,7 +1835,7 @@ static void end_show(void) {
     const char *me = team ? team : pname(k);
     // a cleared round: the fallen stay lying through the line (they leave behind the curtain), unless the announcer
     // needs their OBJ VRAM
-    if (eng.kind == K_RUMBLE && won && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
+    if (eng.kind == K_RUMBLE && won && !eng.ann && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
     for (int i = 0; i < eng.nopp; i++) if (eng.opp[i] && in_list(eng.opp[i])) blink(eng.opp[i], 0);
     Entity *pl[2] = { g_PlayerObject, floor_p2() };
     for (int i = 0; i < 2; i++) if (pl[i]) pose_hold(pl[i], won);
@@ -1763,7 +1869,15 @@ static void end_show(void) {
 // pres 0: the end's poses and the announcer's line; 1: the dialogue seat; 2: the results. The bodies stay as they lie
 // and pose (the pop-ups show over them) until the next step closes the curtain (scene_clear)
 static void step_match_end(void) {
-    if (eng.pres == 0) { end_show(); return; }
+    if (eng.pres == 0) {
+        if (!eng.ann) {                              // he could not come on at the fight's end (OBJ VRAM): now
+            if (eng.kind == K_RUMBLE && eng.result == R_WON && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
+            ann_enter();
+        }
+        if (eng.ann_walk == 1) return;               // the line waits until he is on his mark
+        end_show();
+        return;
+    }
     if (eng.pres == 1) {
         eng.pres = 2;
         if (talk(TALK_AFTER)) return;
@@ -2029,12 +2143,15 @@ void tny_engine_frame(void) {
         stepping = 0;
     }
     story_watch();
+    ann_walk_frame();                                // the announcer walking off / on (24.4)
     if (eng.say_hold && !scene_running()) eng.say_hold--;
     int safe = g_PlayerObject && p1_controllable() && !scene_running() && !eng.say_hold;
     switch (eng.phase) {
     case P_RESTAGE:
-        if (arrived(TNY_RING_ZONE, TNY_RING_AREA)) eng.phase = eng.back;
-        else if (eng.timer > 1200) eng.phase = eng.back;
+        if (arrived(TNY_RING_ZONE, TNY_RING_AREA) || eng.timer > 1200) {
+            eng.restage_t = (u8)(eng.timer > 255 ? 255 : eng.timer);
+            eng.phase = eng.back;
+        }
         break;
     case P_TO_RING:
         if (arrived(TNY_RING_ZONE, TNY_RING_AREA)) eng.phase = P_NEXT;
@@ -2052,7 +2169,7 @@ void tny_engine_frame(void) {
         break;
     case P_DUEL:
         if (eng.timer < 0xFFFF) eng.timer++;
-        if (eng.ann && coop2.duel_active) ann_hide();   // the announcer leaves when the duel begins
+        if (eng.ann && coop2.duel_active && eng.ann_walk != 2) ann_walk_off();   // he walks off as the duel begins
         if (eng.pres == 4 && coop2.call_state == 0 && coop2.duel_winner && !coop2.duel_active) {
             duel_clear();
             heal_all();
@@ -2146,6 +2263,30 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 //   24 FORCE_POOL arg = tiers forced open (bits 0-4), arg2 = TFORCE_* (1 ignore story flags, 2 stand-in bodies)
 //   25 START      a tournament without the screens: arg = division | full << 4 | tier << 8, arg2 = pick 1 | pick 2 << 8
 //                 (0xFF = his own character); from wherever player 1 stands (that is also the way back)
+//   38 CHECKS     the perfecting pass's checks (docs/ids.md). arg 0: a check, arg2 = kind << 16 | n; the answer
+//                 replaces the argument word coop2.cmd_arg (0x0203FD0C), 0 = no, so a test posts arg 0 and waits for
+//                 the answer with waitnz (a command not taken leaves the 0: the wait times out too). Kind 0: the last
+//                 ring reload (P_RESTAGE) took 1..n frames (answer: its frames); 1: the announcer walked off and on at
+//                 least once each (answer: offs | ons << 8); 2: player 1 walked n px (+-1) right of the mark (answer:
+//                 the px). arg 2: mark player 1's x; arg 4: clear the count of walks started.
+static void test_checks(u32 arg, u32 arg2) {
+    Entity *p1 = g_PlayerObject;
+    int n = (int)(arg2 & 0xFFFF);
+    u32 r = 0;
+    if (arg == 2) { if (p1) eng.mark_x = (s16)(p1->x >> 8); return; }
+    if (arg == 4) { eng.ann_starts = 0; return; }
+    if (arg != 0) return;
+    switch (arg2 >> 16) {
+    case 0: r = eng.restage_t && eng.restage_t <= n ? eng.restage_t : 0; break;
+    case 1: r = eng.ann_offs && eng.ann_ons ? (u32)(eng.ann_offs | eng.ann_ons << 8) : 0; break;
+    case 2: if (p1) {
+        int moved = (p1->x >> 8) - eng.mark_x;
+        r = moved > 0 && moved - n <= 1 && n - moved <= 1 ? (u32)moved : 0;
+    } break;
+    }
+    coop2.cmd_arg = r;
+}
+
 void tny_engine_test(u32 cmd, u32 arg, u32 arg2) {
     state_check();
     switch (cmd) {
@@ -2183,6 +2324,7 @@ void tny_engine_test(u32 cmd, u32 arg, u32 arg2) {
         }
         break;
     case 24: eng.force_tiers = (u8)arg; eng.force_flags = (u8)arg2; break;
+    case 38: test_checks(arg, arg2); break;
     case 25:
         if (eng.phase != P_IDLE || !g_PlayerObject) break;
         eng.division = (u8)(arg & 3);

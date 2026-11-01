@@ -88,12 +88,15 @@ void tny_hpbars_draw(u32 **oam);   // tny_hpbars.c
 void tny_hpbars_gone(void);
 void tny_combo_draw(u32 **oam);   // tny_combo.h (the meter)
 void tny_combo_hud_gone(void);
+void tny_caption_draw(u32 **oam);   // tny_caption.c (tourney.h): the Rumble announcer's calls
+void tny_caption_gone(void);
 
 void hud_draw_hook(Hud *h, u32 **oam) {
     Hud_Draw(h, oam);
     revive_draw(oam);   // revive.c: the countdown and revive bars over a downed player
     tny_hpbars_draw(oam);   // tny_hpbars.c: small HP bars over the tournament ring's fighters
     tny_combo_draw(oam);    // tny_combo.h: the team-combo bars and the caption
+    tny_caption_draw(oam);  // tny_caption.c: the Rumble announcer's calls (docs/tournament.md 24.1)
     if (!coop.p2 || companion_active()) return;   // no panel for the prologue's companion (companion.c)
     hud2_ensure_tiles();
     coop.hud2.y = h->y;
@@ -110,6 +113,7 @@ void hud_destroy_hook(Hud *h, int free_it, u32 a, u32 b) {
     revive_hud_gone();
     tny_hpbars_gone();
     tny_combo_hud_gone();
+    tny_caption_gone();
     if (coop.hud2.tile) {
         ObjVram_Free(g_ObjVramList, coop.hud2.tile);
         coop.hud2.tile = 0;

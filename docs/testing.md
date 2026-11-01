@@ -16,6 +16,7 @@ inspection goes through the GDB stub.
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
+| Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
 | Gero's computer / Broly chapter / Time Chamber waves and Roshi's sparring | the three ten-day-wait features, end to end |
@@ -1018,6 +1019,42 @@ big ones, a lead to look at, not a verdict: the camera scrolling shows as change
 minute; four run side by side. The phase numbers: 1 director, 2 to the ring, 3 next, 4 fight, 5 the end, 6 the duel,
 7 trophy, 8 prize, 9 challenge, 10 intro, 11 restage, 12 exit, 13 exiting.
 Run 2026-10-25 (before / after `tny-polish2`): `build/polish2/flow/` and `build/polish2/flow2/` (not committed).
+
+## Tournament perfecting pass: captions, the announcer's walks, the turn change, walking speed (headless, 2026-11-01, branch `pp-tny`)
+
+```
+make BUILD=build/pp-tny DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/pp-tny/log2-coop.gba --out build/pp-tny/hl
+for t in tny_caption tny_annwalk tny_turn tny_walk; do
+  python tools/headless/st_test.py tools/headless/$t.txt build/pp-tny/log2-coop.gba build/pp-tny/hl/menu.ss --out build/pp-tny/hl --cols 6
+done
+```
+
+All four are in `regfull.sh`. Their checks are test commands that answer into the argument word (0x0203FD0C) and a
+`waitnz` on it: a wrong answer (0) or a command never taken (the posted 0 stays) times out. Post a check while no line
+is up, or `stepz 0x0203FD08 10` first (a line holds the command until A closes it). `docs/tournament.md` 24.1 / 24.4
+/ 24.5 / 24.7 say what each item does; `docs/ids.md` test commands 37 / 38 the arguments and offsets.
+
+- `tny_caption.txt` (24.1): a 1P Rookie Royal Rumble with Super Buu forced as headliner (test command 21 arg2
+  0x7E000023): a fighter punched down at 4 HP shows "[NAME] IS DOWN!" (or one of the other three) at the bottom while
+  the other fights on (the fight's counter `eng` +0x16 keeps counting, +0xFC 0); two punched 12 frames apart: "WHAT A
+  FLURRY!"; the headliner round's kits to 55 % then 25 %: "HE'S CHANGING!", "NOT AGAIN!"; a player-down line queued
+  for SSJ2 Gohan (two rows); a co-op Rumble with player 2 downed (test command 10): "HERCULE IS DOWN!  CAN THE PARTNER
+  HOLD ON?". Shots `c_*` in `tny_caption.png`. The caption state is found by its magic (`find cap 0x504E5954`).
+- `tny_annwalk.txt` (24.4): a 1P Rookie 1 v 1: the fight runs while he walks off (he is gone by the first check: the
+  waits press A every 100 frames), back on in the end's pause (`eng` +0x155 1, x falling to his mark) before the result
+  line; a Rookie Rumble: the pack comes in after he is gone; the check answers walks off | on.
+- `tny_turn.txt` (24.5): a co-op Rookie 1 v 1: player 2's first match reloads the ring (P_RESTAGE); the check wants the
+  reload within 40 frames (it takes 21; it was 90), again for the later turns. The films: `tny_flow.py --div 0 --p2
+  --len 6000 --name c1v1` (the black between the two players' fights is 7 shots of 4 frames).
+- `tny_walk.txt` (24.7): player 1 (the debug party's Piccolo) walks right 30 frames from one spot with his own row and
+  with slot 1's display row poked to tournament rows: 36 px at 100 % (his own, Yamcha), 30 at 85 % (Spopovich, Cooler),
+  39 at 110 % (Goten, Videl); the double-tap dash 75 / 63 (own / Spopovich). The dash comes first: after about 1000 idle
+  frames the idle fidget takes the second tap.
+
+The films of 24.4 (`tny_flow.py` 1 v 1, Rumble and co-op): `build/pp-tny/flow/` (not committed): the announcer walks
+right along the ring's top edge after "Begin!" while the fight starts, comes back from the view's right edge in the
+end's pause, and leaves the duel final the same way.
 
 ## Reading screenshots
 

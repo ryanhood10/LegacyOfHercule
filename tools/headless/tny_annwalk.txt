@@ -1,0 +1,130 @@
+# The announcer walks off after "Begin!" and back on at a fight's end (docs/tournament.md 24.4, src/coop/tny_engine.c
+# ann_walk). Debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/tny_annwalk.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# Engine `eng` 0x0203EC00: +4 phase (4 a fight, 5 its end, 10 the intro), +0x14C the announcer entity (0 = gone),
+# +0x150 the step's part (pres), +0x155 his walk (1 on, 2 off), +0x160 / +0x161 walks off / on completed, +0x164 walks
+# started (a waitnz on it catches a walk's first frame), +0xFC 0 = a fight runs and no line is up.
+# Test command 38 (coop2.cmd 0x0203FD08, arg 0x0203FD0C, arg2 0x0203FD54) arg 0 kind 1 (arg2 0x10000) answers
+# offs | ons << 8 into the arg word when both happened (else 0: the waitnz times out; stepz on the command word first:
+# a line on screen holds the command until A closes it); arg 4 clears the count of walks started. The films (tny_flow.py, docs/testing.md
+# "Tournament flow films") show the same: no pop at "Begin!".
+# A. 1P Rookie 1 v 1: the fight starts while he walks off (phase 4, his x growing: +0x158 of the entity), he is gone
+#    out of view; won (test command 22): he walks back on in the end's pause (walk 1) before the result line. The waits
+#    are stepnz (A every 100 frames: the fighters' lines and the call need it), so a shot may come after his walk off.
+# B. 1P Rookie Royal Rumble: after "Begin!" he walks off first (phase 10, pres 3), then the pack comes in: when the
+#    fight runs he is gone (+0x14C 0).
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 4
+poke32 0x0203FD08 38
+frames 10
+echo == A. Rookie 1 v 1: after "Begin!" the fight runs while he walks off
+poke32 0x0203FD0C 0x0000
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepnz 0x0203ED64 30
+echo expect the fight on (phase 4, +0xFC 0, its counter +0x16 running) while he walks off (+0x155 02, x growing) or is
+echo just gone (+0x160 01): the A presses come 100 frames apart, the walk lasts about 70
+peek8 0x0203EC04 1
+peek8 0x0203ECFC 1
+peek16 0x0203EC16 1
+peek8 0x0203ED55 1
+peek8 0x0203ED60 1
+deref ann 0x0203ED4C
+peek ann+0x158 1
+shot a_walkoff1
+frames 8
+peek ann+0x158 1
+shot a_walkoff2
+frames 120
+echo expect him gone (+0x14C 0), a walk off done (+0x160 01)
+peek 0x0203ED4C 1
+peek8 0x0203ED60 2
+shot a_gone
+echo == won: he walks back on in the end's pause (phase 5, walk 1), then the result line
+poke32 0x0203FD0C 4
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+waitnz 0x0203ED64 300
+frames 30
+peek8 0x0203EC04 1
+peek8 0x0203ED55 1
+deref ann 0x0203ED4C
+peek ann+0x158 1
+shot a_walkon1
+frames 40
+peek ann+0x158 1
+shot a_walkon2
+stepnz 0x0203ED61 3
+shot a_line
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x10000
+poke32 0x0203FD08 38
+stepz 0x0203FD08 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2
+echo == B. Rookie Royal Rumble: he walks off before the pack comes in
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x0002
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+poke32 0x0203FD0C 4
+poke32 0x0203FD08 38
+frames 10
+stepnz 0x0203ED64 30
+echo expect phase 10 (0a) pres 3 (+0x150), walking off (+0x155 02)
+peek8 0x0203EC04 1
+peek8 0x0203ED50 1
+peek8 0x0203ED55 1
+shot b_walkoff
+stepz 0x0203ECFC 200
+echo expect the fight on (phase 4) and him gone
+peek8 0x0203EC04 1
+peek 0x0203ED4C 1
+shot b_pack
+echo == the round won: he walks back on; one walk off and one on in this Rumble
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 22
+frames 10
+stepnz 0x0203ED61 5
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x10000
+poke32 0x0203FD08 38
+stepz 0x0203FD08 10
+peek 0x0203FD0C 1
+waitnz 0x0203FD0C 2

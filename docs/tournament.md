@@ -1158,7 +1158,7 @@ his notes first, fix what he found, then work down this list in order** (each it
 to test it, a rough size). Nothing below is a regression; all of it is tested headless except where it says so.
 Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, run it before handing Ryan a build.
 
-### 24.1 The Rumble announcer's calls during a round (dialogue plan section 8)
+### 24.1 The Rumble announcer's calls during a round (dialogue plan section 8; **built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** "[Name] is down!", "Two fighters down!", "[Name] is down! Can the partner hold on?" and Super Buu's form
   change aren't called. The game's dialogue box (`say_go`, a dialogue sequence) stops the fight while it shows.
@@ -1181,6 +1181,21 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
     that power!" / "Not again!  Another form!".
 - **Test:** `tny_fightfix.txt` part C already finishes a Rumble by real hits; a new `tny_caption.txt` films it
   (captions show, the fight never pauses: player x keeps changing under a caption). Size: half a day.
+- **What was built:** `src/coop/tny_caption.c`. The team combos had meanwhile taken the name `tny_caption(const char *)`
+  for their move names (`tny_combo_meter.c`, a queue of string pointers), and a line with a name needs its text kept
+  until it shows, which 0x10 bytes cannot hold: so the calls have their own queue of {line, fighter} pairs (`.tny.cap`,
+  16 bytes) and make the text only when it shows, rendered like the combos' caption (the dialogue font through the
+  stock canvas, white on a black box, 32 x 16 OBJ sprites at the bottom, 90 frames each, three queued). The lines are
+  section 8's as written (names in capitals, the announcer's way): a fall picks one of the four by the frame counter;
+  a second fall while the first's line is queued or has shown under 60 frames turns it into "What a flurry!  Two
+  fighters down!"; a co-op player going down (`revive.c` go_down, so the test command's down too) "[Name] is down!
+  Can the partner hold on?"; Super Buu's first transformation "He's changing!  Look at that power!", the next "Not
+  again!  Another form!". Only in a Rumble round (`tny_rumble_live`: its fight, and the pause after the last fall until
+  the result line, which drops what is left). A line wider than 232 px goes on two rows, split at the announcer's pause
+  ("  "). The caption waits while a team combo plays and 90 frames after (its name's caption sits at the same place);
+  it is moved in front of every other OAM entry (a fighter at the screen's bottom drew over it; the entries' attr3
+  halves stay put: the affine matrices belong to the index). Hooks: `tny_moves.c` `fallen()`'s first frame (not for a
+  Multi-Form copy) and the MK_TRANSFORM's first frames; the HUD draw hook. Test command 37; test `tny_caption.txt`.
 
 ### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu
 
@@ -1204,7 +1219,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - (b) A hand-painted 32 x 32 lying frame stored as a small pixel table in `tools/lying.py`.
 - **Test:** the lying sheet plus `tny_polish.txt`'s end poses. Size: an hour or two.
 
-### 24.4 The announcer walks off and on
+### 24.4 The announcer walks off and on (**built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** he vanishes as a fight starts and appears at its end.
 - **Fix:** in `tny_engine.c`, after "Begin!", queue a walk command (`Cmd_Walk`, as `walk_in` does) from his mark to the
@@ -1214,14 +1229,31 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - The trophy keeps its own placement (section 23).
 - **Test:** `tools/headless/tny_flow.py` films (`docs/testing.md` "Tournament flow films"): no pop at Begin!, he walks.
   Size: a few hours.
+- **What was built** (`tny_engine.c` `ann_walk`): not the stock walk command after all: decompiled, its commit runs the
+  command modal, which stops everything until every walker arrives, and the walk itself is only a mover (0x0800D584:
+  the walk animation, then x / y += a step each frame), so the engine's frame tick moves him (1.5 px a frame, his own
+  update animates the walk; nothing moves while a line shows or behind the curtain). After "Begin!" he walks right
+  along the ring's top edge and leaves once out of view (or 40 px past the platform): in a bracket match, a challenge
+  and the duel final the fight runs meanwhile; in a Rumble the pack walks in once he is gone (he never shares the floor
+  with a pack: OBJ VRAM). At a fight's end he enters from just past the view's right edge during the end's 90-frame
+  pause and walks to his mark (the ring's centre kept inside the view: a fight that ended at the platform's left end
+  showed him at the screen's edge); the result line waits until he is there; one still walking off turns round. No
+  OBJ VRAM for him at the end: he appears on his mark as before. The trophy keeps its own placement. Tests:
+  `tny_annwalk.txt`, the films.
 
-### 24.5 The co-op turn change's black screen (about 1.6 s)
+### 24.5 The co-op turn change's black screen (about 1.6 s; **built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** in a co-op 1 v 1, swapping who fights reloads the ring behind the curtain and holds 90 frames of black.
 - **Fix:** find the fixed 90-frame wait after the reload (`P_RESTAGE` in `tny_engine.c` and the curtain's open
   condition, section 23). Replace it with a readiness check: the ring arrived, player 1 controllable, the bodies
   placed, OBJ VRAM settled; then a minimum of about 20 frames.
 - **Test:** `tny_flow.py --p2 --div 0` (the turns); `tny_engine.txt`'s co-op parts and `duel_end.txt`. Size: an hour.
+- **What was built** (`tny_engine.c` `warp` / `arrived`): the 90 frames were `arrived()`'s fallback for a reload whose
+  new player 1 has the old one's address, and a ring-to-ring reload always does. Now the warp remembers its spot and
+  moves the old body 7 px off it (behind the curtain) when it stands there, so the new body is known by standing on
+  it; the arrival is the ring loaded, player 1 new, in a player state, no scene, the warp command taken, and at least
+  20 frames since the warp (the new bodies' frames decode, OBJ VRAM settles); 90 stays the fallback. The turn change's
+  black is now 21 frames (the trophy's and the challenge's reloads too). Test: `tny_turn.txt` (test command 38).
 
 ### 24.6 Papaya Island's world-map landmark
 
@@ -1236,7 +1268,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 - **Test:** headless world-map flight past the site (the arctic route test's world-map steps are the model); screenshot.
   Size: a day (mostly the decoding). Offered to Ryan, not asked for: **ask before starting**.
 
-### 24.7 Walking speed per tournament playable
+### 24.7 Walking speed per tournament playable (**built 2026-11-01**, branch `pp-tny`)
 
 - **Wrong:** every tournament playable walks at Gohan's speed (they share his behaviour class); Spopovich should be
   slow, small fighters quick.
@@ -1245,6 +1277,15 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
   - Give `tools/tnyplayables.py` a speed column (about 85 % for the giants, 110 % for Goten, Kid Trunks, Chiaotzu and
     Videl) and emit per-row class copies (or a per-row speed table read by a hook).
 - **Test:** `tny_play.txt` measuring x after 30 frames of walking per row. Size: half a day to a day.
+- **What was built:** decompiled: the walk (0x08008031, diagonal: the side speed +0x188 per axis) and the dash / sprint
+  (0x0800811F, 4-way: +0x18C along the facing plus +0x188 sideways) read the entity's speeds, which the behaviour
+  class's init writes from ROM literals (0x08016FD8); every tournament row has Gohan's class. Both states are ours
+  (`player.c` walk_update / diag_update, both players), so they scale the speeds by the row's percent:
+  `tny_play.c` `tny_walk_pct(row)` (a rule, no table column): TR_GIANT 85 %, Goten, Kid Trunks, Chiaotzu and Videl
+  110 %, the rest and every story row 100. The giants are King Cold, Spopovich, Yamu, Cooler, Broly, Super 13, Super
+  Buu, Yakon, Dabura, Evil Buu, Fat Buu and Janemba: Yamu ("the quicker thief" of his kit) is slow with them since he
+  is a 64 x 64 body; one line in `tny_walk_pct` exempts him if Ryan wants. Opponents keep the AI's chase speeds. Test:
+  `tny_walk.txt` (its own script rather than `tny_play.txt`, which is generated).
 
 ### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
 

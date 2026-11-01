@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Perfecting pass, tny piece** (branch `pp-tny`, `docs/tournament.md` 24.1 / 24.4 / 24.5 / 24.7): the Rumble
+  announcer's calls (a fall, the flurry, a co-op player down, Super Buu's forms) as a caption at the bottom that never
+  pauses the fight (`src/coop/tny_caption.c`, `.tny.cap`, test command 37); the announcer walks off after "Begin!" while
+  the fight runs and back on in the end's pause (a Rumble's pack waits for him); the co-op 1 v 1's turn change reloads
+  the ring in 21 frames of black instead of 90 (a readiness check); walking and dash speed per tournament row (giants
+  85 %, Goten, Kid Trunks, Chiaotzu and Videl 110 %). Tests `tny_caption.txt`, `tny_annwalk.txt`, `tny_turn.txt`,
+  `tny_walk.txt` (test command 38), all in `regfull.sh`.
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.
