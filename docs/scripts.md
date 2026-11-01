@@ -84,7 +84,9 @@ chapters does).
 | 4 compressed format | u8 speaker, **u32 pointer to the argument script**, the compressed format text inline at +8 (decompiled 0x0800B396; the reference notes had +4 and +8 the other way round) |
 | 5 jump | u8 pad, u32 target |
 
-Speaker = portrait and name box (0 narration, 1 the active character's box, 3 / 90 Piccolo, 26 16,
+Speaker = portrait and name box (0 narration, 1 the active character's box (the story's lead's while he is in the
+scene and someone else plays, `companion.c`), 250 player 1's own character always (ours: his own lines in places
+another character can play, `data/story/player_lines.json`), 3 / 90 Piccolo, 26 16,
 28 17, 29 18, 38 Cell, 44 Cooler, 49 Frieza, 57 Future Gohan, 63 / 66 Goku, 67 Hercule, 73 Krillin,
 80 Roshi, 81 Mayor, 95 Tien, 98 Trunks). The first character picks the box position: `!` top, `#`,
 `@` and `@^` (captions) as the stock lines use them. `\x0b` is a page break; a page holds about 60
@@ -120,7 +122,8 @@ script, `walk_corpus` histogram): 1-3, 6, 7, 10, 18, 23, 32, 48, 59, 61, 66, 68,
 | 15 | Solo mode | the Cell Games (`cellgames.c`): 0 both players; 1 player 1 fights alone (player 2's entity is removed and not respawned, no co-op twins, one boss bar); 2 player 2 fights alone on player 1's entity (player 2's pad drives it, so a loss is the normal game over; dialogue is then advanced by player 2's A). Only holds in zone 14 areas 2-4, cleared anywhere else |
 | 16 | Beam sprite, on | the Cell Games: the entity showing that sprite holds a Kamehameha, driven from C the way step 137's beam command drives it but outside the command chain, so the script does not wait (step 137 and a batch's commit wait for entity commands); on 0 ends it. A beam object fades on its own, so the struggle refires them at every step |
 | 21 | Players [-> 3 / 4] | the 1 / 2 players question (`players.c`, its sequence built in C): takes the yes / no answer (A one player, B two) and pushes the confirming entry |
-| 22 | SceneActor op, a [-> 0 / 1 / string] | `companion.c`: op 1 (a = party slot) 1 when that character is in the party and neither player plays him (player 2 counts while a second player is in, even before his entity respawns after a warp): spawn his actor; op 2 (a = sprite id) 1 when a non-player entity on that sprite stands on the map: move it; op 3 the lead's name in capitals (a `%s` argument). Guards Gohan's actor (sprite 55) in `ch1_opening` |
+| 22 | SceneActor op, a [-> 0 / 1 / string] | `companion.c`: op 1 (a = party slot) 1 when that character is in the party and neither player plays him (player 2 counts while a second player is in, even before his entity respawns after a warp): spawn his actor; op 2 (a = sprite id) 1 when a non-player entity on that sprite stands on the map: move it; op 3 the lead's name in capitals (a `%s` argument). Guards Gohan's actor (sprite 55) in `ch1_opening`, Krillin's (76) there and in `ch9_gero`, 16's (8) in `ch9_gero` |
+| 31 | P2Actor op [-> value] | `companion.c` `p2_actor_call` (the perfecting pass): op 0 1 when player 2's entity stands; op 1 / 2 its x / y in px; op 3 removes it (no push; it respawns beside player 1 once he is free). A scene that should move player 2 stands an actor of his sprite on his spot first: `CoopCall 31, 0` / `JumpIfFalse` / `PushVarint 158` / `CoopCall 31, 1` / `CoopCall 31, 2` / `Step SpawnCharacterEntity` / `CoopCall 31, 3`. Used for old Hercule in the prologue's knock-out and Gohan's death (`ch1_opening.json`) |
 | 18 | Choice op [-> 1 / 2] | the post-game (`cellgames.c`): op 1 arms a yes / no question right before its text entry; while armed `input.c` takes the last A or B press on either pad as the answer and turns B into A, so either closes the box (on a several-page box the press that closes the last page decides); op 0 after the entry pushes 1 yes / 2 no |
 | 20 | Ssj2Join | Super Saiyan 2 Gohan joins in party slot 8 (`ssj2gohan.c` `ssj2_join`: row 28, Gohan's EXP, Gohan's HP / EP x1.5 and str / pow / end x1.7, flags 0x7F, abilities 3 / 4 / 23 / 2; a second call does nothing). The script then shows the message: `CoopCall 20, 0, 0, 0` in a `script` entry, then `text 0 "@^Super Saiyan 2 Gohan is now an available character!"` (`tools/headless/ssj2_join_test.lscript`) |
 | 23 / 28 / 30 | the tournament team (`tourney_hooks.c` dispatches; `docs/ids.md`) | 23 the engine's director flow (the waiting room's director: a sentinel 0 is pushed first, so nothing pushed = the weak default's fallback line, any pushed value ends the talk); 28, 1 the ui's unlock board (same pattern); 30 the grounds (`tny_grounds.c`): op 0 the waiting room's fighters (its on-load), op 1 b pushes 1 when sprite b has a record in this build (the announcer's record conditions), op 2 pushes 1 when zone 15 area 11 is in the map table (the world-map landing's triggers and marker: a BUU=0 build has no grounds and no landing) |
@@ -174,7 +177,8 @@ clears 400-503 (our chapters and the post-game); flags 504+ survive a new game, 
 flags there. Chapter-specific notes: 441 the tournament grounds' welcome seen (`papaya`), 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic
 route's world-map landing and star, `arctic_route`), 400-419 the Broly chapter (404-419
-the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar, 460 / 461 the difficulty (Easy / Hard). The bank
+the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar, 460 / 461 the difficulty (Easy / Hard), 464-467 the story's lead
+(`companion.c`), 468 Gohan's Super Saiyan given by the Time Chamber (`wait_chamber`). The bank
 is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
 ### 2.6 The journal (quest table)

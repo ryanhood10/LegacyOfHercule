@@ -1,0 +1,370 @@
+# Ryan's one-player notes on the opening (docs/perfect-pass.md 8, items 1-6 and 8; data/story/ch1_opening). Alone
+# (p2 off): old Hercule is the companion (slot 5 on row 24) in the prologue. Sprite 158's record is read from the
+# sprite table (*0x0800959C + (158 - 7) * 4): it lives in our blob and moves between builds. Krillin's NPC set 76 =
+# record 0x082E94B4. From a debug-menu savestate: python tools/headless/st_test.py tools/headless/ch1_notes.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+echo == (1) the knock-out: old Hercule walks up as an actor (player 2 gone: 0, actor 1), "What are you doing?!", Gohan's answer, then "Sorry about that"
+p2 off
+maptest 0
+frames 60
+deref TBL 0x0800959C
+deref OH TBL+0x25C
+poke8 0x0203F0A0 24
+flags +466
+mash 40 120
+frames 300
+flags +0 +1
+findent PL 0x08025604
+poke32 PL+0x158 0x9000
+poke32 PL+0x15C 0x25000
+deref P2 0x0203FF08
+poke32 P2+0x158 0xA800
+poke32 P2+0x15C 0x26000
+frames 30
+key 0x40 30
+frames 20
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 300
+shot n1_walkup
+frames 1100
+peek 0x0203FF08 1
+entrec OH
+shot n1_hercule
+key 1 6
+frames 150
+shot n1_gohan
+key 1 6
+frames 150
+shot n1_sorry
+echo == (2) Gohan's death: old Hercule becomes an actor on his spot (player 2 gone: 0, actor 1) and walks up beside Trunks
+load menu.ss
+p2 off
+maptest 1
+frames 30
+deref TBL 0x0800959C
+deref OH TBL+0x25C
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke32 0x0203FD0C 0x0201
+poke32 0x0203FD54 0x01B00110
+poke32 0x0203FD08 5
+frames 300
+peek 0x0203FF08 1
+entrec OH
+frames 1000
+shot n2_beside
+peek 0x0203FF08 1
+entrec OH
+echo == (3) Frieza's landing alone as Gohan: Krillin walks up with the Z fighters (1), none after (0)
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+entrec 0x082E94B4
+shot n3_landing
+mash 130 110
+frames 300
+entrec 0x082E94B4
+echo == (3) alone as Krillin: no Krillin actor (0)
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F142 1
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0403
+poke32 0x0203FD54 0x007800C8
+poke32 0x0203FD08 5
+frames 280
+entrec 0x082E94B4
+echo == (3) the Goku-arrival site alone as Gohan: Krillin flew in with the group (1)
+load menu.ss
+p2 off
+preset +4 +360 +21 +22
+maptest 54
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0603
+poke32 0x0203FD54 0x01C801A0
+poke32 0x0203FD08 5
+frames 500
+entrec 0x082E94B4
+shot n3_arrival
+echo == (4) talking to old Hercule: "Who are you?" (Gohan), his laugh
+findent PL 0x08025604
+poke32 PL+0x158 0xB800
+poke32 PL+0x15C 0x1BC00
+frames 30
+key 0x10 6
+frames 10
+key 1 6
+frames 120
+shot n4_who
+key 1 6
+frames 150
+shot n4_laugh
+key 1 6
+frames 60
+echo == (5) and (6) Trunks' talk: old Hercule faces the speakers (right); his "Psst!" with Ryan's line
+poke32 PL+0x158 0xF000
+poke32 PL+0x15C 0x1C800
+frames 30
+key 0x20 6
+frames 10
+key 1 6
+frames 120
+shot n5_talk
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p3
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p7
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p11
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p15
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p19
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+key 1 6
+frames 110
+shot n6_p23
+frames 200
+shot n6_psst
+key 1 6
+frames 150
+shot n6_psst2
+key 1 6
+frames 150
+shot n6_psst3
+echo == (8) Goku's call to West City, without "Gohan": map 11
+load menu.ss
+p2 off
+preset +12 +27
+maptest 11
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0502
+poke32 0x0203FD54 0x00960090
+poke32 0x0203FD08 5
+frames 100
+key 0x40 4
+key 1 6
+frames 250
+shot n8_goku
+map

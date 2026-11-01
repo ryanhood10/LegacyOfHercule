@@ -9,7 +9,27 @@
 
 ; map 293 trigger 3 (condition: flag 144 set, 145 clear): the androids land at Kame House
 sequence a16_kame_house
-  [0] stock @083e285c                   ; arrival sound
+  [0] script                            ; arrival sound; Piccolo is player 1 for his deal and fight (the fade hands it over)
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        JumpIfFalse F9
+        FadeOut 20
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse F1
+        PushByte 6
+        PushActiveCharIndex
+        PushByte 0
+        PushByte 0
+        Step CoopCall
+      F1:
+        SetActiveCharacter 1
+        FadeFromWhite 20
+      F9:
+        PlayAudio 50
+        END
   [1] stock @083e2864                   ; 17: can Goku come out and play?
   [2] stock @083e2896                   ; 17, 18 and 16 fly in
   [3] stock @083e2920                   ; 16: I cannot detect him

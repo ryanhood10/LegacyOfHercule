@@ -13,7 +13,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 
 | piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
 |---|---|---|---|---|---|
-| story (`pp-story`) | 468-475 (cleared at a new game) | 31-32 | 34-35 | - | `.party.pp` 0x40 |
+| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (31 used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAF0, the test win's record `cg_note_win`, after `.party.ssj`): `partyram` is then full |
 | ssj (`pp-ssj`) | 476-477 (none used) | - | 36 (none used) | - | `.party.ssj` 0x10 (used: `ssj_state`, after `.party.bv`) |
 | tny (`pp-tny`) | - | - | 37-38 (both used) | - | `.tny.cap` 0x10 (used, 0x0203EFAC); `.tny.eng`'s old padding (the announcer's walks, the reload's frames: `TnyEng` +0x155..+0x167) |
 | art (`pp-art`) | - | - | - | 169-172 (used: the four portraits) | - |
@@ -83,7 +83,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 462 | Krillin's numbers lifted (`krillin.h` `KRILLIN_LIFT_FLAG`): set at every new game; a save without it gets `krillin_lift` once on load (2026-11-01) | |
 | 463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
-| 468-479 | free (cleared at a new game) | |
+| 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first "Training completed!" (`wait_chamber`); 469-475 free |
+| 476-479 | free (476-477 the ssj piece's, 478-479 the map piece's: the allocation table above) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
 | 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
@@ -198,6 +199,7 @@ finds row 4 first).
 | 122 | Super Android 13's dialogue portrait (Android 16's made blue, white-haired) | Makefile `S13_PORTRAIT`, `--extra-portrait`; dialogue `text 122 "SUPER 13: ..."` |
 | 123 | Super 13's allocation (base Android 13's portrait), unused | |
 | 124+ | 124-125 allocated to Super Saiyan 2 Gohan | |
+| 250 | pseudo id, no portrait of its own: player 1's own character's portrait, never the lead's (`companion.c` `PLAYER1_PORTRAIT`; the story piece, 2026-11-01) | `data/story/player_lines.json` (`fmt 250 "%s: ..."`) |
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
 | 128-139 | art-new's allocation (tournament), unused | |
 | 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
@@ -257,12 +259,13 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 19 | allocated: post-game chapter | |
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21 | Players: the 1 / 2 players answer (`players.c`) | every game start |
-| 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55) |
+| 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55; Krillin's, 76), `ch9_gero` (Krillin, 16) |
+| 31 | P2Actor (`companion.c` `p2_actor_call`, the story piece): player 2's entity handed to a scene actor (op 0 stands?, 1 / 2 x / y, 3 remove) | `ch1_opening.json` (old Hercule: the knock-out, Gohan's death) |
 | 23 | Director (op): op 0 the director's whole flow (pushes 1 when the engine took over, 0 when it cannot start now); op 1 pushes 1 while a tournament runs (`tny_engine.c`) | the waiting room's director (`papaya.lscript`) |
 | 24-27 | the tournament engine, free | |
 | 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
 | 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
-| 31+ | free | |
+| 32+ | free (32 the story piece's) | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -376,6 +379,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FA54 | 0x8 | `.party.cp` companion state (`companion.c`) |
 | 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
 | 0x0203FAE0 | 0x10 | `.party.ssj` `ssj_state` (`ssj.c`, magic 0x53534A48 "HJSS": +4 player 2's last slot, the last transformed slot; +6 transforms; +8 reverts; +0xA hand-offs; +0xC EP drained, +0xE of it player 2's); after `.party.xp` 0x0203FA5C (0x44) and `.party.bv` 0x0203FAA0 (0x40) |
+| 0x0203FAF0 | 0x10 | `.party.pp` the test win's record (`cellgames.c` `cg_note_win`: magic "JRWN", enemies standing, stat, two positions; tests `find` it) |
 | 0x0203FAF0-0x0203FB00 | 0x10 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |

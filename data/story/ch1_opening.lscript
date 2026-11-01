@@ -58,6 +58,15 @@ sequence ch1_future_end
   stockseq @083b7adc 4                   ; "Present day Earth...", Gohan's chapter begins
 end
 
+; map 0 record 0 (Future Gohan) talk: the knock-out, then Hercule's protest and Gohan's answer (Ryan, 2026-11-01)
+; before Gohan's "Sorry about that, Trunks." (stock entry 15)
+sequence ch1_knockout
+  stockseq @083b725c 0 14                ; the melee / ki lessons, "Let's go get 'em!", the knock-out
+  text 126 "#HERCULE: What are you doing?!"
+  text 57 "#GOHAN: It's not safe out there, Hercule!  You stay here and watch after Trunks."
+  stockseq @083b725c 15 20               ; "Sorry about that, Trunks", Gohan flies off, Trunks wakes
+end
+
 ; ---- present day: Krillin visits ------------------------------------------------------------------
 
 ; map 19 (Gohan's room, zone 2 area 22) trigger 0 condition: math time, before Krillin's visit
@@ -121,6 +130,12 @@ sequence ch1_spirit
         SetPlayerVisible 0
         WalkToPosition 0, 96, 176
         SetEntityFacing 0, 1
+        CoopCall 22, 1, 0, 0                  ; nobody plays Gohan (alone as Krillin): he walks up beside him (sprite 53)
+        JumpIfFalse G1
+        SpawnCharacterEntity 53, 128, 260
+        WalkToPosition 53, 128, 176
+        SetEntityFacing 53, 1
+      G1:
         PanCameraToPosition 0, 0, 2
         WaitFrames 40
         PlayAudio 50
@@ -135,7 +150,11 @@ sequence ch1_spirit
   text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
   text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
   stock @083b958c                        ; boss bar, battle music, control back
-  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
+  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top);
+        CoopCall 22, 2, 53, 0                 ; Gohan's actor steps back to the clearing's edge for the fight
+        JumpIfFalse G1
+        WalkToPosition 53, 168, 240
+      G1:
         SetActiveEntity 0
 end
 
@@ -153,6 +172,11 @@ sequence ch1_spirit_end
         SetStoryFlag 9
         FadeToWhite 120
         WarpToMapWithEntities 2, 3, 0, 96, 176
+        CoopCall 22, 1, 0, 0                  ; Gohan beside him in the real clearing (an actor when nobody plays him)
+        JumpIfFalse G1
+        SpawnCharacterEntity 53, 128, 176
+        SetEntityFacing 53, 2
+      G1:
         WhiteFadeOut 120
         PlayAudio 50
   text 0 "@^The two figures melted away into the mist..."
@@ -161,6 +185,11 @@ sequence ch1_spirit_end
   text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
   text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
   script
+        CoopCall 22, 2, 53, 0                 ; his actor runs on ahead, west to the forest and the cave
+        JumpIfFalse G1
+        WalkToPosition 53, 0, 176
+        DespawnEntity 53
+      G1:
         SetPlayerVisible 1
 end
 
@@ -186,6 +215,10 @@ sequence ch1_frieza_landing
         JumpIfFalse G1
         SpawnCharacterEntity 55, 248, 200
       G1:
+        CoopCall 22, 1, 6, 0                  ; nobody plays Krillin (alone as Gohan): his stock walk-in (76)
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 248, 200
+      K1:
         BeginCommandBatch
         WalkToPosition 137, 152, 112
         SetEntityFacing 137, 1
@@ -206,6 +239,12 @@ sequence ch1_frieza_landing
         SetEntityFacing 55, 1
         SetEntityAnimation 55, 4
       G2:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K2
+        WalkToPosition 76, 216, 112
+        SetEntityFacing 76, 1
+        SetEntityAnimation 76, 4
+      K2:
         CommitCommandBatch
         BeginCommandBatch
         WalkToPosition 23, 224, 120
@@ -333,6 +372,11 @@ sequence ch1_frieza_landing
         SpawnCharacterEntity 55, 208, 112
         SetEntityFacing 55, 0
       G1:
+        CoopCall 22, 1, 6, 0                  ; Krillin with the others when nobody plays him (his stock spot)
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 208, 112
+        SetEntityFacing 76, 0
+      K1:
         SetEntityFacing 103, 0
         WaitFrames 15
         WaitFrames 10
@@ -354,6 +398,10 @@ sequence ch1_frieza_landing
         JumpIfFalse G2
         SetEntityFollow 55, 128
       G2:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K2
+        SetEntityFollow 76, 128
+      K2:
         PanCameraToPosition 8, 96, 2
         FlyToPosition 128, 88, 200
         FlyToPosition 128, 136, 184
@@ -390,6 +438,10 @@ sequence ch1_frieza_landing
         JumpIfFalse G1
         DespawnEntity 55
       G1:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        DespawnEntity 76
+      K1:
         SetActiveEntity 0
         ReloadMap
         SetPlayerVisible 1
@@ -402,8 +454,45 @@ sequence ch1_trunks_talk
   stockseq @083bfddc 0 77                ; the whole stock conversation up to Trunks' secret
   script                                 ; old Hercule comes out from the crater's rim to Trunks
         WalkToPosition 158, 552, 272
+        SetEntityFacing 158, 3
         SetEntityFollow 158, 128
-  text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bThat Frieza fellow isn't coming back, is he?"
+  text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bTrunks!  You didn't say we would be runnin' into guys like that on this trip!\x0bThat Frieza fella isn't coming back, is he?"
   text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
   stockseq @083bfddc 78                  ; everyone gathers, the warning retold, home
+end
+
+; map 54 (zone 3 area 6): old Hercule beside Trunks, talked to (Ryan, 2026-11-01): player 1's character asks, he
+; laughs it off (nothing may reveal him). Krillin's own portrait when player 1 is Krillin, else the lead's box.
+sequence ch1_old_hercule_talk
+  script                                 ; player 1 Krillin -> 2, else 1
+        PlayAudio 50
+        PushActiveCharIndex
+        PushByte 6
+        CmpEq
+        JumpIfFalse L1
+        PushByte 2
+        END
+      L1:
+        PushByte 1
+        END
+  fmt 1 "%s: Who are you?" -> 3
+        PushActiveCharNameUpper
+        END
+  text 73 "KRILLIN: Who are you?"
+  text 126 "OLD HERCULE: Ha ha ha!  Oh, don't worry, kid, you'll find out!"
+end
+
+; maps 11 / 12 (zone 2 areas 5 / 6) trigger 2 / 0: Goku's call to West City, without "Gohan" (Krillin may be player 1)
+sequence ch1_goku_west_city_a5
+  stock @083b8fa4                        ; Goku walks up
+  text 63 "GOKU: Alright, it's about time to fly over to West City and meet up with Piccolo."
+  stock @083b9032                        ; flags, the world map
+  stock @083b9056                        ; Journal Updated!
+end
+
+sequence ch1_goku_west_city_a6
+  stock @083b9258                        ; Goku walks up
+  text 63 "GOKU: Alright, it's about time to fly over to West City and meet up with Piccolo."
+  stock @083b92dc                        ; flags, the world map
+  stock @083b9300                        ; Journal Updated!
 end

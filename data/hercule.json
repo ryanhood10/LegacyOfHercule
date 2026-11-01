@@ -243,6 +243,7 @@
     "data/story/cell_games.json",
     "data/story/arctic_route.json",
     "data/story/papaya_route.json",
-    "data/story/postgame.json"
+    "data/story/postgame.json",
+    "data/story/player_lines.json"
   ]
 }

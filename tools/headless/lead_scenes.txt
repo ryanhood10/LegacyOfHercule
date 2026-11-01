@@ -1,0 +1,132 @@
+# The story's lead in the other chapters (docs/perfect-pass.md 3.1, docs/story.md 0 "The story's lead in every scene"):
+# the forest spirit alone as Krillin (Gohan's actor, sprite 53), the lab basement alone as Krillin (Trunks' actor 128, no
+# Krillin actor beside the player), and the scenes that need their lead as player 1 (the fade hands it over): the
+# Lookout's first visit and the island (Piccolo, 01), Gingertown (Piccolo, 01), Semi-Perfect Cell (Vegeta, 02). Actor
+# records are read from the sprite table (*0x0800959C + (id - 7) * 4). From a debug-menu savestate (--out its folder).
+echo == the forest spirit alone as Krillin: Gohan's actor walks up (1), Krillin's none (0)
+p2 off
+preset +4 +360
+maptest 7
+frames 100
+deref TBL 0x0800959C
+deref GO TBL+0xB8
+deref TR TBL+0x1E4
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0802
+poke32 0x0203FD54 0x00DC0060
+poke32 0x0203FD08 5
+frames 400
+entrec GO
+entrec 0x082E94B4
+shot ls_spirit
+mash 8 90
+frames 120
+echo == the fight: Gohan's actor by the edge (1)
+entrec GO
+shot ls_fight
+poke32 0x0203FD08 7
+frames 300
+mash 3 90
+frames 60
+echo == after the spirit: Gohan's actor beside him in the clearing (1)
+entrec GO
+shot ls_after
+mash 12 90
+frames 200
+echo == he ran on ahead (0)
+entrec GO
+echo == the lab basement alone as Krillin: Trunks' actor (1), no Krillin actor (0)
+load menu.ss
+p2 off
+preset +136 +466
+maptest 7
+frames 100
+deref TBL 0x0800959C
+deref TR TBL+0x1E4
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x3D08
+poke32 0x0203FD54 0x01180090
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 300
+entrec TR
+entrec 0x082E94B4
+shot ls_basement
+map
+echo == the larva: Trunks' actor (1), Krillin's (0)
+poke32 0x0203FD0C 0x3E08
+poke32 0x0203FD54 0x00F00080
+poke32 0x0203FD08 5
+frames 300
+entrec TR
+entrec 0x082E94B4
+shot ls_larva
+echo == the larva as Trunks: Trunks only player 1 himself (1: his body is sprite 128 too), Krillin's actor (1)
+load menu.ss
+p2 off
+preset +136 +466
+maptest 7
+frames 100
+deref TBL 0x0800959C
+deref TR TBL+0x1E4
+poke8 0x0203F000 3
+poke32 0x0203FD0C 0x3E08
+poke32 0x0203FD54 0x00F00080
+poke32 0x0203FD08 5
+frames 450
+entrec TR
+entrec 0x082E94B4
+echo == the Lookout's first visit as Gohan: Piccolo is player 1 (01)
+load menu.ss
+p2 off
+maptest 7
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0609
+poke32 0x0203FD54 0x00E00070
+poke32 0x0203FD08 5
+frames 300
+peek8 0x0203F000 1
+shot ls_lookout
+echo == Kame House (the androids land) as Krillin: Piccolo is player 1 (01)
+load menu.ss
+p2 off
+preset +144
+maptest 7
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x010B
+poke32 0x0203FD54 0x01B00280
+poke32 0x0203FD08 5
+frames 300
+peek8 0x0203F000 1
+shot ls_kamehouse
+echo == Gingertown as Hercule: Piccolo is player 1 (01), player 2 none
+load menu.ss
+p2 off
+maptest 7
+frames 100
+poke8 0x0203F000 5
+poke32 0x0203FD0C 0x110A
+poke32 0x0203FD54 0x01300100
+poke32 0x0203FD08 5
+frames 300
+peek8 0x0203F000 1
+shot ls_gingertown
+echo == Semi-Perfect Cell, co-op, Trunks player 1 and Vegeta player 2: Vegeta player 1 (02), Trunks player 2 (03)
+load menu.ss
+p2 0
+maptest 7
+frames 100
+poke8 0x0203F000 3
+poke8 0x0203FF84 2
+poke32 0x0203FD0C 0x040C
+poke32 0x0203FD54 0x01A000D0
+poke32 0x0203FD08 5
+frames 300
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+shot ls_semiperfect

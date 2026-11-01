@@ -46,6 +46,22 @@ u8 *cg_test_slot(void) {
     return cg_state._pad;
 }
 
+// The test win's record (the Cell Juniors' check, docs/testing.md "Cell Juniors"): at every COOP_CMD_WIN_STAT win,
+// how many enemies stood and where the first two were (map px). Tests find it by its magic word ("JRWN").
+typedef struct WinNote {
+    u32 magic;
+    u8 standing, stat, _p[2];
+    s16 xy[2][2];
+} WinNote;
+_Static_assert(sizeof(WinNote) == 0x10, "WinNote: .party.pp holds 0x10");
+static WinNote win_note __attribute__((section(".party.pp"), used));
+void cg_note_win(int stat, int standing, const s16 xy[2][2]) {
+    win_note.magic = 0x4E57524Au;
+    win_note.stat = (u8)stat;
+    win_note.standing = (u8)standing;
+    for (int i = 0; i < 2; i++) { win_note.xy[i][0] = xy[i][0]; win_note.xy[i][1] = xy[i][1]; }
+}
+
 // CoopCall 16 Beam (sprite, on): a Kamehameha held by the entity showing that sprite, driven from C the way the
 // beam command of script step 137 (NPCFireKamehameha, 0x0801D788 / 0x0801D7DC) drives it, but without the
 // command chain: step 137 and batch commits wait for the entity's commands, so a beam held through the dialogue

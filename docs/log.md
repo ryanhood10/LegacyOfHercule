@@ -4,6 +4,28 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Perfecting pass, story piece (branch `pp-story`, `docs/perfect-pass.md` 3):** Krillin and Android 16 as actors
+  in Gero's computer (whichever nobody plays walks into the generator, rubble and bunker scenes, watches the 19s'
+  fight from the wall, stands for the birds); Gohan's Super Saiyan from the Time Chamber's first "Training
+  completed!" (flag 468, row 2, "Gohan can now transform into a Super Saiyan!"); the six Cell Juniors checked in
+  co-op (all six in the scene, 1 + 1 + 2 + 2 in the fights, no twin on top; the test win now records the enemies
+  standing, `.party.pp`). Tests `ch9_actors.txt`, `gohan_ssj1.txt`, `cell_juniors.txt` (in `regfull.sh`).
+- **Ryan's opening notes (story piece, `docs/perfect-pass.md` 8.1-8.6, 8.8):** Hercule's protest at the knock-out
+  (Ryan's lines), old Hercule walking into the knock-out and Gohan's death as an actor (new CoopCall 31 hands player
+  2's entity to an actor on his spot), Krillin's actor at the landing and the Goku-arrival site when nobody plays
+  him, old Hercule's talk ("Oh, don't worry, kid, you'll find out!"), facing the talk, Ryan's "runnin' into guys
+  like that" line, Goku's West City call without "Gohan". Test `ch1_notes.txt`.
+- **The story's lead in every scene (story piece, perfect-pass 3.1):** every chapter's scenes audited (the table in
+  `docs/story.md` 0): Gohan's actor in the forest spirit, Trunks' in the lab basement (and Krillin no longer doubled
+  there alone), Krillin handing over to Trunks when Krillin stays home; the scenes whose lead's body carries the
+  staging make him player 1 behind a short fade (the Lookout's first visit, Kame House and the island, Gingertown:
+  Piccolo; Semi-Perfect Cell: Vegeta). Test `lead_scenes.txt`.
+- **Player 1's own lines (story piece, notes 8.9-8.11):** speaker 1 shows the lead only while he is in the scene
+  (player 2 or an actor), else player 1's own character; speaker 250 (new pseudo portrait id) is always player 1's;
+  17 stock lines that named or spoke as Gohan now carry player 1's name or drop "Gohan"
+  (`data/story/player_lines.json`): zone 2 area 1 (door, woods), 2/4 (the chest, the armor), 2/6 and 4/91 (the
+  animals), 3/1 (the robots), 3/4 54 57 (Chiaotzu), 4/3 ("Sure!", Piccolo twice, "Who are you?"), 4/43 (Eyes of the
+  Lion, twice), 4/85 4/87 4/97 4/99 (the missing children). Test `player_lines.txt`.
 - **The soft reset no longer crashes a loaded save** (branch `pp-reset`, `docs/perfect-pass.md` 9): A+B+Select+Start
   kept EWRAM, so after a game with player 2 in, `coop.p2` still pointed at his old entity; on the next load
   `p2_sync_combat` re-ran the class init through it and overwrote a queued event's action pointer (the jump to

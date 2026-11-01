@@ -1,0 +1,200 @@
+# Gohan's Super Saiyan from the Time Chamber (docs/story.md 4g / 4h, data/story/wait_chamber): the first
+# "Training completed!" before the Cell Games sets flag 468 and puts Gohan (slot 0) on the teen row 2 (sprite 56,
+# SetCharacterTransformation 0, 56), whose Transformation (ability 12) turns him Super Saiyan (row 5).
+# Two runs: player 1 as Gohan (transforms, fights round 1 transformed: his EXP goes up), and player 2 as Gohan (the row
+# only: player 2's B on a stock Transformation turns player 1's slot, a known engine gap left to the ssj piece).
+# Entry 0x0203F00C: row +8 (0x0203F014), ability index +9, EXP +0x10 (0x0203F01C); flag 468 = FLAGS+0x3A bit 4;
+# a Map Test leaves the transformation gate 0x0300208C at 0 (docs/testing.md "Goku's halo"): the script sets it.
+# waves (0x0203F914) +0x10 round / state / timer / standing. From a debug-menu savestate (--out its folder).
+load menu.ss
+p2 0
+preset +143 +144 +148 +149 +151 +154 +157
+maptest 263
+frames 200
+poke8 0x0203F000 0
+poke8 0x0203FF84 5
+poke32 0x0203FD0C 0x0309
+poke32 0x0203FD54 0x00A00060
+poke32 0x0203FD08 5
+frames 150
+echo == player 1 Gohan: before the chamber: Gohan's row (00), flag 468 (00)
+peek8 0x0203F014 1
+peek8 FLAGS+0x3A 1
+keys 0x40
+frames 20
+keys 0
+key 1 6
+waitmap 15 2 600
+frames 300
+key 1 6
+frames 60
+poke32 0x0203FD0C 11
+poke32 0x0203FD08 14
+frames 5
+poke32 0x0203FD08 13
+frames 260
+shot g1_done
+key 1 6
+frames 150
+shot g1_ssj_caption
+key 1 6
+frames 100
+echo == player 1 Gohan: after "Training completed!": Gohan's row (02), flag 468 (10), the round (0b)
+peek8 0x0203F014 1
+peek8 FLAGS+0x3A 1
+peek8 0x0203F924 1
+poke8 0x0203F015 2
+poke32 0x0300208C 1
+key 2 4
+frames 200
+echo == player 1 Gohan: B on Transformation: Super Saiyan (row 05)
+peek8 0x0203F014 1
+shot g1_ssj
+echo == player 1 Gohan: out of the chamber and back in for round 1, transformed
+poke32 0x0203FD0C 0x020F
+poke32 0x0203FD54 0x00E60134
+poke32 0x0203FD08 5
+frames 120
+keys 0x40
+frames 60
+keys 0
+waitmap 9 3 400
+frames 100
+poke32 0x0203FD0C 0x0309
+poke32 0x0203FD54 0x00A00060
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 20
+keys 0
+key 1 6
+waitmap 15 2 600
+frames 300
+key 1 6
+frames 60
+peek 0x0203F01C 1
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+keys 0x10
+frames 12
+keys 0
+mash 5 10
+keys 0x20
+frames 12
+keys 0
+mash 5 10
+echo == player 1 Gohan: after round 1's fight: his row (05: still Super Saiyan), EXP above the line before (kills), the round's standing enemies
+peek8 0x0203F014 1
+peek 0x0203F01C 1
+peek8 0x0203F924 4
+shot g1_fight
+load menu.ss
+p2 0
+preset +143 +144 +148 +149 +151 +154 +157
+maptest 263
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 0
+poke32 0x0203FD0C 0x0309
+poke32 0x0203FD54 0x00A00060
+poke32 0x0203FD08 5
+frames 150
+echo == player 2 Gohan: before the chamber: Gohan's row (00), flag 468 (00)
+peek8 0x0203F014 1
+peek8 FLAGS+0x3A 1
+keys 0x40
+frames 20
+keys 0
+key 1 6
+waitmap 15 2 600
+frames 300
+key 1 6
+frames 60
+poke32 0x0203FD0C 11
+poke32 0x0203FD08 14
+frames 5
+poke32 0x0203FD08 13
+frames 260
+shot g2_done
+key 1 6
+frames 150
+shot g2_ssj_caption
+key 1 6
+frames 100
+echo == player 2 Gohan: after "Training completed!": Gohan's row (02), flag 468 (10), the round (0b)
+peek8 0x0203F014 1
+peek8 FLAGS+0x3A 1
+peek8 0x0203F924 1
+echo == player 2 Gohan: player 1's Piccolo untouched (row 06)
+peek8 0x0203F030 1
+shot g2_after

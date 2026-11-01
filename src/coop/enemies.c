@@ -456,6 +456,15 @@ static void win_stat_tick(void) {
     }
     if (!hit || !p1_controllable()) { t[1] = 0; return; }
     if (++t[1] < 30) return;          // half a second of real fighting first
+    s16 xy[2][2] = { { 0, 0 }, { 0, 0 } };
+    int standing = 0;                  // every enemy standing at the win, for the test log (cg_note_win)
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (!is_enemy(e) || e->hp <= 0) continue;
+        if (standing < 2) { xy[standing][0] = (s16)(e->x >> 8); xy[standing][1] = (s16)(e->y >> 8); }
+        standing++;
+    }
+    cg_note_win(t[0] - 1, standing, xy);
     t[0] = t[1] = 0;
     t[2] = (u8)((g_Party->active_slot & 0xF) | (coop_solo() << 4) | (coop.p2 ? 0x80 : 0));   // who fought, for the test log
     story_test_finish();

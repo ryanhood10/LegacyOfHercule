@@ -729,6 +729,43 @@ the chapter's party without its scene) and `bossfight.sh <bunker record> 120 4 0
 the Rocket Punch; `a16p` (coop.sym) counts punches (+8) and hits (+10). Boot fresh for each build: a
 state saved after the party switch sometimes left every boss idle.
 
+**Krillin and 16 as actors** (`tools/headless/ch9_actors.txt`, 2026-11-01): four pairings (co-op Krillin / 16,
+co-op 16 / Krillin, alone as Krillin, alone as 16), each Map Testing area 48 (entry 250) with flags 0-191 and 420
+and `COOP_CMD_A16_PARTY`, then a pairing's slots (`poke8 0x0203F000`, `coop.p2_slot` 0x0203FF84). It warps to the
+west generator, the rubble and the bunker and counts the actors with `entrec` (Krillin's NPC set 76 = record
+0x082E94B4, 16's actor sprite 8 = 0x081E07C4; a played Krillin or 16 has other sprites, 161 / 175): the one of the
+two nobody plays stands in each scene (16 alone in the generator scenes, which have no Krillin lines), none after
+each scene, both by the wall during the 19s' fight; the birds count the other one of the two beside player 1, who
+stands in his own character's spot (x 168 Krillin, 196 16). `entrec` reads 0 while some text boxes are up (the
+scene list is swapped out): the birds are counted 100 frames after the map loads. Expected numbers are in each
+`echo` line.
+
+## The story's lead in the other chapters (headless, 2026-11-01)
+
+`tools/headless/lead_scenes.txt`: alone, Map Test 7 then a test warp into each scene's trigger with player 1 poked
+first: the forest spirit as Krillin (Gohan's actor, sprite 53, 1 through the fight and the clearing, 0 after he runs
+on), the lab basement's plans room and larva as Krillin (Trunks' actor 128: 1, Krillin's 76: 0; the lead noted as
+Trunks with flag 466), the larva as Trunks (128 counts player 1's own body: 1; Krillin's actor 1), and the scenes
+that hand their lead player 1: the Lookout's first visit as Gohan, Kame House's landing as Krillin and Gingertown as
+Hercule (each `0x0203F000` = 01), Semi-Perfect Cell in co-op with Trunks player 1 and Vegeta player 2 (02, player 2
+03). Actor records come from the sprite table (`deref TBL 0x0800959C`, entry (id - 7) * 4).
+
+## Ryan's opening notes (headless, 2026-11-01)
+
+`tools/headless/ch1_notes.txt` (`docs/perfect-pass.md` 8; alone, old Hercule the companion: slot 5 on row 24 by
+`poke8 0x0203F0A0 24`): (1) Map Test 0, the training mashed through, flags 0 / 1 and the lead noted as Trunks
+(flag 466), player 1 and the companion poked next to Future Gohan (144, 568), the talk: after "Right!  Cool!"
+the knock-out shows `coop.p2` 0 and one actor on sprite 158 (its record read from the sprite table,
+`deref TBL 0x0800959C`, `deref OH TBL+0x25C`: it is in our blob and moves between builds), then the two new
+lines and "Sorry about that"; (2) Map Test 1 with Trunks warped in: the death scene leaves `coop.p2` 0 and the
+actor beside Trunks; (3) Frieza's landing and the Goku-arrival site alone as Gohan: Krillin's actor (76) 1, none
+after the scene, 0 alone as Krillin; (4) talking to old Hercule from his left (184, 444, facing right); (5) / (6)
+Trunks' whole talk to the "Psst!" lines (shots); (8) map 11 with flags 12 and 27, A at the sign: Goku's line.
+
+`tools/headless/player_lines.txt` (2026-11-01, notes 8.9-8.11): alone as Krillin, Map Tests the armor cave (10),
+West City's arrival (65, the opening's flags), a missing child (126) and Yajirobe (135); shots only: each line
+reads "KRILLIN:" with Krillin's portrait, Yajirobe says "What's up, Krillin?".
+
 ## Hercule's beam pose (headless, 2026-10-19)
 
 ```
@@ -977,6 +1014,25 @@ script saves `cg_pre8.ss` before the final fight; filming the struggle from it: 
 - In a solo-2 fight player 1's pad is ignored, so the title card and the next scene are advanced by player 2's A.
 - Savestates break whenever the chapter data or code changes (the enemies' record copies hold sequence
   addresses): rerun from the menu state.
+
+**The six Cell Juniors** (`tools/headless/cell_juniors.txt`, 2026-11-01): the Cell Games' setup and wins as
+`cell_games.txt` through fight 3, then 45 A presses 120 frames apart reach the scene's last Junior: `entrec
+0x08246D80` (sprite 31) reads 6. Each Junior fight is won by the queue as before; at every such test win
+`cg_note_win` (`cellgames.c`, `.party.pp`) records the enemies standing: the word "JRWN" 0x4E57524A (`find JR
+0x4E57524A`), +4 standing and the queued stat, +8 the first two enemies' x, y. Seen in co-op (2026-11-01): J1 and J2 one
+Junior each (stat 26 at 432, 359, 63 px below the fighter at 432, 296), J3 and J4 two each (the 141 / 142 pair at
+432, 359 and 451, 359-368): 1 + 1 + 2 + 2, no co-op twin on top (solo fights), all six seen in the scene.
+
+## Gohan's Super Saiyan from the Time Chamber (headless, 2026-11-01)
+
+`tools/headless/gohan_ssj1.txt`: Map Test the chamber room (263) with the wait's flags, Gohan player 1 (row 0, kid
+Gohan), through the door, round 1, then `COOP_CMD_WAVE_SKIP` 11 and `COOP_CMD_WAVE_CLEAR`: "Training completed!",
+"Gohan can now transform into a Super Saiyan!", Gohan on row 2 (`0x0203F014`), flag 468 (`FLAGS+0x3A` bit 4). The
+Transformation (ability index 2, B) takes him to row 5 (Super Saiyan teen Gohan, sprite 59); out of the chamber
+and back in for round 1, he fights it transformed (row 5 after, his EXP up from the kills). A Map Test leaves the
+transformation gate 0x0300208C at 0 (`halo_goku.txt`): the script sets it before B. Second run: player 2 as Gohan,
+player 1 Piccolo: Gohan's row 2 and flag 468 the same, Piccolo's row untouched (6). Known gap, not this piece's:
+player 2's B on a stock Transformation turns player 1's slot (Piccolo to row 7), not his own.
 
 ## Post-game on the Lookout (headless, 2026-10-19)
 

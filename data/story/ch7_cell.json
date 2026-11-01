@@ -16,6 +16,7 @@
       "map": {"zone": 12, "area": 4},
       "_": "Semi-Perfect Cell (and his duplicate in co-op), Cell absorbs 18, Perfect Cell knocks Vegeta out",
       "triggers": {"0": {"payload": "seq:ch7_semi_perfect"}},
+      "pre_edits": [{"at": "trigger:0/entry:0", "replace": [["SetPlayerVisible 0", "PushActiveCharIndex\nPushByte 2\nCmpNe\nJumpIfFalse F9\nFadeOut 20\nCoopCall 8, 0, 0, 0\nPushByte 2\nCmpEq\nJumpIfFalse F1\nPushByte 6\nPushActiveCharIndex\nPushByte 0\nPushByte 0\nStep CoopCall\nF1:\nSetActiveCharacter 2\nFadeFromWhite 20\nF9:\nSetPlayerVisible 0"]]}],
       "records": {
         "1": {"action": "seq:ch7_semi_perfect_end"}
       }

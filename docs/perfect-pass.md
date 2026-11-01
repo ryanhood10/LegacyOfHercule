@@ -45,6 +45,9 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 ## 3. Story polish (offered 2026-10-20, now all wanted; each with its test)
 
+**Built 2026-11-01 on `pp-story`** (items 1-4, the scene list in `docs/story.md` 0; tests `lead_scenes.txt`,
+`ch9_actors.txt`, `gohan_ssj1.txt`, `cell_juniors.txt`, `ch1_notes.txt`, `player_lines.txt`).
+
 1. **The story's lead in every scene when someone else plays him.** Done for the Frieza stretch only
    (`src/coop/companion.c`: when nobody plays the lead, an actor with his sprite walks or flies in and speaks his
    speaker-1 lines; `docs/coop-design.md` "The story's lead and companions"). To do: audit every chapter's scenes for

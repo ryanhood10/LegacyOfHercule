@@ -31,20 +31,50 @@
         "0": {
           "payload": "seq:ch1_training"
         }
-      }
+      },
+      "records": {
+        "0": {
+          "talk": "seq:ch1_knockout"
+        }
+      },
+      "_": "the training (difficulty question first); Future Gohan's talk: the knock-out with old Hercule's protest (Ryan, 2026-11-01); old Hercule (player 2) becomes an actor on his spot and walks up for the knock-out (CoopCall 31)",
+      "edits": [
+        {
+          "at": "record:0/talk/entry:14",
+          "replace": [
+            [
+              "WalkToPosition 0, 208, 111",
+              "CoopCall 31, 0, 0, 0\nJumpIfFalse H1\nPushVarint 158\nCoopCall 31, 1, 0, 0\nCoopCall 31, 2, 0, 0\nStep SpawnCharacterEntity\nCoopCall 31, 3, 0, 0\nH1:\nBeginCommandBatch\nWalkToPosition 0, 208, 111\nCoopCall 22, 2, 158, 0\nJumpIfFalse H2\nWalkToPosition 158, 240, 128\nSetEntityFacing 158, 2\nH2:\nCommitCommandBatch"
+            ]
+          ]
+        }
+      ]
     },
     {
       "map": {
         "zone": 1,
         "area": 2
       },
-      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits)",
+      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits); Gohan's death: player 2's old Hercule (the companion alone) becomes an actor on his own spot (CoopCall 31) and walks up beside Trunks (Ryan, 2026-11-01: he stopped, then popped)",
       "triggers": {
         "0": {
           "payload": "seq:ch1_future_end"
         }
       },
       "edits": [
+        {
+          "at": "trigger:0/entry:0",
+          "replace": [
+            [
+              "SetPlayerVisible 0",
+              "SetPlayerVisible 0\nCoopCall 31, 0, 0, 0\nJumpIfFalse H1\nPushVarint 158\nCoopCall 31, 1, 0, 0\nCoopCall 31, 2, 0, 0\nStep SpawnCharacterEntity\nCoopCall 31, 3, 0, 0\nH1:"
+            ],
+            [
+              "WalkToPosition 0, 208, 360",
+              "WalkToPosition 0, 208, 360\nCoopCall 22, 2, 158, 0\nJumpIfFalse H2\nWalkToPosition 158, 240, 376\nSetEntityFacing 158, 2\nH2:"
+            ]
+          ]
+        },
         {
           "at": "trigger:0/entry:9",
           "replace": [
@@ -107,14 +137,14 @@
         "zone": 3,
         "area": 6
       },
-      "_": "waiting for Goku: no Krillin NPC; old Hercule (sprite 158) travels with Trunks: behind him at first, beside him with the group, hanging back at the crater's rim until his \"Psst!\", back with the group, gone with him (flag 26); when nobody plays Gohan his actor (sprite 55) flies in with the group, walks up to Trunks and stands with the others (CoopCall 22 guards)",
+      "_": "waiting for Goku: no Krillin NPC; old Hercule (sprite 158) travels with Trunks: behind him at first, beside him with the group, hanging back at the crater's rim until his \"Psst!\", back with the group, gone with him (flag 26); when nobody plays Gohan his actor (sprite 55) flies in with the group, walks up to Trunks and stands with the others (CoopCall 22 guards); Krillin's actor (76, his stock flight and spot) when nobody plays him; old Hercule faces the talk (right) and answers when talked to (Ryan, 2026-11-01)",
       "pre_edits": [
         {
           "at": "record:6/talk/entry:0",
           "replace": [
             [
               "SetPlayerVisible 0",
-              "SetPlayerVisible 0\nCoopCall 22, 2, 55, 0\nJumpIfFalse G1\nWalkToPosition 55, 192, 488\nWalkToPosition 55, 192, 472\nSetEntityFollow 55, 128\nG1:"
+              "SetPlayerVisible 0\nCoopCall 22, 2, 55, 0\nJumpIfFalse G1\nWalkToPosition 55, 192, 488\nWalkToPosition 55, 192, 472\nSetEntityFollow 55, 128\nG1:\nSetEntityFacing 158, 3"
             ]
           ]
         },
@@ -123,11 +153,11 @@
           "replace": [
             [
               "SetEntityFacing 76, 1",
-              ""
+              "CoopCall 22, 2, 76, 0\nJumpIfFalse K1\nSetEntityFacing 76, 1\nK1:"
             ],
             [
               "SetEntityAnimation 76, 4",
-              ""
+              "CoopCall 22, 2, 76, 0\nJumpIfFalse K2\nSetEntityAnimation 76, 4\nK2:"
             ],
             [
               "WalkToPosition 0, 376, 456",
@@ -135,7 +165,7 @@
             ],
             [
               "SetEntityAnimation 0, 4",
-              "SetEntityAnimation 0, 4\nCoopCall 22, 2, 55, 0\nJumpIfFalse G2\nSetEntityAnimation 55, 4\nG2:"
+              "SetEntityAnimation 0, 4\nCoopCall 22, 2, 55, 0\nJumpIfFalse G2\nSetEntityAnimation 55, 4\nG2:\nSetEntityFacing 158, 3"
             ],
             [
               "WalkToPosition 128, 352, 440",
@@ -165,7 +195,7 @@
           "replace": [
             [
               "SetEntityAnimation 76, 4",
-              ""
+              "CoopCall 22, 2, 76, 0\nJumpIfFalse K1\nSetEntityAnimation 76, 4\nK1:"
             ]
           ]
         },
@@ -186,6 +216,15 @@
               "FlyToPosition 62, 568, 256\nWalkToPosition 158, 456, 344\nWalkToPosition 158, 496, 256\nSetEntityFacing 158, 3"
             ]
           ]
+        },
+        {
+          "at": "record:6/talk/entry:80",
+          "replace": [
+            [
+              "RestoreMap",
+              "RestoreMap\nSetEntityFacing 158, 3"
+            ]
+          ]
         }
       ],
       "records": {
@@ -196,11 +235,11 @@
       },
       "add_records": [
         {
-          "kind": "actor",
+          "like": 6,
           "sprite": 158,
           "x": 196,
           "y": 444,
-          "facing": 0,
+          "talk": "seq:ch1_old_hercule_talk",
           "condition": "noflag:26"
         }
       ],
@@ -210,15 +249,39 @@
           "replace": [
             [
               "SetEntityPositionInstant 76, 592, 520",
-              "CoopCall 22, 1, 0, 0\nJumpIfFalse G1\nSpawnCharacterEntity 55, 592, 520\nG1:"
+              "CoopCall 22, 1, 0, 0\nJumpIfFalse G1\nSpawnCharacterEntity 55, 592, 520\nG1:\nCoopCall 22, 1, 6, 0\nJumpIfFalse K1\nSpawnCharacterEntity 76, 592, 520\nK1:"
             ],
             [
               "FlyToPosition 76, 456, 488",
-              "CoopCall 22, 2, 55, 0\nJumpIfFalse G2\nFlyToPosition 55, 456, 488\nSetEntityFacing 55, 2\nG2:"
+              "CoopCall 22, 2, 55, 0\nJumpIfFalse G2\nFlyToPosition 55, 456, 488\nSetEntityFacing 55, 2\nG2:\nCoopCall 22, 2, 76, 0\nJumpIfFalse K2\nFlyToPosition 76, 456, 488\nK2:"
             ]
           ]
         }
       ]
+    },
+    {
+      "map": {
+        "zone": 2,
+        "area": 5
+      },
+      "_": "Goku's call to West City without \"Gohan\" (Ryan, 2026-11-01: Krillin may be player 1)",
+      "triggers": {
+        "2": {
+          "payload": "seq:ch1_goku_west_city_a5"
+        }
+      }
+    },
+    {
+      "map": {
+        "zone": 2,
+        "area": 6
+      },
+      "_": "the same call on the other map",
+      "triggers": {
+        "0": {
+          "payload": "seq:ch1_goku_west_city_a6"
+        }
+      }
     }
   ]
 }
