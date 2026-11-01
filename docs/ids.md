@@ -5,6 +5,21 @@ ranges here and update this page in the same commit.** Before parallel sessions 
 its own range of every kind (`docs/howto.md` "Work in parallel sessions"). Last checked against
 the code on 2026-10-19 (main e45c765).
 
+## Allocations for the perfecting pass (2026-11-01, `docs/perfect-pass.md` 7)
+
+Each piece takes numbers only from its own row and says in its report if it needs more. RAM: a story piece takes a
+`.party.<name>` section in `partyram` (at most 0x40), a tournament piece a `.tny.<name>` section in `tourneyram`
+(at most 0x10; about 0x50 left). Nobody adds to `coop2`.
+
+| piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
+|---|---|---|---|---|---|
+| story (`pp-story`) | 468-475 (cleared at a new game) | 31-32 | 34-35 | - | `.party.pp` 0x40 |
+| ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
+| tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
+| art (`pp-art`) | - | - | - | 169-172 | - |
+| combo (`pp-combo`) | - | - | 39 | - | in `comboram`'s free 0xB8 |
+| map (`pp-map`) | 478-479 | - | - | - | - |
+
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
 The tournament team (docs/tournament.md "The team") takes numbers only from its own row. Cross-piece calls go through

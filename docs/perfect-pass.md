@@ -109,3 +109,18 @@ The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"):
 4. Section 5 in branches by a small team (art: 24.2, 24.3, the copies; engine: 24.1, 24.4, 24.5, 24.7, the
    bystanders, the beams; decoding: 24.6), merged and regressed (`regfull.sh`).
 5. Then the Buu campaign's plan (`docs/story-buu-rom.md`).
+
+## 7. The team (2026-11-01, Ryan: "split off into a TEAM ... get these developments done")
+
+Six agents, each in its own worktree `F:/MeltyCreations/log2-<piece>` on branch `pp-<piece>`, building into
+`build/pp-<piece>`; numbers from `docs/ids.md` "Allocations for the perfecting pass". The lead (the main session)
+merges each branch, rebuilds and runs `regfull.sh`. Nobody touches the combos' step tables or tuning.
+
+| piece | owns | done when |
+|---|---|---|
+| story | section 3: `companion.c`, `data/story/*` scene edits, the chamber's end (`waves.c` / `wait_chamber`), the Juniors' check | the lead walks into every scene in both pairings; Krillin and 16 in the Gero scenes; Gohan transforms after the chamber; the Juniors checked |
+| ssj | section 4: `ssj.c`, row 22's bytes, the aura and sound, ability 18's icons | transform, drain, revert at 0 EP and by the ability, as player 1 and 2, a save and reload |
+| tny | 24.1 caption, 24.4 the announcer's walk, 24.5 the turn change, 24.7 walking speed | each has its test in `regfull.sh` |
+| art | 24.2 portraits 169-172, 24.3 Yakon's lying pose | the faces in `tny_talk.txt`; the lying sheet |
+| combo | the copies' facing, 16 / Super 13 holding during a combo, the kits' beams in their colours | the Cell film, a Rumble with 16, `tny_moves.txt` filmed |
+| map | 24.6 Papaya Island's world-map landmark | the landmark in a world-map flight |
