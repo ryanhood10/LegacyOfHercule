@@ -65,3 +65,9 @@ the level cap lifts and how growth flattens; the Time Chamber as more than a gri
 exhibits and the fusion dance look worth it, the stat points, equipment, money and Scouter do not); the world map (one
 Earth with new landings, the Other World by the Instant Transmission circle, rather than a second world map); what to
 cut (ch6's seven dungeons is the long part).
+
+## Ryan's ideas for the Buu phase (noted, not planned)
+
+- 2026-11-01: after the Peace Times the sequel opens from the villains' side. The first chapters are played as the
+  villains only, or as specific villains: Buu, Dabura, Babidi, Spopovich, Yamu and others. Chapters with the heroes come
+  later, leading down to their final face-offs. To take up when the Buu planning starts; nothing is built for it now.
