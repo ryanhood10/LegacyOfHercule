@@ -181,4 +181,7 @@ punctuation only); owner in brackets.
   meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
 - **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows
   on him (90); both are older than the colour work (the combo piece's film, `build/pp-combo/films/kits/`).
+- **After loading a save, the "How many players?" question shows on a black screen with no text box** (the headless runner;
+  a power cycle too, so older than the reset fix; the tournament test notes mention the black screen). To check in
+  real mGBA: Ryan has not reported it.
 - **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
