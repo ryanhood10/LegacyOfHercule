@@ -2,6 +2,12 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-01
+
+- **The Buu campaign decided as chapters inside our ROM** (Ryan; no second ROM, no save conversion), its stock facts
+  researched into `docs/story-buu-rom.md` (the twelve chapters, levels to 200, the systems, Hercule's role). Not
+  planned: Ryan wants the LoG2 half perfected first.
+
 ## 2026-10-31
 
 - **Docs pass:** the engine facts found for the combos (hits, the command modal, projectiles, the beam's frame

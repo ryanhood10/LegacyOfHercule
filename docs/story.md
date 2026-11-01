@@ -681,7 +681,7 @@ a game over) and a difficulty chosen once at a new game (Easy / Normal / Hard). 
 shop, a city-defence mission. No player-count setting: one player is playing without the second controller
 (built 2026-10-20, `docs/coop-design.md` "One player").
 
-## 6. Buu's Fury (phase 2, separate ROM)
+## 6. Buu's Fury (phase 2; decided 2026-11-01: chapters inside our ROM, not a separate ROM; facts in `docs/story-buu-rom.md`)
 
 - The aura from the Cell Games is real; when Goku needs a fusion partner against Buu, Hercule is
   the one there: a new row and sprite for the fused form in the Buu ROM. Vegito stays for Janemba
