@@ -1,0 +1,258 @@
+{
+  "_": "Player 1's lines that named or spoke as Gohan in places another character can play (Ryan's notes, docs/perfect-pass.md 8.9-8.11, 2026-11-01): his own name in capitals and his own portrait (speaker 250, companion.c), or a line without Gohan's name. No sources: in-place edits of stock entries.",
+  "sources": [],
+  "maps": [
+    {
+      "map": {
+        "zone": 2,
+        "area": 1
+      },
+      "_": "Goku's house door; the woods",
+      "edits": [
+        {
+          "at": "trigger:1/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083b8900 \"GOHAN: That's weird... The door is locked.\"",
+              "[1] fmt 250 \"%s: That's weird...  The door is locked.\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        },
+        {
+          "at": "trigger:7/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083b8944 \"GOHAN: This isn't a good time to go exploring in the woods.\"",
+              "[1] fmt 250 \"%s: This isn't a good time to go exploring in the woods.\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 2,
+        "area": 4
+      },
+      "_": "the armor chest; the cave's way out",
+      "edits": [
+        {
+          "at": "trigger:0/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083b8db4 \"#GOHAN: Alright!\"",
+              "[1] fmt 250 \"#%s: Alright!\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        },
+        {
+          "at": "trigger:1/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083b8e30 \"#GOHAN: I should get my armor out of the chest before leaving...\"",
+              "[1] fmt 250 \"#%s: I should get the armor out of the chest before leaving...\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 2,
+        "area": 6
+      },
+      "_": "the wilderness animals (shared with zone 4 area 91)",
+      "edits": [
+        {
+          "at": "trigger:3/entry:1",
+          "replace": [
+            [
+              "[1] textz 1 @083b9090 \"GOHAN:  There are still animals in the wilderness that were transformed into evil beings when Garlic Jr. released his Black Water Mist across the world.\\x0bThe Sacred Water that we used to reverse the effects of the mist didn't reach these poor creatures.\\x0bSince they're more powerful and vicious than the other animals, I should get a good workout training against them - and protect the good animals at the same time!\"",
+              "[1] fmt 250 \"%s:  There are still animals in the wilderness that were transformed into evil beings when Garlic Jr. released his Black Water Mist across the world.\\x0bThe Sacred Water that we used to reverse the effects of the mist didn't reach these poor creatures.\\x0bSince they're more powerful and vicious than the other animals, I should get a good workout training against them - and protect the good animals at the same time!\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 3,
+        "area": 1
+      },
+      "_": "the robots",
+      "edits": [
+        {
+          "at": "trigger:1/entry:1",
+          "replace": [
+            [
+              "[1] textz 1 @083bd680 \"GOHAN: That's strange...  Those robots looked like part of the old Red Ribbon Army my dad told me about...\"",
+              "[1] fmt 250 \"%s: That's strange...  Those robots looked like part of the old Red Ribbon Army Goku fought years ago...\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 3,
+        "area": 4
+      },
+      "_": "Chiaotzu (maps 52, 54, 57)",
+      "edits": [
+        {
+          "at": "record:6/talk/entry:1",
+          "replace": [
+            [
+              "[1] text 42 @083c0590 \"CHIAOTZU: I'm scared!  Aren't you afraid, Gohan?\"",
+              "[1] fmt 42 \"CHIAOTZU: I'm scared!  Aren't you afraid, %s?\"\nPushActiveCharName\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 3
+      },
+      "_": "West City, Goku's arrival; Piccolo leaves West City; Piccolo in West City; Hercule in West City",
+      "edits": [
+        {
+          "at": "trigger:1/entry:2",
+          "replace": [
+            [
+              "[2] text 1 @083c27fc \"#GOHAN: Sure!\"",
+              "[2] fmt 250 \"#%s: Sure!\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        },
+        {
+          "at": "trigger:3/entry:1",
+          "replace": [
+            [
+              "[1] textz 3 @083c30cc \"PICCOLO: Well Gohan, I think it's time to get out of here and start our real training.\\x0bGoku's waiting for us back home.\"",
+              "[1] text 3 \"PICCOLO: Well, I think it's time to get out of here and start our real training.\\x0bGoku's waiting for us back home.\""
+            ]
+          ]
+        },
+        {
+          "at": "record:2/talk/entry:1",
+          "replace": [
+            [
+              "[1] textz 90 @083c31b0 \"PICCOLO: How's your training going, Gohan?\\x0bYou know, sometimes you can't rely on just yourself.\\x0bYou have to set pride aside, and let someone else take care of things. \"",
+              "[1] text 90 \"PICCOLO: How's your training going?\\x0bYou know, sometimes you can't rely on just yourself.\\x0bYou have to set pride aside, and let someone else take care of things. \""
+            ]
+          ]
+        },
+        {
+          "at": "record:0/talk/entry:3",
+          "replace": [
+            [
+              "[3] text 1 @083c3474 \"GOHAN: Who are you?\"",
+              "[3] fmt 250 \"%s: Who are you?\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 43
+      },
+      "_": "the music shop; the music shop's clerk",
+      "edits": [
+        {
+          "at": "trigger:0/entry:3",
+          "replace": [
+            [
+              "[3] text 1 @083c7da0 \"GOHAN: I'm looking for \\\"Eyes of the Lion\\\" by Silver Spider.\"",
+              "[3] fmt 250 \"%s: I'm looking for \\\"Eyes of the Lion\\\" by Silver Spider.\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        },
+        {
+          "at": "record:0/talk/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083c80b4 \"GOHAN: I'm looking for \\\"Eyes of the Lion\\\" by Silver Spider.\"",
+              "[1] fmt 250 \"%s: I'm looking for \\\"Eyes of the Lion\\\" by Silver Spider.\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 85
+      },
+      "_": "a missing child",
+      "edits": [
+        {
+          "at": "record:0/talk/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083caaee \"GOHAN: Are you okay?\"",
+              "[1] fmt 250 \"%s: Are you okay?\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 87
+      },
+      "_": "a missing child",
+      "edits": [
+        {
+          "at": "record:0/talk/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083cac02 \"GOHAN: You alright?\"",
+              "[1] fmt 250 \"%s: You alright?\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 97
+      },
+      "_": "a missing child",
+      "edits": [
+        {
+          "at": "record:0/talk/entry:2",
+          "replace": [
+            [
+              "[2] text 1 @083cb0f8 \"GOHAN: No problem!\"",
+              "[2] fmt 250 \"%s: No problem!\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "map": {
+        "zone": 4,
+        "area": 99
+      },
+      "_": "a missing child",
+      "edits": [
+        {
+          "at": "record:0/talk/entry:1",
+          "replace": [
+            [
+              "[1] text 1 @083cb16e \"GOHAN: There you are!\"",
+              "[1] fmt 250 \"%s: There you are!\"\nPushActiveCharNameUpper\nEND"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

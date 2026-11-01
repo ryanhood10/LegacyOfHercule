@@ -1,0 +1,72 @@
+# Player 1's own lines where another character can play (docs/perfect-pass.md 8.9-8.11, data/story/player_lines.json,
+# speaker 250 = player 1's own portrait, companion.c): alone as Krillin (slot 6), each line should read "KRILLIN:" with
+# Krillin's portrait, never Gohan's. Shots only (the runner reads no text): pl_cave, pl_westcity, pl_child, pl_yajirobe,
+# pl_yajirobe2 (Yajirobe's %s), pl_hercule (West City's Hercule). From a debug-menu savestate (--out its folder).
+echo == the cave (zone 2 area 4): "KRILLIN: I should get the armor out of the chest before leaving..."
+p2 off
+maptest 10
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0402
+poke32 0x0203FD54 0x009100E6
+poke32 0x0203FD08 5
+frames 120
+keys 0x10
+frames 40
+keys 0
+frames 60
+shot pl_cave
+echo == West City (zone 4 area 3), Goku's arrival: "KRILLIN: Sure!"
+load menu.ss
+p2 off
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 65
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x0304
+poke32 0x0203FD54 0x04E00160
+poke32 0x0203FD08 5
+frames 120
+keys 0x80
+frames 30
+keys 0
+mash 1 200
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+key 1 6
+frames 150
+shot pl_westcity
+echo == a missing child (zone 4 area 85): "KRILLIN: Are you okay?"
+load menu.ss
+p2 off
+maptest 126
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x5504
+poke32 0x0203FD54 0x01700070
+poke32 0x0203FD08 5
+frames 120
+key 0x20 4
+frames 10
+key 1 6
+frames 150
+shot pl_child
+echo == Yajirobe (zone 4 area 94): "What's up, Krillin?"
+load menu.ss
+p2 off
+maptest 135
+frames 100
+poke8 0x0203F000 6
+poke32 0x0203FD0C 0x5E04
+poke32 0x0203FD54 0x00E80120
+poke32 0x0203FD08 5
+frames 150
+key 0x40 4
+frames 10
+key 1 6
+frames 150
+shot pl_yajirobe

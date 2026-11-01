@@ -51,18 +51,50 @@ ROM_FN(void, Step_SetActiveCharacterNoReset, (s32 *st), 0x0800A681);
 void vm_set_active_hook(s32 *st) { lead_set(st[st[0]]); Step_SetActiveCharacter(st); }
 void vm_set_active_noreset_hook(s32 *st) { lead_set(st[st[0]]); Step_SetActiveCharacterNoReset(st); }
 
-// the lead when someone else plays (and he is in the party), else -1
+static int alone(void);
+
+// Is the lead in the scene: player 2 plays him, or an actor of his stands (the perfecting pass, Ryan 2026-11-01:
+// alone as Krillin, the player's own lines showed Gohan). Actor sprites by party slot (0 = none further).
+static const u8 slot_actor_sprites[9][6] = {
+    { 53, 55, 56, 57, 59, 0 },        // Gohan (not 54, Future Gohan)
+    { 73, 103, 104, 0 },              // Piccolo
+    { 137, 138, 139, 140, 0 },        // Vegeta
+    { 128, 132, 134, 135, 0 },        // Trunks
+    { 60, 61, 62, 176, 177, 0 },      // Goku (and haloed)
+    { 72, 158, 0 },                   // Hercule, old Hercule
+    { 76, 161, 0 },                   // Krillin
+    { 8, 175, 0 },                    // Android 16
+    { 58, 0 },                        // Super Saiyan 2 Gohan
+};
+static int lead_present(int lead) {
+    if (coop.p2_slot == lead && !alone()) return 1;           // player 2 (even while a warp has his entity away)
+    if (lead >= 9) return 0;
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (!e || e == g_PlayerObject || e == coop.p2) continue;
+        for (const u8 *sp = slot_actor_sprites[lead]; *sp; sp++)
+            if (e->sprite_record == Character_GetSpriteRecord(*sp)) return 1;
+    }
+    return 0;
+}
+
+// the lead when someone else plays, he is in the party and he is in the scene, else -1 (then speaker 1 is player 1's
+// own character, as in the stock game: lines like "%s: Hey, what happened to you?" outside his scenes)
 static int other_lead(void) {
     int lead = lead_slot();
-    return lead >= 0 && lead != g_Party->active_slot && (g_Party->chars[lead].flags & 1) ? lead : -1;
+    return lead >= 0 && lead != g_Party->active_slot && (g_Party->chars[lead].flags & 1) && lead_present(lead) ? lead : -1;
 }
 
 // ---- the portrait getter (0x0800BDCC, re-implemented: an entry jump) ----------------------------------
-// id 0 none; 1 the active character's (the lead's when someone else plays); 2-7 party slot id - 2; 8+ the
+// id 0 none; 1 the active character's (the lead's when someone else plays and the lead is in the scene); 250 player 1's
+// own character always; 2-7 party slot id - 2; 8+ the
 // portrait module table (the getter's literal at 0x0800BE10: word 0 the party, word id + 1 a portrait)
 ROM_FN(int, Character_Portrait, (const CharacterEntry *c), 0x08026441);
+#define PLAYER1_PORTRAIT 250   // speaker id: player 1's own character, never the lead (docs/ids.md "Portraits")
 int portrait_get_hook(int id) {
     if (!id) return 0;
+    if (id == PLAYER1_PORTRAIT) return Character_Portrait(&g_Party->chars[g_Party->active_slot]);
     if (id == 1) {
         int lead = other_lead();
         return Character_Portrait(&g_Party->chars[lead >= 0 ? lead : g_Party->active_slot]);

@@ -84,7 +84,9 @@ chapters does).
 | 4 compressed format | u8 speaker, **u32 pointer to the argument script**, the compressed format text inline at +8 (decompiled 0x0800B396; the reference notes had +4 and +8 the other way round) |
 | 5 jump | u8 pad, u32 target |
 
-Speaker = portrait and name box (0 narration, 1 the active character's box, 3 / 90 Piccolo, 26 16,
+Speaker = portrait and name box (0 narration, 1 the active character's box (the story's lead's while he is in the
+scene and someone else plays, `companion.c`), 250 player 1's own character always (ours: his own lines in places
+another character can play, `data/story/player_lines.json`), 3 / 90 Piccolo, 26 16,
 28 17, 29 18, 38 Cell, 44 Cooler, 49 Frieza, 57 Future Gohan, 63 / 66 Goku, 67 Hercule, 73 Krillin,
 80 Roshi, 81 Mayor, 95 Tien, 98 Trunks). The first character picks the box position: `!` top, `#`,
 `@` and `@^` (captions) as the stock lines use them. `\x0b` is a page break; a page holds about 60

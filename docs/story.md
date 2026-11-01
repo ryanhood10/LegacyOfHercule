@@ -133,6 +133,15 @@ nobody else loses their moment.
     runnin' into guys like that on this trip!  That Frieza fella isn't coming back, is he?";
   - Goku's call to West City (maps 11 / 12): "GOKU: Alright, it's about time to fly over to West City and meet up
     with Piccolo." (no "Gohan": Krillin may be player 1).
+  - player 1's own lines (8.9-8.11): the speaker-1 box shows the lead only while he is in the scene, else player 1's
+    own character; the stock lines that named or spoke as Gohan where someone else can play now carry player 1's
+    name and portrait or drop "Gohan" (`data/story/player_lines.json`, every line listed in `docs/perfect-pass.md` 8
+    and the log): Goku's house door and the woods, the armor cave ("I should get the armor"), the wilderness
+    animals, the Red Ribbon robots ("the old Red Ribbon Army Goku fought years ago"), Chiaotzu's "Aren't you afraid,
+    %s?", West City's "Sure!", Piccolo's two lines without "Gohan", "Who are you?" to Hercule, the "Eyes of the
+    Lion" pair, the four missing children. Lines the stock already branches by character (the scientists, Roshi's
+    "Hey Gohan!") and dead ones (the dream, the phone, the nap) are unchanged. Yajirobe's "What's up, %s?" already
+    reads the player's name (`krillin.c` `vm_push_name_hook`): "What's up, Krillin?" in the test.
 - **Triceratops Jungle:** Piccolo's solo stretch with Hercule only as player 2 (level 1 beside
   Piccolo; Gohan and Krillin are locked inside and given back on the way out); Hercule claims the
   credit for the dinosaur peace treaty.

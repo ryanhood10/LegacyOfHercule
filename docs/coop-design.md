@@ -1308,7 +1308,10 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
   464-467, saved with the game; none noted, as in an older save, reads Gohan while he is in the party). Stock
   scenes are written for the lead: their speaker-1 lines (the active character's box) are his. So:
   * **portraits:** the portrait getter (`0x0800BDCC`, re-implemented as `portrait_get_hook`) gives speaker 1 the
-    lead's portrait when someone else plays (alone and in co-op); speakers 2-7 stay party slot id - 2;
+    lead's portrait when someone else plays (alone and in co-op) **and the lead is in the scene** (since 2026-11-01:
+    player 2 plays him, or an actor of one of his sprites stands, `lead_present`); otherwise player 1's own, as in the
+    stock game (Ryan: alone as Krillin, his own lines showed Gohan). Speaker 250 is always player 1's own character
+    (the edited player lines, `data/story/player_lines.json`); speakers 2-7 stay party slot id - 2;
   * **the lead as an actor (Ryan: walk or fly in like the others, never pop in):** when nobody plays the lead,
     our scene scripts stage him as an ordinary actor who walks and flies in with the rest of the cast. The steps
     are guarded by CoopCall 22 (op 1 slot: in the party and played by neither player, player 2 counting while a

@@ -750,6 +750,10 @@ actor beside Trunks; (3) Frieza's landing and the Goku-arrival site alone as Goh
 after the scene, 0 alone as Krillin; (4) talking to old Hercule from his left (184, 444, facing right); (5) / (6)
 Trunks' whole talk to the "Psst!" lines (shots); (8) map 11 with flags 12 and 27, A at the sign: Goku's line.
 
+`tools/headless/player_lines.txt` (2026-11-01, notes 8.9-8.11): alone as Krillin, Map Tests the armor cave (10),
+West City's arrival (65, the opening's flags), a missing child (126) and Yajirobe (135); shots only: each line
+reads "KRILLIN:" with Krillin's portrait, Yajirobe says "What's up, Krillin?".
+
 ## Hercule's beam pose (headless, 2026-10-19)
 
 ```
