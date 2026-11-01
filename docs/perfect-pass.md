@@ -187,4 +187,9 @@ punctuation only); owner in brackets.
 - **After loading a save, the "How many players?" question shows on a black screen with no text box** (the headless runner;
   a power cycle too, so older than the reset fix; the tournament test notes mention the black screen). To check in
   real mGBA: Ryan has not reported it.
+- **Gero's lab door (`ch4_piccolo`)**: Hercule's "Let's negotiate!" and Piccolo's "Hercule.  Get behind me." play even
+  when neither is on screen (one player as someone else); the scene is staged for Piccolo and Hercule together.
+- **Ryan to decide (story piece, 3.1):** in four fights that are the lead's own (the Lookout's first visit, Kame House
+  and the island for Piccolo, Gingertown, Semi-Perfect Cell for Vegeta) the lead is made player 1 behind a short fade,
+  as Vegeta's Android 19 fight already did; the other way would be the lead as an actor watching his own fight.
 - **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
