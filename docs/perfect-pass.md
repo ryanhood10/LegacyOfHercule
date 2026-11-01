@@ -124,3 +124,29 @@ merges each branch, rebuilds and runs `regfull.sh`. Nobody touches the combos' s
 | art | 24.2 portraits 169-172, 24.3 Yakon's lying pose | the faces in `tny_talk.txt`; the lying sheet |
 | combo | the copies' facing, 16 / Super 13 holding during a combo, the kits' beams in their colours | the Cell film, a Rumble with 16, `tny_moves.txt` filmed |
 | map | 24.6 Papaya Island's world-map landmark | the landmark in a world-map flight |
+
+## 8. Ryan's one-player notes (2026-11-01, playing `build/play` alone)
+
+"The beginning of the game is strong." Notes in his order; Ryan's lines are kept word for word (spelling and
+punctuation only); owner in brackets.
+
+1. **The prologue: Future Gohan knocks Trunks out** [story]. After the knock-out and before Gohan's "sorry" line,
+   Hercule reacts: HERCULE: "What are you doing?!" GOHAN: "It's not safe out there Hercule! You stay here and watch
+   after Trunks." Then Gohan's "sorry Trunks" line as it is. (The line is not in the text dump of zone 1 areas 1-2 by
+   a plain search: find where the knock-out plays.)
+2. **The prologue: Gohan's death** [story]. Walking up to the scene with old Hercule following, he stops at the
+   scene's start and pops back next to Trunks. He should walk into the scene with the player (`SetEntityFollow` /
+   the companion's position at the trigger), never pop.
+3. **After Trunks kills Frieza, playing as Gohan** [story]: Krillin is missing from the group that flies over to talk
+   to Trunks (the companion / lead-actor work: Krillin's actor when nobody plays him).
+4. **Talking to old Hercule beside Trunks** [story]: he has no line. Player 1's character asks "Who are you?" and he
+   laughs it off: "Oh, don't worry kid, you'll find out!" (Ryan: "or something like that"; nothing may reveal him).
+5. **Goku's arrival talk** [story]: old Hercule turns towards whoever is speaking (now often his back to the scene).
+6. **Goku and Trunks' talk** [story]: old Hercule's interruption becomes Ryan's line: HERCULE: "Psst!  Trunks!  Is it
+   safe to come out now?" then "Trunks! You didn't say we would be runnin' into guys like that on this trip! That Frieza
+   fella isn't coming back, is he?" (replaces "That Frieza fellow isn't coming back, is he?" in `ch1_trunks_talk`).
+7. **Krillin at level 1 is too weak** [lead]: he cannot kill an animal. Still clearly weaker than Gohan, but slightly
+   stronger and with slightly more health. His **Destructo Disc does not really hit** enemies.
+8. **Goku's "Alright, Gohan, it's about time to fly over to West City and meet up with Piccolo."** [story] (stock,
+   maps 11 / 12, zone 2 areas 5 / 6): drop "Gohan" so it fits Krillin as player 1: "Alright, it's about time to fly
+   over to West City and meet up with Piccolo."
