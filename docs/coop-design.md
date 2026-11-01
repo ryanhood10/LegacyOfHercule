@@ -1325,6 +1325,11 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
     ("The story's lead in every scene"). Gero's computer stages its pair the same way: Krillin (76) or 16 (8),
     whichever nobody plays, in the generator, rubble and bunker scenes (`ch9_gero`, CoopCall 22 op 1 / 2), by the
     wall during the 19s' fight;
+  * **the lead made player 1 (2026-11-01):** where the scene is the lead's own fight and his body carries the staging
+    (the Lookout's first visit, Kame House and the island, Gingertown: Piccolo; Semi-Perfect Cell: Vegeta), the
+    scene's first entry makes him player 1 behind a 20-frame fade; player 2 on him takes player 1's character
+    (`CoopCall 6` from the stack). Krillin staying home at Kame House hands a player 1 Krillin over to Trunks the same
+    way. Player 2 handed to an actor: `CoopCall 31` (old Hercule in the prologue's knock-out and Gohan's death);
   * **old Hercule (alone):** while party slot 5 shows him (row 24, the future prologue) he walks along with player
     1 (player 2 with a follower pad: toward player 1 beyond 28 px, a jump beside him when walled off far behind).
   A companion is no player for the rules: `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him
