@@ -53,6 +53,12 @@ VTABLE_HOOKS = [
     (0x0802408C, 4, "hud_draw_hook"),
     (0x08025604, 9, "player_msg_hook"),     # player message handler: duel hits (duel.c)
     (0x08025604, 16, "p1_take_damage_hook"),# player 1 take-damage: a duel's final blow leaves 1 HP
+    # Super Saiyan transformations for the entity's own party slot, not only the active one (src/coop/ssj.c)
+    (0x08025D9C, 5, "ssj_transform_done"),   # transform (anim 0x23, ability 12) done: stock 0x0801563D
+    (0x08025CE0, 5, "ssj_transform_done"),   # transform (anim 0x25, ability 11) done: the same function
+    (0x080256AC, 5, "ssj_detransform_done"), # detransform (anim 0x24) done: stock 0x080157AF
+    (0x08024C58, 1, "ssj_class_update"),     # the Super Saiyans' class update (drain, revert): stock 0x08017307
+    (0x08024004, 1, "ssj_base_update"),      # the base class update (meter, regeneration; none for a transformed slot)
     # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
     # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
     (0x08023B3C, 13, "status_title_hook"),

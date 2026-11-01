@@ -830,6 +830,33 @@ and transforms back, printing the row and the entity's sprite record (`halo_goku
   on the desert (Map Test 325, warp to (256, 320); Cell's beam interrupts after a few seconds).
 - Control: the same script with `poke8 0x0203F084 19` (Goku's stock rows 19 / 20).
 
+## Super Saiyan Hercule (headless, 2026-11-01)
+
+```
+make BUILD=build/<dir> DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/<dir>/log2-coop.gba --out build/<dir>/hl
+python tools/headless/st_expect.py tools/headless/ssj_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
+
+`tools/headless/st_expect.py` runs a script through `st_test.py` and checks it: each `echo EXPECT <regex>` line must
+be followed by an output line matching the regex (`{symbol}` = its address from the build's `coop.sym`); it prints
+`ok` / `FAIL` per check and a summary, exits 1 on a failure, and `regfull.sh` runs `ssj_hercule.txt` through it (56
+checks, about 3 minutes). The script, in the town (Map Test 7): **A** player 2 Hercule with ability 18 poked in
+(as `hercule_awaken` does): the stock transform state 0x23 on his group 9, row 22 / `ssj_record` / the Super Saiyan
+class / combat bytes +10 with no EP spent; 10 EP in 200 frames from his slot and none from player 1's; the ability
+again turns him back; refused while the party meter is not empty and under 10 EP; at 0 EP he turns back by himself.
+**B** the same as player 1 (active slot 5, a warp rebuilds the entity). **C** player 2 to Goku (Select x3), both
+transform (Goku: stock record 61), save at the pad (both Super Saiyans), power off and on (`reset`), Select Game,
+load, B (two players) and A: player 1 Hercule is still row 22 with the class, draining, and turns back; Goku is
+row 19 (`Party_DetransformOthers`). **D** player 2 to Goku, transform, Select on: Goku's slot turns back (the
+hand-off counter). Words to poke: the ability gate 0x0300208C := 1 before each use (0 on a Map Test), the party
+meter PARTY+8 := 0. `S` = `find S 0x53534A48` (`.party.ssj`, `docs/ids.md`).
+
+- A soft reset (`key 0xF 6`) then loading the save crashed at frame ~5 after the load's A (jump through a null
+  object's vtable from `0x080109AC`) with or without a transformation: the script uses `reset` (power cycle,
+  the cartridge save kept). `ssj2_save.txt` still uses the soft reset (not in `regfull.sh`).
+- `SSJ_TEST=1` builds: player 2's Start uses ability 18 (`input.c`).
+
 ## Frame counts (headless, 2026-10-19)
 
 ```

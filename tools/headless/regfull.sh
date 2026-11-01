@@ -20,6 +20,9 @@ for t in arctic_summit postgame ch9_gero; do
   sed -e 's/^p2 0$/p2 off/' -e '/^p2 [^o]/d' tools/headless/$t.txt > "$OUT/${t}_1p.txt"
   run ${t}_1p "$OUT/${t}_1p.txt"
 done
+# Super Saiyan Hercule (docs/testing.md "Super Saiyan Hercule"): self-checking, st_expect.py prints FAIL on a mismatch
+echo "## ssj_hercule" >> "$LOG"
+python tools/headless/st_expect.py tools/headless/ssj_hercule.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt build/log2-coop.gba --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"

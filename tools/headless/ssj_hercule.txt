@@ -1,0 +1,347 @@
+# Super Saiyan Hercule: the stock Super Saiyans' rules for him, as player 2 and player 1, and a save and reload
+# while transformed (docs/testing.md "Super Saiyan Hercule"; docs/engine.md "Super Saiyan transformation").
+# From the debug-menu state of a DEBUG_MENU=1 build:
+#   python tools/headless/st_test.py tools/headless/ssj_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# The town (Map Test 7, zone 2 area 1): player 1 Piccolo (slot 1), player 2 Hercule (slot 5). Hercule's entry
+# PARTY+0x8C (0x0203F098): ep +4 (0x0203F09C), row +8 (0x0203F0A0: 0x15 base, 0x16 Super Saiyan), ability index
+# +9, list +0x18 (third = 0x0203F0B2: 18 as hercule_awaken puts it). Goku slot 4: ep 0x0203F080, row 0x0203F084
+# (0x13 / 0x14), ability index 0x0203F085 (2 = Transformation B). Before each use: the ability gate word
+# 0x0300208C (0 on a Map Test) to 1 and the party meter PARTY+8 to 0 (the transform fills it and the base
+# class drains it 1 a frame: the stock cool-down). ssj.c's state S ("HJSS"): +4 player 2's last slot, the
+# last transformed slot; +6 transforms; +8 reverts; +0xA hand-offs; +0xC EP drained; +0xE of it player 2's.
+# Run it through st_expect.py: each "echo EXPECT <regex>" checks the next output line ({sym} = coop.sym).
+#   python tools/headless/st_expect.py tools/headless/ssj_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+p2 0
+maptest 7
+frames 300
+find S 0x53534A48
+deref P2 0x0203FF08
+echo --- start: player 2's slot, Hercule's entry, player 2's record, class and combat bytes
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84
+peek 0x0203F098 7
+echo EXPECT \w+: {herc_record}
+peek P2+0x48
+echo EXPECT \w+: 030021e0
+peek P2+0x180
+echo EXPECT \w+: 8064494e
+peek P2+0x160
+echo === A1 player 2 transforms (ability 18 = the stock Transformation B)
+poke8 0x0203F0B2 18
+poke8 0x0203F0A1 2
+poke16 0x0203F09C 120
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 40
+shot sh_00_p2_powerup
+echo --- the stock transform state (anim 0x23) on herc_record's group 9
+echo EXPECT \w+: 03002184
+peek P2+0x18
+peek P2+0x4C
+frames 80
+shot sh_01_p2_powerup
+frames 60
+echo --- row, EP (120, no cost; drained since), Piccolo's EP, record, class, combat bytes, S
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+echo EXPECT 0203f09c: 007[0-7]
+peek16 0x0203F09C
+peek16 0x0203F02C
+echo EXPECT \w+: {ssj_record}
+peek P2+0x48
+echo EXPECT \w+: 030021ec
+peek P2+0x180
+echo --- the Super Saiyan class: combat bytes +10 each (0x4e 0x49 0x64 -> 0x58 0x53 0x6e)
+echo EXPECT \w+: 806e5358
+peek P2+0x160
+peek S 4
+shot sh_02_p2_ssj
+echo === A2 the drain: 200 frames = 10 EP from Hercule, none from player 1
+poke16 0x0203F09C 100
+poke16 0x0203F02C 100
+frames 200
+echo EXPECT 0203f09c: 005[9ab]
+peek16 0x0203F09C
+echo EXPECT 0203f02c: 006[4-9a-f]
+peek16 0x0203F02C
+peek S 4
+echo === A3 the ability again turns him back
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 30
+shot sh_03_p2_detransform
+frames 60
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo EXPECT \w+: {herc_record}
+peek P2+0x48
+echo EXPECT \w+: 030021e0
+peek P2+0x180
+peek S 4
+shot sh_04_p2_back
+echo === A4 refused while the meter runs (the stock cool-down), then at 0 EP he turns back by himself
+poke16 0x0203F09C 100
+poke32 0x0300208C 1
+poke32 PARTY+8 0x200
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+poke16 0x0203F09C 3
+frames 150
+echo EXPECT 0203f09c: 0000
+peek16 0x0203F09C
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo EXPECT \w+: {herc_record}
+peek P2+0x48
+peek S 4
+shot sh_05_p2_ep0
+echo === A5 under 10 EP: not ready
+poke16 0x0203F09C 9
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo === B1 player 1 as Hercule (player 2 takes Piccolo): transform
+poke8 PARTY 5
+frames 10
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x025A0242
+poke32 0x0203FD08 5
+frames 200
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+echo EXPECT \w+: {herc_record}
+peek PL+0x48
+poke16 0x0203F09C 120
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+key 2 4
+frames 40
+shot sh_06_p1_powerup
+frames 160
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+echo EXPECT \w+: {ssj_record}
+peek PL+0x48
+echo EXPECT \w+: 030021ec
+peek PL+0x180
+echo EXPECT \w+: 030021e0
+peek P2+0x180
+peek PL+0x160
+peek S 4
+shot sh_07_p1_ssj
+echo === B2 the drain from player 1's slot only
+poke16 0x0203F09C 100
+poke16 0x0203F02C 100
+frames 200
+echo EXPECT 0203f09c: 005[9ab]
+peek16 0x0203F09C
+echo EXPECT 0203f02c: 006[4-9a-f]
+peek16 0x0203F02C
+echo === B3 the ability again
+poke32 0x0300208C 1
+key 2 4
+frames 100
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo EXPECT \w+: {herc_record}
+peek PL+0x48
+echo === B4 0 EP
+poke16 0x0203F09C 100
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+key 2 4
+frames 200
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+poke16 0x0203F09C 2
+frames 150
+echo EXPECT 0203f09c: 0000
+peek16 0x0203F09C
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo EXPECT \w+: {herc_record}
+peek PL+0x48
+peek S 4
+shot sh_08_p1_ep0
+echo === C1 player 2 on Goku (Select x3: Vegeta, Trunks, Goku), both transform: Hercule (1) and Goku (2)
+p2 4
+frames 4
+p2 0
+frames 20
+p2 4
+frames 4
+p2 0
+frames 20
+p2 4
+frames 4
+p2 0
+frames 30
+echo EXPECT 0203ff84: 04
+peek8 0x0203FF84
+deref P2 0x0203FF08
+poke16 0x0203F09C 140
+poke16 0x0203F080 140
+poke8 0x0203F085 2
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+key 2 4
+frames 200
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo --- Hercule's row, Goku's row, records (Goku's Super Saiyan: stock record 61), S
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+echo EXPECT 0203f084: 14
+peek8 0x0203F084
+echo EXPECT \w+: {ssj_record}
+peek PL+0x48
+echo EXPECT \w+: 082cedd4
+peek P2+0x48
+echo EXPECT \w+: 030021ec
+peek P2+0x180
+peek S 4
+shot sh_09_both_ssj
+echo === C2 save at the town's pad while both are Super Saiyans
+poke16 0x0203F09C 140
+poke16 0x0203F080 140
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+shot sh_10_pad
+key 1 4
+frames 80
+shot sh_11_pad
+key 1 4
+frames 80
+shot sh_12_pad
+key 1 4
+frames 80
+shot sh_13_pad
+key 1 4
+frames 60
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+echo EXPECT 0203f084: 14
+peek8 0x0203F084
+peek PARTY 3
+shot sh_14_saved
+echo === C3 power off and on, Select Game, load (B: two players, then A): player 1 Hercule stays a Super Saiyan, player 2's Goku is turned back
+reset
+frames 400
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 100
+key 1 6
+frames 400
+key 2 6
+frames 200
+key 1 6
+frames 200
+map
+find S 0x53534A48
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo EXPECT 0203f000: \w{6}05
+peek PARTY 1
+peek8 0x0203FF84
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+echo EXPECT 0203f084: 13
+peek8 0x0203F084
+echo EXPECT \w+: {ssj_record}
+peek PL+0x48
+echo EXPECT \w+: 030021ec
+peek PL+0x180
+shot sh_15_loaded
+echo --- the drain goes on after the load
+poke16 0x0203F09C 100
+frames 200
+echo EXPECT 0203f09c: 005[9ab]
+peek16 0x0203F09C
+echo --- and the ability turns him back
+poke32 0x0300208C 1
+key 2 4
+frames 100
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+echo EXPECT \w+: {herc_record}
+peek PL+0x48
+shot sh_16_loaded_back
+echo === D player 2 (Gohan after the load) to Goku with Select x4, transforms, then switches on: Goku's slot turns back (the hand-off)
+p2 4
+frames 4
+p2 0
+frames 20
+p2 4
+frames 4
+p2 0
+frames 20
+p2 4
+frames 4
+p2 0
+frames 20
+p2 4
+frames 4
+p2 0
+frames 20
+frames 20
+echo EXPECT 0203ff84: 04
+peek8 0x0203FF84
+poke16 0x0203F080 140
+poke8 0x0203F085 2
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f084: 14
+peek8 0x0203F084
+peek S 4
+p2 4
+frames 4
+p2 0
+frames 30
+echo EXPECT 0203ff84: 0[^4]
+peek8 0x0203FF84
+echo EXPECT 0203f084: 13
+peek8 0x0203F084
+echo EXPECT \w+: 53534a48 \w{8} 0001
+peek S 4
+shot sh_17_handoff

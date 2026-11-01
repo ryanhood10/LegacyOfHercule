@@ -121,7 +121,11 @@
     },
     {
       "name": "SuperHercule",
-      "icons": 6,
+      "_": "entry 18: Super Saiyan Hercule (src/coop/ssj.c): the stock Transformation's rules; icons = the Transformation icon in Hercule's colours (tools/ssjhercule.py ICON_READY / ICON_COOLING; a stock id such as 12 swaps it back)",
+      "icons": [
+        "sym:herc_ssj_icon_0",
+        "sym:herc_ssj_icon_1"
+      ],
       "is_ready": "fn:ssj_ready",
       "on_use": "fn:ssj_use"
     },

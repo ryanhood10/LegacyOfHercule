@@ -226,7 +226,7 @@ def main():
              " * sprite index and display rows. Build output only; never commit. */",
              '#include "rom.h"', "",
              "typedef struct { signed char xo, yo; u8 w, h; u32 attr; const void *blob; } SpriteDesc;",
-             "typedef struct { u8 header[0x4C]; const SpriteDesc *groups[%d][4]; u32 end; } SpriteRecord;" % len(groups), ""]
+             "typedef struct { u8 header[0x4C]; const SpriteDesc *groups[%d][4]; u32 end; } SpriteRecord;" % (len(groups) + 1), ""]
     blob_id = 0
     blob_names = {}
     for p, frames in arrays.items():
@@ -244,8 +244,22 @@ def main():
             bn = blob_names.get((p, fi), "0")
             entries.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {bn}}}")
         lines.append(f"static const SpriteDesc {names[p]}[{len(frames)}] = {{{', '.join(entries)}}};")
+    # group 21: the detransform (anim 0x24 plays group 21 of the transformed record; Hercule's 72 has 21
+    # groups, so the state read past the table), one array for all four facings (tools/ssjhercule.py)
+    import ssjhercule
+    from buu2log2 import compress
+    ents = []
+    for fi, (xo, yo, w, h, attr, px) in enumerate(ssjhercule.detransform_frames(sp)):
+        blob = compress(ssjhercule.tiles(px, w, h))
+        lines.append(f"static const u8 ssj_detrans_blob_{fi}[{len(blob)}] __attribute__((aligned(4))) = "
+                     f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
+        ents.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, ssj_detrans_blob_{fi}}}")
+    lines.append(f"static const SpriteDesc ssj_detrans[{len(ents)}] = {{{', '.join(ents)}}};")
+    header = bytearray(header)
+    header[2] = ssjhercule.DETRANSFORM_GROUP + 1
     hdr = ", ".join(f"0x{b:02x}" for b in header)
     grp = ", ".join("{" + ", ".join(names[p] if p else "0" for p in g) + "}" for g in groups)
+    grp += ", {ssj_detrans, ssj_detrans, ssj_detrans, ssj_detrans}"
     lines.append(f"const SpriteRecord ssj_record = {{{{{hdr}}}, {{{grp}}}, 0}};")
     # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
     idx_words = [struct.unpack_from("<I", rom, S.INDEX - S.ROM_BASE + i * 4)[0] for i in range(NEW_SPRITE)]
@@ -278,6 +292,10 @@ def main():
     new = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
     new[0] |= 1            # transformed form
     new[1] = row_sprite
+    # the stock Super Saiyans' behaviour class (rows 5, 11, 16, 17, 20: 0x030021EC, vtable 0x08024C58): combat
+    # bytes +10, walk 1.75 / dash 3.0, 1 EP every 20 frames, back to the base form at 0 EP, the aura's hum
+    # (docs/engine.md "Super Saiyan transformation")
+    new[16:20] = rows[SSJ_GOKU_ROW * 20 + 16:SSJ_GOKU_ROW * 20 + 20]
     new[4] = NEW_ROW       # transformedDataIndex (itself)
     new[5] = SRC_ROW       # detransformedDataIndex -> Hercule
     rows[SRC_ROW * 20 + 4] = NEW_ROW   # Hercule's own row now links to the new form
