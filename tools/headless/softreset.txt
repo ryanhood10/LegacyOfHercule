@@ -1,0 +1,139 @@
+# A soft reset (A+B+Select+Start) and what follows it (docs/testing.md "Soft reset"; docs/coop-design.md "Session logic"):
+# the reset clears all our EWRAM as a power cycle does (input.c soft_reset). Before 2026-11-01 coop.p2 survived it
+# and a loaded save jumped to garbage a few frames in (docs/perfect-pass.md section 9). Self-checking:
+#   python tools/headless/st_expect.py tools/headless/softreset.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# From the debug-menu state of a DEBUG_MENU=1 build, the town (Map Test 7): player 1 Piccolo, player 2 Hercule.
+# After a reset: key 8 twice skips the intro, Start the title's video, A the title (Select Game), A loads slot 1
+# (Down then A: a new game in slot 2). The players question (players.c, found by its magic PS: +4 mode 1 / 2,
+# +5 asking) comes when player 1 can move: A one player, B two, then A closes the answer's line (the town stays
+# black under the question until then, as after a power cycle). coop.p2 is 0x0203FF08.
+p2 0
+maptest 7
+frames 300
+echo === A two players, player 2 Hercule a Super Saiyan (ability 18 as in ssj_hercule.txt), saved at the town's pad
+poke8 0x0203F0B2 18
+poke8 0x0203F0A1 2
+poke16 0x0203F09C 140
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 1 4
+frames 60
+shot sr_00_saved
+echo --- player 2's entity before the reset
+echo EXPECT 0203ff04: c00b0002 0202\w{4}
+peek 0x0203FF04 2
+echo === A soft reset: our state is cleared (coop.p2 0 on the title)
+key 0xF 6
+frames 400
+echo EXPECT 0203ff04: c00b0002 00000000
+peek 0x0203FF04 2
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 100
+shot sr_01_select
+key 1 6
+frames 100
+stepnz 0x0203FA49 10
+find PS 0x91A7E250
+frames 60
+key 2 6
+frames 100
+key 1 6
+frames 300
+shot sr_02_loaded_2p
+map
+echo --- two players: mode 2, a new player 2 on the private vtable, no crash
+echo EXPECT \w+: 91a7e250 00000002
+peek PS 2
+deref P2 0x0203FF08
+echo EXPECT \w+: {g_p2_vtable}
+peek P2
+frames 300
+echo EXPECT map zone 2 area 1
+map
+shot sr_03_2p_later
+echo === B a soft reset mid-game (player 2 in), load, one player: no player 2
+key 0xF 6
+frames 400
+echo EXPECT 0203ff04: c00b0002 00000000
+peek 0x0203FF04 2
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 100
+key 1 6
+frames 100
+stepnz 0x0203FA49 10
+find PS 0x91A7E250
+frames 60
+key 1 6
+frames 100
+key 1 6
+frames 300
+echo EXPECT \w+: 91a7e250 00000001
+peek PS 2
+frames 300
+echo EXPECT 0203ff04: c00b0002 00000000
+peek 0x0203FF04 2
+echo EXPECT map zone 2 area 1
+map
+shot sr_04_loaded_1p
+echo === C a soft reset mid-game, then a new game (slot 2), two players
+key 0xF 6
+frames 400
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 200
+key 0x80 6
+frames 60
+shot sr_05_new_game
+key 1 6
+frames 200
+shot sr_06_prologue
+stepnz 0x0203FA49 40
+find PS 0x91A7E250
+frames 60
+key 2 6
+frames 100
+key 1 6
+frames 300
+echo EXPECT \w+: 91a7e250 00000002
+peek PS 2
+deref P2 0x0203FF08
+echo EXPECT \w+: {g_p2_vtable}
+peek P2
+frames 300
+map
+shot sr_07_new_2p

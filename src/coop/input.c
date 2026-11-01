@@ -23,6 +23,19 @@ static void poll_into(InputSystem *in, u16 now) {
     }
 }
 
+// A+B+Select+Start. The stock soft reset (0x0802135C: sound off, display off, SWI 0) restarts the game from
+// 0x08000000 but leaves EWRAM as it was, so all our pinned state (coop.ld: comboram 0x0203EA00 up to the end of
+// EWRAM) survived into the next game: coop.p2 still pointed at the old player 2's entity, ensure_p2 never built a
+// new one and p2_sync_combat's install_behaviour wrote into whatever the new heap had put there (a loaded save
+// crashed a few frames in: an enemy-death event's action pointer, 0x184 into the old entity, zeroed, and the
+// event's fire 0x080109AC jumped through it; docs/testing.md "Soft reset"). Clear it all first, as a power cycle does.
+extern u32 __coop_ram_start[], __coop_ram_end[];   // coop.ld
+static void __attribute__((noreturn)) soft_reset(void) {
+    for (volatile u32 *p = __coop_ram_start; p < __coop_ram_end; p++) *p = 0;
+    SoftReset();
+    for (;;) ;
+}
+
 // g_p2_remote (coop.h): an emulator-side script (tools/mgba/p2_input.lua) writes player 2's buttons
 // there: bit 15 = valid, bits 0-9 = GBA keys active-high. When valid it overrides the link cable.
 
@@ -205,7 +218,7 @@ void input_poll_hook(InputSystem *in) {
 #endif
     poll_into(in, p1);
     if (in->pressed) g_LastInputFrame = g_FrameCounter;
-    if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) SoftReset();
+    if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) soft_reset();
 
     poll_into(&coop.input2, p2);
 

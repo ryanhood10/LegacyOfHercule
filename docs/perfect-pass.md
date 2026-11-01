@@ -171,9 +171,12 @@ punctuation only); owner in brackets.
 
 ## 9. Found during the pass (not asked for; to fix or to ask Ryan)
 
-- **A soft reset, then loading a save, crashes** about 5 frames after the load's A (a jump through a null vtable from
-  `0x080109AC`), with or without a transformation; found by the ssj piece (2026-11-01). `ssj2_save.txt` (not in
-  `regfull.sh`) still uses the soft reset. A real bug a player can hit: A+B+Select+Start, then Continue.
+- **Fixed (2026-11-01, branch `pp-reset`): a soft reset, then loading a save, crashed** a few frames after the load (a
+  jump to garbage from `0x080109AC`); found by the ssj piece. The cause: the soft reset keeps EWRAM, so `coop.p2`
+  still pointed at the old player 2's entity (any game where player 2 was in at the reset), no new player 2 was built
+  and our code wrote into whatever the new heap put there. The soft reset now clears all our RAM first, as a power
+  cycle does (`docs/coop-design.md` "Session logic"); test `tools/headless/softreset.txt` in `regfull.sh`, and
+  `ssj_hercule.txt` reloads through the soft reset again.
 - **The Super Saiyan cool-down is about half as long in co-op**: both players' base classes drain the shared party
   meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
 - **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows

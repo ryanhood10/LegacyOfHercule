@@ -165,6 +165,13 @@ from `coop.sym`). See also `ents.lua` and `force.lua` below.
 - While player 1 is not in a player-driven control state (cutscenes, scripted walks, menus), player
   2 sees no input (`p1_controllable()` checks the control-state vtable), so it cannot wander during
   dialogue.
+- **The soft reset clears our RAM (2026-11-01).** A+B+Select+Start reaches the stock reset (`0x0802135C`: sound and
+  display off, `SWI 0`) only through our `input_poll_hook`, and that reset keeps EWRAM. Our state is not built for
+  it: `coop.magic` stayed set, so `coop_init_once` did nothing, `coop.p2` still pointed at the old player 2's entity,
+  `ensure_p2` never built a new one and `p2_sync_combat`'s `install_behaviour` wrote into the new heap (a loaded save
+  crashed: `docs/testing.md` "Soft reset"). `input.c` `soft_reset` now zeroes `__coop_ram_start`..`__coop_ram_end`
+  (`coop.ld`: `comboram` 0x0203EA00 to the end of EWRAM, every region of ours) and then resets, so the next boot sees
+  the RAM of a power cycle. A debugger jump to the ROM entry (`tools/fork` `reset.sh`) still skips it.
 
 ## Soak results (2026-10-17)
 

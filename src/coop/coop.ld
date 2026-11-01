@@ -32,6 +32,10 @@ MEMORY
 
 SECTIONS
 {
+    /* all our EWRAM, lowest region to the end: input.c clears it before a soft reset (a power cycle's zeroed RAM) */
+    __coop_ram_start = ORIGIN(comboram);
+    __coop_ram_end = ORIGIN(ewram) + LENGTH(ewram);
+
     .art : {
         KEEP(*(.rodata.art*))
         . = ALIGN(4);

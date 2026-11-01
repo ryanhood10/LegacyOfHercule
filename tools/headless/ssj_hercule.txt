@@ -256,8 +256,8 @@ echo EXPECT 0203f084: 14
 peek8 0x0203F084
 peek PARTY 3
 shot sh_14_saved
-echo === C3 power off and on, Select Game, load (B: two players, then A): player 1 Hercule stays a Super Saiyan, player 2's Goku is turned back
-reset
+echo === C3 a soft reset (A+B+Select+Start, which clears our RAM as a power cycle does), Select Game, load (B: two players, then A): player 1 Hercule stays a Super Saiyan, player 2's Goku is turned back
+key 0xF 6
 frames 400
 key 8 6
 frames 200
