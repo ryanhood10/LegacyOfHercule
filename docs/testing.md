@@ -691,6 +691,18 @@ stands in his own character's spot (x 168 Krillin, 196 16). `entrec` reads 0 whi
 scene list is swapped out): the birds are counted 100 frames after the map loads. Expected numbers are in each
 `echo` line.
 
+## Ryan's opening notes (headless, 2026-11-01)
+
+`tools/headless/ch1_notes.txt` (`docs/perfect-pass.md` 8; alone, old Hercule the companion: slot 5 on row 24 by
+`poke8 0x0203F0A0 24`): (1) Map Test 0, the training mashed through, flags 0 / 1 and the lead noted as Trunks
+(flag 466), player 1 and the companion poked next to Future Gohan (144, 568), the talk: after "Right!  Cool!"
+the knock-out shows `coop.p2` 0 and one actor on sprite 158 (its record read from the sprite table,
+`deref TBL 0x0800959C`, `deref OH TBL+0x25C`: it is in our blob and moves between builds), then the two new
+lines and "Sorry about that"; (2) Map Test 1 with Trunks warped in: the death scene leaves `coop.p2` 0 and the
+actor beside Trunks; (3) Frieza's landing and the Goku-arrival site alone as Gohan: Krillin's actor (76) 1, none
+after the scene, 0 alone as Krillin; (4) talking to old Hercule from his left (184, 444, facing right); (5) / (6)
+Trunks' whole talk to the "Psst!" lines (shots); (8) map 11 with flags 12 and 27, A at the sign: Goku's line.
+
 ## Hercule's beam pose (headless, 2026-10-19)
 
 ```

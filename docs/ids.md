@@ -13,7 +13,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 
 | piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
 |---|---|---|---|---|---|
-| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (none used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAE0, the test win's record `cg_note_win`): `partyram` had only 0x20 left, so 0x10 remain after it |
+| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (31 used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAE0, the test win's record `cg_note_win`): `partyram` had only 0x20 left, so 0x10 remain after it |
 | ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
 | tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
 | art (`pp-art`) | - | - | - | 169-172 | - |
@@ -256,12 +256,13 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 19 | allocated: post-game chapter | |
 | 20 | Ssj2Join (): Super Saiyan 2 Gohan joins (`ssj2gohan.c`; called at the end of the Cell Games) | Super Saiyan 2 Gohan |
 | 21 | Players: the 1 / 2 players answer (`players.c`) | every game start |
-| 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55) |
+| 22 | Scene actor guards (`companion.c`): op 1 slot unplayed, op 2 actor of a sprite present, op 3 the lead's name | `ch1_opening` (Gohan's actor, sprite 55; Krillin's, 76), `ch9_gero` (Krillin, 16) |
+| 31 | P2Actor (`companion.c` `p2_actor_call`, the story piece): player 2's entity handed to a scene actor (op 0 stands?, 1 / 2 x / y, 3 remove) | `ch1_opening.json` (old Hercule: the knock-out, Gohan's death) |
 | 23 | Director (op): op 0 the director's whole flow (pushes 1 when the engine took over, 0 when it cannot start now); op 1 pushes 1 while a tournament runs (`tny_engine.c`) | the waiting room's director (`papaya.lscript`) |
 | 24-27 | the tournament engine, free | |
 | 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
 | 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
-| 31+ | free | |
+| 32+ | free (32 the story piece's) | |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 

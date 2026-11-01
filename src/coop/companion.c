@@ -142,3 +142,19 @@ u16 companion_pad(void) {
     else if (dy < -8) pad |= KEY_UP;
     return pad;
 }
+
+// ---- scenes: player 2 handed to an actor (CoopCall 31) -------------------------------------------------
+// Player 2's entity takes no part in scenes (it cannot be walked by a script, and the companion's pad is not
+// read while one runs), so a scene that should move him stands an actor of his sprite on his spot and removes the
+// entity (Ryan, 2026-11-01: old Hercule walking into Gohan's death scene instead of stopping, then popping):
+//   op 0 -> 1 when player 2's entity stands; op 1 / 2 -> its x / y in px; op 3: remove it (the usual respawn beside
+//   player 1 brings it back once he is free; nothing is pushed).
+s32 p2_actor_call(int op) {
+    Entity *p2 = coop.p2;
+    if (op == 0) return p2 != 0;
+    if (!p2) return 0;
+    if (op == 1) return p2->x >> 8;
+    if (op == 2) return p2->y >> 8;
+    if (op == 3) EntityList_Remove(g_SceneTable[1], p2, 0);   // its destroy clears coop.p2 (cg_set_solo does the same)
+    return 0;
+}

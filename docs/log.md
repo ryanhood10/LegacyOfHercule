@@ -10,6 +10,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
   completed!" (flag 468, row 2, "Gohan can now transform into a Super Saiyan!"); the six Cell Juniors checked in
   co-op (all six in the scene, 1 + 1 + 2 + 2 in the fights, no twin on top; the test win now records the enemies
   standing, `.party.pp`). Tests `ch9_actors.txt`, `gohan_ssj1.txt`, `cell_juniors.txt` (in `regfull.sh`).
+- **Ryan's opening notes (story piece, `docs/perfect-pass.md` 8.1-8.6, 8.8):** Hercule's protest at the knock-out
+  (Ryan's lines), old Hercule walking into the knock-out and Gohan's death as an actor (new CoopCall 31 hands player
+  2's entity to an actor on his spot), Krillin's actor at the landing and the Goku-arrival site when nobody plays
+  him, old Hercule's talk ("Oh, don't worry, kid, you'll find out!"), facing the talk, Ryan's "runnin' into guys
+  like that" line, Goku's West City call without "Gohan". Test `ch1_notes.txt`.
 
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered

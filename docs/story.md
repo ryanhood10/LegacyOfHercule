@@ -119,6 +119,20 @@ nobody else loses their moment.
 - **West City:** Gohan and Krillin fly there; Piccolo becomes playable, and **Hercule joins** after
   the mansion deal (he wants Piccolo's flying "magic trick", Piccolo needs a roof for the three
   years). Hercule is in the party from here on.
+- **Ryan's one-player notes (2026-11-01, `docs/perfect-pass.md` 8; built in the perfecting pass):**
+  - the knock-out: after Future Gohan knocks Trunks out, HERCULE: "What are you doing?!" GOHAN: "It's not safe out
+    there, Hercule!  You stay here and watch after Trunks." (Ryan's lines), then the stock "Sorry about that, Trunks";
+    old Hercule walks up the path with Trunks for it (player 2's entity handed to an actor, CoopCall 31);
+  - Gohan's death: old Hercule walks up beside Trunks as an actor instead of stopping and popping back;
+  - Krillin, when nobody plays him (alone as Gohan), walks up with the Z fighters at Frieza's landing, flies over
+    to Trunks with them and flies in at the Goku-arrival site (his stock path, CoopCall 22 guards);
+  - talking to old Hercule beside Trunks: player 1's character asks "Who are you?" (Krillin's own portrait, else
+    the lead's box), OLD HERCULE: "Ha ha ha!  Oh, don't worry, kid, you'll find out!" (Ryan's line, the laugh ours);
+  - Goku's arrival talk: old Hercule faces the speakers (right) instead of the camera;
+  - his interruption: "Psst!  Trunks!  Is it safe to come out now?" then Ryan's "Trunks!  You didn't say we would be
+    runnin' into guys like that on this trip!  That Frieza fella isn't coming back, is he?";
+  - Goku's call to West City (maps 11 / 12): "GOKU: Alright, it's about time to fly over to West City and meet up
+    with Piccolo." (no "Gohan": Krillin may be player 1).
 - **Triceratops Jungle:** Piccolo's solo stretch with Hercule only as player 2 (level 1 beside
   Piccolo; Gohan and Krillin are locked inside and given back on the way out); Hercule claims the
   credit for the dinosaur peace treaty.
