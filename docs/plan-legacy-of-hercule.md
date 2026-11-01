@@ -8,7 +8,10 @@ Hercule, 25 Android 16); new sprite ids up to 175 (`docs/ids.md`); the extended 
 the Buu crater); Super Saiyan Hercule; Krillin playable (slot 6) and Android 16 playable in one
 chapter (slot 7); the story chapters 1-8 plus the ten-day wait (Broly chapter, "Gero's computer",
 Time Chamber training waves, Roshi's dojo spar). Still to do: the Cell Games story, the ending, the
-Buu phase, a full save-pad run with two players, and the animal quest. Story status lives in
+Buu phase, a full save-pad run with two players, and the animal quest. **Update 2026-10-31:** the Cell Games
+story, the ending and the post-game are built (`docs/story.md` section 0), the party has 9 slots (slot 8 Super
+Saiyan 2 Gohan), and the World Tournament on Papaya Island with its team combos is built (`docs/tournament.md`);
+still to do: the Buu phase, a full run with two people at two pads, and the animal quest. Story status lives in
 `docs/story.md` section 0, recent work in `docs/log.md`. Section 4 "Rules we keep" stands.
 
 Ryan's direction (2026-10-17): keep Legacy of Goku II's story backbone (it is good and already built),

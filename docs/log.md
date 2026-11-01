@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-10-31
 
+- **Docs pass:** the engine facts found for the combos (hits, the command modal, projectiles, the beam's frame
+  sets, the Big Bang, the Special Beam Cannon, recolouring, the camera) collected in `docs/engine.md`; `docs/howto.md`
+  "Change a team combo"; the stale status of `docs/story.md` 0 and `docs/plan-legacy-of-hercule.md` brought up to
+  date; `docs/INDEX.md`'s duplicate rows removed; finished open items marked.
 - **Team combos: the colour pass** (`docs/tournament.md` 25.4): each fighter's ki and beams in his own colour (a
   yellow Masenko, pink and purple Death Beams, a golden Supernova, a green Eraser Cannon, King Cold's red), Vegeta's
   Big Bang drawn with the game's own art, white sparks at teleports and punches, every spot kept on screen, a phantom
@@ -682,8 +686,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - Boss tuning: re-tune Android 13 (stats 110 / 112) once the story fixes the levels for the 19 and
   Gero fights (13 mostly fights player 2, Hercule); re-run the Namekian's final 74/70/68 numbers in
-  the fork; King Cold needs a fight set (pose groups 2 and 5-8) before he can partner anyone.
-- Old Hercule needs his own dialogue portrait (he uses Hercule's).
+  the fork; King Cold needs a fight set (pose groups 2 and 5-8) before he can partner anyone in the story (the
+  tournament's King Cold, sprite 185, fights on AI set 21: `docs/tournament.md` 9b art-new).
+- ~~Old Hercule needs his own dialogue portrait~~ (done: portrait 126, from Buu's Fury's Hercule).
 - Party: the save menu's six-wide portrait rows, the status screen's paging key; the journal with
   seen bits set was not exercised in the fork.
 
@@ -694,7 +699,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 - Super Saiyan Hercule: icon for the ability, aura/flash on transform, EP drain and revert rules,
   Hercule-specific SSJ moveset; the game's own transformed-state handling only runs for the active
   player (opcode 73 refreshes player 1's entity only; `p2_refresh_sprite` covers player 2).
-- Story: Ryan plans the Cell Games, the ending and the Buu phase next (`docs/story.md` section 0).
+- Story: the Cell Games and the ending are built; the Buu phase is next, after the tournament's playtest
+  (`docs/story.md` section 0).
 - Removed from the wait (2026-10-18): the arctic Android 13 encounter (`ch8_arctic`), held for after Cell;
   stat 114 and flag 376 are unused.
 - Training waves: rewards beyond EXP are Ryan's call (ideas in `docs/story.md` 4g).

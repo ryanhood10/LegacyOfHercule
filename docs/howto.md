@@ -96,6 +96,24 @@ Format and tools in `docs/maps.md` (8, 9). New areas live in zone 15; take the a
 `docs/ids.md`. Build previews land in `$(BUILD)/maps/`. Test with `COOP_CMD_WARP` (5).
 Stock-map edits that only add triggers, exits or records go in a story `.json` through `mapedit.py`.
 
+## Change a team combo
+
+Reference: `docs/tournament-combos.md` (Ryan's doc and the game's data; the runner `src/coop/tny_combo_run.c`).
+
+1. A combo's steps are its table in section 3 (the verbs and columns: section 1); a colour is a row of section 4
+   (five OBJ palette indices: core, highlight, middle, shadow, edge; `white` is the sparks' and must stay). A step's
+   colour is the last word of its arguments (`blast | 1 yellow`, `beam | 6 30 yellow`).
+2. Build: `tools/tnycombo.py` turns the doc into `build/gen/tny_combo_data.c` (a Makefile rule); a row that does not
+   parse stops the build with its line. Recoloured beams need `roms/` (the rule passes `--rom`); without it they stay
+   the stock blue.
+3. A new pair: its row in the pair table in `src/coop/tny_combo.c` (the doc's section 5 lists it), then its table.
+4. Test: `tools/headless/tny_combo_tune.txt` films every combo and prints its damage and slowdown (`docs/testing.md`
+   "Team combos: the tuned eight"); keep the pairs' damage within a few per cent of each other (section 2), then
+   `regfull.sh`.
+
+Rules that bite: Hercule's half of a combo is the pose, the partner's attack does the work; a fighter's dictated line
+stays word for word (the dialogue is `docs/tournament-dialogue.md`, built by `tools/tnytalk.py` the same way).
+
 ## Test
 
 - **Headless (default for story):** `docs/testing.md` "Story chapters, headless". Build with

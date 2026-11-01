@@ -7,7 +7,13 @@ and `*.lscript` (format in `docs/scripts.md`, applied in the order listed in `da
 "story"). Game facts come from the script dump (`python tools/script_dump.py map ZONE AREA`, all
 maps in `build/scripts/` after a full dump), the quest table and Ghidra.
 
-## 0. Status and how to resume (2026-10-21)
+## 0. Status and how to resume (2026-10-21; update 2026-10-31)
+
+**Since 2026-10-21 (2026-10-31):** the story is as below; the work since has been the World Tournament on Papaya
+Island (`docs/tournament.md`: planned 2026-10-24, built and play-tested from 2026-10-25, its team combos added
+2026-10-31 in section 25). The drop-ins are F1-F9 (F8 Papaya Island early in the story, F9 the waiting room with
+every tier open; `build/play/DROP-INS.txt`). Next is Ryan's playtest notes on the tournament, then its open points
+(`docs/tournament.md` 24); the Buu's Fury phase (section 6) is still the story's next step.
 
 **Mode: playtest.** Everything through the post-game is built and tested headless, in co-op and with
 one player. Ryan is playing it alone (mostly as Krillin) through the drop-in savestates F1-F7 in

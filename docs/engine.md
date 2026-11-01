@@ -136,3 +136,41 @@ so nothing in ROM references it by address.
   Destructo Disc, 22 Android 16's Rocket Punch, 23 Super Saiyan 2 Gohan's Burst. `python tools/romdata.py abilities <built rom>` prints it.
 - Map entities are spawned from `MapEntry.mapScripts[]` by handlers `0x0800B711` (town NPC),
   `0x0800D6DF` (script actor), `0x0800E77F` (enemy); behaviour lists ticked by `0x0800D156`.
+
+## Messages, projectiles and beams (decompiled 2026-10-31 for the team combos)
+
+How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere below: 0 down, 1 up, 2 left, 3 right.
+
+- **Hits.** A hit is an entity message: +0x24 the hit, +0x20 the attacker; `0x08008944` passes it to OnHit
+  `0x08008807` (vtable slot 14), which calls take-damage `0x08008785`. Attack descriptors (punch, ki blast) at
+  `0x086DB2CC`. Players' combat bytes are their party entry's STR / POW high bytes (class init `0x08016FD8`).
+- **The command modal (a frozen fight).** `CommitCommandBatch` (`0x0800E038`) runs the modal `0x0800DE20` (vtable
+  `0x08025150`): its update `0x08004EA8` draws the entity list without updating it, its late update `0x0800DE6E`
+  broadcasts message 10 and ends when no entity answers 1. The base entity message `0x08019B70` answers 10 by
+  stepping the entity's command (+0x150 `{vtable, next, done}`: slots 1 start, 2 step, 3 done?, 4 stay; popped by
+  `0x0800E078`) and animating it. No entity's update (slot 2) runs inside it, but projectiles' messages answer 10 by
+  updating: the projectile class `0x08013D68`, the beam `0x0801D91C`, the players' ki blast `0x0800EA3A`.
+- **Projectiles (the ProjBase class).** +0x0C the VRAM tile, +0x10 loaded, +0x18 the frame descriptor; vtable slot 5
+  (`0x08013D40`) DMAs the descriptor's blob (raw w x h bytes, 8bpp) to `0x06010000 + tile * 32` with DMA3. The OBJ
+  VRAM allocator counts 64-byte blocks: a size under 0x40 is a block of 0 and breaks its free list.
+- **Recolouring.** Every OBJ shares one 256-colour palette (`0x081DA6C8`) and tiles are 8bpp, so a colour change is a
+  remap of palette indices in the tiles. The energy arts' ramps (brightest first): Super 13's orbs 2 106 247 252 26,
+  the blue ki 2 184 191 76 196, the Kamehameha beam 43 67 68 74 76; the stock Masenko (a lobbed ball, object
+  `0x080139BC`) uses 37 43 44 45 46.
+- **The beam (the Kamehameha object, every kit's beam).** `Beam_Fire` (`0x08014478`) takes the facing's frame set from
+  `0x086E3458 + facing * 0x60` (eight 12-byte descriptors `{geometry, attr, tiles}`; the alternate yellow / pink
+  art's sets at `0x08704604`) into +0x44 / +0x48 (+0x40 the current frame) and DMAs descriptors 0, 2, 1 to the
+  beam's VRAM + 0, + 0x100, + 0x200; the update (`0x08014556`) and the end (`0x0801451C`) upload later frames from
+  the same set, so pointing +0x40 / +0x44 / +0x48 at another set redraws the whole beam.
+- **The Big Bang.** The player's ability state is vtable `0x080258B4`; its enter `0x08015018` makes the object
+  `FUN_08013E48` (0x5C bytes, OBJ VRAM 0x400), whose update `0x08013FDA` animates the charge with the three
+  descriptors at `0x086DEB6C` (frames 0 1 2 1, every 8 frames) and the flight with four at `0x086E0B90 + facing *
+  0x30` (32 x 32).
+- **The Special Beam Cannon.** Object 0x4C bytes, OBJ VRAM 0x300: `0x080157E0` makes it charging at the fingers,
+  `0x0801585A` fires it, `0x0801592E` ends it; its message `0x08015EE0` answers 10 with the update `0x0801594C(o,
+  10)` (grows the drill 3 px a frame and hits every enemy on it; with 0 it only animates). Charge and shot spots per
+  facing: `0x086E382C`, `0x086E385C`.
+- **Drawing a body.** `0x08007A84`: a frame's descriptor and its screen spot from the camera cell; `0x08007772`: the
+  OAM words.
+- **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
+  bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.
