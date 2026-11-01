@@ -164,4 +164,6 @@ punctuation only); owner in brackets.
   `regfull.sh`) still uses the soft reset. A real bug a player can hit: A+B+Select+Start, then Continue.
 - **The Super Saiyan cool-down is about half as long in co-op**: both players' base classes drain the shared party
   meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
+- **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows
+  on him (90); both are older than the colour work (the combo piece's film, `build/pp-combo/films/kits/`).
 - **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
