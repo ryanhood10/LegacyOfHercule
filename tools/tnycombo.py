@@ -11,10 +11,15 @@ Out (C): one TComboStep array per combo, sorted by frame, and tny_combo_defs[COM
 Every COMBO_* must have a table that ends with an `end` row.
 Colours (the doc's section 4, a table | colour | core | hi | mid | lo | edge |): five OBJ palette indices each, brightest
 first. Out: tny_combo_tints[], a remap per colour of the energy arts' own ramps (FAMILIES) onto those five, and with
---rom, tny_combo_beams[]: the Kamehameha beam's frame sets with their tiles redrawn in each colour a `beam` row uses.
+--rom, tny_combo_beams[]: the Kamehameha beam's frame sets with their tiles redrawn in each colour a `beam` row (or a
+kit's move) uses.
+The kits' table (the same section, | fighter | move | colour |: a TF_* name without the prefix, his tny_kits slot 1-6
+first in the move cell, a colour of the table above): tny_kit_colours[], the colour of a fighter's own move outside the
+combos (tny_moves.c; src/coop/tny_colours.c paints it). The fighter names come from tourney.h beside the header.
 
 usage: python -I tools/tnycombo.py docs/tournament-combos.md src/coop/tny_combo.h OUT.c [--rom roms/log2.gba]
 """
+import os
 import re
 import sys
 
@@ -256,19 +261,37 @@ def who_bits(cell, op, where):
     return bits
 
 
-def parse_colours(lines, doc_path):
-    """the colour table (in a section whose heading names Colours): -> [(name, [5 palette indices])]"""
-    out, inside = [], False
+def colour_tables(lines, doc_path):
+    """the tables of the section whose heading names Colours, by their header row's first cell:
+    -> {"colour": [(where, cells)], "fighter": [...]}"""
+    out, inside, table = {"colour": [], "fighter": []}, False, None
     for no, line in enumerate(lines, 1):
         where = f"{doc_path}:{no}"
         if line.startswith("## "):
-            inside = "colour" in line.lower()
+            inside, table = "colour" in line.lower(), None
             continue
-        if not inside or not line.startswith("|") or re.match(r"\|\s*[-:]", line):
+        if not inside:
+            continue
+        if not line.startswith("|"):
+            table = None
+            continue
+        if re.match(r"\|\s*[-:]", line):
             continue
         cells = [c.strip().strip("`") for c in line.strip().strip("|").split("|")]
-        if cells[0].lower() in ("colour", "color"):
+        head = cells[0].lower()
+        if head in ("colour", "color", "fighter"):
+            table = "fighter" if head == "fighter" else "colour"
             continue
+        if table is None:
+            fail(where, "a table in the colours section starts with a | colour | or a | fighter | header row")
+        out[table].append((where, cells))
+    return out
+
+
+def parse_colours(lines, doc_path):
+    """the colour table (in a section whose heading names Colours): -> [(name, [5 palette indices])]"""
+    out = []
+    for where, cells in colour_tables(lines, doc_path)["colour"]:
         if len(cells) < 6:
             fail(where, "a colour row is | colour | core | hi | mid | lo | edge |")
         name = cells[0].lower()
@@ -277,6 +300,37 @@ def parse_colours(lines, doc_path):
         out.append((name, [num(c, where, 1, 255) for c in cells[1:6]]))
     if len(out) >= TCOL_MAX:
         fail(doc_path, f"at most {TCOL_MAX - 1} colours")
+    return out
+
+
+def fighter_ids(header):
+    """tourney.h's TF_* roster (beside tny_combo.h)"""
+    src = open(os.path.join(os.path.dirname(header), "tourney.h"), encoding="utf-8").read()
+    body = re.search(r"typedef enum\s*\{(.*?)TF_COUNT", src, re.S).group(1)
+    body = re.sub(r"//[^\n]*", "", body)
+    return re.findall(r"\bTF_(\w+)", body)
+
+
+def parse_kits(lines, doc_path, fighters, colours):
+    """the kits' table: -> [(TF name, slot 0-5, colour id)]"""
+    out = []
+    for where, cells in colour_tables(lines, doc_path)["fighter"]:
+        if len(cells) < 3:
+            fail(where, "a kits' row is | fighter | move | colour |")
+        name, move, col = cells[0].upper(), cells[1], cells[2].lower()
+        if name.startswith("TF_"):
+            name = name[3:]
+        if name not in fighters:
+            fail(where, f"fighter {cells[0]!r}: a TF_* name of tourney.h without the prefix (FRIEZA, KING_COLD...)")
+        m = re.match(r"(\d+)\b", move)
+        if not m or not 1 <= int(m.group(1)) <= 6:
+            fail(where, f"move {move!r}: his tny_kits slot first, 1-6 (then its name)")
+        if col not in colours:
+            fail(where, f"colour {col!r}: one of the table above ({', '.join(colours)})")
+        slot = int(m.group(1)) - 1
+        if any(k[0] == name and k[1] == slot for k in out):
+            fail(where, f"{name} move {slot + 1} twice")
+        out.append((name, slot, colours.index(col) + 1))
     return out
 
 
@@ -396,8 +450,10 @@ def main():
         del argv[k:k + 2]
     doc, header, out = argv[:3]
     ids = combo_ids(header)
-    colours = parse_colours(open(doc, encoding="utf-8").read().split("\n"), doc)
+    doc_lines = open(doc, encoding="utf-8").read().split("\n")
+    colours = parse_colours(doc_lines, doc)
     names = [c[0] for c in colours]
+    kits = parse_kits(doc_lines, doc, fighter_ids(header), names)
     combos = parse(doc, ids, names)
     c = ["// Generated by tools/tnycombo.py from docs/tournament-combos.md (edit the doc, not this file).",
          '#include "tny_combo_run.h"', ""]
@@ -419,7 +475,8 @@ def main():
     c += defs
     c.append("};")
     # the colours: a remap each, and (with the ROM) the beam's frame sets in each colour a beam row uses
-    beam_cols = sorted({st[7] for k in combos.values() for st in k["steps"] if st[2] == "BEAM" and st[7]})
+    beam_cols = sorted({st[7] for k in combos.values() for st in k["steps"] if st[2] == "BEAM" and st[7]}
+                       | {col for _, _, col in kits})     # (a kit's move may be a beam: its colour's sets too)
     tints, beams = [], []
     for i, (name, ramp) in enumerate(colours, 1):
         t = tint_of(ramp)
@@ -442,8 +499,16 @@ def main():
     if "white" not in names:
         fail(doc, "the colour table needs `white` (the spark where a body vanishes)")
     c.append("const u8 *const tny_combo_spark = tint_white;")
+    c.append("")
+    c.append("// the kits' own moves outside the combos (the doc's kits' table): fighter, slot, colour")
+    c.append("const TKitColour tny_kit_colours[] = {")
+    for name, slot, col in kits:
+        c.append(f"    {{ TF_{name}, {slot}, {col} }},   // {names[col - 1]}")
+    c.append("    { 0xFF, 0, 0 },")
+    c.append("};")
     print(f"tnycombo: {len(colours)} colours ({', '.join(names)}); beams in "
-          + (", ".join(names[i - 1] for i in beam_cols) or "none") + ("" if rom is not None else " (no ROM: stock beams)"))
+          + (", ".join(names[i - 1] for i in beam_cols) or "none") + ("" if rom is not None else " (no ROM: stock beams)")
+          + f"; {len(kits)} kit moves coloured")
     open(out, "w", newline="\n").write("\n".join(c) + "\n")
 
 

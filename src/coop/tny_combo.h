@@ -44,6 +44,8 @@ void tny_combo_meter_test(u32 cmd, u32 arg, u32 arg2);     // test command 32 (T
 // pair (the target is a player). 1 = started (the fight freezes until it ends).
 int  tny_combo_start(int combo, Entity *a, int a_id, Entity *b, int b_id, Entity *target, int side);
 int  tny_combo_busy(void);                                 // 1 while a combo plays (the fight is frozen)
+int  tny_combo_frozen(const Entity *e);                    // 1 while a combo plays and e is not in it (a bystander:
+                                                           // Android 16's and Super 13's kits swallow message 10)
 void tny_combo_run_frame(void);                            // per frame (tny_frame)
 const char *tny_combo_name(int combo);                     // the move's name (the caption)
 void tny_combo_run_test(u32 cmd, u32 arg, u32 arg2);       // test command 33 (TNY_COMBO_RUN)

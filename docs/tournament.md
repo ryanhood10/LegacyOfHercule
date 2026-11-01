@@ -1612,6 +1612,49 @@ and 56 for that).
 **Damage**: unchanged by the colours (`docs/tournament-combos.md` section 2: the players' pairs 2389 to 2517, the
 villains' 1590 to 1626). Slowdown 1 to 7 % (it was 0 to 7 %): the coloured uploads cost nothing visible.
 
-**Still not done**: Cell Jr.'s copies show his own frame (a turned copy mirrors it); Android 16 and Super 13 as
-bystanders keep animating; the kits' own beams outside the combos are still the stock blue (the same frame sets could
-colour them: Frieza's Death Beam, Mystic Gohan's Masenko).
+**Still not done**: nothing from this pass (the three leftovers it listed, Cell Jr.'s turned copies, Android 16 and Super
+13 animating as bystanders and the kits' blue beams outside the combos, were built on 2026-11-01: 25.5).
+
+### 25.5 The combos' leftovers (2026-11-01, branch `pp-combo`, the perfecting pass: `docs/perfect-pass.md` 5)
+
+**What a player sees now:**
+- **Cell Jr.'s copies face him from their own side.** Each copy shows Cell Jr.'s pose frame for frame in its own
+  facing: right when it stands left of the target, left when it stands right (the step's X on the fighter's side), drawn
+  where the game draws that facing's frame. Before, a copy turned round mirrored Cell Jr.'s own frame about the wrong
+  point (16 px off, onto the target) and copied an up / down frame when he faced up or down.
+- **Android 16 and Super 13 stand still** while a combo plays near them (a Rumble), like every other bystander: they
+  hold the frame they had, even mid-special, and go on from it afterwards.
+- **The kits' own moves in their colours**, outside the combos too: Frieza's and Mecha Frieza's Death Beam pink, King
+  Cold's red, Cooler's Death Flash purple and his Supernova gold, Mystic Gohan's Masenko yellow (his Kamehameha stays
+  blue), Broly's Eraser Cannon and Gigantic Meteor green. Every other kit beam stays the blue Kamehameha.
+
+**How:**
+- **The copies** (`tny_combo_run.c` `copy_frame`): the frame is his group (+0x4C) and frame (+0x14) in the copy's own
+  facing's array of the record (clamped to that array's length; the entity draw `0x08007A84` reads +0x4C, the facing
+  +0x10 and the frame the same way). Where its blob is the one his own draw shows (a side facing and its mirror share
+  one blob, the right frame's attribute flips it: Cell Jr.'s record) the copy draws from his tiles with that frame's own
+  attribute and offset; else (he faces up or down) it decodes the frame into its own OBJ VRAM, sized at the copy's start
+  for his largest frame (0x400 for Cell Jr.), with the game's unpacker (`0x0801F394`) into a 4 KB stack buffer, as the
+  entity draw does (`0x08007772` unpacks a changed frame to sp - 0x1004 and DMAs it to the entity's buffer +0x30),
+  through his colour remap (+0x24, so his flashes show on the copies). With no VRAM to spare it falls back to his own
+  frame flipped (at the frame's own offset now).
+- **16 and 13** (`tny_combo_frozen`, checked in `tny_moves.c` `kit_message`): in the tournament their kits wrap the
+  co-op enemy vtable (`coop2.enemy_vtable`, whose message is the stock enemy's `0x0800E5B8`, which passes 10 to the base
+  entity message `0x08019B70`: with no command it runs the control state's and the aux state's animate). Android 16's
+  and Super 13's own code drives them through the update, so the hold state (which would end their specials) is not
+  theirs: a native kit's message 10 is swallowed while a combo plays and he is not in it. (android16.c's `a16_message`
+  is the story boss's only; the tournament's 16 never reaches it.)
+- **The kits' colours** live in `docs/tournament-combos.md` section 4 beside the combos' (its kits' table: fighter,
+  move slot, colour); `tools/tnycombo.py` turns it into `tny_kit_colours` (and builds the beam frame sets for those
+  colours too). The shared painting moved to `src/coop/tny_colours.c`: `tny_beam_paint` (the old `beam_paint`, right
+  after `Beam_Fire` in both the runner and the kits' beam move), `tny_tint_tiles` (a projectile's upload through a
+  remap: the runner's coloured shots and the kits' orbs), `tny_kit_colour`. In `tny_moves.c`: the beam move paints
+  after `Beam_Fire`, the ball move paints its orb (a `tint` field in the kit's projectile, its slot 5 the remap upload).
+
+**Damage**: unchanged (`tny_combo_tune.txt` on this branch: every combo's numbers equal section 2 of the combos doc,
+2389 to 2517 for the players' pairs, 1590 to 1626 for the villains'). No step table, timing or weight changed.
+
+**Test:** `tools/headless/tny_pp_combo.txt` (`docs/testing.md` "Team combos: the leftovers", in `regfull.sh`): the kits'
+moves filmed, 16 and 13 in a Rumble held through Spopovich & Yamu's combo (their animation timer +0x12 stays put, then
+runs again), the copies' facings and the decode path (Cell Jr. poked to face down: modes 2). `tny_combo_tune.txt` also
+prints the copies' state at four shots (`.combo.run` +0x88).

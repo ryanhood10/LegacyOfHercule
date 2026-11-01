@@ -20,6 +20,7 @@ WEAK int  tny_combo_start(int combo, Entity *a, int a_id, Entity *b, int b_id, E
     (void)combo; (void)a; (void)a_id; (void)b; (void)b_id; (void)target; (void)side; return 0;
 }
 WEAK int  tny_combo_busy(void) { return 0; }
+WEAK int  tny_combo_frozen(const Entity *e) { (void)e; return 0; }
 WEAK void tny_combo_run_frame(void) {}
 WEAK const char *tny_combo_name(int combo) { (void)combo; return "Team combo"; }
 WEAK void tny_combo_run_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }

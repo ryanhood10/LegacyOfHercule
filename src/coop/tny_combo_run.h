@@ -52,3 +52,11 @@ typedef struct TBeamDesc { u32 geom, attr; const u8 *src; } TBeamDesc;
 extern const u8 *const tny_combo_tints[TCOL_MAX];
 extern const TBeamDesc *const tny_combo_beams[TCOL_MAX];
 extern const u8 *const tny_combo_spark;                  // the colour `white` (where a body vanishes: a spark)
+
+// The kits' own energy outside the combos (the doc's section 4, its kits' table): fighter (TF_*), slot (0-5 in his
+// tny_kits row), colour; ends with fighter 0xFF. tny_colours.c: the shared painting.
+typedef struct TKitColour { u8 fighter, slot, col; } TKitColour;
+extern const TKitColour tny_kit_colours[];
+void tny_beam_paint(void *beam, int col);                 // a fired beam (right after Beam_Fire) redrawn in colour col
+void tny_tint_tiles(void *obj, const u8 *tint);          // a projectile's upload (slot 5) through a remap
+int  tny_kit_colour(int fighter, int slot);               // the colour of a kit fighter's own move, 0 = its own

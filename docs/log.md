@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **The combos' leftovers** (branch `pp-combo`, `docs/tournament.md` 25.5): Cell Jr.'s copies face the target from
+  their own side (his pose in the copy's facing from the record, decoded into their own VRAM when it is not his blob);
+  Android 16 and Super 13 hold still as bystanders while a combo plays (their kits swallow message 10); the kits' own
+  moves in their colours outside the combos (Frieza's and Mecha Frieza's Death Beam pink, King Cold's red, Cooler's
+  purple and his Supernova gold, Mystic Gohan's Masenko yellow, Broly's orbs green), their table in
+  `docs/tournament-combos.md` section 4 beside the combos' colours, the painting shared in `src/coop/tny_colours.c`.
+  Combo damage unchanged; test `tools/headless/tny_pp_combo.txt`.
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.
