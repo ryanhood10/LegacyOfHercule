@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Papaya Island's world-map landmark** (perfecting pass 24.6, branch `pp-map`; `docs/maps.md` 9e,
+  `docs/tournament.md` 24.6): the 3D towns over the world map's sites are its decorations (`FindCharacterEntity N`
+  shows decoration N; decoded); Papaya Island gets decoration 14, a frame of its own (`tools/wmlandmark.py`: the
+  ring on a sandy island, the hall's red roof, a palm), the arctic decoration 13 (the stock snowy mountain, flag
+  381). `tools/mapedit.py` `add_decorations`; test `tools/headless/wm_landmark.txt` (in `regfull.sh`, which takes
+  `PLAY=` for a private play ROM).
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.

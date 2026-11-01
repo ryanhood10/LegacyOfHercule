@@ -87,7 +87,7 @@ The tournament's, each already planned in `docs/tournament.md` 24 with its test 
 calls during a Rumble as a non-pausing caption (half a day); **24.2** portraits for Android 13, Cell Jr., the Namekian
 Warrior and Evil Buu, ids 169-172 (hours); **24.3** Yakon's lying pose (an hour or two); **24.4** the announcer walks
 off and on (hours); **24.5** the co-op turn change's black screen, a readiness check instead of 90 frames (an hour);
-**24.6** Papaya Island's world-map landmark (a day, mostly decoding); **24.7** walking speed per playable (half a day
+**24.6** Papaya Island's world-map landmark (built 2026-11-01, branch `pp-map`: `docs/tournament.md` 24.6); **24.7** walking speed per playable (half a day
 to a day); **24.9** the merged worktrees removed once the films are not wanted.
 
 The combos' leftovers (`docs/tournament.md` 25.4 "Still not done"):
