@@ -62,6 +62,11 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 ## 4. Super Saiyan Hercule (Ryan: the same rules as the Super Saiyans)
 
+**Built 2026-11-01** (branch `pp-ssj`): the rules as found are in `docs/engine.md` "Super Saiyan transformation" and
+what he now does in `docs/hercule.md` 3b; test `tools/headless/ssj_hercule.txt`. Two corrections to the plan below:
+everyone's Transformation is ability 12 (13 is Trunks' 5-EP move), and the drain is the Super Saiyan class's update
+(`0x08017306`), not the dash state `0x080083C3`. The stock transformation costs no EP (it needs 10).
+
 What he has (`src/coop/ssj.c`): ability 18 switches slot 5 to row 22 (sprite 157) for 50 EP through the game's
 transformation opcode; `hercule_awaken` puts it in his list late in the story; no aura, no drain, no revert.
 

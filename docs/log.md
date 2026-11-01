@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Super Saiyan Hercule: the Super Saiyans' rules** (branch `pp-ssj`, `docs/perfect-pass.md` 4, `docs/hercule.md`
+  3b): the stock transformation decompiled into `docs/engine.md` "Super Saiyan transformation" (ability 12: ready at
+  10 EP, no cost, a 160-frame power-up with its hum and sound, the Super Saiyan class's +10 combat bytes, faster legs,
+  1 EP every 20 frames, back at 0 EP or by the ability, `Party_DetransformOthers`). Ability 18 is now that ability on
+  Hercule's rows: row 22 has the class, `herc_record` a power-up group (his victory pose, the afro turning gold in a
+  yellow aura), `ssj_record` a turn-back group (it had none: the turn back read past its table), ability 18 its own
+  icon pair (the Transformation icon in his colours, `tools/ssjhercule.py`). The three stock routines that served only
+  player 1 (the form change, the drain, the revert) are replaced for the entity's own slot, so player 2 transforms
+  too (Goku, Gohan... as well); a Super Saiyan gets no regeneration from the partner's class; a slot player 2 leaves
+  turns back. When he gets it is unchanged (`hercule_awaken`). Test `tools/headless/ssj_hercule.txt` through the new
+  `st_expect.py` (56 checks), in `regfull.sh`.
 - **Krillin stronger at level 1, the Disc hits alone** (Ryan's one-player notes, `docs/perfect-pass.md` 8.7): 70 HP, str 2.5,
   pow 3.5, end 2.0 (was 60, 1.5 / 2.5 / 1.5: a punch took 1 HP off a snake), older saves lifted once on load (flag 462).
   The Destructo Disc and 16's Rocket Punch only hit co-op-wrapped enemies, so in a one-player game they hit nothing:

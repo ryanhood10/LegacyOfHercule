@@ -133,7 +133,7 @@ $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16
 -include $(patsubst src/coop/%.c,$(BUILD)/obj/%.d,$(SRCS))
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
-$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
+$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/ssjhercule.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
 	$(PYTHON) tools/spriteclone.py $(ROM) $@ $(CLONE_FLAGS)
 
 # re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
@@ -220,7 +220,7 @@ $(BUILD)/obj/broly_sprites_data.o: $(BUILD)/gen/broly_sprites_data.c src/coop/ro
 
 # Hercule's record 72 with the Kamehameha pose (group 18) for the Cell Games beam struggle (never committed);
 # preview beside it (Goku and Gohan's beam frames above Hercule's)
-$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM)
+$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py tools/spriteclone.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM)
 	$(PYTHON) tools/herculesprites.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/hercule_sprites_data.o: $(BUILD)/gen/hercule_sprites_data.c src/coop/rom.h

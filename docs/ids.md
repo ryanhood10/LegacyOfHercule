@@ -14,7 +14,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 | piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
 |---|---|---|---|---|---|
 | story (`pp-story`) | 468-475 (cleared at a new game) | 31-32 | 34-35 | - | `.party.pp` 0x40 |
-| ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
+| ssj (`pp-ssj`) | 476-477 (none used) | - | 36 (none used) | - | `.party.ssj` 0x10 (used: `ssj_state`, after `.party.bv`) |
 | tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
 | art (`pp-art`) | - | - | - | 169-172 (used: the four portraits) | - |
 | combo (`pp-combo`) | - | - | 39 | - | in `comboram`'s free 0xB8 |
@@ -136,7 +136,7 @@ sprite 72) for Roshi's gym.
 |---|---|---|---|
 | 58 | Super Saiyan 2 Gohan, **repointed**: `ssj2_record` = the stock record 58 (ROM groups) with hurt 11, lying 12 and tumble 20 from record 59 (party slot 8, row 28; the Cell Games' stock row 4 too) | `tools/ssj2sprites.py` | `EXTRA_SPRITES` `58=ssj2_record` |
 | 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
-| 157 | Super Saiyan Hercule | `tools/spriteclone.py` | `SSJ_SPRITE` |
+| 157 | Super Saiyan Hercule (22 groups: group 21 the turn back, `tools/ssjhercule.py`) | `tools/spriteclone.py` | `SSJ_SPRITE` |
 | 158 | Hercule from Buu's Fury (old Hercule's body) | `tools/buu2log2.py` | `BUU_SPRITES` |
 | 159 | Legendary Super Saiyan Broly (from Buu's Fury) | `tools/buu2log2.py` | `BUU_SPRITES` (hardcoded in `bosses.h`) |
 | 160 | Android 16 boss | `tools/a16sprites.py` | `A16_SPRITE` |
@@ -172,7 +172,7 @@ leaves copies out of step: grep for the number before moving one.
 
 | row | character | sprite | portrait (dialogue / status) | built by |
 |---|---|---|---|---|
-| 22 | Super Saiyan Hercule | 157 | Hercule's | `spriteclone.py` |
+| 22 | Super Saiyan Hercule: transformed (flag bit 0, back to 21), the Super Saiyans' class `0x030021EC` | 157 | Hercule's | `spriteclone.py` |
 | 23 | Krillin | 161 | 73 / 119 | `spriteclone.py`, `krillin.h` |
 | 24 | old Hercule | 158 (72 when `BUU=0`) | Hercule's | `spriteclone.py`, `krillin.h` |
 | 25 | Android 16 (player) | 175 | 26 / 121 | `spriteclone.py`, `a16player.h` |
@@ -216,7 +216,7 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 | id | ability | C |
 |---|---|---|
 | 14-17 | Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Hercule Taunt | `hercule.c` |
-| 18 | Super Hercule (transform) | `ssj.c` |
+| 18 | Super Hercule (the stock Transformation's rules; icons `herc_ssj_icon_0/1`) | `ssj.c` |
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
@@ -373,7 +373,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
 | 0x0203FA54 | 0x8 | `.party.cp` companion state (`companion.c`) |
 | 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
-| 0x0203FA58-0x0203FB00 | 0xA8 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203FAE0 | 0x10 | `.party.ssj` `ssj_state` (`ssj.c`, magic 0x53534A48 "HJSS": +4 player 2's last slot, the last transformed slot; +6 transforms; +8 reverts; +0xA hand-offs; +0xC EP drained, +0xE of it player 2's); after `.party.xp` 0x0203FA5C (0x44) and `.party.bv` 0x0203FAA0 (0x40) |
+| 0x0203FAF0-0x0203FB00 | 0x10 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |

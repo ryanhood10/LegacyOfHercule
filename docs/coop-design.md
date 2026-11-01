@@ -14,9 +14,10 @@ The player entity (`g_PlayerObject`, 0x1A0 bytes, vtable `0x08025604`) runs a **
   | 1 | `0x03001F44` | `0x080258DC` | `0x08008031` | walk (all directions): the diagonal / 8-way state; plain walking runs here (corrected 2026-10-20) |
   | 0xD | `0x03001F48` | `0x080256C4` | `0x0800811F` | **sprint** (a direction twice within 20 frames; corrected 2026-10-20: the anim table at `0x083B5278` maps 0xD to this 4-way walk state, not to `0x08025E20`): moves `+0x158/+0x15C` (8.8 fixed) by speed `+0x188` along facing `+0x10`; collision via `0x08006366(ctx[4], &pos)`; wall -> sound 8, anim 0x1F |
   | ? | - | `0x080258DC` | `0x08008031` | diagonal/8-way variant (`0x08007D24` step helper, facing lookup `ctx+0x9C`) |
-  | ? | - | `0x08025E20` | `0x080083C3` | flight / charge (EP drain against display row byte +7) |
+  | ? | - | `0x08025E20` | `0x080083C3` | dash (row byte +8: frames that leave a trail, word +0xC: speed; not an EP drain: the Super Saiyan drain is the class update, `docs/engine.md` "Super Saiyan transformation") |
   | 0x24 | `0x03002180` | `0x080256AC` | `0x0801358C` (slot 1) | detransform (abilities 11 / 12 when the row's flag bit 0 is set): group 21 of the current record (record + 0x19C), frame = counter / 16 for 64 frames, then back through the row's link |
-  | 0x25 | `0x03002188` | `0x08025CE0` | `0x0801560E` (slot 1) | transform (bit 0 clear): plays group 9, then the row's link |
+  | 0x25 | `0x03002188` | `0x08025CE0` | `0x0801560E` (slot 1) | transform, ability 11 (bit 0 clear): plays group 9, then the row's link |
+  | 0x23 | `0x03002184` | `0x08025D9C` | `0x080155E4` (slot 1) | transform, ability 12 (everyone's): the hum, group 9 for 160 frames, then the row's link (slot 5 `ssj_transform_done` in the build, `docs/engine.md` "Super Saiyan transformation") |
   | 30 | `0x03002268` | `0x08025038` | `0x0801CB24` (slot 1) | NPC beam pose (`NPCFireKamehameha`): sprite group 18, frame 0 for 8 frames, then 1 / 2 every 8; never leaves by itself |
   | ? | - | `0x080251F4` | `0x08008277` | |
   | ? | - | `0x08025D70` | `0x080085AD` (slot 5) | end of an attack: A held + the active slot's flags bit 2 (special melee page) -> anim 0x27 (group 16), else 0; replaced by `wrap.c` `attack_end` (each player's own slot, only with group 16) |

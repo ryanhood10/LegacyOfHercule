@@ -77,7 +77,28 @@ tables and raises `CharacterData_FindBySprite`'s row limit (file 0x42D6), first 
 transforms through the game's own opcode-73 handler `{2, slot, 157}` (EP cost 50) and re-binds
 player 2's entity when the slot is player 2's; `src/coop/rom.h` `DISPLAY_DATA` is the relocated
 table. The hercule-hero session wired it as ability 18 in Hercule's third slot (`docs/hercule.md`).
-Verified in the fork: transform, gold afro, walk, attack, HUD intact.
+Verified in the fork: transform, gold afro, walk, attack, HUD intact. (The opcode-73 path and the cost of 50 were
+replaced on 2026-11-01 by the stock transformation, below.)
+
+### Super Saiyan Hercule: the transformation (2026-11-01, `tools/ssjhercule.py`)
+
+The stock transformation plays group 9 of the base record (the power-up) and group 21 of the transformed one (the
+turn back; `docs/engine.md` "Super Saiyan transformation"). Record 72 has no group 9 and 157 had only 21 groups, so
+the turn back read past the group table. `tools/ssjhercule.py` (a library; preview with `python -I
+tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercule_transform_preview.png`) builds:
+
+- **`herc_record` group 9** (`herculesprites.py` emits it beside group 18): four 32 x 32 frames at (-8, -24), one
+  array for all four facings, as Goku's (60): his victory pose (group 11 frame 1, both fists up), the same with a dim
+  orange outline (38, every other pixel), then the gold afro (`spriteclone.recolour`) in a yellow ring (46), and in
+  a white / yellow / amber double ring (2, 46, 37): frames 2 and 3 alternate every 16 frames, like teen Gohan's (59).
+- **`ssj_record` group 21** (`spriteclone.py`; the record's group count is now 22): his front idle with the afro gold
+  (120 / 46) -> dark gold (20 / 120) -> brown (23 / 20) -> black, like Super Saiyan Goku's (61).
+- **Row 22** takes the Super Saiyans' behaviour class from row 20 (bytes 16-19 = `0x030021EC`); flags, links,
+  sprite and portraits as before.
+- **Ability 18's HUD icons** `herc_ssj_icon_0 / _1` (`herculesprites.py` emits them): ability 12's Transformation
+  icon pair with the picture (rows 2-8, columns 13-28) remapped by `ICON_READY` / `ICON_COOLING`.
+
+A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
 
 ## Buu's Fury (roms/buu.gba, USA BG3E): format, tools, ids (2026-10-17)
 
