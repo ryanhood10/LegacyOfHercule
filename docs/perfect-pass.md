@@ -155,3 +155,12 @@ punctuation only); owner in brackets.
 8. **Goku's "Alright, Gohan, it's about time to fly over to West City and meet up with Piccolo."** [story] (stock,
    maps 11 / 12, zone 2 areas 5 / 6): drop "Gohan" so it fits Krillin as player 1: "Alright, it's about time to fly
    over to West City and meet up with Piccolo."
+
+## 9. Found during the pass (not asked for; to fix or to ask Ryan)
+
+- **A soft reset, then loading a save, crashes** about 5 frames after the load's A (a jump through a null vtable from
+  `0x080109AC`), with or without a transformation; found by the ssj piece (2026-11-01). `ssj2_save.txt` (not in
+  `regfull.sh`) still uses the soft reset. A real bug a player can hit: A+B+Select+Start, then Continue.
+- **The Super Saiyan cool-down is about half as long in co-op**: both players' base classes drain the shared party
+  meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
+- **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
