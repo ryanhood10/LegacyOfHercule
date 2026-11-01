@@ -132,6 +132,7 @@ merges each branch, rebuilds and runs `regfull.sh`. Nobody touches the combos' s
 | art | 24.2 portraits 169-172, 24.3 Yakon's lying pose | the faces in `tny_talk.txt`; the lying sheet |
 | combo | the copies' facing, 16 / Super 13 holding during a combo, the kits' beams in their colours | the Cell film, a Rumble with 16, `tny_moves.txt` filmed |
 | map | 24.6 Papaya Island's world-map landmark | the landmark in a world-map flight |
+| reset (added 2026-11-01, `log2-reset`) | section 9: the soft-reset load crash (reproduced: two players, save, A+B+Select+Start, load) | a soft-reset load test in `regfull.sh` |
 
 ## 8. Ryan's one-player notes (2026-11-01, playing `build/play` alone)
 
