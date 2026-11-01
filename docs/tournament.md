@@ -1248,7 +1248,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 
 ### 24.8 Decisions only Ryan can make (dialogue plan section 10, at their defaults now)
 
-- A loser's line after a fight too (now only the winner speaks)?
+- A loser's line after a fight too (now only the winner speaks)? **No (Ryan, 2026-11-01).**
 - 2 v 2 opponent teams: draw known teams together when both are in the pool: **yes (Ryan, 2026-10-31, for the
   team combos, 24.10)**; the dialogue's team-vs-team lines then show up too.
 - Start skips the talk: keep?

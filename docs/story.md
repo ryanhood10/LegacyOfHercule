@@ -26,7 +26,7 @@ moves, the big Saiyan ship with its door and the cast riding along). Not yet pla
 players together, and whether the new difficulty numbers feel right. Next: more playtest feedback,
 then the Buu's Fury phase (section 6), planned in chat.
 
-**Offered polish Ryan has not taken up (2026-10-20; do not start without his OK):** the story's lead
+**Offered polish, all wanted since 2026-11-01 (the plan: `docs/perfect-pass.md` 3; build after the two-player playtest):** the story's lead
 missing from scenes other than the Frieza stretch when someone else plays; the Gero rubble and bunker
 scenes show no Krillin or 16; Gohan's Super Saiyan 1 only from the Cell Games (could start in the
 Time Chamber); real two-player testing; the six Cell Juniors' spawn not looked at. Ryan plans at a slow pace, one decision at a time, answered from the

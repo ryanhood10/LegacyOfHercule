@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
+  Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
+  story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.
 - **The Buu campaign decided as chapters inside our ROM** (Ryan; no second ROM, no save conversion), its stock facts
   researched into `docs/story-buu-rom.md` (the twelve chapters, levels to 200, the systems, Hercule's role). Not
   planned: Ryan wants the LoG2 half perfected first.

@@ -49,7 +49,8 @@ team combos (built 2026-10-31 by a lead plus three agents; Ryan's design in 24.1
 step tables and colours live in `docs/tournament-combos.md`, which is both Ryan's doc and the game's data (`tools/tnycombo.py`), as
 `docs/tournament-dialogue.md` is for the dialogue (`tools/tnytalk.py`): edit a line there to change it in the game.
 Contracts: `src/coop/tourney.h`, `src/coop/tny_combo.h`; tests `tools/headless/tny_*.txt`; films of every combo in
-`build/combos/` (not committed). **Next session: Ryan's playtest notes first, then the rest of section 24.**
+`build/combos/` (not committed). **Next (2026-11-01): the perfecting pass, `docs/perfect-pass.md`: Ryan's two-player playtest notes first, then its
+sections in order; the Buu campaign (`docs/story-buu-rom.md`, chapters inside our ROM) waits for it.**
 Full regression: `bash tools/headless/regfull.sh build/<dir>` (`docs/testing.md` "Full regression"; exit 0 = clean).
 Drop-ins F8 (Papaya Island, early) and F9 (waiting room, every tier open) carry a powered-up party (`dropins.py`
 `boost`). Swapping a build into `build/play`: if mGBA's window lingers after Ryan closes it, close it with
