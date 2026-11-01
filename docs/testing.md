@@ -361,6 +361,11 @@ frame-stop makes emulated time lag real time, so wait longer before reading the 
 
 ## Krillin / old Hercule tests (fork slot 2, `KR_TEST=1`, 2026-10-18)
 
+**Headless, one player (2026-11-01):** `tools/headless/krillin_disc.txt` (in `regfull.sh`): Krillin's level-1 combat
+bytes punch a snake (3 a hit) and the Destructo Disc cuts a stock snake in a one-player game (HP 0x20 -> about 0x15,
+EP 40 -> 28); expected values in its header.
+
+
 ```
 make BUILD=build/kn DEBUG_MENU=1 KR_TEST=1          # standard 240-wide ROM (the wide build's view can be wider than the window)
 tools\fork\runfork.ps1 /mnt/f/.../build/kn/log2-coop.gba -Slot 2 -Wait 3 -State /mnt/f/.../dbgmenu.ss3 -Mute   # dbgmenu.ss3: a debug-menu state you make with this build (boot, idle on the title, save)

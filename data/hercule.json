@@ -17,11 +17,11 @@
       "ability_index": 0
     },
     "6": {
-      "hp": 60,
+      "hp": 70,
       "ep": 40,
-      "str": 1.5,
-      "pow": 2.5,
-      "end": 1.5,
+      "str": 2.5,
+      "pow": 3.5,
+      "end": 2.0,
       "display_row": 23,
       "flags": "0x58",
       "abilities": [
@@ -31,7 +31,7 @@
         2
       ],
       "ability_index": 0,
-      "_": "Krillin (slot 6, row 23, sprite 161): weaker than the Z fighters like Hercule, ki-leaning. Flags 0x40 as the stock rows plus bits 3/4 (his two status-screen technique pages). Abilities: Destructo Disc, Afterimage Rush, Shockwave Punch, Ki Blast (stock 2, recoloured blue for him). docs/hercule.md 'Krillin'."
+      "_": "Krillin (slot 6, row 23, sprite 161): weaker than the Z fighters like Hercule, ki-leaning; raised 2026-11-01 (Ryan: at level 1 he could not kill an animal; was 60 HP, 1.5 / 2.5 / 1.5; old saves are lifted once by party_save.c). Flags 0x40 as the stock rows plus bits 3/4 (his two status-screen technique pages). Abilities: Destructo Disc, Afterimage Rush, Shockwave Punch, Ki Blast (stock 2, recoloured blue for him). docs/hercule.md 'Krillin'."
     }
   },
   "growth": {

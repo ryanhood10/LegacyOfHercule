@@ -12,6 +12,7 @@
 // active character. Old six-slot saves fail the checksum and show as empty; saves of the eight-slot
 // builds (2026-10-17 .. 2026-10-19) are read at their own layout and moved to this one (migrate_old).
 #include "coop.h"
+#include "krillin.h"
 
 #define SAVE_HEADER       0x10                                   // options + checksum (0x08001E4A), untouched
 #define SAVE_STRIDE       ((sizeof(PartyState) + 4 + 7) & ~7u)   // block + u32 checksum, EEPROM writes 8 bytes at a time
@@ -59,6 +60,8 @@ ROM_FN(void, Scene_Transition, (void), 0x0801F2CF);
 ROM_FN(int, Scene_Run, (void), 0x0801F2F5);
 
 void party_init_hook(PartyState *p);   // party.c
+int flag_test_hook(PartyState *p, u32 id);   // party.c
+void flag_set_hook(PartyState *p, u32 id);
 const CharacterEntry *party_default_entries(void);   // party.c: the N-entry default table
 
 // Saves of the eight-slot builds: the same block with eight entries (0x19C bytes), slots of 0x1A0 at
@@ -109,6 +112,10 @@ void load_slot_hook(PartyState *dst, int slot) {
     if (Save_Checksum(&s->party, sizeof(PartyState)) != s->checksum) {
         if (migrate_old(s, slot)) store.migrated |= (u8)(1 << slot);
         else party_init_hook(&s->party);
+    }
+    if ((s->party.flags & 1) && !flag_test_hook(&s->party, KRILLIN_LIFT_FLAG)) {
+        krillin_lift(&s->party.chars[KRILLIN_SLOT]);   // a save from before 2026-11-01: his new base numbers, once
+        flag_set_hook(&s->party, KRILLIN_LIFT_FLAG);
     }
     if (dst != &s->party) memcpy(dst, &s->party, sizeof(PartyState));
 }

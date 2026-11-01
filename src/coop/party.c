@@ -6,6 +6,7 @@
 // an entry jump (PARTY_ENTRY_JUMPS in patch_rom.py) because the original adds the stock tail offsets
 // (+0xB4 flags, +0x11A seen bits, +0x12B counters) as Thumb immediates.
 #include "coop.h"
+#include "krillin.h"
 
 PartyState g_party_block __attribute__((section(".party"), aligned(4)));
 
@@ -41,6 +42,7 @@ void party_init_hook(PartyState *p) {
     memset(p->event_flags, 0, PARTY_FLAG_BANK_ZEROED);
     memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // our chapters' flags 400-503 (13 bytes)
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
+    flag_set_hook(p, KRILLIN_LIFT_FLAG);       // a new game starts with Krillin's current numbers (krillin_lift)
     const StoryTest *t = STORY_TEST_RAM;      // chapter-test preset (coop.h)
 #ifdef STORY_TEST
     if (STORY_PRESET->magic == STORY_TEST_MAGIC) t = STORY_PRESET;

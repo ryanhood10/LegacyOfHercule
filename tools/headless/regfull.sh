@@ -12,7 +12,7 @@ DIR=${1:-build/tny}
 ROM=$DIR/log2-coop.gba; PLAY=${PLAY:-build/log2-coop.gba}; OUT=$DIR/hl; LOG=$OUT/reg.log; : > "$LOG"
 run() { echo "## $1" >> "$LOG"; python tools/headless/st_test.py "$2" "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|entrec|reached|stepnz|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"; }
 for t in a16_moves tny_eggs tny_crowd tny_npcs tny_polish tny_engine tny_ui tny_moves tny_rumble tny_play tny_artnew \
-         tny_artbuu tny_grounds cell_games cell_games_1p arctic_summit postgame ch9_gero p2_special revive difficulty \
+         tny_artbuu tny_grounds cell_games cell_games_1p krillin_disc arctic_summit postgame ch9_gero p2_special revive difficulty \
          journal dropout ch1_room_forest scene_actor exp_credit a16_gone broly_ride duel_end tny_hpbars tny_fightfix \
          tny_nomirror tny_talk tny_combo_draw tny_combo_meter tny_combo_run tny_combo_tune wm_landmark; do
   run $t tools/headless/$t.txt

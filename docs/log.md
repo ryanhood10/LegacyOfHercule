@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Krillin stronger at level 1, the Disc hits alone** (Ryan's one-player notes, `docs/perfect-pass.md` 8.7): 70 HP, str 2.5,
+  pow 3.5, end 2.0 (was 60, 1.5 / 2.5 / 1.5: a punch took 1 HP off a snake), older saves lifted once on load (flag 462).
+  The Destructo Disc and 16's Rocket Punch only hit co-op-wrapped enemies, so in a one-player game they hit nothing:
+  now `is_any_enemy`; the Disc's box also reaches down to the thrower's feet. Test `tools/headless/krillin_disc.txt`.
 - **Papaya Island's world-map landmark** (perfecting pass 24.6, branch `pp-map`; `docs/maps.md` 9e,
   `docs/tournament.md` 24.6): the 3D towns over the world map's sites are its decorations (`FindCharacterEntity N`
   shows decoration N; decoded); Papaya Island gets decoration 14, a frame of its own (`tools/wmlandmark.py`: the

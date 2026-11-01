@@ -145,7 +145,7 @@ punctuation only); owner in brackets.
 6. **Goku and Trunks' talk** [story]: old Hercule's interruption becomes Ryan's line: HERCULE: "Psst!  Trunks!  Is it
    safe to come out now?" then "Trunks! You didn't say we would be runnin' into guys like that on this trip! That Frieza
    fella isn't coming back, is he?" (replaces "That Frieza fellow isn't coming back, is he?" in `ch1_trunks_talk`).
-7. **Krillin at level 1 is too weak** [lead]: he cannot kill an animal. Still clearly weaker than Gohan, but slightly
+7. **Krillin at level 1 is too weak** [lead; **done 2026-11-01**: 70 HP, str 2.5, pow 3.5, end 2.0, old saves lifted once; the Disc missed every enemy of a one-player game, fixed, `krillin_disc.txt`]: he cannot kill an animal. Still clearly weaker than Gohan, but slightly
    stronger and with slightly more health. His **Destructo Disc does not really hit** enemies.
 8. **Goku's "Alright, Gohan, it's about time to fly over to West City and meet up with Piccolo."** [story] (stock,
    maps 11 / 12, zone 2 areas 5 / 6): drop "Gohan" so it fits Krillin as player 1: "Alright, it's about time to fly

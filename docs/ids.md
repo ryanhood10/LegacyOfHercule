@@ -80,7 +80,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 441-445 | the tournament grounds (`data/story/papaya.lscript`, `tny_ring.h`) | 441 the plaza's first-visit welcome has played; 442 Pikkon's Senzu bean taken (the hidden arena); 443-445 free |
 | 446-459 | the tournament engine (`tourney.h` `TNY_FLAG_ENGINE0`) | |
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
-| 462-463 | free | |
+| 462 | Krillin's numbers lifted (`krillin.h` `KRILLIN_LIFT_FLAG`): set at every new game; a save without it gets `krillin_lift` once on load (2026-11-01) | |
+| 463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
 | 468-479 | free (cleared at a new game) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |

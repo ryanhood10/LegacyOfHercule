@@ -141,8 +141,11 @@ follow `docs/story.md`; the tool and the write path stay.
 Krillin is a real party member: his own row, sprite (`docs/sprites.md` "Krillin"), portraits, names,
 stats, growth and four abilities. Ids are in `src/coop/krillin.h`.
 
-**Stats** (`data/hercule.json` slot 6; Ryan's rule: weaker than the Z fighters, like Hercule): 60 HP,
-40 EP, str 1.5 / pow 2.5 / end 1.5, growth str 280..480, pow 330..530, end 300..500 per level (Gohan
+**Stats** (`data/hercule.json` slot 6; Ryan's rule: weaker than the Z fighters, like Hercule; raised 2026-11-01, Ryan:
+"level 1 krillin is SOOO weak he cant even kill an animal", from 60 HP and 1.5 / 2.5 / 1.5: a punch took 1 HP off a
+35-HP snake, now 3, Gohan's 5): 70 HP, 40 EP, str 2.5 / pow 3.5 / end 2.0 (combat bytes are the high bytes: 2 / 3
+against Gohan's 3 / 5); a save from before is lifted once on load (`krillin_lift`, `party_save.c`, flag 462, set
+at every new game); growth unchanged: growth str 280..480, pow 330..530, end 300..500 per level (Gohan
 318..518 / 302..502 / 256..456), flags 0x58 (0x40 like every stock row, plus bits 3 and 4 = his two
 status-screen technique pages). At the debug party's level 40 he lands near str 60 / pow 70 / end 60
 with about 60 % of Gohan's HP. A live level-up 40 -> 41 in the fork gave HP +7 %, EP +4, str +479,
@@ -152,7 +155,7 @@ pow +513, end +303 (inside the ranges) and showed "Krillin has achieved Level 41
 
 | idx | name (HUD icon) | what | EP |
 |---|---|---|---|
-| 21 | Destructo Disc (new disc icons) | animation 5 (the ki pose) and a disc of the ROM's projectile class flying along his facing at 4 px / frame for up to 90 frames or until it leaves the view; every frame it sends a type-1 hit message (attack `{1, 3, 0x800}`, twice the ki blast's base) with a 24x14 box to each enemy it has not hit yet (up to 12): it **pierces** and never hits the same enemy twice; walls do not stop it; players ignore it. Cooldown 150 frames per slot; while thrown, `coop.acting` = the thrower so kill EXP goes to him | 12 |
+| 21 | Destructo Disc (new disc icons; 2026-11-01: it aims at `is_any_enemy`, so it hits in a one-player game too, where enemies keep the stock class and the old `is_coop_enemy` check refused all of them; its hit box reaches from the hand down to his feet line, `DISC_REACH_MAX`, so it no longer flies over a snake; 16's Rocket Punch had the same one-player miss) | animation 5 (the ki pose) and a disc of the ROM's projectile class flying along his facing at 4 px / frame for up to 90 frames or until it leaves the view; every frame it sends a type-1 hit message (attack `{1, 3, 0x800}`, twice the ki blast's base) with a 24x14 box to each enemy it has not hit yet (up to 12): it **pierces** and never hits the same enemy twice; walls do not stop it; players ignore it. Cooldown 150 frames per slot; while thrown, `coop.acting` = the thrower so kill EXP goes to him | 12 |
 | 19 | Afterimage Rush (Energy Punch icon) | dashes up to 40 px along his facing (4 px steps, stops at walls), then the A attack plus a melee hit `{0, 3, 0x600}` in front of him | 4 |
 | 20 | Shockwave Punch (Hercule punch icon) | animation 5 and a melee burst `{0, 4, 0x500}` 36 px around him, small camera shake | 6 |
 | 2 | Ki Blast (stock) | the stock ability; `kiblast_spawn_hook` (entry jump on `0x0800EAD8`) gives every ki blast whose owner plays row 23 the blue frames | 2 |

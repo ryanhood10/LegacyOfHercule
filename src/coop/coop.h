@@ -207,6 +207,7 @@ void waves_tick(void);
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
 int is_coop_enemy(const Entity *e);
+int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
 Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2);   // entities.c
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 #define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4

@@ -32,6 +32,9 @@ int is_coop_enemy(const Entity *e) { return e && (e->vtable == coop2.enemy_vtabl
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e) || tny_moves_base(e)); }
+// The players' own projectiles (Krillin's Disc, 16's Rocket Punch) aim at this: is_coop_enemy alone missed every
+// enemy of a one-player game (they keep the stock class there; found 2026-11-01, Ryan: "the Disc isn't hitting").
+int is_any_enemy(const Entity *e) { return is_enemy(e); }
 
 // Bosses: real HP and either no EXP (story bosses) or a record that only a script spawns (condition
 // word 1: the Cell forms, the tournament opponents). Scripted targets such as rocks (no EXP, tiny HP)
