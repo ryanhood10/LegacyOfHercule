@@ -50,8 +50,23 @@ sequence lk_tc_round
         CoopCall 14, 1, 0, 0
   stop
   text 0 "@^Training completed!"
-  script
+  script                                 ; the first time, before the Cell Games (193): Gohan's Super Saiyan -> 6
         PlayAudio 27
+        StackTestStoryFlagNot 468
+        StackTestStoryFlagNot 193
+        And
+        JumpIfFalse L1
+        SetStoryFlag 468
+        SetCharacterTransformation 0, 56
+        PlayAudio 62
+        PushByte 6
+        END
+      L1:
+        PushByte 7
+        END
+  text 0 "@^Gohan can now transform into a Super Saiyan!"
+  script
+        END
 end
 
 ; ---- Mr. Popo in the wait -------------------------------------------------------------------------

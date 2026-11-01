@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Perfecting pass, story piece (branch `pp-story`, `docs/perfect-pass.md` 3):** Krillin and Android 16 as actors
+  in Gero's computer (whichever nobody plays walks into the generator, rubble and bunker scenes, watches the 19s'
+  fight from the wall, stands for the birds); Gohan's Super Saiyan from the Time Chamber's first "Training
+  completed!" (flag 468, row 2, "Gohan can now transform into a Super Saiyan!"); the six Cell Juniors checked in
+  co-op (all six in the scene, 1 + 1 + 2 + 2 in the fights, no twin on top; the test win now records the enemies
+  standing, `.party.pp`). Tests `ch9_actors.txt`, `gohan_ssj1.txt`, `cell_juniors.txt` (in `regfull.sh`).
+
 - **The perfecting pass planned** (`docs/perfect-pass.md`): Ryan wants the LoG2 half finished before the Buu campaign.
   Decisions: no loser's line in the tournament; Super Saiyan Hercule gets the Super Saiyans' rules; all the offered
   story polish is wanted. First the two-player playtest (its list is section 1); the combos' notes wait for it.

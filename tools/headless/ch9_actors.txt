@@ -1,0 +1,341 @@
+# Krillin and Android 16 in "Gero's computer" (docs/story.md 4g, data/story/ch9_gero, CoopCall 22): the one of the
+# two nobody plays walks into the generator, rubble and bunker scenes as an actor (Krillin sprite 76, record
+# 0x082E94B4; 16 sprite 8, record 0x081E07C4), steps back to the wall for the 19s, and stands for the birds; a played
+# character has no actor. Four pairings: co-op Krillin / 16, co-op 16 / Krillin, alone as Krillin, alone as 16.
+# From a debug-menu savestate: python tools/headless/st_test.py tools/headless/ch9_actors.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+preset +151 +155 +156 +157
+maptest 250
+frames 200
+poke32 FLAGS+0x00 0xFFFFFFFF
+poke32 FLAGS+0x04 0xFFFFFFFF
+poke32 FLAGS+0x08 0xFFFFFFFF
+poke32 FLAGS+0x0C 0xFFFFFFFF
+poke32 FLAGS+0x10 0xFFFFFFFF
+poke32 FLAGS+0x14 0xFFFFFFFF
+flags +420
+poke32 0x0203FD08 11
+frames 30
+poke32 0x0203FD0C 0x1B08
+poke32 0x0203FD54 0x00BE01DC
+poke32 0x0203FD08 5
+frames 200
+echo == co-op Krillin + 16: the west generator: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot kc_gen
+mash 3 120
+frames 120
+mash 4 90
+frames 200
+echo == co-op Krillin + 16: after the generator: no actor (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+flags +423 +424
+poke32 0x0203FD0C 0x3008
+poke32 0x0203FD54 0x0122008C
+poke32 0x0203FD08 5
+frames 200
+echo == co-op Krillin + 16: the rubble: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot kc_rubble
+mash 2 200
+frames 60
+shot kc_punch
+mash 1 200
+frames 100
+mash 4 90
+frames 200
+echo == co-op Krillin + 16: after the rubble: the actors went into the cave (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+poke32 0x0203FD0C 0x4008
+poke32 0x0203FD54 0x00B400F0
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 200
+map
+echo == co-op Krillin + 16: the bunker: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot kc_bunker
+mash 1 90
+mash 8 90
+frames 120
+echo == co-op Krillin + 16: the 19s' fight: the actors by the wall (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot kc_fight
+poke32 0x0203FD08 7
+frames 400
+mashmap 8 48 30
+frames 100
+echo == co-op Krillin + 16: the birds: Krillin's actor (0), 16's actor (1); player 1 at Krillin's spot (168) or 16's (196)
+entrec 0x082E94B4
+entrec 0x081E07C4
+map
+shot kc_birds
+mashmap 6 5 30
+mash 6 90
+frames 300
+echo == co-op Krillin + 16: home: Krillin player 1 (06), Hercule player 2 (05 / ff alone)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 0
+preset +151 +155 +156 +157
+maptest 250
+frames 200
+poke32 FLAGS+0x00 0xFFFFFFFF
+poke32 FLAGS+0x04 0xFFFFFFFF
+poke32 FLAGS+0x08 0xFFFFFFFF
+poke32 FLAGS+0x0C 0xFFFFFFFF
+poke32 FLAGS+0x10 0xFFFFFFFF
+poke32 FLAGS+0x14 0xFFFFFFFF
+flags +420
+poke32 0x0203FD08 11
+frames 30
+poke8 0x0203F000 7
+poke8 0x0203FF84 6
+poke32 0x0203FD0C 0x1B08
+poke32 0x0203FD54 0x00BE01DC
+poke32 0x0203FD08 5
+frames 200
+echo == co-op 16 + Krillin: the west generator: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot ac_gen
+mash 3 120
+frames 120
+mash 4 90
+frames 200
+echo == co-op 16 + Krillin: after the generator: no actor (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+flags +423 +424
+poke32 0x0203FD0C 0x3008
+poke32 0x0203FD54 0x0122008C
+poke32 0x0203FD08 5
+frames 200
+echo == co-op 16 + Krillin: the rubble: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot ac_rubble
+mash 2 200
+frames 60
+shot ac_punch
+mash 1 200
+frames 100
+mash 4 90
+frames 200
+echo == co-op 16 + Krillin: after the rubble: the actors went into the cave (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+poke32 0x0203FD0C 0x4008
+poke32 0x0203FD54 0x00B400F0
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 200
+map
+echo == co-op 16 + Krillin: the bunker: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot ac_bunker
+mash 1 90
+mash 8 90
+frames 120
+echo == co-op 16 + Krillin: the 19s' fight: the actors by the wall (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot ac_fight
+poke32 0x0203FD08 7
+frames 400
+mashmap 8 48 30
+frames 100
+echo == co-op 16 + Krillin: the birds: Krillin's actor (1), 16's actor (0); player 1 at Krillin's spot (168) or 16's (196)
+entrec 0x082E94B4
+entrec 0x081E07C4
+map
+shot ac_birds
+mashmap 6 5 30
+mash 6 90
+frames 300
+echo == co-op 16 + Krillin: home: Krillin player 1 (06), Hercule player 2 (05 / ff alone)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 off
+preset +151 +155 +156 +157
+maptest 250
+frames 200
+poke32 FLAGS+0x00 0xFFFFFFFF
+poke32 FLAGS+0x04 0xFFFFFFFF
+poke32 FLAGS+0x08 0xFFFFFFFF
+poke32 FLAGS+0x0C 0xFFFFFFFF
+poke32 FLAGS+0x10 0xFFFFFFFF
+poke32 FLAGS+0x14 0xFFFFFFFF
+flags +420
+poke32 0x0203FD08 11
+frames 30
+poke32 0x0203FD0C 0x1B08
+poke32 0x0203FD54 0x00BE01DC
+poke32 0x0203FD08 5
+frames 200
+echo == alone as Krillin: the west generator: Krillin's actor (0), 16's actor (1)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot k1_gen
+mash 3 120
+frames 120
+mash 4 90
+frames 200
+echo == alone as Krillin: after the generator: no actor (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+flags +423 +424
+poke32 0x0203FD0C 0x3008
+poke32 0x0203FD54 0x0122008C
+poke32 0x0203FD08 5
+frames 200
+echo == alone as Krillin: the rubble: Krillin's actor (0), 16's actor (1)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot k1_rubble
+mash 2 200
+frames 60
+shot k1_punch
+mash 1 200
+frames 100
+mash 4 90
+frames 200
+echo == alone as Krillin: after the rubble: the actors went into the cave (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+poke32 0x0203FD0C 0x4008
+poke32 0x0203FD54 0x00B400F0
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 200
+map
+echo == alone as Krillin: the bunker: Krillin's actor (0), 16's actor (1)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot k1_bunker
+mash 1 90
+mash 8 90
+frames 120
+echo == alone as Krillin: the 19s' fight: the actors by the wall (0, 1)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot k1_fight
+poke32 0x0203FD08 7
+frames 400
+mashmap 8 48 30
+frames 100
+echo == alone as Krillin: the birds: Krillin's actor (0), 16's actor (1); player 1 at Krillin's spot (168) or 16's (196)
+entrec 0x082E94B4
+entrec 0x081E07C4
+map
+shot k1_birds
+mashmap 6 5 30
+mash 6 90
+frames 300
+echo == alone as Krillin: home: Krillin player 1 (06), Hercule player 2 (05 / ff alone)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1
+load menu.ss
+p2 off
+preset +151 +155 +156 +157
+maptest 250
+frames 200
+poke32 FLAGS+0x00 0xFFFFFFFF
+poke32 FLAGS+0x04 0xFFFFFFFF
+poke32 FLAGS+0x08 0xFFFFFFFF
+poke32 FLAGS+0x0C 0xFFFFFFFF
+poke32 FLAGS+0x10 0xFFFFFFFF
+poke32 FLAGS+0x14 0xFFFFFFFF
+flags +420
+poke32 0x0203FD08 11
+frames 30
+poke8 0x0203F000 7
+poke8 0x0203FF84 7
+poke32 0x0203FD0C 0x1B08
+poke32 0x0203FD54 0x00BE01DC
+poke32 0x0203FD08 5
+frames 200
+echo == alone as 16: the west generator: Krillin's actor (0), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot a1_gen
+mash 3 120
+frames 120
+mash 4 90
+frames 200
+echo == alone as 16: after the generator: no actor (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+flags +423 +424
+poke32 0x0203FD0C 0x3008
+poke32 0x0203FD54 0x0122008C
+poke32 0x0203FD08 5
+frames 200
+echo == alone as 16: the rubble: Krillin's actor (1), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot a1_rubble
+mash 2 200
+frames 60
+shot a1_punch
+mash 1 200
+frames 100
+mash 4 90
+frames 200
+echo == alone as 16: after the rubble: the actors went into the cave (0, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+poke32 0x0203FD0C 0x4008
+poke32 0x0203FD54 0x00B400F0
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 90
+keys 0
+frames 200
+map
+echo == alone as 16: the bunker: Krillin's actor (1), 16's actor (0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot a1_bunker
+mash 1 90
+mash 8 90
+frames 120
+echo == alone as 16: the 19s' fight: the actors by the wall (1, 0)
+entrec 0x082E94B4
+entrec 0x081E07C4
+shot a1_fight
+poke32 0x0203FD08 7
+frames 400
+mashmap 8 48 30
+frames 100
+echo == alone as 16: the birds: Krillin's actor (1), 16's actor (0); player 1 at Krillin's spot (168) or 16's (196)
+entrec 0x082E94B4
+entrec 0x081E07C4
+map
+shot a1_birds
+mashmap 6 5 30
+mash 6 90
+frames 300
+echo == alone as 16: home: Krillin player 1 (06), Hercule player 2 (05 / ff alone)
+peek8 0x0203F000 1
+peek8 0x0203FF84 1

@@ -174,7 +174,8 @@ clears 400-503 (our chapters and the post-game); flags 504+ survive a new game, 
 flags there. Chapter-specific notes: 441 the tournament grounds' welcome seen (`papaya`), 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic
 route's world-map landing and star, `arctic_route`), 400-419 the Broly chapter (404-419
-the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar, 460 / 461 the difficulty (Easy / Hard). The bank
+the party kept by CoopCall 10), 420-437 Gero's computer, 440 Roshi's dojo booked for a spar, 460 / 461 the difficulty (Easy / Hard), 464-467 the story's lead
+(`companion.c`), 468 Gohan's Super Saiyan given by the Time Chamber (`wait_chamber`). The bank
 is at `0x0203F00C + PARTY_SLOTS * 0x1C` (0x0203F108 with the default 9 slots; headless `FLAGS`).
 
 ### 2.6 The journal (quest table)

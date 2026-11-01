@@ -181,6 +181,12 @@ sequence ch9_gen_west
   [0] script
         SetPlayerVisible 0
         PanCameraToPosition 270, 10, 3
+        CoopCall 22, 1, 7, 0                      ; nobody plays 16: he walks up as an actor
+        JumpIfFalse L1
+        SpawnCharacterEntity 8, 476, 260
+        WalkToPosition 8, 476, 150
+        SetEntityFacing 8, 1
+      L1:
         PlayAudio 50
         END
   [1] text 0 "@^Under the waterfall, one of Dr. Gero's generators is humming again."
@@ -203,6 +209,11 @@ sequence ch9_gen_west
   [4] text 26 "ANDROID 16: One generator is down.\x0bThe other is under the waterfall east of the mountain pass." -> 6
   [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
   [6] script
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse L1
+        WalkToPosition 8, 476, 260
+        DespawnEntity 8
+      L1:
         SetActiveEntity 0
         SetPlayerVisible 1
         END
@@ -212,6 +223,12 @@ sequence ch9_gen_east
   [0] script
         SetPlayerVisible 0
         PanCameraToPosition 80, 60, 3
+        CoopCall 22, 1, 7, 0                      ; nobody plays 16: he walks up as an actor
+        JumpIfFalse L1
+        SpawnCharacterEntity 8, 56, 392
+        WalkToPosition 8, 96, 200
+        SetEntityFacing 8, 1
+      L1:
         PlayAudio 50
         END
   [1] text 0 "@^Under the waterfall, one of Dr. Gero's generators is humming again."
@@ -234,6 +251,11 @@ sequence ch9_gen_east
   [4] text 26 "ANDROID 16: One generator is down.\x0bThe other is under the waterfall west of the mountain pass." -> 6
   [5] text 26 "ANDROID 16: Both generators are down.  Now, the lab." -> 6
   [6] script
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse L1
+        WalkToPosition 8, 56, 392
+        DespawnEntity 8
+      L1:
         SetActiveEntity 0
         SetPlayerVisible 1
         END
@@ -245,6 +267,18 @@ sequence ch9_rubble
   [0] script
         SetPlayerVisible 0
         PanCameraToPosition 40, 170, 2
+        CoopCall 22, 1, 6, 0                      ; Krillin and 16 walk up as actors when nobody plays them
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 120, 380
+        WalkToPosition 76, 120, 300
+        SetEntityFacing 76, 1
+      K1:
+        CoopCall 22, 1, 7, 0
+        JumpIfFalse A1
+        SpawnCharacterEntity 8, 184, 380
+        WalkToPosition 8, 184, 300
+        SetEntityFacing 8, 1
+      A1:
         PlayAudio 50
         StackTestStoryFlag 423
         StackTestStoryFlag 424
@@ -258,6 +292,12 @@ sequence ch9_rubble
   [1] text 73 "KRILLIN: Aw, no...  The cave collapsed when the lab blew up.\x0bWe'll never dig through all that!"
   [2] text 26 "ANDROID 16: Stand back."
   [3] script
+        CoopCall 22, 2, 8, 0                      ; 16's actor walks up to the rubble and punches
+        JumpIfFalse A1
+        WalkToPosition 8, 152, 288
+        SetEntityFacing 8, 1
+        SetEntityAnimation 8, 6
+      A1:
         PlayAudio 26
         WaitFrames 30
         WhiteFlash 10
@@ -273,7 +313,32 @@ sequence ch9_rubble
   [4] text 73 "KRILLIN: ...Remind me never to arm-wrestle you." -> 7
   [5] text 73 "KRILLIN: Aw, no...  The cave collapsed when the lab blew up." -> 6
   [6] text 26 "ANDROID 16: The rubble is not the problem.\x0bTwo of Gero's generators feed the bunker's defenses again:\x0bone under the waterfall west of the mountain pass, one under the waterfall to the east.\x0bWe shut them down first." -> 7
-  [7] script
+  [7] script                             ; the actors go on into the cave (punched through) or back down the path
+        StackTestStoryFlag 422
+        JumpIfFalse L1
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        WalkToPosition 76, 152, 288
+        WalkToPosition 76, 152, 232
+        DespawnEntity 76
+      K1:
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse L2
+        SetEntityAnimation 8, 0
+        WalkToPosition 8, 152, 232
+        DespawnEntity 8
+        Jump L2
+      L1:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K2
+        WalkToPosition 76, 120, 380
+        DespawnEntity 76
+      K2:
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse L2
+        WalkToPosition 8, 184, 380
+        DespawnEntity 8
+      L2:
         SetActiveEntity 0
         SetPlayerVisible 1
         END
@@ -285,14 +350,45 @@ sequence ch9_bunker
   [0] script
         SetPlayerVisible 0
         WalkToPosition 0, 216, 280
+        CoopCall 22, 1, 6, 0                      ; Krillin and 16 come in behind as actors when nobody plays them
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 216, 368
+        WalkToPosition 76, 248, 288
+        SetEntityFacing 76, 1
+      K1:
+        CoopCall 22, 1, 7, 0
+        JumpIfFalse A1
+        SpawnCharacterEntity 8, 216, 368
+        WalkToPosition 8, 184, 288
+        SetEntityFacing 8, 1
+      A1:
         PanCameraToPosition 64, 96, 2
         PlayAudio 50
         END
   [1] text 26 "ANDROID 16: Dr. Gero's computer.  It survived."
   [2] text 0 "@^ASSEMBLY COMPLETE:  UNIT 19, SPARE BODY A.\x0bASSEMBLY COMPLETE:  UNIT 19, SPARE BODY B.\x0bACTIVATING..."
   [3] text 73 "KRILLIN: TWO of them?!  Aw man, not those energy-sucking creeps!"
-  [4] text 26 "ANDROID 16: Do not let them grab you.  I will do the punching."
-  [5] script
+  [4] script                             ; 16 fights: his own line (5); 16 an actor: he keeps watch (6)
+        CoopCall 22, 1, 7, 0
+        JumpIfFalse L1
+        PushByte 6
+        END
+      L1:
+        PushByte 5
+        END
+  [5] text 26 "ANDROID 16: Do not let them grab you.  I will do the punching." -> 7
+  [6] text 26 "ANDROID 16: Do not let them grab you, Krillin.\x0bThey drain power through their hands.  I will watch the computer." -> 7
+  [7] script                             ; the actors step back to the wall for the fight
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        WalkToPosition 76, 280, 336
+        SetEntityFacing 76, 2
+      K1:
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse A1
+        WalkToPosition 8, 120, 336
+        SetEntityFacing 8, 3
+      A1:
         TriggerMapEvent 1
         SetPlayerVisible 1
         DrawBossHealthBar 12
@@ -307,6 +403,16 @@ sequence ch9_bunker_won
         SetPlayerVisible 0
         StopMusic
         WaitFrames 60
+        CoopCall 22, 2, 76, 0                     ; the actors come back from the wall
+        JumpIfFalse K1
+        WalkToPosition 76, 248, 288
+        SetEntityFacing 76, 1
+      K1:
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse A1
+        WalkToPosition 8, 184, 288
+        SetEntityFacing 8, 1
+      A1:
         PanCameraToPosition 64, 96, 2
         END
   [1] text 73 "KRILLIN: Phew...  Okay.  Let's wreck this thing before it builds a third one."
@@ -323,9 +429,20 @@ sequence ch9_bunker_won
         PlayAudio 20
         FadeToWhite 10
         WarpToMapNoEntities 8, 48, 1, 168, 330
-        SpawnCharacterEntity 8, 196, 326
+        PushActiveCharIndex                       ; player 1 as 16 stands in 16's spot; the other of the two is
+        PushByte 7                                ; an actor (player 2 has no entity after the warp)
+        CmpEq
+        JumpIfFalse B1
+        SetEntityPositionInstant 0, 196, 326
+        SetEntityFacing 0, 1
+        SpawnCharacterEntity 76, 168, 330
+        SetEntityFacing 76, 3
+        Jump B2
+      B1:
         SetEntityFacing 0, 3
+        SpawnCharacterEntity 8, 196, 326
         SetEntityFacing 8, 1
+      B2:
         SetPlayerVisible 0
         PanCameraToPosition 56, 200, 10
         WhiteFadeOut 30

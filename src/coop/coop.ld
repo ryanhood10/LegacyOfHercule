@@ -69,6 +69,7 @@ SECTIONS
         KEEP(*(.party.cp))   /* companion.c state (old Hercule following player 1 in the prologue) */
         KEEP(*(.party.xp))   /* exp.c: the last hit per enemy (kill EXP to that player) */
         KEEP(*(.party.bv))   /* cellgames.c: the capped beams' vtable copy (last: the sections before keep their addresses) */
+        KEEP(*(.party.pp))   /* the perfecting pass's story piece: the test win's record (cellgames.c, 0x10) */
     } > partyram
 
     .tny (NOLOAD) : {

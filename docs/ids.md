@@ -13,7 +13,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 
 | piece (branch) | flags | CoopCall | test cmds | portraits | RAM |
 |---|---|---|---|---|---|
-| story (`pp-story`) | 468-475 (cleared at a new game) | 31-32 | 34-35 | - | `.party.pp` 0x40 |
+| story (`pp-story`) | 468-475 (cleared at a new game; 468 used) | 31-32 (none used) | 34-35 (none used) | - | `.party.pp` 0x40 allotted, **0x10 used** (0x0203FAE0, the test win's record `cg_note_win`): `partyram` had only 0x20 left, so 0x10 remain after it |
 | ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
 | tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
 | art (`pp-art`) | - | - | - | 169-172 | - |
@@ -82,7 +82,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 460-461 | difficulty (`difficulty.h`): 460 Easy, 461 Hard, neither Normal; set by the new game's question |
 | 462-463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
-| 468-479 | free (cleared at a new game) | |
+| 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first "Training completed!" (`wait_chamber`); 469-475 free |
+| 476-479 | free (476-477 the ssj piece's, 478-479 the map piece's: the allocation table above) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
 | 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
@@ -358,7 +359,9 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FA2C | 0x18 | `.party.ui` the Cell Games' one-player title card (`cellgames.c` `card_buf`) |
 | 0x0203FA54 | 0x8 | `.party.cp` companion state (`companion.c`) |
 | 0x0203FA44 | 0x14 | `.party.ui` `players` (the 1 / 2 players choice: magic, mode, asking, the question's action) |
-| 0x0203FA58-0x0203FB00 | 0xA8 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
+| 0x0203FA54 | 0x6 | `.party.cp` (2026-11-01 layout: then `.party.xp` 0x0203FA5C 0x44, `.party.bv` 0x0203FAA0 0x40) |
+| 0x0203FAE0 | 0x10 | `.party.pp` the test win's record (`cellgames.c` `cg_note_win`: magic "JRWN", enemies standing, stat, two positions; tests `find` it) |
+| 0x0203FAF0-0x0203FB00 | 0x10 | free in `partyram` (each `.party.<name>` section added before `.party.wv` moves `waves`) |
 | 0x0203F000 | 0xB00 region | `partyram`: `g_party_block` (party, flags at +0xEC, 0x19C), `party_save` store (0x50C), `switch` (0x19C) |
 | 0x0203F844 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |

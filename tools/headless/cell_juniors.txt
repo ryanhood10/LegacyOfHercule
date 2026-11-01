@@ -1,0 +1,185 @@
+# The six Cell Juniors in co-op (docs/story.md 4h, docs/testing.md "Cell Juniors"): Cell spawns six in the scene
+# after fight 3 (sprite 31, record 0x08246D80), then J1 (Krillin) and J2 (Piccolo) fight one each (stat 26,
+# BOSS_NO_TWIN) and J3 (Vegeta) and J4 (Trunks) two each (stat 141 + 142, BOSS_PAIR): never a co-op twin on top.
+# Each test win notes the enemies standing at that moment (cellgames.c cg_note_win: the word "JRWN" 0x4E57524A,
+# then +4 standing, stat; +8 the first two enemies' x, y in px). Setup and wins as cell_games.txt.
+p2 0
+preset +191 +421
+maptest 323
+frames 200
+poke8 0x0203F000 4
+poke32 0x0203FD0C 0x010E
+poke32 0x0203FD54 0x00700108
+poke32 0x0203FD08 5
+frames 200
+key 0x40 20
+key 1 6
+frames 120
+shot cg01_barrier_open
+p2 0x40
+key 0x40 160
+p2 0
+waitmap 14 2 300
+frames 60
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 22
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 1: Goku (4) alone, solo 1 -> expect 14
+peek8 0x0203F9B7 1
+map
+shot cg02_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 23
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 2: Goku on player 2's pad -> expect 24
+peek8 0x0203F9B7 1
+map
+shot cg03_won
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 24
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == fight 3: Gohan + Hercule -> expect 80
+peek8 0x0203F9B7 1
+map
+shot cg04_won
+echo == the scene after fight 3: Cell spawns six Juniors (6)
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 120
+entrec 0x08246D80
+shot jr_six
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J1: Krillin alone: who fought (expect 16); standing at the win (expect 1, stat 1a) and where
+peek8 0x0203F9B7 1
+find JR 0x4E57524A
+peek8 JR+4 2
+peek16 JR+8 4
+map
+shot jr_16
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 27
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J2: Piccolo alone (player 2): who fought (expect 21); standing at the win (expect 1, stat 1a) and where
+peek8 0x0203F9B7 1
+find JR 0x4E57524A
+peek8 JR+4 2
+peek16 JR+8 4
+map
+shot jr_21
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 142
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J3: Vegeta alone, two Juniors: who fought (expect 12); standing at the win (expect 2, stat 8d) and where
+peek8 0x0203F9B7 1
+find JR 0x4E57524A
+peek8 JR+4 2
+peek16 JR+8 4
+map
+shot jr_12
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 142
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 140
+echo == J4: Trunks alone (player 2), two Juniors: who fought (expect 23); standing at the win (expect 2, stat 8d) and where
+peek8 0x0203F9B7 1
+find JR 0x4E57524A
+peek8 JR+4 2
+peek16 JR+8 4
+map
+shot jr_23

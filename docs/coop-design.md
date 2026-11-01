@@ -1316,7 +1316,11 @@ in the default `P2_MODE_SIO` build). Without one, the game is single-player. Aud
     kid Gohan in armour (sprite 55) walks up with the Z fighters at the landing (map 52), stands with them on the
     return, flies in with the group at the Goku-arrival site (map 54), walks up to Trunks for "how do you know my
     dad?", kneels beside the others when Goku lands and turns to him. Nobody is swapped; nobody follows in free
-    play; the sequence start / end are stock again;
+    play; the sequence start / end are stock again. **The perfecting pass (2026-11-01, `docs/perfect-pass.md` 3)**
+    gives the other chapters' scenes the same actor; the list of every scene looked at is in `docs/story.md` 0
+    ("The story's lead in every scene"). Gero's computer stages its pair the same way: Krillin (76) or 16 (8),
+    whichever nobody plays, in the generator, rubble and bunker scenes (`ch9_gero`, CoopCall 22 op 1 / 2), by the
+    wall during the 19s' fight;
   * **old Hercule (alone):** while party slot 5 shows him (row 24, the future prologue) he walks along with player
     1 (player 2 with a follower pad: toward player 1 beyond 28 px, a jump beside him when walled off far behind).
   A companion is no player for the rules: `p2_coming()` is 0 (no twins or co-op scaling), enemies ignore him

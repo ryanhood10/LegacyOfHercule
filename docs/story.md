@@ -289,7 +289,8 @@ sparring match names the winner's character instead), and both players are back 
   stronger than the last... You may walk out at any time"). Before each round a caption "Round N" (A
   to start it); the round's four enemies (eight in co-op with their twins) spawn on a ring around the
   players; when none is left standing, a short pause and the next caption. After round 10 a caption
-  says "Training completed!" and nothing more spawns. The chamber's door returns to the chamber room
+  says "Training completed!" and nothing more spawns (the first time before the Cell Games it also gives Gohan
+  his Super Saiyan, 4h). The chamber's door returns to the chamber room
   and stops the training at any time; the Lookout door starts it again from round 1. Repeatable.
   Rewards: EXP from the kills only (ideas in section 0). The rounds (stock stat / sprite, HP before
   the co-op x1.5; four records per round):
@@ -331,6 +332,12 @@ sparring match names the winner's character instead), and both players are back 
   - *End:* warp back to Capsule Corp; the players become Krillin (player 1) and Hercule (player 2),
     and 16 is never playable again (he stays a scene actor). From here the players proceed to the
     Cell Games.
+  - *Krillin and 16 as actors (2026-11-01, the perfecting pass):* the one of the two nobody plays (alone: the
+    other one; with two players, nobody) walks into the generator scenes (16), the rubble (both: 16 walks up to
+    the rubble and punches, then they go on into the cave) and the bunker (in behind the player; by the wall during
+    the 19s' fight, back for the file), and stands with player 1 for the birds, where player 1 takes his own
+    character's spot. When 16 is the actor his bunker line is "Do not let them grab you, Krillin. They drain power
+    through their hands. I will watch the computer." (Claude's) instead of "I will do the punching."
   - *Build notes:* 16 plays in the last party slot during the chapter (sprite 175, row 25, Rocket
     Punch ability 22; `src/coop/a16player.c`). Area 47's top exit was broken in the stock game too and
     is fixed. Flags 420-439. Tested headless end to end (`tools/headless/ch9_gero.txt`), and the bunker
@@ -494,7 +501,11 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
   40; the 2026-10-19 build let anyone through at level 30). The fight-1 script makes player 1 Goku.
 - **Super Saiyan 1 Gohan (Ryan, 2026-10-20):** from the Games' start Gohan is the teen Gohan of the cutscenes
   (sprite 56, row 2) and can go Super Saiyan on B (stock kept him on kid Gohan's row, no transformation,
-  until the scripted Super Saiyan 2).
+  until the scripted Super Saiyan 2). **Since 2026-11-01 (the perfecting pass, `docs/perfect-pass.md` 3.3) he has
+  it from the Time Chamber:** the first "Training completed!" of the wait's training waves (before the Games, flag
+  468) puts him on row 2 with the caption "Gohan can now transform into a Super Saiyan!" (Claude's line), so he
+  transforms in the wait's fights too. The Games' own steps (the ring's row 2, the scripted Super Saiyan 2, Super
+  Saiyan 2 Gohan in slot 8) are unchanged.
 - **Hercule's walk-out and Gohan's entrance (Ryan, 2026-10-20):** the camera pans up to the crowd, Hercule
   steps in and the camera follows him down between Goku and Cell, pans to Cell for his line, then up to
   Gohan, who flies into the ring.
