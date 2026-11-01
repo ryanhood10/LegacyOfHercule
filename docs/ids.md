@@ -16,7 +16,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 | story (`pp-story`) | 468-475 (cleared at a new game) | 31-32 | 34-35 | - | `.party.pp` 0x40 |
 | ssj (`pp-ssj`) | 476-477 | - | 36 | - | `.party.ssj` 0x10 |
 | tny (`pp-tny`) | - | - | 37-38 | - | `.tny.cap` 0x10 |
-| art (`pp-art`) | - | - | - | 169-172 | - |
+| art (`pp-art`) | - | - | - | 169-172 (used: the four portraits) | - |
 | combo (`pp-combo`) | - | - | 39 | - | in `comboram`'s free 0xB8 |
 | map (`pp-map`) | 478-479 | - | - | - | - |
 
@@ -200,7 +200,8 @@ finds row 4 first).
 | 126 | old Hercule's dialogue portrait (Buu's Fury's Hercule, module 0x086F393C id 76, on LoG2's frame; stock 67 without `roms/buu.gba`) | Makefile `OLD_HERCULE_PORTRAIT`, `tools/oldherculeportrait.py`; `text 126` in `ch1_opening` and the epilogue |
 | 128-139 | art-new's allocation (tournament), unused | |
 | 140-168 | the tournament's dialogue portraits from Buu's Fury (its portrait module 0x086F393C, on LoG2's grey frame; LoG2's Hercule 67 for every id with `BUU=0`): 140 the announcer (Buu portrait 10), 141 Broly (16), 142 Spopovich (126), 143 Yamu (160), 144 Pui Pui (119), 145 Yakon (116), 146 Kibito (83), 147 Pikkon (113), 148 Dabura (24), 149 Fat Buu (92), 150 Kid Buu (85), 151 Super Buu (127), 152 Super Buu, Gotenks absorbed (130), 153 Super Buu, Gohan absorbed (129), 154 Janemba (81), 155 Goten SSJ (65), 156 Kid Trunks SSJ (139), 157 / 158 / 159 Gotenks, SSJ, SSJ3 (68 / 71 / 73), 160 Vegito SSJ (151), 161 Uub (142), 162 / 163 / 164 Goku, SSJ, SSJ3 (57 / 59 / 61), 165 Majin Vegeta (148), 166 Mystic Gohan (42), 167 Great Saiyaman (47), 168 Piccolo, Buu saga (112). Evil Buu has none in Buu's Fury. | Makefile `TNY_PORTRAITS`, `tools/tnyportraits.py` (`tny_portrait_<id>`), `--extra-portrait`; `tourney_data.c`'s portrait column |
-| 169-189 | art-buu's allocation, unused | |
+| 169-172 | dialogue portraits for the fighters that had none (the perfecting pass, `docs/tournament.md` 24.2): 169 Android 13 (Android 16's 26 with a trucker cap and white hair), 170 Cell Jr. (Perfect Cell's 40 in blue), 171 the Namekian Warrior (Piccolo's 94 teal, a maroon gi), 172 Evil Buu (Buu's Fury's Super Buu 127 grey; LoG2's Hercule 67 without `roms/buu.gba`) | Makefile `PP_PORTRAITS`, `tools/ppportraits.py` (`pp_portrait_<id>`, second ROM blob), `--extra-portrait`; `tourney_data.c`'s portrait column |
+| 173-189 | art-buu's allocation, unused | |
 | 190-199 | ui's allocation (tournament) | |
 | 127 | Videl's dialogue portrait (Buu's Fury's short-haired Videl, module 0x086F393C id 153, on LoG2's frame; stock 43 Chi-Chi without `roms/buu.gba`); the tournament's other new fighters use stock portraits: King Cold 70, Roshi 80, Chi-Chi 43, Chiaotzu 42 (`tourney_data.c`) | Makefile `VIDEL_PORTRAIT`, `tools/tnysprites.py` `tny_videl_portrait`, `--extra-portrait` |
 | 128-139 | art-new's allocation, unused | |

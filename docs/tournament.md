@@ -263,7 +263,7 @@ Our calls, made while building:
 - **The announcer** is a town NPC's 5-group layout (record 80): idle, walk, and the raised microphone in group 4.
 - **Portraits**: Buu's Fury's own, on LoG2's grey frame (old Hercule's 126 recipe); the forms have their own (Super
   Buu 151-153, Gotenks 157-159, Goku 162-164) for the moves piece's transforms, though the roster row names the
-  first. Evil Buu has none in Buu's Fury: his row keeps 0 (the ui draws his face from the sprite). Without
+  first. Evil Buu has none in Buu's Fury: his row kept 0 until 2026-11-01 (now 172, a grey Super Buu: 24.2). Without
   `roms/buu.gba` every id gets LoG2's Hercule portrait so no id is empty.
 - **Colours**: the nearest LoG2 OBJ colour per Buu colour (`build/<dir>/gen/tny_buu_report.md`). Most move 8-24
   colours by small distances; Yakon's greens come out darker and browner than Buu's (LoG2's palette has no matching
@@ -1182,7 +1182,24 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 - **Test:** `tny_fightfix.txt` part C already finishes a Rumble by real hits; a new `tny_caption.txt` films it
   (captions show, the fight never pauses: player x keeps changing under a caption). Size: half a day.
 
-### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu
+### 24.2 Dialogue portraits for Android 13, Cell Jr., the Namekian Warrior and Evil Buu (**built 2026-11-01**, branch `pp-art`)
+
+**What was built** (`tools/ppportraits.py`, Makefile `PP_PORTRAITS`, ids 169-172 in `tourney_data.c`): each is the
+stock portrait of the body his sprite was made from, repainted the way that sprite was, so face and body agree:
+Android 13 (169) is Android 16's 26 with a yellow trucker cap (crown, seam, button, the Red Ribbon dot, a peak with its
+shadow on the forehead), white hair at the temples and the back, the earring gone, his dark-yellow vest, a blue
+background; Cell Jr. (170) is Perfect Cell's 40 with a blue crest and dark-blue spots, blue-white face and body, the
+gold jaw kept, an orange background; the Namekian Warrior (171) is Piccolo's 94 in the sprite's teal-green with a
+maroon gi on the Namekians' purple; Evil Buu (172): Buu's Fury has no portrait of him (all 155 entries of its module
+read), so it is its Super Buu (127) grey with red eyes on a dark blue (his cape's) background; LoG2's Hercule without
+the Buu ROM. **Judged** side by side with the stock portraits at 3x (`--compare`: the source, ours, the plan's
+sprite-face recipe, stock Hercule and Goku) and in the game's box beside Yamcha's and Perfect Cell's: same frame,
+same drawing density, the colours from the same palette; the plan's recipe (the idle frame's top 32 x 32 at 2x) shows these
+small bodies whole, the head 10-12 px, in blocks of 2 x 2 pixels next to hand-drawn 64 px faces, so it was not used. The select screen's panel shows the
+portrait now (its grid cells still crop the sprite). Test: `tny_talk.txt` t8 (13 / Cell Jr.) and t9 (the Namekian
+Warrior / Evil Buu), `ppportraits.py --check`.
+
+The plan:
 
 - **Wrong:** their lines show the name with no face (roster portrait 0).
 - **Fix:** four new portraits, ids **169-172** (art-buu's unused range 169-189; record them in `docs/ids.md`).
@@ -1194,7 +1211,18 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 - **Test:** `tny_talk.txt` with each of the four opening (test command 31); the select screen still crops its own faces.
   Size: a few hours.
 
-### 24.3 Yakon's lying pose
+### 24.3 Yakon's lying pose (**built 2026-11-01**, branch `pp-art`)
+
+**What was built:** (a), as `lying.sprawl` (`buu2log2.py` `LIE_FRAME` 290 = his recoil 9.3, which has no hit sparks,
+`"sprawl"`): his front frame squashed to 45 % of its height, centred where he stood, one row under his feet. Both
+candidates were built and drawn by `tnysheet.py --lying` beside Hercule's lying pose. (a) keeps Buu's Fury's drawing
+(the muscles, the face, the claws) and reads as a body flat on its back seen down LoG2's angled camera: short and wide,
+face up, arms and legs spread on the floor. (b), a lying frame painted from shapes (head, torso, limbs on his side),
+read as lying too but looked like another creature (flat greens, no texture, a turtle's shape) beside his standing
+body. No shadow: no other lying body has one, and under a flat body it read as a puddle or as him standing. Test:
+`tny_polish.txt` section 12 (Yakon forced as the first opponent, beaten: group 12, shot `p12_yakon_down`).
+
+The plan:
 
 - **Wrong:** it reads like a crab seen from above (Buu's Fury draws him from the front only; `tools/lying.py` turns a
   front recoil frame).
