@@ -37,8 +37,8 @@ headless test can judge are **feel**: is it fun with two, is anyone bored, is an
 
 - **A loser's line after a tournament fight: no.** Only the winner speaks (the default stays).
 - **Start skips the fighters' talk:** not decided; the default (it skips) stays until he says.
-- **Open (2026-11-01): Yamu's walking speed.** He is a 64 x 64 body, so 24.7 gives him the giants' 85 %, though his kit
-  calls him "the quicker thief". Exempting him is one line in `tny_walk_pct`.
+- **Yamu walks at normal speed (Ryan, 2026-11-01)**, though a 64 x 64 body (the giants walk at 85 %): "the quicker
+  thief" (`tny_walk_pct`).
 - **Super Saiyan Hercule: the same rules as the Super Saiyans** (section 4).
 - **The story polish:** all of it is to be addressed (section 3), after the playtest's notes are in.
 - **The combos' playtest notes** wait for the two-player session; the combos are not touched until then.

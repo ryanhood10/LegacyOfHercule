@@ -97,6 +97,7 @@ int tny_walk_pct(int row) {
     for (int id = 0; id < TF_COUNT; id++) {
         if (tny_play_row(id) != row) continue;
         if (id == TF_GOTEN || id == TF_KID_TRUNKS || id == TF_CHIAOTZU || id == TF_VIDEL) return WALK_SMALL_PCT;
+        if (id == TF_YAMU) return 100;           // a giant body, but "the quicker thief" (Ryan, 2026-11-01: normal speed)
         return (tny_fighters[id].role & TR_GIANT) ? WALK_GIANT_PCT : 100;
     }
     return 100;
