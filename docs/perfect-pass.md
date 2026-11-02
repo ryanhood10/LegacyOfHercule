@@ -266,8 +266,8 @@ punctuation only); owner in brackets.
   transformed row gets Megaton Punch (16) and row 0x15 back at the load (`party_save.c` -> `hercule_lock`). The
   transformation itself stays built and tested (`ssj_hercule.txt` pokes the ability in). Test:
   `tools/headless/ssj_lock.txt` (self-checking, in `regfull.sh`). The unlock's place in the story is Ryan's, later. Full regression on that build (61 blocks): only `ssj_hercule.txt`'s C3 differed, as the lock means it to (a
-  transformed Hercule is turned back by a load and has Megaton Punch; its expectations updated); in `build/play` since
-  2026-11-02 02:48.
+  transformed Hercule is turned back by a load and has Megaton Punch; its expectations updated, rerun 57 / 57); in
+  `build/play` since 2026-11-02 02:48.
 
 ## 10. State at the end of the team round (2026-11-01)
 
@@ -276,3 +276,196 @@ All seven pieces merged into main and pushed; the full regression of the merged 
 fine. Player 2's stock Transformation now changes his own slot (the story piece saw it turn player 1's before the ssj
 merge; `gohan_ssj1.txt` checks it). In `build/play` since 2026-11-01 09:08, the night's build (pickups, resting heals, the fade fix, the drop-ins asking) since 23:47 (ROM identical to the regressed one; drop-ins F1-F9 remade and checked; his save and the old states backed up as `backup/legacy-of-hercule.11010906.sav` and `backup/ss_11010906/`). Open: section 9's items, the
 lead-made-player-1 choice, the two-player playtest (section 1).
+
+## 11. The second two-player session's notes (Ryan, 2026-11-02) and the plan for them
+
+**Planning only.** Ryan: "I don't want to actually build any of them, but I want to make a detailed build/update plan
+... we could even use a TEAM to stay aligned and break the tasks up ... ask and clarify any questions you have with me
+before we ever proceed with writing code." Nothing below is built. Each item: his note, what is known, the plan, its
+test, and the open questions (collected in 11.9). The pieces for a team are in 11.8.
+
+### 11.1 Health regeneration
+
+**Ryan:** "the health regeneration is perfect right now, great timing, battle awareness, etc, but you have player 1
+regenerating all the way to full health when it should just be 2/3rds (player 2 worked fine). Also, you had player 1's
+Ki regenerating too. We do not have ki regeneration."
+
+**Known.** Our resting heal (`regen.c`) caps at 2/3 and never lowers. The rest comes from the **stock** base-class
+update (`ssj.c` `ssj_base_update`, the stock rule rewritten): every ~10 s the active slot gets EP + 3 % of its maximum
+and every other stock slot (0-5) HP and EP + 5 % (the stock game's way of healing the party members you are not
+playing). In co-op that update runs once per player entity, so it runs **twice**: the active slot's EP comes back at
+6 % every 10 s, and the other played slot (player 2's character, in slots 0-5) gets 10 % HP and EP every 10 s to full.
+Which player that is depends on who is the active slot: player 1's slot is the active one, so by the code player 2's
+character should be the one healing to full and player 1 the one whose ki fills; Ryan saw player 1 heal to full
+(to confirm who was whom: 11.9 Q1). Either way the cause is the stock trickle, doubled, not the resting heal.
+
+**Plan.** (a) Run the stock trickle once a frame (from player 1's entity only). (b) Keep the stock trickle for the
+party members nobody is playing (benched: slots 0-5 not played by either player), and keep its benched HP to full as
+stock, or cap benched HP at 2/3 too (Q2). (c) The two played slots get no stock HP trickle and no stock EP trickle:
+their HP comes from the resting heal (2/3) and their ki from 11.2's rule. Numbers stay macros.
+
+**Test.** `regen.txt` extended: both players at 10 HP in the town, 3 minutes: both end at exactly 2/3, EP untouched by
+the old trickle; a benched member's HP and EP keep rising as stock (or to 2/3, per Q2).
+
+### 11.2 Ki regeneration
+
+**Ryan:** "the game does already have a mechanic to generate like a tiny tiny microscopic amount of ki, not sure how it
+works. But I think we should make a ki regeneration mechanic as follows: it regenerates only up to 1/3rd (the rest of
+gaining ki must be from the traditional way). This is independent from the health mechanic: we can take damage, hit
+enemies, be near enemies, and have our ki regenerate to 1/3rd after 60 seconds of us not using any ki moves."
+
+**Known.** The "microscopic amount" is the stock active-slot trickle above (3 % of the maximum every ~10 s, doubled in
+co-op). Using a ki move: every ability's on_use spends EP (the stock ones, Hercule's, Krillin's, the Super Saiyans'
+drain), so "used a ki move" = the slot's EP went down by an ability (a hook in `use_ability`, `player.c`, for both
+players, plus the transformation's drain).
+
+**Plan.** `regen.c` gains a ki timer per player: reset by any ability use on that player's slot; after 60 s with none,
+EP rises 1 % of the maximum every 20 frames up to 1/3 of the maximum (the same shape as the heal; the rate is a
+macro, Q3), regardless of damage, hits or enemies near. The stock trickle for played slots goes (11.1c), or stays
+underneath as the stock game's own crumb (Q3). Transformed players: the Super Saiyan class drains EP and runs instead
+of the base class, so no ki regeneration while transformed (stock).
+
+**Test.** `regen.txt`: EP at 0 in the town, 59 s: 0; at 61 s rising; caps at 1/3; a ki move resets it; a hit does not.
+
+### 11.3 Player 2 is a co-pilot
+
+**Ryan:** "player 2 feels too much like a co-pilot. Right now, player 2 can't press A or B to advance cutscenes, press A
+to activate the save / switch character pad, use the fly pads, or open doors to enter character-locked areas (by
+punching with the correct character), walk into new areas (taking both players with them; right now only P1 can guide
+the gameplay experience). Fly pads need to also make player 1 and 2 fly (for Hercule you can just make him run)."
+
+**Known.**
+- Dialogue advances on the stock input system's A / B (player 1's pad); player 2's pad is read into `coop.input2`
+  and, since 2026-11-02, held to A during a sequence (`input.c`) but that A goes nowhere.
+- Save pads, fly pads and map exits are trigger boxes in the list at 0x03001FE0 (`docs/engine.md` "Dropped items and
+  touch boxes"): the stock scan tests player 1's position only (the save pad: kind 0, condition 0x08010AC7, A to
+  open; exits: `WarpToMapWithEntities` payloads). Player 2's pickups already scan that list for him (`pickup.c`).
+- The save pad's menu (save / switch characters) works on the active slot (player 1's); a save-pad switch in co-op is
+  `switch.c` (player 1's character; player 2's own switch is Select, `p2_cycle`).
+- The fly pad: "only the player who stepped on the flight sign controls the world map; the world map has no player-2
+  entity; both land together" (`docs/coop-design.md`). The take-off is a scene on player 1's entity.
+- "Only Piccolo" / "Only Vegeta" barriers (`docs/story-rom.md`): the barrier opens to a punch from the right
+  character; the check reads the active slot (player 1's character), so player 2's punch as the right character does
+  nothing. The barrier's class and its hit handler are not decompiled yet (first step of the piece).
+- Map exits: player 2 is leashed to the view, so he reaches an exit but cannot fire it.
+
+**Plan (the "player 2 agency" piece).**
+1. Cutscenes: while a sequence runs, player 2's A (and B where the stock takes B) is merged into the stock input's
+   pressed bits for that frame (one press, no double-advance when both press the same frame).
+2. Pads and exits: every input poll, player 2's position is tested against the trigger list like his pickups; a
+   save pad fires on his A (the menu opens; "switch characters" changes **his** character, Q4; saving saves), a fly pad
+   fires on his A (the take-off scene, then the world map as today), an exit fires on contact and takes both (Q5).
+   The stock's own scan for player 1 is untouched. The condition scripts of a trigger (kind / condition fields) run
+   as the stock runs them (same functions, player 2's position in place of player 1's).
+3. Fly-off for both: the take-off scene animates player 1's entity; player 2's entity gets the same flight animation
+   beside him (an actor-style move as the story scenes do, `CoopCall 31`), Hercule runs off instead (no flight
+   sprite; `docs/story.md`: he "runs" where others fly). Landing: both already land together.
+4. Barriers: decompile the barrier object (find its class from a map's object records, e.g. map 103's "Only
+   Piccolo"), then make its character check use the **attacker's** slot: `coop.acting` / the hit message's attacker
+   word (`docs/engine.md` "Hits") gives the entity; player 2's slot is `coop.p2_slot`.
+
+**Tests.** Headless: a two-player sequence advanced by `p2 1` presses only; the Northern Wastelands pad opened by
+player 2 (the menu's shot, a switch that changes slot 0x0203FF84), a fly pad by player 2 (the world map loads), an
+exit walked into by player 2 alone (both on the next map); a barrier punched by player 2 as the right character
+(the barrier gone), by the wrong one (still there). The real-time feel (both flying) is Ryan's.
+
+### 11.4 Papaya Island in co-op: lag, and the missing world-map board
+
+**Ryan:** "I flew to Papaya Island to check out our tournament mode and the tournament grounds and waiting room to
+fight were both very laggy (maybe because we placed randomly generated characters there) but it wasn't like that in
+1 player. Also on Papaya Island, the world map indicator is missing from the ground; it has the ability to use it but
+there's no board / map to walk up to."
+
+**Known.** The grounds' crowds are actors drawn from the roster (`tny_grounds.c`, `tny_crowd.txt`); in co-op every
+entity update also picks the nearer player (`entities.c`, cheap) and the waiting room keeps "today's competition" per
+frame (`tny_grounds.c`). Parsec's own stream ran at ~53 fps on the host (its log), which looks like lag on the guest's
+screen regardless of the game; mGBA's title bar shows the emulation's fps on the host (Q6 tells the two apart). The
+fly pad's marker: our island maps (`data/maps/papaya_*.json`) have the fly trigger but no pad decoration / object on
+the ground (the stock landing sites draw a sign; `docs/maps.md` 179).
+
+**Plan.** (a) Measure before guessing: a frame-time probe (the frame's scanline at the end of the main loop, read
+headless with the runner; `docs/testing.md` will get the recipe) on the plaza, the waiting room and West City, alone
+and with player 2, on this build; then fix what the numbers point at (likely candidates: per-frame roster work in
+`tny_grounds.c` / `tny_ui.c` with player 2 present, the second HUD panel's redraw, OBJ VRAM churn from the crowd).
+(b) The board: add the stock flight-sign object to `papaya_plaza.json` at the fly trigger (the same object other
+landing towns use), one-player and co-op alike.
+
+**Tests.** The probe's numbers alone vs co-op (a budget: under one frame); `tny_grounds.txt` gains the sign's entity
+and a shot of it.
+
+### 11.5 Tournament mode in co-op: 2 v 2 and the Rumble do not start
+
+**Ryan:** "most importantly, tournament mode did not work when I was in 2-player co-op mode. I tried loading in to 2v2
+tournament, we selected our characters, and then nothing happened. It's like the trigger didn't work or I'm not sure.
+I also tried the same when selecting royal rumble and nothing happened. So we really gotta get tournament mode working
+for co-op! All the way through!"
+
+**Known.** The engine's co-op paths are tested headless for 1 v 1 (`tny_turn.txt`, the turn change) and the combos
+(`tny_combo_run.txt` "an opponent pair on a player"), and `tny_engine.txt` runs every division; whether its runs had
+player 2 *in* through the director's selection and the ring entry for 2 v 2 and the Rumble is the first thing to
+check (the test list in `docs/testing.md` "Tournament"). The selection screen's end hands over to the ring reload
+(`tny_ui.c` -> `tny_engine.c`); a wait for "both players ready" or a pad check that only sees player 1 would hang
+exactly as described (Q7 narrows it: did the screen stay on the selection, go black, or return to the room?).
+
+**Plan.** Reproduce headless first: from F9 (every tier open) with `p2 0`, the director, 2 v 2, both picks, A: where
+does it stop (a `tny_flow.py` film of it); then the Rumble. Fix the hand-off; then run every division **with player 2
+in** end to end (the whole bracket, the record, the reload), the Rumble, and the 2 v 2 with the team combos, as new
+blocks of `tny_engine.txt` or a `tny_coop.txt`. "All the way through" = the test plays a full tournament of each
+division with two players and checks the record and the prize.
+
+### 11.6 West City in co-op: models vanish for a moment, and it lags
+
+**Ryan:** "the cutscene still had people disappear for a second when we entered West City, and also it was really
+really laggy in that area of West City. I'm not sure if that's because now with co-op there are too many sprite
+characters or what? We need to figure it out."
+
+**Known.** The arrival's drag was fixed (section 9); the vanishing was not that. West City's first screen holds the
+parade crowd (nine NPCs and the float) plus Goku's and Piccolo's actors in the scene, two players, two HUD panels and
+the HUD meters: the GBA draws at most 128 sprites and OBJ VRAM is one pool (`docs/engine.md`; the allocator's 64-byte
+blocks, "Tournament bodies"). Sprites past the limit are simply not drawn for that frame (they "disappear for a
+second"), and a frame that runs past VBlank is a lagged frame: both symptoms point at the same place, too much per
+frame, in co-op only (the second player, his panel and the twins' code paths are the difference). Not reproduced
+yet: the headless runner draws every frame it is asked for and never shows an overrun.
+
+**Plan.** The same probe as 11.4a (frame time and the OAM count per frame, in West City's first screen with the
+parade, alone and in co-op); then the fix the numbers call for: fewer OBJ for the second HUD panel, the crowd culled
+outside the view (the stock already culls by the view rect: check it holds for our entity loop), the per-frame
+co-op work trimmed. The disappearing: if it is the OAM limit, the HUD and the players get priority (drawn first).
+
+### 11.7 Order
+
+1. 11.5 the tournament in co-op (the thing Ryan called most important; a reproduction first).
+2. 11.3 player 2's agency (the biggest piece; cutscenes and pads first, exits, fly-off, barriers).
+3. 11.1 + 11.2 the regeneration rules (small, one piece).
+4. 11.4a + 11.6 performance (one piece: the probe, then the fixes), 11.4b the board (tiny, with it).
+5. A two-player session to check all of it, with the combo notes still waiting (section 1).
+
+### 11.8 The team (when Ryan says go)
+
+| piece (branch) | scope | done when |
+|---|---|---|
+| tny-coop (`pp2-tny`) | 11.5 | 2 v 2, Rumble and every division start and finish with player 2 in, headless, end to end |
+| agency (`pp2-agency`) | 11.3 | the five abilities above, each with a headless check; `docs/coop-design.md` "One player" updated |
+| regen (`pp2-regen`) | 11.1, 11.2 | the trickle once, played slots capped, the ki rule; `regen.txt` covers all of it |
+| perf (`pp2-perf`) | 11.4a, 11.6, 11.4b | the probe in the runner and `docs/testing.md`; West City and the island under a frame in co-op; the board |
+
+Rules as in section 7: own worktree and `BUILD=`, numbers from `docs/ids.md`, the lead merges and runs `regfull.sh`,
+nothing swapped into `build/play` until Ryan asks. The pieces touch different files (tny_*, input/player/switch,
+regen/ssj, hud/entities/tny_grounds + a map spec); the perf piece's entity-loop change is the one overlap with
+agency (both in `entities.c` / `player.c`): perf goes last or merges first.
+
+### 11.9 Questions for Ryan (before any code)
+
+1. **Who healed to full:** which character was player 1 and which player 2 when player 1 filled up? (The code says the
+   benched trickle feeds the non-active slot; the answer tells whether something else is going on.)
+2. **Benched party members:** the stock game heals the characters nobody is playing to full over time (5 % every
+   ~10 s). Keep that for them, or cap them at 2/3 too?
+3. **Ki rule's shape:** once the 60 s pass, how fast to 1/3 (the heal takes ~22 s from empty to 2/3; the same pace?),
+   and does the stock crumb (3 % every ~10 s) stay underneath or go entirely?
+4. **Player 2 at a save pad:** "switch characters" there changes player 2's character (and saving saves), yes?
+5. **Exits:** when player 2 walks into a map exit, both go at once, exactly as when player 1 does?
+6. **The island's lag:** on the host, did mGBA's title bar fps drop under 60, or was it the Parsec picture on his
+   brother's side that stuttered?
+7. **The tournament:** after both picks, did the screen stay on the selection, go black, or drop back to the waiting
+   room? And which characters were picked?
+8. **West City's vanishing:** did it happen playing alone through West City too, or only in co-op?

@@ -50,7 +50,8 @@ leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games
 (`pp-story`), the tournament fixes 24.1-24.7 (`pp-tny`), the soft-reset crash (`pp-reset`): all seven pieces merged,
 full regression clean (section 10). The two-player sessions started 2026-11-01 (Parsec; his brother's pad through
 `p2_keys.py`): player 2's pickups (`src/coop/pickup.c`) and resting heals (`src/coop/regen.c`) came out of the first
-(section 1 "First session", section 9). The combos' step tables wait for a longer session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
+(section 1 "First session", section 9); the second session's notes and their plan are section 11 (planning only until
+Ryan answers 11.9 and says go). The combos' step tables wait for a longer session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
 
 The World Tournament on Papaya Island (`docs/tournament.md`: the plan, 9b-13 the build, 14-23 playtest rounds, 24 open
 points, 25 the team combos, 25.4 colours, 25.5 the leftovers) and its team combos (`docs/tournament-combos.md`, both
