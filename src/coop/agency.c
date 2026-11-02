@@ -57,6 +57,8 @@ ROM_FN(void *, Mover_Walk, (const void *go, Entity *e), 0x0800D585);
 
 typedef struct AgState {
     u8 modal;            // 1: player 2 fired what runs now: his pad is the stock input (input.c)
+    u8 menu;             // 1: the pause menu he opened runs: the same
+    u8 in_update;        // inside the world update: a poll here is a modal's (its menus, a box it fired)
     u8 world;            // he took off: his pad drives the world map until the flyer lands (1 on the way, 2 on it)
     u8 pad;              // the box firing is a flight pad's kind (a script on A): 1 for player 1, 2 for player 2
     u8 quiet;            // frames left of a press's "no second press from the other pad" (a line closed once)
@@ -323,7 +325,15 @@ void agency_pads(u16 *p1, u16 *p2) {
         else if (ag.world == 2) ag.world = 0;
     }
     if (!p2_pad_present() || players_one()) { ag.world = 0; return; }
-    if ((ag.modal || ag.world == 2) && !scene_running()) {
+    // his Start: the next world update opens the pause menu (below); a press inside one is a modal's
+    if (!ag.in_update && !ag.menu && !ag.modal && ag.world != 2 && coop.p2 && !companion_active() && !scene_running()
+        && p1_controllable() && (*p2 & KEY_START) && !(ag.prev2 & KEY_START)) {
+        ag.menu = 1;
+        *p1 |= KEY_START;
+        *p2 = (u16)(*p2 & ~KEY_START);
+        return;
+    }
+    if ((ag.modal || ag.menu || ag.world == 2) && !scene_running()) {
         *p1 = *p2;
         *p2 = 0;
     }
@@ -345,6 +355,30 @@ void agency_scene_press(InputSystem *in, u16 pad2) {
     }
     if (mine) { ag.quiet = PRESS_QUIET; ag.quiet_by = 1; }
     else if (edge) { in->pressed |= edge; ag.quiet = PRESS_QUIET; ag.quiet_by = 2; }
+}
+
+// ---- player 2's Start: the pause menu, on his pad, on his character (Ryan, 2026-11-02) -------------------------------------
+// The stock world update (0x08004CAC, world vtable 0x08023884 slot 10) opens the menu on the stock input's Start, modal, from
+// inside the update, and only with the active slot alive. His press becomes that Start at the poll (agency_pads), and his
+// pad is the stock input until the update that saw it returns; player 1's pad does nothing meanwhile, as at a save pad player
+// 2 opened. Not in a scene, and not while a menu is up (the update's nested polls).
+ROM_FN(int, World_Update, (void *world), 0x08004CAD);
+ROM_FN(void, StatusScreen_Open, (s32 *o), 0x08003BD7);
+int world_update_hook(void *world) {
+    ag.in_update = 1;
+    int r = World_Update(world);
+    ag.in_update = 0;
+    ag.menu = 0;
+    return r;
+}
+
+// The pause menu's status object (vtable 0x080248CC slot 1): it starts on the active character (+0x114 the index, +0x154 the
+// count, then the listed slots); opened by player 2, on his
+void status_open_hook(s32 *o) {
+    if (ag.menu)
+        for (int i = 0; i < o[0x55]; i++)
+            if (o[0x56 + i] == coop.p2_slot) o[0x45] = i;
+    StatusScreen_Open(o);
 }
 
 // ---- the save pad's switch screen (switch.c) ----------------------------------------------------------------------------

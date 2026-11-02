@@ -120,6 +120,25 @@ void ssj_detransform_done(void *state, Entity *e) {
     apply(e, 0);
 }
 
+// The death state's enter (vtable 0x080254D8 slot 0, stock 0x0800833E): the state's bookkeeping, no ranged or melee
+// resistance, and the form turned back: the stock's is the active slot's whoever fell, so player 2 going down took player
+// 1's row back while his body stayed transformed and kept draining, and left his own form on (found by the regression,
+// 2026-11-02; docs/perfect-pass.md 9). Now the fallen one's own, as apply() does. His body stays as it lies until he is
+// up: p2_sync_combat rebinds him then.
+ROM_FN(void, DeathState_Base, (void *state, Entity *e), 0x0800E131);
+void ssj_death_enter(void *state, Entity *e) {
+    DeathState_Base(state, e);
+    *((u8 *)e + 0x163) = 0;
+    *((u8 *)e + 0x164) = 0;
+    int slot = slot_of_entity(e);
+    if (slot < 0 || slot >= PARTY_SLOTS) return;
+    const u8 *row = row_of(slot);
+    if (!(row[0] & 1)) return;
+    class_call(row, 3);
+    g_Party->chars[slot].display_row = row[5];
+    if (coop.p2) hum_settle();                     // the class's stop took the first hum it found: the other's stays
+}
+
 // the Super Saiyans' class update (vtable 0x08024C58 slot 1, stock 0x08017306): not while turning back; the
 // entity's +0x184 accumulator gains 0xCCD a frame and each overflow takes 1 EP from its own slot; at 0 EP
 // (alive) it turns back
@@ -132,6 +151,7 @@ void ssj_class_update(void *cls, Entity *e) {
     int slot = slot_of_entity(e);
     if (slot >= 0 && slot < PARTY_SLOTS) {
         CharacterEntry *c = &g_Party->chars[slot];
+        if (c->hp == 0) { *acc &= 0xFFFF; return; }   // down: his body is still on the class, his ki stays
         if ((s16)c->ep >= 1) {
             c->ep--;
             ssj_state.drains++;

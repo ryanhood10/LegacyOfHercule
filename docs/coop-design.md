@@ -1443,4 +1443,4 @@ companion) nothing below runs: the scan and the barriers do what the stock does,
   and an A press in the box (`gate`, for both players, also for the swing). So the right character opens it whoever plays him, the
   wrong one gets the line and no opening, and Select on the spot works. Zone 4 area 50's stock line (only for Gohan) now shows for everyone but Piccolo.
 - **Player_Attack's swing** (`trigger_takes_a_hook`): a box asks for the player punching, so his A on a pad does not swing either.
-- **Kept:** player 1's pad never opens a menu for him; the pause menu and the status screen stay player 1's (not asked for).
+- **Player 2's Start (Ryan, 2026-11-02):** the pause menu, on his pad and his character (`agency.c`: `agency_pads` turns his press into the stock Start at the poll; `world_update_hook` on the world's vtable 0x08023884 slot 10 ends it; `status_open_hook` starts the status page on his slot). Player 1's pad does nothing meanwhile. Not in a scene; like player 1's, it needs the active slot alive (stock). Player 1's pad never opens a menu for him.

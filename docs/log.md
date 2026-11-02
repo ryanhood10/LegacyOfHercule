@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Player 2's Start opens the pause menu** (his pad, his character; `agency.c`), and **a Super Saiyan going down turns back only his own form** (`ssj.c` `ssj_death_enter`; it was the active slot's, whoever fell). `p2_cases.txt` blocks 7 and 8.
 - **Hercule's kit and player 2's levels, Ryan's session notes (`docs/perfect-pass.md` 9, `docs/hercule.md` 3):** the Flash (freeze 320 -> 120 frames, a real
   hit ends it) and a Gun (ability 25, 3/4 of a ki blast) from the start, the Ki Blast at the three-year skip, nothing else selectable; punch, power and
   endurance growth lowered, older saves brought down once at the load (`hercule_lock`); the level-up box names whoever levelled, with their level. Test `hercule_kit.txt`.

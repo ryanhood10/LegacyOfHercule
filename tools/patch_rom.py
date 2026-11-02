@@ -57,6 +57,7 @@ VTABLE_HOOKS = [
     (0x08025D9C, 5, "ssj_transform_done"),   # transform (anim 0x23, ability 12) done: stock 0x0801563D
     (0x08025CE0, 5, "ssj_transform_done"),   # transform (anim 0x25, ability 11) done: the same function
     (0x080256AC, 5, "ssj_detransform_done"), # detransform (anim 0x24) done: stock 0x080157AF
+    (0x080254D8, 0, "ssj_death_enter"),      # the death state's enter: the fallen one's own form turns back: stock 0x0800833F
     (0x08024C58, 1, "ssj_class_update"),     # the Super Saiyans' class update (drain, revert): stock 0x08017307
     (0x08024004, 1, "ssj_base_update"),      # the base class update: regen.c's rules (meter and trickle once a frame, resting, ki)
     (0x08024E4C, 1, "ssj_base_update"),      # the Super Saiyan 2 class (rows 4, 28): the same, not "the active slot + 1 %" to full
@@ -68,6 +69,8 @@ VTABLE_HOOKS = [
     (0x08023B3C, 13, "status_title_hook"),
     (0x08023B3C, 23, "status_pages_hook"),
     (0x08023B3C, 24, "status_draw_hook"),
+    (0x08023884, 10, "world_update_hook"),   # the world update: player 2's Start opens the pause menu (agency.c)
+    (0x080248CC, 1, "status_open_hook"),     # the pause menu's status object: opened by player 2, on his character
     (0x080248CC, 13, "status_title_hook"),
     (0x080248CC, 23, "status_pages_hook"),
     (0x080248CC, 24, "status_draw_hook"),

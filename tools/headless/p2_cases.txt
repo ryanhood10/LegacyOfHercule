@@ -479,3 +479,100 @@ frames 30
 echo EXPECT \w+: 00
 peek8 FLAGS+34
 p2 0
+echo === 7 A SUPER SAIYAN GOES DOWN: only his own form ends (stock: the active slot's, whoever fell). Vegeta (player 1, slot 2, base row 08) and Goku (player 2, slot 4, base row 13)
+load pc_both.ss
+echo --- player 2 down: his row back, player 1's stays, one hum for player 1, his ki stays while he lies
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 60
+echo EXPECT 0203f084: 13
+peek8 PARTY+0x84
+echo EXPECT 0203f04c: 0b
+peek8 PARTY+0x4C
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+peek16 PARTY+0x80 1
+frames 120
+peek16 PARTY+0x80 1
+shot pc_p2_down
+echo --- the map changes: he is up at 30 % on his base body, player 1 still transformed
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x01100220
+poke32 0x0203FD08 5
+frames 300
+deref P2 0x0203FF08
+echo EXPECT 0203f084: 13
+peek8 PARTY+0x84
+echo EXPECT 0203f04c: 0b
+peek8 PARTY+0x4C
+echo EXPECT \w+: 030021e0
+peek P2+0x180
+peek16 PARTY+0x7C 1
+shot pc_p2_up
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+echo --- player 1 down instead: his row back, player 2's stays, one hum for player 2
+load pc_both.ss
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 10
+frames 60
+echo EXPECT 0203f04c: 08
+peek8 PARTY+0x4C
+echo EXPECT 0203f084: 14
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+shot pc_p1_down
+echo === 8 PLAYER 2'S START: the pause menu on his pad, on his character (the entity list is set aside while it is up: 0 listed)
+load menu.ss
+p2 0
+maptest 7
+frames 300
+echo EXPECT 03001124: 000000[1-9a-f][0-9a-f]
+peek 0x03001124 1
+p2 8
+frames 3
+p2 0
+frames 60
+echo EXPECT 03001124: 00000000
+peek 0x03001124 1
+shot pc_p2_menu
+echo --- player 1's Start does not close it
+key 8 6
+frames 40
+echo EXPECT 03001124: 00000000
+peek 0x03001124 1
+echo --- his Right moves on, his Start closes
+p2 0x10
+frames 3
+p2 0
+frames 30
+shot pc_p2_menu_right
+p2 8
+frames 3
+p2 0
+frames 80
+echo EXPECT 03001124: 000000[1-9a-f][0-9a-f]
+peek 0x03001124 1
+echo --- player 1's own menu: on his character, player 2's Start does nothing to it, player 1's closes it
+key 8 6
+frames 60
+echo EXPECT 03001124: 00000000
+peek 0x03001124 1
+shot pc_p1_menu
+p2 8
+frames 3
+p2 0
+frames 40
+echo EXPECT 03001124: 00000000
+peek 0x03001124 1
+key 8 6
+frames 80
+echo EXPECT 03001124: 000000[1-9a-f][0-9a-f]
+peek 0x03001124 1

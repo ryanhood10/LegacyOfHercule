@@ -1128,6 +1128,17 @@ frames, 30 for the Kamehameha), EP peeked after each. Pass: no `CRASH`, every EP
 the bodies right in the sheet (fighters whose art is not in the build show Hercule). 342 shots: the sheet's command
 line has to stay under Windows' 32 K limit (P1 shots only the walk, the punch and ability 0). About a minute.
 
+## The tournament in co-op at each story stage, and crowded blast fights (headless, 2026-11-02)
+
+`tools/headless/tny_stages_gen.py` writes both scripts. `tny_stages.txt` (self-checking, about 10 minutes; not in `regfull.sh`): five stages by the real story flags (no forced tiers, Rookie only through every tier open), the highest tier's 1 v 1, 2 v 2 and Rumble from the director's menu to the record, a `perf` line over each. `tny_blasts.txt` (read its `perf` lines): Rookie, Z-Fighter and Legend Rumble rounds watched, then with both players holding B, ki topped up, and Map Test 13's doubled wolves the same way. Both need the `perf` runner, and from Git Bash the path kept as it is:
+
+```
+MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_expect.py tools/headless/tny_stages.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py tools/headless/tny_blasts.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+```
+
+Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
+
 ## Hercule's kit (headless, 2026-11-02)
 
 `tools/headless/hercule_kit.txt` (self-checking, in `regfull.sh`): the flags and list of a new game, L between the Flash and the Gun, the flash's two seconds and a punch thawing one enemy (test command 47 counts the held), the Ki Blast's and the Gun's damage at the same stats (printed: the bullet about 3/4), player 2's level-up box and status page, and the three-year scene from its trigger (flag 66 set, 68 clear: Hercule's flags 0x4B -> 0x5B). `ssj_lock.txt` takes an old save's Hercule through the load.
@@ -1427,7 +1438,7 @@ build/<dir>/hl --cols 6` (about a minute, in `regfull.sh`). Every block that tes
    area 5's script barrier on the refusal's rect.
 7. Choices: a soft reset, the save he made, "How many players?" answered and closed by his B and A; player 1 loads on his spot.
 
-`tools/headless/p2_cases.txt` (self-checking, in `regfull.sh`): the rarer cases: a downed player at a fly pad, a take-off during a move, Super
+`tools/headless/p2_cases.txt` (self-checking, in `regfull.sh`): a Super Saiyan going down, player 2's Start; the rarer cases: a downed player at a fly pad, a take-off during a move, Super
 Saiyans at a save pad and the hum (test command 46 counts it), rows 10 / 14 on player 2, the companion's bench slot, Dende's yes / no on his pad,
 zone 4 area 50's line. A Map Test's ability gate is 0: `poke32 0x0300208C 1` before a B; the party meter (`poke32 PARTY+8 0`) before a second transformation.
 
