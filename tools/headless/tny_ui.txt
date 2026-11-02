@@ -356,3 +356,54 @@ shot u39_courtyard_after
 echo == screens opened (byte 3 of the third word) and allocation failures (UI+0x80): none failed
 peek UI+8 1
 peek16 UI+0x80 1
+# ---- 8. the tier list with its locked lines (28, 8: arg2 = the locked mask), the champion's screen (28, 9: fighter | fighter 2 << 8 | tier << 16 | division << 24)
+echo == the tier list, Rookie open: the cursor starts on it; Down onto Adept, A buzzes and the list stays; Up, A answers 0
+poke32 0x0203FD0C 8
+poke32 0x0203FD54 0x1E
+poke32 0x0203FD08 28
+waitnz UI+0x88 300
+shot u40_tiers_rookie
+key 0x80 4
+frames 10
+shot u41_tiers_locked_line
+key 1 4
+frames 30
+shot u42_tiers_buzz
+peek UI+0x88 1
+key 0x40 4
+frames 10
+key 1 4
+frames 100
+peek8 UI+7 1
+echo == from the top with Rookie locked (Adept open): the cursor starts on Adept, A answers 1
+poke32 0x0203FD0C 8
+poke32 0x0203FD54 0x1D
+poke32 0x0203FD08 28
+waitnz UI+0x88 300
+key 1 4
+frames 100
+peek8 UI+7 1
+echo == the champion: one, A finishes the show, A closes; OBJ VRAM before = after
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0x0000FF32
+poke32 0x0203FD08 28
+frames 40
+shot u43_champion_rising
+key 1 4
+frames 20
+shot u44_champion_shown
+key 1 4
+frames 100
+peek16 UI+0x7C 2
+echo == two champions, waited out; OBJ VRAM before = after
+poke32 0x0203FD0C 9
+poke32 0x0203FD54 0x02043332
+poke32 0x0203FD08 28
+waitnz UI+0x88 400
+frames 60
+shot u45_champions
+key 1 4
+frames 100
+peek16 UI+0x7C 2
+echo == no allocation failures
+peek16 UI+0x80 1

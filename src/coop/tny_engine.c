@@ -1694,26 +1694,26 @@ static void begin_tournament(void) {
 // ("it just dropped back to the waiting room").
 enum { DS_TIER, DS_DIV, DS_SIZE, DS_P1, DS_P2, DS_DONE };
 static int director_menus(int players) {
-    const char *lines[TIER_COUNT];
-    u8 tiers[TIER_COUNT];
-    int n = 0, sized = 0, stage = DS_TIER, c;
-    for (int t = 0; t < TIER_COUNT; t++) if (tny_tier_open(t)) { tiers[n] = (u8)t; lines[n++] = tier_name[t]; }
-    if (!n) return 0;
+    u32 locked = 0;
+    int sized = 0, stage = DS_TIER, c;
+    for (int t = 0; t < TIER_COUNT; t++) if (!tny_tier_open(t)) locked |= 1u << t;
+    if (locked == (1u << TIER_COUNT) - 1) return 0;
     static const char *const div2[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
     static const char *const div1[2] = { "1 v 1", "Royal Rumble" };
     static const char *const size[2] = { "Quick (8 fighters)", "Full (16 fighters)" };
     while (stage != DS_DONE) {
         u8 p = NO;
         switch (stage) {
-        case DS_TIER:                                // a list only when more than one is open
-            c = n > 1 ? tny_ui_choose("Which tournament?", lines, n) : 0;
-            if (c < 0 || c >= n) return 0;
-            eng.tier = tiers[c];
+        case DS_TIER:                                // every tier, the closed ones locked: a first-timer sees there is more
+            c = tny_ui_choose_locked("Which tournament?", tier_name, TIER_COUNT, locked,
+                                     "More tiers open as the story goes on", "Locked: come back later in the story!");
+            if (c < 0) return 0;
+            eng.tier = (u8)c;
             stage = DS_DIV;
             break;
         case DS_DIV:
             c = players == 2 ? tny_ui_choose("Which division?", div2, 3) : tny_ui_choose("Which division?", div1, 2);
-            if (c < 0) { if (n <= 1) return 0; stage = DS_TIER; break; }
+            if (c < 0) { stage = DS_TIER; break; }
             eng.division = (u8)(players == 2 ? c : c == 1 ? DIV_RUMBLE : DIV_1V1);
             eng.full = 0;
             stage = DS_SIZE;
@@ -1780,7 +1780,12 @@ static int champion_seat(void) { return eng.br.rounds ? eng.br.winner[eng.br.rou
 static void step_next(void) {
     scene_clear();                                   // the curtain closes on the last scene
     if (eng.division == DIV_RUMBLE) {
-        if (eng.rb_round >= eng.rb_rounds) { eng.phase = P_TROPHY; eng.pres = 0; return; }
+        if (eng.rb_round >= eng.rb_rounds) {
+            tny_ui_champion(eng.pick, eng.players, eng.tier, eng.division, 0);
+            eng.phase = P_TROPHY;
+            eng.pres = 0;
+            return;
+        }
         rumble_round();
         return;
     }
@@ -1789,7 +1794,9 @@ static void step_next(void) {
         tny_ui_bracket(eng.br_shown ? 1 : 0);
         eng.br_shown = 1;
         eng.results = 0;
-        eng.phase = (players_in(champion_seat()) & ~eng.out) ? P_TROPHY : P_EXIT;
+        int cs = champion_seat();
+        if (cs != NO) tny_ui_champion(&eng.br.seat[cs], unit_w(), eng.tier, eng.division, eng.full);
+        eng.phase = (players_in(cs) & ~eng.out) ? P_TROPHY : P_EXIT;
         return;
     }
     int r = eng.br.round, m = eng.br.match;

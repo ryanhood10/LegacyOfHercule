@@ -40,6 +40,8 @@ key 1 6
 frames 60
 key 1 6
 frames 80
+key 0x1 6
+frames 80
 shot c1_division
 key 0x80 6
 frames 80
@@ -99,6 +101,8 @@ key 1 6
 frames 60
 key 1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x2
 frames 4
 p2 0
@@ -128,6 +132,8 @@ echo EXPECT 0203ec04: 01
 peek8 0x0203EC04
 key 0x2 6
 frames 80
+key 0x2 6
+frames 80
 frames 60
 shot c2_left
 echo EXPECT map zone 15 area 15
@@ -153,6 +159,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x80 6
 frames 80
@@ -204,6 +212,8 @@ key 1 6
 frames 60
 key 1 6
 frames 80
+key 0x1 6
+frames 80
 key 0x80 6
 frames 80
 key 0x1 6
@@ -251,6 +261,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x80 6
 frames 80
@@ -301,6 +313,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -336,6 +350,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -380,6 +396,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x80 6
 frames 80

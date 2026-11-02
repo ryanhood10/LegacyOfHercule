@@ -275,6 +275,10 @@ punctuation only); owner in brackets.
   a status icon pair (bits 3 / 4 need one: `krillin.c` `status_module`). Bit 5 also gives him the charged A attack and the meter
   on his panel, like Android 16. `ssj_lock.txt` covers it: flags, index, player 2's L through all four.
 
+- **Ryan, 2026-11-02, the next two-player session:** Hercule "way too overpowered": the flash froze enemies far too long and a punch did not end it; only the Flash, the Ki Blast after the three years and (his idea) a gun, "fairly weak (slightly weaker than ki blasts)", from the start; his punches grew too strong too quickly; and when player 2 levelled, the box always named player 1's character. All built: `docs/hercule.md` 3. The box's script asks for the active character's name and level, so while it shows the VM's two pushes answer for whoever levelled (`exp_speaker`, `krillin.c` `box_slot`; not by changing the active slot: the input poll read that as player 1 switching, the regression's `gohan_ssj1` caught it). **His note that the journal's level did not go up did not reproduce:** the EXP lands on the right slot and the status page reads that slot (headless: "HERCULE LEVEL 41" after player 2's level-up; his save: Hercule level 17 with EXP 35209). The box naming player 1 and his unchanged level is the likely cause: to check in the next session.
+
+- **Found by the regression, not fixed (2026-11-02):** when player 2 goes down, player 1's Super Saiyan row goes back to base while his body stays transformed and keeps draining. The death state's enter `0x0800833E` turns back the *active* slot's form, whoever died (watch on the row: pc `0x0800838A`). Older than this round: `gohan_ssj1`'s "row 05" line reads 02 now only because Hercule, with less endurance, goes down in that fight.
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM

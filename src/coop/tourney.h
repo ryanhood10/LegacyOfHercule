@@ -202,10 +202,13 @@ const TBracket *tny_bracket(void);                               // engine: the 
 // ui
 int  tny_ui_call(int fn, s32 a, s32 b, s32 c, s32 *push);       // CoopCall 28-29 (the screens, run from scripts)
 int  tny_ui_choose(const char *title, const char *const *lines, int n);   // modal list box: index or -1 (B)
+int  tny_ui_choose_locked(const char *title, const char *const *lines, int n, u32 locked, const char *hint, const char *hint_locked);
+                                                                 // ... with lines shown locked (bits of locked) and a footer
 int  tny_ui_select(int player, int tier, u8 *pick);              // modal select for player 0 / 1: 1 picked, 0 backed out
 void tny_ui_bracket(int phase);                                  // modal bracket screen: 0 show the next match,
                                                                  // 1 animate the last results, then show the next
 void tny_ui_rumble_board(const u8 *ids, const u8 *down, int n);  // modal: the round's faces, fallen ones greyed
+void tny_ui_champion(const u8 *ids, int n, int tier, int division, int full);   // modal: the tournament's champion(s), 1 or 2
 void tny_ui_test(u32 cmd, u32 arg, u32 arg2);                    // test commands 28-29
 void tny_ui_frame(void);                                         // every frame
 void tny_popup_show(const char *line);                           // the pop-up's look (engine calls it when safe)

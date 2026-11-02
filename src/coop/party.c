@@ -79,6 +79,10 @@ void party_add_exp_hook(PartyState *p, int slot, int amount) {
     int to = Character_GetLevel(c);
     if (from == to) return;
     Party_LevelUp(p, slot, from, to);
+    // the box's script asks for the active character's name and level ("%s has achieved Level %d!"): player 2's level-up
+    // said player 1's name and level (Ryan, 2026-11-02). The VM's two pushes answer for whoever levelled while it shows
+    // (krillin.c); the active slot itself must stay: the input poll would read a change as player 1 switching characters
+    exp_speaker = SPEAKER_SET | (u8)slot;
     u32 ctx[8];        // the stock frame gives the dialogue context 28 bytes
     u16 state = 0;
     VmDialog_Init(ctx, LEVELUP_SEQ, &state, LEVELUP_NO_ACTOR, 0);
@@ -86,6 +90,7 @@ void party_add_exp_hook(PartyState *p, int slot, int amount) {
     u32 *screen = Arena_Alloc(8);
     if (screen) { screen[0] = LEVELUP_SCREEN_VT; screen[1] = (u32)ctx; }
     ((int (*)(void *))0x0801F2F5)(screen);   // Modal_Run with the screen pushed in r0
+    exp_speaker = 0;
     if (g_PlayerObject) PlayerEntity_RefreshSprite(g_PlayerObject);
     EntityList_Broadcast(LEVELUP_MODULE[3], 0x15, 0);
     Map_RefreshItems(LEVELUP_MODULE[4]);

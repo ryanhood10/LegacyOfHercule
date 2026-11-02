@@ -138,6 +138,32 @@ def icons(rom):
     return out
 
 
+GUN_PICTURE = [                   # right-facing pistol in the icon's picture area: # steel, + its shadow
+    "................",
+    ".##############.",
+    ".++++++++++++++.",
+    ".####.#.........",
+    ".###..##........",
+    ".###............",
+    ".+++............",
+]
+
+
+def gun_icons(rom):
+    """Ability 25's HUD icons (ready, cooling), on the Transformation icons' frame: 0x200 bytes each, 32 x 16 8bpp tiles."""
+    out = []
+    r0, r1, c0, c1 = ICON_PICTURE
+    for j, colours in enumerate(({"#": 2, "+": 46}, {"#": 112, "+": 113})):
+        a = struct.unpack_from("<I", rom, ABILITY_TABLE + 16 * TRANSFORM_ABILITY + 4 * j - S.ROM_BASE)[0]
+        px = untile(rom[a - S.ROM_BASE:a - S.ROM_BASE + 0x200], 32, 16)
+        field = px[r0][c0]
+        for y in range(r0, r1):
+            for x in range(c0, c1):
+                px[y][x] = colours.get(GUN_PICTURE[y - r0][x - c0], field)
+        out.append(tiles(px, 32, 16))
+    return out
+
+
 def preview(path, rom):
     """Both groups (Goku's / Gohan's for reference above Hercule's) and the icon pair, x4."""
     sp = S.Sprites(rom)

@@ -25,7 +25,7 @@ echo EXPECT \w+: {herc_record}
 peek P2+0x48
 echo EXPECT \w+: 030021e0
 peek P2+0x180
-echo EXPECT \w+: 8064494e
+echo EXPECT \w+: 803e3b30
 peek P2+0x160
 echo === A1 player 2 transforms (ability 18 = the stock Transformation B)
 poke8 0x0203F0B2 18
@@ -55,8 +55,8 @@ echo EXPECT \w+: {ssj_record}
 peek P2+0x48
 echo EXPECT \w+: 030021ec
 peek P2+0x180
-echo --- the Super Saiyan class: combat bytes +10 each (0x4e 0x49 0x64 -> 0x58 0x53 0x6e)
-echo EXPECT \w+: 806e5358
+echo --- the Super Saiyan class: combat bytes +10 each (0x30 0x3b 0x3e -> 0x3a 0x45 0x48)
+echo EXPECT \w+: 8048453a
 peek P2+0x160
 peek S 4
 shot sh_02_p2_ssj
@@ -289,7 +289,7 @@ echo EXPECT \w+: {herc_record}
 peek PL+0x48
 echo EXPECT \w+: 030021e0
 peek PL+0x180
-echo EXPECT \w+: 11100f0e
+echo EXPECT \w+: 19100f0e
 peek 0x0203F0B0 1
 shot sh_15_loaded
 echo --- no drain after the load (not transformed)

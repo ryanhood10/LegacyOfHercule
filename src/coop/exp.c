@@ -12,6 +12,7 @@
 typedef struct ExpHit { const Entity *enemy, *player; } ExpHit;
 static ExpHit exp_hits[EXP_HITS] __attribute__((section(".party.xp")));
 static u8 exp_hit_next __attribute__((section(".party.xp")));
+u8 exp_speaker __attribute__((section(".party.xp")));   // SPEAKER_SET | slot while a level-up box shows (party.c, krillin.c)
 
 #define EXP_EVENT_VTABLE 0x080245B0u   // original event: slot 2 = destroy, slot 3 = fire
 

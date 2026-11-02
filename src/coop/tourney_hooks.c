@@ -54,7 +54,13 @@ WEAK int  tny_ui_select(int player, int tier, u8 *pick) {
     *pick = slot >= 0 && slot < 9 ? by_slot[slot] : TF_GOHAN;
     return 1;
 }
+WEAK int  tny_ui_choose_locked(const char *title, const char *const *lines, int n, u32 locked, const char *hint, const char *hint_locked) {
+    (void)title; (void)lines; (void)hint; (void)hint_locked;
+    for (int i = 0; i < n; i++) if (!((locked >> i) & 1)) return i;
+    return -1;
+}
 WEAK void tny_ui_bracket(int phase) { (void)phase; }
+WEAK void tny_ui_champion(const u8 *ids, int n, int tier, int division, int full) { (void)ids; (void)n; (void)tier; (void)division; (void)full; }
 WEAK void tny_ui_rumble_board(const u8 *ids, const u8 *down, int n) { (void)ids; (void)down; (void)n; }
 WEAK const TBracket *tny_bracket(void) { return 0; }
 

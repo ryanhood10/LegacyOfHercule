@@ -14,7 +14,7 @@ poke8 0x0203F0A0 0x16
 echo == and flags 0x43 with the Taunt selected, as saves had: the cycle could not leave it
 poke32 0x0203F0AC 0x43
 poke8 0x0203F0A1 3
-echo EXPECT \w+: 11120f0e
+echo EXPECT \w+: 19120f0e
 peek 0x0203F0B0 1
 poke32 0x0203FD0C 0x0102
 poke32 0x0203FD54 0x0100021C
@@ -49,26 +49,16 @@ frames 200
 key 1 6
 frames 200
 map
-echo EXPECT \w+: 11100f0e
+echo EXPECT \w+: 19100f0e
 peek 0x0203F0B0 1
 echo EXPECT 0203f0a0: 15
 peek8 0x0203F0A0
-echo == his moves learned, his first move selected; player 2's L goes through all four
-echo EXPECT 0203f0ac: 0000007b
+echo == his kit: the Flash and the Gun (a Map Test party has no three-year flag), the Taunt's slot now the Gun, on the Flash; player 2's L goes between the two
+echo EXPECT 0203f0ac: 0000004b
 peek 0x0203F0AC 1
+echo EXPECT 0203f0b0: 19100f0e
+peek 0x0203F0B0 1
 echo EXPECT 0203f0a1: 00
-peek8 0x0203F0A1
-p2 0x200
-frames 4
-p2 0
-frames 10
-echo EXPECT 0203f0a1: 01
-peek8 0x0203F0A1
-p2 0x200
-frames 4
-p2 0
-frames 10
-echo EXPECT 0203f0a1: 02
 peek8 0x0203F0A1
 p2 0x200
 frames 4

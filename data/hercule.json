@@ -6,15 +6,15 @@
       "hp": 50,
       "ep": 30,
       "str": 2.0,
-      "pow": 0.5,
+      "_": "pow 4: the Gun's damage (Gohan starts at 5; at 0.5 a shot did nothing). flags 0x40 like every stock row plus bit 3: the ability cycle stops only on learned moves (8 << index), so the Flash (0) and the Gun (3); the three years add bit 4, the Ki Blast (1); bit 5 stays off: the Megaton Punch's slot and the charged A attack",
+      "pow": 4.0,
       "end": 1.5,
-      "_": "flags: 0x40 like every stock row, plus bits 3-5: the ability cycle stops only on learned moves (8 << index); with 0x40 alone L could never leave the Taunt",
-      "flags": "0x78",
+      "flags": "0x48",
       "abilities": [
         14,
         15,
         16,
-        17
+        25
       ],
       "ability_index": 0
     },
@@ -68,17 +68,18 @@
       ]
     },
     "5": {
+      "_": "Ryan, 2026-11-02: his punches got too strong too quickly. 1.05 / 1.2 / 1.25 a level on average (Gohan 1.6 / 1.6 / 1.4); ssj.c's HERCULE_STR/POW/END are this for older saves",
       "str": [
-        360,
-        560
+        200,
+        340
       ],
       "pow": [
-        300,
-        500
+        240,
+        380
       ],
       "end": [
-        450,
-        650
+        240,
+        400
       ]
     },
     "6": {
@@ -98,13 +99,13 @@
   },
   "abilities": [
     {
-      "name": "RollingHerculePunch",
+      "name": "Flash",
       "icons": 6,
       "is_ready": "fn:hercule_punch_ready",
       "on_use": "fn:hercule_punch_use"
     },
     {
-      "name": "DynamiteKick",
+      "name": "HerculeKiBlast",
       "icons": 2,
       "is_ready": "fn:hercule_kick_ready",
       "on_use": "fn:hercule_kick_use"
@@ -117,7 +118,7 @@
     },
     {
       "name": "HerculeTaunt",
-      "_": "icons 8, not the stock 11: that is the Transformation icon, and Ryan read it as a Super Saiyan move",
+      "_": "tournament fighters only since 2026-11-02. Icons 8, not the stock 11: that is the Transformation icon, and Ryan read it as a Super Saiyan move",
       "icons": 8,
       "is_ready": "fn:hercule_taunt_ready",
       "on_use": "fn:hercule_taunt_use"
@@ -173,9 +174,31 @@
       "icons": 6,
       "is_ready": "fn:tny_steal_ready",
       "on_use": "fn:tny_steal_use"
+    },
+    {
+      "name": "HerculeGun",
+      "_": "entry 25 (Ryan, 2026-11-02): from the start, a shade weaker than a ki blast; the projectile is kiblast_spawn_hook's",
+      "icons": [
+        "sym:herc_gun_icon_0",
+        "sym:herc_gun_icon_1"
+      ],
+      "is_ready": "fn:hercule_gun_ready",
+      "on_use": "fn:hercule_gun_use"
     }
   ],
   "patches": [
+    {
+      "offset": "0x6D1DAC",
+      "expect": "00010000",
+      "bytes": "50000000",
+      "note": "Hercule's flash: AI set 5's first wait, 256 -> 80 frames (Ryan, 2026-11-02: 'last WAYYY too long'); sets 19 and 114 share it"
+    },
+    {
+      "offset": "0x6D1DBC",
+      "expect": "40000000",
+      "bytes": "28000000",
+      "note": "... and its second wait, 64 -> 40: two seconds in all"
+    },
     {
       "offset": "0x3F4DE7",
       "expect": "000b",

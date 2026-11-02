@@ -95,6 +95,7 @@ ENTRY_JUMPS = [
     (0x0801B15E, "ai_speed4_create_hook"),   # axis-aligned approach AI module constructor
     (0x080104C0, "bossbar_create_hook"),     # BossHealthBar_Create (DrawBossHealthBar opcodes)
     (0x0800DD80, "camera_shake_hook"),       # Camera_Shake: never link the camera into its own chain
+    (0x0800949C, "vm_push_active_hook"),     # VM: push the active character's index (a level-up box: whoever levelled)
     (0x080094B0, "vm_push_name_hook"),       # VM: push the active character's name (dialogue %s)
     (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
     (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)

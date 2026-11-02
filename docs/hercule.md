@@ -74,13 +74,21 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 
 | idx | name (HUD icon) | animation | EP | how |
 |---|---|---|---|---|
-| 14 | Rolling Hercule Punch (Hercule icon) | 5, his stock punch: pose, shockwave object, grunt (SFX 40) | 4 | stock onUse `0x0801327D`, 2 EP refunded |
-| 15 | Dynamite Kick (Ki Blast icon) | 34, Ki Blast: one quick projectile | 3 | stock onUse `0x080131E1`, 1 EP extra |
-| 16 | Megaton Punch (Big Bang icon) | 46, Big Bang: the big slow projectile | 12 | stock onUse `0x08013179`, 2 EP extra |
-| 17 | Hercule Taunt (icon 8; the Transformation icon until 2026-11-02, read as a Super Saiyan move) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
+| 14 | Flash (Hercule icon) | 5, his stock move: the pose and a flash; every enemy on screen dazed (attack descriptor 15, power 0: AI set 5) | 4 | stock onUse `0x0801327D`, 2 EP refunded |
+| 15 | Ki Blast (Ki Blast icon) | 34, one quick projectile | 2 | stock onUse `0x080131E1` |
+| 16 | Megaton Punch (Big Bang icon; tournament fighters only) | 46, Big Bang: the big slow projectile | 12 | stock onUse `0x08013179`, 2 EP extra |
+| 17 | Hercule Taunt (tournament fighters only; icon 8; the Transformation icon until 2026-11-02, read as a Super Saiyan move) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
 | 18 | Super Hercule (the Transformation icon in his colours, `herc_ssj_icon_0/1`) | the stock Transformation (ability 12): animation 0x23, then display row 22 (sprite 157); again: animation 0x24, back to row 21 | none (needs 10; drains 3 a second while transformed) | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` (section 3b) |
 
-Hercule's starting list is **14, 15, 16, 17** (punch, kick, Megaton Punch, taunt), all learned: flags 0x78 (`Ability_Cycle` 0x08004284 stops only on index i with flag `8 << i`; with the stock row's 0x40 L could never leave the taunt; `hercule_lock` lifts an older save at the load, and puts him on his first move once). Super Hercule (18)
+| 25 | Gun (`herc_gun_icon_0/1`, a pistol) | 34, the ki blast's own object with `herc_bullet`'s frames at twice the speed; damage x 3/4 (`kiblast_spawn_hook`, `hercule_bullet_hit`) | 1 | stock onUse `0x080131E1`, 1 EP refunded |
+
+**His kit (Ryan, 2026-11-02: "true to the original game and the anime"):** the list is **14, 15, 16, 25**. `Ability_Cycle` (`0x08004284`) stops only on index i with flag `8 << i`: flags 0x48 give the Flash (0) and the Gun (3); the stock skip's `SetCharacterFlag_Dynamic 5, 2` (flags `|= 4 << n`: `ch3_zone7.lscript`, with the line "Hercule has learned the Ki Blast!") adds the Ki Blast (1). Bit 5 stays off: the Megaton Punch's index is unreachable, and it is also the charged A attack and the panel's meter. `hercule_lock` (`ssj.c`, at every load) brings an older save to this once: flags, the Taunt's slot to the Gun, index 0, the Ki Blast if flag 68 is set, str and end cut to the new growth for his level, pow set to it.
+
+**The flash** (decompiled 2026-11-02): the message is descriptor 15 (id byte, power 0) to the whole map; every enemy's hit tree matches id 15 (`0x0801A804`) and pushes AI set 5 (bosses 19, 114: the same main class `0x086D1DC0`): the dazed pose, a wait of 256 (data at `0x086D1DA0`), stars, a wait of 64 (`0x086D1DB0`), a pop. `data/hercule.json` makes the waits 80 and 40: two seconds. A hit during it only pushed the knock-back over the set, and the freeze went on when that ended; `flash_thaw` (`enemies.c`, in the damage calculation) pops the set first, so any real hit reacts as usual.
+
+**Numbers:** start str 2.0 / pow 4.0 / end 1.5; growth str 200..340, pow 240..380, end 240..400 per level (Gohan 318..518 / 302..502 / 256..456). Pow was 0.5: the combat byte is `pow >> 8`, and a shot from a byte of 0 did no damage.
+
+(Before 2026-11-02 the list was 14, 15, 16, 17 and the flags the stock row's 0x40: L could never leave the Taunt.) Super Hercule (18)
 is kept out of it by Ryan's no-reveal rule (2026-10-18): the late-story script calls
 `hercule_awaken()` (src/coop/ssj.c), which puts 18 into the third slot in place of the Megaton
 Punch. (It was 14, 15, 18, 17 until then.) Verified as player 2 from `log2-run.ss1`: row 21 ->

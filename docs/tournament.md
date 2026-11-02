@@ -678,7 +678,10 @@ ours all-black for silhouettes. Player 2's HUD panel is re-composed after a scre
 - Every screen is full-screen (the map uses all four BG layers and both char blocks, so an overlay would need the
   same restore); the list box is a centred box over the checker. Fades in / out by `BLDY` (16 frames each way).
 - **List box** (`tny_ui_choose`): title in gold, up to 7 lines, Up / Down wrap, A answers the index, B -1. Either
-  pad drives it.
+  pad drives it. **`tny_ui_choose_locked`** adds lines shown but not picked (a mask: grey, a padlock, A buzzes and stays;
+  the cursor starts on the first open line) and a footer that changes on a locked line. The director's first menu uses it
+  (Ryan, 2026-11-02): every tier always listed, also when only Rookie is open ("More tiers open as the story goes on"; on a
+  locked line "Locked: come back later in the story!"), so that a first-time player knows to come back. It names no story event.
 - **Select** (`tny_ui_select`): tabs Z Fighters / Tourney / Villains / Buu Saga (L / R), eight faces a page (4 x 2;
   Left / Right past the edge turns the page), the right panel: the dialogue portrait (or the standing body when the
   fighter has portrait 0), the name, the tier. Listed: fighters a player can ever pick (`TR_STORY`, `TR_BEAT`,
@@ -690,13 +693,24 @@ ours all-black for silhouettes. Player 2's HUD panel is re-composed after a scre
   B returns 0. The same fighter twice (the violet shadow) is the engine's to apply in the match.
 - **Bracket** (`tny_ui_bracket`): a two-sided tree (round 1 down both edges with names, winners one column in per
   round, the champion top centre); Quick one page, Full a page per half and a page for the final. Players' names in
-  red (player 1) / blue (player 2), the fallen grey. Phase 0 draws the bracket as it stands; phase 1 first animates
-  every result since the screen was last shown (the seats and winners last drawn are kept in `.tny.ui`; when the
-  seats differ, every result is new): the players' matches first (the loser greys, a beat, the winner slides to the
-  next column), then the round's other matches with quick slides, grouped by page. Then the next match
-  (`round` / `match`) lights up, both faces slide to the middle and the banner says "GOHAN vs FRIEZA"; a finished
-  bracket slides nobody and the banner says "GOHAN wins!". A (or B / Start) skips the animation, then closes the
-  screen; it closes itself after 5 s.
+  red (player 1) / blue (player 2), the fallen grey, the next match's others gold. Phase 0 draws the bracket as it stands;
+  phase 1 first animates every result since the screen was last shown (the seats and winners last drawn are kept in
+  `.tny.ui`; when the seats differ, every result is new): the players' matches first (the loser and his name grey, a beat,
+  the winner walks to the next column with a little hop, his line lights up, the bar says "GOHAN advances!"), then the
+  round's other matches a little quicker, grouped by page. Then the next match (`round` / `match`) lights up on the tree for
+  a moment and both faces walk down to the ends of the **bar** at the bottom, which says "GOHAN vs FRIEZA" (a team's two
+  faces side by side, its names on two lines); a finished bracket sends nobody and the bar says "GOHAN wins!". A (or B /
+  Start) skips the animation, then closes the screen; it closes itself after 5 s (2.5 s on a finished one).
+  **Layout (2026-11-02, Ryan: the winners at the bottom overlapped):** the old "vs" spots stood on the lower winners' column,
+  and the last row's faces ran into the banner. Rows are 28 px apart from y 32, so the tree ends above the bar (y 132); the
+  columns (x 14, 84, 108, 120 and their mirrors) keep faces apart; nothing but the two fighters crosses the tree. All the
+  frames are the `T_*` defines at the top of `tny_ui_bracket.c`.
+- **The champion's screen** (`tny_ui_champion`, Ryan 2026-11-02: "they can get their own screen"): the engine shows it after
+  the last bracket screen and after a Rumble's headliner, for whoever won (a computer fighter too). The tier and division on
+  top, the dialogue portrait rising into a gold frame (the standing body when he has none; a team or a co-op Rumble two side
+  by side), "CHAMPION" letter by letter, the jingle, "GOHAN wins the Rookie tournament!" in the bar, confetti in the columns
+  beside the panel (the bitmap, nothing to restore there). A finishes the show, A closes; it closes itself after 10 s. The
+  announcer's trophy scene in the ring follows as before.
 - **Rumble board** (`tny_ui_rumble_board`): up to eight faces with names; the fallen grey one after another with a
   red frame; "Standing: N".
 - **Unlock board** (CoopCall 28, a=1; the grounds' courtyard object): every `TR_BEAT` / `TR_CHALLENGER` fighter in

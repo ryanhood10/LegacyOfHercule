@@ -4,8 +4,15 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Hercule's kit and player 2's levels, Ryan's session notes (`docs/perfect-pass.md` 9, `docs/hercule.md` 3):** the Flash (freeze 320 -> 120 frames, a real
+  hit ends it) and a Gun (ability 25, 3/4 of a ki blast) from the start, the Ki Blast at the three-year skip, nothing else selectable; punch, power and
+  endurance growth lowered, older saves brought down once at the load (`hercule_lock`); the level-up box names whoever levelled, with their level. Test `hercule_kit.txt`.
 - **Hercule's moves really selectable (`docs/perfect-pass.md` 9):** flags 0x78, old saves lifted at the load, L goes through all four on
   either pad; the Taunt no longer wears the Transformation icon. Ryan's "stuck with super saiyan" was the Taunt on that icon.
+- **The tournament's screens, Ryan's notes (`docs/tournament.md` 12):** the director's list always shows every tier, the closed
+  ones locked (`tny_ui_choose_locked`); the bracket's faces no longer overlap (tighter rows, a bar at the bottom the two fighters
+  walk down to); the champion gets a screen of their own (`tny_ui_champion`); slower animations, the winner walks and hops, the bar
+  says who advances. Scripts that pass the director by pad press once more (`tny_coop_gen.py`).
 - **Section 12's loose ends (`docs/perfect-pass.md` 13, `tools/headless/p2_cases.txt`):** the untested player 2 cases tested; the aura hum
   no longer sticks (one for two players, `ssj.c`); player 1's pad switch leaves player 2's form; zone 4 area 50's line for everyone but Piccolo;
   flight signs on the arctic landing and the summit (`mapbuild.py` joins two sheets). The stock ki top-up stays gone (Ryan).

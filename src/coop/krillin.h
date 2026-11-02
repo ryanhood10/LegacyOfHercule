@@ -36,7 +36,6 @@
 // the box (cx +- rx, cy +- ry) to every entity of the scene list
 void melee_burst(Entity *e, s32 cx, s32 cy, s32 rx, s32 ry, const u32 *attack);
 void krillin_lift(CharacterEntry *c);   // an older save's Krillin: the 2026-11-01 base numbers (party_save.c)
-void hercule_lock(CharacterEntry *c);   // ssj.c: Super Saiyan Hercule locked off at a load (2026-11-02)
 
 // Destructo Disc (ability 22)
 #define DISC_EP          12

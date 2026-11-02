@@ -14,7 +14,7 @@
 // abilities play the beam groups 18 / 19 (the Kamehameha 3 only on Yamcha, Perfect Cell and Cooler, whose records
 // have a group 18; Special Beam Cannon 9, Spirit Bomb 10 and Sword Blast 13 on nobody) and Energy Punch 7 crashes
 // on Hercule's layout. Ability ids: 0 Big Bang, 1 Burning Attack, 2 Ki Blast, 3 Kamehameha, 4 Masenko,
-// 8 Scatter Shot, 14-17 Hercule's (Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Taunt), 19 Afterimage
+// 8 Scatter Shot, 14-17 Hercule's table entries (the Flash, the Ki Blast, Megaton Punch, Taunt), 19 Afterimage
 // Rush, 20 Shockwave Punch, 21 Destructo Disc, 23 Super Saiyan 2 Burst, 24 Energy Steal (below: Spopovich, Yamu).
 #include "tourney.h"
 

@@ -56,7 +56,7 @@ now ends there, `patch_rom.py` 0xF87E words). ROM: big generated art goes to `ro
 | playables | - | - | 235-249 (player-layout LoG2 bodies) | 29-79 | - | 24-40 | - | - | - | - |
 | engine | 446-459 (none used yet) | 160-219 (160-209 used: 160 + fighter id) | - | - | - | - | 23 (24-27 free) | 21-25 | EEPROM 0x1E00-0x1E3F (the global record) | `.tny.eng` 0x240 (0x21C used) |
 | moves (built, branch `tny-moves`) | - | 220-229 (none used: stand-in stock stats for tests) | - | - | - | - | - | 26 spawn a fighter with his kit, 27 drive kits / Rumble | - | `.tny.mv` 0x7C used (`MvGlobal`, magic 0x4D4F5645 "MOVE"; +0x54 the fight-fix counters, docs/testing.md); kit state on the heap |
-| ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
+| ui (built, branch `tny-ui`) | - | - | - | - | 190-199 (none used) | - | 28 (a=1 the unlock board, a=2 the bracket phase b; pushes 1), 29 (the select for player a at tier b; pushes the id or -1) | 28 open a screen (arg 1 / 2 list boxes, 3 select (arg2 player \| tier << 8), 4 bracket (arg2 phase), 5 Rumble board (arg2 fallen mask), 6 unlock board, 7 pop-up from the next frame (arg2 0 fighter, 1 tier, 2 division), 8 the tier list (arg2 the locked mask), 9 the champion's screen (arg2 fighter \| fighter 2 << 8 (0xFF none) \| tier << 16 \| division << 24)), 29 test stand-ins (arg 0 clear, 1 / 2 unlock bits 0-31 / 32-63 = arg2, 3 fake bracket (arg2 size \| coop << 8), 4 play its round (arg2 1 = the players win), 5 tier mask = arg2) | ui_strings 380-399 (none used: labels are C strings) | `.tny.ui` 0x8C used (`UiState`, magic 0x7A1C0002; +0x7C / +0x7E OBJ VRAM before / after the last screen, +0x88 a screen waits for a button); screen state on the heap |
 
 ## Allocations for the Cell Games and post-game build (2026-10-19)
 
@@ -230,13 +230,14 @@ Dialogue speaker ids worth knowing: 26 Android 16, 36 Bulma, 38 Cell, 67 Hercule
 
 | id | ability | C |
 |---|---|---|
-| 14-17 | Rolling Hercule Punch, Dynamite Kick, Megaton Punch, Hercule Taunt | `hercule.c` |
+| 14-17 | Flash (Rolling Hercule Punch in the tournament's kits), Ki Blast (Dynamite Kick there), Megaton Punch, Hercule Taunt | `hercule.c` |
 | 18 | Super Hercule (the stock Transformation's rules; icons `herc_ssj_icon_0/1`) | `ssj.c` |
 | 19-21 | Afterimage Rush, Shockwave Punch, Destructo Disc | `krillin.c` |
 | 22 | Rocket Punch (Android 16) | `a16player.c` |
 | 23 | Super Saiyan 2 Burst (Super Saiyan 2 Gohan) | `ssj2gohan.c` |
 | 24 | Energy Steal (the tournament's Spopovich and Yamu as players) | `tny_play.c` |
-| 25-40 | allocated to the tournament's playables, unused | |
+| 25 | Hercule's Gun | `hercule.c`, `krillin.c` `kiblast_spawn_hook` |
+| 26-40 | allocated to the tournament's playables, unused | |
 | 41+ | free (24 was allocated to Super Saiyan 2 Gohan, unused) | |
 
 ## Party slots (`PARTY_SLOTS` = 9)
@@ -309,6 +310,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 19+ | 19-20 allocated to the post-game chapter | |
 | 45 | OBJ_ROOM_HOLD (perf, `objroom.c`) | `arg` bytes of OBJ VRAM held at the largest free run's low end (a map fuller than it is), 0 gives them back; answers `cmd_arg` := the largest free block. `perf_budget.py` forces an eviction with it |
 | 46 | HUM_COUNT (`ssj.c`, `tools/headless/p2_cases.txt`) | answers `cmd_arg` := how many Super Saiyan aura hums are playing (one while either player is transformed, else none) |
+| 47 | HERCULE_KIT (`enemies.c`, `tools/headless/hercule_kit.txt`) | `arg` 0: `cmd_arg` := the enemies the flash holds, 1: the last hit's damage, 2: 60 EXP for slot `arg2` |
 | 21 | TNY_SEED (engine) | `arg` = the next tournament's draw seed (`tny_engine.c`); `arg2` = 0x7E000000 \| fighter: he is the players' first opponent (the seat across from player 1, outside the pool's rules) or the Rumble's headliner; any other `arg2`: none |
 | 22 | TNY_FORCE (engine) | `arg` 0: every opponent of the running fight takes a lethal blow from player 1 (a won fight); 1: the fight is lost (player at 1 HP); 2: the running duel ends, `arg2` = the winner (1 / 2) |
 | 23 | TNY_RECORD (engine) | `arg` 0: wipe the global record; 1 / 2: set / clear fighter `arg2`'s unlock bit; 3: reread it into `eng.rec` (0x0203ED68) |

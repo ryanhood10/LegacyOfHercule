@@ -261,6 +261,10 @@ def write_c(path, sp, group18):
     for i, ic in enumerate(SSJ.icons(rom)):
         lines.append(f"const u8 herc_ssj_icon_{i}[0x200] __attribute__((aligned(4))) = "
                      f"{{{', '.join(f'0x{b:02x}' for b in ic)}}};")
+    # ability 25's: the Gun (ssjhercule.py)
+    for i, ic in enumerate(SSJ.gun_icons(rom)):
+        lines.append(f"const u8 herc_gun_icon_{i}[0x200] __attribute__((aligned(4))) = "
+                     f"{{{', '.join(f'0x{b:02x}' for b in ic)}}};")
     grp = []
     for gi, g in enumerate(stock):
         if gi == BEAM_GROUP:

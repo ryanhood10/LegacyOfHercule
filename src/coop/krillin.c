@@ -13,7 +13,7 @@
 #include "ssj2gohan.h"
 
 typedef struct KrDesc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } KrDesc;
-extern const KrDesc kr_kiblast[16], kr_disc[4];     // build/gen/krillin_sprites_data.c
+extern const KrDesc kr_kiblast[16], herc_bullet[16], kr_disc[4];     // build/gen/krillin_sprites_data.c
 extern const u8 kr_status_icon_disc[], kr_status_icon_ki[], kr_status_icon_rocket[];
 extern const char *const ui_strings[];
 
@@ -239,11 +239,13 @@ static void vm_push(s32 *stack, s32 v) {
     stack[1 + n] = v;
 }
 // (Super Saiyan 2 Gohan is "Gohan" in dialogue; "SSJ2 Gohan" is his status-screen title)
-static int speaker_slot(void) { int s = g_Party->active_slot; return s == SSJ2_SLOT ? GOHAN_SLOT : s; }
+static int box_slot(void) { return (exp_speaker & 0xF0) == SPEAKER_SET ? exp_speaker & 0xF : g_Party->active_slot; }
+static int speaker_slot(void) { int s = box_slot(); return s == SSJ2_SLOT ? GOHAN_SLOT : s; }
+void vm_push_active_hook(s32 *stack) { vm_push(stack, box_slot()); }   // Step 11 PushActiveCharIndex (0x0800949C)
 void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + speaker_slot()]); }
 void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + speaker_slot()]); }
 
-// ---- ki blast (0x0800EAD8): the stock spawn, Krillin's blasts get the blue frames --------------------
+// ---- ki blast (0x0800EAD8): the stock spawn, Krillin's blasts get the blue frames, Hercule's Gun a bullet's --------
 void kiblast_spawn_hook(const s32 *xy, Entity *owner) {
     void *list = KIBLAST_LIST;
     if (ObjVram_Largest(list) < 0x100) return;
@@ -254,8 +256,27 @@ void kiblast_spawn_hook(const s32 *xy, Entity *owner) {
         p[0x14] = (u32)f;    // +0x50 frame base (the update adds frame * 12)
         p[6] = (u32)f;       // +0x18 current frame
         state()->kiblasts++;
+    } else {
+        int slot = entity_slot(owner);
+        const CharacterEntry *c = slot >= 0 ? &g_Party->chars[slot] : 0;
+        if (c && c->ability_list[c->ability_index] == HERCULE_GUN_ABILITY) {
+            const KrDesc *f = &herc_bullet[(E8(p, 0x14) & 3) * 4];
+            p[0x14] = (u32)f;
+            p[6] = (u32)f;
+            p[0x10] *= 2;    // +0x40, +0x44 the velocity: a bullet is quick
+            p[0x11] *= 2;
+        }
     }
     EntityList_Add(list, (Entity *)p);
+}
+
+// damage_calc_hook: is this hit a bullet's? The ki blast's message names its object at +0x30 (+0x1C of the Hit); other
+// callers' messages end sooner, so the word is checked to be a RAM object first
+int hercule_bullet_hit(const Hit *hit) {
+    u32 src = *(const u32 *)((const u8 *)hit + 0x1C);
+    if (src < 0x02000000u || src >= 0x04000000u || (src & 3)) return 0;
+    const KrDesc *f = *(const KrDesc *const *)(src + 0x50);
+    return f >= herc_bullet && f < herc_bullet + 16;
 }
 
 // ---- hits ----------------------------------------------------------------------------------------

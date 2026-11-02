@@ -1,4 +1,4 @@
-// The tournament's screens (ui piece): the screen framework (tny_ui.h), the list box (tny_ui_choose), the pop-up
+// The tournament's screens (ui piece): the screen framework (tny_ui.h), the list box (tny_ui_choose, tny_ui_choose_locked), the pop-up
 // (tny_popup_show), CoopCall 28-29 and test commands 28-29. The character select and the unlock board are in
 // tny_ui_grid.c, the bracket and the Rumble board in tny_ui_bracket.c.
 #include "tny_ui.h"
@@ -591,17 +591,36 @@ typedef struct Choose {
     const char *const *lines;
     int n, cur, result;
     int x, y, w, h;
+    u32 locked;                 // lines shown but not to be picked: grey, with a padlock
+    const char *hint, *hint_locked;   // the footer: on an open line, on a locked one
 } Choose;
 
 #define CH_ROW 18
 #define CH_TOP 26
+#define CH_FOOT 16
+
+static int choose_locked(const Choose *c, int i) { return (c->locked >> i) & 1; }
+
+static void padlock(int x, int y, int c) {      // 9 x 11: the shackle, the body, the keyhole
+    bm_frame(x + 2, y, 5, 5, c);
+    bm_fill(x, y + 4, 9, 7, c);
+    bm_fill(x + 4, y + 6, 1, 3, C_SHADE);
+}
 
 static void choose_row(Ui *u, Choose *c, int i) {
     int y = c->y + CH_TOP + i * CH_ROW;
-    int on = i == c->cur;
-    bm_fill(c->x + 6, y, c->w - 12, CH_ROW - 2, on ? C_GOLD_DARK : C_PANEL);
-    if (on) bm_frame(c->x + 6, y, c->w - 12, CH_ROW - 2, C_GOLD);
-    ui_text(u, c->x + c->w / 2, y + 2, 1, on ? C_WHITE : C_LINE, c->lines[i]);
+    int on = i == c->cur, lock = choose_locked(c, i);
+    bm_fill(c->x + 6, y, c->w - 12, CH_ROW - 2, on ? (lock ? C_PANEL2 : C_GOLD_DARK) : C_PANEL);
+    if (on) bm_frame(c->x + 6, y, c->w - 12, CH_ROW - 2, lock ? C_GREY : C_GOLD);
+    ui_text(u, c->x + c->w / 2, y + 2, 1, lock ? C_GREY : on ? C_WHITE : C_LINE, c->lines[i]);
+    if (lock) padlock(c->x + c->w / 2 - ui_text_width(c->lines[i]) / 2 - 14, y + 3, C_GREY);
+}
+
+static void choose_foot(Ui *u, Choose *c) {
+    if (!c->hint) return;
+    int y = c->y + c->h - CH_FOOT - 2, lock = choose_locked(c, c->cur);
+    bm_fill(c->x + 6, y, c->w - 12, CH_FOOT - 2, C_PANEL);
+    ui_text(u, c->x + c->w / 2, y + 1, 1, lock ? C_GOLD : C_LINE, lock ? c->hint_locked : c->hint);
 }
 
 static void choose_open(Ui *u) {
@@ -609,10 +628,15 @@ static void choose_open(Ui *u) {
     int w = c->title ? ui_text_width(c->title) : 0;
     for (int i = 0; i < c->n; i++) { int t = ui_text_width(c->lines[i]); if (t > w) w = t; }
     w += 48;
+    if (c->hint) {
+        int t = ui_text_width(c->hint) + 20, l = ui_text_width(c->hint_locked) + 20;
+        if (t > w) w = t;
+        if (l > w) w = l;
+    }
     if (w < 140) w = 140;
     if (w > 224) w = 224;
     c->w = w;
-    c->h = CH_TOP + c->n * CH_ROW + 8;
+    c->h = CH_TOP + c->n * CH_ROW + 8 + (c->hint ? CH_FOOT : 0);
     c->x = (240 - c->w) / 2;
     c->y = (160 - c->h) / 2;
     if (c->y < 0) c->y = 0;
@@ -623,6 +647,7 @@ static void choose_open(Ui *u) {
     if (c->title) ui_text(u, c->x + c->w / 2, c->y + 5, 1, C_GOLD, c->title);
     bm_hline(c->x + 8, c->y + CH_TOP - 4, c->w - 16, C_PANEL2);
     for (int i = 0; i < c->n; i++) choose_row(u, c, i);
+    choose_foot(u, c);
 }
 
 static void choose_step(Ui *u) {
@@ -636,8 +661,10 @@ static void choose_step(Ui *u) {
         ui_sfx(UI_SFX_MOVE);
         choose_row(u, c, old);
         choose_row(u, c, c->cur);
+        choose_foot(u, c);
     }
-    if (u->keys & KEY_A) { ui_sfx(UI_SFX_OK); c->result = c->cur; ui_leave(u); }
+    if ((u->keys & KEY_A) && choose_locked(c, c->cur)) ui_sfx(UI_SFX_BUZZ);
+    else if (u->keys & KEY_A) { ui_sfx(UI_SFX_OK); c->result = c->cur; ui_leave(u); }
     // back is player 1's alone: player 2's pad may have its A and B the other way round (p2_keys.py's default), so his
     // pad's "A" would take the whole menu away (docs/perfect-pass.md 11.5)
     else if ((u->keys & KEY_B) && (g_InputSystem->pressed & KEY_B)) { ui_sfx(UI_SFX_BACK); c->result = -1; ui_leave(u); }
@@ -652,6 +679,25 @@ int tny_ui_choose(const char *title, const char *const *lines, int n) {
     c.lines = lines;
     c.n = n;
     c.result = -1;
+    if (!ui_run(choose_open, choose_step, 0, &c, UI_PAD_BOTH)) return -1;
+    ui_st.last_ret = (s8)c.result;
+    return c.result;
+}
+
+// Every line shown, the locked ones (bits of `locked`) refused with a buzz; the cursor starts on the first open one
+int tny_ui_choose_locked(const char *title, const char *const *lines, int n, u32 locked, const char *hint, const char *hint_locked) {
+    if (n <= 0 || !lines) return -1;
+    if (n > 7) n = 7;
+    Choose c;
+    memset(&c, 0, sizeof c);
+    c.title = title;
+    c.lines = lines;
+    c.n = n;
+    c.result = -1;
+    c.locked = locked;
+    c.hint = hint;
+    c.hint_locked = hint_locked;
+    while (c.cur < n - 1 && choose_locked(&c, c.cur)) c.cur++;
     if (!ui_run(choose_open, choose_step, 0, &c, UI_PAD_BOTH)) return -1;
     ui_st.last_ret = (s8)c.result;
     return c.result;
@@ -790,6 +836,12 @@ void tny_ui_test(u32 cmd, u32 arg, u32 arg2) {
         }
         case 6: tny_ui_grid(GRID_BOARD, 0, 0, 0); break;
         case 7: ui_st.popup_test = (u8)(arg2 + 1); break;   // shown from tny_ui_frame (the input poll), as the engine would
+        case 8: tny_ui_choose_locked("Which tournament?", ui_tier_names, TIER_COUNT, arg2, "More tiers open as the story goes on", "Locked: come back later in the story!"); break;
+        case 9: {   // the champion's screen: arg2 = fighter | fighter 2 << 8 (0xFF none) | tier << 16 | division << 24
+            const u8 ids[2] = { (u8)arg2, (u8)(arg2 >> 8) };
+            tny_ui_champion(ids, ids[1] == 0xFF ? 1 : 2, (int)(arg2 >> 16) & 0xFF, (int)(arg2 >> 24), 0);
+            break;
+        }
         }
     } else if (cmd == 29) {
         switch (arg) {

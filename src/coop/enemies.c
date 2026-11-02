@@ -32,6 +32,7 @@ int is_coop_enemy(const Entity *e) { return e && (e->vtable == coop2.enemy_vtabl
 // A co-op enemy's record copy lives behind its stat copy in the entity block (create_coop_enemy).
 static EnemyRecord *record_of(Entity *e) { return (EnemyRecord *)((u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
 static const EnemyRecord *record_of_const(const Entity *e) { return (const EnemyRecord *)((const u8 *)e + ENEMY_SIZE + sizeof(EnemyStat)); }
+#define AI_FLASH_MAIN 0x086D1DC0u   // Hercule's flash: below, "Hercule's flash"
 static int is_enemy(const Entity *e) { return e && (e->vtable == (u32 *)ENEMY_VTABLE || e->vtable == coop2.enemy_vtable || is_a16(e) || is_s13(e) || tny_moves_base(e)); }
 // The players' own projectiles (Krillin's Disc, 16's Rocket Punch) aim at this: is_coop_enemy alone missed every
 // enemy of a one-player game (they keep the stock class there; found 2026-11-01, Ryan: "the Disc isn't hitting").
@@ -501,6 +502,18 @@ void coop_debug_tick(void) {
         regen_test(coop2.cmd_arg);
     } else if (cmd == 45) {                     // objroom.c: hold OBJ VRAM (perf_budget.py)
         obj_room_test(coop2.cmd_arg);
+    } else if (cmd == 47) {                     // Hercule's kit (hercule_kit.txt): arg 0 the enemies the flash holds, 1 the last hit's damage, 2 EXP for slot arg2
+        if (coop2.cmd_arg == 0) {
+            u32 n = 0;
+            for (int i = 0; i < g_EntityList->count; i++) {
+                Entity *o = g_EntityList->items[i];
+                if (!is_enemy(o)) continue;
+                const u32 *ai = (const u32 *)((const u8 *)o + 0x19C);
+                if (ai[1] >= 2 && ai[1] <= 5 && ai[ai[1] * 2 + 1] && *(const u32 *)ai[ai[1] * 2 + 1] == AI_FLASH_MAIN) n++;
+            }
+            coop2.cmd_arg = n;
+        } else if (coop2.cmd_arg == 1) coop2.cmd_arg = (u32)coop2.last_dmg;
+        else Party_AddExp(g_Party, (int)coop2.cmd_arg2, 60);
     } else if (cmd == 46) {                     // ssj.c: how many aura hums are playing (p2_cases.txt)
         coop2.cmd_arg = (u32)ssj_hum_count();
     } else if (cmd == COOP_CMD_SPAWN_SCRIPT) {
@@ -598,6 +611,22 @@ static SpeedModule *speed_module(const u32 *cls, const Entity *e, u32 vtable) {
 SpeedModule *ai_speed8_create_hook(const u32 *cls, const Entity *e) { return speed_module(cls, e, AI_SPEED8_VTABLE); }
 SpeedModule *ai_speed4_create_hook(const u32 *cls, const Entity *e) { return speed_module(cls, e, AI_SPEED4_VTABLE); }
 
+// ---- Hercule's flash ------------------------------------------------------------------------------
+// The flash (attack descriptor 15, power 0) pushes AI set 5 (19, 114: the same main class 0x086D1DC0, two waits and the
+// dazed pose, then a pop). A hit there only pushed the short knock-back on top, so the enemy went back to being frozen for
+// what was left. A real hit now pops the set first, so the hit tree below it reacts as to any other hit (Ryan, 2026-11-02:
+// "when you punch an enemy that is frozen, they are supposed to un-freeze"). The waits themselves are data/hercule.json's.
+#define ATTACK_FLASH 15
+ROM_FN(void, Ai_Pop, (void *ai), 0x0801AAD5);
+ROM_FN(void, Entity_ClearAux, (Entity *e), 0x080076BD);
+static void flash_thaw(Entity *e) {
+    u32 *ai = (u32 *)((u8 *)e + 0x19C);
+    u32 n = ai[1];
+    if (n < 2 || n > 5) return;
+    const u32 *top = (const u32 *)ai[n * 2 + 1];
+    if (top && *top == AI_FLASH_MAIN) { Ai_Pop(ai); Entity_ClearAux(e); }
+}
+
 // ---- damage -------------------------------------------------------------------------------------
 // Port of 0x0800F910(defender, hit): the same arithmetic and the same two RNG draws in the same
 // order (lockstep netplay depends on it), then the co-op multiplier for enemy hits on either player.
@@ -629,6 +658,8 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
         dmg = dmg * diff_damage_pct() / 100;   // co-op x 1.25 on Normal; alone by the difficulty (difficulty.h)
         coop2.dmg_scaled++;
     }
+    if (hercule_bullet_hit(hit)) dmg = dmg * 3 / 4 > 0 ? dmg * 3 / 4 : 1;   // krillin.c: a shade weaker than a ki blast
+    if (!player && attack[1] != ATTACK_FLASH && is_enemy(defender)) flash_thaw(defender);
     hit->dmg = dmg;
     hit->secondary = (s32)(res * dmg) >> 7;
     coop2.last_dmg = dmg;

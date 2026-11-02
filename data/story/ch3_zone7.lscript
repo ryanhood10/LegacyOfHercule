@@ -64,3 +64,14 @@ sequence ch3_z7_defeat
         WaitFrames 30
   stockseq @083d4834 1 14                ; Vegeta's "Silly robot", 20 flees, Vegeta follows, Piccolo takes over
 end
+
+; ---- zone 2 area 1 (map 7): the three-year skip: after Gohan's and Piccolo's new moves, Hercule's Ki Blast (Ryan, 2026-11-02) ----
+
+sequence ch3_three_years
+  stockseq @083b88a0 0 12                ; stock through Piccolo's Special Beam Cannon; entry 7 as pre_edited
+  script
+        PlayAudio 27
+        SetCharacterFlag_Dynamic 5, 2
+  text 0 "@^Hercule has learned the Ki Blast!"
+  stockseq @083b88a0 13 20               ; "It's about time to head to Amenbo Island" through the L Button's line
+end

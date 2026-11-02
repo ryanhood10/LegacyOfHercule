@@ -44,10 +44,13 @@ def start(seed=42, record=True):
     cmd(21, seed)
 
 
-def to_director():
-    """In front of the director: Down onto him, A, his two lines. The next press answers the first menu."""
+def to_director(rookie=True):
+    """In front of the director: Down onto him, A, his two lines. The next press answers the first menu, the tier list
+    (every tier, the closed ones locked); rookie: A takes the first line, the next press answers the division."""
     warp(15, 15, 168, 306)
     out("key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80")
+    if rookie:
+        p1(1)
 
 
 def finish(steps=150):
@@ -115,7 +118,8 @@ p1(2)        # and his own B: the list
 out("shot c2_back_list")
 p2(2)
 expect(r"0203ec04: 01", f"peek8 {PHASE}")
-p1(2)        # one tier: the list's B leaves
+p1(2)        # back to the tier list
+p1(2)        # and its B leaves
 out("frames 60", "shot c2_left")
 back_in_room()
 
@@ -234,7 +238,7 @@ for t, name in enumerate(tiers):
         out(f"echo --- {name} {dname}")
         cmd(40, 30, 0)
         cmd(21, 42 + t * 3 + d)
-        to_director()
+        to_director(rookie=False)
         for _ in range(t):
             out("key 0x80 6", "frames 20")
         p1(1)               # the tier
@@ -255,7 +259,7 @@ for t, name in enumerate(tiers):
 out("echo === 6b. A Full bracket with player 2 in: Champion, the list's second line, 16 seats, the record's Full win")
 cmd(40, 30, 0)
 cmd(21, 77)
-to_director()
+to_director(rookie=False)
 for _ in range(3):
     out("key 0x80 6", "frames 20")
 p1(1)

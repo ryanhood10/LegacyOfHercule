@@ -1128,6 +1128,10 @@ frames, 30 for the Kamehameha), EP peeked after each. Pass: no `CRASH`, every EP
 the bodies right in the sheet (fighters whose art is not in the build show Hercule). 342 shots: the sheet's command
 line has to stay under Windows' 32 K limit (P1 shots only the walk, the punch and ability 0). About a minute.
 
+## Hercule's kit (headless, 2026-11-02)
+
+`tools/headless/hercule_kit.txt` (self-checking, in `regfull.sh`): the flags and list of a new game, L between the Flash and the Gun, the flash's two seconds and a punch thawing one enemy (test command 47 counts the held), the Ki Blast's and the Gun's damage at the same stats (printed: the bullet about 3/4), player 2's level-up box and status page, and the three-year scene from its trigger (flag 66 set, 68 clear: Hercule's flags 0x4B -> 0x5B). `ssj_lock.txt` takes an old save's Hercule through the load.
+
 ## Tournament screens (headless, 2026-10-25)
 
 `tools/headless/tny_ui.txt` opens every ui screen through test command 28 on a co-op Map Test (149) and drives it
@@ -1136,7 +1140,8 @@ fighter refused, pages, a pick) and player 2, the Quick and Full brackets round 
 played by test command 29, 4 and shown with phase 1: mid-slide shots, the page turns, the final page, the
 champion), the Rumble board, the unlock board (some unlocked, then everyone), both pop-ups (shown from
 `tny_ui_frame`, the engine's context), then the courtyard's real board object (CoopCall 28, 1). The test stand-ins
-(fake unlocks, tiers, a fake bracket) are test command 29; the engine's own data replaces them once merged. Wait
+(fake unlocks, tiers, a fake bracket) are test command 29; the engine's own data replaces them once merged. The last
+section: the tier list with locked lines (28, 8) and the champion's screen, one and two (28, 9). Wait
 for a screen with `waitnz UI+0x88` (UI = `find UI 0x7A1C0002`, the ui's RAM): it is nonzero while a screen waits
 for a button. Leave about 100 frames after a screen closes before the next test command: commands run in the map's
 entity update, which is paused while a screen or a fade runs (a second poke before that overwrites the first).

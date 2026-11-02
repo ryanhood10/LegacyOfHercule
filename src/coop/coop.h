@@ -233,6 +233,11 @@ void krillin_frame(const InputSystem *in);   // krillin.c, every input poll
 void a16_frame(void);
 void ssj_frame(void);   // ssj.c: every input poll (a slot player 2 leaves turns back from Super Saiyan)
 int ssj_hum_count(void);
+extern u8 exp_speaker;                     // exp.c: the level-up box's character
+#define SPEAKER_SET 0xA0
+#define HERCULE_GUN_ABILITY 25
+int hercule_bullet_hit(const Hit *hit);   // krillin.c
+void hercule_lock(PartyState *p);          // ssj.c: an older save's Hercule
 int  tny_coop_call(int fn, s32 a, s32 b, s32 c, s32 *push);   // tourney_hooks.c: CoopCall 23-30
 void tny_test_cmd(u32 cmd, u32 arg, u32 arg2);                // tourney_hooks.c: test commands 21-30
 void tny_frame(void);                                         // tourney_hooks.c: every input poll                         // a16player.c, every input poll (an older save's 16: his four moves)

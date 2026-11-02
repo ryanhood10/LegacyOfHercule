@@ -5,7 +5,8 @@
     {
       "map": {"zone": 2, "area": 1},
       "_": "Goku's house, 'three years to train': the stock skip raises Gohan (0) and Piccolo (1) one level with a full refill; Hercule (5) and Krillin (6) get the same",
-      "edits": [
+      "triggers": {"11": {"payload": "seq:ch3_three_years"}},
+      "pre_edits": [
         {"at": "trigger:11/entry:7", "replace": [
           ["WaitFrames 120", "SetCharHP 5, 500\nSetCharEP 5, 500\nSetCharHP 6, 500\nSetCharEP 6, 500\nStackGetCharLevel 5, 5\nPushByte 1\nAdd\nSetCharacterLevel\nStackGetCharLevel 6, 6\nPushByte 1\nAdd\nSetCharacterLevel\nWaitFrames 120"]
         ]}

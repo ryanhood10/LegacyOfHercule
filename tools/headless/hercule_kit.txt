@@ -1,0 +1,422 @@
+# Hercule's kit (Ryan, 2026-11-02; docs/hercule.md): the Flash and the Gun from a new game, the Ki Blast after the three years; the flash's freeze
+# two seconds and a punch ends it; the bullet weaker than a ki blast; player 2's level-up box names him and his level. Self-checking, in regfull.sh:
+#   python tools/headless/st_expect.py tools/headless/hercule_kit.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+# Test command 47: arg 0 cmd_arg := the enemies the flash holds, 1 the last hit's damage, 2 60 EXP for slot arg2. cmd_arg 0x0203FD0C. Hercule (player 2): row 0x0203F0A0,
+# index 0x0203F0A1, str/pow/end 0x0203F0A2, exp 0x0203F0A8, flags 0x0203F0AC, list 0x0203F0B0, EP 0x0203F09C.
+load menu.ss
+p2 0
+maptest 13
+frames 300
+echo == the kit: flags 4b, list 0e 0f 10 19, on the Flash
+echo EXPECT 0203f0ac: 0000004b
+peek 0x0203F0AC 1
+echo EXPECT 0203f0b0: 19100f0e
+peek 0x0203F0B0 1
+echo EXPECT 0203f0a1: 00
+peek8 0x0203F0A1
+echo == L: the Gun, then back: no Ki Blast yet
+p2 0x200
+frames 4
+p2 0
+frames 10
+echo EXPECT 0203f0a1: 03
+peek8 0x0203F0A1
+p2 0x200
+frames 4
+p2 0
+frames 10
+echo EXPECT 0203f0a1: 00
+peek8 0x0203F0A1
+echo == the flash holds them (pressed three times: a snake's bite can eat a press), then two seconds
+poke32 0x0300208C 1
+poke16 0x0203F09C 30
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 20
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 47
+frames 6
+echo EXPECT 0203fd0c: 0000000[1-9a-f]
+peek 0x0203FD0C 1
+shot hk_flash_held
+frames 80
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 47
+frames 6
+echo EXPECT 0203fd0c: 0000000[1-9a-f]
+peek 0x0203FD0C 1
+frames 50
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 47
+frames 6
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+shot hk_flash_over
+echo == again, player 2 turns to the snake and punches: that one thaws, the rest stay held
+poke32 0x0300208C 1
+poke16 0x0203F09C 30
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 20
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+p2 0x20
+frames 3
+p2 0
+frames 2
+p2 1
+frames 3
+p2 0
+frames 12
+p2 1
+frames 3
+p2 0
+frames 12
+p2 1
+frames 3
+p2 0
+frames 12
+shot hk_punched
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+frames 200
+echo == the Ki Blast against the Gun: the flash holds everyone (no bites to confuse the number), then the last hit's damage after each shot at the frozen snake (the bullet about 3/4)
+poke32 0x0203F0AC 0x5B
+echo --- ki
+poke8 0x0203F0A1 0
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 30
+poke8 0x0203F0A1 1
+p2 0x20
+frames 3
+p2 0
+frames 2
+shot hk_ki_ready
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_ki_0
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_ki_1
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_ki_2
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_ki_3
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+frames 200
+echo --- gun
+poke8 0x0203F0A1 0
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+p2 2
+frames 4
+p2 0
+frames 40
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 30
+poke8 0x0203F0A1 3
+p2 0x20
+frames 3
+p2 0
+frames 2
+shot hk_gun_ready
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_gun_0
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_gun_1
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_gun_2
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+poke32 0x0300208C 1
+poke16 0x0203F09C 40
+p2 2
+frames 4
+p2 0
+frames 10
+shot hk_gun_3
+frames 30
+poke32 0x0203FD54 0
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 47
+frames 6
+peek 0x0203FD0C 1
+frames 200
+echo == player 2's level-up: the box says Hercule and his new level; Piccolo's level does not move
+poke32 0x0203F0A8 3335500
+peek 0x0203F0A8 1
+poke32 0x0203FD54 5
+poke32 0x0203FD0C 2
+poke32 0x0203FD08 47
+frames 6
+frames 40
+shot hk_levelup_box
+key 1 6
+frames 60
+shot hk_levelup_box2
+key 1 6
+frames 60
+key 1 6
+frames 80
+shot hk_levelup_after
+peek 0x0203F0A8 1
+echo EXPECT 0203f000: 01
+peek8 0x0203F000
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84
+key 8 6
+frames 60
+key 0x10 6
+frames 40
+key 0x10 6
+frames 40
+key 0x10 6
+frames 40
+key 0x10 6
+frames 40
+shot hk_status_hercule
+key 8 6
+frames 80
+echo == the three-year skip: Hercule learns the Ki Blast (bit 4); a save of his old shape comes through ssj_lock.txt
+poke8 0x0203F0AC 0x4B
+poke8 0x0203F110 0x04
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x01F4012C
+poke32 0x0203FD08 5
+frames 300
+map
+shot hk_3y_start
+key 1 6
+frames 50
+shot hk_3y_00
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_03
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_06
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_09
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_12
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_15
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_18
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_21
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_24
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_27
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_30
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_33
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_36
+key 1 6
+frames 50
+key 1 6
+frames 50
+key 1 6
+frames 50
+shot hk_3y_39
+map
+echo EXPECT 0203f0ac: 0000005b
+peek 0x0203F0AC 1

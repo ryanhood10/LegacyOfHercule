@@ -221,18 +221,31 @@ void hercule_awaken(void) {
 #endif
 }
 // A save from the days the ability was granted: Megaton Punch back in slot 2, and his base row if he was transformed.
-// A save from before his moves were learned (flags 0x40, Ryan, 2026-11-02: "STUCK"): Ability_Cycle (L) stops only on
-// learned moves, 8 << index, so he could never leave the Taunt, index 3: all learned, and back on his first move once.
-#define HERCULE_MOVES 0x38u
-void hercule_lock(CharacterEntry *c) {
-    if ((c->flags & HERCULE_MOVES) != HERCULE_MOVES) {
-        c->flags |= HERCULE_MOVES;
-        c->ability_index = 0;
-    }
+// A save from before his kit was settled (Ryan, 2026-11-02: the Flash and the Gun, the Ki Blast after the three years, nothing
+// else: Ability_Cycle stops only on learned moves, 8 << index, and bit 5 is also the charged A attack): the Taunt's slot gets
+// the Gun, the moves are learned as a new game's would be, and his numbers come down to the new growth for his level. The
+// flags say whether that has run (a new game's are 0x48).
+#define HERCULE_FLASH_BIT 0x08u
+#define HERCULE_KI_BIT 0x10u
+#define HERCULE_CHARGE_BIT 0x20u
+#define THREE_YEARS_FLAG 68       // set by the stock skip, as the two of them learn their moves
+#define HERCULE_STR(l) (0x200 + ((l) - 1) * 270)   // data/hercule.json: start + the growth's middle per level
+#define HERCULE_POW(l) (0x400 + ((l) - 1) * 310)
+#define HERCULE_END(l) (0x180 + ((l) - 1) * 320)
+int flag_test_hook(PartyState *p, u32 id);   // party.c
+void hercule_lock(PartyState *p) {
+    CharacterEntry *c = &p->chars[HERCULE_SLOT_INDEX];
 #if !SSJ_HERCULE_UNLOCK
     if (c->ability_list[2] == SSJ_ABILITY) c->ability_list[2] = 16;
     if (c->display_row == 0x16) c->display_row = 0x15;
-#else
-    (void)c;
 #endif
+    if ((c->flags & (HERCULE_FLASH_BIT | HERCULE_CHARGE_BIT)) == HERCULE_FLASH_BIT) return;
+    c->flags = (c->flags | HERCULE_FLASH_BIT) & ~(HERCULE_CHARGE_BIT | HERCULE_KI_BIT);
+    if (flag_test_hook(p, THREE_YEARS_FLAG)) c->flags |= HERCULE_KI_BIT;
+    if (c->ability_list[3] == 17) c->ability_list[3] = HERCULE_GUN_ABILITY;
+    c->ability_index = 0;
+    int level = Character_GetLevel(c);
+    if (c->str > HERCULE_STR(level)) c->str = (u16)HERCULE_STR(level);
+    if (c->end > HERCULE_END(level)) c->end = (u16)HERCULE_END(level);
+    c->pow = (u16)HERCULE_POW(level);
 }

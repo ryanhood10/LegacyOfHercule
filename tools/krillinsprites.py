@@ -26,6 +26,7 @@ Also emitted:
     remapped to the menu BG palette (0x081D4F50) that the status screen's portraits (8..25) use,
     compressed like the stock ones (64x64 linear 8bpp).
   * kr_kiblast[16]: the player ki blast's 4 facings x 4 frames (0x0840E47C) recoloured blue-white.
+  * herc_bullet[16]: the same frames' geometry with a small brass bullet (Hercule's Gun, ability 25).
   * kr_disc[4]: the Destructo Disc, a spinning yellow disc (32x32 raw tiles, drawn procedurally).
   * kr_disc_icon_0/1: HUD icons (ready / cooling, 32x16) built from the Ki Blast icon pair, and
     kr_status_icon_disc / _ki: the status screen's 18x8 technique icons (menu BG palette, compressed).
@@ -265,6 +266,24 @@ def disc_frame(pal, k):
     return px
 
 
+def bullet_frame(pal, w, h, facing, frame):
+    """A bullet on a ki blast frame's canvas: 5 x 2 px of brass with a white tip and a short smoke trail. Facings: 0 down,
+    1 up, 2 left, 3 right."""
+    white, brass, dark, smoke = (nearest(pal, c) for c in ((255, 255, 255), (240, 200, 90), (150, 110, 50), (150, 150, 160)))
+    along = [white, brass, brass, brass, dark] + ([smoke] if frame & 1 else [smoke, 0, smoke])
+    px = [[0] * w for _ in range(h)]
+    cx, cy = w // 2, h // 2
+    for i, c in enumerate(along):
+        for j in (0, 1):
+            k = 2 - i
+            if c == smoke and j:
+                continue
+            x, y = {0: (cx - 1 + j, cy - k), 1: (cx - 1 + j, cy + k), 2: (cx + k, cy - 1 + j), 3: (cx - k, cy - 1 + j)}[facing]
+            if 0 <= x < w and 0 <= y < h:
+                px[y][x] = c
+    return px
+
+
 def recolour_ki(px, pal):
     """Yellow/orange ki blast -> blue-white, by brightness rank onto a blue ramp."""
     ramp_rgb = [(255, 255, 255), (200, 240, 255), (120, 200, 255), (60, 140, 255), (40, 80, 230), (30, 40, 170)]
@@ -397,6 +416,7 @@ def main():
             px = untile(rom[rawp - S.ROM_BASE:rawp - S.ROM_BASE + w * h], w, h)
             ki_cache[rawp] = recolour_ki(px, pal)
         ki.append((xo, yo, w, h, attr, ki_cache[rawp]))
+    bullet = [(f[0], f[1], f[2], f[3], f[4], bullet_frame(pal, f[2], f[3], i // 4, i & 3)) for i, f in enumerate(ki)]
     disc = [(16, 16, 32, 32, 0x80002000, disc_frame(pal, k)) for k in range(4)]
     icons = disc_icons(rom, pal)
     status_icons = {"kr_status_icon_disc": compress(status_icon(bg, "disc")),
@@ -405,7 +425,7 @@ def main():
     ui = ui_table(rom)
     pmod = [u32(PORTRAIT_MODULE + 4 * i) for i in range(PORTRAIT_MODULE_COPY)]
 
-    write_c(out_c, header, groups, {"kr_kiblast": ki, "kr_disc": disc}, portrait_blob, icons, status_icons, ui, pmod,
+    write_c(out_c, header, groups, {"kr_kiblast": ki, "herc_bullet": bullet, "kr_disc": disc}, portrait_blob, icons, status_icons, ui, pmod,
             a16_portrait_blob, extra)
     if preview_path:
         write_preview(preview_path, sp, groups, {"kr_kiblast": ki, "kr_disc": disc}, portrait, bg)
