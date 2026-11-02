@@ -214,7 +214,7 @@ for i in range(1, 10):
     shutil.copy(os.path.join(work, f"f{i}.ss"), os.path.join(out, f"{base}.ss{i}"))
 # the debug party's scenes are past the three-year skip, which they did not play: Hercule's Ki Blast (flags bit 4; docs/hercule.md)
 for n in (3, 4, 5, 6, 7, 9):
-    path = os.path.join(out, f"log2-coop.ss{n}")
+    path = os.path.join(out, f"{base}.ss{n}")
     data = bytearray(open(path, "rb").read())
     data[0x21000 + 0x3F0AC] |= 0x10
     open(path, "wb").write(data)
