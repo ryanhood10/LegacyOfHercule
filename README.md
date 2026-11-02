@@ -98,8 +98,17 @@ A GBA game sees only its own 10 buttons, so player 2's pad reaches the ROM throu
    has no command-line script option, so this step is manual).
 3. Run `python tools\p2_keys.py` in a terminal. Player 1 uses mGBA's normal keys; player 2 uses
    IJKL to move, O = A, U = B, [ ] = L R, N = Select, M = Start. `p2_keys.py` reads the keyboard
-   globally (`GetAsyncKeyState`), not a gamepad: change player 2's keys in its `KEYMAP`. A gamepad can
-   be player 1's, bound in mGBA.
+   globally (`GetAsyncKeyState`), and one XInput controller: the first pad to press a button after the
+   start is player 2's (`--pad N` picks one, `--pad none` turns pads off; B / Y = A, A / X = B, LB / LT
+   = L, RB / RT = R, Back = Select, `--swap-ab` swaps A and B). Player 1's pad is the one chosen in
+   mGBA's Settings > Controllers (mGBA reads only that one). `build\play\Player2-keys.bat` starts it.
+
+### Two players over Parsec (one PC hosts, the other streams)
+
+The host runs mGBA, the bridge and `p2_keys.py` as above and shares the screen with Parsec; the guest's
+controller reaches the host as Parsec's virtual Xbox 360 pad (XInput), so it becomes player 2's when the guest
+presses a button after `p2_keys.py` starts (their keyboard's IJKL keys work too). In Parsec, allow the
+guest gamepad (and keyboard) input; in mGBA, choose the host's own controller as player 1's.
 
 Keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t build\log2-coop.ss1 build\log2-coop.gba`
 starts straight from it. Make savestates with the current build: player 2's vtable copies in EWRAM

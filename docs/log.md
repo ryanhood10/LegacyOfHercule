@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Player 2 on a controller (for Parsec):** `tools/p2_keys.py` also reads one XInput pad, the first to press a button
+  after it starts (`--pad N`, `--pad none`, `--swap-ab`), so a Parsec guest's pad (a virtual Xbox 360 pad on the host)
+  plays player 2 while the host's own pad, chosen in mGBA, plays player 1. README "Two players over Parsec".
 - **Perfecting pass, story piece (branch `pp-story`, `docs/perfect-pass.md` 3):** Krillin and Android 16 as actors
   in Gero's computer (whichever nobody plays walks into the generator, rubble and bunker scenes, watches the 19s'
   fight from the wall, stands for the birds); Gohan's Super Saiyan from the Time Chamber's first "Training

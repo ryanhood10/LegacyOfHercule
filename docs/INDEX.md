@@ -177,7 +177,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `mgba_cmd.py` + `mgba/cmd_server.lua` | focus-free TCP command server inside Windows mGBA (`seq`, `state`, `shot`); `--port=N` / `cmd_server_port` for a second instance |
 | `mgba/coop.lua`, `peek.lua`, `ents.lua`, `force.lua`, `enemies.lua`, `p2_input.lua`, `wide_test.lua` | Lua helpers for Windows mGBA (console inspectors, player-2 pad bridge) |
 | `mgba/netplay.lua`, `netplay_relay.py` | frame-lockstep netplay (Windows mGBA) |
-| `p2_keys.py` | player-2 keyboard sender (IJKL / O U / [ ] / N M) over TCP (7777 Lua bridge, 7778 fork) |
+| `p2_keys.py` | player-2 keyboard and XInput controller sender (IJKL / O U / [ ] / N M; the first pad to press a button; Parsec guests' pads too) over TCP (7777 Lua bridge, 7778 fork) |
 | `win_keys.ps1`, `win_shot.ps1`, `win_burst.ps1` | keys and screenshots for any window by title (used for the WSL fork window); `win_burst` takes N frames from one process |
 | `mgba-wide/` | the mGBA fork: `apply.py` patches a 0.10 clone, `software-wide.c` wide renderer, `p2pad.c` TCP pad, `build-wsl.sh` |
 | `gdb/*.gdb` | GDB batch scripts for mGBA's stub (boot check, crash catch, state dumps) |

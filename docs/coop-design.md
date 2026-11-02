@@ -76,7 +76,9 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
 1. **Same PC, one keyboard (works).** mGBA (Qt) > Tools > Scripting, run
    `dofile("F:/MeltyCreations/log2/tools/mgba/p2_input.lua")`; then `python tools/p2_keys.py`.
    The sender reads the keyboard globally (IJKL move, O = A, U = B, [ ] = L R, N/M = Select/Start)
-   and streams changes over TCP 7777; the script writes them into `g_p2_remote` every frame.
+   and streams changes over TCP 7777; the script writes them into `g_p2_remote` every frame. Since
+   2026-11-01 it also reads one XInput controller (the first to press a button), which covers a
+   Parsec guest's pad (Parsec gives the host a virtual Xbox 360 pad); README "Two players over Parsec".
    Verified: P2 walks while P1 stands still, in a single window.
 2. **Remote (same path).** The brother runs `p2_keys.py --host <host ip>` and watches the game
    over a screen share; the host forwards port 7777. Lockstep netplay (each player runs the ROM, no

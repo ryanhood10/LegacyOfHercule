@@ -69,7 +69,7 @@ after 30 s idle on the title (1800 frames, checked at 0x08000434), about 75 s fr
 
 ```
 tools\mgba_run.ps1 [-NoStates]        # restarts mGBA on build\log2-run.gba (mGBA locks the file it runs)
-python tools\p2_keys.py               # player 2: IJKL move, O=A, U=B, [ ]=L R, N=Select, M=Start
+python tools\p2_keys.py               # player 2: IJKL move, O=A, U=B, [ ]=L R, N=Select, M=Start; or the first XInput pad to press a button
 python tools\mgba_cmd.py "seq('DOWN:4 WAIT:20 A:4')"   # focus-free pad/state/screenshot commands
 ```
 
