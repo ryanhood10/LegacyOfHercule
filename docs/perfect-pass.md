@@ -249,6 +249,13 @@ punctuation only); owner in brackets.
   A while one runs (`input.c`; the stock already holds player 1). Test: `tools/headless/wc_arrival.txt` (self-checking, in `regfull.sh`). Full regression on that build
   (`build/wc`) clean: 59 blocks, exit 0; in `build/play` since 2026-11-02 01:26.
 
+- **Ryan, 2026-11-02 (in the corn maze with his brother): no twins for the corn maze's triceratops.** "Remove the
+  twin rule for the corn field maze, it is causing them to run into and block each other (hence blocking the path)
+  and we cannot proceed; just for these small rhino enemies in the corn maze sections." The maze's paths are one
+  enemy wide. `enemies.c` `corn_maze_single`: sprite 125 (the triceratops; the bestiary's 108-111) on zone 4 areas
+  56, 57, 59 (maps 103, 104, 106) spawns as one co-op enemy, no twin; the King (sprite 127) and every other map are
+  unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`).
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM

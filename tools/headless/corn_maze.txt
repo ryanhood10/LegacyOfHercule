@@ -1,0 +1,28 @@
+# The corn maze's triceratops spawn without twins in co-op (Ryan, 2026-11-02: "remove the twin rule for the corn field
+# maze, it is causing them to run into and block each other"): sprite 125 on zone 4 areas 56, 57, 59 (maps 103, 104,
+# 106; enemies.c corn_maze_single). Map 103 holds 7 of them: with player 2 in, 19 entities (7 co-op enemies, vtable
+# 0x0203FB04), not 26 (14); map 104's 12 give 15 entities, not 27; Map Test 13's wolves still twin (25 entities).
+#   python tools/headless/st_expect.py tools/headless/corn_maze.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+maptest 103
+frames 300
+echo == zone 4 area 56 with player 2: co-op enemies = the 7 records, no twins
+map
+echo EXPECT entities 19
+ents
+shot corn_103
+load menu.ss
+p2 0
+maptest 104
+frames 300
+echo == zone 4 area 57: 12 records, 12 enemies
+echo EXPECT entities 15
+ents
+load menu.ss
+p2 0
+maptest 13
+frames 300
+echo == Map Test 13 (wolves and snakes): still twinned, 20 enemies from 10 records
+echo EXPECT entities 25
+ents

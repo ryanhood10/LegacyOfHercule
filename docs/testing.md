@@ -1332,3 +1332,9 @@ player 1 and player 2 in, the test warp to the landing (352, 1248) and a step do
 Both players hold up with A mashed through the scene; after it they are still on the landing's row (y 0x4C0-0x4FF).
 Before the fix both ended at y 1077: the scene ends with the view panned up to Piccolo, and while it glided back the
 leash snapped both players into it, past the parade float. The leash now moves nobody more than 8 px a frame.
+
+## The corn maze's triceratops (2026-11-02)
+
+`python tools/headless/st_expect.py tools/headless/corn_maze.txt ...`: Map Tests 103 and 104 (zone 4 areas 56 / 57)
+with player 2 in list 19 and 15 entities (7 and 12 co-op enemies, one per record; 26 and 27 with twins before), and
+Map Test 13's wolves still twin (25 entities).
