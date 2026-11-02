@@ -120,7 +120,7 @@ static void draw_bar(Ui *u, Grid *g) {
         char buf[8] = { (char)('1' + g->page), '/', (char)('0' + pages(g)), 0 };
         ui_text(u, x, BAR_Y + 4, 0, C_GREY, buf);
     }
-    ui_text(u, 236, BAR_Y + 4, 2, C_LINE, g->mode == GRID_SELECT ? "L R tab  A pick  B back" : "A B close");
+    ui_text(u, 236, BAR_Y + 4, 2, C_LINE, g->mode != GRID_SELECT ? "A B close" : g->player ? "L R tab  A/B pick" : "L R tab  A pick  B back");
 }
 
 static void panel_clear(Grid *g) {
@@ -280,7 +280,15 @@ static void grid_step(Ui *u) {
         build_page(u, g);
         ui_sfx(UI_SFX_MOVE);
     }
-    if (u->keys & KEY_A) {
+    // Player 2's screen (docs/perfect-pass.md 11.5): both his face buttons pick (his pad's "A" is the GBA's B under
+    // p2_keys.py's default, and backing out on it ended the tournament when he thought he had picked); player 1's B
+    // takes it back to player 1's own pick, also the way out when player 2's pad has gone
+    int p2_screen = g->mode == GRID_SELECT && g->player;
+    if (p2_screen && !u->fade && !u->leaving && (g_InputSystem->pressed & KEY_B)) {
+        ui_sfx(UI_SFX_BACK);
+        g->result = 0;
+        ui_leave(u);
+    } else if (u->keys & (p2_screen ? KEY_A | KEY_B : KEY_A)) {
         int id = cur_id(g);
         if (g->mode == GRID_SELECT && id >= 0 && pickable(g, id)) {
             ui_sfx(UI_SFX_OK);

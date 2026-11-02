@@ -159,6 +159,7 @@ typedef struct UiState {
     u8 dbg[4];                  // the last bracket screen: state, event, events, page (tests)
     u32 ready;                  // a screen is open and waits for a button (tests: waitnz)
     u8 popup_test;              // test command 28, 7: the pop-up to show from tny_ui_frame (+1)
+    u8 vs[2];                   // the last bracket banner's seats (tests: +141; a 2 v 2's are the teams' first seats)
 } UiState;
 extern UiState tny_ui_state;
 #define ui_st tny_ui_state

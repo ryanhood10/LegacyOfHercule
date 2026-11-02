@@ -108,7 +108,8 @@ A GBA game sees only its own 10 buttons, so player 2's pad reaches the ROM throu
 The host runs mGBA, the bridge and `p2_keys.py` as above and shares the screen with Parsec; the guest's
 controller reaches the host as Parsec's virtual Xbox 360 pad (XInput), so it becomes player 2's when the guest
 presses a button after `p2_keys.py` starts (their keyboard's IJKL keys work too). In Parsec, allow the
-guest gamepad (and keyboard) input; in mGBA, choose the host's own controller as player 1's.
+guest gamepad (and keyboard) input; in mGBA, choose the host's own controller as player 1's. By default the pad's
+buttons go by position, as on a GBA: its B / Y are the GBA's A, its A / X the GBA's B (`--swap-ab` for the labels).
 
 Keep an mGBA savestate (`Shift+F1`) on a map; `mGBA.exe -t build\log2-coop.ss1 build\log2-coop.gba`
 starts straight from it. Make savestates with the current build: player 2's vtable copies in EWRAM

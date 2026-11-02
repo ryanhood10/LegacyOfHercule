@@ -1360,9 +1360,10 @@ int tny_ko_check(int k, s32 dmg) {
     if (eng.phase != P_MATCH) return 1;              // after the fight's end (a blast still flying): 1 HP, no more
     eng.koed = 1;
     // a fight of both players: while the partner stands the revive takes the KO (revive.c)
+    // (the revive's own record of who lies down: g_PlayerObject is the nearer player while an enemy's update runs,
+    // entities.c, so asking it for the partner found player 2 himself; "both down" then fell to revive_hit's game over)
     if (eng.fighter == 2 && eng.players == 2 && coop.p2 && g_PlayerObject && !coop_solo()) {
-        Entity *partner = k ? g_PlayerObject : coop.p2;
-        if (!revive_is_down(partner) && !(eng.ko & (1 << !k))) return 0;
+        if (!(rv.magic == REVIVE_MAGIC && rv.body[!k]) && !(eng.ko & (1 << !k))) return 0;
     }
     eng.ko |= (u8)(1 << k);
     eng.result = R_LOST;
@@ -1687,46 +1688,77 @@ static void begin_tournament(void) {
     }
 }
 
+// The director's menus, one step at a time (docs/perfect-pass.md 11.5): B goes back one step, past the first it leaves
+// (0). Player 2's screen answers to both his face buttons and player 1's B is the way back from it (tny_ui_grid.c): his
+// pad's "A" is the GBA's B under p2_keys.py's default, and that B used to end the whole tournament the moment he picked
+// ("it just dropped back to the waiting room").
+enum { DS_TIER, DS_DIV, DS_SIZE, DS_P1, DS_P2, DS_DONE };
+static int director_menus(int players) {
+    const char *lines[TIER_COUNT];
+    u8 tiers[TIER_COUNT];
+    int n = 0, sized = 0, stage = DS_TIER, c;
+    for (int t = 0; t < TIER_COUNT; t++) if (tny_tier_open(t)) { tiers[n] = (u8)t; lines[n++] = tier_name[t]; }
+    if (!n) return 0;
+    static const char *const div2[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
+    static const char *const div1[2] = { "1 v 1", "Royal Rumble" };
+    static const char *const size[2] = { "Quick (8 fighters)", "Full (16 fighters)" };
+    while (stage != DS_DONE) {
+        u8 p = NO;
+        switch (stage) {
+        case DS_TIER:                                // a list only when more than one is open
+            c = n > 1 ? tny_ui_choose("Which tournament?", lines, n) : 0;
+            if (c < 0 || c >= n) return 0;
+            eng.tier = tiers[c];
+            stage = DS_DIV;
+            break;
+        case DS_DIV:
+            c = players == 2 ? tny_ui_choose("Which division?", div2, 3) : tny_ui_choose("Which division?", div1, 2);
+            if (c < 0) { if (n <= 1) return 0; stage = DS_TIER; break; }
+            eng.division = (u8)(players == 2 ? c : c == 1 ? DIV_RUMBLE : DIV_1V1);
+            eng.full = 0;
+            stage = DS_SIZE;
+            break;
+        case DS_SIZE:
+            sized = eng.division == DIV_1V1 && eng.tier != TIER_ROOKIE && pool_of(eng.tier, 0) >= 15;
+            if (sized) {
+                c = tny_ui_choose("Which bracket?", size, 2);
+                if (c < 0) { stage = DS_DIV; break; }
+                eng.full = (u8)c;
+            }
+            stage = DS_P1;
+            break;
+        case DS_P1:
+            if (!tny_ui_select(0, eng.tier, &p)) { stage = sized ? DS_SIZE : DS_DIV; break; }
+            eng.pick[0] = pick_playable(p) ? p : (u8)own_pick(eng.own[0]);
+            stage = players == 2 ? DS_P2 : DS_DONE;
+            break;
+        default:                                     // DS_P2
+            if (!tny_ui_select(1, eng.tier, &p)) { eng.pick[0] = NO; stage = DS_P1; break; }
+            eng.pick[1] = pick_playable(p) ? p : (u8)own_pick(eng.own[1]);
+            stage = DS_DONE;
+            break;
+        }
+    }
+    return 1;
+}
+
 static void step_director(void) {
     int players = (coop.p2 || p2_present()) && !companion_active() ? 2 : 1;
     eng.players = (u8)players;
     eng.pick[0] = eng.pick[1] = NO;                 // last tournament's picks: not out of the pool counts below
     // the waiting room fades out once: the choices and the select screens follow each other through black, and the
-    // warp into the ring happens in the dark (B anywhere: P_IDLE opens the curtain on the waiting room again)
+    // warp into the ring happens in the dark (B out of the first menu: P_IDLE opens the curtain on the waiting room)
     curtain_close();
-    if (!eng.preset) {
-        // the tier (when more than one is open), the division, Quick / Full
-        const char *lines[TIER_COUNT];
-        u8 tiers[TIER_COUNT];
-        int n = 0;
-        for (int t = 0; t < TIER_COUNT; t++) if (tny_tier_open(t)) { tiers[n] = (u8)t; lines[n++] = tier_name[t]; }
-        int c = n > 1 ? tny_ui_choose("Which tournament?", lines, n) : 0;
-        if (c < 0 || c >= n) { eng.phase = P_IDLE; return; }
-        eng.tier = tiers[c];
-        static const char *const div2[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
-        static const char *const div1[2] = { "1 v 1", "Royal Rumble" };
-        c = players == 2 ? tny_ui_choose("Which division?", div2, 3) : tny_ui_choose("Which division?", div1, 2);
-        if (c < 0) { eng.phase = P_IDLE; return; }
-        eng.division = (u8)(players == 2 ? c : c == 1 ? DIV_RUMBLE : DIV_1V1);
-        eng.full = 0;
-        if (eng.division == DIV_1V1 && eng.tier != TIER_ROOKIE && pool_of(eng.tier, 0) >= 15) {
-            static const char *const size[2] = { "Quick (8 fighters)", "Full (16 fighters)" };
-            c = tny_ui_choose("Which bracket?", size, 2);
-            if (c < 0) { eng.phase = P_IDLE; return; }
-            eng.full = (u8)c;
-        }
-    }
-    if (eng.division == DIV_2V2 && players < 2) eng.division = DIV_1V1;   // 2 v 2 is co-op only
-    if (eng.full && pool_of(eng.tier, 0) < 15) eng.full = 0;
     eng.own[0] = g_Party->active_slot;
     eng.own[1] = players == 2 ? coop.p2_slot : NO;
-    for (int k = 0; k < players; k++) {
-        u8 p = NO;
-        if (eng.preset) p = eng.preset_pick[k] != NO ? eng.preset_pick[k] : (u8)own_pick(eng.own[k]);
-        else if (!tny_ui_select(k, eng.tier, &p)) { eng.phase = P_IDLE; eng.preset = 0; return; }
-        if (!pick_playable(p)) p = (u8)own_pick(eng.own[k]);
-        eng.pick[k] = p;
-    }
+    if (eng.preset) {
+        for (int k = 0; k < players; k++) {
+            u8 p = eng.preset_pick[k] != NO ? eng.preset_pick[k] : (u8)own_pick(eng.own[k]);
+            eng.pick[k] = pick_playable(p) ? p : (u8)own_pick(eng.own[k]);
+        }
+    } else if (!director_menus(players)) { eng.phase = P_IDLE; return; }
+    if (eng.division == DIV_2V2 && players < 2) eng.division = DIV_1V1;   // 2 v 2 is co-op only
+    if (eng.full && pool_of(eng.tier, 0) < 15) eng.full = 0;
     eng.preset = 0;
     resolve_slots();
     enter_players();
@@ -1837,6 +1869,7 @@ static void end_show(void) {
     // needs their OBJ VRAM
     if (eng.kind == K_RUMBLE && won && !eng.ann && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
     for (int i = 0; i < eng.nopp; i++) if (eng.opp[i] && in_list(eng.opp[i])) blink(eng.opp[i], 0);
+    revive_fight_over();                             // a body down: up before the poses (his pad closes the line)
     Entity *pl[2] = { g_PlayerObject, floor_p2() };
     for (int i = 0; i < 2; i++) if (pl[i]) pose_hold(pl[i], won);
     for (int i = 0; i < eng.nopp; i++) {
@@ -2135,6 +2168,28 @@ static void story_watch(void) {
     eng.baseline = 1;
 }
 
+// ---- test command 40: the fights decide themselves (tny_coop.txt plays whole tournaments by pad presses only) --------
+#define CP_MAGIC 0x50434E54u              // "TNCP"
+typedef struct TnyCp {
+    u32 magic;
+    u32 lose;                             // bit n: the n-th fight of this run is lost (arg2)
+    u16 after, t;                         // a fight is decided after this many frames of it (0: off)
+    u8 fights;                            // fights decided so far
+    u8 duel;                              // the co-op final's winner (1 / 2)
+    u8 _p[2];
+} TnyCp;
+_Static_assert(sizeof(TnyCp) <= 0x20, ".tny.cp holds at most 0x20 bytes (docs/ids.md)");
+static TnyCp cp TNY_SECTION("cp") __attribute__((used));
+static void cp_tick(void) {
+    if (cp.magic != CP_MAGIC || !cp.after) return;
+    if (eng.t_nofight) { cp.t = 0; return; }
+    if (++cp.t < cp.after || coop2.cmd) return;
+    cp.t = 0;
+    if (eng.phase == P_DUEL) { coop2.cmd_arg = 2; coop2.cmd_arg2 = cp.duel; }
+    else { coop2.cmd_arg = (cp.lose >> (cp.fights & 31)) & 1; cp.fights++; }
+    coop2.cmd = 22;
+}
+
 // ---- every frame (input poll) --------------------------------------------------------------------------------------
 void tny_engine_frame(void) {
     state_check();
@@ -2209,6 +2264,13 @@ void tny_engine_frame(void) {
         g_InputSystem->current &= (u16)~(lock & ~KEY_SELECT);
         coop.input2.pressed &= (u16)~lock;
         coop.input2.current &= (u16)~(lock & ~KEY_SELECT);
+    }
+    cp_tick();
+    // behind the curtain on the way out the player already stands beside the director: a mashed A no longer talks to
+    // him again in the dark (found by tny_coop.txt, a press there opened his menus straight after a tournament)
+    if (eng.dark && (eng.phase >= P_EXIT || eng.phase == P_IDLE) && !scene_running()) {
+        g_InputSystem->pressed &= (u16)~KEY_A;
+        coop.input2.pressed &= (u16)~KEY_A;
     }
     if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
@@ -2325,6 +2387,16 @@ void tny_engine_test(u32 cmd, u32 arg, u32 arg2) {
         break;
     case 24: eng.force_tiers = (u8)arg; eng.force_flags = (u8)arg2; break;
     case 38: test_checks(arg, arg2); break;
+    // 40 AUTO: arg = frames: every fight is decided after that many frames (test command 22's ways), 0 = off; arg2: bits
+    // 0-23 the fights to lose (bit n: the n-th from now), bits 24-25 the co-op final's winner (0 / 1: player 1, 2: player 2)
+    case 40:
+        cp.magic = CP_MAGIC;
+        cp.after = (u16)arg;
+        cp.t = 0;
+        cp.fights = 0;
+        cp.lose = arg2 & 0xFFFFFF;
+        cp.duel = (u8)((arg2 >> 24) == 2 ? 2 : 1);
+        break;
     case 25:
         if (eng.phase != P_IDLE || !g_PlayerObject) break;
         eng.division = (u8)(arg & 3);

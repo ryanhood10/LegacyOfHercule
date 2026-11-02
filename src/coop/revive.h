@@ -37,6 +37,7 @@ void revive_hud_gone(void);                   // hud.c: the HUD is destroyed (it
 int revive_is_down(const Entity *e);
 void revive_p2_up(void);                      // player 2 gets up now (a save-pad trade of its slot)
 void revive_p2_gone(void);                    // player 2 leaves: a downed player 1 is a game over
+void revive_fight_over(void);                 // a tournament fight has ended: the bodies get up, the poses take over
 int scene_running(void);                      // a dialogue sequence runs (0x03001FDC)
 void revive_test_down(int k);                 // test command 10: player k goes down
 int revive_p1_down(void);                     // player 1 lies downed and no scene runs: player 2 plays on

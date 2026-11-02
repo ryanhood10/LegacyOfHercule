@@ -30,7 +30,8 @@
 #define TNY_AB_STEAL        24      // ability: Energy Steal (Spopovich, Yamu as players; tny_play.c, data/hercule.json)
 // CoopCall: engine 23-27, ui 28-29, grounds 30.
 // Test commands (coop2.cmd): engine 21-25, moves 26-27, ui 28-29, grounds 30; the perfecting pass's tny piece 37
-// (tny_caption.c) and 38 (tny_engine.c's checks).
+// (tny_caption.c) and 38 (tny_engine.c's checks); the second two-player round's tny piece 40 (tny_engine.c: the fights decide
+// themselves, tny_coop.txt).
 // Zone 15 areas 11-17: grounds. UI strings 357-379: grounds (place names, banner), 380-399: ui.
 // Display rows 29-79: playables (raise the row limit at file 0x42D6 and EXTRA_ROWS in spriteclone.py).
 // Abilities 24-40: playables. Portraits 127-139 art-new, 140-189 art-buu, 190-199 ui.
@@ -87,7 +88,7 @@
 
 // RAM: the tournament region `tourneyram` (coop.ld, 0x0203EC00, 0x400 bytes; the heap cap ends there). Each
 // piece keeps its state in its own section: engine `.tny.eng` (<= 0x240), ui `.tny.ui` (<= 0x100), moves
-// `.tny.mv` (<= 0x80), grounds `.tny.gr` (<= 0x40). State is NOLOAD: guard it with a magic word.
+// `.tny.mv` (<= 0x80), grounds `.tny.gr` (<= 0x40), test command 40 `.tny.cp` (<= 0x20). State is NOLOAD: guard it with a magic word.
 #define TNY_SECTION(name)   __attribute__((section(".tny." name)))
 // ROM: big generated art goes in the second blob `rom2` (0x08E00000, 2 MiB): mark frame data with TNY_ART.
 #define TNY_ART             __attribute__((section(".rodata.art")))

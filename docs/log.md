@@ -21,6 +21,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
   the text box"). His body and panel now sit at the run's low end; `objroom.c` replaces the eviction's last round with one
   body at a time, the players last. The plaza has the stock sign on its cloud (decoration 0 of zone 7 area 1, its post
   solid). Test: `tools/headless/perf_budget.py` (self-checking, in `regfull.sh`).
+- **The tournament in co-op (branch `pp2-tny`, `docs/perfect-pass.md` 11.5):** "it just dropped back to the waiting room" was
+  player 2's back-out: an Xbox pad's labelled A is the GBA's B under `p2_keys.py`'s default, and any back-out ended the whole
+  tournament. Player 2's select now picks on A and B, player 1's B steps back, the menus go back one step at a time. Every
+  division played to the end with player 2 in (`tny_coop.txt`, 15 tournaments by pad presses) found: both players down was a
+  stock game over (`tny_ko_check` read the nearer player as the partner), a body down under a line hung the game
+  (`revive_fight_over`; also every two-player game over with player 1 down first, on "You have died!"), and the 2 v 2's
+  bracket screen read teams as seats (`docs/tournament.md` 13b). Test command 40, `.tny.cp`.
 - **Super Saiyan Hercule locked off** (Ryan: not an option yet, much later): `ssj.c` `SSJ_HERCULE_UNLOCK` 0, CoopCall 4
   a no-op, saves holding the ability get Megaton Punch back at the load (`hercule_lock`, `ssj_lock.txt`).
 - **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide
