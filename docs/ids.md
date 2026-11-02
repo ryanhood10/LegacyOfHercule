@@ -31,7 +31,7 @@ Each piece takes numbers only from its own row. `ewram`, `partyram` and `coop2` 
 | tny (`pp2-tny`, `log2-pp2-tny`) | - | - | 40-41 | `.tny.cp` at most 0x20 |
 | agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 | 33-34 | 42-43 | `.combo.ag` at most 0x40 |
 | regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 (used) | `.combo.rg` grows to at most 0x10 (**0xC used**: the resting and ki timers) |
-| perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 | `.combo.pf` at most 0x10 |
+| perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 (45 used, 46 free) | `.combo.pf` at most 0x10 (8 used: `obj_room`, `src/coop/objroom.h`; after `.combo.rg`, so read its address from `coop.sym`) |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
@@ -307,6 +307,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
 | 19+ | 19-20 allocated to the post-game chapter | |
+| 45 | OBJ_ROOM_HOLD (perf, `objroom.c`) | `arg` bytes of OBJ VRAM held at the largest free run's low end (a map fuller than it is), 0 gives them back; answers `cmd_arg` := the largest free block. `perf_budget.py` forces an eviction with it |
 | 21 | TNY_SEED (engine) | `arg` = the next tournament's draw seed (`tny_engine.c`); `arg2` = 0x7E000000 \| fighter: he is the players' first opponent (the seat across from player 1, outside the pool's rules) or the Rumble's headliner; any other `arg2`: none |
 | 22 | TNY_FORCE (engine) | `arg` 0: every opponent of the running fight takes a lethal blow from player 1 (a won fight); 1: the fight is lost (player at 1 HP); 2: the running duel ends, `arg2` = the winner (1 / 2) |
 | 23 | TNY_RECORD (engine) | `arg` 0: wipe the global record; 1 / 2: set / clear fighter `arg2`'s unlock bit; 3: reread it into `eng.rec` (0x0203ED68) |

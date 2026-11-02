@@ -45,15 +45,23 @@ static int shows_slot(int sprite_id, int slot) {
     return 0;
 }
 
-// Sprite id of an NPC entity: match its sprite record against the ids the players' characters use.
-static int npc_duplicates(const Entity *npc, int slot) {
-    if (slot < 0 || slot >= PARTY_SLOTS) return 0;
+// The sprite records that show the character in `slot`: its aliases, then its current row's chain of forms (the rows
+// same_family reaches, walked directly). Each player's chain is 1-3 rows, so the check below costs a few comparisons
+// an NPC; testing all 29 rows per NPC per frame was half the frame in a town with a crowd, twice over with player 2
+// (the probe, docs/perfect-pass.md 11.6: 150 % of a frame in West City).
+static int slot_records(int slot, const void **out, int n) {
+    if (slot < 0 || slot >= PARTY_SLOTS) return n;
     for (u32 i = 0; i < sizeof aliases / sizeof aliases[0]; i++)
-        if (aliases[i].slot == slot && npc->sprite_record == Character_GetSpriteRecord(aliases[i].sprite)) return 1;
-    int row = g_Party->chars[slot].display_row;
-    for (u32 r = 0; r < display_row_count; r++)
-        if (same_family(row, (int)r) && npc->sprite_record == Character_GetSpriteRecord(row_sprite((int)r))) return 1;
-    return 0;
+        if (aliases[i].slot == slot) out[n++] = Character_GetSpriteRecord(aliases[i].sprite);
+    int from = g_Party->chars[slot].display_row, r = from;
+    for (int i = 0; i < 8 && (u32)r < display_row_count; i++) {
+        out[n++] = Character_GetSpriteRecord(row_sprite(r));
+        int next = DISPLAY_DATA[r * 0x14 + 4];
+        if (next == r) next = DISPLAY_DATA[r * 0x14 + 5];
+        if (next == r || next == from) break;
+        r = next;
+    }
+    return n;
 }
 
 void actors_tick(void) {
@@ -62,12 +70,17 @@ void actors_tick(void) {
     int s1 = g_PlayerObject ? g_Party->active_slot : -1;
     int s2 = coop.p2 ? coop.p2_slot : -1;
     if (s1 < 0 && s2 < 0) return;
+    const void *recs[2 * (8 + sizeof aliases / sizeof aliases[0])];
+    int nrecs = -1;
     for (int i = list->count - 1; i >= 0; i--) {
         Entity *e = list->items[i];
         if (!e || e->vtable != (u32 *)NPC_VTABLE) continue;
-        if (npc_duplicates(e, s1) || npc_duplicates(e, s2)) {
+        if (nrecs < 0) nrecs = slot_records(s2, recs, slot_records(s1, recs, 0));   // the first NPC of the frame
+        for (int k = 0; k < nrecs; k++) {
+            if (e->sprite_record != recs[k]) continue;
             EntityList_Remove(list, e, 0);   // the list's own removal (vtable slot 1 tears it down)
             coop2.dupes_removed++;
+            break;
         }
     }
 }

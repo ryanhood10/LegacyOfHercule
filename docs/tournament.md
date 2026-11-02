@@ -955,6 +955,11 @@ above the beach, and the flight trigger sits on it ((216, 344)-(264, 376)). The 
 beach below. (World-map landmarks, the 3D towns seen while flying, are drawn per site by the on-load's
 FindCharacterEntity 2-12; Papaya Island has one since 2026-11-01: 24.6, `docs/maps.md` 9e.)
 
+Ryan, 2026-11-02: "the world map indicator is missing from the ground; it has the ability to use it but there's no board /
+map to walk up to". The cloud was only half of it: the stock towns have the wooden sign on the cloud too, a decoration.
+The plaza has it now at (214, 336), its post solid at (224, 360)-(240, 368), and the trigger is the stock rect round it
+joined with the cloud's: (201, 329)-(264, 384) (`docs/perfect-pass.md` 11.4).
+
 ## 19. Overhead HP bars in the ring (2026-10-25)
 
 Ryan: "should we display the hp of the other fighters during the royal rumble?" `src/coop/tny_hpbars.c`, drawn from

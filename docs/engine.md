@@ -248,6 +248,36 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
 - **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
   bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.
 
+## OBJ VRAM and the text box (decompiled 2026-11-02 for West City's vanishing)
+
+- **The frame.** `GameLoop_Tick`'s wait is `FUN_08020D40`: a `swi 2` (Halt) loop at 0x08020D6E until the VBlank flag. It
+  also keeps a CPU meter at the mixer's +0x3C: 100 if VBlank already fired, else the scanline scaled. The probe
+  (`docs/testing.md` "Frame time and OAM probe") measures from the emulated clock instead.
+- **The entity list is also the allocator.** `g_EntityList` (0x03001120) = `{u8 free head, u8 free records; +4 count; +8
+  items (128: the draw pass's array is 129 words, and a full list reports no room); +0x208 the upload queue; +0x40C the aside
+  pile {count, items}; +0x694 block records, 10 bytes each; +0xC00 + tile / 2 the record id at a tile}`. A record = `{u8
+  used, u16 +2 offset, u16 +4 size (both 64-byte units), u8 +6 / +7 next and previous by address, u8 +8 / +9 the free
+  list}`. `ObjVram_Alloc` (0x080067AC): an exact fit if any, else the smallest bigger block, **cut from that block's top**.
+  `0x08006D70`: the largest free block in bytes. OBJ VRAM is 32 KB.
+- **OAM.** A body is one OBJ. The shadow (pointer 0x030022BC, 128 entries, filled with 0x200 first) is written without a
+  bound by each entity's slot 4 and copied by `0x08006AA6`. Far from full on every map measured: 22 at most.
+- **The text box.** `FUN_0800B1E2` asks `0x0800700E(list, need)` for one contiguous run: 0xA0 << 6 = 0x2800 bytes without a
+  portrait, 0xE0 << 6 = **0x3800** with one (the box is 64 x 64 x 3 + 32 x 64, 8bpp). Others ask too: 0x1680 (`0x080109EC`),
+  0x400 (`0x080119F4`, `0x0801EC16`). Short of it, `0x0800700E` runs rounds 0, 1, 2...: each asks every entity's **slot 6**
+  (`round`): 1 = destroy, 2 = aside (slot 7 frees its block), and redraws. The answers: a body `0x080078A2` off screen
+  from round 13, **on screen at exactly round 15**; the HUD `0x08008EFA` from round 4; `0x08024230` from 8 or 9; decorations
+  and the system entities `0x08006528` at round 15. So the last round takes **everything on screen at once**, the players
+  and the panels too. When the box closes `0x0800712E` (`0x0800B2DA`) brings the pile back through slot 8 (a new block; +0x20
+  := 0 uploads the frame again). A run that can never fit spins for ever.
+- **The build** (`src/coop/objroom.c`): the allocator cuts from the top, so player 2's body and panel, made last, sat in the
+  middle of the free run. They now go to its low end (`obj_alloc_low`: a block on the run's top for the rest, the wanted one,
+  the first freed). `obj_make_room_hook` replaces `0x0800700E`: player 2's two blocks settle first (into a hole they fit, else
+  the low end), then the stock's rounds to 14, then round 15 one body at a time (the one whose block makes the longest
+  free run, then the farthest from player 1), stopping when the box fits, player 1's body moved low first; then the
+  decorations together (the first holds the sheet's block, the rest draw from it: one left behind shows the box's tiles); the
+  players last. It also gives up at round 64 instead of hanging. `obj_room` (`.combo.pf`) keeps the last eviction's round, the bodies
+  taken and the count. **`coop.hud2.size` is now the panel's "allocated" flag: tile 0 is a real place for it.**
+
 ## Dropped items and touch boxes (decompiled 2026-11-01 for player 2's pickups)
 
 - **A drop.** The drop scripts' `SpawnItem` (Step 87 / 92, handler `0x0800ABA4`) builds an item entity (`0x08011802`,

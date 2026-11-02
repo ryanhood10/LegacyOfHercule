@@ -323,7 +323,7 @@ void coop_init_once(void) {
     coop.input2.history_head = 0;
     coop.input2.history_armed = 0;
     coop.input2.current = coop.input2.pressed = coop.input2.released = 0;
-    coop.hud2.tile = 0;
+    coop.hud2.tile = coop.hud2.size = 0;
     coop.polls = 0;
     coop.sio_last = 0;
     coop.source_age = P2_SOURCE_TIMEOUT;
@@ -462,6 +462,7 @@ static void ensure_p2(Entity *p1) {
     p2->vtable = g_p2_vtable;
     if (coop.p2_slot != g_Party->active_slot) install_behaviour(p2, coop.p2_slot);
     EntityList_Add(g_SceneTable[1], p2);
+    obj_entity_low(p2);   // objroom.c: the free run stays one piece
     coop.p2 = p2;
     coop.spawns++;
 }

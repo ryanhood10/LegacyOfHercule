@@ -20,7 +20,7 @@ typedef struct CoopState {
     u8 control;        // SWAP mode: 0 = controller drives P1, 1 = drives P2
     u16 p2_last_dir;   // per-player copies of g_LastDir / g_LastDirFrame
     u32 p2_last_dir_frame;
-    Hud hud2;          // player 2's panel state (vtable unused); tile == 0 means not allocated
+    Hud hud2;          // player 2's panel state (vtable unused); size == 0 means not allocated
     u16 polls;         // input polls since boot (controller-mode detection window)
     u8 sio_ready;      // serial registers initialised
     u8 _pad;
@@ -209,6 +209,7 @@ void waves_tick(void);
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
+void obj_entity_low(Entity *e);                               // objroom.c: an entity's body block at OBJ VRAM's free run's low end
 int is_coop_enemy(const Entity *e);
 int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
 void p2_pickup_tick(void);            // pickup.c: every input poll, player 2 takes dropped food he stands on

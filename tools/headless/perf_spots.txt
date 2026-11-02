@@ -1,0 +1,342 @@
+# The spots the frame-time probe measures (tools/headless/perf_probe.py `table`, docs/testing.md "Frame time and OAM
+# probe"). Each "== NAME" block is a runner script from a debug-menu savestate; {P2} is `p2 0` or `p2 off`, {P2W} player
+# 2 walking (nothing alone), {ROW} the perf line's label suffix, {LOG} a per-frame log file. Its perf lines are the numbers.
+== light
+# known-light: zone 1 area 3, a map with no triggers, scripts or objects (map entry 2): the floor of the table
+{P2}
+maptest 2
+frames 400
+map
+perf 120 light_stand{ROW}
+keys 0x10
+{P2W}
+perf 120 light_walk{ROW}
+keys 0
+== wc_scene
+# West City's first screen (map 65): the arrival scene with the parade (Goku's arrival, trigger 1), as wc_arrival.txt
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 65
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0304
+poke32 0x0203FD54 0x04E00160
+poke32 0x0203FD08 5
+frames 120
+perf 120 wc_landing{ROW}
+keys 0x80
+frames 30
+keys 0
+perflog {LOG}
+perfstart
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+key 1 8
+frames 40
+perfstop wc_scene{ROW}
+perflog off
+map
+== wc_land
+# The real arrival: the world map, A at West City's landing (player 1 Gohan), the whole scene with A mashed. The first
+# line's box wanted 0x3800 bytes of OBJ VRAM in one piece: before the fix `drop` was the whole crowd (docs/perfect-pass.md 11.6)
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 176
+waitmap 6 99 2000
+frames 60
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x063805D8
+poke32 0x0203FD08 5
+frames 150
+perfstart
+key 1 10
+waitmap 4 3 600
+frames 300
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+key 1 8
+frames 60
+perfstop wc_land{ROW}
+peek8 FLAGS+3
+== wc_first
+# the same arrival: the map's name still up, the first line's box opens inside this window
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 176
+waitmap 6 99 2000
+frames 60
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x063805D8
+poke32 0x0203FD08 5
+frames 150
+key 1 10
+waitmap 4 3 600
+frames 60
+perfstart
+frames 180
+perfstop wc_first{ROW}
+shot wc_first{ROW}
+== wc_talk
+# talking to a parade watcher after the scene: the HUD stays up, so the box has less room
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29 +30
+maptest 65
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0304
+poke32 0x0203FD54 0x04A200C8
+poke32 0x0203FD08 5
+frames 300
+key 0x80 6
+frames 10
+perfstart
+key 1 8
+frames 100
+perfstop wc_talk{ROW}
+shot wc_talk{ROW}
+vram
+key 1 8
+frames 100
+== wait_talk
+# talking to a fighter in the waiting room's fullest crowd
+{P2}
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+poke32 0x0203FD0C 31
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00620050
+poke32 0x0203FD08 5
+frames 400
+key 0x80 6
+frames 10
+perfstart
+key 1 8
+frames 100
+perfstop wait_talk{ROW}
+shot wait_talk{ROW}
+vram
+key 1 8
+frames 100
+== wc_after
+# West City's first screen after the scene (flag 30): the parade stands, players walk through it
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29 +30
+maptest 65
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0304
+poke32 0x0203FD54 0x04B00120
+poke32 0x0203FD08 5
+frames 300
+map
+perf 120 wc_stand{ROW}
+keys 0x20
+{P2W}
+perf 120 wc_walk{ROW}
+keys 0
+== plaza
+{P2}
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+poke32 0x0203FD0C 0x0B0F
+poke32 0x0203FD54 0x014A0090
+poke32 0x0203FD08 5
+frames 300
+map
+perf 120 plaza_stand{ROW}
+keys 0x10
+{P2W}
+perf 120 plaza_walk{ROW}
+keys 0
+== street
+{P2}
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+poke32 0x0203FD0C 0x0C0F
+poke32 0x0203FD54 0x02E800F0
+poke32 0x0203FD08 5
+frames 300
+map
+perf 120 street_stand{ROW}
+keys 0x40
+{P2W}
+perf 120 street_walk{ROW}
+keys 0
+== courtyard
+{P2}
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 1
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 1
+poke32 0x0203FD54 36
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0x0D0F
+poke32 0x0203FD54 0x009800F0
+poke32 0x0203FD08 5
+frames 300
+map
+perf 120 court_stand{ROW}
+keys 0x20
+{P2W}
+perf 120 court_walk{ROW}
+keys 0
+== waiting
+# the waiting room with its fullest crowd (F9's state: every tier open)
+{P2}
+maptest 176
+waitmap 6 99 2000
+frames 60
+flags +441
+poke32 0x0203FD0C 31
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x00C000C8
+poke32 0x0203FD08 5
+frames 300
+map
+perf 120 wait_stand{ROW}
+keys 0x10
+{P2W}
+perf 120 wait_walk{ROW}
+keys 0
+== rumble
+# a Rookie Royal Rumble's first round, the kits fighting (seed 42, as tny_caption.txt)
+{P2}
+maptest 13
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 2
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x0002
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+peek8 0x0203EC04 1
+frames 60
+keys 1
+{P2A}
+perf 600 rumble_fight{ROW}
+keys 0
+== wolves
+# twins: Map Test 13's wolves, doubled in co-op; both players walk into them
+{P2}
+maptest 13
+frames 300
+map
+perf 120 wolves_stand{ROW}
+keys 0x40
+{P2W}
+perf 120 wolves_walk{ROW}
+keys 0
+== crowded
+# the stock map with the most enemy records (zone 4 area 59: 15, doubled in co-op)
+{P2}
+maptest 106
+frames 300
+map
+perf 120 crowded_stand{ROW}
+keys 0x20
+{P2W}
+perf 120 crowded_walk{ROW}
+keys 0

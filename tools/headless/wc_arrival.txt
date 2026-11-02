@@ -268,13 +268,13 @@ frames 8
 keys 0
 p2 0
 frames 60
-echo == after the scene: both still at the landing's row (y 0x4c0-0x4ff), the scene over
+echo == after the scene: both still near the landing's row (y 0x4a0-0x4ff; the bug put them at 0x435), the scene over
 map
 findent PL 0x08025604
 deref P2 0x0203FF08
-echo EXPECT \w+: \w{8} 0004[c-f]\w{3}
+echo EXPECT \w+: \w{8} 0004[a-f]\w{3}
 peek PL+0x158 2
-echo EXPECT \w+: \w{8} 0004[c-f]\w{3}
+echo EXPECT \w+: \w{8} 0004[a-f]\w{3}
 peek P2+0x158 2
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1

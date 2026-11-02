@@ -42,10 +42,24 @@
 //   watch ADDR MAX         step instructions until the word at ADDR changes; print pc, lr, registers, stack
 //   breakpc PC MAX [HITS]  step until PC runs (HITS times); print the registers and the 8 words at r4 + 0x20
 //   trace N FILE           step N instructions; write "pc count" for every pc run
+//   ptrace N FILE          step N instructions; write "pc count cycles" (cycles = emulated cycles spent at that pc,
+//                          ROM wait states included): tools/headless/perf_probe.py hot rolls it up by function
+// The performance probe (docs/testing.md "Frame time and OAM probe"), from the emulated machine's own clock:
+//   perf N [LABEL]         run N frames and print one "perf" line: game-loop ticks and lagged frames, the busiest
+//                          frame in CPU cycles (VBlank to the main loop's next wait, budget 280896), its average,
+//                          OBJs in OAM (max, avg), the OAM shadow's fullest frame, the worst scanline's OBJ cost
+//                          against the hardware's limit and how many OBJs that limit cut, the entity list's largest
+//                          count and its largest fall in one frame (a text box's eviction takes many at once)
+//   perfstart / perfstop [LABEL]   the same line over whatever commands run in between (a scene with A mashed)
+//   perflog FILE | perflog off   one line per frame during `perf` ("frame busy vcount objs linecost cut ents")
+//   oam                    the OBJs the last frame showed: index, x, y, size, tile
+//   vram [all]             OBJ VRAM's largest free block and how many bytes are free (the 64-byte-block allocator);
+//                          with `all` every block in address order and the entity holding it
 #include <mgba/core/core.h>
 #include <mgba/core/log.h>
 #include <mgba/internal/arm/arm.h>
 #include <mgba/core/serialize.h>
+#include <mgba/core/timing.h>
 #include <mgba-util/vfs.h>
 #include <ctype.h>
 #include <stdarg.h>
@@ -88,6 +102,7 @@ static void set_var(const char *name, unsigned v) {
     if (nvars < MAX_VARS) { snprintf(var_name[nvars], 32, "%s", name); var_val[nvars++] = v; }
 }
 
+static void perf_frame_end(void);
 static unsigned r8(unsigned a) { return core->busRead8(core, a); }
 static unsigned r16(unsigned a) { return core->busRead16(core, a); }
 static unsigned r32(unsigned a) { return core->busRead32(core, a); }
@@ -100,6 +115,7 @@ static void run_frames(int n) {
         if (p2_on) w16(0x0203FF00, 0x8000 | (p2_word & 0x3FF));
         core->runFrame(core);
         frame_no++;
+        perf_frame_end();
     }
 }
 
@@ -156,6 +172,131 @@ static void press(unsigned mask, int n) {
     run_frames(4);
 }
 
+
+// ---- the performance probe -------------------------------------------------------------------------------------
+// The frame time comes from the emulated clock, so it is what any mGBA runs the game at (the host only decides
+// whether emulated frames reach the 60 fps cap). runFrame returns at the start of VBlank; the main loop's next
+// wait for VBlank (GameLoop_Tick's FUN_08020D40: a Halt loop, its swi at GAMELOOP_WAIT_SWI, docs/engine.md) ends its
+// work: the distance is the frame's CPU time, VBlank handler included. Reaching the next VBlank with no wait entered
+// is a lagged frame.
+#define GAMELOOP_WAIT_SWI 0x08020D6E
+#define FRAME_CYCLES 280896
+#define OAM_SHADOW_PTR 0x030022BC              // the stock's pointer to its 128-OBJ shadow (literal 0x081DA8FC)
+static struct {
+    int on, waiting;
+    int ticks, frames, lag;
+    int t_wake;
+    long long busy_sum;
+    int busy_max, busy_n, vc_at_max;
+    long long obj_sum;
+    int obj_max, shadow_max, line_max, cut_max, cut_frames;
+    int last_busy, last_vc, have_tick;
+    int ents, ents_max, drop_max;
+    FILE *log;
+} pf;
+static void (*orig_swi16)(struct ARMCore *, int);
+
+static void perf_wait_entered(struct ARMCore *cpu) {
+    if ((cpu->cpsr.packed & 0x1F) == 0x12) return;      // inside the IRQ handler: not the main loop
+    int now = mTimingCurrentTime(core->timing);
+    if (!pf.waiting) {
+        int busy = now - pf.t_wake;
+        pf.last_busy = busy; pf.last_vc = r16(0x04000006); pf.have_tick = 1;
+        if (pf.on) {
+            pf.ticks++;
+            pf.busy_sum += busy; pf.busy_n++;
+            if (busy > pf.busy_max) { pf.busy_max = busy; pf.vc_at_max = pf.last_vc; }
+            unsigned sh = r32(OAM_SHADOW_PTR); int n = 0;
+            for (int i = 0; i < 128; i++) if ((r16(sh + 8 * i) & 0x300) != 0x200) n++;
+            if (n > pf.shadow_max) pf.shadow_max = n;
+        }
+    }
+    pf.waiting = 1;
+}
+static void perf_swi16(struct ARMCore *cpu, int imm) {
+    if (imm == 2 && cpu->gprs[15] - 4 == GAMELOOP_WAIT_SWI) perf_wait_entered(cpu);
+    orig_swi16(cpu, imm);
+}
+
+static const unsigned char obj_size[12][2] = {
+    { 8, 8 }, { 16, 16 }, { 32, 32 }, { 64, 64 }, { 16, 8 }, { 32, 8 }, { 32, 16 }, { 64, 32 }, { 8, 16 }, { 8, 32 }, { 16, 32 }, { 32, 64 },
+};
+// The OBJs hardware OAM holds, by the renderer's own rule (GBAVideoRendererCleanOAM, the scanline budget in
+// GBAVideoSoftwareRendererPreprocessSpriteLayer): *worst = the fullest line's cost, *cut = OBJs a line's budget cut.
+static int oam_scan(int *worst, int *cut, int print) {
+    int n = 0, lim = (r16(0x04000000) & 0x20) ? 954 : 1210;
+    short yy[128], hh[128], cc[128];
+    unsigned char dropped[128];
+    for (int i = 0; i < 128; i++) {
+        unsigned a = r16(0x07000000 + 8 * i), b = r16(0x07000002 + 8 * i), c = r16(0x07000004 + 8 * i);
+        cc[i] = 0;
+        dropped[i] = 0;
+        if ((a & 0x300) == 0x200 || (a >> 14) == 3) continue;
+        int w = obj_size[(a >> 14) * 4 + (b >> 14)][0], h = obj_size[(a >> 14) * 4 + (b >> 14)][1], cost = w;
+        if (a & 0x100) { int d = (a >> 9) & 1; w <<= d; h <<= d; cost = 10 + w * 2; }
+        int y = a & 0xFF, x = b & 0x1FF;
+        if (y >= 160 && y + h < 228) continue;
+        if (x >= 240 && x + w < 512) continue;
+        yy[i] = (short)y; hh[i] = (short)h; cc[i] = (short)cost; n++;
+        if (print) printf("  obj %3d x %3d y %3d %2dx%-2d tile %4u attr %04x %04x %04x\n", i, x >= 256 ? x - 512 : x, y, w, h, c & 0x3FF, a, b, c);
+    }
+    int max = 0, ncut = 0;
+    for (int line = 0; line < 160; line++) {
+        int cost = 0, left = lim, over = 0;
+        for (int i = 0; i < 128; i++) {
+            if (!cc[i]) continue;
+            int y = yy[i] >= 160 ? yy[i] - 256 : yy[i];
+            if (line < y || line >= y + hh[i]) continue;
+            cost += cc[i];
+            if (over) { dropped[i] = 1; continue; }
+            left -= cc[i];
+            if (left <= 0) over = 1;
+        }
+        if (cost > max) max = cost;
+    }
+    for (int i = 0; i < 128; i++) ncut += dropped[i];
+    *worst = max; *cut = ncut;
+    return n;
+}
+
+static void perf_frame_end(void) {
+    int now = mTimingCurrentTime(core->timing);
+    int missed = !pf.waiting;
+    if (pf.waiting) { pf.t_wake = now; pf.waiting = 0; }
+    if (!pf.on) { pf.have_tick = 0; return; }
+    pf.frames++;
+    if (missed) pf.lag++;
+    int worst, cut, objs = oam_scan(&worst, &cut, 0);
+    pf.obj_sum += objs;
+    if (objs > pf.obj_max) pf.obj_max = objs;
+    if (worst > pf.line_max) pf.line_max = worst;
+    if (cut > pf.cut_max) pf.cut_max = cut;
+    if (cut) pf.cut_frames++;
+    int ents = r32(0x03001124);                 // the list falling at once: the text box's eviction (0x0800700E)
+    if (pf.ents - ents > pf.drop_max) pf.drop_max = pf.ents - ents;
+    if (ents > pf.ents_max) pf.ents_max = ents;
+    pf.ents = ents;
+    if (pf.log) fprintf(pf.log, "%lu %d %d %d %d %d %d%s\n", frame_no, pf.have_tick ? pf.last_busy : -1, pf.have_tick ? pf.last_vc : -1, objs, worst, cut, ents, missed ? " LAG" : "");
+    pf.have_tick = 0;
+}
+
+static void perf_start(void) {
+    FILE *keep = pf.log;
+    memset(&pf, 0, sizeof pf);
+    pf.log = keep;
+    pf.t_wake = mTimingCurrentTime(core->timing);
+    pf.ents = r32(0x03001124);
+    pf.on = 1;
+}
+
+static void perf_stop(const char *label) {
+    pf.on = 0;
+    int avg = pf.busy_n ? (int)(pf.busy_sum / pf.busy_n) : 0;
+    printf("perf %-22s frames %d ticks %d lag %d busy avg %d (%d%%) max %d (%d%%) oam max %d avg %lld shadow %d line max %d cut %d in %d frames ents max %d drop %d\n",
+           label, pf.frames, pf.ticks, pf.lag, avg, avg * 100 / FRAME_CYCLES, pf.busy_max, pf.busy_max * 100 / FRAME_CYCLES,
+           pf.obj_max, pf.frames ? pf.obj_sum / pf.frames : 0, pf.shadow_max, pf.line_max, pf.cut_max, pf.cut_frames, pf.ents_max, pf.drop_max);
+}
+
 static int crashes;
 static void quiet_log(struct mLogger *l, int category, enum mLogLevel level, const char *fmt, va_list args) {
     (void)l; (void)category;
@@ -192,6 +333,11 @@ int main(int argc, char **argv) {
         struct VFile *vf = VFileOpen(argv[3], O_RDONLY);
         if (!vf || !mCoreLoadStateNamed(core, vf, SAVESTATE_SAVEDATA)) { fprintf(stderr, "cannot load state %s\n", argv[3]); return 1; }
         vf->close(vf);
+    }
+    {
+        struct ARMCore *cpu = core->cpu;
+        orig_swi16 = cpu->irqh.swi16;
+        cpu->irqh.swi16 = perf_swi16;
     }
     FILE *sf = !strcmp(argv[2], "-") ? stdin : fopen(argv[2], "r");
     if (!sf) { perror(argv[2]); return 1; }
@@ -237,6 +383,61 @@ int main(int argc, char **argv) {
             for (unsigned j = 0; j < (1 << 20); j++) if (cnts[j]) { fprintf(tf, "%08x %u\n", pcs[j], cnts[j]); cnts[j] = 0; }
             fclose(tf);
             printf("trace %u steps: %u pcs -> %s\n", k, np, tok[2]);
+        }
+        else if (!strcmp(c, "ptrace")) {   // ptrace N FILE: as trace, plus the emulated cycles spent at each pc
+            static unsigned pcs[1 << 20], cnts[1 << 20];
+            static unsigned long long cyc[1 << 20];
+            unsigned np = 0, k = num(tok[1]);
+            struct ARMCore *cpu = core->cpu;
+            for (unsigned i = 0; i < k; i++) {
+                unsigned pc = cpu->gprs[15] - (cpu->cpsr.t ? 4 : 8), h = (pc * 2654435761u) >> 12, j;
+                for (j = h; cnts[j] && pcs[j] != pc; j = (j + 1) & ((1 << 20) - 1)) ;
+                if (!cnts[j]) { pcs[j] = pc; np++; }
+                cnts[j]++;
+                int t0 = mTimingCurrentTime(core->timing);
+                core->step(core);
+                cyc[j] += (unsigned)(mTimingCurrentTime(core->timing) - t0);
+            }
+            FILE *tf = fopen(tok[2], "w");
+            for (unsigned j = 0; j < (1 << 20); j++) if (cnts[j]) { fprintf(tf, "%08x %u %llu\n", pcs[j], cnts[j], cyc[j]); cnts[j] = 0; cyc[j] = 0; }
+            fclose(tf);
+            printf("ptrace %u steps: %u pcs -> %s\n", k, np, tok[2]);
+        }
+        else if (!strcmp(c, "perf")) { perf_start(); run_frames((int)num(tok[1])); perf_stop(n > 2 ? tok[2] : "-"); }
+        else if (!strcmp(c, "perfstart")) perf_start();
+        else if (!strcmp(c, "perfstop")) perf_stop(n > 1 ? tok[1] : "-");
+        else if (!strcmp(c, "perflog")) {
+            if (pf.log) { fclose(pf.log); pf.log = 0; }
+            if (strcmp(tok[1], "off")) pf.log = fopen(tok[1], "w");
+        }
+        else if (!strcmp(c, "oam")) {
+            int worst, cut, objs = oam_scan(&worst, &cut, 1);
+            printf("oam: %d objs, worst line %d, cut %d, dispcnt %04x\n", objs, worst, cut, r16(0x04000000));
+        }
+        else if (!strcmp(c, "vram")) {     // the allocator's blocks (64-byte units; the list at 0x083B5348 + 8); `vram all` lists them
+            unsigned list = r32(0x083B5348 + 8), id = r8(list), largest = 0, total = 0, first = id;
+            for (int guard = 0; id != 0xFF && guard < 256; guard++) {
+                unsigned rec = list + 0x694 + id * 10, sz = r16(rec + 4);
+                total += sz;
+                if (sz > largest) largest = sz;
+                id = r8(rec + 8);
+            }
+            printf("vram: free %u bytes, largest block %u bytes\n", total * 64, largest * 64);
+            if (n > 1 && first != 0xFF) {  // address order: back along +7 from any block, then forward along +6
+                id = first;
+                for (int guard = 0; r8(list + 0x694 + id * 10 + 7) != 0xFF && guard < 256; guard++) id = r8(list + 0x694 + id * 10 + 7);
+                for (int guard = 0; id != 0xFF && guard < 256; guard++) {
+                    unsigned rec = list + 0x694 + id * 10, used = r8(rec), tile = r16(rec + 2) * 2;
+                    printf("  block tile %4u %6u bytes %s", tile, r16(rec + 4) * 64, used ? "used" : "free");
+                    unsigned cnt = r32(0x03001124);
+                    if (used) for (unsigned i = 0; i < cnt && i < 128; i++) {
+                        unsigned e = r32(0x03001128 + 4 * i);
+                        if (r16(e + 0xC) == tile || r16(e + 0xE) == tile) printf(" ent %u vt %08x x %d y %d", i, r32(e), (int)r32(e + 0x158) >> 8, (int)r32(e + 0x15C) >> 8);
+                    }
+                    printf("\n");
+                    id = r8(rec + 6);
+                }
+            }
         }
         else if (!strcmp(c, "watch")) {   // watch ADDR MAXSTEPS: step until the word at ADDR changes; print the writer
             unsigned a = num(tok[1]), mx = num(tok[2]), v0 = r32(a), i;

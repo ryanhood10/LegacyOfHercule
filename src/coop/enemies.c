@@ -7,6 +7,7 @@
 // calculation 0x0800F910, the two chase-module constructors (0x0801B332, 0x0801B15E) that carry the
 // walk speed, and BossHealthBar_Create 0x080104C0.
 #include "coop.h"
+#include "objroom.h"
 #include "revive.h"
 #include "difficulty.h"
 #include "android16.h"
@@ -498,6 +499,8 @@ void coop_debug_tick(void) {
         tny_test_cmd(cmd, coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == COOP_CMD_REGEN) {
         regen_test(coop2.cmd_arg);
+    } else if (cmd == 45) {                     // objroom.c: hold OBJ VRAM (perf_budget.py)
+        obj_room_test(coop2.cmd_arg);
     } else if (cmd == COOP_CMD_SPAWN_SCRIPT) {
         Map_SpawnScript(g_MapState, (int)coop2.cmd_arg);
     } else if (cmd == COOP_CMD_ACTOR) {

@@ -454,6 +454,15 @@ landing towns use), one-player and co-op alike.
 **Tests.** The probe's numbers alone vs co-op (a budget: under one frame); `tny_grounds.txt` gains the sign's entity
 and a shot of it.
 
+**Built (2026-11-02, `pp2-perf`).** The probe reproduced it exactly: the grounds ran under a frame alone and over it with
+player 2. Cause and numbers: 11.6, the same function. The crowd was not the cause: its OBJ VRAM and bodies cost almost
+nothing per frame, and the waiting room's co-op frame fell from 140 % to 33 % with the crowd unchanged.
+The sign: every stock town's flight spot has a wooden board, a **decoration** (`docs/maps.md` "Flight spot to the world
+map"). Decided: the stock sign from zone 7 area 1's sheet (1 KB of OBJ VRAM, it holds only the sign), on the cloud at West
+City's offset, (214, 336), post solid at (224, 360)-(240, 368), the trigger the stock rect round it joined with the old
+cloud rect, (201, 329)-(264, 384), so standing on the cloud and at the sign's foot both fly. One-player and co-op alike.
+Shots: `gr18b_flight_sign` in `tny_grounds.txt`, `plaza_sign.coop` in `perf_budget.py`.
+
 ### 11.5 Tournament mode in co-op: 2 v 2 and the Rumble do not start
 
 **Ryan:** "most importantly, tournament mode did not work when I was in 2-player co-op mode. I tried loading in to 2v2
@@ -492,6 +501,50 @@ yet: the headless runner draws every frame it is asked for and never shows an ov
 parade, alone and in co-op); then the fix the numbers call for: fewer OBJ for the second HUD panel, the crowd culled
 outside the view (the stock already culls by the view rect: check it holds for our entity loop), the per-frame
 co-op work trimmed. The disappearing: if it is the OAM limit, the HUD and the players get priority (drawn first).
+
+**Built (2026-11-02, `pp2-perf`). The lag.** Measured headless on the emulated clock (`docs/testing.md` "Frame time and OAM
+probe"); % of a frame, average, fps in brackets when under 60; Ryan's "30 fps" is real:
+
+| spot | before alone | before co-op | after alone | after co-op |
+|---|---|---|---|---|
+| empty map (zone 1 area 3), the floor | 30 | 32 | 30 | 32 |
+| West City's first screen, parade up, standing | 80 | **150 (30)** | 37 | 43 |
+| the same, walking | 81 | **151 (30)** | 37 | 45 |
+| West City, the arrival scene | 41 | 39 | 38 | 39 |
+| Papaya plaza, standing / walking | 53 / 55 | 81 / 84 | 30 / 31 | 33 / 36 |
+| Papaya street | 85 / 87 | **156 / 158 (30)** | 32 / 33 | 36 / 38 |
+| Papaya courtyard | 54 / 55 | 82 / 83 | 30 / 31 | 34 / 35 |
+| the waiting room, full | 76 / 78 | **140 / 142 (30)** | 29 / 30 | 33 / 36 |
+| a Rookie Rumble (busiest frame 95 %) | 40 | 46 | 40 | 46 |
+| twins: Map Test 13's wolves | 40 | 56 | 40 | 56 |
+| the most enemies, zone 4 area 59 | 46 | 51 | 46 | 52 |
+
+The cause was one function. `actors_tick` (`actors.c`), the duplicate-NPC check that keeps Krillin the NPC away from Krillin
+the player, ran every frame and for each NPC tested all 29 display rows for each player: `same_family` + `npc_duplicates`
+were 46 % of all cycles in co-op West City, so crowds of NPCs and the second player multiplied each other. It costs a few
+comparisons an NPC now (each player's sprite records collected once a frame by walking his row's links). Candidates the
+numbers cleared: the second panel's redraw (only on a change), `coop_target` / `nearest_player` / `revive_is_down` about 2.5 %
+together, the crowd's VRAM, `pickup.c`, `regen.c`, `tny_grounds.c`: none reaches 1 %. Twins double enemies and cost
+16 % of a frame on the wolves; no change needed.
+
+**The vanishing.** Not the OAM limit: at most 22 OBJs of 128 anywhere measured, no scanline over its 1210 cycles (worst 974).
+Not a failed allocation either, and not ReloadMap or SetPlayerVisible (`docs/scripts.md`: 86 is the HUD meter). The first
+line's **text box wants 0x3800 bytes of OBJ VRAM in one piece**, and short of that the stock's eviction takes everything on
+screen, players and HUD too, until the box closes (`docs/engine.md` "OBJ VRAM and the text box"). Alone the free run is
+16640 bytes once the map's name goes. In co-op, player 2's body, made last, sat in the middle of it: 10496 + 5120. So the
+list fell by 20 at the first line of the arrival, and by 17 at any talk on that screen. In the shots: `wc_first.coop`
+(before: crowd, players and float gone; after: all there). **Decided:** his body and panel go to the free run's low end, and
+`obj_make_room_hook` settles them again before any eviction; if a map is truly full the last round takes one body at a time
+(the one that makes the longest run first), stops when the box fits, the players last. Forced with test command 45
+(4 KB held, more than the screen can give any other way): the four other bodies on screen, then the decorations (the sign,
+the float: one block, they go together) leave for the box, the players stay, everyone back after it. Alone it changes
+nothing unless a map was already evicting.
+
+**Test.** `tools/headless/perf_budget.py` (in `regfull.sh`): 58 fps and 75 % on the stand and walk spots both ways, OBJs
+under 128, no OBJ cut, West City's arrival and a talk take nobody, the forced eviction, the sign. **For a real session to
+judge:** the probe is the emulated machine, on the fork's libmgba 0.10.5. Ryan's own mGBA reaching 60 fps on the host, what the Lua
+pad script and Parsec add, and how it looks on his brother's side cannot show here. Text boxes opening still miss a frame
+or two now and then, alone as much as in co-op (busy 101-106 %, the stock's decompression): not touched.
 
 ### 11.7 Order
 
