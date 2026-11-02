@@ -455,6 +455,9 @@ nothing swapped into `build/play` until Ryan asks. The pieces touch different fi
 regen/ssj, hud/entities/tny_grounds + a map spec); the perf piece's entity-loop change is the one overlap with
 agency (both in `entities.c` / `player.c`): perf goes last or merges first.
 
+**Started 2026-11-02** (Ryan's handoff, `build/play/HANDOFF-PROMPT-2.txt`): the four pieces run in parallel, numbers in
+`docs/ids.md` "Allocations for the second two-player round"; the lead merges in 11.7's order.
+
 ### 11.9 Questions for Ryan (before any code) and his answers (2026-11-02)
 
 1. **Who healed to full:** which character was player 1 and which player 2 when player 1 filled up? (The code says the

@@ -21,6 +21,18 @@ Each piece takes numbers only from its own row and says in its report if it need
 | map (`pp-map`) | 478-479 (not needed: unused, free) | - | - | - | - |
 | regen + pickup (main, 2026-11-01, Ryan's two-player session) | - | - | - | - | `.combo.rg` 4 bytes in `comboram` after `.combo.run` (the resting timers, `regen.c`; `ewram` is full) |
 
+## Allocations for the second two-player round (2026-11-02, `docs/perfect-pass.md` 11.8)
+
+Each piece takes numbers only from its own row. `ewram`, `partyram` and `coop2` are full: RAM is a section in `comboram`
+(0x0203EA00, 0x200 bytes, 0x148 used before this round) or, for the tournament, `tourneyram`'s last 0x44.
+
+| piece (branch, worktree `F:/MeltyCreations/log2-<piece>`) | flags | CoopCall | test cmds | RAM |
+|---|---|---|---|---|
+| tny (`pp2-tny`, `log2-pp2-tny`) | - | - | 40-41 | `.tny.cp` at most 0x20 |
+| agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 | 33-34 | 42-43 | `.combo.ag` at most 0x40 |
+| regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 | `.combo.rg` grows to at most 0x10 |
+| perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 | `.combo.pf` at most 0x10 |
+
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
 The tournament team (docs/tournament.md "The team") takes numbers only from its own row. Cross-piece calls go through
