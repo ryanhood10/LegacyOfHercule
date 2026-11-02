@@ -45,8 +45,8 @@ poke32 0x0203FD0C 1
 poke32 0x0203FD08 10
 frames 300
 shot rv6_waiting
-frames 340
-echo == the countdown ran out: over (+0x22) = 1, timeouts (+0x30) = 1
+frames 3340
+echo == the countdown ran out (60 s on every difficulty since 2026-11-02): over (+0x22) = 1, timeouts (+0x30) = 1
 peek 0x0203F9F8 13
 frames 30
 shot rv7_falls

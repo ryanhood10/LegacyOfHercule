@@ -2,6 +2,12 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-02
+
+- **Revive countdown 60 s on every difficulty** (Ryan; `difficulty.h`, was 20 / 10 / 6; `revive.txt` adjusted). **Drop-ins
+  start at full HP and EP** (`dropins.py` `fill`): Ryan took F1's carried-over health (Krillin 40 / 70, Gohan 64 / 96)
+  for the resting cap.
+
 ## 2026-11-01
 
 - **Drop-ins ask "How many players?" on load:** F1, F2 and F8 were saved answered "1 Player" and kept a second pad out;

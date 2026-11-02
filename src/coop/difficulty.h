@@ -16,7 +16,7 @@
 #define DIFF_DAMAGE     {  75,  125,  150 }   // damage enemies deal the players, percent, while player 2 is there
 #define DIFF_SPEED      { 100,  120,  130 }   // regular enemies' walk speed, percent, while player 2 is there
 #define DIFF_BOSS_HP    {  80,  100,  125 }   // bosses' HP, percent (every boss: stock, ours, Android 16, Super 13)
-#define DIFF_REVIVE_S   {  20,   10,    6 }   // seconds a downed player waits for a revive (revive.c)
+#define DIFF_REVIVE_S   {  60,   60,   60 }   // seconds a downed player waits for a revive (revive.c; Ryan 2026-11-02: 60 on every difficulty, was 20 / 10 / 6)
 // Alone (no player 2) Normal is the stock game; Easy and Hard still change these:
 #define DIFF_SOLO_ENEMY_HP { 100, 100, 130 }  // regular enemies' HP, percent, alone
 #define DIFF_SOLO_DAMAGE   {  75, 100, 120 }  // damage enemies deal the player, percent, alone

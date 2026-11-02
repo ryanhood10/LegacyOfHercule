@@ -173,6 +173,25 @@ def boost(name):
 boost("f8")
 boost("f9")
 
+# Every state starts with every party member at full HP and EP (Ryan, 2026-11-02: "characters should have full
+# health"; F1's Krillin and Gohan carried 40 / 70 and 64 / 96 from the save it was made from).
+def fill(name):
+    log = run(name + "_read", play, f"load {W(name + '.ss')}\nframes 2\npeek PARTY 0x1F0\n")
+    words = next(l for l in log.splitlines() if l.startswith("0203f000:")).split(":", 1)[1].split()
+    data = b"".join(struct.pack("<I", int(w, 16)) for w in words)
+    pokes = []
+    for slot in range(9):
+        o = 0xC + slot * 0x1C
+        if not struct.unpack_from("<I", data, o + 20)[0] & 1:
+            continue
+        mhp, mep = struct.unpack_from("<H", data, o + 2)[0], struct.unpack_from("<H", data, o + 6)[0]
+        pokes += [f"poke16 0x{PARTY_ADDR + o:08X} {mhp}", f"poke16 0x{PARTY_ADDR + o + 4:08X} {mep}"]
+    run(name + "_fill", play, f"load {W(name + '.ss')}\n" + "\n".join(pokes) + f"\nframes 1\nssave {W(name + '.ss')}\n")
+
+
+for i in range(1, 10):
+    fill(f"f{i}")
+
 # Every state asks "How many players?" when it loads (players.c: the magic word with mode 0 = armed, not answered;
 # `players` from the play ROM's coop.sym). F1, F2 and F8 come from the save answered "1 Player", which kept a second
 # pad out (Ryan's first two-player session, 2026-11-01); the Map Test states had never been asked (the pad decided).

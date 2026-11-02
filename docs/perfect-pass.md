@@ -231,6 +231,12 @@ punctuation only); owner in brackets.
   as Vegeta's Android 19 fight already did; the other way would be the lead as an actor watching his own fight.
 - **Unused allocations**: ssj's flags 476-477 and test command 36; map's flags 478-479.
 
+- **Ryan, 2026-11-02 (the second two-player evening): the revive countdown is 60 s on every difficulty** (`difficulty.h`
+  `DIFF_REVIVE_S`, was 20 / 10 / 6; `revive.txt` waits for it). And "you loaded us in with 2/3rds health ... characters
+  should have full health when you first get them": the resting cap never lowers anyone; the F-key states carried the
+  health of the save they were made from (Krillin 40 / 70, Gohan 64 / 96). Every drop-in now starts with the whole
+  party at full HP and EP (`dropins.py` `fill`).
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM
