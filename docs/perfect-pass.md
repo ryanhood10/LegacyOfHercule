@@ -663,3 +663,72 @@ agency (both in `entities.c` / `player.c`): perf goes last or merges first.
 **State (2026-11-02):** every question answered. The stock ki crumb for played characters: dropped (Ryan did not
 answer; reversible). Ryan then handed the build-out to a team under another model: the prompt is
 `build/play/HANDOFF-PROMPT-2.txt` (the order, the team, the rules, when `build/play` may be swapped, the report).
+
+## 12. What Ryan will see (the second two-player round, built 2026-11-02)
+
+All four pieces of section 11 are merged and pushed; the full regression of the final main is clean (`build/r4`, 64
+blocks; `tny_coop`, `p2_agency`, `regen`, `perf_budget` among them). The build is in `build/play`, tested headless only:
+nobody has played it. The reasons and decisions are in 11.1-11.6.
+
+**Player 2.** He is a full player now. His A and B advance cutscenes, and if you both press for one line it closes once.
+His A at a save pad opens the menu, and it runs on his pad: Save saves, Switch Characters changes his character (player
+1's is greyed out). His A at a fly pad takes off and he steers the world map (player 1's pad does nothing there until
+you land). Walking into a door or map exit takes you both at once. Taking off, both fly up together; Hercule runs off
+instead. "Only Piccolo" barriers open to the right character whoever plays him, by punch or ki blast; the wrong one
+gets the refusal. In a walk-in story scene he triggers, player 1 is moved onto his spot first (the scene is written for
+one body): watch whether that looks wrong. Nobody leaves a map while someone is down.
+
+**The tournament.** The drop back to the waiting room was player 2's **B**: on his select screen B backed out, and a
+back-out ended the whole tournament. His pad's labelled **A sends the GBA's B** (`p2_keys.py`'s default layout, B / Y = A,
+A / X = B), so "A to pick" most likely did exactly that. This is inferred (the replay on a copy of Ryan's own save
+matches his report); only he can confirm which button his brother pressed. Now player 2 picks with A or B, player 1's B
+steps back a screen, and menus go back one step at a time. Every division and tier runs to the banner, record and prize
+with player 2 in. Also fixed on the way: both players down in a 2 v 2 or Rumble is a lost match, not a game over; a
+game over with player 1 down first no longer sticks on "You have died!" (outside the tournament too); the 2 v 2 bracket
+draws teams instead of partners fighting each other.
+
+**Healing and ki.** Both players rest up to exactly 2/3, as it felt before. Ki: 30 s without a ki move, then 40 s to
+reach 1/3, through damage, hits and enemies; a ki move starts the count over; nothing else brings ki back by itself but
+the traditional ways (level-ups still refill, as stock). Benched characters still recover to full at the stock pace. What
+made player 1 fill up: mostly Super Saiyan 2 Gohan's stock class, which heals the *active* slot whoever plays him; the
+doubled stock trickle filled player 2's character and player 1's ki. Whether Gohan was in play in the session is unknown;
+every route is closed. If player 1 still passes 2/3, note who played whom. The party meter runs once a frame too, so the
+co-op Super Saiyan cool-down is no longer half as long. **To overrule after playing:** no resting and no ki rise in a duel
+or the tournament ring (ki there only from drops and Energy Steal), and the stock ki crumb is gone (`REGEN_PLAYED_CRUMB`).
+
+**The lag** (% of a frame on average, measured headless on the emulated machine; over 100 % = 30 fps):
+
+| spot | before, alone | before, co-op | after, alone | after, co-op |
+|---|---|---|---|---|
+| West City, first screen | 80 | 150 | 37 | 43 |
+| Plaza | 53 | 81 | 30 | 34 |
+| Street | 85 | 156 | 32 | 36 |
+| Courtyard | 54 | 82 | 30 | 34 |
+| Waiting room | 76 | 140 | 29 | 33 |
+| Wolves with twins (unchanged) | 40 | 56 | 40 | 56 |
+
+One function did it: the duplicate-NPC check (`actors_tick`), 46 % of all cycles in co-op West City. Not the crowd.
+**The vanishing:** a text box needs one contiguous piece of OBJ VRAM; player 2's body cut the free space in two, so the
+stock eviction removed everything on screen, players and HUD included, until the box closed. Player 2's body now sits out
+of the way, and an eviction takes bodies one at a time with the players last. On West City's arrival the entities lost
+fell from 20 to 1. The sprite limit was never close (22 of 128). **The sign:** the plaza has its flight board; walk up to it
+and press A.
+
+### Not finished or not verified
+
+- **Nothing has been played by two people**, and real mGBA's fps, the Lua pad script and Parsec do not show headless.
+  Watch mGBA's title-bar fps in West City, the street and the waiting room.
+- **The pad labels:** his brother's labelled A is the GBA's B, and B is the GBA's A. Left alone, as he has played two
+  sessions on it; now it matters more (A at pads means his labelled B). `Player2-keys.bat` can pass `--swap-ab`. Ryan's call.
+- Not exercised headless: a downed player at a fly pad; a player 2 take-off while player 1 holds an ability; player 2 a
+  Super Saiyan switching at a pad; the Dende yes / no box itself (same code as the question, which was tested); the
+  companion's bench slot; rows 10 / 14 on player 2.
+- An early pair may struggle to win Rookie fights by hand: a simple two-pad bot lost its first 2 v 2 from Ryan's save (the
+  lost-match flow itself worked). Balance is for a real session.
+- A text box still misses a frame or two when it opens (about 7-8 lagged frames over West City's whole arrival), alone as
+  much as in co-op. Left alone.
+- The arctic's and summit's flight spots were not checked for a sign.
+- Zone 4 area 50's "Only Piccolo" refusal line shows only for Gohan: a stock bug, left because fixing it changes one-player
+  play.
+- The merged `pp2-*` worktrees (`F:/MeltyCreations/log2-pp2-*`) can be removed after Ryan has played. The combos' step tables
+  still wait for his notes. The Buu campaign is not planned.
