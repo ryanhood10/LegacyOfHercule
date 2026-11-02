@@ -58,7 +58,10 @@ VTABLE_HOOKS = [
     (0x08025CE0, 5, "ssj_transform_done"),   # transform (anim 0x25, ability 11) done: the same function
     (0x080256AC, 5, "ssj_detransform_done"), # detransform (anim 0x24) done: stock 0x080157AF
     (0x08024C58, 1, "ssj_class_update"),     # the Super Saiyans' class update (drain, revert): stock 0x08017307
-    (0x08024004, 1, "ssj_base_update"),      # the base class update (meter, regeneration; none for a transformed slot)
+    (0x08024004, 1, "ssj_base_update"),      # the base class update: regen.c's rules (meter and trickle once a frame, resting, ki)
+    (0x08024E4C, 1, "ssj_base_update"),      # the Super Saiyan 2 class (rows 4, 28): the same, not "the active slot + 1 %" to full
+    (0x0802526C, 1, "form_update_drain"),    # the forms on rows 10, 14: the drain on the entity's own slot
+    (0x08024ABC, 1, "form_update_heal"),     # Piccolo's form, row 7: HP for EP on the entity's own slot
     # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
     # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
     (0x08023B3C, 13, "status_title_hook"),

@@ -10,8 +10,8 @@
 //   * the transform's end (states 0x23 / 0x25, vtable slot 5, stock 0x0801563D -> 0x08014D58),
 //   * the detransform's end (state 0x24, slot 5, stock 0x080157AF -> 0x08014D58),
 //   * the transformed class's update (0x08024C58 slot 1, stock 0x08017307: the drain and the revert).
-// For player 1 the replacements do exactly what the stock does. The base class's update (0x08024004 slot 1)
-// is rewritten too, so that a Super Saiyan partner gets no regeneration from the other player's class.
+// For player 1 the replacements do exactly what the stock does. The base class's update (0x08024004 slot 1) is
+// regen.c's now, and the other forms' classes run on the entity's own slot (form_update below).
 #include "coop.h"
 #include "krillin.h"
 
@@ -79,6 +79,7 @@ static void apply(Entity *e, int up) {
         if (other < PARTY_SLOTS && transformed_class(row_of(other))) class_call(row_of(other), 2);
     }
     if (up) { ssj_state.ups++; ssj_state.last_up_slot = (u8)slot; } else ssj_state.downs++;
+    regen_ki_used(is_p2_entity(e));   // regen.c: a form burns ki; the 30 s count from when it ends
 }
 
 // transform states 0x23 / 0x25, vtable slot 5 (stock 0x0801563C): the transform's sound, then the form
@@ -118,37 +119,27 @@ void ssj_class_update(void *cls, Entity *e) {
     *acc &= 0xFFFF;
 }
 
-// The base class's update (vtable 0x08024004 slot 1, stock 0x08017028), rewritten with one rule added: a slot
-// on a transformed row gets no regeneration. Stock, per frame: the party meter -1 (to 0); the entity's +0x184
-// accumulator gains 0x6E and each overflow (about every 596 frames) gives the active slot EP + max_ep * 0x7AE
-// >> 16 (3 %) and every other stock slot (0-5) EP and HP + max * 0xCCD >> 16 (5 %), capped at the maximum.
-// Alone, no transformed slot is ever regenerated (the active one runs the Super Saiyan class, the others are
-// turned back); in co-op each player's base class regenerates the other player's slot, which would have
-// fed a Super Saiyan partner.
-static void regen(CharacterEntry *c, int ep_rate, int hp_rate) {
-    if (DISPLAY_DATA[c->display_row * 0x14] & 1) return;
-    s32 ep = (s16)c->ep + (((s16)c->max_ep * ep_rate) >> 16);
-    c->ep = (u16)(ep > (s16)c->max_ep ? (s16)c->max_ep : ep);
-    if (!hp_rate) return;
-    s32 hp = (s16)c->hp + (((s16)c->max_hp * hp_rate) >> 16);
-    c->hp = (u16)(hp > (s16)c->max_hp ? (s16)c->max_hp : hp);
-}
+// The base class's update (vtable 0x08024004 slot 1, stock 0x08017028) and the Super Saiyan 2 class's (rows 4 and 28,
+// vtable 0x08024E4C slot 1, stock 0x0801710E: only "the active slot's HP + 1 % every 20 frames", to full, whoever's
+// entity it ran for): both are regen.c's rules now. docs/engine.md "Behaviour classes", docs/perfect-pass.md 11.1.
 void ssj_base_update(void *cls, Entity *e) {
     (void)cls;
-    PartyState *p = g_Party;
-    if (p->meter) p->meter--;
-    u32 *acc = (u32 *)((u8 *)e + 0x184);
-    *acc += 0x6E;
-    if (*acc >> 16) {
-        regen(&p->chars[p->active_slot], 0x7AE, 0);
-        for (int i = 0; i < PARTY_SLOTS_STOCK; i++)
-            if (i != p->active_slot) regen(&p->chars[i], 0xCCD, 0xCCD);
-    }
-    *acc &= 0xFFFF;
-    // resting heals the entity's own slot to 2/3 (regen.c; the companion is nobody's slot, companion.c)
-    if (coop.p2 && e == coop.p2) { if (!companion_active()) regen_tick(e, &p->chars[coop.p2_slot], 1); }
-    else regen_tick(e, &p->chars[p->active_slot], 0);
+    regen_update(e);
 }
+
+// The other two forms' classes read the active slot for every entity, as the Super Saiyans' did (above): rows 10 and
+// 14 (vtable 0x0802526C slot 1, stock 0x080171E4: 1 EP every 40 frames, back at 0) and Piccolo's row 7 (vtable
+// 0x08024ABC slot 1, stock 0x08017400: 1 % HP for 1 EP every 20 frames, back at 0). Player 2 on one of them fed or
+// drained player 1 and never himself. The stock code runs as it is, with player 2's slot presented as the active one.
+static void form_update(void *cls, Entity *e, u32 stock) {
+    PartyState *p = g_Party;
+    u8 active = p->active_slot;
+    if (is_p2_entity(e) && coop.p2_slot < PARTY_SLOTS) p->active_slot = coop.p2_slot;
+    ((void (*)(void *, Entity *))stock)(cls, e);
+    p->active_slot = active;
+}
+void form_update_drain(void *cls, Entity *e) { form_update(cls, e, 0x080171E5); }
+void form_update_heal(void *cls, Entity *e)  { form_update(cls, e, 0x08017401); }
 
 // Every input poll (input.c). Party_DetransformOthers (0x08003ED4, at a load and a save-pad switch) turns back
 // every transformed slot but player 1's; in co-op player 2's slot is played too, so the same rule runs when

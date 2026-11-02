@@ -101,18 +101,27 @@ functions, which fooled a first pass):
 | `ppVTable` (IWRAM) | vtable (ROM) | display rows | 0 init | 1 update | 2 | 3 |
 |---|---|---|---|---|---|---|
 | `0x030021E0` | `0x08024004` | 0,1,2,3,6,8,9,12,13,15,18,19,21 (standard) | `0x08016FD9` | `0x08017029` | `0x0802609D` (stub) | `0x080263B9` (stub) |
-| `0x030021E4` | `0x08024E4C` | 4 | `0x080170D9` | `0x0801710F` | `0x08017159` | `0x08017175` |
+| `0x030021E4` | `0x08024E4C` | 4 (and our 28) | `0x080170D9` | `0x0801710F` | `0x08017159` | `0x08017175` |
 | `0x030021E8` | `0x0802526C` | 10, 14 | `0x0801718D` | `0x080171E5` | `0x0801727D` | `0x08017299` |
 | `0x030021EC` | `0x08024C58` | 5, 11, 16, 17, 20 | `0x080172B1` | `0x08017307` | `0x08017377` | `0x08017393` |
 | `0x030021F0` | `0x08024ABC` | 7 | `0x080173AB` | `0x08017401` | `0x0802609D` (stub) | `0x080263B9` (stub) |
 
 The same init also stores `0x08025684` / `0x08025EAC` at `0x030021FC` and `0x08025698` at `0x03002204`.
 
+The updates, stock (2026-11-02, `docs/perfect-pass.md` 11.1): **each works on the active slot, whichever entity it runs for.**
+`0x030021E0` is "The base class's update" below. `0x030021E4`: the active slot's HP + 1 % (`max * 0x290 >> 16`) every 20
+frames (+0x184 + 0xCCD) to the maximum, nothing else. `0x030021E8`: not while in animation 0x24; 1 EP from the active slot
+every 40 frames (+0x184 + 0x667), animation 0x24 at 0 EP with HP above 0. `0x030021EC`: the Super Saiyans' (below).
+`0x030021F0`: as `0x030021E8` every 20 frames, with the active slot's HP + 1 % each time. In the build slot 1 is
+replaced for all of them: `0x08024004` and `0x08024E4C` are `regen.c`'s rules for the entity's own slot, `0x08024C58`
+`ssj_class_update`, and `0x0802526C` / `0x08024ABC` run the stock code with player 2's slot presented as the active one
+(`ssj.c` `form_update`). The stock `Party_LevelUp` (`0x08003CA0`) sets HP and EP to the new maximum.
+
 Rows 22-28 exist only in the build (`tools/spriteclone.py`): 22 Super Saiyan Hercule and 24 old
 Hercule are copies of Hercule's row 21, 23 Krillin and 25 Android 16 copies of Gohan's row 0, 26 / 27
 haloed Goku / Super Saiyan Goku copies of Goku's rows 19 / 20, 28 Super Saiyan 2 Gohan a copy of Gohan's
-row 3 with row 4's sprite and portraits (row 4's class `0x030021E4`: combat bytes fixed at 100, the active
-slot's HP regenerated, an aura sound in slots 2 / 3). Only bytes 0-5 (flags, sprite,
+row 3 with row 4's sprite and portraits (row 4's class `0x030021E4`: combat bytes fixed at 100, an aura sound in
+slots 2 / 3; its stock update, the active slot's HP regenerated, is replaced). Only bytes 0-5 (flags, sprite,
 portraits, transformation links) change, so each keeps its source row's class (27 that of row 20).
 
 **Why static input searches failed:** the controller lives behind these RAM-resident vtable pointers,
@@ -173,7 +182,8 @@ The stock rules, read from the ROM (thumb disassembly); what the build changes i
   No regeneration and no meter decay while transformed.
 - **The base class's update** (`0x08017028`): the party meter -1 a frame (the cool-down: a transform's 1280 frames
   before the next, less what the charged attack spends); +0x184 += 0x6E and at each overflow (about 10 s) the
-  active slot's EP +3 % of its maximum and every other stock slot (0-5) EP and HP +5 %.
+  active slot's EP +3 % of its maximum and every other stock slot (0-5) EP and HP +5 %. The build's rules are `regen.c`
+  (once a frame, not per entity; only for characters nobody plays; no 3 % for the played ones; `docs/perfect-pass.md` 11.1).
 - **Turn back, animation 0x24** (state `0x03002180`, vtable `0x080256AC`): enter `0x0801579A` (+0x163 / +0x164 := 0,
   restored to 0x80 by leave `0x080157BA`) and `0x08013578` (**group 21** of the record, +0x19C); update `0x0801358C`:
   frame = counter / 16 for 64 frames; slot 5 `0x080157AE` = `0x08014D58(entity, 0)`. No sound. Goku's group 21
@@ -186,8 +196,8 @@ The stock rules, read from the ROM (thumb disassembly); what the build changes i
 player 2 who transformed changed player 1's row and drained player 1's EP. The transform's slot 5 (vtables
 `0x08025D9C`, `0x08025CE0`), the turn-back's slot 5 (`0x080256AC`) and the Super Saiyan class's update
 (`0x08024C58` slot 1) are replaced by C that does the same for the entity's own slot (player 2: `p2_refresh_sprite`
-for the sprite and class); the base class's update (`0x08024004` slot 1) is rewritten with one rule added, no
-regeneration for a slot on a transformed row (each player's base class otherwise feeds the other player's slot);
+for the sprite and class); the base class's update (`0x08024004` slot 1) is `regen.c`'s (no trickle for a slot on a
+transformed row, none for a played one);
 and `ssj_frame` applies `Party_DetransformOthers`' rule to a slot player 2 leaves. For player 1 alone nothing changes.
 
 ## Messages, projectiles and beams (decompiled 2026-10-31 for the team combos)

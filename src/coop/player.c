@@ -80,8 +80,11 @@ void leash_p2(Entity *e) {
 static void use_ability(Entity *e) {
     CharacterEntry *c = &g_Party->chars[slot_for(e)];
     const AbilityDef *a = &ABILITY_TABLE[c->ability_list[c->ability_index]];
-    if (a->is_ready(c)) a->on_use(c, e);
-    else play_cant_sfx();
+    if (a->is_ready(c)) {
+        s32 ep = (s16)c->ep;
+        a->on_use(c, e);
+        if ((s16)c->ep < ep) regen_ki_used(is_p2(e));   // regen.c: a move that spends ki (not a taunt, not Energy Steal)
+    } else play_cant_sfx();
 }
 
 static void handle_buttons(Entity *e, const InputSystem *in) {

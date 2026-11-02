@@ -341,7 +341,7 @@ def main():
         rows += r
     # row 28 = Super Saiyan 2 Gohan as his own party member (slot 8, docs/story.md 4h): Gohan's row 3 with the
     # stock Super Saiyan 2 row's sprite, portraits and class (bytes 16-19: 0x030021E4, fixed combat bytes 100,
-    # HP regeneration, an aura loop; Ryan, 2026-10-20: as fast and strong as in the Cell fight, not a regular
+    # an aura loop, its stock HP regeneration replaced by regen.c; Ryan, 2026-10-20: as fast and strong as in the Cell fight, not a regular
     # character). A base form (flags 0, links to itself): the stock row 4's transformed flags would make
     # Party_DetransformOthers turn him back into row 2 whenever he is not player 1.
     ssj2 = bytearray(rows[TEEN_GOHAN_ROW * 20:TEEN_GOHAN_ROW * 20 + 20])

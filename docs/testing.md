@@ -1309,12 +1309,16 @@ python tools/headless/tny_film.py ... --opp 195 --name spo          # an opponen
 ## Resting heals (2026-11-01)
 
 `python tools/headless/st_expect.py tools/headless/regen.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out
-build/<dir>/hl`: the town (Map Test 7, no enemies) with both players at 10 HP: both rise at once (the quiet timers
-passed the 5 s delay during the Map Test; the delay counts from the last hit or enemy, not from the HP loss), Piccolo
-to his cap 0x2BF (2/3 of 1055) and holding; Map Test 13 with the wolves beside them: no resting (Piccolo set to 600
-ends under it, hit), then test command 13 kills them all and he rests to 0x2BF. Player 2's slot (Hercule) ends above
-his cap: the stock 5 % trickle for the slots not being played still feeds it. The numbers (delay, step, rate, range,
-cap) are the macros at the top of `src/coop/regen.c`.
+build/<dir>/hl` (96 checks, about 3 minutes to run; `docs/perfect-pass.md` 11.1, 11.2 have the rules). The numbers are the macros at the top of `src/coop/regen.c`; test command 44 sets both ki timers. Blocks: **A** the
+town (Map Test 7), player 1 Piccolo, player 2 Hercule, Gohan and Krillin on the bench, everybody at 10 HP and 0 EP: no EP at
+29 s, rising at 31 s, both at exactly 2/3 HP, at 1/3 EP by 70-75 s and not above at 225 s, the bench at its stock pace and
+then full; a poked start above the caps stays put; the party meter falls 1 a frame. **B** the pairing the other way
+round. **C** Super Saiyan 2 Gohan (slot 8, poked in as `ssj2_join` leaves him) as player 2 and as player 1: both at their
+caps (this pairing is what took player 1 to full). **D** a real Ki Blast by player 1 restarts his count and not player
+2's, and Hercule's punch by player 2 the other way. **E** among wolves (Map Test 13): hit, and the ki rises anyway; no
+resting; then test command 13 kills them all and both rest to the cap. **F** player 2 on Piccolo's form (row 7): HP for EP on
+his own slot, player 1's EP at 0. **G** a downed player 2: no HP, no ki. **H** one player: the same rules, Hercule on the
+bench. **I** a duel by test command 6, **J** a Rumble in the ring: nothing rises.
 
 ## Player 2's pickups (2026-11-01)
 

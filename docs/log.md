@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Regeneration (Ryan's second session; `docs/perfect-pass.md` 11.1, 11.2):** player 1 healed to full only through Super
+  Saiyan 2 Gohan's stock class, which heals the *active* slot whoever plays him; the doubled stock trickle filled player 2
+  and player 1's ki. Now: the trickle and the party meter run once a frame (the co-op Super Saiyan cool-down is the same as
+  alone), the trickle goes only to characters nobody plays, to full; played characters heal by resting to 2/3 as before,
+  Super Saiyan 2 Gohan included; ki comes back by a new rule (30 s without a ki move, then 40 s from empty to 1/3; hits do not
+  matter), for both players and alone, none in a duel or the ring. The other forms' classes (rows 7, 10, 14) run on the
+  entity's own slot. `regen.c`, `ssj.c`, test command 44, `regen.txt`.
 - **Super Saiyan Hercule locked off** (Ryan: not an option yet, much later): `ssj.c` `SSJ_HERCULE_UNLOCK` 0, CoopCall 4
   a no-op, saves holding the ability get Megaton Punch back at the load (`hercule_lock`, `ssj_lock.txt`).
 - **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide

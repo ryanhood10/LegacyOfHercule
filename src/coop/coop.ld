@@ -11,7 +11,7 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        save_menu_location_hook save_menu_count_hook save_menu_member_in_party_hook save_menu_member_selectable_hook
        save_menu_active_pos_hook save_menu_member_sprite_hook save_menu_set_active_hook save_menu_erase_hook save_menu_start_hook
        switch_view switch_create_hook switch_next_hook switch_prev_hook switch_select_hook switch_arrows_hook switch_update_hook
-       hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use ssj_transform_done ssj_detransform_done ssj_class_update ssj_base_update herc_ssj_icon_0 herc_ssj_icon_1 sprite_index display_rows display_row_count ssj_record
+       hercule_punch_ready hercule_punch_use hercule_kick_ready hercule_kick_use hercule_megaton_ready hercule_megaton_use hercule_taunt_ready hercule_taunt_use ssj_ready ssj_use ssj_transform_done ssj_detransform_done ssj_class_update ssj_base_update form_update_drain form_update_heal herc_ssj_icon_0 herc_ssj_icon_1 sprite_index display_rows display_row_count ssj_record
        ui_strings portrait_module status_module status_title_hook status_pages_hook status_draw_hook
        vm_push_name_hook vm_push_caps_hook kiblast_spawn_hook map_variation_hook krillin_rush_ready krillin_rush_use krillin_shock_ready
        krillin_shock_use krillin_disc_ready krillin_disc_use kr_disc_icon_0 kr_disc_icon_1 kr_state krillin_record
@@ -91,7 +91,7 @@ SECTIONS
         KEEP(*(.combo.meter))  /* the meter (<= 0x80) */
         KEEP(*(.combo.cap))    /* the caption (<= 0x30) */
         KEEP(*(.combo.run))    /* the runner (<= 0x140) */
-        KEEP(*(.combo.rg))     /* regen.c: the resting timers (4 bytes; ewram is full) */
+        KEEP(*(.combo.rg))     /* regen.c: the resting and ki timers (0xC of at most 0x10 bytes; ewram is full) */
     } > comboram
 
     .bss (NOLOAD) : {
