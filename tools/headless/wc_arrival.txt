@@ -1,0 +1,281 @@
+# West City's arrival in co-op (Ryan's two-player session, 2026-11-02): the stock scene (map 65 trigger 1, Goku's
+# arrival) pans the camera up to Piccolo at (280, 960) behind the parade float; the leash (player.c leash_p2) then
+# clamped any player who moved into the panned view, so both landed beside Piccolo, past the float. The leash now
+# stands down while a scene runs. Both players hold up (A mashed) through the scene: they stay at the landing
+# (y 1248 = 0x4E0; before the fix 1077 = 0x435, the panned view's bottom). From a debug-menu savestate:
+#   python tools/headless/st_expect.py tools/headless/wc_arrival.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 65
+frames 100
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x0304
+poke32 0x0203FD54 0x04E00160
+poke32 0x0203FD08 5
+frames 120
+findent PL 0x08025604
+deref P2 0x0203FF08
+echo == at the landing: player 1 (Gohan) 352,1248, player 2 340,1248
+echo EXPECT \w+: 00016000 0004e000
+peek PL+0x158 2
+echo EXPECT \w+: 00015400 0004e000
+peek P2+0x158 2
+keys 0x80
+frames 30
+keys 0
+p2 0x40
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0x41
+frames 8
+keys 0x40
+frames 8
+keys 0
+p2 0
+frames 60
+echo == after the scene: both still at the landing's row (y 0x4c0-0x4ff), the scene over
+map
+findent PL 0x08025604
+deref P2 0x0203FF08
+echo EXPECT \w+: \w{8} 0004[c-f]\w{3}
+peek PL+0x158 2
+echo EXPECT \w+: \w{8} 0004[c-f]\w{3}
+peek P2+0x158 2
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+shot wc_arrival

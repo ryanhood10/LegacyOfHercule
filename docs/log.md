@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **West City's arrival dragged both players to Piccolo (Ryan's two-player session):** the scene ends with the view panned up to Piccolo, and while
+  it glided back the leash snapped both players into it, past the parade float. The leash now moves nobody more than
+  8 px a frame and stands down in a sequence; player 2's pad is held to A while one runs (`wc_arrival.txt`).
 - **Revive countdown 60 s on every difficulty** (Ryan; `difficulty.h`, was 20 / 10 / 6; `revive.txt` adjusted). **Drop-ins
   start at full HP and EP** (`dropins.py` `fill`): Ryan took F1's carried-over health (Krillin 40 / 70, Gohan 64 / 96)
   for the resting cap.

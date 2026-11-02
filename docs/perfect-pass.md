@@ -237,6 +237,17 @@ punctuation only); owner in brackets.
   health of the save they were made from (Krillin 40 / 70, Gohan 64 / 96). Every drop-in now starts with the whole
   party at full HP and EP (`dropins.py` `fill`).
 
+- **Fixed (2026-11-02, Ryan's two-player session): West City's arrival put both players beside Piccolo, behind the
+  parade float.** "A bunch of character models momentarily disappeared, then it returned to normal, but it loaded us
+  in on a weird spot ... next to Piccolo (he's gated off) ... almost like the game was trying to force one of the
+  players to be Piccolo." The stock scene (map 65 trigger 1, Goku's arrival) ends with a camera pan up to Piccolo
+  at (280, 960) and 100 frames of wait, and when the sequence ends the view glides back to the players over the next
+  frames; the co-op leash (`leash_p2`: both players kept inside the view) then snapped both into the still-far view,
+  the landing is y 1248 and they ended at 1077, the panned view's bottom, past the parade float (not solid until
+  flag 34). Alone, player 1 stays. Now the leash never moves a player more than 8 px (a walker is only ever a few
+  px past the edge; more is the view's own doing) and stands down during a sequence, and player 2's pad is held to
+  A while one runs (`input.c`; the stock already holds player 1). Test: `tools/headless/wc_arrival.txt` (self-checking, in `regfull.sh`).
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM

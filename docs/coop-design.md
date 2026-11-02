@@ -122,6 +122,10 @@ GBA keys active-high; address in `build/coop.sym`) with the link cable as fallba
   view origin (`0x03001090` +0x1C/+0x20; position kept as px << 10 at +4/+8). `src/coop/camera.c`
   replaces that slot: when player 2 exists the target point is the midpoint of both players'
   box centres, same smoothing, same setter.
+- (Since 2026-11-02 the leash never moves a player more than 8 px and stands down during a dialogue sequence: West
+  City's arrival ends with the view panned up to Piccolo and gliding back, and the clamp snapped both players into
+  the far view, past the parade float; player 2's pad is also held to A while a sequence runs, `input.c`;
+  `tools/headless/wc_arrival.txt`.)
 - Both players are leashed to the visible area (`leash_p2`, applied in the ported control states
   and after the wrapped originals), so the screen edge is the separation limit: a player walking
   away stops at the edge until the other follows. Scripted movement is unaffected since the leash

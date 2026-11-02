@@ -52,7 +52,14 @@ static void play_cant_sfx(void) { Sfx_Play(g_AudioMixer + 0x5C4, SFX_TABLE + 0xE
 
 void leash_p2(Entity *e) {
     if (!coop.p2 || (e != coop.p2 && e != g_PlayerObject)) return;   // both players, only in co-op
+    // not during a scene (input.c holds player 2 still through one since 2026-11-02; this is the second guard)
+    if (scene_running()) return;
     const s32 *cam = CAMERA_CELL;
+    // only at the view's edge: when the view is away from the players (West City's arrival ends with the camera
+    // panned up to Piccolo behind the parade float, and it glides back over the next frames) the clamp would snap
+    // them into the far view, which put Ryan and his brother beside Piccolo (2026-11-02). A walking player is never
+    // more than a few px past the edge, so a clamp of more than LEASH_SNAP px is the view's doing: leave him.
+#define LEASH_SNAP 8
     if (!cam) return;
     s32 left = cam[7], top = cam[8];           // +0x1C, +0x20
     s32 x = e->x >> 8, y = e->y >> 8;
@@ -65,6 +72,7 @@ void leash_p2(Entity *e) {
     // Gero's lab area 47) could never be reached in co-op
     s32 min_y = top > 0 ? top + 20 : top;
     s32 ny = y < min_y ? min_y : (y > bottom ? bottom : y);
+    if (nx - x > LEASH_SNAP || x - nx > LEASH_SNAP || ny - y > LEASH_SNAP || y - ny > LEASH_SNAP) return;
     if (nx != x) e->x = nx << 8;
     if (ny != y) e->y = ny << 8;
 }

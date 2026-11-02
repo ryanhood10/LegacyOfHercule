@@ -221,6 +221,10 @@ void input_poll_hook(InputSystem *in) {
     if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) soft_reset();
 
     poll_into(&coop.input2, p2);
+    // player 2 holds still through a scene (a dialogue sequence, 0x03001FDC): the stock holds player 1, but in West
+    // City's arrival player 2 walked up to Piccolo behind the parade float during the scene's camera pan and the
+    // leash dragged player 1 after him (Ryan's two-player session, 2026-11-02). A stays, for the dialogue.
+    if (scene_running()) { coop.input2.current &= KEY_A; coop.input2.pressed &= KEY_A; }
 
     coop_active_check();
     players_tick();                        // players.c: the 1 / 2 players question after a Select Game

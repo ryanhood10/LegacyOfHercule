@@ -1324,3 +1324,11 @@ pointer of the list at 0x03001FE0 (`docs/engine.md` "Dropped items and touch box
 who stands alone at 540,424 after 24 frames of walking left; within 60 frames his HP goes 100 -> 149, the list is one
 shorter, the item entity is gone and player 1's HP and the active slot are untouched. Moving the players by poke does
 not work for this (the leash and the camera pull them back): move the box.
+
+## West City's arrival (2026-11-02)
+
+`python tools/headless/st_expect.py tools/headless/wc_arrival.txt ...`: Map Test 65 with the chapter-1 flags, Gohan
+player 1 and player 2 in, the test warp to the landing (352, 1248) and a step down into trigger 1 (Goku's arrival).
+Both players hold up with A mashed through the scene; after it they are still on the landing's row (y 0x4C0-0x4FF).
+Before the fix both ended at y 1077: the scene ends with the view panned up to Piccolo, and while it glided back the
+leash snapped both players into it, past the parade float. The leash now moves nobody more than 8 px a frame.
