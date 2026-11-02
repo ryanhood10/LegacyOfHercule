@@ -1377,3 +1377,17 @@ sequence names the winner itself passes `DUEL_OWN_WINNER` (16): Roshi's sparring
 which already refilled both). When player 2 wins a duel with `DUEL_SWAP_ON_P2_WIN`, the pads have swapped, so player
 2's A closes the line. Test: `tools/headless/duel_end.txt` (the space duel, each player winning once).
 
+
+## Resting heals and player 2's pickups (2026-11-01, Ryan's first two-player session)
+
+- **Resting heals** (`src/coop/regen.c`, Ryan: "if you get away from enemies and you aren't hit, your health will regen
+  after a certain amount of time to 2/3rds; the last 1/3rd the player will have to get the traditional way"). From
+  the base class's update (`ssj.c` `ssj_base_update`, per player entity, for its own slot): a timer per player
+  (`.combo.rg`, 4 bytes in `comboram`: `ewram` is full) counts frames since the last hit (both take-damage hooks call
+  `regen_hit`) or the last frame with an enemy (`is_any_enemy`) within 128 px either axis; past 300 frames HP rises
+  1 % of the maximum every 20 frames up to 2/3 of it. Downed (HP 0) players and the companion are skipped; a
+  transformed player runs the Super Saiyan class, which never rests (stock). Food, senzu and the stock 5 % trickle
+  for the slots not being played are unchanged.
+- **Player 2's pickups** (`src/coop/pickup.c`): the stock game fires a dropped item's touch box only for player 1's
+  position (`docs/engine.md` "Dropped items and touch boxes"); every input poll player 2's position is tested against
+  the item boxes and one is fired the stock way with the active slot and `g_PlayerObject` swapped to his.

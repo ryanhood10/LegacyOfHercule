@@ -264,7 +264,7 @@ static int p2_take_damage(Entity *e, const u8 *hit) {
     int dmg = *(const s32 *)(hit + 8);
     if (dmg == 0) return 0;
     if (companion_active()) return 1;            // the companion takes no hits (companion.c)
-    if (dmg > 0) tny_combo_on_hit(e, *(Entity *const *)(hit - 4));   // team combos (tny_combo.h): the attacker word before the hit
+    if (dmg > 0) { tny_combo_on_hit(e, *(Entity *const *)(hit - 4)); regen_hit(1); }   // team combos (tny_combo.h): the attacker word before the hit; regen.c: no rest
     if (tny_ko_check(1, dmg)) {                  // a tournament fight: 1 HP and out (tny_engine.c)
         Player_Knockback(e, (void *)hit);
         g_Party->chars[coop.p2_slot].hp = 1;

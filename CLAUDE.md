@@ -48,7 +48,9 @@ the team (7: six agents on `pp-*` branches in `F:/MeltyCreations/log2-<piece>`, 
 world-map landmark (24.6), the four portraits and Yakon (24.2-3), Super Saiyan Hercule by the stock rules, the combos'
 leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games, the story polish and Ryan's notes
 (`pp-story`), the tournament fixes 24.1-24.7 (`pp-tny`), the soft-reset crash (`pp-reset`): all seven pieces merged,
-full regression clean (section 10). The combos' step tables wait for Ryan's two-player session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
+full regression clean (section 10). The two-player sessions started 2026-11-01 (Parsec; his brother's pad through
+`p2_keys.py`): player 2's pickups (`src/coop/pickup.c`) and resting heals (`src/coop/regen.c`) came out of the first
+(section 1 "First session", section 9). The combos' step tables wait for a longer session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
 
 The World Tournament on Papaya Island (`docs/tournament.md`: the plan, 9b-13 the build, 14-23 playtest rounds, 24 open
 points, 25 the team combos, 25.4 colours, 25.5 the leftovers) and its team combos (`docs/tournament-combos.md`, both

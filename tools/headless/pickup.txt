@@ -1,0 +1,48 @@
+# Player 2 picks up dropped food (src/coop/pickup.c; docs/testing.md "Player 2's pickups"). Map Test 13; test command 13
+# kills every wolf and their defeat scripts roll the drops: one item lands at 228-244 x 256-272 (entity vtable
+# 0x08024C90; its touch box is the last pointer of the list at 0x03001FE0, class 0x08023F18). Walking there is a long
+# way round the rocks, so the box is moved onto player 2 instead (he stands alone at 540,424 after a short walk; player
+# 1 at 568). Stock, nothing happened for 120 frames; now he takes it within 60: Hercule's HP (0x0203F098) 100 -> 149
+# (item 11), the list one shorter, the item entity gone, Piccolo's HP (0x0203F028) untouched, the active slot restored.
+#   python tools/headless/st_expect.py tools/headless/pickup.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+maptest 13
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo == both at 100 HP; every enemy dies; the drop's box
+poke16 0x0203F028 100
+poke16 0x0203F098 100
+poke32 0x0203FD08 13
+frames 120
+echo EXPECT 03001fe0: 00000005
+peek 0x03001FE0 1
+deref BX 0x03001FF4
+echo EXPECT \w+: 08023f18 00f900d5 011000f4 030020bc 02026fac
+peek BX 5
+echo == player 2 walks left 24 frames (to 540; player 1 stays at 568), the box onto him alone: 516..546 x 404..444
+p2 0x20
+frames 24
+p2 0
+frames 10
+echo EXPECT \w+: 000238c0
+peek PL+0x158 1
+echo EXPECT \w+: 00021c00
+peek P2+0x158 1
+poke16 BX+4 516
+poke16 BX+6 404
+poke16 BX+8 546
+poke16 BX+10 444
+frames 60
+echo == 60 frames: Hercule 149, Piccolo 100, the list 4, the active slot 1
+echo EXPECT 0203f098: 0095
+peek16 0x0203F098
+echo EXPECT 0203f028: 0064
+peek16 0x0203F028
+echo EXPECT 03001fe0: 00000004
+peek 0x03001FE0 1
+echo EXPECT 0203f000: \w{6}01
+peek PARTY 1
+ents
+shot pickup_p2

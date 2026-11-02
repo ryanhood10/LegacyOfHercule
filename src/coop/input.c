@@ -233,6 +233,7 @@ void input_poll_hook(InputSystem *in) {
     krillin_frame(in);   // krillin.c: old Hercule's weak combat bytes, KR_TEST triggers
     ssj2_frame();        // ssj2gohan.c: SSJ2_TEST triggers
     ssj_frame();         // ssj.c: a slot player 2 leaves turns back from Super Saiyan
+    p2_pickup_tick();    // pickup.c: player 2 takes dropped food he stands on (the stock scan only sees player 1)
     a16_frame();         // a16player.c: an older save's Android 16 gets his four moves
     tny_frame();         // tourney_hooks.c: the tournament team's per-frame work (engine, moves, ui)
 #ifdef SSJ_TEST

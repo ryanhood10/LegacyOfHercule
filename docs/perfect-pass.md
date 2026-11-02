@@ -12,6 +12,13 @@ drops him). Every game start asks "How many players?" (A: 1, B: 2). The drop-ins
 are one-player saves: after loading one, player 2 joins by pressing a button on pad 2 (the join is `dropout.txt`'s
 recipe). Saving inside F2-F7 replaces the real save (backups in `build/play/backup/`).
 
+**First session (2026-11-01, Ryan and his brother over Parsec, his brother's pad through `p2_keys.py`):** three
+things came back, two built the same night (section 9): player 2 could not take the food dropped from boulders and
+enemies (fixed: `src/coop/pickup.c`); Ryan wants resting to heal (built: `src/coop/regen.c`, to 2/3 of the maximum, the
+rest the stock way); and "at a certain point it quit allowing us to ki blast, I guess after we saved" (open: most
+likely both EP bars were empty, 2 EP a blast and 3 % back every 10 s, and player 2 could not refill from drops; to
+confirm with Ryan: was the lower bar empty, who were they playing, did L change the ability).
+
 Take notes as you go: one line per thing (where, who played whom, what happened, what you expected). The things no
 headless test can judge are **feel**: is it fun with two, is anyone bored, is anyone lost.
 
@@ -174,6 +181,21 @@ punctuation only); owner in brackets.
 
 ## 9. Found during the pass (not asked for; to fix or to ask Ryan)
 
+- **Fixed (2026-11-01, Ryan's two-player session): player 2 could not pick up dropped food.** Decompiled: a dropped
+  item with no popup and no count (food, senzu) registers a touch box in the list at 0x03001FE0 and the stock scan
+  fires a box only for player 1's position (`docs/engine.md` "Dropped items and touch boxes"). `src/coop/pickup.c`
+  tests player 2's position every input poll and fires the box the stock way with the active slot swapped to his.
+  Test: `tools/headless/pickup.txt` (self-checking, in `regfull.sh`).
+- **Built (2026-11-01, Ryan: "if you get away from enemies and you aren't hit, your health will regen after a certain
+  amount of time to 2/3rds; the last 1/3rd the player will have to get the traditional way"):** `src/coop/regen.c`,
+  from the base class's update (`ssj.c`): 5 s with no hit and no enemy within 128 px, then 1 % of the maximum every
+  20 frames up to 2/3 (0 to 2/3 in about 22 s); a transformed player never rests (the Super Saiyan class runs
+  instead, as stock). Numbers are the macros at the top of `regen.c`. Test: `tools/headless/regen.txt`.
+- **Open (the same session): "at a certain point it quit allowing us to ki blast, I guess after we saved the game".**
+  A save at a pad does not touch the ability gate or EP (headless `build/go/sv.txt`: both players blast after the
+  save). Most likely EP ran out (2 EP a blast, the stock 3 % of the maximum back every 10 s, and player 2 could not
+  refill from drops until the fix above). To ask Ryan: was the lower bar empty, who was playing whom, had L changed
+  the ability.
 - **Fixed (2026-11-01, branch `pp-reset`): a soft reset, then loading a save, crashed** a few frames after the load (a
   jump to garbage from `0x080109AC`); found by the ssj piece. The cause: the soft reset keeps EWRAM, so `coop.p2`
   still pointed at the old player 2's entity (any game where player 2 was in at the reset), no new player 2 was built

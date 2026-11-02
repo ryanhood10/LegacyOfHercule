@@ -60,7 +60,7 @@ void tny_combo_on_hit(Entity *target, Entity *attacker);   // tny_combo_meter.c
 int p1_take_damage_hook(Entity *e, u8 *hit) {
     int (*orig)(Entity *, u8 *) = (int (*)(Entity *, u8 *))P1_TAKE_DAMAGE;
     // team combos (tny_combo.h): a kit fighter's hit; the hit is the message's +0x24, its attacker the word before
-    if (*(s32 *)(hit + 8) > 0) tny_combo_on_hit(e, *(Entity **)(hit - 4));
+    if (*(s32 *)(hit + 8) > 0) { tny_combo_on_hit(e, *(Entity **)(hit - 4)); regen_hit(0); }   // regen.c: no rest
     if (coop2.duel_active) {
         CharacterEntry *c = &g_Party->chars[g_Party->active_slot];
         s32 *dmg = (s32 *)(hit + 8);

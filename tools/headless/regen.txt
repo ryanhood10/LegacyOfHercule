@@ -1,0 +1,56 @@
+# Resting heals (src/coop/regen.c; docs/testing.md "Resting heals"): a player not hit and with no enemy within 128 px
+# for 5 s regains 1 % of his maximum HP every 20 frames up to 2/3 of it. Player 1 Piccolo (slot 1: hp 0x0203F028,
+# max 0x41F = 1055, cap 703 = 0x2BF), player 2 Hercule (slot 5: hp 0x0203F098, max 0x1ED = 493, cap 328 = 0x148; his
+# slot also gets the stock 5 % trickle from the base classes, so he ends above the cap). From a debug-menu savestate:
+#   python tools/headless/st_expect.py tools/headless/regen.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+maptest 7
+frames 300
+echo == the town, no enemies: both at 10 HP; the quiet timers passed the 5 s delay during the Map Test, so both rise at once
+poke16 0x0203F028 10
+poke16 0x0203F098 10
+frames 290
+echo EXPECT 0203f028: 00[5-9a-f]\w
+peek16 0x0203F028
+echo EXPECT 0203f098: 00[2-9a-f]\w
+peek16 0x0203F098
+echo == 200 frames on: both higher still, under the caps
+frames 200
+echo EXPECT 0203f028: 0[01][a-f0-9]\w
+peek16 0x0203F028
+echo EXPECT 0203f098: 0[01]\w\w
+peek16 0x0203F098
+echo == 1800 frames on: Piccolo at his cap, Hercule at his plus the trickle; 300 more: Piccolo still there
+frames 1800
+echo EXPECT 0203f028: 02bf
+peek16 0x0203F028
+echo EXPECT 0203f098: 01[4-9a-f]\w
+peek16 0x0203F098
+frames 300
+echo EXPECT 0203f028: 02bf
+peek16 0x0203F028
+shot regen_town
+echo == Map Test 13, wolves beside both: Piccolo 600, Hercule 200; 700 frames among them: no resting (Piccolo hit, under 600)
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke16 0x0203F028 600
+poke16 0x0203F098 200
+frames 700
+echo EXPECT 0203f028: 0[01]\w\w|02[0-5]\w
+peek16 0x0203F028
+peek16 0x0203F098
+shot regen_near
+echo == test command 13 (every standing enemy dies), 1000 frames: Piccolo rests to his cap
+poke32 0x0203FD08 13
+frames 100
+poke16 0x0203F028 600
+poke16 0x0203F098 200
+frames 1000
+echo EXPECT 0203f028: 02bf
+peek16 0x0203F028
+echo EXPECT 0203f098: 01[4-9a-f]\w
+peek16 0x0203F098
+shot regen_clear

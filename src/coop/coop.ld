@@ -91,6 +91,7 @@ SECTIONS
         KEEP(*(.combo.meter))  /* the meter (<= 0x80) */
         KEEP(*(.combo.cap))    /* the caption (<= 0x30) */
         KEEP(*(.combo.run))    /* the runner (<= 0x140) */
+        KEEP(*(.combo.rg))     /* regen.c: the resting timers (4 bytes; ewram is full) */
     } > comboram
 
     .bss (NOLOAD) : {

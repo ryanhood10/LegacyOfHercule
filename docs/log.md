@@ -4,6 +4,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Ryan's first two-player session (over Parsec; `p2_keys.py` reads his brother's pad):** player 2 could not take
+  dropped food: the stock touch-box scan only tests player 1 (`docs/engine.md` "Dropped items and touch boxes");
+  `src/coop/pickup.c` fires an item box for player 2 with the active slot swapped (`pickup.txt`). Resting heals built
+  as he asked (`src/coop/regen.c`: 5 s quiet, no enemy within 128 px, 1 % every 20 frames to 2/3; `regen.txt`). "It
+  quit allowing us to ki blast after we saved": a save does not touch the gate or EP headless; EP most likely ran out
+  (`docs/perfect-pass.md` 9). The timers sit in `comboram` (`.combo.rg`): `ewram` was full.
 - **"How many players?" after a load (Ryan's two-player session):** the question started while the loaded map was still
   black and held its fade-in, so the screen stayed black and the first A answered "1 player". It now waits until the
   background palette has colour plus 40 frames (`src/coop/players.c`). Checked on his own save (the box shows, B gives

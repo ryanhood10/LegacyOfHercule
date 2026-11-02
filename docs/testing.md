@@ -1302,3 +1302,22 @@ python tools/headless/tny_film.py ... --opp 195 --name spo          # an opponen
 - `tools/headcheck.py` on 185-189 / 235-244 flags only Chiaotzu's halo (group 17, a ring above the head by design) and
   one swing arc over Roshi's back-view kick.
 
+
+## Resting heals (2026-11-01)
+
+`python tools/headless/st_expect.py tools/headless/regen.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out
+build/<dir>/hl`: the town (Map Test 7, no enemies) with both players at 10 HP: both rise at once (the quiet timers
+passed the 5 s delay during the Map Test; the delay counts from the last hit or enemy, not from the HP loss), Piccolo
+to his cap 0x2BF (2/3 of 1055) and holding; Map Test 13 with the wolves beside them: no resting (Piccolo set to 600
+ends under it, hit), then test command 13 kills them all and he rests to 0x2BF. Player 2's slot (Hercule) ends above
+his cap: the stock 5 % trickle for the slots not being played still feeds it. The numbers (delay, step, rate, range,
+cap) are the macros at the top of `src/coop/regen.c`.
+
+## Player 2's pickups (2026-11-01)
+
+`python tools/headless/st_expect.py tools/headless/pickup.txt ...`: Map Test 13, test command 13 kills the wolves and
+their defeat scripts drop one item at 228-244 x 256-272 (deterministic in the runner); its touch box is the last
+pointer of the list at 0x03001FE0 (`docs/engine.md` "Dropped items and touch boxes"). The box is moved onto player 2,
+who stands alone at 540,424 after 24 frames of walking left; within 60 frames his HP goes 100 -> 149, the list is one
+shorter, the item entity is gone and player 1's HP and the active slot are untouched. Moving the players by poke does
+not work for this (the leash and the camera pull them back): move the box.

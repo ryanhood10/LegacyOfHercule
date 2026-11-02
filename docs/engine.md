@@ -237,3 +237,25 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   256 frames.
 - **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
   bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.
+
+## Dropped items and touch boxes (decompiled 2026-11-01 for player 2's pickups)
+
+- **A drop.** The drop scripts' `SpawnItem` (Step 87 / 92, handler `0x0800ABA4`) builds an item entity (`0x08011802`,
+  0x44 bytes, vtable `0x08024C90`: slot 3 update `0x08011896` bounces it to the ground, slot 10 `0x0801193E` "taken"
+  removes it from the list and runs the item record's +0x34 handler, slot 9 `0x08011960` answers message 3 (a punch's
+  hit box, `Player_Attack`) only for a counted item). Fields: +0x14 the item record, +0x18..+0x24 the bounds (x1, y1,
+  x2, y2), +0x30 / +0x34 the bounce, +0x38 landed, +0x3C 1 for a direct-effect item, +0x40 the item id. The item
+  table `0x086ADE24` (0x38 a record): +0 counted, +2 popup, +3 max count, +0x30 the use handler (`0x0800F592`:
+  ids 0xB / 0xC / 0xD heal the **active slot** by fractions of its maximum, 0x15 gives EP), +0x34 the pick-up handler
+  (`0x0800F3F0`, our `item_use_hook`, which runs +0x30 for a direct item).
+- **The touch box.** A direct-effect item (no popup, not counted: the food and senzu that drop) gets a box from
+  `0x0801177C`: `{vtable 0x08023F18, s16 x1 - 15, s16 y1 - 7, s16 x2, s16 y2, the player object 0x030020BC, the item}`
+  (0x14 bytes), appended to the list at **0x03001FE0** (`{count, pointers...}`; the map's own trigger boxes of classes
+  `0x080240E4` / `0x08023E38` / `0x08023E44` share it). Class slots: 0 the destructor, 1 fire (`0x080117C2`: the item's
+  slot 10, then `0x0800BF6E` takes the box off the list), 4 returns +0x14. The stock scan fires a box whose rectangle
+  holds **player 1's** position, moving or standing, and never tests player 2 (headless: the box moved onto player 2
+  alone did nothing for 120 frames; onto player 1 alone it was taken within 60). The player object `0x030020BC` is
+  `{vtable 0x080240F0, the camera-follow vtable 0x08025A6C, player 1's entity, 0x0802480C, ...}`.
+- **The build** (`src/coop/pickup.c`): every input poll player 2's position is tested against the item boxes and one
+  is fired the stock way with the party's active slot and `g_PlayerObject` swapped to his for the call, so the handler
+  heals his character. `tools/headless/pickup.txt`.

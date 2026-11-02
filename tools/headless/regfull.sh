@@ -28,6 +28,11 @@ python tools/headless/st_expect.py tools/headless/ssj_hercule.txt "$ROM" "$OUT/m
 # A soft reset, then a two-player load, a one-player load and a new game (docs/testing.md "Soft reset"): self-checking
 echo "## softreset" >> "$LOG"
 python tools/headless/st_expect.py tools/headless/softreset.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+# Resting heals and player 2's pickups (docs/testing.md "Resting heals", "Player 2's pickups"): self-checking
+for t in regen pickup; do
+  echo "## $t" >> "$LOG"
+  python tools/headless/st_expect.py tools/headless/$t.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+done
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt "$PLAY" --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"

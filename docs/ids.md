@@ -19,6 +19,7 @@ Each piece takes numbers only from its own row and says in its report if it need
 | art (`pp-art`) | - | - | - | 169-172 (used: the four portraits) | - |
 | combo (`pp-combo`) | - | - | 39 (not used) | - | in `comboram`'s free 0xB8: `.combo.run` +0x88..+0x91, the copies' state (`RunRam` 0x92 of 0x140) |
 | map (`pp-map`) | 478-479 (not needed: unused, free) | - | - | - | - |
+| regen + pickup (main, 2026-11-01, Ryan's two-player session) | - | - | - | - | `.combo.rg` 4 bytes in `comboram` after `.combo.run` (the resting timers, `regen.c`; `ewram` is full) |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 
@@ -406,7 +407,7 @@ Useful `coop2` words: `cmd` 0x0203FD08, `cmd_arg` 0x0203FD0C, `a16` 0x0203FD34, 
 `cmd_arg2` 0x0203FD54, `duel_active` / `duel_winner` 0x0203FD5C / 0x0203FD5D.
 
 IWRAM and ROM: entity list 0x03001120, world/camera object 0x03001090, input 0x0300229C, player
-object pointer 0x03001FA8 (position at +0x158 / +0x15C, 24.8), stock party 0x03000E90 (unused once
+object pointer 0x03001FA8 (position at +0x158 / +0x15C, 24.8), the trigger / touch-box list 0x03001FE0 and the player object 0x030020BC (`docs/engine.md` "Dropped items and touch boxes"), stock party 0x03000E90 (unused once
 relocated); blob at 0x08800000, sprite index (relocated, stock at 0x083B4E74), ability table literal
 0x08008024, CoopCall repointed at file 0x3B5E14, story-flag preset in ROM at 0xC00000. More in
 `docs/engine.md`, `docs/rom-map.md` and `src/coop/rom.h`.

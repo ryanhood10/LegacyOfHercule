@@ -145,6 +145,9 @@ void ssj_base_update(void *cls, Entity *e) {
             if (i != p->active_slot) regen(&p->chars[i], 0xCCD, 0xCCD);
     }
     *acc &= 0xFFFF;
+    // resting heals the entity's own slot to 2/3 (regen.c; the companion is nobody's slot, companion.c)
+    if (coop.p2 && e == coop.p2) { if (!companion_active()) regen_tick(e, &p->chars[coop.p2_slot], 1); }
+    else regen_tick(e, &p->chars[p->active_slot], 0);
 }
 
 // Every input poll (input.c). Party_DetransformOthers (0x08003ED4, at a load and a save-pad switch) turns back

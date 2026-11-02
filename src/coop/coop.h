@@ -210,6 +210,9 @@ void enemies_init(void);                                   // build the vtable c
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
 int is_coop_enemy(const Entity *e);
 int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
+void p2_pickup_tick(void);            // pickup.c: every input poll, player 2 takes dropped food he stands on
+void regen_hit(int k);                // regen.c: player k (0 / 1) was hit: no resting for a while
+void regen_tick(const Entity *e, CharacterEntry *c, int k);   // regen.c: every frame of the base class's update
 Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2);   // entities.c
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 #define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4
