@@ -47,15 +47,17 @@ static int is_boss_rec(const EnemyRecord *rec, const EnemyStat *st) {
 static int is_boss(const Entity *e) { return is_boss_rec(record_of_const(e), (const EnemyStat *)e->behaviour); }
 static int twinnable(const EnemyRecord *rec, const EnemyStat *st) { return st->exp > 0 || is_boss_rec(rec, st); }
 
-// Triceratops Jungle's corn maze (zone 4 areas 56, 57, 59): its triceratops (sprite 125) spawn without a twin.
-// Ryan, 2026-11-02, two players in the maze: "remove the twin rule for the corn field maze, it is causing them to
-// run into and block each other (hence blocking the path) and we cannot proceed". The paths are one enemy wide.
+// Triceratops Jungle's corn maze (zone 4 areas 56, 57, 59): with two players its triceratops (sprite 125) do not
+// spawn at all. Ryan, 2026-11-02, two players in the maze: first "remove the twin rule for the corn field maze, it
+// is causing them to run into and block each other (hence blocking the path) and we cannot proceed", then "just
+// remove those triceratops". The paths are one enemy wide. The King (sprite 127) and one-player play are unchanged.
 #define MAP_STATE ((const u8 *)((void *const *)0x081D952C)[4])   // [0] zone, [1] area (party_save.c's module table)
 #define TRICERATOPS_SPRITE 125
-static int corn_maze_single(const EnemyRecord *rec) {
+static int corn_maze_map(void) {
     const u8 *map = MAP_STATE;
-    return rec->sprite_id == TRICERATOPS_SPRITE && map[0] == 4 && (map[1] == 56 || map[1] == 57 || map[1] == 59);
+    return map[0] == 4 && (map[1] == 56 || map[1] == 57 || map[1] == 59);
 }
+static int corn_maze_single(const EnemyRecord *rec) { return rec->sprite_id == TRICERATOPS_SPRITE && corn_maze_map(); }
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
@@ -373,8 +375,13 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = buf.max_hp * COOP_LONE_BOSS_HP_PCT / 100;
     }
-    if (corn_maze_single(rec) && p2_coming() && !coop_solo())     // the corn maze: one co-op enemy, no twin
-        return create_coop_enemy(rec, st, 1, 0, 0, 0, -1);
+    if (corn_maze_single(rec) && p2_coming() && !coop_solo()) {   // the corn maze with two players: no triceratops
+        // the loader puts the returned entity on the list (a null crashes it), so the record's enemy is built and
+        // parked far outside the map, out of sight and out of chase range, with no collision box
+        Entity *e = create_coop_enemy(rec, st, 1, 0, 0, 0, -1);
+        if (e) { e->x = -256 << 8; e->y = -256 << 8; *(u32 *)((u8 *)e + 0x154) = 0; }
+        return e;
+    }
     if (((!p2_coming() || coop_solo()) && !pair) || !twinnable(rec, st) || alone) {
         // alone on Easy / Hard a regular enemy gets the difficulty's HP and drop roll (a private copy)
         if (!alone && twinnable(rec, st) && difficulty() != DIFF_NORMAL && !is_boss_rec(rec, st))

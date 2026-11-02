@@ -4,8 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
-- **No twins in the corn maze** (Ryan, in it with his brother: the twins blocked the one-enemy-wide paths): the
-  triceratops (sprite 125) on zone 4 areas 56 / 57 / 59 spawn one co-op enemy per record (`enemies.c`
+- **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide
+  paths, then "just remove those triceratops"): sprite 125 on zone 4 areas 56 / 57 / 59 is built and parked at
+  (-256, -256) with no collision box, as the loader lists whatever the spawn hook returns (`enemies.c`
   `corn_maze_single`, `corn_maze.txt`).
 - **West City's arrival dragged both players to Piccolo (Ryan's two-player session):** the scene ends with the view panned up to Piccolo, and while
   it glided back the leash snapped both players into it, past the parade float. The leash now moves nobody more than

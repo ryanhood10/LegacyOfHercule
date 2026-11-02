@@ -251,10 +251,13 @@ punctuation only); owner in brackets.
 
 - **Ryan, 2026-11-02 (in the corn maze with his brother): no twins for the corn maze's triceratops.** "Remove the
   twin rule for the corn field maze, it is causing them to run into and block each other (hence blocking the path)
-  and we cannot proceed; just for these small rhino enemies in the corn maze sections." The maze's paths are one
-  enemy wide. `enemies.c` `corn_maze_single`: sprite 125 (the triceratops; the bestiary's 108-111) on zone 4 areas
-  56, 57, 59 (maps 103, 104, 106) spawns as one co-op enemy, no twin; the King (sprite 127) and every other map are
-  unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`).
+  and we cannot proceed; just for these small rhino enemies in the corn maze sections", then, played with no twins,
+  "make those rhinos 50 % slower", then "if it's easier, just remove those triceratops". So: with two players the
+  maze's triceratops (sprite 125, the bestiary's 108-111) on zone 4 areas 56, 57, 59 (maps 103, 104, 106) are not
+  there. The loader puts the spawn hook's entity on the list (a null crashed it at frame 68), so each record's enemy
+  is built and parked at (-256, -256) with no collision box, out of sight and chase range (`enemies.c`
+  `corn_maze_single`). The King (sprite 127), the other triceratops maps (zone 6 area 3, zone 8 areas 15 / 19 / 21)
+  and one-player play are unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`).
 
 ## 10. State at the end of the team round (2026-11-01)
 

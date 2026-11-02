@@ -1336,5 +1336,5 @@ leash snapped both players into it, past the parade float. The leash now moves n
 ## The corn maze's triceratops (2026-11-02)
 
 `python tools/headless/st_expect.py tools/headless/corn_maze.txt ...`: Map Tests 103 and 104 (zone 4 areas 56 / 57)
-with player 2 in list 19 and 15 entities (7 and 12 co-op enemies, one per record; 26 and 27 with twins before), and
-Map Test 13's wolves still twin (25 entities).
+with player 2 in list their triceratops parked at (-256, -256), still there 300 frames on (18 and 15 entities; 26 and 27
+with twins before), and Map Test 13's wolves still twin (25 entities).

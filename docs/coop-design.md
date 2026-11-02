@@ -1251,8 +1251,10 @@ Normal is exactly the co-op tuning from before.
 | revive countdown | 60 s | 60 s | 60 s (Ryan, 2026-11-02: "turn the teammate revive timer to 60 seconds"; 20 / 10 / 6 before) |
 | drops | a second roll when the first gave nothing | as stock | one roll in three skipped |
 
-No twins in the corn maze (2026-11-02, Ryan: the twins blocked the one-enemy-wide paths): `corn_maze_single` in
-`enemies.c`, sprite 125 on zone 4 areas 56 / 57 / 59, one co-op-scaled enemy per record (`tools/headless/corn_maze.txt`).
+No triceratops in the corn maze with two players (2026-11-02, Ryan: the twins blocked the one-enemy-wide paths, then
+"just remove those triceratops"): `corn_maze_single` in `enemies.c`, sprite 125 on zone 4 areas 56 / 57 / 59, each
+record's enemy built and parked at (-256, -256) with no collision box, since the loader lists whatever the spawn hook
+returns (`tools/headless/corn_maze.txt`).
 
 Drops: a regular enemy's record action is the bytecode action (`0x0801069B`) on one of five stock drop
 scripts (`StackRand 100` against thresholds, then `SpawnItem`: `0x083EE120`, `0x083EEDE4`, `0x083FEB28`,
