@@ -320,7 +320,7 @@ void coop_init_once(void) {
     coop.input2.history_head = 0;
     coop.input2.history_armed = 0;
     coop.input2.current = coop.input2.pressed = coop.input2.released = 0;
-    coop.hud2.tile = 0;
+    coop.hud2.tile = coop.hud2.size = 0;
     coop.polls = 0;
     coop.sio_last = 0;
     coop.source_age = P2_SOURCE_TIMEOUT;

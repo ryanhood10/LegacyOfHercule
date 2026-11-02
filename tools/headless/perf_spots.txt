@@ -127,6 +127,25 @@ key 1 8
 frames 60
 perfstop wc_land{ROW}
 peek8 FLAGS+3
+== wc_first
+# the same arrival: the map's name still up, the first line's box opens inside this window
+{P2}
+preset +4 +360 +21 +22 +23 +24 +26 +27 +29
+maptest 176
+waitmap 6 99 2000
+frames 60
+poke8 0x0203F000 0
+poke32 0x0203FD0C 0x6306
+poke32 0x0203FD54 0x063805D8
+poke32 0x0203FD08 5
+frames 150
+key 1 10
+waitmap 4 3 600
+frames 60
+perfstart
+frames 180
+perfstop wc_first{ROW}
+shot wc_first{ROW}
 == wc_talk
 # talking to a parade watcher after the scene: the HUD stays up, so the box has less room
 {P2}
@@ -135,10 +154,10 @@ maptest 65
 frames 100
 poke8 0x0203F000 0
 poke32 0x0203FD0C 0x0304
-poke32 0x0203FD54 0x04D00128
+poke32 0x0203FD54 0x04A200C8
 poke32 0x0203FD08 5
 frames 300
-key 0x40 2
+key 0x80 6
 frames 10
 perfstart
 key 1 8
@@ -160,10 +179,10 @@ poke32 0x0203FD54 2
 poke32 0x0203FD08 24
 frames 10
 poke32 0x0203FD0C 0x0F0F
-poke32 0x0203FD54 0x0098005A
+poke32 0x0203FD54 0x00620050
 poke32 0x0203FD08 5
 frames 400
-key 0x40 2
+key 0x80 6
 frames 10
 perfstart
 key 1 8
@@ -306,7 +325,18 @@ maptest 13
 frames 300
 map
 perf 120 wolves_stand{ROW}
-keys 0x10
+keys 0x40
 {P2W}
-perf 300 wolves_walk{ROW}
+perf 120 wolves_walk{ROW}
+keys 0
+== crowded
+# the stock map with the most enemy records (zone 4 area 59: 15, doubled in co-op)
+{P2}
+maptest 106
+frames 300
+map
+perf 120 crowded_stand{ROW}
+keys 0x20
+{P2W}
+perf 120 crowded_walk{ROW}
 keys 0

@@ -3,6 +3,7 @@
 #include "coop.h"
 #include "revive.h"
 #include "wide.h"
+#include "objroom.h"
 
 static void dma_copy32(const void *src, void *dst, int words) {
     REG_DMA3SAD = (u32)src;
@@ -75,8 +76,8 @@ static void compose_panel(Hud *h, CharacterEntry *c) {
 }
 
 static void hud2_ensure_tiles(void) {
-    if (coop.hud2.tile) return;
-    coop.hud2.tile = obj_alloc_low(0x500);   // objroom.c
+    if (coop.hud2.size) return;
+    coop.hud2.tile = obj_alloc_low(0x500);   // objroom.c: the low end, tile 0 included
     coop.hud2.size = 0x500;
     coop.hud2.hp_px = 0xFF;
     coop.hud2.flash = 0;
@@ -114,9 +115,10 @@ void hud_destroy_hook(Hud *h, int free_it, u32 a, u32 b) {
     tny_hpbars_gone();
     tny_combo_hud_gone();
     tny_caption_gone();
-    if (coop.hud2.tile) {
+    if (coop.hud2.size) {
         ObjVram_Free(g_ObjVramList, coop.hud2.tile);
         coop.hud2.tile = 0;
+        coop.hud2.size = 0;
     }
     Hud_Destroy(h, free_it, a, b);
 }

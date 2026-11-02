@@ -33,6 +33,9 @@ for t in regen pickup wc_arrival corn_maze ssj_lock; do
   echo "## $t" >> "$LOG"
   python tools/headless/st_expect.py tools/headless/$t.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 done
+# The frame budget, West City's arrival, the eviction, the plaza's sign (docs/testing.md "Frame time and OAM probe"): self-checking
+echo "## perf_budget" >> "$LOG"
+python tools/headless/perf_budget.py "$ROM" "$OUT/menu.ss" --out "$OUT" 2>&1 | grep -E "^==|^perf |FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt "$PLAY" --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"

@@ -1,5 +1,5 @@
 {
- "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is West City's light-blue cloud marker on the paving just above the beach (the world-map landing arrives on the beach below it). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
+ "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is West City's light-blue cloud marker on the paving just above the beach with the stock flight sign on it (the world-map landing arrives on the beach below it). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
  "name": "papaya_plaza",
  "zone": 15,
  "area": 11,
@@ -93,8 +93,32 @@
    ],
    "collision": false,
    "_": "the flight spot's marker: West City's light-blue cloud on the paving (Ryan, 2026-10-25: no visible way back to the world map)"
+  },
+  {
+   "op": "block",
+   "rect": [
+    28,
+    45,
+    2,
+    1
+   ],
+   "_": "the flight sign's post, 16 x 8 at the sign's foot, as every stock sign (West City: decoration (342,1216), blocked (352,1240)-(368,1248))"
   }
  ],
+ "decorations": {
+  "sheet": [
+   7,
+   1
+  ],
+  "list": [
+   {
+    "x": 214,
+    "y": 336,
+    "frame": 0,
+    "_": "the stock flight sign (zone 7 area 1's decoration 0, its 1 KB sheet holds only the sign) on the cloud at West City's offset (Ryan, 2026-11-02: 'there's no board / map to walk up to')"
+   }
+  ]
+ },
  "triggers": [
   {
    "type": "savepad",
@@ -109,16 +133,16 @@
   {
    "type": "flight",
    "rect": [
-    216,
-    344,
+    201,
+    329,
     264,
-    376
+    384
    ],
    "world": [
     1260,
     1820
    ],
-   "_": "the light-blue cloud above the beach: back to the world map at the landing"
+   "_": "the sign on the light-blue cloud above the beach: back to the world map at the landing. The stock rect round a sign (x - 13, y - 7, 47 x 55) joined with the cloud's"
   },
   {
    "type": "dialogue",
