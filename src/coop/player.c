@@ -4,6 +4,7 @@
 #include "revive.h"
 #include "wide.h"
 #include "tny_engine.h"
+#include "agency.h"
 
 // Both live in the .coop section at the top of EWRAM (reserved from the heap by the ROM patcher);
 // the game never zeroes them, hence the magic. Order fixed: remote word at +0, state at +4.
@@ -30,6 +31,15 @@ int p1_in_play(void) {
     if (!p1 || !p1->ctrl_state) return 0;
     u32 vt = *(u32 *)p1->ctrl_state;
     for (unsigned i = 0; i < sizeof PLAYER_CTRL_VTABLES / sizeof PLAYER_CTRL_VTABLES[0]; i++)
+        if (vt == PLAYER_CTRL_VTABLES[i]) return 1;
+    return 0;
+}
+
+// agency.c: player 2 stands, walks or dashes (the player-driven states but the hurt one, the last)
+int p2_in_control(void) {
+    if (!coop.p2 || !coop.p2->ctrl_state) return 0;
+    u32 vt = *(u32 *)coop.p2->ctrl_state;
+    for (unsigned i = 0; i + 1 < sizeof PLAYER_CTRL_VTABLES / sizeof PLAYER_CTRL_VTABLES[0]; i++)
         if (vt == PLAYER_CTRL_VTABLES[i]) return 1;
     return 0;
 }
@@ -88,7 +98,7 @@ static void use_ability(Entity *e) {
 }
 
 static void handle_buttons(Entity *e, const InputSystem *in) {
-    if (in->pressed & KEY_A) Player_Attack(e);
+    if (in->pressed & KEY_A) agency_attack(e);
     else if (in->pressed & KEY_B) use_ability(e);
 }
 
@@ -400,6 +410,12 @@ static void p2_bind(Entity *p2, int slot) {
     install_behaviour(p2, slot);
     Entity_SetAnimation(p2, ANIM_IDLE);
     coop.rebinds++;
+}
+
+// agency.c: does that slot's body fit his entity's VRAM slot (p2_bind otherwise rebuilds the entity)
+int p2_body_fits(int slot) {
+    const void *rec = CharacterEntry_GetSpriteRecord(&g_Party->chars[slot]);
+    return coop.p2 && (!rec || *(const u16 *)rec == *(const u16 *)((const u8 *)coop.p2 + 0x0E));
 }
 
 // duel.c: bind player 2 to any slot (the duel's clone slot is not a selectable party member).

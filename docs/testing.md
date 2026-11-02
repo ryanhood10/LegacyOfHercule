@@ -1403,3 +1403,25 @@ leash snapped both players into it, past the parade float. The leash now moves n
 `python tools/headless/st_expect.py tools/headless/corn_maze.txt ...`: Map Tests 103 and 104 (zone 4 areas 56 / 57)
 with player 2 in list their triceratops parked at (-256, -256), still there 300 frames on (18 and 15 entities; 26 and 27
 with twins before), and Map Test 13's wolves still twin (25 entities).
+
+## Player 2's agency (2026-11-02)
+
+`python tools/headless/st_expect.py tools/headless/p2_agency.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out
+build/<dir>/hl --cols 6` (about a minute, in `regfull.sh`). Every block that tests him presses only `p2`; entities are placed by poke.
+1. Scenes: the town pad's tutorial (Map Test 7) started by his step in; four presses close it (three do not), with his A, with his B,
+   with both in one frame, with the other pad 5 frames after, either way round; a held A does not press; Right does not move him.
+2. Save pad: the menu on his A (player 1's Down does nothing), "Game Saved!", the saved spot his (`PARTY+0x1B4` x, `+0x1B6` y with 9
+   slots) and player 1 not moved; Switch: six Lefts from Hercule end on Gohan (Piccolo's slot skipped), a 64 x 64 row rebuilt after
+   the screen, Cancel, player 1's own switch with the trade.
+3 + 5. Fly: his A at Gohan's house (Map Test 145), both rising in their states (`0x03002130` flying, `0x03001F48` Hercule's run, read at
+   +0x18), the world map, his Up steers and player 1's Right does not, his A lands (flag 30), player 1's pad back; player 1's take-off
+   (his pad on the map), player 1 as Hercule, a flight circle (Map Test 51), the one-player take-off with no flight.
+4. Exits: Capsule Corp's door by his Up, arrival and respawn; a walk-off and its offset; none with a scene, a duel, player 1 down
+   (revived by his A, then it fires) or himself down.
+6. Barriers: zone 8 area 9, the three pairings and alone, punch and ki blast; zone 4 area 50 (`maps.md`: the route from map 103); zone 4
+   area 5's script barrier on the refusal's rect.
+7. Choices: a soft reset, the save he made, "How many players?" answered and closed by his B and A; player 1 loads on his spot.
+
+Traps when editing it: the runner's `NAME+OFFSET` takes one offset; `load` leaves variables as they were, so `deref P2` again after a
+map change; text timing counts (a press while a line prints is another press), so keep cycles the same length; Map Test 7's and 13's
+barrier items for two players shift the random draws (`pickup.txt`'s drop count).

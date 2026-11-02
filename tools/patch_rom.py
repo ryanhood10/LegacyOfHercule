@@ -62,6 +62,7 @@ VTABLE_HOOKS = [
     (0x08024E4C, 1, "ssj_base_update"),      # the Super Saiyan 2 class (rows 4, 28): the same, not "the active slot + 1 %" to full
     (0x0802526C, 1, "form_update_drain"),    # the forms on rows 10, 14: the drain on the entity's own slot
     (0x08024ABC, 1, "form_update_heal"),     # Piccolo's form, row 7: HP for EP on the entity's own slot
+    (0x08025720, 9, "agency_item_msg"),      # a map item's message: a barrier's hit counts for the puncher's character (agency.c)
     # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
     # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
     (0x08023B3C, 13, "status_title_hook"),
@@ -99,6 +100,8 @@ ENTRY_JUMPS = [
     (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
     (0x0800EB4C, "map_variation_hook"),      # MapEntry -> variation: the backyard with the parked Saiyan ship (shipyard.c)
     (0x0800700E, "obj_make_room_hook"),      # a text box's OBJ VRAM: the eviction, one entity at a time at its last round (objroom.c)
+    (0x0800BFC0, "trigger_scan_hook"),       # the trigger boxes' scan: player 1's, then player 2's (agency.c)
+    (0x0800C06E, "trigger_takes_a_hook"),    # would a box take this A press (no swing): for the player punching (agency.c)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs

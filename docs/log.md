@@ -28,6 +28,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
   stock game over (`tny_ko_check` read the nearer player as the partner), a body down under a line hung the game
   (`revive_fight_over`; also every two-player game over with player 1 down first, on "You have died!"), and the 2 v 2's
   bracket screen read teams as seats (`docs/tournament.md` 13b). Test command 40, `.tny.cp`.
+- **Player 2 is no co-pilot (`docs/perfect-pass.md` 11.3, branch `pp2-agency`, `src/coop/agency.c`):** his A and B advance scenes; he
+  opens a save pad (Save saves, Switch Characters changes his character, never onto player 1's); he takes off from a fly pad and steers
+  the world map; he walks through doors and off edges and takes player 1 along; walk-in scenes fire for him with player 1 put on his spot;
+  both fly off a pad, Hercule runs; a character barrier opens to the character of whoever punched, the refusal shows for whoever is
+  wrong. Facts: `docs/engine.md` "Trigger boxes"; test: `p2_agency.txt`.
 - **Super Saiyan Hercule locked off** (Ryan: not an option yet, much later): `ssj.c` `SSJ_HERCULE_UNLOCK` 0, CoopCall 4
   a no-op, saves holding the ability get Megaton Punch back at the load (`hercule_lock`, `ssj_lock.txt`).
 - **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide

@@ -294,8 +294,64 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   `0x080240E4` / `0x08023E38` / `0x08023E44` share it). Class slots: 0 the destructor, 1 fire (`0x080117C2`: the item's
   slot 10, then `0x0800BF6E` takes the box off the list), 4 returns +0x14. The stock scan fires a box whose rectangle
   holds **player 1's** position, moving or standing, and never tests player 2 (headless: the box moved onto player 2
-  alone did nothing for 120 frames; onto player 1 alone it was taken within 60). The player object `0x030020BC` is
-  `{vtable 0x080240F0, the camera-follow vtable 0x08025A6C, player 1's entity, 0x0802480C, ...}`.
+  alone did nothing for 120 frames; onto player 1 alone it was taken within 60). `0x030020BC` is the "always" activation
+  object of the next section (`{vtable 0x080240F0, the camera-follow vtable 0x08025A6C, player 1's entity, 0x0802480C, ...}`).
 - **The build** (`src/coop/pickup.c`): every input poll player 2's position is tested against the item boxes and one
   is fired the stock way with the party's active slot and `g_PlayerObject` swapped to his for the call, so the handler
   heals his character. `tools/headless/pickup.txt`.
+
+## Trigger boxes: the scan, the activations, the fires (decompiled 2026-11-02 for player 2's agency)
+
+- **The list** at 0x03001FE0: `[0]` count, `[1..]` the boxes, `[0x21]` scans since the last reset, `[0x22]` resets (a map
+  load, `0x0800BF08`; a variation change, `0x0800C0F8`), `[0x23]` 1 during a scan. **The scan** `0x0800BFC0`, once a world
+  update (`0x08004CAC`, after the entity list's update): nothing without a player or with the active slot's HP at 0; from
+  the top of the list down, a box whose rect holds player 1's position (x1 <= x < x2, y1 <= y < y2, `0x0800791A`: +0x158 /
+  +0x15C >> 8) has its activation's slot 1 asked (activation, box, player); the first nonzero answer ends the scan.
+  **`0x0800C06E`** (Player_Attack, when the punch hit nothing and message 3 found nobody): the same walk with the
+  activation's slot 2 (activation, player): a box that would take this A press: no swing. For player 1's position only.
+- **A box:** `{vtable, s16 x1, y1, x2, y2, activation}`, slot 1 its fire (box, player), modal, 1 when it did something.
+
+| box class (create) | fire | notes |
+|---|---|---|
+| door `0x080240E4` (`0x0800C233`) | `0x0800C1AC` | fires only while the key at +0x11 is held on the stock input; +0x10 the facing, +0x14 the payload: fade (`0x0800C84C`, freezes the entity it is given), `0x0800C584` loads the map at the payload's spot and builds player 1 there |
+| walk-off `0x08023E38` (`0x0800D9C3`) | `0x0800D93C` | the same, the arrival = the payload's spot + (the given entity's position - the rect's corner) |
+| script `0x08023BC0` (`0x0800C2C3`) | `0x0800C2A6` | runs the script at +0x10; the entity plays no part |
+| dialogue `0x08023E44` (`0x0800D7E1`) | `0x0800D7A0` | runs the sequence at +0x14 with the entity's +0x190 as its context |
+| save pad `0x08023BCC` (`0x08010AC7`) | `0x080109EC` | below |
+
+| activation (getter) | object, vtable | slot 1 |
+|---|---|---|
+| enter once (`0x0800D765`) | `0x03002094`, `0x080238E4` | fires; the box leaves the list unless the fire reset it |
+| A (`0x0800D839`) | `0x03002098`, `0x08023E50` | A pressed on the stock input |
+| A facing (`0x0800D87F`, `0x0800D889`) | `0x0300209C` .. `0xB4`, `0x08025188` | A pressed and the entity's facing +0x10 == object +4 |
+| key held, once (`0x0801087B`, `F`, `85`, `8B`) | `0x03002154` .. , `0x0802498C` | the key at +4 held (0x40, 0x80, 0x20, 0x10), then as enter once (every door's opening animation and sound: only `FindEntityByType` / `PlayAudio`) |
+| on entering (`0x0800D8EB`, an object per box) | `0x08024980` | fires unless +4 == the scan's number - 1 (it was inside at the last scan); writes +4 |
+| always (`0x0800D8AF`) | `0x030020BC`, `0x080240F0` | the box's own test (exits, dropped items) |
+
+- **What each kind does in the stock maps** (the dumps): script + A: the flight spots and flight circles, map viewers
+  (`LoadMapNoEntities`, `WaitForConfirmButton`, `RestoreMap`); script + on-entering: seven bridge layer swaps on zone 4
+  areas 53 / 55 only; dialogue / script + enter once: the story's walk-in scenes; dialogue + A facing: doors' lines and barriers.
+- **The save pad** `0x080109EC`: with more than one member (`0x08003E00`) the menu `0x080112C0` (modal: 1 Save, 2 Switch
+  Characters, else nothing); Save: `0x08004030(party, the given entity's position)` writes the map, that spot and the save,
+  then the one-line sequence 0x083B6428 "Game Saved!" (a scene, so `0x03001FDC` is set); Switch: a fade, `0x08010B08` (ours,
+  `switch.c`), `0x08005F1A`, the fade back. `0x08006F4A` (the screen's EntityList_Begin) copies the whole entity list out
+  and empties it, `0x08006FA4` puts it back: removing an entity under that screen corrupts the list (`0x080068CA` finds no index).
+- **Character barriers** ("Only Piccolo"). A barrier is an item (MapEntry +0x18, count +5): `{cond, deco id, hits, flags,
+  0, handler 0x0800F9A3, script}`, attached when the map loads if its condition holds (`0x0800C390`: `0x08003F06`, then
+  `0x0800F034`: the item object, vtable `0x08025720`, +0x24 the record, +0x28 the decoration, takes the decoration's place in
+  the list), and a refusal: a dialogue trigger with the opposite condition, also tested once, at the load. Both conditions read
+  the active character with Step 11 (bytes 02 0B); those bytes are in no other trigger's or item's condition in the ROM
+  (19 refusals, 20 items; zone 4 area 5's opener is a script trigger on the refusal's own rect, no item). The item's message
+  (`0x0800F2B6`, slot 9) takes the hit in message 0: `{+0 kind, +4 x1, y1, x2, y2, +0x18 power, +0x1C the attack
+  descriptor, +0x20 the attacker (a punch: the player; a ki blast: its owner, 0x0800E946), +0x30 the object}`; flags bit 0 melee,
+  bit 1 energy; `0x0800F1AE` counts the hits, the last runs the handler. Nothing there asks who hit. **Stock quirk:** zone 4 area
+  50's refusal says "Only Piccolo" but its condition is `active == 0` (Gohan) and flag 275 clear: only Gohan ever sees it.
+- **Commands** (see `docs/scripts.md` for the batch): FlyToPosition's (`0x08009E30`) is `{vt 0x08024864, next, done, mover, x,
+  y}`; its start `0x0800E838` calls the entity's slot 12 and the mover `0x0800D5B8` with `{0, s16 x, y, speed 0x200}`: 2 px a
+  frame, animation 1 then 12 (state `0x03002130`, **group 12**, `0x0800E7A0`). The walk's start `0x0800E004` / `0x08010898` the mover
+  `0x0800D584`, speed 0x100, animation 1. Hercule's record 72 has a group 12 but it is no flying pose (a stub of a body): stock
+  flights of a player 1 Hercule show that. A world-map pad (`PushByte 43; PlayMusic; ...; WarpToMapWithEntities`) has no
+  take-off at all in the stock: the music, the fade.
+
+**The build** (`src/coop/agency.c`, `docs/coop-design.md` "Player 2's agency"): entry jumps on `0x0800BFC0` and `0x0800C06E`,
+slot 9 of `0x08025720`, VM steps 54 and 38.

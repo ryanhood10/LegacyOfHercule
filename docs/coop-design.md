@@ -1406,3 +1406,41 @@ which already refilled both). When player 2 wins a duel with `DUEL_SWAP_ON_P2_WI
 - **Player 2's pickups** (`src/coop/pickup.c`): the stock game fires a dropped item's touch box only for player 1's
   position (`docs/engine.md` "Dropped items and touch boxes"); every input poll player 2's position is tested against
   the item boxes and one is fired the stock way with the active slot and `g_PlayerObject` swapped to his.
+
+## Player 2's agency (2026-11-02, `docs/perfect-pass.md` 11.3, `src/coop/agency.c`)
+
+Ryan: "player 2 feels too much like a co-pilot". The facts are in `docs/engine.md` "Trigger boxes". Alone (no player 2 or a
+companion) nothing below runs: the scan and the barriers do what the stock does, a pad take-off has no flight.
+
+- **Scenes:** player 2's A and B (an edge on his own buttons, before the solo modes and the revive) go into the stock
+  `pressed` while `0x03001FDC` is set. A press of one pad shuts the other out for 10 frames (`PRESS_QUIET`), so two people pressing
+  for one line close it once. He still stands still in a scene (his input is held to A, `input.c`). The yes / no boxes (CoopCall 18,
+  21) read both pads already; now his press closes the box too.
+- **The scan** is ours (`trigger_scan_hook`): player 1's half is the stock's; then, when he is free (below), the same boxes for
+  player 2's position with the activation's test on his pad and entity. What he gets:
+  * door, walk-off: fires on his key, with his entity (the arrival's offset is his; player 1 is built there, player 2 respawns
+    beside him as ever): **both go at once**;
+  * save pad: his A, his entity (the spot saved is his), his menu; **Switch Characters changes his character** (`switch.c`: the
+    selection starts on him, player 1's character is greyed and skipped, `Party_DetransformOthers` is not called; a body of another
+    OBJ size is rebuilt after the screen, as the entity list is swapped out under it);
+  * script, dialogue walked into (enter once) and scripts on A: **player 1 is put on his spot first** (`bring_p1`) and the fire runs as
+    written, for player 1's entity and active character. Stock scenes stage the player where the box is and speak as the active
+    character, so nothing in them changes but who walked in. A dialogue on A (a locked door's line) moves nobody;
+  * the door animations (key held) fire for him, without moving player 1;
+  * not for him: the seven bridge layer scripts (they follow player 1), dropped items (`pickup.c`).
+- **Free** (`p2_free`): a second pad, no scene, no duel (running or pending), no solo fight, no ring (`tny_ring_active`), nobody down,
+  both with HP, player 1 in a control state, player 2 standing, walking or dashing. So an exit waits for a revive.
+- **His pad** runs what he fired (`agency_pads`): the stock input is his buttons for the fire's length, outside dialogues (which go
+  by the merge above, both pads); and the **world map** he took off to, until the flyer lands (Ryan's rule of 2026-10-17: whoever
+  stepped on the sign). Player 1's take-off keeps player 1's pad on it. That his pad and only his drives the map is a decision.
+- **Fly-off** (VM steps 54 and 38, `data/hercule.json`, with two players and a script box on A firing): a flight circle's
+  `FlyToPosition 0` goes in a batch with player 2 flying 16 px to his side; a world-map pad, which has no take-off in the stock,
+  flies both up past the view's top first (the camera goes along, then the warp's fade). **Hercule (party slot 5, every form) runs**:
+  the fly command with a private start (`run_start`: the walk's mover at 2 px a frame, the sprint's pose, group 13), player 1 or 2.
+  Player 2 goes along only from a control state: forcing him out of an ability's state frees what it holds (`p2_cycle`'s crash).
+- **Barriers:** once a map, when both stand on it (`barriers_for_two`), the item and the refusal are made for any character in the party
+  the condition holds for; then the condition is tested again at each use with the player's slot: a hit's attacker (`agency_item_msg`)
+  and an A press in the box (`gate`, for both players, also for the swing). So the right character opens it whoever plays him, the
+  wrong one gets the line and no opening, and Select on the spot works. Stock quirks stay (zone 4 area 50's line only for Gohan).
+- **Player_Attack's swing** (`trigger_takes_a_hook`): a box asks for the player punching, so his A on a pad does not swing either.
+- **Kept:** player 1's pad never opens a menu for him; the pause menu and the status screen stay player 1's (not asked for).

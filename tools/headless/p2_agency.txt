@@ -1,0 +1,960 @@
+# Player 2's agency (src/coop/agency.c, docs/perfect-pass.md 11.3, docs/testing.md "Player 2's agency"). Self-checking:
+#   python tools/headless/st_expect.py tools/headless/p2_agency.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+# From the debug-menu state of a DEBUG_MENU=1 build. coop.p2 0x0203FF08, coop.p2_slot 0x0203FF84, the active slot PARTY + 0,
+# the scene word 0x03001FDC, the entities' x / y at +0x158 / +0x15C (24.8) and their control state at +0x18. A block that
+# tests player 2 presses only his pad (`p2`); entities are placed with pokes (the walks are long), never moved for him.
+# Map Test party: player 1 Piccolo (slot 1), player 2 Hercule (slot 5), level 40, everyone in slots 0-5 available.
+
+echo === 1 CUTSCENES: the town's platform tutorial (Map Test 7), on entering the pad's rect
+load menu.ss
+p2 0
+maptest 7
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+save ag_town.ss
+echo --- player 2 walks in (his spot on the pad): the scene starts, player 1 stands where it is staged
+poke32 P2+0x158 0x22000
+poke32 P2+0x15C 0x11000
+frames 10
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+echo EXPECT \w+: 00022000 00011000
+peek PL+0x158 2
+echo --- he holds still in a scene: Right does not move him
+p2 0x10
+frames 20
+p2 0
+echo EXPECT \w+: 00022000 00011000
+peek P2+0x158 2
+save ag_scene.ss
+shot ag_1_scene
+echo --- four presses of his A alone close it: three leave it open
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 2
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_1_third
+p2 1
+frames 2
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- the same with his B
+load ag_scene.ss
+p2 2
+frames 2
+p2 0
+frames 40
+p2 2
+frames 2
+p2 0
+frames 40
+p2 2
+frames 2
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 2
+frames 2
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- both press in the same frame: one press each time (the same count)
+load ag_scene.ss
+keys 1
+p2 1
+frames 2
+keys 0
+p2 0
+frames 40
+keys 1
+p2 1
+frames 2
+keys 0
+p2 0
+frames 40
+keys 1
+p2 1
+frames 2
+keys 0
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+keys 1
+p2 1
+frames 2
+keys 0
+p2 0
+frames 40
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- player 2 a few frames after player 1, either way round: still one press each time (cycles of the same length)
+load ag_scene.ss
+keys 1
+frames 2
+keys 0
+frames 3
+p2 1
+frames 2
+p2 0
+frames 35
+p2 1
+frames 2
+p2 0
+frames 3
+keys 1
+frames 2
+keys 0
+frames 35
+keys 1
+frames 2
+keys 0
+frames 3
+p2 1
+frames 2
+p2 0
+frames 35
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 1
+frames 2
+p2 0
+frames 3
+keys 1
+frames 2
+keys 0
+frames 35
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- his A held from before does not press
+load ag_scene.ss
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 200
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 0
+
+echo === 2 SAVE PAD: player 2 on it, the same town (the tutorial closed first; player 1 sent off a way)
+load ag_town.ss
+poke32 P2+0x158 0x22000
+poke32 P2+0x15C 0x11000
+frames 10
+stepz 0x03001FDC 40
+frames 20
+poke32 PL+0x158 0x24000
+poke32 PL+0x15C 0x14000
+frames 4
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+save ag_pad.ss
+echo --- his A: the menu; player 1's pad does not drive it
+p2 1
+frames 2
+p2 0
+frames 40
+shot ag_2_menu
+key 0x80 4
+frames 20
+shot ag_2_menu_p1
+echo --- his A on Save (the cursor stayed): "Game Saved!", the spot saved is his, player 1 did not move
+p2 1
+frames 2
+p2 0
+frames 60
+shot ag_2_saved
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT \w+: 0110
+peek16 PARTY+0x1B6 1
+echo EXPECT \w+: 0220
+peek16 PARTY+0x1B4 1
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT \w+: 00024000 00014000
+peek PL+0x158 2
+echo --- Switch Characters: his character, never player 1's: five times Left from Hercule ends on Gohan (slot 0)
+load ag_pad.ss
+p2 1
+frames 2
+p2 0
+frames 40
+p2 0x80
+frames 3
+p2 0
+frames 30
+p2 1
+frames 2
+p2 0
+frames 70
+shot ag_2_switch
+p2 0x20
+frames 3
+p2 0
+frames 12
+shot ag_2_left1
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 0x20
+frames 3
+p2 0
+frames 12
+shot ag_2_left5
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 1
+frames 2
+p2 0
+frames 80
+echo EXPECT 0203ff84: 00
+peek8 0x0203FF84
+echo EXPECT \w+: 01
+peek8 PARTY
+shot ag_2_gohan
+echo EXPECT \w+: 0203fe00
+peek P2 1
+echo --- a bigger body (a 64 x 64 row on Trunks' slot): the entity is rebuilt once the screen is gone, never under it
+load ag_pad.ss
+deref P2 0x0203FF08
+poke8 PARTY+0x68 36
+p2 1
+frames 2
+p2 0
+frames 40
+p2 0x80
+frames 3
+p2 0
+frames 30
+p2 1
+frames 2
+p2 0
+frames 70
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 1
+frames 2
+p2 0
+frames 150
+echo EXPECT 0203ff84: 03
+peek8 0x0203FF84
+deref P2 0x0203FF08
+echo EXPECT \w+: 0203fe00
+peek P2 1
+echo EXPECT \w+: 1000\w{4}
+peek P2+0x0C 1
+shot ag_2_big
+echo --- Cancel (his B) changes nothing
+load ag_pad.ss
+p2 1
+frames 2
+p2 0
+frames 40
+p2 0x80
+frames 3
+p2 0
+frames 30
+p2 1
+frames 2
+p2 0
+frames 70
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 2
+frames 2
+p2 0
+frames 80
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84
+echo EXPECT \w+: 01
+peek8 PARTY
+echo --- player 1 at the pad: his own menu as ever; switching onto player 2's character trades
+load ag_pad.ss
+poke32 PL+0x158 0x22000
+poke32 PL+0x15C 0x11000
+poke32 P2+0x158 0x25000
+poke32 P2+0x15C 0x16000
+frames 4
+key 1 2
+frames 40
+key 0x80 3
+frames 30
+key 1 2
+frames 70
+key 0x10 3
+frames 12
+key 0x10 3
+frames 12
+key 0x10 3
+frames 12
+key 0x10 3
+frames 12
+key 1 2
+frames 80
+echo EXPECT \w+: 05
+peek8 PARTY
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+
+echo === 3 + 5 FLY PAD: player 2's A on Gohan's house's pad (Map Test 145): both go up, Hercule runs, the world map opens
+load menu.ss
+p2 0
+maptest 145
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+save ag_145.ss
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+frames 4
+peek PL+0x15C 1
+peek P2+0x15C 1
+p2 1
+frames 2
+p2 0
+frames 22
+echo --- under way: player 1 on his spot in the flying state, player 2 16 px to his left in the dash's; both risen
+shot ag_3_up
+echo EXPECT \w+: 0000f800 0000[ab]\w{3}
+peek PL+0x158 2
+echo EXPECT \w+: 0000\w{4} 0000[ab]\w{3}
+peek P2+0x158 2
+echo --- the flying pose for him (the animation 12 state 0x03002130), the sprint's 0x03001F48 for Hercule
+echo EXPECT \w+: 03002130
+peek PL+0x18 1
+echo EXPECT \w+: 03001f48
+peek P2+0x18 1
+frames 160
+echo EXPECT map zone 6 area 99
+map
+shot ag_3_world
+echo EXPECT 0203ff08: 00000000
+peek 0x0203FF08 1
+echo --- his Up steers the flyer, player 1's Right does not
+p2 0x40
+frames 40
+p2 0
+frames 4
+echo EXPECT map zone 6 area 99 var 1 player 1624,1(4|5)\d\d
+map
+key 0x10 40
+echo EXPECT map zone 6 area 99 var 1 player 1624,
+map
+echo --- his A on the landing site (Gohan's house, flag 30 for its trigger): both land; the pad goes back to player 1
+load ag_145.ss
+flags +30
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+frames 4
+p2 1
+frames 2
+p2 0
+frames 300
+echo EXPECT map zone 6 area 99
+map
+shot ag_3_site
+p2 1
+frames 2
+p2 0
+frames 200
+echo EXPECT map zone 6 area 1 var 1 player 248,232
+map
+shot ag_3_landed
+deref P2 0x0203FF08
+echo EXPECT \w+: 0203fe00
+peek P2 1
+key 0x20 10
+echo EXPECT map zone 6 area 1 var 1 player 2[34]\d,232
+map
+echo --- player 1 takes off from the same pad: he drives the flyer, player 2's pad does not; Hercule still runs along
+load ag_145.ss
+deref P2 0x0203FF08
+poke32 PL+0x158 0xF800
+poke32 PL+0x15C 0xDC00
+poke32 P2+0x158 0x10800
+poke32 P2+0x15C 0xDC00
+frames 4
+key 1 2
+frames 20
+echo EXPECT \w+: 0000f800 0000[bc]\w{3}
+peek PL+0x158 2
+echo EXPECT \w+: 000\w{5} 0000[bc]\w{3}
+peek P2+0x158 2
+echo EXPECT \w+: 03001f48
+peek P2+0x18 1
+frames 300
+echo EXPECT map zone 6 area 99 var 1 player 1624,1588
+map
+p2 0x40
+frames 40
+p2 0
+echo EXPECT map zone 6 area 99 var 1 player 1624,1588
+map
+key 0x40 40
+echo EXPECT map zone 6 area 99 var 1 player 1624,1[45]\d\d
+map
+echo --- player 1 Hercule, player 2 Piccolo (the pad's trade on the warp): the first runs, the second flies
+load ag_145.ss
+poke8 PARTY 5
+poke8 0x0203FF84 1
+poke32 0x0203FD0C 0x0106
+poke32 0x0203FD54 0x010000F0
+poke32 0x0203FD08 5
+frames 200
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+frames 4
+p2 1
+frames 2
+p2 0
+frames 20
+echo EXPECT \w+: 03001f48
+peek PL+0x18 1
+echo EXPECT \w+: 03002130
+peek P2+0x18 1
+shot ag_3_herc
+frames 300
+echo EXPECT map zone 6 area 99
+map
+echo --- a flight circle's flight (zone 3 area 3): FlyToPosition takes player 2 along, then the warp as ever
+load menu.ss
+p2 0
+maptest 51
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x8000
+poke32 PL+0x15C 0x5800
+poke32 P2+0x158 0x8800
+poke32 P2+0x15C 0x5800
+frames 4
+p2 1
+frames 2
+p2 0
+frames 16
+shot ag_3_circle
+echo EXPECT \w+: 03002130
+peek PL+0x18 1
+echo EXPECT \w+: 03001f48
+peek P2+0x18 1
+frames 400
+map
+shot ag_3_circle_after
+
+echo === 3b A one-player take-off is the stock one: no flight, the world map at once
+load ag_145.ss
+findent PL 0x08025604
+p2 off
+frames 200
+poke32 PL+0x158 0xF800
+poke32 PL+0x15C 0xDC00
+frames 4
+key 1 2
+frames 22
+echo EXPECT \w+: 0000f800 0000dc00
+peek PL+0x158 2
+frames 160
+echo EXPECT map zone 6 area 99
+map
+p2 0
+
+echo === 4 EXITS: player 2 walks up into Capsule Corp's door (Map Test 145): both go
+load ag_145.ss
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x11000
+poke32 PL+0x15C 0x7800
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x7800
+frames 4
+echo --- the guards first: a scene on: no exit while he stands in the door
+poke32 P2+0x15C 0x6000
+poke32 0x03001FDC 1
+p2 0x40
+frames 30
+p2 0
+echo EXPECT map zone 6 area 1
+map
+poke32 0x03001FDC 0
+frames 4
+poke32 P2+0x15C 0x7800
+frames 2
+echo --- the walk: his Up alone
+p2 0x40
+frames 60
+p2 0
+frames 80
+echo EXPECT map zone 6 area 2
+map
+shot ag_4_door
+frames 40
+echo --- both there: player 1 at the arrival, player 2 beside him
+echo EXPECT map zone 6 area 2 var 1 player 144,260
+map
+deref P2 0x0203FF08
+echo EXPECT \w+: 0203fe00
+peek P2 1
+echo EXPECT \w+: 00008400 00010400
+peek P2+0x158 2
+echo --- a walk-off (the right edge of the same map): the arrival keeps his offset along the edge (y 256 -> 304)
+load ag_145.ss
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 P2+0x158 0x1EC00
+poke32 P2+0x15C 0x10000
+frames 2
+p2 0x10
+frames 4
+p2 0
+frames 120
+echo EXPECT map zone 6 area 21 var 1 player 20,304
+map
+shot ag_4_walkoff
+echo --- a downed player 1 keeps them here (test command 10); up again, the exit fires
+load ag_145.ss
+deref P2 0x0203FF08
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x7800
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 10
+frames 40
+findent PL 0x08025604
+poke32 P2+0x15C 0x6000
+p2 0x40
+frames 30
+p2 0
+echo EXPECT map zone 6 area 1
+map
+shot ag_4_down
+deref PX PL+0x158
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x12000
+p2 1
+frames 220
+p2 0
+frames 20
+echo --- player 1 up (revive body +4 = 0), player 2's Up in the door: both go
+echo EXPECT 0203f9fc: 00000000
+peek 0x0203F9FC 1
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x7800
+frames 2
+p2 0x40
+frames 60
+p2 0
+frames 80
+echo EXPECT map zone 6 area 2
+map
+echo --- a downed player 2 cannot walk out either
+load ag_145.ss
+deref P2 0x0203FF08
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x6000
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 40
+p2 0x40
+frames 30
+p2 0
+echo EXPECT map zone 6 area 1
+map
+echo --- a duel on: no exit
+load ag_145.ss
+deref P2 0x0203FF08
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x6000
+poke8 0x0203FD5C 1
+p2 0x40
+frames 30
+p2 0
+echo EXPECT map zone 6 area 1
+map
+poke8 0x0203FD5C 0
+
+echo === 6 BARRIERS: "Only Piccolo", zone 8 area 9 (level 30): player 1 Vegeta, player 2 Hercule at the barrier's foot
+load ag_town.ss
+findent PL 0x08025604
+poke8 PARTY 2
+poke32 0x0203FD0C 0x0908
+poke32 0x0203FD54 0x00300080
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 8 area 9
+map
+deref P2 0x0203FF08
+findent PL 0x08025604
+save ag_bar.ss
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x3000
+echo --- he faces up (the refusal needs it) and punches: the line, the barrier stands (flag 279 clear)
+p2 0x40
+frames 2
+p2 0
+frames 20
+p2 1
+frames 2
+p2 0
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_6_refused
+p2 1
+frames 2
+p2 0
+frames 60
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+echo --- Select until he is Piccolo (Hercule, Krillin, Gohan, Piccolo), the same punch: no line, the barrier gone
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT \w+: 80
+peek8 FLAGS+34
+shot ag_6_opened
+echo --- he walks through: the collision rect is open
+p2 0x40
+frames 40
+p2 0
+echo EXPECT \w+: 000\w{5} 0000[01]\w{3}
+peek P2+0x158 2
+echo --- player 1 Piccolo, player 2 Hercule: player 2's punch does not open it (the line), player 1's does
+load ag_town.ss
+poke32 0x0203FD0C 0x0908
+poke32 0x0203FD54 0x00300080
+poke32 0x0203FD08 5
+frames 200
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 P2+0x158 0xE000
+poke32 P2+0x15C 0x3000
+p2 0x40
+frames 2
+p2 0
+frames 20
+p2 1
+frames 2
+p2 0
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 1
+frames 2
+p2 0
+frames 60
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+poke32 P2+0x158 0x10000
+poke32 PL+0x158 0xE000
+poke32 PL+0x15C 0x3000
+key 0x40 2
+frames 20
+key 1 2
+frames 60
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT \w+: 80
+peek8 FLAGS+34
+echo --- ki: player 2 Hercule has none; player 1 Vegeta's ki blast at the barrier does nothing, player 2 Piccolo's opens it
+load ag_bar.ss
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke8 PARTY+0x5C 2
+poke8 PARTY+0x4D 0
+poke8 PARTY+0x40 2
+poke8 PARTY+0x31 0
+poke32 PL+0x158 0xE800
+poke32 PL+0x15C 0x4000
+poke32 P2+0x158 0x10000
+key 0x40 2
+frames 6
+poke32 PL+0x15C 0x4000
+key 2 2
+frames 60
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+shot ag_6_ki_p1
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+poke32 PL+0x158 0x10000
+poke32 P2+0x158 0xE800
+poke32 P2+0x15C 0x4000
+p2 0x40
+frames 2
+p2 0
+frames 6
+poke32 P2+0x15C 0x4000
+p2 2
+frames 2
+p2 0
+frames 60
+shot ag_6_ki
+echo EXPECT \w+: 80
+peek8 FLAGS+34
+echo --- zone 4 area 50's "Only Piccolo" (the route from map 103; A inside the rect, the stock's line only for Gohan): player 2 Gohan gets it, Piccolo opens
+load ag_town.ss
+poke8 PARTY 2
+poke32 0x0203FD0C 0x3204
+poke32 0x0203FD54 0x00FA0258
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 4 area 50
+map
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x20000
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 00
+peek8 0x0203FF84
+poke32 P2+0x158 0x25800
+poke32 P2+0x15C 0xFA00
+p2 0x40
+frames 2
+p2 0
+frames 10
+poke32 P2+0x15C 0xFA00
+p2 1
+frames 2
+p2 0
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_6_a50_gohan
+p2 1
+frames 2
+p2 0
+frames 60
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+poke32 P2+0x15C 0xFA00
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT \w+: 08
+peek8 FLAGS+34
+shot ag_6_a50_open
+echo --- zone 4 area 5's "Only Hercule" (a script box, not an item, on the refusal's rect): player 1 Piccolo's A does nothing, player 2 Hercule's at level 50 opens the wall
+load ag_town.ss
+poke32 PARTY+0xA8 0x02000000
+poke32 0x0203FD0C 0x0504
+poke32 0x0203FD54 0x03F801AE
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 4 area 5
+map
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x1AE00
+poke32 PL+0x15C 0x3F800
+frames 2
+key 0x40 2
+frames 8
+poke32 PL+0x15C 0x3F800
+key 1 2
+frames 40
+echo --- player 1 pressed: player 2 walks up: the wall holds him at the rect's foot
+poke32 PL+0x158 0x19000
+poke32 P2+0x158 0x1AE00
+poke32 P2+0x15C 0x3F800
+p2 0x40
+frames 40
+p2 0
+echo EXPECT \w+: 0003f080
+peek P2+0x15C 1
+shot ag_6_a5_wall
+poke32 P2+0x15C 0x3F800
+p2 1
+frames 2
+p2 0
+frames 60
+p2 0x40
+frames 60
+p2 0
+echo --- through (past 1008: the wall's gone, and his step in fires the chapter's scene on the rect behind it)
+echo EXPECT \w+: 0003e\w{3}
+peek P2+0x15C 1
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_6_a5_open
+echo --- alone (no player 2): Vegeta gets the stock refusal and cannot open it
+load ag_town.ss
+p2 off
+frames 200
+poke8 PARTY 2
+poke32 0x0203FD0C 0x0908
+poke32 0x0203FD54 0x00300080
+poke32 0x0203FD08 5
+frames 200
+findent PL 0x08025604
+echo EXPECT 0203ff08: 00000000
+peek 0x0203FF08 1
+poke32 PL+0x158 0xE000
+poke32 PL+0x15C 0x3000
+key 0x40 2
+frames 20
+key 1 2
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+mash 3 30
+frames 30
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+
+echo === 7 CHOICES (CoopCall 18 / 21): a soft reset, the save player 2 made above, "How many players?": his B answers, his A closes
+load ag_pad.ss
+deref P2 0x0203FF08
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 2
+p2 0
+frames 120
+p2 1
+frames 2
+p2 0
+frames 60
+key 0xF 6
+frames 400
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 100
+key 1 6
+frames 100
+stepnz 0x0203FA49 10
+find PS 0x91A7E250
+frames 60
+shot ag_7_question
+echo --- the question is up; his B: two players, the box closes
+p2 2
+frames 2
+p2 0
+frames 60
+shot ag_7_answer
+echo EXPECT \w+: 91a7e250 00\w{2}0002
+peek PS 2
+p2 1
+frames 2
+p2 0
+frames 60
+p2 1
+frames 2
+p2 0
+frames 200
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- the load's player 1 stands where player 2 saved
+echo EXPECT map zone 2 area 1 var 1 player 544,272
+map
+deref P2 0x0203FF08
+echo EXPECT \w+: 0203fe00
+peek P2 1
+shot ag_7_loaded

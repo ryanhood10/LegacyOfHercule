@@ -6,6 +6,7 @@
 #include "android16.h"
 #include "ssj2gohan.h"
 #include "super13.h"
+#include "agency.h"
 
 #define CONTROLLER_WINDOW 600   // polls (~10 s) during which holding L+R turns this GBA into the P2 pad
 
@@ -178,6 +179,8 @@ void input_poll_hook(InputSystem *in) {
     u16 p2 = p2_source(now, &p1);
     if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
     cg_choice_input(&p1, &p2);             // a yes / no question (CoopCall 18): B answers no and closes the box
+    u16 pad2 = p2;                         // player 2's buttons before the solo modes and the revive take them
+    agency_pads(&p1, &p2);                 // agency.c: a menu or a world map player 2 opened runs on his pad
     switch (coop_solo()) {                 // the Cell Games' solo fights (cellgames.c)
     case 1: p2 = 0; break;                 // player 1 fights alone, player 2 watches
     case 2:                                // player 2 fights on player 1's entity, player 1 watches;
@@ -220,6 +223,7 @@ void input_poll_hook(InputSystem *in) {
     if (in->pressed) g_LastInputFrame = g_FrameCounter;
     if ((~in->current & 0xF) == 0 && in->history_armed && (in->pressed & 0xF)) soft_reset();
 
+    agency_scene_press(in, pad2);          // agency.c: his A and B advance a scene (after the soft reset's chord)
     poll_into(&coop.input2, p2);
     // player 2 holds still through a scene (a dialogue sequence, 0x03001FDC): the stock holds player 1, but in West
     // City's arrival player 2 walked up to Piccolo behind the parade float during the scene's camera pan and the
@@ -237,6 +241,7 @@ void input_poll_hook(InputSystem *in) {
     krillin_frame(in);   // krillin.c: old Hercule's weak combat bytes, KR_TEST triggers
     ssj2_frame();        // ssj2gohan.c: SSJ2_TEST triggers
     ssj_frame();         // ssj.c: a slot player 2 leaves turns back from Super Saiyan
+    agency_map_tick();   // agency.c: the barrier pieces for a second character, once a map
     p2_pickup_tick();    // pickup.c: player 2 takes dropped food he stands on (the stock scan only sees player 1)
     a16_frame();         // a16player.c: an older save's Android 16 gets his four moves
     tny_frame();         // tourney_hooks.c: the tournament team's per-frame work (engine, moves, ui)
