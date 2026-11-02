@@ -480,4 +480,6 @@ agency (both in `entities.c` / `player.c`): perf goes last or merges first.
 8. **West City's vanishing:** did it happen playing alone through West City too, or only in co-op? **Ryan: only in
    co-op.** Consistent with the sprite / frame budget (11.6).
 
-**State (2026-11-02):** every question answered; still planning only, nothing built, until Ryan says go.
+**State (2026-11-02):** every question answered. The stock ki crumb for played characters: dropped (Ryan did not
+answer; reversible). Ryan then handed the build-out to a team under another model: the prompt is
+`build/play/HANDOFF-PROMPT-2.txt` (the order, the team, the rules, when `build/play` may be swapped, the report).
