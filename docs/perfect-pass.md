@@ -193,9 +193,13 @@ punctuation only); owner in brackets.
   instead, as stock). Numbers are the macros at the top of `regen.c`. Test: `tools/headless/regen.txt`.
 - **Open (the same session): "at a certain point it quit allowing us to ki blast, I guess after we saved the game".**
   A save at a pad does not touch the ability gate or EP (headless `build/go/sv.txt`: both players blast after the
-  save). Most likely EP ran out (2 EP a blast, the stock 3 % of the maximum back every 10 s, and player 2 could not
-  refill from drops until the fix above). To ask Ryan: was the lower bar empty, who was playing whom, had L changed
-  the ability.
+  save). Ryan: the EP bar was not empty. Found next: every ability's isReady checks the world switch (the object
+  `0x03002080` +0xC = **0x0300208C**: `DisableWorld` / `EnableWorld` Steps 122 / 123 write it, and a map load sets it
+  from the map header's +0x08 flags, 1 on field maps, 0 in towns: `docs/maps.md`), and the switch is **0 on Papaya
+  Island's grounds** (zone 15 areas 11-15: beach, street, courtyard, waiting room, infirmary; headless from Ryan's save,
+  which sits in the waiting room) and 1 in the ring (area 16) and on every field map: the stock town rule, no
+  fighting in town. So if they were on the island (his save's own map) after saving at its pad, that is it, by
+  design; to confirm with Ryan where it happened and whether it came back off the island.
 - **Fixed (2026-11-01, branch `pp-reset`): a soft reset, then loading a save, crashed** a few frames after the load (a
   jump to garbage from `0x080109AC`); found by the ssj piece. The cause: the soft reset keeps EWRAM, so `coop.p2`
   still pointed at the old player 2's entity (any game where player 2 was in at the reset), no new player 2 was built
