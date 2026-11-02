@@ -11,7 +11,7 @@ frames 300
 echo == the ability and the transformed row poked into the save-to-be
 poke8 0x0203F0B2 18
 poke8 0x0203F0A0 0x16
-echo EXPECT \w+: 11101\w0e
+echo EXPECT \w+: 11120f0e
 peek 0x0203F0B0 1
 poke32 0x0203FD0C 0x0102
 poke32 0x0203FD54 0x0100021C
