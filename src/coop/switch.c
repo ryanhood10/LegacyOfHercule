@@ -9,6 +9,7 @@
 // input handler, which scrolls the window: portraits are rebuilt when the selection leaves it, and
 // small arrow tiles at the frame's edges show that more characters exist on that side.
 #include "coop.h"
+#include "agency.h"
 
 #define SWITCH_OBJ_SIZE   0xD8
 #define SWITCH_WINDOW     6          // portraits the stock screen shows at once
@@ -61,12 +62,24 @@ void p2_refresh_sprite(void);   // player.c
 
 // ---- the view -----------------------------------------------------------------------------------
 
+// Player 2's screen (a save pad he opened, agency.c): his character is the selection and player 1's is greyed.
+static int slot_selectable(int slot) {
+    return (g_Party->chars[slot].flags & 2) && !(agency_menu_is_p2() && slot == g_Party->active_slot);
+}
+
+static void view_copy(SwitchExt *x, int k) {
+    int slot = x->members[x->first + k];
+    switch_view.chars[k] = g_Party->chars[slot];
+    if (!slot_selectable(slot)) switch_view.chars[k].flags &= ~2u;
+}
+
 static void build_view(void *obj) {
     SwitchExt *x = EXT(obj);
     int n = 0, pos = 0;
+    int cur = agency_menu_is_p2() ? coop.p2_slot : g_Party->active_slot;
     for (int i = 0; i < PARTY_SLOTS; i++) {
         if (!(g_Party->chars[i].flags & 1)) continue;
-        if (i == g_Party->active_slot) pos = n;
+        if (i == cur) pos = n;
         x->members[n++] = (u8)i;
     }
     x->count = (u8)n;
@@ -79,12 +92,12 @@ static void build_view(void *obj) {
     x->first = (u8)first;
     x->wsize = (u8)(n - first > SWITCH_WINDOW ? SWITCH_WINDOW : n - first);
     memset(&switch_view, 0, sizeof switch_view);
-    for (int k = 0; k < x->wsize; k++) switch_view.chars[k] = g_Party->chars[x->members[first + k]];
+    for (int k = 0; k < x->wsize; k++) view_copy(x, k);
     switch_view.active_slot = (u8)(pos - first);
 }
 
 static int member_selectable(SwitchExt *x, int j) {
-    return (g_Party->chars[x->members[j]].flags & 2) != 0;
+    return slot_selectable(x->members[j]);
 }
 
 // ---- portraits and indicators ---------------------------------------------------------------------
@@ -97,7 +110,7 @@ static int row_spacing(int n) {
 static Entity *make_portrait(int slot, int px) {
     const u8 *row = DISPLAY_DATA + g_Party->chars[slot].display_row * 0x14;
     Entity *e = Portrait_Create(0, Character_GetSpriteRecord(row[1]), px, PORTRAIT_Y);
-    if (!(g_Party->chars[slot].flags & 2)) {
+    if (!slot_selectable(slot)) {
         *((u8 *)e + 0x10) = 1;          // greyed: not selectable
         if (*(u32 *)((u8 *)e + 0x28) != PORTRAIT_FRAME_OK) Portrait_Refresh(e);
     }
@@ -120,7 +133,7 @@ static void rebuild_portraits(void *obj) {
         px += spacing;
     }
     F32(obj, 0x08) = x->wsize;
-    for (int k = 0; k < x->wsize; k++) switch_view.chars[k] = g_Party->chars[x->members[x->first + k]];
+    for (int k = 0; k < x->wsize; k++) view_copy(x, k);
 }
 
 // Two 8x8 tiles: a left-pointing arrow (top and bottom halves of a 16-row shape); the right one is the
@@ -250,6 +263,12 @@ int switch_update_hook(u8 *obj) {
         Sfx_Play(sfx_channel(), SFX_TABLE + 0x6C, 0x40, 0);
         SwitchExt *x = EXT(obj);
         int slot = x->members[x->first + F32(obj, 0x3C)];
+        if (agency_menu_is_p2()) {             // player 2's own character; player 1 and the others stay as they are
+            agency_menu_choose(slot);
+            obj[5] = 2;
+            obj[0x48] = 1;
+            return 0;
+        }
         g_Party->active_slot = (u8)slot;
         Entity *player = FPTR(obj, 0x4C);
         const u8 *row = DISPLAY_DATA + g_Party->chars[slot].display_row * 0x14;

@@ -220,6 +220,18 @@
       "expect": "81a60008",
       "word": "fn:vm_set_active_noreset_hook",
       "note": "VM step 115 SetActiveCharacterNoReset -> the same"
+    },
+    {
+      "offset": "0x3B5E00",
+      "expect": "319e0008",
+      "word": "fn:vm_fly_hook",
+      "note": "VM step 54 FlyToPosition -> a flight circle takes player 2 along (src/coop/agency.c)"
+    },
+    {
+      "offset": "0x3B5DC0",
+      "expect": "d3990008",
+      "word": "fn:vm_warp_hook",
+      "note": "VM step 38 WarpToMapWithEntities -> a world-map pad flies both off first (src/coop/agency.c)"
     }
   ],
   "story_free": "0xB00000",

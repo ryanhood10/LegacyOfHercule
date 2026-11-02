@@ -59,6 +59,7 @@ VTABLE_HOOKS = [
     (0x080256AC, 5, "ssj_detransform_done"), # detransform (anim 0x24) done: stock 0x080157AF
     (0x08024C58, 1, "ssj_class_update"),     # the Super Saiyans' class update (drain, revert): stock 0x08017307
     (0x08024004, 1, "ssj_base_update"),      # the base class update (meter, regeneration; none for a transformed slot)
+    (0x08025720, 9, "agency_item_msg"),      # a map item's message: a barrier's hit counts for the puncher's character (agency.c)
     # status screen (src/coop/krillin.c): per-slot title, page count, page dispatch; 0x08023B3C is the
     # object 0x08003480 builds, 0x080248CC the pause menu's (0x08004CAC), same methods
     (0x08023B3C, 13, "status_title_hook"),
@@ -95,6 +96,8 @@ ENTRY_JUMPS = [
     (0x080094CC, "vm_push_caps_hook"),       # VM: push the active character's name in capitals
     (0x0800EAD8, "kiblast_spawn_hook"),      # the player ki blast's spawn (Krillin's are recoloured)
     (0x0800EB4C, "map_variation_hook"),      # MapEntry -> variation: the backyard with the parked Saiyan ship (shipyard.c)
+    (0x0800BFC0, "trigger_scan_hook"),       # the trigger boxes' scan: player 1's, then player 2's (agency.c)
+    (0x0800C06E, "trigger_takes_a_hook"),    # would a box take this A press (no swing): for the player punching (agency.c)
 ]
 
 # (file offset, old word, new word): Arena_Init's heap size in 4-byte words. The heap otherwise runs
