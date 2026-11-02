@@ -14,7 +14,8 @@ typedef struct PlayersState {
     u32 magic;            // set by the Select Game screen: partyram is not cleared at power-on
     u8 mode;              // 0 not asked yet, 1 one player, 2 two players
     u8 asking;            // the question is queued or showing
-    u8 _pad[2];
+    u8 shown;             // frames the screen has been faded in since player 1 could move (asked at SHOWN_FRAMES)
+    u8 _pad;
     u32 action[2];        // the queued sequence's action object (coop_run_sequence: two live words)
 } PlayersState;
 static PlayersState players __attribute__((section(".party.ui")));
@@ -44,6 +45,19 @@ void players_reset(void) {
     players.magic = PLAYERS_MAGIC;
     players.mode = 0;
     players.asking = 0;
+    players.shown = 0;
+}
+
+// A loaded save puts player 1 in control while its map is still black (palettes at 0, before the fade-in), and a
+// dialogue started then holds the fade: the question sat on a black screen with no box, and the first A answered
+// it (Ryan, 2026-11-01: "it does NOT ask"). So it waits until the background palette has colour, plus the rest of
+// the fade.
+#define SHOWN_FRAMES 40
+static int screen_lit(void) {
+    const volatile u32 *pal = (const volatile u32 *)0x05000000;
+    for (int i = 0; i < 64; i++)
+        if (pal[i]) return 1;
+    return 0;
 }
 
 int players_one(void) { return players.magic == PLAYERS_MAGIC && players.mode == 1; }
@@ -59,7 +73,8 @@ int players_take(void) {
 // Every input poll: ask once player 1 is free to move after a Select Game
 void players_tick(void) {
     if (players.magic != PLAYERS_MAGIC || players.mode || players.asking) return;
-    if (!g_PlayerObject || !p1_in_play() || scene_running()) return;
+    if (!g_PlayerObject || !p1_in_play() || scene_running() || !screen_lit()) { players.shown = 0; return; }
+    if (++players.shown < SHOWN_FRAMES) return;
     players.asking = 1;
     coop_run_sequence(players.action, q_seq);
 }

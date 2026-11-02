@@ -66,7 +66,7 @@ frames 300
 shot sr_02_loaded_2p
 map
 echo --- two players: mode 2, a new player 2 on the private vtable, no crash
-echo EXPECT \w+: 91a7e250 00000002
+echo EXPECT \w+: 91a7e250 00\w{2}0002
 peek PS 2
 deref P2 0x0203FF08
 echo EXPECT \w+: {g_p2_vtable}
@@ -97,7 +97,7 @@ key 1 6
 frames 100
 key 1 6
 frames 300
-echo EXPECT \w+: 91a7e250 00000001
+echo EXPECT \w+: 91a7e250 00\w{2}0001
 peek PS 2
 frames 300
 echo EXPECT 0203ff04: c00b0002 00000000
@@ -129,7 +129,7 @@ key 2 6
 frames 100
 key 1 6
 frames 300
-echo EXPECT \w+: 91a7e250 00000002
+echo EXPECT \w+: 91a7e250 00\w{2}0002
 peek PS 2
 deref P2 0x0203FF08
 echo EXPECT \w+: {g_p2_vtable}

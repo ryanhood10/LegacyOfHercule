@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **"How many players?" after a load (Ryan's two-player session):** the question started while the loaded map was still
+  black and held its fade-in, so the screen stayed black and the first A answered "1 player". It now waits until the
+  background palette has colour plus 40 frames (`src/coop/players.c`). Checked on his own save (the box shows, B gives
+  two players), `softreset` 12/12, `ssj_hercule` 56/56, drop-ins remade and swapped into `build/play`.
 - **Player 2 on a controller (for Parsec):** `tools/p2_keys.py` also reads one XInput pad, the first to press a button
   after it starts (`--pad N`, `--pad none`, `--swap-ab`), so a Parsec guest's pad (a virtual Xbox 360 pad on the host)
   plays player 2 while the host's own pad, chosen in mGBA, plays player 1. README "Two players over Parsec".

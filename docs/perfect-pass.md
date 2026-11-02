@@ -184,9 +184,10 @@ punctuation only); owner in brackets.
   meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
 - **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows
   on him (90); both are older than the colour work (the combo piece's film, `build/pp-combo/films/kits/`).
-- **After loading a save, the "How many players?" question shows on a black screen with no text box** (the headless runner;
-  a power cycle too, so older than the reset fix; the tournament test notes mention the black screen). To check in
-  real mGBA: Ryan has not reported it.
+- **After loading a save, the "How many players?" question showed on a black screen with no text box.** Fixed
+  2026-11-01 (Ryan hit it in the two-player session: the first A after a load answered "1 player"): a loaded save gives
+  player 1 control before its map fades in, and the open question held the fade. `players.c` now asks once the
+  background palette has colour plus 40 frames (`screen_lit`, `shown`); `softreset.txt` expects the new byte.
 - **Gero's lab door (`ch4_piccolo`)**: Hercule's "Let's negotiate!" and Piccolo's "Hercule.  Get behind me." play even
   when neither is on screen (one player as someone else); the scene is staged for Piccolo and Hercule together.
 - **Ryan to decide (story piece, 3.1):** in four fights that are the lead's own (the Lookout's first visit, Kame House
