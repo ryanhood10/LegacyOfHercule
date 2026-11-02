@@ -29,7 +29,7 @@ Each piece takes numbers only from its own row. `ewram`, `partyram` and `coop2` 
 | piece (branch, worktree `F:/MeltyCreations/log2-<piece>`) | flags | CoopCall | test cmds | RAM |
 |---|---|---|---|---|
 | tny (`pp2-tny`, `log2-pp2-tny`) | - | - | 40-41 | `.tny.cp` at most 0x20 |
-| agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 | 33-34 | 42-43 | `.combo.ag` at most 0x40 |
+| agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 (not used) | 33-34 (not used) | 42-43 (not used) | `.combo.ag` 0x28 of 0x40 (`agency.c` `AgState`) |
 | regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 | `.combo.rg` grows to at most 0x10 |
 | perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 | `.combo.pf` at most 0x10 |
 

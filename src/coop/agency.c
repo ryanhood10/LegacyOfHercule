@@ -27,6 +27,8 @@
 #define BOX_SCRIPT    0x08023BC0u    // 0x0800C2C3
 #define BOX_SAVE      0x08023BCCu    // 0x08010AC7
 #define BOX_DIALOGUE  0x08023E44u    // 0x0800D7E1
+#define CREATE_SCRIPT   0x0800C2C3u
+#define CREATE_DIALOGUE 0x0800D7E1u
 #define ACT_ENTER     0x080238E4u    // 0x03002094: fires, then the box leaves the list (unless the fire reset it)
 #define ACT_A         0x08023E50u    // 0x03002098: A pressed inside
 #define ACT_FACING    0x08025188u    // 0x0300209C..B4: A pressed while facing +4
@@ -110,14 +112,19 @@ static int cond_for(u32 cond, int slot) {
 typedef struct MapTrigger { u32 cond; const u32 *data; } MapTrigger;   // data: create, activation getter, s16 rect, payload
 static const u8 *map_entry(void) { return *(const u8 **)((u8 *)g_MapState + 4); }
 
-// The condition of a live box, if it is one of those (found by rect in the map's list; only asked on a press)
+// Is this live box made from that trigger data: its rect and its kind (zone 4 area 5: the refusal and the opener share a rect)
+static int box_is(const Box *b, const u32 *data) {
+    const s16 *r = (const s16 *)&data[2];
+    if (r[0] != b->x1 || r[1] != b->y1 || r[2] != b->x2 || r[3] != b->y2) return 0;
+    return (b->vtable == BOX_DIALOGUE && data[0] == CREATE_DIALOGUE) || (b->vtable == BOX_SCRIPT && data[0] == CREATE_SCRIPT);
+}
+
+// The condition of a live box, if it is one of those (found in the map's list; only asked on a press)
 static u32 box_condition(const Box *b) {
     const u8 *m = map_entry();
     const MapTrigger *t = *(const MapTrigger *const *)(m + 0x10);
-    for (int i = 0; i < m[3]; i++) {
-        const s16 *r = (const s16 *)&t[i].data[2];
-        if (r[0] == b->x1 && r[1] == b->y1 && r[2] == b->x2 && r[3] == b->y2 && reads_character(t[i].cond)) return t[i].cond;
-    }
+    for (int i = 0; i < m[3]; i++)
+        if (box_is(b, t[i].data) && reads_character(t[i].cond)) return t[i].cond;
     return 0;
 }
 
@@ -145,11 +152,8 @@ static int item_there(const u32 *rec) {
 
 static int box_there(const u32 *data) {
     const s32 *list = TRIGGER_LIST;
-    const s16 *r = (const s16 *)&data[2];
-    for (int i = 1; i <= list[0]; i++) {
-        const Box *b = (const Box *)list[i];
-        if (r[0] == b->x1 && r[1] == b->y1 && r[2] == b->x2 && r[3] == b->y2) return 1;
-    }
+    for (int i = 1; i <= list[0]; i++)
+        if (box_is((const Box *)list[i], data)) return 1;
     return 0;
 }
 

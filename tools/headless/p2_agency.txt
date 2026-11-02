@@ -774,6 +774,109 @@ frames 60
 shot ag_6_ki
 echo EXPECT \w+: 80
 peek8 FLAGS+34
+echo --- zone 4 area 50's "Only Piccolo" (the route from map 103; A inside the rect, the stock's line only for Gohan): player 2 Gohan gets it, Piccolo opens
+load ag_town.ss
+poke8 PARTY 2
+poke32 0x0203FD0C 0x3204
+poke32 0x0203FD54 0x00FA0258
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 4 area 50
+map
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x20000
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 00
+peek8 0x0203FF84
+poke32 P2+0x158 0x25800
+poke32 P2+0x15C 0xFA00
+p2 0x40
+frames 2
+p2 0
+frames 10
+poke32 P2+0x15C 0xFA00
+p2 1
+frames 2
+p2 0
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_6_a50_gohan
+p2 1
+frames 2
+p2 0
+frames 60
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+poke32 P2+0x15C 0xFA00
+p2 1
+frames 2
+p2 0
+frames 60
+echo EXPECT \w+: 08
+peek8 FLAGS+34
+shot ag_6_a50_open
+echo --- zone 4 area 5's "Only Hercule" (a script box, not an item, on the refusal's rect): player 1 Piccolo's A does nothing, player 2 Hercule's at level 50 opens the wall
+load ag_town.ss
+poke32 PARTY+0xA8 0x02000000
+poke32 0x0203FD0C 0x0504
+poke32 0x0203FD54 0x03F801AE
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 4 area 5
+map
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x1AE00
+poke32 PL+0x15C 0x3F800
+frames 2
+key 0x40 2
+frames 8
+poke32 PL+0x15C 0x3F800
+key 1 2
+frames 40
+echo --- player 1 pressed: player 2 walks up: the wall holds him at the rect's foot
+poke32 PL+0x158 0x19000
+poke32 P2+0x158 0x1AE00
+poke32 P2+0x15C 0x3F800
+p2 0x40
+frames 40
+p2 0
+echo EXPECT \w+: 0003f080
+peek P2+0x15C 1
+shot ag_6_a5_wall
+poke32 P2+0x15C 0x3F800
+p2 1
+frames 2
+p2 0
+frames 60
+p2 0x40
+frames 60
+p2 0
+echo --- through (past 1008: the wall's gone, and his step in fires the chapter's scene on the rect behind it)
+echo EXPECT \w+: 0003e\w{3}
+peek P2+0x15C 1
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot ag_6_a5_open
 echo --- alone (no player 2): Vegeta gets the stock refusal and cannot open it
 load ag_town.ss
 p2 off

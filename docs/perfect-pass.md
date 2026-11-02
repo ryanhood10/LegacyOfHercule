@@ -370,6 +370,35 @@ player 2 (the menu's shot, a switch that changes slot 0x0203FF84), a fly pad by 
 exit walked into by player 2 alone (both on the next map); a barrier punched by player 2 as the right character
 (the barrier gone), by the wrong one (still there). The real-time feel (both flying) is Ryan's.
 
+**Built 2026-11-02 (branch `pp2-agency`, `src/coop/agency.c`; how: `docs/coop-design.md` "Player 2's agency"; facts: `docs/engine.md`
+"Trigger boxes"; test: `tools/headless/p2_agency.txt`).** All six as asked. What the plan's "Known" had wrong: the barrier's check is
+not a hit handler's but a condition tested once at the map's load, for the item and for the refusal; a world-map pad has no take-off scene
+in the stock, only music and the fade, so the fly-off is new; the punch's message 0 has the attacker at +0x20.
+
+Decided while Ryan was away (each is one macro or one branch to change):
+1. **Walk-in story scenes fire for player 2 too**, with player 1 moved onto his spot at that moment (a visible jump if player 1 stands
+   elsewhere on the screen). The alternative, scenes only for player 1, would have kept him a co-pilot: he would stand on the trigger and
+   nothing would happen. Scripts still see player 1's entity and character, so no line or staging changes.
+2. **The world map is driven by whoever took off** (Ryan's rule of 2026-10-17, `docs/coop-design.md` "World map rule"): when player 2 took off
+   player 1's pad does nothing there until they land.
+3. **What he fires runs on his pad**, player 1's pad out, except in dialogues, where both count.
+4. **Nobody leaves while someone is down**, in a scene, a duel, a solo fight or a ring: the exit waits. Player 1's own exits are as they
+   were (the stock lets player 1 walk out of anything but a scene).
+5. **The double-press window is 10 frames** (`PRESS_QUIET`): a press of the other pad that soon counts for nothing, so two people pressing
+   for one line do not skip the next. Not asked for; it can only swallow a press within a sixth of a second of the other player's.
+6. **One-player play keeps the stock pads**: no fly-off alone. Hercule runs in every form with two players; a player 1 Hercule alone
+   keeps the stock's odd flying pose.
+7. **Zone 4 area 50's refusal stays the stock's** (the line shows only for Gohan, a stock bug: `docs/engine.md`). Fixing it would change
+   one-player play. Tell me if it should go.
+8. The bridges' layer scripts (zone 4 areas 53, 55) follow player 1 only. If player 2 crosses first he walks under the wrong layer until
+   player 1 does, as today.
+
+Numbers: `.combo.ag` 0x28 bytes; flags 478-479, CoopCall 33-34 and test commands 42-43 were not needed.
+
+Only a two-player session can judge: whether player 1's jump onto player 2's spot in a walk-in scene reads as a bug or as fine; the
+fly-off's look and pace (the camera rises with them); Hercule's run against a wall (the commands do not test collision); whether player 2's
+exit firing on a held direction surprises player 1; the 10-frame window by feel.
+
 ### 11.4 Papaya Island in co-op: lag, and the missing world-map board
 
 **Ryan:** "I flew to Papaya Island to check out our tournament mode and the tournament grounds and waiting room to
