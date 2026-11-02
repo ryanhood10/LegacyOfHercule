@@ -53,7 +53,36 @@ static void class_call(const u8 *row, int slot) {
     const u32 *vt = (const u32 *)*cell;
     ((void (*)(u32 *))((u32)vt + vt[slot]))(cell);
 }
-static int transformed_class(const u8 *row) { return *(u32 *)(row + 0x10) == 0x030021ECu; }
+
+// The hum: three classes play it (the Super Saiyans', rows 10 and 14's, Super Saiyan 2's). A class's slot 2 starts a
+// channel of its own and slot 3 stops the first it finds (0x0801FC9C, 0x0801FC22: 16 channels of 0x40 bytes, +0x10 bit 0
+// on, +0x28 the sound). Two players need one hum: two Super Saiyans started two and a turn-back's restart left one
+// looping after both had turned back; a slot player 2 left kept his, and a save pad's screen gives back what it found.
+#define HUM_SFX      (SFX_TABLE + 0x294)
+#define SFX_CHANNELS (g_AudioMixer + 0x5C4)
+ROM_FN(void, Sfx_Stop, (void *channel, const void *sfx), 0x0801FC23);
+
+// Test command 46 answers this
+int ssj_hum_count(void) {
+    int on = 0;
+    for (int i = 0; i < 16; i++) {
+        const u8 *ch = SFX_CHANNELS + i * 0x40;
+        if ((ch[0x10] & 1) && *(const u8 *const *)(ch + 0x28) == HUM_SFX) on++;
+    }
+    return on;
+}
+
+static int hums(const u8 *row) {
+    u32 cell = *(u32 *)(row + 0x10);
+    return cell == 0x030021ECu || cell == 0x030021E8u || cell == 0x030021E4u;
+}
+
+static void hum_settle(void) {
+    int want = hums(row_of(g_Party->active_slot)) || (coop.p2 && hums(row_of(coop.p2_slot)));
+    int on = ssj_hum_count();
+    for (; on > want; on--) Sfx_Stop(SFX_CHANNELS, HUM_SFX);
+    if (on < want) Sfx_Play(SFX_CHANNELS, HUM_SFX, 0x40, 0);
+}
 
 // 0x08014D58 for the entity's own slot: the old class's stop, the row's link (+4 transformed / +5 back), the
 // new sprite and class, idle, the new class's start.
@@ -73,11 +102,7 @@ static void apply(Entity *e, int up) {
         PlayerEntity_RefreshSprite(e);
     }
     class_call(row, 2);
-    // one sound channel: a player turning back silenced the other's hum too
-    if (!up && coop.p2) {
-        int other = is_p2_entity(e) ? g_Party->active_slot : coop.p2_slot;
-        if (other < PARTY_SLOTS && transformed_class(row_of(other))) class_call(row_of(other), 2);
-    }
+    hum_settle();
     if (up) { ssj_state.ups++; ssj_state.last_up_slot = (u8)slot; } else ssj_state.downs++;
     regen_ki_used(is_p2_entity(e));   // regen.c: a form burns ki; the 30 s count from when it ends
 }
@@ -151,6 +176,7 @@ void ssj_frame(void) {
         ssj_state.magic = SSJ_MAGIC;
         ssj_state.last_p2 = 0xFF;
     }
+    if (coop.p2 && p1_in_play()) hum_settle();
     // between maps the entity is gone for a while and comes back on the same slot: only a player 2 who
     // left (no controller, or one-player play) counts as gone
     if (!coop.p2 && p2_present() && !coop_solo()) return;

@@ -274,7 +274,9 @@ int switch_update_hook(u8 *obj) {
         const u8 *row = DISPLAY_DATA + g_Party->chars[slot].display_row * 0x14;
         player->sprite_record = Character_GetSpriteRecord(row[1]);
         PlayerEntity_RefreshSprite(player);
+        u8 p2_row = g_Party->chars[coop.p2_slot].display_row;
         Party_DetransformOthers2(g_Party);
+        if (coop.p2 && coop.p2_slot != slot) g_Party->chars[coop.p2_slot].display_row = p2_row;   // his form is his own
         obj[5] = 2;
         obj[0x48] = 1;
     }

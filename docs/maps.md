@@ -179,7 +179,7 @@ to is a **decoration** (`{x, y, x + 32, y + 32, 0x2000, 0x8000, frame, 0x28, 1}`
 rect sits round it at (x - 13, y - 7), 47 x 55 (West City's (342, 1216), rect (329, 1209)-(376, 1264)), its post is 16 x 8
 blocked in the walk bitmap at (x + 10, y + 24), and a light-blue cloud is usually painted under it. The cheapest
 sheet holding only the sign is zone 7 area 1's (1 KB, frame 0); a map spec adds it with `"decorations"` (`tools/mapbuild.py`,
-`data/maps/papaya_plaza.json`). The world map (zone 6 area 99, affine) has a
+`data/maps/papaya_plaza.json`, `arctic.json`; on `arctic_summit.json` joined to the rocks' sheet, no stock sheet holds both). The world map (zone 6 area 99, affine) has a
 pair of triggers per landing site: a script trigger warping to the town and a 0x0801A6B3 banner.
 
 **Level gates** (+0x20, 8 bytes): u16 x, u16 y (where the number is drawn), u8 barrier (the
@@ -300,7 +300,7 @@ The Android 13 post-game's way up the mountain, reachable only once flag 381 is 
 | second climb 15 / 6 | bottom (200, 632)-(280, 672), Down / cave (288, 64)-(328, 104), Up | first climb (240, 56) / ridge (160, 276) |
 | ridge 15 / 7 | path down (144, 360)-(176, 400), Down / cave (128, 64)-(160, 104), Up | second climb (308, 120) / summit (336, 464) |
 | summit 15 / 8 | path down (320, 552)-(352, 592), Down | ridge (144, 112) |
-| landing, summit | flight spots (104, 232)-(168, 296) and (212, 412)-(268, 476), press A | world map (1100, 800), the arctic landing |
+| landing, summit | flight spots (89, 217)-(168, 296) and (201, 401)-(268, 476) round their signs, press A | world map (1100, 800), the arctic landing |
 
 - **Save pad:** the ridge, rect (184, 176)-(233, 217) (Save / Switch Characters; a save there loads back on
   the ridge and the Select Game screen names it "The Arctic").

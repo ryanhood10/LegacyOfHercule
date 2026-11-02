@@ -1422,6 +1422,10 @@ build/<dir>/hl --cols 6` (about a minute, in `regfull.sh`). Every block that tes
    area 5's script barrier on the refusal's rect.
 7. Choices: a soft reset, the save he made, "How many players?" answered and closed by his B and A; player 1 loads on his spot.
 
+`tools/headless/p2_cases.txt` (self-checking, in `regfull.sh`): the rarer cases: a downed player at a fly pad, a take-off during a move, Super
+Saiyans at a save pad and the hum (test command 46 counts it), rows 10 / 14 on player 2, the companion's bench slot, Dende's yes / no on his pad,
+zone 4 area 50's line. A Map Test's ability gate is 0: `poke32 0x0300208C 1` before a B; the party meter (`poke32 PARTY+8 0`) before a second transformation.
+
 Traps when editing it: the runner's `NAME+OFFSET` takes one offset; `load` leaves variables as they were, so `deref P2` again after a
 map change; text timing counts (a press while a line prints is another press), so keep cycles the same length; Map Test 7's and 13's
 barrier items for two players shift the random draws (`pickup.txt`'s drop count).

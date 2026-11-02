@@ -50,7 +50,8 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      drop script (random HP / EP pickups by player 1's bars); solid until broken, back on
                                      every load. Stock drops: 0x083ED894 small (1 hit), 0x083ED6CC medium (2), 0x083EE6A8 large (3)
   "decorations": {"sheet": [Z, A], "list": [{"x":, "y":, "frame": 0}, ...]},
-                                     plain 32x32 decorations on a stock map's sheet (OBJ VRAM: the whole sheet); the flight
+                                     plain 32x32 decorations on a stock map's sheet (OBJ VRAM: the whole sheet; after "rocks" on
+                                     another sheet the two are joined, and "frame" counts in this one); the flight
                                      sign is frame 0 of zone 7 area 1's 1 KB sheet (docs/maps.md "Flight spot to the world map")
   "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
   "requires": "buu"                  only built when that ROM is given (--buu-rom)
@@ -887,12 +888,15 @@ def emit(b, pk):
     deco = spec.get("decorations")
     if deco:
         sheet = b.source(deco["sheet"]).var.sheet
-        if b.decos and b.sheet and b.sheet != sheet:
-            raise SpecError("decorations: the map already has decorations on another sheet")
+        first = 0
+        if b.decos and b.sheet and b.sheet != sheet:      # a second stock sheet (the summit's rocks and the sign): joined
+            have = rom.resource(b.sheet)
+            first = len(have) // 32
+            sheet = pk.put(lz(have + rom.resource(sheet)), f"{spec['name']} decoration sheet")
         b.sheet = sheet
         for r in deco["list"]:
             b.decos.append(struct.pack("<iiiiHHHBB", r["x"], r["y"], r["x"] + 32, r["y"] + 32, 0x2000, 0x8000,
-                                       r.get("frame", 0), 0x28, 1))
+                                       first + r.get("frame", 0), 0x28, 1))
     # decorations, gates
     deco_ptr = pk.put(b"".join(b.decos)) if b.decos else 0
     for g in spec.get("gates", []):

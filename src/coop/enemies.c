@@ -501,6 +501,8 @@ void coop_debug_tick(void) {
         regen_test(coop2.cmd_arg);
     } else if (cmd == 45) {                     // objroom.c: hold OBJ VRAM (perf_budget.py)
         obj_room_test(coop2.cmd_arg);
+    } else if (cmd == 46) {                     // ssj.c: how many aura hums are playing (p2_cases.txt)
+        coop2.cmd_arg = (u32)ssj_hum_count();
     } else if (cmd == COOP_CMD_SPAWN_SCRIPT) {
         Map_SpawnScript(g_MapState, (int)coop2.cmd_arg);
     } else if (cmd == COOP_CMD_ACTOR) {

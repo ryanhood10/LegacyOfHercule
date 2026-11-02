@@ -178,7 +178,8 @@
       "op": "border",
       "width": 1,
       "mask": "both"
-    }
+    },
+    {"op": "block", "rect": [14, 31, 2, 1], "_": "the flight sign's post, 16 x 8 at its foot"}
   ],
   "recolor": {
     "rules": [
@@ -273,15 +274,16 @@
       1
     ]
   },
+  "decorations": {
+    "sheet": [7, 1],
+    "list": [
+      {"x": 102, "y": 224, "frame": 0, "_": "the stock flight sign on the grass patch, as at Snowy Highlands (Ryan, 2026-11-02: there's no board to walk up to at a flight spot); the rect joined with the stock one round a sign"}
+    ]
+  },
   "triggers": [
     {
       "type": "flight",
-      "rect": [
-        104,
-        232,
-        168,
-        296
-      ],
+      "rect": [89, 217, 168, 296],
       "world": [
         1100,
         800

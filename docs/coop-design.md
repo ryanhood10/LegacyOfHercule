@@ -1441,6 +1441,6 @@ companion) nothing below runs: the scan and the barriers do what the stock does,
 - **Barriers:** once a map, when both stand on it (`barriers_for_two`), the item and the refusal are made for any character in the party
   the condition holds for; then the condition is tested again at each use with the player's slot: a hit's attacker (`agency_item_msg`)
   and an A press in the box (`gate`, for both players, also for the swing). So the right character opens it whoever plays him, the
-  wrong one gets the line and no opening, and Select on the spot works. Stock quirks stay (zone 4 area 50's line only for Gohan).
+  wrong one gets the line and no opening, and Select on the spot works. Zone 4 area 50's stock line (only for Gohan) now shows for everyone but Piccolo.
 - **Player_Attack's swing** (`trigger_takes_a_hook`): a box asks for the player punching, so his A on a pad does not swing either.
 - **Kept:** player 1's pad never opens a menu for him; the pause menu and the status screen stay player 1's (not asked for).

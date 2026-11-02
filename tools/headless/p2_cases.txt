@@ -1,0 +1,481 @@
+# The player 2 cases section 12 of docs/perfect-pass.md left unexercised, and the aura hum. Self-checking:
+#   python tools/headless/st_expect.py tools/headless/p2_cases.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+# Map Test party: player 1 Piccolo (slot 1), player 2 Hercule (slot 5). Entries at PARTY + 0xC + slot * 0x1C: HP +0, EP +4, row +8,
+# ability index +9. Test command 46 answers how many hums play (one while either player is transformed, else none).
+
+echo === 1 A DOWNED PLAYER AT A FLY PAD (Gohan's house, Map Test 145)
+load menu.ss
+p2 0
+maptest 145
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+save pc_145.ss
+echo --- player 2 down: player 1's A takes off alone, the body stays, the world map comes
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 40
+echo EXPECT 0203f098: 0000
+peek16 0x0203F098
+poke32 PL+0x158 0xF800
+poke32 PL+0x15C 0xDC00
+frames 4
+key 1 2
+frames 30
+echo EXPECT \w+: 03002130
+peek PL+0x18 1
+echo EXPECT \w+: 03001f58
+peek P2+0x18 1
+shot pc_1_alone
+frames 300
+echo EXPECT map zone 6 area 99
+map
+echo --- player 1 down: player 2's A on the pad does nothing (nobody leaves him)
+load pc_145.ss
+deref P2 0x0203FF08
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 10
+frames 40
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+frames 4
+p2 1
+frames 2
+p2 0
+frames 200
+echo EXPECT map zone 6 area 1
+map
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+
+echo === 2 A TAKE-OFF DURING A MOVE
+echo --- player 1 mid Ki Blast: player 2's A does not take off; his next press does
+load pc_145.ss
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke8 PARTY+0x31 3
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+poke32 PL+0x158 0x10800
+poke32 PL+0x15C 0xDC00
+frames 4
+poke32 0x0300208C 1
+key 2 2
+frames 4
+p2 1
+frames 2
+p2 0
+frames 10
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 6 area 1
+map
+frames 60
+poke32 P2+0x158 0xF800
+poke32 P2+0x15C 0xDC00
+frames 2
+p2 1
+frames 2
+p2 0
+frames 300
+echo EXPECT map zone 6 area 99
+map
+echo --- player 2 Piccolo mid Ki Blast, player 1's A: player 1 goes, player 2 is not forced out of his move, the map comes
+load pc_145.ss
+poke8 PARTY 5
+poke8 0x0203FF84 1
+poke32 0x0203FD0C 0x0106
+poke32 0x0203FD54 0x010000F0
+poke32 0x0203FD08 5
+frames 200
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84
+poke8 PARTY+0x31 3
+poke32 PL+0x158 0xF800
+poke32 PL+0x15C 0xDC00
+frames 4
+poke32 0x0300208C 1
+p2 2
+frames 2
+p2 0
+frames 4
+key 1 2
+frames 300
+echo EXPECT map zone 6 area 99
+map
+
+echo === 3 SUPER SAIYANS AT A SAVE PAD: the town's pad (Map Test 7), player 2 on it as Super Saiyan Goku
+load menu.ss
+p2 0
+maptest 7
+frames 300
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 P2+0x158 0x22000
+poke32 P2+0x15C 0x11000
+frames 10
+stepz 0x03001FDC 40
+frames 20
+poke32 PL+0x158 0x24000
+poke32 PL+0x15C 0x14000
+frames 4
+echo --- Select five times: Krillin, Gohan, Vegeta, Trunks, Goku
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 04
+peek8 0x0203FF84
+poke8 PARTY+0x85 2
+poke32 0x0300208C 1
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+p2 2
+frames 2
+p2 0
+frames 260
+echo EXPECT 0203f084: 14
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+save pc_ssj.ss
+shot pc_3_ssj
+echo --- his Switch Characters, one Left, his A: Trunks; Goku is back on his row, the hum stops
+p2 1
+frames 2
+p2 0
+frames 40
+p2 0x80
+frames 3
+p2 0
+frames 30
+p2 1
+frames 2
+p2 0
+frames 70
+p2 0x20
+frames 3
+p2 0
+frames 12
+p2 1
+frames 2
+p2 0
+frames 80
+echo EXPECT 0203ff84: 03
+peek8 0x0203FF84
+echo EXPECT 0203f084: 13
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+echo EXPECT 0203f064: 0088
+peek16 PARTY+0x64
+shot pc_3_trunks
+echo --- Cancel: still Super Saiyan, the hum on
+load pc_ssj.ss
+p2 1
+frames 2
+p2 0
+frames 40
+p2 0x80
+frames 3
+p2 0
+frames 30
+p2 1
+frames 2
+p2 0
+frames 70
+p2 2
+frames 2
+p2 0
+frames 80
+echo EXPECT 0203ff84: 04
+peek8 0x0203FF84
+echo EXPECT 0203f084: 14
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+echo --- his Select away from the form: the slot turns back and the hum stops the same way
+load pc_ssj.ss
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203f084: 13
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+echo --- Vegeta as player 1 too (the cool-down cleared): two Super Saiyans, one hum
+load pc_ssj.ss
+poke8 PARTY 2
+poke8 PARTY+0x4D 2
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x01100220
+poke32 0x0203FD08 5
+frames 200
+deref P2 0x0203FF08
+findent PL 0x08025604
+echo EXPECT 0203f084: 14
+peek8 PARTY+0x84
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+key 2 2
+frames 260
+echo EXPECT 0203f04c: 0b
+peek8 PARTY+0x4C
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+save pc_both.ss
+echo --- player 2 turns back: the hum goes on for player 1; player 1 turns back: silence
+p2 2
+frames 2
+p2 0
+frames 200
+echo EXPECT 0203f084: 13
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+key 2 2
+frames 200
+echo EXPECT 0203f04c: 08
+peek8 PARTY+0x4C
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+echo --- the other order
+load pc_both.ss
+key 2 2
+frames 200
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+p2 2
+frames 2
+p2 0
+frames 200
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000000
+peek 0x0203FD0C 1
+echo --- player 1's own switch at the pad (to Piccolo): his form ends, player 2's stays, one hum
+load pc_both.ss
+deref P2 0x0203FF08
+findent PL 0x08025604
+poke32 PL+0x158 0x22000
+poke32 PL+0x15C 0x11000
+poke32 P2+0x158 0x25000
+poke32 P2+0x15C 0x16000
+frames 4
+key 1 2
+frames 40
+key 0x80 3
+frames 30
+key 1 2
+frames 70
+key 0x20 3
+frames 12
+key 1 2
+frames 80
+echo EXPECT 0203f000: \w{6}01
+peek PARTY 1
+echo EXPECT 0203f04c: 08
+peek8 PARTY+0x4C
+echo EXPECT 0203f084: 14
+peek8 PARTY+0x84
+poke32 0x0203FD08 46
+frames 2
+echo EXPECT 0203fd0c: 00000001
+peek 0x0203FD0C 1
+shot pc_3_p1switch
+
+echo === 4 ROWS 10 AND 14 ON PLAYER 2: his own ki goes, not player 1's; at 0 he is back on the base row
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke8 PARTY+0x4C 10
+poke8 PARTY+0x68 14
+poke16 PARTY+0x48 8
+poke16 PARTY+0x64 6
+poke16 PARTY+0x2C 100
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 02
+peek8 0x0203FF84
+frames 500
+echo EXPECT 0203f048: 0000
+peek16 PARTY+0x48
+echo EXPECT 0203f04c: 09
+peek8 PARTY+0x4C
+echo EXPECT 0203f02c: 0064
+peek16 PARTY+0x2C
+p2 4
+frames 2
+p2 0
+frames 6
+echo EXPECT 0203ff84: 03
+peek8 0x0203FF84
+frames 400
+echo EXPECT 0203f064: 0000
+peek16 PARTY+0x64
+echo EXPECT 0203f068: 0d
+peek8 PARTY+0x68
+echo EXPECT 0203f02c: 0064
+peek16 PARTY+0x2C
+
+echo === 5 THE COMPANION'S SLOT (alone, old Hercule walks with player 1): benched: the stock trickle, no resting heal for him
+load menu.ss
+p2 off
+maptest 7
+frames 300
+poke8 0x0203F0A0 24
+frames 200
+deref P2 0x0203FF08
+echo EXPECT \w+: 0203fe00
+peek P2 1
+poke16 0x0203F098 10
+poke16 0x0203F09C 0
+poke16 0x0203F028 10
+frames 1210
+echo --- about 20 s: two ticks of 5 % for him, 10 + 2 * 24 = 58 HP and 2 * 7 EP; player 1 is resting his way up to 2/3 (703)
+echo EXPECT 0203f098: 003a
+peek16 0x0203F098
+echo EXPECT 0203f09c: 000e
+peek16 0x0203F09C
+echo EXPECT 0203f028: 0(2|1)\w\w
+peek16 0x0203F028
+p2 0
+
+echo === 6 DENDE'S YES / NO ON PLAYER 2'S PAD (the post-game finale's question, CoopCall 18)
+load menu.ss
+p2 0
+preset +195 +191
+maptest 261
+frames 260
+flags +483
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x01C002F8
+poke32 0x0203FD08 5
+frames 200
+save pc_dende.ss
+echo --- player 1 starts the talk; his B answers no and closes the question, his A closes the line: still on the Lookout
+key 0x40 12
+frames 30
+key 1 6
+frames 210
+p2 1
+frames 2
+p2 0
+frames 120
+shot pc_6_question
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 2
+frames 2
+p2 0
+frames 150
+shot pc_6_no
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+p2 1
+frames 2
+p2 0
+frames 120
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 9 area 1
+map
+echo --- his A twice: yes, yes: the scene goes on to the talk show (another map)
+load pc_dende.ss
+key 0x40 12
+frames 30
+key 1 6
+frames 210
+p2 1
+frames 2
+p2 0
+frames 120
+p2 1
+frames 2
+p2 0
+frames 150
+shot pc_6_sure
+p2 1
+frames 2
+p2 0
+frames 400
+shot pc_6_yes
+map
+
+echo === 7 ZONE 4 AREA 50'S "ONLY PICCOLO", ALONE: Vegeta gets the line (it only ever showed for Gohan), the barrier stands; Piccolo opens it
+load menu.ss
+p2 off
+maptest 7
+frames 300
+poke8 PARTY 2
+poke32 0x0203FD0C 0x3204
+poke32 0x0203FD54 0x00FA0258
+poke32 0x0203FD08 5
+frames 200
+echo EXPECT map zone 4 area 50
+map
+findent PL 0x08025604
+echo EXPECT 0203ff08: 00000000
+peek 0x0203FF08 1
+poke32 PL+0x15C 0xFA00
+key 0x40 2
+frames 10
+poke32 PL+0x15C 0xFA00
+key 1 2
+frames 30
+echo EXPECT 03001fdc: 00000001
+peek 0x03001FDC 1
+shot pc_7_vegeta
+mash 3 30
+frames 30
+echo EXPECT \w+: 00
+peek8 FLAGS+34
+p2 0

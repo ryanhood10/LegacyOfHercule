@@ -676,7 +676,8 @@ His A at a save pad opens the menu, and it runs on his pad: Save saves, Switch C
 you land). Walking into a door or map exit takes you both at once. Taking off, both fly up together; Hercule runs off
 instead. "Only Piccolo" barriers open to the right character whoever plays him, by punch or ki blast; the wrong one
 gets the refusal. In a walk-in story scene he triggers, player 1 is moved onto his spot first (the scene is written for
-one body): watch whether that looks wrong. Nobody leaves a map while someone is down.
+one body): watch whether that looks wrong. Player 2 cannot lead anyone off a map while either of you is down; player 1's own
+exits and take-offs work as they always did, and a player 2 left lying gets up at 30 % on the next map (section 13).
 
 **The tournament.** The drop back to the waiting room was player 2's **B**: on his select screen B backed out, and a
 back-out ended the whole tournament. His pad's labelled **A sends the GBA's B** (`p2_keys.py`'s default layout, B / Y = A,
@@ -732,3 +733,50 @@ and press A.
   play.
 - The merged `pp2-*` worktrees (`F:/MeltyCreations/log2-pp2-*`) can be removed after Ryan has played. The combos' step tables
   still wait for his notes. The Buu campaign is not planned.
+
+## 13. The loose ends of section 12 (2026-11-02)
+
+Ryan: "lets do one more pass to clean up those loose ends". The test is `tools/headless/p2_cases.txt` (in `regfull.sh`).
+
+**The stock ki top-up stays gone.** Ryan, told what it was (3 % of max ki about every 10 s for the character being played):
+"okay thats good". `REGEN_PLAYED_CRUMB` stays 0. The pad labels and the ring's regen are still his to call after playing.
+
+**Tested, nothing wrong:**
+- A downed player 2 and player 1's A at a fly pad: player 1 takes off alone, the body stays, the world map comes. A downed
+  player 1 and player 2's A: nothing happens. A map change gets a left-behind player 2 up at 30 % (`docs/coop-design.md` "Revive").
+- Player 2's take-off while player 1 is in a move, for every move of slots 0-4 and 6: in a move's own state his press does
+  not take off and the next press does; a move that has already handed control back (Vegeta's and Krillin's second) takes off
+  at once, and the world map comes. Player 1's take-off while player 2 is in a move leaves him out of the flight, and the map comes.
+- Player 2 a Super Saiyan at a save pad: Switch Characters leaves the old slot on its base row; Cancel, or picking himself, stays
+  transformed; Save saves.
+- Dende's yes / no on player 2's pad alone: B answers no and closes, A closes the line; A, A runs on to the talk show.
+- The companion's bench slot: the stock trickle (5 % about every 10 s), no resting heal; player 1 rests as usual.
+- Rows 10 and 14 on player 2: his own ki drains, player 1's stays, at 0 he is back on the base row.
+
+**Found and fixed:**
+- **The Super Saiyan hum stuck.** The class's slot 2 starts a channel of its own and slot 3 stops the first it finds. Player 2
+  switching off a form (Select or the pad) never stopped his; two Super Saiyans played two, and the old "restart for the other
+  player" left one looping after both had turned back. Now `ssj.c` keeps it at one hum while either player is on a class that
+  hums (the Super Saiyans', rows 10 / 14, Super Saiyan 2) and none otherwise, every frame in co-op: a save pad's screen hands
+  back the channels it found, so settling once at the switch was undone. Alone nothing changes. Test command 46 counts them.
+- **Player 1's switch at a pad took player 2's form away** (`Party_DetransformOthers` turns back every slot but the active
+  one). Now only player 1's own form ends. A load still turns everyone back, as before.
+- **Zone 4 area 50's "Only Piccolo" line** now shows for everyone but Piccolo, like every other barrier (two bytes of its
+  condition). The one change here to one-player play, and only an added line.
+- **Flight signs:** the arctic landing and the summit have the board on their grass patches, with the rect joined to the stock
+  one round a sign and a 16 x 8 post. No stock sheet holds both the sign and the summit's rock, so `tools/mapbuild.py` joins two
+  sheets (1 KB more of OBJ VRAM on the summit; `perf_budget.py` does not cover the summit: a real fight there is the check).
+
+**Left on purpose:**
+- The text box's frame or two when it opens: the stock's decompression, alone as much as in co-op. Not looked into further: a
+  hitch nobody reported, in code every box goes through.
+- The bridges' layer swaps (zone 4 areas 53, 55) follow player 1: there is one background layer order for two people.
+- Early Rookie balance: only a real session can judge it (the bot was simple). Nothing changed.
+- The `pp2-*` worktrees stay until Ryan has played.
+
+**Still open:** the ki blast that stopped working on the way to Future Trunks. Not reproduced. Every zone 3 map allows moves, and
+no script of ours turns them off. One fact from this pass: **the corn maze (zone 4 areas 56, 57, 59) is the only stock map with
+enemies where no move works at all** (header flag 0, the same switch as the towns; `0x0300208C`). So if it happens again, the map's
+name is the thing to note. Left as stock.
+
+**Still only a real session can judge:** real mGBA's fps, Lua and Parsec; the walk-in scene's jump; the fly-off's look.

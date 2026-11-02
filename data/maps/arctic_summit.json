@@ -269,17 +269,19 @@
         11,
         35
       ]
-    }
+    },
+    {"op": "block", "rect": [28, 54, 2, 1], "_": "the flight sign's post, 16 x 8 at its foot"}
   ],
+  "decorations": {
+    "sheet": [7, 1],
+    "list": [
+      {"x": 214, "y": 408, "frame": 0, "_": "the stock flight sign on the grass patch; its sheet is joined to the rocks' (tools/mapbuild.py), so frame 0 here is the second sheet's first"}
+    ]
+  },
   "triggers": [
     {
       "type": "flight",
-      "rect": [
-        212,
-        412,
-        268,
-        476
-      ],
+      "rect": [201, 401, 268, 476],
       "world": [
         1100,
         800

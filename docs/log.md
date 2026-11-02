@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Section 12's loose ends (`docs/perfect-pass.md` 13, `tools/headless/p2_cases.txt`):** the untested player 2 cases tested; the aura hum
+  no longer sticks (one for two players, `ssj.c`); player 1's pad switch leaves player 2's form; zone 4 area 50's line for everyone but Piccolo;
+  flight signs on the arctic landing and the summit (`mapbuild.py` joins two sheets). The stock ki top-up stays gone (Ryan).
 - **Regeneration (Ryan's second session; `docs/perfect-pass.md` 11.1, 11.2):** player 1 healed to full only through Super
   Saiyan 2 Gohan's stock class, which heals the *active* slot whoever plays him; the doubled stock trickle filled player 2
   and player 1's ki. Now: the trickle and the party meter run once a frame (the co-op Super Saiyan cool-down is the same as

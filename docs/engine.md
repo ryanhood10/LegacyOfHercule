@@ -191,6 +191,9 @@ The stock rules, read from the ROM (thumb disassembly); what the build changes i
 - **`Party_DetransformOthers`** (`0x08003ED4`): every stock slot (0-5) but the active one whose row has bit 0 goes to
   its byte-5 row. Called at a load (`save_menu_start_hook`) and at a save pad's switch (`switch.c`), so a transformed
   player 1 stays transformed through a save and a reload (the class's slot 2 restarts the hum) and nobody else does.
+- **The hum:** classes `0x030021EC`, `0x030021E8` and `0x030021E4` start it in slot 2 (`0x0801FC9C`, always a new channel) and
+  stop it in slot 3 (`0x0801FC22`, the first it finds): 16 channels of 0x40 bytes at the mixer's +0x5C4, +0x10 bit 0 on, +0x28 the
+  sound. A save pad's screen hands back the channels it found. `ssj.c` `hum_settle` keeps one for two players.
 
 **The build** (`src/coop/ssj.c`, 2026-11-01): `0x08014D58` and the class update served only the active slot, so a
 player 2 who transformed changed player 1's row and drained player 1's EP. The transform's slot 5 (vtables
@@ -344,8 +347,9 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   (19 refusals, 20 items; zone 4 area 5's opener is a script trigger on the refusal's own rect, no item). The item's message
   (`0x0800F2B6`, slot 9) takes the hit in message 0: `{+0 kind, +4 x1, y1, x2, y2, +0x18 power, +0x1C the attack
   descriptor, +0x20 the attacker (a punch: the player; a ki blast: its owner, 0x0800E946), +0x30 the object}`; flags bit 0 melee,
-  bit 1 energy; `0x0800F1AE` counts the hits, the last runs the handler. Nothing there asks who hit. **Stock quirk:** zone 4 area
-  50's refusal says "Only Piccolo" but its condition is `active == 0` (Gohan) and flag 275 clear: only Gohan ever sees it.
+  bit 1 energy; `0x0800F1AE` counts the hits, the last runs the handler. Nothing there asks who hit. **Stock quirk, patched:** zone 4 area
+  50's refusal says "Only Piccolo" but its condition was `active == 0` (Gohan) and flag 275 clear: only Gohan ever saw it
+  (`data/hercule.json`: now `active != 1`, as the others).
 - **Commands** (see `docs/scripts.md` for the batch): FlyToPosition's (`0x08009E30`) is `{vt 0x08024864, next, done, mover, x,
   y}`; its start `0x0800E838` calls the entity's slot 12 and the mover `0x0800D5B8` with `{0, s16 x, y, speed 0x200}`: 2 px a
   frame, animation 1 then 12 (state `0x03002130`, **group 12**, `0x0800E7A0`). The walk's start `0x0800E004` / `0x08010898` the mover
