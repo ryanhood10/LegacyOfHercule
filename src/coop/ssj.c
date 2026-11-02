@@ -221,7 +221,14 @@ void hercule_awaken(void) {
 #endif
 }
 // A save from the days the ability was granted: Megaton Punch back in slot 2, and his base row if he was transformed.
+// A save from before his moves were learned (flags 0x40, Ryan, 2026-11-02: "STUCK"): Ability_Cycle (L) stops only on
+// learned moves, 8 << index, so he could never leave the Taunt, index 3: all learned, and back on his first move once.
+#define HERCULE_MOVES 0x38u
 void hercule_lock(CharacterEntry *c) {
+    if ((c->flags & HERCULE_MOVES) != HERCULE_MOVES) {
+        c->flags |= HERCULE_MOVES;
+        c->ability_index = 0;
+    }
 #if !SSJ_HERCULE_UNLOCK
     if (c->ability_list[2] == SSJ_ABILITY) c->ability_list[2] = 16;
     if (c->display_row == 0x16) c->display_row = 0x15;

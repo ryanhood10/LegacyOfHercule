@@ -267,6 +267,14 @@ punctuation only); owner in brackets.
   transformed Hercule is turned back by a load and has Megaton Punch; its expectations updated, rerun 57 / 57); in
   `build/play` since 2026-11-02 02:48.
 
+- **Ryan, 2026-11-02, two players again: "player 2 is still STUCK with the ki move of super saiyan for hercule".** The lock above
+  was right and in the build (his save's list held 14 15 16 17), and this was never ability 18. Hercule's flags were 0x40, and
+  `Ability_Cycle` (L) stops only on learned moves (`8 << index`), so index 3, the Taunt, was all he had; the Taunt wore the stock
+  Transformation icon (ability icons 11). Every test before ran on index 0 or poked the index, none pressed L from a real save.
+  Now flags 0x78 for a new game, older saves lifted once at the load (and put on his first move), the Taunt on icon 8, slot 5 has
+  a status icon pair (bits 3 / 4 need one: `krillin.c` `status_module`). Bit 5 also gives him the charged A attack and the meter
+  on his panel, like Android 16. `ssj_lock.txt` covers it: flags, index, player 2's L through all four.
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM

@@ -8,6 +8,8 @@
       "str": 2.0,
       "pow": 0.5,
       "end": 1.5,
+      "_": "flags: 0x40 like every stock row, plus bits 3-5: the ability cycle stops only on learned moves (8 << index); with 0x40 alone L could never leave the Taunt",
+      "flags": "0x78",
       "abilities": [
         14,
         15,
@@ -115,7 +117,8 @@
     },
     {
       "name": "HerculeTaunt",
-      "icons": 11,
+      "_": "icons 8, not the stock 11: that is the Transformation icon, and Ryan read it as a Super Saiyan move",
+      "icons": 8,
       "is_ready": "fn:hercule_taunt_ready",
       "on_use": "fn:hercule_taunt_use"
     },

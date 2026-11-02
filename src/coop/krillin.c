@@ -111,7 +111,7 @@ const u32 status_module[13 + 2 * PARTY_SLOTS] __attribute__((aligned(4))) = {
     0x90, 4, 0xD0, 0x44, 2, 4, 0x1C, 0xF,                                  // blit rects (stock words 5-12)
     0x086FF6D0, 0x086FF68C, 0x086FF7A8, 0x086FF764, 0x086FF5B8,            // slots 0-4 (stock words 13-22)
     0x086FF71C, 0x086FF63C, 0x086FF83C, 0x086FF68C, 0x086FF7E4,
-    0, 0,                                                                   // slot 5: Hercule has no technique pages
+    (u32)kr_status_icon_ki, (u32)kr_status_icon_ki,                         // slot 5: Hercule, no technique pages; his flags hold the bits
 #if PARTY_SLOTS > KRILLIN_SLOT
     (u32)kr_status_icon_disc, (u32)kr_status_icon_ki,                       // slot 6: Krillin
 #endif

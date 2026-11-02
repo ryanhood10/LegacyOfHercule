@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Hercule's moves really selectable (`docs/perfect-pass.md` 9):** flags 0x78, old saves lifted at the load, L goes through all four on
+  either pad; the Taunt no longer wears the Transformation icon. Ryan's "stuck with super saiyan" was the Taunt on that icon.
 - **Section 12's loose ends (`docs/perfect-pass.md` 13, `tools/headless/p2_cases.txt`):** the untested player 2 cases tested; the aura hum
   no longer sticks (one for two players, `ssj.c`); player 1's pad switch leaves player 2's form; zone 4 area 50's line for everyone but Piccolo;
   flight signs on the arctic landing and the summit (`mapbuild.py` joins two sheets). The stock ki top-up stays gone (Ryan).

@@ -77,10 +77,10 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 | 14 | Rolling Hercule Punch (Hercule icon) | 5, his stock punch: pose, shockwave object, grunt (SFX 40) | 4 | stock onUse `0x0801327D`, 2 EP refunded |
 | 15 | Dynamite Kick (Ki Blast icon) | 34, Ki Blast: one quick projectile | 3 | stock onUse `0x080131E1`, 1 EP extra |
 | 16 | Megaton Punch (Big Bang icon) | 46, Big Bang: the big slow projectile | 12 | stock onUse `0x08013179`, 2 EP extra |
-| 17 | Hercule Taunt (Transformation icon) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
+| 17 | Hercule Taunt (icon 8; the Transformation icon until 2026-11-02, read as a Super Saiyan move) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
 | 18 | Super Hercule (the Transformation icon in his colours, `herc_ssj_icon_0/1`) | the stock Transformation (ability 12): animation 0x23, then display row 22 (sprite 157); again: animation 0x24, back to row 21 | none (needs 10; drains 3 a second while transformed) | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` (section 3b) |
 
-Hercule's starting list is **14, 15, 16, 17** (punch, kick, Megaton Punch, taunt). Super Hercule (18)
+Hercule's starting list is **14, 15, 16, 17** (punch, kick, Megaton Punch, taunt), all learned: flags 0x78 (`Ability_Cycle` 0x08004284 stops only on index i with flag `8 << i`; with the stock row's 0x40 L could never leave the taunt; `hercule_lock` lifts an older save at the load, and puts him on his first move once). Super Hercule (18)
 is kept out of it by Ryan's no-reveal rule (2026-10-18): the late-story script calls
 `hercule_awaken()` (src/coop/ssj.c), which puts 18 into the third slot in place of the Megaton
 Punch. (It was 14, 15, 18, 17 until then.) Verified as player 2 from `log2-run.ss1`: row 21 ->
