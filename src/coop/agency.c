@@ -310,17 +310,17 @@ static int on_world_map(void) {
     return m && m[0] == WORLD_ZONE && m[1] == WORLD_AREA;
 }
 
-// Every poll, before the stock input is filled: what player 2 fired runs on his pad; in a dialogue inside it player 1's
-// A and B still count. The world map he took off to, until the flyer lands (Ryan's rule: whoever stepped on the sign).
+// Every poll, before the stock input is filled: what player 2 fired runs on his pad (a dialogue inside it goes by
+// agency_scene_press as any other). The world map he took off to, until the flyer lands (Ryan's rule: whoever stepped on
+// the sign).
 void agency_pads(u16 *p1, u16 *p2) {
     if (ag.world) {
         if (on_world_map()) ag.world = 2;
         else if (ag.world == 2) ag.world = 0;
     }
     if (!p2_pad_present() || players_one()) { ag.world = 0; return; }
-    if (ag.modal || ag.world == 2) {
-        u16 mine = scene_running() ? (u16)(*p1 & (KEY_A | KEY_B)) : 0;
-        *p1 = (u16)(*p2 | mine);
+    if ((ag.modal || ag.world == 2) && !scene_running()) {
+        *p1 = *p2;
         *p2 = 0;
     }
 }
@@ -381,7 +381,8 @@ static void go_cmd(Entity *e, int slot, s32 x, s32 y) {
 
 static void p2_goes_along(s32 x, s32 y) {
     Entity *p2 = coop.p2;
-    if (!p2 || revive_is_down(p2) || *(u32 *)((u8 *)p2 + 0x150)) return;
+    // standing, walking or dashing only: forcing him out of an ability's state frees what it holds (p2_cycle's crash)
+    if (!p2 || !p2_in_control() || revive_is_down(p2) || *(u32 *)((u8 *)p2 + 0x150)) return;
     go_cmd(p2, coop.p2_slot, x - 16, y);
 }
 
