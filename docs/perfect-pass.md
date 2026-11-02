@@ -257,7 +257,7 @@ punctuation only); owner in brackets.
   there. The loader puts the spawn hook's entity on the list (a null crashed it at frame 68), so each record's enemy
   is built and parked at (-256, -256) with no collision box, out of sight and chase range (`enemies.c`
   `corn_maze_single`). The King (sprite 127), the other triceratops maps (zone 6 area 3, zone 8 areas 15 / 19 / 21)
-  and one-player play are unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`).
+  and one-player play are unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`). Full regression on that build clean (60 blocks).
 
 - **Ryan, 2026-11-02 (two players): Super Saiyan Hercule locked off.** "Hercule's Super Saiyan mode should NOT be an
   option yet in the game (don't even bother looking to when to unlock it, it's MUCH later in development). Fix this
