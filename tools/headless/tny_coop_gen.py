@@ -252,6 +252,25 @@ for t, name in enumerate(tiers):
         back_in_room()
         expect(rf"0203ed78:( \w\w){{{t * 3 + d}}} 0[1-9]", f"peek8 {WINS} 15")
 
+out("echo === 6b. A Full bracket with player 2 in: Champion, the list's second line, 16 seats, the record's Full win")
+cmd(40, 30, 0)
+cmd(21, 77)
+to_director()
+for _ in range(3):
+    out("key 0x80 6", "frames 20")
+p1(1)
+p1(1)               # 1 v 1
+out("key 0x80 6", "frames 20")
+p1(1)               # Full
+p1(1)
+p2(1)
+out("frames 300", "shot c6b_full")
+expect(r"0203ec6c: 10 04", "peek8 0x0203EC6C 2")
+finish(300)
+back_in_room()
+out("echo --- full_wins[Champion]")
+expect(r"0203ed8a: 01", "peek8 0x0203ED8A")
+
 here = os.path.dirname(os.path.abspath(__file__))
 open(os.path.join(here, "tny_coop.txt"), "w", newline="\n").write("\n".join(L) + "\n")
 print(f"tny_coop.txt: {len(L)} lines")

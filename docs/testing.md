@@ -1236,7 +1236,7 @@ Krillin only, one tier): 2 v 2, player 2 picks with B, the bracket's banner, the
 characters back; 2 the way back (player 1's B on player 2's screen, on his own, on the list; player 2's B on a list);
 3 both players down by real hits, no game over; 3b player 1 down, player 2 wins alone; 4 the Rumble, a co-op 1 v 1 with
 player 1 out early, one to the duel final won by player 2; 4b tournament playables picked on the screens' second tab by both;
-5 a two-player game over with player 1 down first; 6 every tier x every division. On the code before it block 1 ends on map
+5 a two-player game over with player 1 down first; 6 every tier x every division; 6b a Full bracket (Champion, 16 seats). On the code before it block 1 ends on map
 15 / 15 with player 2's pick empty, Ryan's report. `stepz`'s limit counts steps of 100 frames, not frames.
 
 To replay a real save as a player would: copy a `.sav` next to the build, `cart /mnt/f/.../x.sav`, `frames 900`, Start, A, A,

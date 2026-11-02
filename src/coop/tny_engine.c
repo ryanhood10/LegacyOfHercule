@@ -2268,8 +2268,10 @@ void tny_engine_frame(void) {
     cp_tick();
     // behind the curtain on the way out the player already stands beside the director: a mashed A no longer talks to
     // him again in the dark (found by tny_coop.txt, a press there opened his menus straight after a tournament)
-    if (eng.dark && eng.phase >= P_EXIT && !scene_running()) { g_InputSystem->pressed &= (u16)~KEY_A; coop.input2.pressed &= (u16)~KEY_A; }
-    if (eng.phase == P_IDLE && eng.dark && !scene_running()) { g_InputSystem->pressed &= (u16)~KEY_A; coop.input2.pressed &= (u16)~KEY_A; }
+    if (eng.dark && (eng.phase >= P_EXIT || eng.phase == P_IDLE) && !scene_running()) {
+        g_InputSystem->pressed &= (u16)~KEY_A;
+        coop.input2.pressed &= (u16)~KEY_A;
+    }
     if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued

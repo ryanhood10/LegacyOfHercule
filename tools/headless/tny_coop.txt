@@ -1175,3 +1175,56 @@ echo EXPECT 0203ec04: 00 00
 peek8 0x0203EC04 2
 echo EXPECT 0203ed78:( \w\w){14} 0[1-9]
 peek8 0x0203ED78 15
+echo === 6b. A Full bracket with player 2 in: Champion, the list's second line, 16 seats, the record's Full win
+poke32 0x0203FD0C 0x1e
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 40
+frames 10
+poke32 0x0203FD0C 0x4d
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0xf0f
+poke32 0x0203FD54 0x13200a8
+poke32 0x0203FD08 5
+frames 200
+key 0x80 6
+key 1 10
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 80
+key 0x80 6
+frames 20
+key 0x80 6
+frames 20
+key 0x80 6
+frames 20
+key 0x1 6
+frames 80
+key 0x1 6
+frames 80
+key 0x80 6
+frames 20
+key 0x1 6
+frames 80
+key 0x1 6
+frames 80
+p2 0x1
+frames 4
+p2 0
+frames 80
+frames 300
+shot c6b_full
+echo EXPECT 0203ec6c: 10 04
+peek8 0x0203EC6C 2
+stepz 0x0203ECFD 300
+frames 30
+echo EXPECT map zone 15 area 15
+map
+echo EXPECT 0203ec04: 00 00
+peek8 0x0203EC04 2
+echo --- full_wins[Champion]
+echo EXPECT 0203ed8a: 01
+peek8 0x0203ED8A
