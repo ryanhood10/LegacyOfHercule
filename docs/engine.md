@@ -301,7 +301,7 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   `0x0800F034`: the item object, vtable `0x08025720`, +0x24 the record, +0x28 the decoration, takes the decoration's place in
   the list), and a refusal: a dialogue trigger with the opposite condition, also tested once, at the load. Both conditions read
   the active character with Step 11 (bytes 02 0B); those bytes are in no other trigger's or item's condition in the ROM
-  (20 refusals, 18 items; zone 4 area 5's is a script trigger on the refusal's own rect, no item). The item's message
+  (19 refusals, 20 items; zone 4 area 5's opener is a script trigger on the refusal's own rect, no item). The item's message
   (`0x0800F2B6`, slot 9) takes the hit in message 0: `{+0 kind, +4 x1, y1, x2, y2, +0x18 power, +0x1C the attack
   descriptor, +0x20 the attacker (a punch: the player; a ki blast: its owner, 0x0800E946), +0x30 the object}`; flags bit 0 melee,
   bit 1 energy; `0x0800F1AE` counts the hits, the last runs the handler. Nothing there asks who hit. **Stock quirk:** zone 4 area
