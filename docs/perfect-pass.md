@@ -246,7 +246,8 @@ punctuation only); owner in brackets.
   the landing is y 1248 and they ended at 1077, the panned view's bottom, past the parade float (not solid until
   flag 34). Alone, player 1 stays. Now the leash never moves a player more than 8 px (a walker is only ever a few
   px past the edge; more is the view's own doing) and stands down during a sequence, and player 2's pad is held to
-  A while one runs (`input.c`; the stock already holds player 1). Test: `tools/headless/wc_arrival.txt` (self-checking, in `regfull.sh`).
+  A while one runs (`input.c`; the stock already holds player 1). Test: `tools/headless/wc_arrival.txt` (self-checking, in `regfull.sh`). Full regression on that build
+  (`build/wc`) clean: 59 blocks, exit 0; in `build/play` since 2026-11-02 01:26.
 
 ## 10. State at the end of the team round (2026-11-01)
 
