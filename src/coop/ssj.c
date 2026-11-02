@@ -192,7 +192,23 @@ void ssj_use(CharacterEntry *c, Entity *e) {
 // Megaton Punch (16).
 #define HERCULE_SLOT_INDEX 5
 #define SSJ_ABILITY 18
+// Locked off (Ryan, 2026-11-02, two players: "Hercule's Super Saiyan mode should NOT be an option yet in the game;
+// it's MUCH later in development. Fix this so player 2 can actually use Hercule's ki moves again"): CoopCall 4 does
+// nothing until SSJ_HERCULE_UNLOCK is 1, and a save that already holds the ability gets Megaton Punch back at the
+// load (party_save.c hercule_lock). The transformation itself (ssj_hercule.txt pokes ability 18 in) stays built.
+#define SSJ_HERCULE_UNLOCK 0
 void hercule_awaken(void) {
+#if SSJ_HERCULE_UNLOCK
     CharacterEntry *c = &g_Party->chars[HERCULE_SLOT_INDEX];
     c->ability_list[2] = SSJ_ABILITY;
+#endif
+}
+// A save from the days the ability was granted: Megaton Punch back in slot 2, and his base row if he was transformed.
+void hercule_lock(CharacterEntry *c) {
+#if !SSJ_HERCULE_UNLOCK
+    if (c->ability_list[2] == SSJ_ABILITY) c->ability_list[2] = 16;
+    if (c->display_row == 0x16) c->display_row = 0x15;
+#else
+    (void)c;
+#endif
 }

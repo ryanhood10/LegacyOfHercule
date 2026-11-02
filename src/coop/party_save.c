@@ -117,6 +117,7 @@ void load_slot_hook(PartyState *dst, int slot) {
         krillin_lift(&s->party.chars[KRILLIN_SLOT]);   // a save from before 2026-11-01: his new base numbers, once
         flag_set_hook(&s->party, KRILLIN_LIFT_FLAG);
     }
+    if (s->party.flags & 1) hercule_lock(&s->party.chars[5]);   // ssj.c: Super Saiyan Hercule locked off (2026-11-02)
     if (dst != &s->party) memcpy(dst, &s->party, sizeof(PartyState));
 }
 

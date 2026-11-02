@@ -4,6 +4,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Super Saiyan Hercule locked off** (Ryan: not an option yet, much later): `ssj.c` `SSJ_HERCULE_UNLOCK` 0, CoopCall 4
+  a no-op, saves holding the ability get Megaton Punch back at the load (`hercule_lock`, `ssj_lock.txt`).
 - **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide
   paths, then "just remove those triceratops"): sprite 125 on zone 4 areas 56 / 57 / 59 is built and parked at
   (-256, -256) with no collision box, as the loader lists whatever the spawn hook returns (`enemies.c`

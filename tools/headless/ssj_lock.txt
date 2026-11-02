@@ -1,0 +1,53 @@
+# Super Saiyan Hercule locked off (Ryan, 2026-11-02: "should NOT be an option yet"; ssj.c SSJ_HERCULE_UNLOCK 0): a save
+# that holds the ability (18 in his list's slot 2, as CoopCall 4 used to put it) and his transformed row (0x16) gets
+# Megaton Punch (16) and the base row (0x15) back when it loads (party_save.c load_slot_hook -> hercule_lock). The town
+# (Map Test 7), player 2 Hercule: his list 0x0203F0B0 (14 15 16 17 = 0e 0f 10 11), row 0x0203F0A0; a save at the pad as
+# ssj_hercule.txt's C2, then a soft reset and the load (two players).
+#   python tools/headless/st_expect.py tools/headless/ssj_lock.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+load menu.ss
+p2 0
+maptest 7
+frames 300
+echo == the ability and the transformed row poked into the save-to-be
+poke8 0x0203F0B2 18
+poke8 0x0203F0A0 0x16
+echo EXPECT \w+: 11101\w0e
+peek 0x0203F0B0 1
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 1 4
+frames 80
+key 1 4
+frames 60
+shot lk_saved
+echo == a soft reset, Select Game, the load (B: two players, then A): Megaton Punch back (10), the base row (15)
+key 0xF 6
+frames 400
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 1 6
+frames 100
+key 1 6
+frames 400
+key 2 6
+frames 200
+key 1 6
+frames 200
+map
+echo EXPECT \w+: 11100f0e
+peek 0x0203F0B0 1
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+shot lk_loaded

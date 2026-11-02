@@ -259,6 +259,14 @@ punctuation only); owner in brackets.
   `corn_maze_single`). The King (sprite 127), the other triceratops maps (zone 6 area 3, zone 8 areas 15 / 19 / 21)
   and one-player play are unchanged. Test: `tools/headless/corn_maze.txt` (self-checking, in `regfull.sh`).
 
+- **Ryan, 2026-11-02 (two players): Super Saiyan Hercule locked off.** "Hercule's Super Saiyan mode should NOT be an
+  option yet in the game (don't even bother looking to when to unlock it, it's MUCH later in development). Fix this
+  so player 2 can actually use Hercule's ki moves again." `ssj.c` `SSJ_HERCULE_UNLOCK` 0: CoopCall 4 (`hercule_awaken`)
+  does nothing, and a save that already holds the ability (18 in his list's slot 2, over Megaton Punch) or his
+  transformed row gets Megaton Punch (16) and row 0x15 back at the load (`party_save.c` -> `hercule_lock`). The
+  transformation itself stays built and tested (`ssj_hercule.txt` pokes the ability in). Test:
+  `tools/headless/ssj_lock.txt` (self-checking, in `regfull.sh`). The unlock's place in the story is Ryan's, later.
+
 ## 10. State at the end of the team round (2026-11-01)
 
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM
