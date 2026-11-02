@@ -1,5 +1,6 @@
 # Super Saiyan Hercule: the stock Super Saiyans' rules for him, as player 2 and player 1, and a save and reload
-# while transformed (docs/testing.md "Super Saiyan Hercule"; docs/engine.md "Super Saiyan transformation").
+# while transformed (docs/testing.md "Super Saiyan Hercule"; docs/engine.md "Super Saiyan transformation"). Since the
+# lock (2026-11-02, ssj.c SSJ_HERCULE_UNLOCK 0) a load turns Hercule back and gives him Megaton Punch over the ability.
 # From the debug-menu state of a DEBUG_MENU=1 build:
 #   python tools/headless/st_test.py tools/headless/ssj_hercule.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
 # The town (Map Test 7, zone 2 area 1): player 1 Piccolo (slot 1), player 2 Hercule (slot 5). Hercule's entry
@@ -256,7 +257,7 @@ echo EXPECT 0203f084: 14
 peek8 0x0203F084
 peek PARTY 3
 shot sh_14_saved
-echo === C3 a soft reset (A+B+Select+Start, which clears our RAM as a power cycle does), Select Game, load (B: two players, then A): player 1 Hercule stays a Super Saiyan, player 2's Goku is turned back
+echo === C3 a soft reset (A+B+Select+Start, which clears our RAM as a power cycle does), Select Game, load (B: two players, then A): player 1 Hercule is turned back by the lock (ssj.c hercule_lock, 2026-11-02: Megaton Punch over the ability too), player 2's Goku is turned back
 key 0xF 6
 frames 400
 key 8 6
@@ -280,21 +281,23 @@ findent PL 0x08025604
 echo EXPECT 0203f000: \w{6}05
 peek PARTY 1
 peek8 0x0203FF84
-echo EXPECT 0203f0a0: 16
+echo EXPECT 0203f0a0: 15
 peek8 0x0203F0A0
 echo EXPECT 0203f084: 13
 peek8 0x0203F084
-echo EXPECT \w+: {ssj_record}
+echo EXPECT \w+: {herc_record}
 peek PL+0x48
-echo EXPECT \w+: 030021ec
+echo EXPECT \w+: 030021e0
 peek PL+0x180
+echo EXPECT \w+: 11100f0e
+peek 0x0203F0B0 1
 shot sh_15_loaded
-echo --- the drain goes on after the load
+echo --- no drain after the load (not transformed)
 poke16 0x0203F09C 100
 frames 200
-echo EXPECT 0203f09c: 005[9ab]
+echo EXPECT 0203f09c: 006[4-9a-f]
 peek16 0x0203F09C
-echo --- and the ability turns him back
+echo --- and B is Megaton Punch now, not the transformation
 poke32 0x0300208C 1
 key 2 4
 frames 100
