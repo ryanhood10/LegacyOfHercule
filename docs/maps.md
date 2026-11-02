@@ -174,8 +174,12 @@ list behind a condition (story-dependent exits).
 
 **Flight spot to the world map:** a script trigger (create 0x0800C2C3, activation 0x0800D839) whose
 script is `PushByte 43; PlayMusic; PushMultiVarint [6, 99, 1, x, y]; WarpToMapWithEntities` (x, y =
-where the flyer appears on the world map, e.g. (1632, 1592) at Gohan's house). There is no sign
-graphic in the map data; the spot is a plain rect. The world map (zone 6 area 99, affine) has a
+where the flyer appears on the world map, e.g. (1632, 1592) at Gohan's house). The board you walk up
+to is a **decoration** (`{x, y, x + 32, y + 32, 0x2000, 0x8000, frame, 0x28, 1}`, 8bpp, 32 x 32), not part of the trigger: the
+rect sits round it at (x - 13, y - 7), 47 x 55 (West City's (342, 1216), rect (329, 1209)-(376, 1264)), its post is 16 x 8
+blocked in the walk bitmap at (x + 10, y + 24), and a light-blue cloud is usually painted under it. The cheapest
+sheet holding only the sign is zone 7 area 1's (1 KB, frame 0); a map spec adds it with `"decorations"` (`tools/mapbuild.py`,
+`data/maps/papaya_plaza.json`). The world map (zone 6 area 99, affine) has a
 pair of triggers per landing site: a script trigger warping to the town and a 0x0801A6B3 banner.
 
 **Level gates** (+0x20, 8 bytes): u16 x, u16 y (where the number is drawn), u8 barrier (the

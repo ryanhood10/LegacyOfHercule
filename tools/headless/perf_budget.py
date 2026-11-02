@@ -96,7 +96,7 @@ def arrival(rom, state, outdir, room):
         ln, r = perf_line(out, f"wc_first.{mode}")
         print(ln)
         check(bool(r) and int(r["drop"]) <= 1 and int(r["cut"]) == 0 and int(r["oam"]) < 128,
-              f"West City's arrival {mode}: the first line's box takes nobody (drop {r.get('drop')}: the map's name leaving; 22 before the fix; {r.get('oam')} OBJs)")
+              f"West City's arrival {mode}: the first line's box takes nobody (drop {r.get('drop')}: the map's name leaving; 20 in co-op before the fix; {r.get('oam')} OBJs)")
         m = re.search(r"^0*%x: (\w{8}) (\w{8})" % room, out, re.M)
         taken = (int(m.group(1), 16) >> 24) if m else -1
         check(taken == 0, f"West City's arrival {mode}: on-screen bodies taken {taken}")
@@ -121,6 +121,7 @@ def forced(rom, state, outdir, room):
     check(1 <= taken <= 12, f"forced eviction: {taken} on-screen bodies taken, not the whole crowd")
     listed = re.findall(r"vt (\w{8})", out[out.index("perf forced"):out.index("\nafter")] if "\nafter" in out else "")
     check("08025604" in listed and "0203fe00" in listed, "forced eviction: both players stay listed through the box")
+    check("08025974" in listed or "08024ee4" not in listed, "forced eviction: no decoration left without its sheet (it would show the box's tiles)")
     after = re.search(r"^after\s*\n03001124: (\w{8})", out, re.M)
     check(bool(after) and int(after.group(1), 16) >= 20, f"forced eviction: they are all back after the box ({after.group(1) if after else '?'} listed)")
     check("TIMEOUT" not in out and "CRASH" not in out, "forced eviction: no crash")

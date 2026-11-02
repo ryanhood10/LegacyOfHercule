@@ -4,6 +4,16 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Co-op's lag and West City's vanishing, measured and fixed; the plaza's flight sign** (`pp2-perf`, `docs/perfect-pass.md`
+  11.4, 11.6). A frame-time and OAM probe in the runner (`perf`, `perflog`, `oam`, `vram all`, `ptrace`; `perf_probe.py`;
+  `docs/testing.md` "Frame time and OAM probe"). The lag was one function: `actors_tick`, the duplicate-NPC check, tested
+  all 29 display rows per NPC per player every frame: half the frame in a town, twice over with player 2. West City, the
+  street and the waiting room in co-op ran at 150 % of a frame, 30 fps; now 33-45 %, 60 fps. The vanishing was not the
+  sprite limit (22 OBJs of 128 at most): a text box wants 0x3800 bytes of OBJ VRAM in one piece, player 2's body cut the free
+  run in two, and the stock's eviction then takes everything on screen for that line (`docs/engine.md` "OBJ VRAM and
+  the text box"). His body and panel now sit at the run's low end; `objroom.c` replaces the eviction's last round with one
+  body at a time, the players last. The plaza has the stock sign on its cloud (decoration 0 of zone 7 area 1, its post
+  solid). Test: `tools/headless/perf_budget.py` (self-checking, in `regfull.sh`).
 - **Super Saiyan Hercule locked off** (Ryan: not an option yet, much later): `ssj.c` `SSJ_HERCULE_UNLOCK` 0, CoopCall 4
   a no-op, saves holding the ability get Megaton Punch back at the load (`hercule_lock`, `ssj_lock.txt`).
 - **No triceratops in the corn maze with two players** (Ryan, in it with his brother: the twins blocked the one-enemy-wide

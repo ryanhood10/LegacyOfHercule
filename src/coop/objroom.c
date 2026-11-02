@@ -142,11 +142,18 @@ static void round15(EntityList *l, int need) {
         Entity_Suspend(l, e);
         obj_room.taken++;
     }
-    for (int i = l->count - 1; i >= 0 && !room_for(l, need); i--) {   // what is not a body: the decorations
+    // What is not a body: the decorations, together. The first holds the sheet's one block (its slot 7 frees it), the
+    // others draw from it with nothing of their own to give back: one left behind would show whatever moves in there.
+    for (int i = l->count - 1; i >= 0 && !room_for(l, need); i--) {
         if (i >= l->count) continue;
         e = l->items[i];
-        if (e == p1 || e == p2 || (u32)vslot(e, 7) == NO_VRAM_SLOT7 || answer(e, 15) != 2) continue;
+        if (e == p1 || e == p2 || (u32)vslot(e, 6) == BODY_SLOT6 || (u32)vslot(e, 7) == NO_VRAM_SLOT7 || answer(e, 15) != 2) continue;
+        for (int k = l->count - 1; k >= 0; k--) {
+            Entity *d = l->items[k];
+            if (d != e && (u32)vslot(d, 7) == NO_VRAM_SLOT7 && answer(d, 15) == 2) Entity_Suspend(l, d);
+        }
         Entity_Suspend(l, e);
+        i = l->count;
     }
     if (p2 && listed(l, p2) && !room_for(l, need)) { Entity_Suspend(l, p2); obj_room.taken++; }
     if (p1 && listed(l, p1) && !room_for(l, need)) { Entity_Suspend(l, p1); obj_room.taken++; }

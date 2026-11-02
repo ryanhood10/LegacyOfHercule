@@ -12,6 +12,7 @@ inspection goes through the GDB stub.
 | section | use it for |
 |---|---|
 | Full regression | before merging or handing Ryan a build: every chapter and tournament script, both modes, one command |
+| Frame time and OAM probe | lag, frame budget, OBJ count, what vanished and why, which function eats the frame: alone vs with player 2, on any map |
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
@@ -30,7 +31,7 @@ inspection goes through the GDB stub.
 | Tournament fighters (art-new) | the five new tournament bodies as opponents on AI set 21 and as player 1's body, portrait 127 |
 | New maps (zone 15) | building and warping to the new maps |
 | Arctic route (headless) | the post-game arctic: world-map landing and star, every exit, the save pad, OBJ VRAM |
-| Tournament grounds (headless) | Papaya Island: the world-map landing, the welcome, both pads, every exit, the board, the director, the waiting room's fighters |
+| Tournament grounds (headless) | Papaya Island: the world-map landing, the welcome, both pads, every exit, the flight sign, the board, the director, the waiting room's fighters |
 | Tournament art (Buu's Fury imports) | any new fighter sprite: spawn it as an opponent from a RAM record, fight, hit test, OBJ VRAM with giants |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
@@ -55,6 +56,42 @@ Out: `build/<dir>/hl/reg.log` (a `## name` block per script with its echoes, map
 TIMEOUT / CRASH / FAIL line (the script greps them at the end; 37 blocks on 2026-10-25, 42 on 2026-11-01 with `wm_landmark`, 50 later that day, `softreset` the last). A new script goes into its
 list. Known flaky: `tny_artbuu`'s hit test (one fighter may take no punch). Tests that depend on a seeded draw break
 when code adds `rnd()` calls in the engine (2026-10-25: the Rumble announcer's variety now uses the frame counter).
+
+## Frame time and OAM probe (headless, 2026-11-02, `docs/perfect-pass.md` 11.4, 11.6)
+
+Reads the emulated machine's own clock, so the numbers are what any mGBA runs the game at. mGBA caps at 60 fps: a frame
+that does not reach the wait before the next VBlank is a lagged one and the game drops to 30 fps. Budget: 280896 cycles a
+frame. What the host adds (Parsec, the Lua pad script, its own speed) is not in these numbers.
+
+```
+make BUILD=build/<dir> DEBUG_MENU=1
+python tools/headless/st_test.py tools/headless/mkmenu.txt build/<dir>/log2-coop.gba --out build/<dir>/hl
+python tools/headless/perf_budget.py build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl     # self-checking, FAIL on a miss (in regfull.sh)
+ST_HEADLESS=/root/st_perf python tools/headless/perf_probe.py table build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl [--spots wc_first,wc_talk]   # every spot alone and in co-op, as a table
+python tools/headless/perf_probe.py hot TRACE build/<dir>/log2-coop.gba --top 25    # a `ptrace` rolled up by function
+```
+
+`perf_budget.py` builds its own runner (`/root/st_perf`, from `st_headless.c`, when older than the source); the `perf`
+commands are not in a `/root/st_headless` built before them. From Git Bash set `MSYS_NO_PATHCONV=1` before
+`ST_HEADLESS=/root/...`, or the path gets rewritten. The spots are `tools/headless/perf_spots.txt` (runner scripts with
+`{P2}` for `p2 0` / `p2 off`).
+
+Runner commands (`st_headless.c`): `perf N LABEL`; `perfstart` / `perfstop LABEL` around any commands (a scene with A
+mashed); `perflog FILE` / `perflog off` one line per frame (`frame busy vcount objs linecost cut ents`, `LAG` on a
+missed frame); `oam` the OBJs on screen; `vram [all]` OBJ VRAM's free space, with `all` every block in address order and
+its entity; `ptrace N FILE` the cycles per pc. To profile a spot: its script up to the `perf` line, then
+`ptrace 3000000 FILE` (about 40 frames), then `perf_probe.py hot`.
+
+A `perf` line: `frames` run, `ticks` (main-loop iterations, the runner hooks the Halt in the game's wait, swi at
+0x08020D6E), `lag` (VBlanks the main loop missed), `busy avg` / `max` (cycles from VBlank to that wait, VBlank handler
+included, and % of a frame), `oam max / avg` (OBJs hardware OAM showed, by mGBA's own culling rule), `shadow` (the fullest
+OAM shadow at the wait; 0 while a modal draws without the list), `line max` (the worst scanline's OBJ cycles against the
+hardware's 1210, 954 with H-blank free), `cut` (OBJs that limit cut), `ents max` and `drop` (the list's largest fall in
+one frame: a text box's eviction shows here, a map change too; 1 is the map's name leaving).
+
+The floor: the stock title screen runs 17 %, our empty map (zone 1 area 3, nothing on it) 30 % alone and 32 % in co-op
+(`light`), so the probe reads sense on a known-light map. Numbers per spot before and after the 2026-11-02 fix:
+`docs/perfect-pass.md` 11.6.
 
 ## Savestates
 
@@ -1329,7 +1366,7 @@ not work for this (the leash and the camera pull them back): move the box.
 
 `python tools/headless/st_expect.py tools/headless/wc_arrival.txt ...`: Map Test 65 with the chapter-1 flags, Gohan
 player 1 and player 2 in, the test warp to the landing (352, 1248) and a step down into trigger 1 (Goku's arrival).
-Both players hold up with A mashed through the scene; after it they are still on the landing's row (y 0x4C0-0x4FF).
+Both players hold up with A mashed through the scene; after it they are still near the landing's row (y 0x4A0-0x4FF: at 60 fps, since the frame-time fix, they walk a little further in the frames the script leaves after the scene).
 Before the fix both ended at y 1077: the scene ends with the view panned up to Piccolo, and while it glided back the
 leash snapped both players into it, past the parade float. The leash now moves nobody more than 8 px a frame.
 
