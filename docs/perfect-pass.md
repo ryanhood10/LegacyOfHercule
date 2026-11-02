@@ -236,5 +236,5 @@ punctuation only); owner in brackets.
 All seven pieces merged into main and pushed; the full regression of the merged main (`build/main-final`, play ROM
 `build/main-final/play`) exits 0: 56 blocks, `ssj_hercule` 56/56, `softreset` 12/12, the prologue on the play ROM
 fine. Player 2's stock Transformation now changes his own slot (the story piece saw it turn player 1's before the ssj
-merge; `gohan_ssj1.txt` checks it). In `build/play` since 2026-11-01 09:08, the night's build (pickups, resting heals, the fade fix, the drop-ins asking) since 22:5x (ROM identical to the regressed one; drop-ins F1-F9 remade and checked; his save and the old states backed up as `backup/legacy-of-hercule.11010906.sav` and `backup/ss_11010906/`). Open: section 9's items, the
+merge; `gohan_ssj1.txt` checks it). In `build/play` since 2026-11-01 09:08, the night's build (pickups, resting heals, the fade fix, the drop-ins asking) since 23:47 (ROM identical to the regressed one; drop-ins F1-F9 remade and checked; his save and the old states backed up as `backup/legacy-of-hercule.11010906.sav` and `backup/ss_11010906/`). Open: section 9's items, the
 lead-made-player-1 choice, the two-player playtest (section 1).
