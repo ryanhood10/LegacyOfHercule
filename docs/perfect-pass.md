@@ -198,8 +198,18 @@ punctuation only); owner in brackets.
   from the map header's +0x08 flags, 1 on field maps, 0 in towns: `docs/maps.md`), and the switch is **0 on Papaya
   Island's grounds** (zone 15 areas 11-15: beach, street, courtyard, waiting room, infirmary; headless from Ryan's save,
   which sits in the waiting room) and 1 in the ring (area 16) and on every field map: the stock town rule, no
-  fighting in town. So if they were on the island (his save's own map) after saving at its pad, that is it, by
-  design; to confirm with Ryan where it happened and whether it came back off the island.
+  fighting in town. Ryan: they were elsewhere, "fighting enemies on the way to meet Future Trunks and Frieza's
+  arrival" (zone 3, from the F1 pad), "if you don't find the bug it's okay". Not reproduced headless from the new F1
+  with two players in (Krillin player 1, Gohan player 2): both players' blasts fire on the route's maps and after a
+  save at the pad with player 2 in (`build/go/ch1.txt`, `abx2.txt`); the switch stays 1. One plausible cause for next
+  time: **L (LB / LT on the pads) changes the selected move**, and a move costing more EP than the bar holds does
+  nothing on B; the icon by the EP bar shows which move is selected. Left open.
+- **Found on the way (2026-11-01 night):** the drop-ins F1, F2 and F8 were saved answered "1 Player" (from his save),
+  so a second pad could not join them (the other six had never been asked and let the pad decide): `dropins.py` now
+  saves every state with the question armed and unanswered, so each F-key asks on load (`docs/testing.md` "Drop-in
+  savestates"). Also: player 2 as Gohan (slot 0, row 1) using the Transformation (ability 12, his list's index 2,
+  reachable only by poke: L never selects it) jumps to garbage; and player 2's L did not cycle his ability in the
+  headless run (`abx2.txt`: Gohan's index stayed 3) while player 1's did: to check in real mGBA before chasing.
 - **Fixed (2026-11-01, branch `pp-reset`): a soft reset, then loading a save, crashed** a few frames after the load (a
   jump to garbage from `0x080109AC`); found by the ssj piece. The cause: the soft reset keeps EWRAM, so `coop.p2`
   still pointed at the old player 2's entity (any game where player 2 was in at the reset), no new player 2 was built

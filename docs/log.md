@@ -4,6 +4,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-01
 
+- **Drop-ins ask "How many players?" on load:** F1, F2 and F8 were saved answered "1 Player" and kept a second pad out;
+  `dropins.py` now arms the question (the `players` magic, mode 0) in every state. The ki-blast report from the two-player
+  session stayed unreproduced (`docs/perfect-pass.md` 9: both players blast on the chapter-1 route and after a pad save;
+  the island's grounds are towns, where the stock rule switches abilities off).
 - **Ryan's first two-player session (over Parsec; `p2_keys.py` reads his brother's pad):** player 2 could not take
   dropped food: the stock touch-box scan only tests player 1 (`docs/engine.md` "Dropped items and touch boxes");
   `src/coop/pickup.c` fires an item box for player 2 with the active slot swapped (`pickup.txt`). Resting heals built

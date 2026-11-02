@@ -173,6 +173,23 @@ def boost(name):
 boost("f8")
 boost("f9")
 
+# Every state asks "How many players?" when it loads (players.c: the magic word with mode 0 = armed, not answered;
+# `players` from the play ROM's coop.sym). F1, F2 and F8 come from the save answered "1 Player", which kept a second
+# pad out (Ryan's first two-player session, 2026-11-01); the Map Test states had never been asked (the pad decided).
+def players_addr():
+    sym = os.path.join(os.path.dirname(play), "coop.sym")
+    if os.path.exists(sym):
+        for line in open(sym):
+            m = re.match(r"^([0-9a-f]{8}) \w players$", line)
+            if m:
+                return int(m.group(1), 16)
+    return 0x0203FA44
+
+
+PLAYERS = players_addr()
+for i in range(1, 10):
+    run(f"f{i}_ask", play, f"load {W(f'f{i}.ss')}\npoke32 0x{PLAYERS:08X} 0x91A7E250\npoke32 0x{PLAYERS + 4:08X} 0\nframes 1\nssave {W(f'f{i}.ss')}\n")
+
 base = os.path.splitext(os.path.basename(play))[0]
 for i in range(1, 10):
     shutil.copy(os.path.join(work, f"f{i}.ss"), os.path.join(out, f"{base}.ss{i}"))

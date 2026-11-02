@@ -1255,7 +1255,9 @@ and the Games' last "Journal Updated!" holds it until A), and F5 makes the wishe
 is the real one (Goku's halo, Super Saiyan 2 Gohan). All are re-saved on the play ROM. Each is saved 300 frames after its warp or Map Test, with the map fully loaded (Ryan, 2026-10-21: F7 saved
 30 frames after its warp opened mid-load on the Map Test spot and stayed there in mGBA; check a new one with `load`, `frames 2`, `map`: real player coordinates, not -1,-1). Every one gets the story
 before the ten-day wait as done (`EARLY` in dropins.py, worked out from the world map's on-load: no stale stars,
-the Lookout landing open) and flag 400 (Bulma's news: the Broly ship waits in the backyard). The states hold no cartridge save, so loading one leaves the .sav alone (an
+the Lookout landing open) and flag 400 (Bulma's news: the Broly ship waits in the backyard). Since 2026-11-01 (night) every state is saved with the players question armed and unanswered (`players` from the play
+ROM's `coop.sym`: the magic word, mode 0), so "How many players?" shows as soon as a drop-in loads: F1, F2 and F8 were
+made from his save answered "1 Player", which kept a second pad out (Ryan's first two-player session). The states hold no cartridge save, so loading one leaves the .sav alone (an
 in-game save inside one still writes it). Savestates break with every rebuild: rerun after each, with mGBA closed.
 `build/play/DROP-INS.txt` lists the keys for Ryan.
 
