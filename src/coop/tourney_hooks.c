@@ -92,6 +92,7 @@ void tny_test_cmd(u32 cmd, u32 arg, u32 arg2) {
     else if (cmd == 33) tny_combo_run_test(cmd, arg, arg2);
     else if (cmd == 37) tny_caption_test(cmd, arg, arg2);      // tny_caption.c: the Rumble announcer's calls (24.1)
     else if (cmd == 38) tny_engine_test(cmd, arg, arg2);       // the engine's perfecting-pass checks (24.4, 24.5, 24.7)
+    else if (cmd == 40) tny_engine_test(cmd, arg, arg2);       // the fights decide themselves (tny_coop.txt)
 }
 
 void tny_frame(void) {

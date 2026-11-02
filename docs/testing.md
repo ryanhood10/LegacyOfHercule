@@ -17,6 +17,7 @@ inspection goes through the GDB stub.
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
+| Tournament in co-op | every tournament with player 2 in, the director and picks by pad presses, to the record and the prize |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
 | Team combos: the leftovers | the kits' own moves in their colours filmed, Android 16 and Super 13 held as bystanders, Cell Jr.'s copies' facings |
@@ -1182,6 +1183,8 @@ big ones, a lead to look at, not a verdict: the camera scrolling shows as change
 minute; four run side by side. The phase numbers: 1 director, 2 to the ring, 3 next, 4 fight, 5 the end, 6 the duel,
 7 trophy, 8 prize, 9 challenge, 10 intro, 11 restage, 12 exit, 13 exiting.
 Run 2026-10-25 (before / after `tny-polish2`): `build/polish2/flow/` and `build/polish2/flow2/` (not committed).
+`--pads KEYS` (2026-11-02) talks to him and presses the menus by pad, `KEYS` a comma list of `pad:mask`, one every 80 frames;
+`--early` the party of an early save (Gohan and Krillin, Krillin player 1).
 
 ## Tournament perfecting pass: captions, the announcer's walks, the turn change, walking speed (headless, 2026-11-01, branch `pp-tny`)
 
@@ -1218,6 +1221,27 @@ is up, or `stepz 0x0203FD08 10` first (a line holds the command until A closes i
 The films of 24.4 (`tny_flow.py` 1 v 1, Rumble and co-op): `build/pp-tny/flow/` (not committed): the announcer walks
 right along the ring's top edge after "Begin!" while the fight starts, comes back from the view's right edge in the
 end's pause, and leaves the duel final the same way.
+
+## Tournament in co-op (headless, 2026-11-02, branch `pp2-tny`)
+
+```
+python tools/headless/tny_coop_gen.py     # the script is generated; rerun after changing the generator
+python tools/headless/st_expect.py tools/headless/tny_coop.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
+
+Self-checking, in `regfull.sh`; about 5 minutes. Every menu and pick is a pad press (`key` for player 1, `p2` for player 2:
+**`p2 2` is what his brother's pad's labelled A sends**, `docs/perfect-pass.md` 11.5); test command 40 only decides the fights
+(after 30 frames, the listed ones lost), through test command 22's own ways. Blocks: 1 an early save's party (Gohan and
+Krillin only, one tier): 2 v 2, player 2 picks with B, the bracket's banner, the whole tournament, the record, the prize, own
+characters back; 2 the way back (player 1's B on player 2's screen, on his own, on the list; player 2's B on a list);
+3 both players down by real hits, no game over; 3b player 1 down, player 2 wins alone; 4 the Rumble, a co-op 1 v 1 with
+player 1 out early, one to the duel final won by player 2; 4b tournament playables picked on the screens' second tab by both;
+5 a two-player game over with player 1 down first; 6 every tier x every division. On the code before it block 1 ends on map
+15 / 15 with player 2's pick empty, Ryan's report. `stepz`'s limit counts steps of 100 frames, not frames.
+
+To replay a real save as a player would: copy a `.sav` next to the build, `cart /mnt/f/.../x.sav`, `frames 900`, Start, A, A,
+then `p2 0` and B at "How many players?". `tny_flow.py --pads 1:0x80,1:1,1:1,2:2 --early --p2` films the same by pad (each
+`pad:mask` one press). Keep `find UI 0x7A1C0002` for the ui's state: `UI+141` the last banner's two seats.
 
 ## Reading screenshots
 

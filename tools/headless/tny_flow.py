@@ -10,7 +10,10 @@ every --win frames (a no-op outside a fight), so fights last up to that long.
 
 usage: python tools/headless/tny_flow.py ROM MENU_SS OUTDIR [--div 0|1|2] [--tier 0-4] [--full] [--p2] [--pick1 N]
        [--pick2 N] [--seed 42] [--len 6000] [--every 4] [--a 60] [--win 240] [--name flow] [--director] [--lose]
-       [--unlock 9,8]
+       [--unlock 9,8] [--pads KEYS] [--early]
+--pads (docs/testing.md "Tournament flow films"): the director by pad presses only, implies --director: KEYS is a comma list
+of <pad>:<mask> presses, one every 60 frames after the talk's two lines, e.g. "1:0x80,1:1,1:1,2:1" = player 1 Down, A
+(2 v 2), A (his pick), player 2 A (his). --early: the party of an early save, Gohan and Krillin only, Krillin player 1.
 Out: OUTDIR/<name>_NN.png (sheets of 48 shots, each labelled "index frame phase pres diff"), OUTDIR/<name>.txt (the timeline:
 every shot's phase and its difference to the shot before; JUMP marks a one-shot spike, CUT a big change).
 """
@@ -43,6 +46,12 @@ def main():
     L = ["p2 off", "maptest 13", "frames 300"]
     if p2:
         L += ["p2 0", "frames 200"]
+    pads = arg("--pads", "")
+    if "--early" in sys.argv:          # the entries' flags: only slots 0 and 6 in the party; player 1 on slot 6
+        for slot in range(9):
+            if slot not in (0, 6):
+                L += [f"poke32 {0x0203F00C + slot * 0x1C + 0x14:#x} 0"]
+        L += ["poke8 0x0203F000 6", "poke8 0x0203FF84 0", "frames 10"]
     L += ["poke32 0x0203FD0C 0", "poke32 0x0203FD54 2", "poke32 0x0203FD08 24", "frames 10",
           "poke32 0x0203FD0C 0", "poke32 0x0203FD08 23", "frames 10",
           f"poke32 0x0203FD0C {seed}", "poke32 0x0203FD54 0", "poke32 0x0203FD08 21", "frames 10",
@@ -50,7 +59,15 @@ def main():
           "poke32 0x0203FD0C 0x0F0F", "poke32 0x0203FD54 0x013200A8", "poke32 0x0203FD08 5", "frames 300"]
     for fid in [int(v, 0) for v in arg("--unlock", "").split(",") if v]:   # record bits (test command 23 op 1)
         L += ["poke32 0x0203FD0C 1", f"poke32 0x0203FD54 {fid}", "poke32 0x0203FD08 23", "frames 10"]
-    if "--director" in sys.argv:
+    if pads:
+        L += ["key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80"]
+        for press in pads.split(","):
+            pad, mask = press.split(":")
+            if pad == "1":
+                L += [f"key {mask} 6", "frames 80"]
+            else:
+                L += [f"p2 {mask}", "frames 4", "p2 0", "frames 80"]
+    elif "--director" in sys.argv:
         L += ["key 0x80 6", "key 1 10"]
     else:
         L += [f"poke32 0x0203FD0C {div | full << 4 | tier << 8:#x}", f"poke32 0x0203FD54 {pick1 | pick2 << 8:#x}",

@@ -112,6 +112,23 @@ static void get_up(int k) {
     sfx(SFX_UP);
 }
 
+// A tournament fight has ended (tny_engine.c end_show): nobody lies waiting for a partner any more. Up on the spot, no
+// sound, the engine's poses take the bodies from here (a body left down kept player 1's pad cut under the result line)
+void revive_fight_over(void) {
+    if (rv.magic != REVIVE_MAGIC) return;
+    for (int k = 0; k < 2; k++) {
+        Entity *e = rv.body[k];
+        if (!e) continue;
+        CharacterEntry *c = entry(k);
+        if (!c->hp) c->hp = 1;
+        rv.body[k] = 0;
+        rv.hold[k] = 0;
+        set_tint(e, 0);
+        Entity_SetAnimation(e, 0);
+    }
+    if (rv.glow) { Arena_Free(rv.glow); rv.glow = 0; }
+}
+
 int revive_hit(Entity *e, u8 *hit, int k) {
     init();
     if (rv.body[k] == e) return 1;                 // the body takes no more hits
@@ -170,7 +187,10 @@ void revive_input(u16 *p1, u16 *p2) {
     u16 *pad[2] = { p1, p2 };
     for (int k = 0; k < 2; k++) {
         rv.reaching[k] = rv.a_held[k] = 0;
-        if (rv.body[k]) { *pad[k] = 0; continue; }             // a downed player's pad does nothing
+        // a downed player's pad does nothing, but for a line that has come up over him (dialogue is player 1's A, and no
+        // list update runs under it to get him up): the game over's own "You have died!" with player 1 down when it came,
+        // a tournament's result line, hung the game
+        if (rv.body[k] && !(k == 0 && (rv.over || SCENE_RUNNING))) { *pad[k] = 0; continue; }
         Entity *me = player(k), *body = rv.body[!k];
         if (!me || !body || rv.over || SCENE_RUNNING) continue;
         if (k == 0 && !p1_in_play()) continue;               // a menu (pause, save pad): its A stays its own

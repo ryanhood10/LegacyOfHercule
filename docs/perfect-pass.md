@@ -408,6 +408,41 @@ check (the test list in `docs/testing.md` "Tournament"). The selection screen's 
 (`tny_ui.c` -> `tny_engine.c`); a wait for "both players ready" or a pad check that only sees player 1 would hang
 exactly as described (Q7 narrows it: did the screen stay on the selection, go black, or return to the room?).
 
+**Found and built (2026-11-02, branch `pp2-tny`).** Reproduced on his own ROM, from his own save (a copy of
+`build/play/legacy-of-hercule.sav`: the waiting room's pad, Gohan and Krillin, Rookie only) and from F9, by pad presses:
+director, 2 v 2 or the Rumble, both picks with the GBA's **A**: it starts, every time, on the unchanged code; the engine
+never failed. The only way from both select screens back to the waiting room is `tny_ui_select` answering "backed out",
+player 2's **B**, and `step_director` turned any back-out into "the tournament is over" (P_IDLE, the curtain opens on the
+room). `tools/p2_keys.py`'s default has an Xbox pad's labelled **A** send the GBA's **B** (B / Y = A, A / X = B, by
+position), and Parsec's guest pad is exactly that pad; the screen's bar said "A pick". So his brother pressed A to pick and
+backed the whole tournament out, on any division; the tests all press the GBA's A. That is the cause as far as a headless
+run can tell (block 1 of `tny_coop.txt` on the old code ends on map 15 / 15 with player 2's pick empty, his words): **only
+Ryan can confirm which button his brother pressed.** Our calls (he was away):
+- **Player 2's select screen takes both face buttons as "pick"** (the bar says "A/B pick"); **player 1's B** is the way
+  back from it, to his own pick. That also gets them out when player 2's pad has gone (the screen used to answer only to it).
+- **Menus go back one step:** player 1's B on his pick -> the division (or Quick / Full), the division -> the tier, the
+  first list -> out, quietly, still on the waiting room. On the lists only player 1's B counts; player 2's does nothing.
+- **`p2_keys.py`'s mapping stays** (his brother has played two sessions on it). `--swap-ab` is there if Ryan wants the
+  labels to match; the agency piece's A at pads meets the same question.
+
+Running every division to the end with player 2 in found four more, all fixed:
+- **Both players down in a 2 v 2 or a Rumble was a stock game over**, not a lost match: `tny_ko_check` asked
+  `g_PlayerObject` for the partner, and during an enemy's update that is the nearer player (`entities.c`), so with player 1
+  down it looked at player 2 himself. It now reads the revive's own record.
+- **A body down when a line came up hung the game:** a downed player 1's pad is cut (`revive_input`), and no list update
+  runs under a line to get him up. So "your team wins" with player 1 down never closed, nor did a lost match. The fight's end
+  now gets the bodies up (`revive_fight_over`, the poses take over) and a line always reaches player 1's pad.
+- **The same hang outside the tournament:** every two-player game over with player 1 down first stopped on "You have
+  died!" for good. Not in Ryan's notes yet; `revive.txt` stopped at the line.
+- **The 2 v 2's bracket screen read teams as single seats:** its match was the two partners ("YAMU vs SPOPOVICH", the
+  boxes on them) and the results landed on the wrong seats. It now draws teams (`docs/tournament.md` 13b).
+- A mashed A on the way out behind the curtain talked to the director again in the dark; it now waits for the curtain.
+
+Test: `tools/headless/tny_coop.txt` (`docs/testing.md` "Tournament in co-op"), all 15 tournaments by pad presses with player 2
+in. **Only a real two-player session can judge:** that the buttons now feel right on his brother's pad, and whether real fights
+at Rookie are winnable by an early pair (a dumb two-pad bot lost its first 2 v 2 on his save, and got the lost-match
+line and the room back with both healed, no game over).
+
 **Plan.** Reproduce headless first: from F9 (every tier open) with `p2 0`, the director, 2 v 2, both picks, A: where
 does it stop (a `tny_flow.py` film of it); then the Rumble. Fix the hand-off; then run every division **with player 2
 in** end to end (the whole bracket, the record, the reload), the Rumble, and the 2 v 2 with the team combos, as new

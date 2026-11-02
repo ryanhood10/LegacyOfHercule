@@ -638,7 +638,9 @@ static void choose_step(Ui *u) {
         choose_row(u, c, c->cur);
     }
     if (u->keys & KEY_A) { ui_sfx(UI_SFX_OK); c->result = c->cur; ui_leave(u); }
-    else if (u->keys & KEY_B) { ui_sfx(UI_SFX_BACK); c->result = -1; ui_leave(u); }
+    // back is player 1's alone: player 2's pad may have its A and B the other way round (p2_keys.py's default), so his
+    // pad's "A" would take the whole menu away (docs/perfect-pass.md 11.5)
+    else if ((u->keys & KEY_B) && (g_InputSystem->pressed & KEY_B)) { ui_sfx(UI_SFX_BACK); c->result = -1; ui_leave(u); }
 }
 
 int tny_ui_choose(const char *title, const char *const *lines, int n) {

@@ -839,6 +839,21 @@ once per draw, `(1)` before each later match and at the end; the grounds' direct
 `.tny.eng` 0x21C of its 0x240 (since the polish). The walk-in, the end poses and the announcer in the ring came with the
 polish (section 14); the Rumble's NPC-vs-NPC fighting is the moves piece's.
 
+### 13b. The tournament in co-op (2026-11-02, branch `pp2-tny`, `docs/perfect-pass.md` 11.5)
+
+Replaces "B anywhere ends it quietly" in step 1 above. `director_menus` runs the choices as stages: tier, division, Quick /
+Full, player 1's pick, player 2's pick; a back-out goes one stage back and only the first list's leaves. Player 2's select
+answers A and B alike as "pick" (`p2_keys.py` sends the GBA's B for an Xbox pad's labelled A), player 1's B on it goes
+back to his own pick; on the lists only player 1's B counts.
+
+The 2 v 2 bracket screen (`tny_ui_bracket.c`, `is_team`): the engine's unit is a team, seats 2k and 2k + 1, `rounds` 2,
+`winner[r][m]` the winning team's first seat. Both seats of a team join with one line, move together (level 1 one above the
+other in the inner column, the champions side by side at the top), both grey out, the boxes and the banner name both
+("YAMU & SPOPOVICH vs KRILLIN & GOHAN"), the title says "2 v 2".
+
+The end of a fight in co-op: `tny_ko_check` asks the revive's `rv.body[]`, never `g_PlayerObject` (the nearer player inside
+an enemy's update). `end_show` calls `revive_fight_over` first: nobody stays "down" under the result line.
+
 ## 14. The polish (built 2026-10-25, branch `tny-polish`)
 
 The engine's open items: `src/coop/tny_engine.c` (presentation, alternatives, 16 / Super 13), `src/coop/super13.c` (his
