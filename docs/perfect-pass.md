@@ -319,13 +319,14 @@ co-op). Using a ki move: every ability's on_use spends EP (the stock ones, Hercu
 drain), so "used a ki move" = the slot's EP went down by an ability (a hook in `use_ability`, `player.c`, for both
 players, plus the transformation's drain).
 
-**Plan.** `regen.c` gains a ki timer per player: reset by any ability use on that player's slot; after 60 s with none,
-EP rises 1 % of the maximum every 20 frames up to 1/3 of the maximum (the same shape as the heal; the rate is a
-macro, Q3), regardless of damage, hits or enemies near. The stock trickle for played slots goes (11.1c), or stays
+**Plan.** `regen.c` gains a ki timer per player: reset by any ability use on that player's slot; after **30 s** with
+none (Ryan's answer to Q3), EP rises to 1/3 of the maximum over **40 s** (a 120th of the maximum every 20 frames; the
+numbers are macros), regardless of damage, hits or enemies near. The stock trickle for played slots goes (11.1c), or stays
 underneath as the stock game's own crumb (Q3). Transformed players: the Super Saiyan class drains EP and runs instead
 of the base class, so no ki regeneration while transformed (stock).
 
-**Test.** `regen.txt`: EP at 0 in the town, 59 s: 0; at 61 s rising; caps at 1/3; a ki move resets it; a hit does not.
+**Test.** `regen.txt`: EP at 0 in the town, 29 s: 0; at 31 s rising; 1/3 at about 70 s and no more; a ki move resets
+it; a hit does not.
 
 ### 11.3 Player 2 is a co-pilot
 
@@ -454,18 +455,29 @@ nothing swapped into `build/play` until Ryan asks. The pieces touch different fi
 regen/ssj, hud/entities/tny_grounds + a map spec); the perf piece's entity-loop change is the one overlap with
 agency (both in `entities.c` / `player.c`): perf goes last or merges first.
 
-### 11.9 Questions for Ryan (before any code)
+### 11.9 Questions for Ryan (before any code) and his answers (2026-11-02)
 
 1. **Who healed to full:** which character was player 1 and which player 2 when player 1 filled up? (The code says the
    benched trickle feeds the non-active slot; the answer tells whether something else is going on.)
+   **Ryan: no idea, it's like every time.** So the regen piece starts by reproducing it headless with both pairings.
 2. **Benched party members:** the stock game heals the characters nobody is playing to full over time (5 % every
-   ~10 s). Keep that for them, or cap them at 2/3 too?
+   ~10 s). Keep that for them, or cap them at 2/3 too? **Ryan: keep stock, full.**
 3. **Ki rule's shape:** once the 60 s pass, how fast to 1/3 (the heal takes ~22 s from empty to 2/3; the same pace?),
-   and does the stock crumb (3 % every ~10 s) stay underneath or go entirely?
+   and does the stock crumb (3 % every ~10 s) stay underneath or go entirely? **Ryan: start it after 30 s (not 60)
+   and have it take 40 s to reach 1/3.** (The crumb: not answered; the plan drops it for played slots, so the only
+   ki back is his rule and the traditional ways. To confirm when the piece starts.)
 4. **Player 2 at a save pad:** "switch characters" there changes player 2's character (and saving saves), yes?
-5. **Exits:** when player 2 walks into a map exit, both go at once, exactly as when player 1 does?
+   **Ryan: yes, the same experience player 1 gets.**
+5. **Exits:** when player 2 walks into a map exit, both go at once, exactly as when player 1 does? **Ryan: yes.**
 6. **The island's lag:** on the host, did mGBA's title bar fps drop under 60, or was it the Parsec picture on his
-   brother's side that stuttered?
+   brother's side that stuttered? **Ryan: lag on his mGBA, he believes; not measured.** So the probe (11.4a) comes
+   first in the perf piece.
 7. **The tournament:** after both picks, did the screen stay on the selection, go black, or drop back to the waiting
-   room? And which characters were picked?
-8. **West City's vanishing:** did it happen playing alone through West City too, or only in co-op?
+   room? And which characters were picked? **Ryan: it just dropped back to the waiting room; Gohan and Krillin.** A
+   clean lead: the selection's end refused the pair or player 2's pick and returned to the room (Krillin is one of
+   our playables, Gohan the stock lead; a pair-table / roster lookup that does not know the pairing, or a check that
+   reads player 1's pick twice). The reproduction: F9, `p2 0`, the director, 2 v 2, Gohan and Krillin.
+8. **West City's vanishing:** did it happen playing alone through West City too, or only in co-op? **Ryan: only in
+   co-op.** Consistent with the sprite / frame budget (11.6).
+
+**State (2026-11-02):** every question answered; still planning only, nothing built, until Ryan says go.
