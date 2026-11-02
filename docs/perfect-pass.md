@@ -265,7 +265,7 @@ punctuation only); owner in brackets.
   does nothing, and a save that already holds the ability (18 in his list's slot 2, over Megaton Punch) or his
   transformed row gets Megaton Punch (16) and row 0x15 back at the load (`party_save.c` -> `hercule_lock`). The
   transformation itself stays built and tested (`ssj_hercule.txt` pokes the ability in). Test:
-  `tools/headless/ssj_lock.txt` (self-checking, in `regfull.sh`). The unlock's place in the story is Ryan's, later.
+  `tools/headless/ssj_lock.txt` (self-checking, in `regfull.sh`). The unlock's place in the story is Ryan's, later. Full regression on that build clean (61 blocks); in `build/play` since 2026-11-02 02:48.
 
 ## 10. State at the end of the team round (2026-11-01)
 
