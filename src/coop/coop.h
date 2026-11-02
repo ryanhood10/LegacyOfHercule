@@ -180,6 +180,7 @@ extern CoopExtra coop2;
 #define COOP_CMD_WAVE_CLEAR 13    // every standing enemy on the map takes a blow worth its HP (wave tests)
 #define COOP_CMD_WIN_STAT  16    // arg = stat index (tests): its fight is won once it stands and player 1 is free (cellgames.c)
 #define COOP_CMD_SOLO      15    // arg = solo mode (cellgames.c): 0 both, 1 player 1 alone, 2 player 2 alone
+#define COOP_CMD_REGEN     44    // arg = frames: both players' ki timers set to it, 0 = as if each had just used a ki move (regen.c)
 #define COOP_CMD_WAVE_SKIP  14    // arg = round: the next round announced is arg (wave tests; the training must be running)
 void coop_run_sequence(u32 *action, const void *seq);   // vmcall.c: queue a dialogue sequence (action = 2 live words)
 void wave_start(const void *seq, int first_round);
@@ -212,7 +213,9 @@ int is_coop_enemy(const Entity *e);
 int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
 void p2_pickup_tick(void);            // pickup.c: every input poll, player 2 takes dropped food he stands on
 void regen_hit(int k);                // regen.c: player k (0 / 1) was hit: no resting for a while
-void regen_tick(const Entity *e, CharacterEntry *c, int k);   // regen.c: every frame of the base class's update
+void regen_ki_used(int k);            // regen.c: player k spent ki on a move: the 30 s start over
+void regen_update(Entity *e);         // regen.c: the base classes' update (ssj.c): the stock trickle, resting heals, ki
+void regen_test(u32 frames);          // regen.c: test command 44
 Entity *nearest_player(const Entity *e, Entity *p1, Entity *p2);   // entities.c
 extern volatile u16 g_p2_remote;   // pinned at 0x0203FF00: emulator-side player-2 pad word
 #define PLAYER_VTABLE_SLOTS 48     // 0x08025604 .. 0x080256C4

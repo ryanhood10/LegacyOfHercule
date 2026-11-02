@@ -242,11 +242,11 @@ party member; regular Gohan (slot 0) stays selectable. `PARTY_SLOTS=9` (`docs/pa
 - **Growth** row 8 (`data/hercule.json`): str 600-800, pow 600-800, end 520-720 per level (/256), about
   twice Gohan's (318-518 / 302-502 / 256-456). At Map Test level 40 he joins with 88 / 117 / 74 against
   Gohan's 52 / 69 / 44 (the status bars are scaled to 100: "117/100"); HP 1314, EP 210.
-- **Display row 28**: a copy of Gohan's row 3 (behaviour class `0x030021E0`: combat bytes from his own
-  stats, regeneration) with sprite 58 and portraits 61 / 12; a base form linking to itself (flags 0). The
-  stock row 4 is not used: its class `0x030021E4` fixes the combat bytes at 100, regenerates the active
-  slot's HP and plays an aura loop, and as a transformed row (flags 3, links to row 2) it would be turned
-  back by `Party_DetransformOthers` whenever he is not player 1.
+- **Display row 28**: a copy of Gohan's row 3 with sprite 58, portraits 61 / 12 and the stock Super Saiyan 2
+  class `0x030021E4` (since the F4 batch: combat bytes fixed at 100, an aura loop; since 2026-11-02 its update is
+  `regen.c`'s rules, not the stock "active slot's HP + 1 % to full", `docs/perfect-pass.md` 11.1); a base form
+  linking to itself (flags 0). The stock row 4 itself is not used: as a transformed row (flags 3, links to row 2)
+  it would be turned back by `Party_DetransformOthers` whenever he is not player 1.
 - **Abilities**: Kamehameha (3), Masenko (4), **Super Saiyan 2 Burst (23)**, Ki Blast (2): Gohan's list
   without Transformation B (sprite 58 has no transformation groups). The Burst (`ssj2_burst_ready /
   _use`, `BURST_*` in the header): 10 EP, the ki pose (animation 5), one melee hit `{0, 4, 0x900}` over

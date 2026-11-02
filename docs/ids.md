@@ -30,7 +30,7 @@ Each piece takes numbers only from its own row. `ewram`, `partyram` and `coop2` 
 |---|---|---|---|---|
 | tny (`pp2-tny`, `log2-pp2-tny`) | - | - | 40-41 | `.tny.cp` at most 0x20 |
 | agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 | 33-34 | 42-43 | `.combo.ag` at most 0x40 |
-| regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 | `.combo.rg` grows to at most 0x10 |
+| regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 (used) | `.combo.rg` grows to at most 0x10 (**0xC used**: the resting and ki timers) |
 | perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 | `.combo.pf` at most 0x10 |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
@@ -192,13 +192,13 @@ leaves copies out of step: grep for the number before moving one.
 | 25 | Android 16 (player) | 175 | 26 / 121 | `spriteclone.py`, `a16player.h` |
 | 26 | haloed Goku (links 27 / 27, as 19 / 20 do) | 176 | Goku's (63 / 14) | `spriteclone.py` `--halo-sprites` |
 | 27 | haloed Super Saiyan Goku (flags 1, links 26 / 26) | 177 | SSJ Goku's (65 / 15) | `spriteclone.py` `--halo-sprites` |
-| 28 | Super Saiyan 2 Gohan (party slot 8): Gohan's row 3 (standard class), a base form linking to itself | 58 | 61 / 12 (the stock Super Saiyan 2 Gohan's, from row 4) | `spriteclone.py` `SSJ2_ROW`, `ssj2gohan.h` |
+| 28 | Super Saiyan 2 Gohan (party slot 8): Gohan's row 3 with row 4's class `0x030021E4` (slot 1 replaced by `regen.c`'s rules), a base form linking to itself | 58 | 61 / 12 (the stock Super Saiyan 2 Gohan's, from row 4) | `spriteclone.py` `SSJ2_ROW`, `ssj2gohan.h` |
 | 29-66 | the tournament's playables, one per `TR_BEAT` / `TR_CHALLENGER` fighter of `tourney_data.c` in `TFighterId` order (29 Yamcha ... 47 Super 13, 48-52 the Buu-saga five, 53-66 the challengers; the map `tny_play_rows`, `tny_play_row()`): Gohan's standard row, links to itself | the table's `play_sprite` (72 when that record is not in the build; 180 -> 243 with `BUU=0`) | the table's portrait (Hercule's 67 when 0) / Hercule's status portrait | `tools/tnyplayables.py` `display_rows` (via `spriteclone.py`), `tny_play.c` |
 | 67-79 | the playables' allocation, unused (Hercule's row as filler) | | | |
 | 80+ | free (raise the limit in `patch_rom.py`, an imm8, and `EXTRA_ROWS` in `spriteclone.py`) | | | |
 
-The stock row 4 (sprite 58, class `0x030021E4`: fixed combat bytes 100, HP regeneration, an aura sound
-loop; flags 3, links to row 2) stays the Cell Games' transformation (`SetCharacterTransformation 0, 58`
+The stock row 4 (sprite 58, class `0x030021E4`: fixed combat bytes 100, an aura sound loop; its stock HP
+regeneration replaced, `docs/perfect-pass.md` 11.1; flags 3, links to row 2) stays the Cell Games' transformation (`SetCharacterTransformation 0, 58`
 finds row 4 first).
 
 ## Portraits (`portrait_module`, stock words 0-118 copied; word id + 1)
@@ -320,6 +320,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 31 | TNY_TALK (dialogue, main) | the fighters' dialogue (`tny_talk.c`): `arg` = the opening side (fighter \| fighter << 8, 0xFF nobody), `arg2` = the answering side; `arg` bit 31: fighter `arg & 0xFF`'s win line instead (`tools/headless/tny_talk.txt`) |
 | 30 | TNY_GROUNDS | `arg` 0 the waiting room's real pool, 1 force the pool to the Rookie opponents (stand-in for the engine's `tny_in_pool`), 2 spawn today's fighters now (`tny_grounds.c`) |
 | 19+ | 19-20 allocated to the post-game chapter; 21-30 the tournament team (above) | |
+| 44 | REGEN (`regen.c`) | `arg` = frames: both players' ki timers at it (0: as if each had just used a ki move; 1800: rising now) |
 | 26 | TNY_SPAWN (moves) | `arg` = fighter (TF_*) \| spot << 8 (0 = 64 px right of player 1, 1-7 round him) \| flags << 16 (1 boss bar, 2 the last spawn's side, 4 no specials for 600 frames); `arg2` = stat (0 or >= 1000: the engine's row 160 + id, else a stand-in): spawn him with his kit (`tny_moves.c`) |
 | 27 | TNY_DRIVE (moves) | `arg` = op << 24: 0 force move (`reg << 8 \| move`: 1-6 his kit's slot, 0x80 \| kind a library kind, 0xFB-0xFF Multi-Form / self-KO / stun beam / stun projectile / big ball), 1 Rumble = `arg & 1`, 2 HP of kit `reg` := `arg2` (0x800000NN = NN %), 3 no specials for `arg2` frames, 4 every kit fighter leaves, 5 a passive on top (11 drain, 12 regen), 6 player 1 throws one punch at kit `reg` (`reg << 8 \| gap << 16 \| step`: step 1 = first stand `gap` px (0 = 20) on his left; the A button's own routine 0x08007DE8) |
 

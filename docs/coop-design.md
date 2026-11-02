@@ -1395,8 +1395,14 @@ which already refilled both). When player 2 wins a duel with `DUEL_SWAP_ON_P2_WI
   (`.combo.rg`, 4 bytes in `comboram`: `ewram` is full) counts frames since the last hit (both take-damage hooks call
   `regen_hit`) or the last frame with an enemy (`is_any_enemy`) within 128 px either axis; past 300 frames HP rises
   1 % of the maximum every 20 frames up to 2/3 of it. Downed (HP 0) players and the companion are skipped; a
-  transformed player runs the Super Saiyan class, which never rests (stock). Food, senzu and the stock 5 % trickle
-  for the slots not being played are unchanged.
+  transformed player runs the Super Saiyan class, which never rests (stock). Food and senzu are unchanged.
+  **Since 2026-11-02** (`docs/perfect-pass.md` 11.1, 11.2): every class that heals or feeds (`0x030021E4`, row 28 too) comes
+  through `regen.c`. The stock trickle and the party meter's decrement run once a frame, not per player entity (`regen_update`:
+  from player 1's, from player 2's while player 1 is on a form's class). The trickle goes only to characters nobody plays
+  (slots 0-5, and 6 and 8 when in the party; the companion's slot counts as benched), to full. Played characters get no stock
+  EP; a ki timer per player (`.combo.rg`, now 0xC bytes), restarted by an ability that spent EP (`use_ability`, for both players)
+  or a form's start or end, lets EP rise after 30 s, 40 s from empty to 1/3. In one-player play the same. In a duel or the
+  ring (`coop2.duel_active`, `tny_ring_active()`) no resting heal and no ki rule.
 - **Player 2's pickups** (`src/coop/pickup.c`): the stock game fires a dropped item's touch box only for player 1's
   position (`docs/engine.md` "Dropped items and touch boxes"); every input poll player 2's position is tested against
   the item boxes and one is fired the stock way with the active slot and `g_PlayerObject` swapped to his.

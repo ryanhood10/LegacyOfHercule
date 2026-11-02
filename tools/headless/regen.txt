@@ -1,56 +1,470 @@
-# Resting heals (src/coop/regen.c; docs/testing.md "Resting heals"): a player not hit and with no enemy within 128 px
-# for 5 s regains 1 % of his maximum HP every 20 frames up to 2/3 of it. Player 1 Piccolo (slot 1: hp 0x0203F028,
-# max 0x41F = 1055, cap 703 = 0x2BF), player 2 Hercule (slot 5: hp 0x0203F098, max 0x1ED = 493, cap 328 = 0x148; his
-# slot also gets the stock 5 % trickle from the base classes, so he ends above the cap). From a debug-menu savestate:
+# What a character gets back with time (src/coop/regen.c; docs/perfect-pass.md 11.1, 11.2; docs/testing.md "Resting heals").
+# Played characters, both players: HP from the resting heal only (5 s without a hit or an enemy within 128 px, 1 % of
+# the maximum every 20 frames, to exactly 2/3); ki only from the ki rule (30 s without a ki move by that player, then
+# 40 s from empty to exactly 1/3; hits and enemies do not matter). Benched characters: the stock trickle, once a frame,
+# to full. Self-checking; from a debug-menu savestate:
 #   python tools/headless/st_expect.py tools/headless/regen.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
+# Map Test party (entries 0x0203F00C + slot * 0x1C: hp +0, max +2, ep +4, max +6, row +8, ability index +9):
+#   slot 1 Piccolo  max 1055 / 148: caps 703 = 0x2BF, 49 = 0x31     slot 5 Hercule max 493 / 145: caps 328 = 0x148, 48 = 0x30
+#   slot 0 Gohan    max 876 / 140 (benched here)                    slot 6 Krillin max 745 / 162 (benched here)
+#   slot 8 Super Saiyan 2 Gohan, poked in as ssj2_join leaves him: max 1314 / 210: caps 876 = 0x36C, 70 = 0x46
+# Test command 44 (arg = frames) sets both ki timers; the party meter is PARTY+8; the ability gate word 0x0300208C is 0 on a Map Test.
+echo === A. player 1 Piccolo, player 2 Hercule; everybody at 10 HP and 0 EP, the ki timers at 0
+p2 0
+maptest 7
+frames 300
+poke16 0x0203f028 10
+poke16 0x0203f02c 0
+poke16 0x0203f098 10
+poke16 0x0203f09c 0
+poke16 0x0203f00c 10
+poke16 0x0203f010 0
+poke16 0x0203f0b4 10
+poke16 0x0203f0b8 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1740
+echo == 29 s: no ki back for either player; the bench has its first ticks
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+echo EXPECT 0203f00c: 00[3-9a-f]\w
+peek16 0x0203f00c
+echo EXPECT 0203f010: 00[01]\w
+peek16 0x0203f010
+frames 120
+echo == 31 s: the ki is rising; both at exactly 2/3 HP (the delay had passed in the Map Test)
+echo EXPECT 0203f02c: 000[1-3]
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 000[1-3]
+peek16 0x0203f09c
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f098: 0148
+peek16 0x0203f098
+frames 2340
+echo == 70 s: 1/3 or a step under
+echo EXPECT 0203f02c: 00(2f|30|31)
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 00(2e|2f|30)
+peek16 0x0203f09c
+frames 300
+echo == 75 s: exactly 1/3; a bench member by the stock's own pace (7-8 ticks of 5 %, not twice that)
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 0030
+peek16 0x0203f09c
+echo EXPECT 0203f00c: 01[0-9a-f]\w
+peek16 0x0203f00c
+echo EXPECT 0203f010: 00[34]\w
+peek16 0x0203f010
+echo EXPECT 0203f0b4: 01[0-9a-f]\w
+peek16 0x0203f0b4
+shot regen_town_75s
+frames 9000
+echo == 225 s: nothing above the caps; the bench full
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 0030
+peek16 0x0203f09c
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f098: 0148
+peek16 0x0203f098
+echo EXPECT 0203f00c: 036c
+peek16 0x0203f00c
+echo EXPECT 0203f010: 008c
+peek16 0x0203f010
+echo EXPECT 0203f0b4: 02e9
+peek16 0x0203f0b4
+echo EXPECT 0203f0b8: 00a2
+peek16 0x0203f0b8
+shot regen_town_225s
+echo == a poked start above the caps stays where it is (never lowers)
+poke16 0x0203f028 900
+poke16 0x0203f02c 100
+poke16 0x0203f098 400
+poke16 0x0203f09c 100
+frames 700
+echo EXPECT 0203f028: 0384
+peek16 0x0203f028
+echo EXPECT 0203f02c: 0064
+peek16 0x0203f02c
+echo EXPECT 0203f098: 0190
+peek16 0x0203f098
+echo EXPECT 0203f09c: 0064
+peek16 0x0203f09c
+echo == the party meter falls 1 a frame, not 2 (docs/perfect-pass.md 9: the co-op cool-down)
+poke32 PARTY+8 1000
+frames 100
+echo EXPECT 0203f008: 00000(38\w|39\w)
+peek PARTY+8
+echo === B. the other way round: player 1 slot 5, player 2 slot 1
 load menu.ss
 p2 0
 maptest 7
 frames 300
-echo == the town, no enemies: both at 10 HP; the quiet timers passed the 5 s delay during the Map Test, so both rise at once
-poke16 0x0203F028 10
-poke16 0x0203F098 10
-frames 290
-echo EXPECT 0203f028: 00[5-9a-f]\w
-peek16 0x0203F028
-echo EXPECT 0203f098: 00[2-9a-f]\w
-peek16 0x0203F098
-echo == 200 frames on: both higher still, under the caps
-frames 200
-echo EXPECT 0203f028: 0[01][a-f0-9]\w
-peek16 0x0203F028
-echo EXPECT 0203f098: 0[01]\w\w
-peek16 0x0203F098
-echo == 1800 frames on: Piccolo at his cap, Hercule at his plus the trickle; 300 more: Piccolo still there
-frames 1800
-echo EXPECT 0203f028: 02bf
-peek16 0x0203F028
-echo EXPECT 0203f098: 01[4-9a-f]\w
-peek16 0x0203F098
+poke8 0x0203FF84 1
+poke8 0x0203F000 5
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
 frames 300
+echo EXPECT 0203f000: 05
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84 1
+poke16 0x0203f098 10
+poke16 0x0203f09c 0
+poke16 0x0203f028 10
+poke16 0x0203f02c 0
+poke16 0x0203f00c 10
+poke16 0x0203f010 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1740
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+frames 2760
+echo == 75 s
+echo EXPECT 0203f098: 0148
+peek16 0x0203f098
 echo EXPECT 0203f028: 02bf
-peek16 0x0203F028
-shot regen_town
-echo == Map Test 13, wolves beside both: Piccolo 600, Hercule 200; 700 frames among them: no resting (Piccolo hit, under 600)
+peek16 0x0203f028
+echo EXPECT 0203f09c: 0030
+peek16 0x0203f09c
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f00c: 01[0-9a-f]\w
+peek16 0x0203f00c
+echo === C. Super Saiyan 2 Gohan's class (it healed the active slot to full, whoever played him): player 1 slot 1, player 2 slot 8
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke16 0x203f0ec 1314
+poke16 0x203f0ee 1314
+poke16 0x203f0f0 210
+poke16 0x203f0f2 210
+poke8 0x203f0f4 28
+poke32 0x203f100 0x7F
+poke32 0x203f104 0x02170403
+poke16 0x203f0f6 0x5800
+poke16 0x203f0f8 0x7500
+poke16 0x203f0fa 0x4A00
+poke8 0x0203FF84 8
+poke8 0x0203F000 1
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 08
+peek8 0x0203FF84 1
+poke16 0x0203f028 10
+poke16 0x0203f02c 0
+poke16 0x0203f0ec 10
+poke16 0x0203f0f0 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1740
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+echo EXPECT 0203f0f0: 0000
+peek16 0x0203f0f0
+frames 2760
+echo == 75 s: both at their caps
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f0ec: 036c
+peek16 0x0203f0ec
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f0f0: 0046
+peek16 0x0203f0f0
+frames 1800
+echo == 105 s: and there they stay
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f0ec: 036c
+peek16 0x0203f0ec
+shot regen_ss2_1_8
+echo === C. Super Saiyan 2 Gohan's class (it healed the active slot to full, whoever played him): player 1 slot 8, player 2 slot 1
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke16 0x203f0ec 1314
+poke16 0x203f0ee 1314
+poke16 0x203f0f0 210
+poke16 0x203f0f2 210
+poke8 0x203f0f4 28
+poke32 0x203f100 0x7F
+poke32 0x203f104 0x02170403
+poke16 0x203f0f6 0x5800
+poke16 0x203f0f8 0x7500
+poke16 0x203f0fa 0x4A00
+poke8 0x0203FF84 1
+poke8 0x0203F000 8
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+echo EXPECT 0203f000: 08
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84 1
+poke16 0x0203f0ec 10
+poke16 0x0203f0f0 0
+poke16 0x0203f028 10
+poke16 0x0203f02c 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1740
+echo EXPECT 0203f0f0: 0000
+peek16 0x0203f0f0
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+frames 2760
+echo == 75 s: both at their caps
+echo EXPECT 0203f0ec: 036c
+peek16 0x0203f0ec
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f0f0: 0046
+peek16 0x0203f0f0
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+frames 1800
+echo == 105 s: and there they stay
+echo EXPECT 0203f0ec: 036c
+peek16 0x0203f0ec
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+shot regen_ss2_8_1
+echo === D. a ki move starts player 1's count over and not player 2's, then the other way round
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke16 0x0203f02c 20
+poke16 0x0203f09c 20
+poke32 0x0203FD0C 1700
+poke32 0x0203FD08 44
+poke8 0x0203F031 3
+poke32 0x0300208C 1
+key 2 6
+frames 200
+echo == Ki Blast: Piccolo 18; 200 frames on, Hercule has passed 20 and Piccolo has not moved
+echo EXPECT 0203f02c: 0012
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 00(1[5-9a-f]|2\w)
+peek16 0x0203f09c
+frames 1500
+echo EXPECT 0203f02c: 0012
+peek16 0x0203f02c
+frames 200
+echo == 30 s after the move: Piccolo rising
+echo EXPECT 0203f02c: 00(1[3-9a-f]|2\w)
+peek16 0x0203f02c
+poke16 0x0203f02c 20
+poke16 0x0203f09c 20
+poke32 0x0203FD0C 1700
+poke32 0x0203FD08 44
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo == Hercule's punch (4 EP): 16; Piccolo has passed 20
+echo EXPECT 0203f09c: 0010
+peek16 0x0203f09c
+echo EXPECT 0203f02c: 00(1[5-9a-f]|2\w)
+peek16 0x0203f02c
+echo === E. among wolves: hits and enemies do not touch the ki; no resting
 load menu.ss
 p2 0
 maptest 13
 frames 300
-poke16 0x0203F028 600
-poke16 0x0203F098 200
+poke16 0x0203f028 600
+poke16 0x0203f02c 0
+poke16 0x0203f098 200
+poke16 0x0203f09c 0
+poke32 0x0203FD0C 1500
+poke32 0x0203FD08 44
 frames 700
+echo == Piccolo under 600 (hit), EP rising regardless
 echo EXPECT 0203f028: 0[01]\w\w|02[0-5]\w
-peek16 0x0203F028
+peek16 0x0203f028
+echo EXPECT 0203f02c: 00(0[3-9a-f]|[1-2]\w)
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 00(0[3-9a-f]|[1-2]\w)
+peek16 0x0203f09c
 peek16 0x0203F098
 shot regen_near
-echo == test command 13 (every standing enemy dies), 1000 frames: Piccolo rests to his cap
+echo == test command 13 (every standing enemy dies), 1000 frames: both rest to the cap
 poke32 0x0203FD08 13
 frames 100
-poke16 0x0203F028 600
-poke16 0x0203F098 200
+poke16 0x0203f028 600
+poke16 0x0203f098 200
 frames 1000
 echo EXPECT 0203f028: 02bf
-peek16 0x0203F028
-echo EXPECT 0203f098: 01[4-9a-f]\w
-peek16 0x0203F098
+peek16 0x0203f028
+echo EXPECT 0203f098: 0148
+peek16 0x0203f098
 shot regen_clear
+echo === F. a form on player 2 (Piccolo's, row 7: HP for EP) works on his own slot and leaves player 1's alone
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke8 0x0203FF84 1
+poke8 0x0203F000 5
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+echo EXPECT 0203f000: 05
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84 1
+poke16 0x0203f028 300
+poke16 0x0203f02c 100
+poke8 0x0203F031 2
+poke32 PARTY+8 0
+poke32 0x0300208C 1
+p2 2
+frames 4
+p2 0
+frames 200
+echo EXPECT 0203f030: 07
+peek8 0x0203F030 1
+poke16 0x0203f098 100
+poke16 0x0203f09c 0
+poke16 0x0203f028 300
+poke16 0x0203f02c 100
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1300
+echo == 65 ticks: Hercule at his cap by resting, no EP; Piccolo up 65 x 10 HP for 65 EP
+echo EXPECT 0203f098: 0148
+peek16 0x0203f098
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+echo EXPECT 0203f028: 03[a-c]\w
+peek16 0x0203f028
+echo EXPECT 0203f02c: 00(2[0-9a-f])
+peek16 0x0203f02c
+shot regen_form_p2
+echo === G. a downed player: no HP, no ki; his partner goes on
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke32 0x0203FD0C 1
+poke32 0x0203FD08 10
+frames 40
+poke16 0x0203f09c 0
+poke16 0x0203f02c 0
+poke32 0x0203FD0C 1800
+poke32 0x0203FD08 44
+frames 300
+echo EXPECT 0203f098: 0000
+peek16 0x0203f098
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+echo EXPECT 0203f02c: 000[3-9a-f]
+peek16 0x0203f02c
+echo === H. one player: the same rules; player 2's old slot is on the bench
+load menu.ss
+p2 off
+maptest 7
+frames 300
+poke16 0x0203f028 10
+poke16 0x0203f02c 0
+poke16 0x0203f098 10
+poke16 0x0203f09c 0
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 44
+frames 1740
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+frames 120
+echo EXPECT 0203f02c: 000[1-3]
+peek16 0x0203f02c
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+frames 2640
+echo == 75 s: 1/3, 2/3; Hercule, benched, on the stock's way to full
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f098: 00[8-9a-f]\w
+peek16 0x0203f098
+echo EXPECT 0203f09c: 00[34]\w
+peek16 0x0203f09c
+frames 9000
+echo EXPECT 0203f02c: 0031
+peek16 0x0203f02c
+echo EXPECT 0203f028: 02bf
+peek16 0x0203f028
+echo EXPECT 0203f098: 01ed
+peek16 0x0203f098
+echo EXPECT 0203f09c: 0091
+peek16 0x0203f09c
+shot regen_alone
+echo === I. a duel (test command 6: player 1 Piccolo against player 2 Hercule, both on the standard class): no resting heal and no ki rule
+load menu.ss
+p2 0
+maptest 7
+frames 300
+poke16 0x0203f028 30
+poke16 0x0203f02c 0
+poke16 0x0203f098 30
+poke16 0x0203f09c 0
+poke32 0x0203FD0C 6
+poke32 0x0203FD08 6
+frames 2
+poke32 0x0203FD0C 1800
+poke32 0x0203FD08 44
+echo EXPECT 0203fd5c: \w\w\w\w\w\w01
+peek 0x0203FD5C 1
+frames 400
+echo EXPECT 0203f028: 001e
+peek16 0x0203f028
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+echo EXPECT 0203f098: 001e
+peek16 0x0203f098
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+echo === J. a tournament's ring (a Rookie Rumble, Map Test 147's grounds): the same
+load menu.ss
+p2 0
+maptest 147
+frames 300
+poke32 0x0203FD0C 0x100F
+poke32 0x0203FD54 0x018000F8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x0002
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 200
+poke16 0x0203f02c 0
+poke16 0x0203f09c 0
+poke32 0x0203FD0C 1800
+poke32 0x0203FD08 44
+frames 240
+echo == no ki back in 4 s past the 30 (a fighter's Energy Steal only lowers it)
+echo EXPECT 0203f02c: 0000
+peek16 0x0203f02c
+echo EXPECT 0203f09c: 0000
+peek16 0x0203f09c
+shot regen_ring

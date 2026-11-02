@@ -216,8 +216,6 @@ punctuation only); owner in brackets.
   and our code wrote into whatever the new heap put there. The soft reset now clears all our RAM first, as a power
   cycle does (`docs/coop-design.md` "Session logic"); test `tools/headless/softreset.txt` in `regfull.sh`, and
   `ssj_hercule.txt` reloads through the soft reset again.
-- **The Super Saiyan cool-down is about half as long in co-op**: both players' base classes drain the shared party
-  meter (+8), so the meter empties twice as fast (stock alone: about 21 s).
 - **Broly's Eraser Cannon bursts at his own feet** right after he throws it in the tournament, and a damage number shows
   on him (90); both are older than the colour work (the combo piece's film, `build/pp-combo/films/kits/`).
 - **After loading a save, the "How many players?" question showed on a black screen with no text box.** Fixed
@@ -307,6 +305,49 @@ their HP comes from the resting heal (2/3) and their ki from 11.2's rule. Number
 **Test.** `regen.txt` extended: both players at 10 HP in the town, 3 minutes: both end at exactly 2/3, EP untouched by
 the old trickle; a benched member's HP and EP keep rising as stock (or to 2/3, per Q2).
 
+**Built (2026-11-02, `pp2-regen`; `src/coop/regen.c`, `docs/engine.md` "Behaviour classes").** The cause, from eight
+pairings and then the classes, headless (town, both at 10 HP and 0 EP, 3 minutes):
+
+| who plays | player 1 HP | player 1 EP | player 2 HP | player 2 EP |
+|---|---|---|---|---|
+| any two standard characters, player 2 on slots 0-5 | 2/3 | nearly full | **full** | full |
+| player 2 on Krillin (slot 6) | 2/3 | nearly full | 2/3 | 0 |
+| player 2 on Super Saiyan 2 Gohan (slot 8) | **full** | half | **10, never healed** | 0 |
+| player 1 on Super Saiyan 2 Gohan | **full** | half | full | most |
+
+So the plan's reading was half right: the doubled trickle fills **player 2's** character and player 1's ki (the "player 2
+worked fine" of Ryan's note fits player 2 on Krillin, who is outside the stock loop). **Player 1 filling his HP is another
+bug, and the only way the headless runs produce it:** Super Saiyan 2 Gohan's class (row 28 uses the stock Super Saiyan 2
+class on purpose, `0x030021E4`) has its own update, stock `0x0801710E`, "the **active** slot's HP + 1 % every 20 frames" to
+full, with no rest and no cap. Nobody's update swaps the active slot (`wrap.c` swaps only the input, `pickup.c` and
+`install_behaviour` swap it around other calls), so whoever plays him, player 1 is healed, and player 2 on him rested
+never: that class does not run the base class's update. Piccolo's form (row 7, `0x030021F0`, stock `0x08017400`: 1 % HP
+for 1 EP every 20 frames) did the same with player 2 in it, and the forms on rows 10 and 14 (`0x030021E8`, stock
+`0x080171E4`) drained player 1's ki for player 2's form. A level-up is the last way: stock `Party_LevelUp` sets HP and EP
+to the new maximum (a traditional way; unchanged). **Not known:** whether Super Saiyan 2 Gohan was in play in Ryan's
+session (F9 is after the Cell Games, where he joins; Ryan said "no idea, it's like every time"). Every route above is
+closed whichever it was; if Ryan still sees player 1 pass 2/3 without food, a level-up or a Senzu, the pairing is the
+thing to ask for.
+
+**The rules as built.** The stock trickle runs once a frame, from player 1's entity (from player 2's while player 1 is on a
+form's class; both on forms, none, as stock alone), at the stock's own pace (5 % HP and EP about every 596 frames, once:
+it was double for everybody). It goes only to characters nobody plays, to full (Q2). The party meter's decrement goes with
+it (section 9's "co-op Super Saiyan cool-down": fixed, the same 21 s as alone). Super Saiyan 2 Gohan's update is now the
+base class's (his fixed combat bytes and aura stay: only slot 1 of the class changed), so he rests like anyone, to 2/3,
+and heals nobody else. Decisions taken with Ryan away, each reversible:
+- **Super Saiyan 2 Gohan loses his own stock 1 % to full** (Ryan's rule is for every played character; he asked for the class
+  on 2026-10-20 for "as fast and strong as in the Cell fight", which stays).
+- **Piccolo's form keeps its 1 % HP for 1 EP**, now on Piccolo's own slot: a form he turns on and pays for is a move, not
+  regeneration.
+- **The bench takes in slots 6 and 8** (Krillin, Super Saiyan 2 Gohan) when they are in the party: the stock loop stops at
+  slot 5, and Ryan's rule is "characters nobody is playing". Slot 7 (duel clone, Android 16) is borrowed: left out, as before.
+- **The companion's slot counts as benched** (he is nobody's), as stock. A pad whose player 2 is waiting for the map to
+  build him still counts as playing.
+- **No resting heal and no ki rule in a duel or the tournament's ring** (`coop2.duel_active`, `tny_ring_active()`): a fight
+  must not outlast its stakes, and `tny_ko_check`'s fights end at 1 HP. The story's space duel keeps both players on
+  Piccolo's form with full ki, so that form's heal runs there, on each player's own slot now (before: all of it, twice, on
+  player 1).
+
 ### 11.2 Ki regeneration
 
 **Ryan:** "the game does already have a mechanic to generate like a tiny tiny microscopic amount of ki, not sure how it
@@ -327,6 +368,25 @@ of the base class, so no ki regeneration while transformed (stock).
 
 **Test.** `regen.txt`: EP at 0 in the town, 29 s: 0; at 31 s rising; 1/3 at about 70 s and no more; a ki move resets
 it; a hit does not.
+
+**Built (2026-11-02, `pp2-regen`; macros at the top of `regen.c`).** `KI_DELAY` 1800 frames with no ki move by that player,
+then EP rises by `max / 3` over `KI_RISE` 2400 frames (a fraction kept per player: a 148-EP Piccolo gets 1 EP every 49
+frames, 0 to 49 between 30 s and 70 s), up to exactly `max_ep / KI_CAP_DEN` (3). It never lowers EP and a player above 1/3 stays
+where he is. Damage, hits and enemies do not touch it. (The plan's "a 120th of the maximum every 20 frames" would reach
+1/3 in 13 s; the 40 s of Ryan's answer is what is built.)
+- **What counts as a ki move:** an ability whose `on_use` lowered the slot's EP. Every ability of both players goes through
+  `player.c` `use_ability` (player 1 too: the idle, walk and diagonal states are our ports of the ROM's only callers,
+  `0x08007F34`, `0x08007DE8`, `0x08007F12`; the table's other literal, `0x08008E8C`, is the HUD's icon). All
+  the stock and our own on_use spend at once, so a before / after is exact; the Taunt and Energy Steal do not count, a held
+  beam's or a volley's later EP does not restart the count (it was restarted at the press, seconds before).
+- **Forms:** a form's class runs no ki rule, and each form's start and end (`ssj.c` `apply`) restart the count, so the 30 s run
+  from when it ends. (The transformation itself costs nothing and would not count by the first rule.)
+- **Downed (HP 0):** no ki and no count until he is up.
+- **The stock crumb (3 % every 10 s) is gone for both players** and for one-player play: Ryan's rules are the game's rules,
+  not co-op only. So a game alone is different from the stock game here on purpose, and the stock's ki comes back only by
+  this rule and the traditional ways. `REGEN_PLAYED_CRUMB` 1 brings the crumb back.
+- **In the tournament's fights** the crumb's loss is felt: a player had 6 % of his ki per 10 s in a 1 v 1 before, and now only
+  drops and Energy Steal (a decision for Ryan to overrule after playing it: the ki rule could run there instead).
 
 ### 11.3 Player 2 is a co-pilot
 
