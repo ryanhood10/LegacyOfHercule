@@ -76,7 +76,7 @@ static void compose_panel(Hud *h, CharacterEntry *c) {
 
 static void hud2_ensure_tiles(void) {
     if (coop.hud2.tile) return;
-    coop.hud2.tile = ObjVram_Alloc(g_ObjVramList, 0x500);
+    coop.hud2.tile = obj_alloc_low(0x500);   // objroom.c
     coop.hud2.size = 0x500;
     coop.hud2.hp_px = 0xFF;
     coop.hud2.flash = 0;

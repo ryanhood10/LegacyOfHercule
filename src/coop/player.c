@@ -459,6 +459,7 @@ static void ensure_p2(Entity *p1) {
     p2->vtable = g_p2_vtable;
     if (coop.p2_slot != g_Party->active_slot) install_behaviour(p2, coop.p2_slot);
     EntityList_Add(g_SceneTable[1], p2);
+    obj_entity_low(p2);   // objroom.c: the free run stays one piece
     coop.p2 = p2;
     coop.spawns++;
 }

@@ -208,6 +208,8 @@ void waves_tick(void);
 
 void enemies_init(void);                                   // build the vtable copies (from coop_init_once)
 Entity *coop_target(Entity *e, Entity *p1, Entity *p2);    // which player an enemy should see this frame
+u16 obj_alloc_low(int bytes);                                  // objroom.c: OBJ VRAM at the free run's low end
+void obj_entity_low(Entity *e);                               // objroom.c: an entity's body block moved there
 int is_coop_enemy(const Entity *e);
 int is_any_enemy(const Entity *e);    // a field enemy in one-player play too (stock class), a boss, a tournament fighter
 void p2_pickup_tick(void);            // pickup.c: every input poll, player 2 takes dropped food he stands on
