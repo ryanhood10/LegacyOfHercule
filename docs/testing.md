@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## Balance (headless, 2026-11-02)
+
+`tools/headless/balance.txt` (from `balance_gen.py`; self-checking, in `regfull.sh`): one boss hit on a level 17 Hercule's endurance in the Android 19 + 13 fight (7-25, by `watch` on his HP), 13's HP, a Rookie first round's opponent's HP. To measure a real save: copy the `.sav`, `cart` it, Start, A, Down per file, A, A, B, then `poke32 0x0203FA44 0x91A7E250`, `poke32 0x0203FA48 2` (`players`: two players), HP 9000 and log the HP deltas every 12 frames.
+
 ## Scenes and player 2 (headless, 2026-11-02)
 
 `tools/headless/p2_scenes.txt` (self-checking, in `regfull.sh`): zone 7 area 15 (Vegeta flown into the arena, player 2 brought beside him, both walk, the flash holds no boss, bullets hit), zone 8 area 40 (the door's seal with player 2 inside its rect), zone 7 area 19 (one Android 20, nobody left after his scene). `waitnz 0x03001FDC N` then `stepz 0x03001FDC N`, or the steps run before the scene starts; pressing A past a scene's end leaves idle players to die and the game goes back to the title.

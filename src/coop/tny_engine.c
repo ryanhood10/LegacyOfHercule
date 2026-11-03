@@ -178,16 +178,17 @@ static TnyEng eng TNY_SECTION("eng") __attribute__((used));
 
 // ---- opponents' numbers (stats 160-219) ------------------------------------------------------------------
 // Fixed per tier (the tournament's, not the fighter's own): a tier base times the fighter's power, then the
-// difficulty on top in enemy_spawn_hook. Our tuning, to be adjusted in play; references: the Android 19 fight
-// (2970 HP, 21/14/11) for Adept, Imperfect Cell (5210, 32/32/37) for Z-Fighter, the Cell Games (6500,
-// 50/55/60) for Champion, Super 13 (10000, 48/64/56) for Legend.
+// difficulty on top in enemy_spawn_hook. A match is a shorter thing than a story boss, and a tournament has three or
+// four of them: at the level a tier opens about 30 of a player's hits win it and about 20 of the opponent's lose it.
+// Ryan, 2026-11-02: two players at levels 17-20 could not get past a Rookie first round (was 1400, 12/12/10: 30 hits to
+// win, 9 on Hercule to lose; the higher tiers were story bosses' numbers).
 typedef struct TierBase { s32 hp; u8 melee, ranged, defence, _p; } TierBase;
 static const TierBase tier_base[TIER_COUNT] = {
-    { 1400, 12, 12, 10, 0 },    // Rookie: early game (levels about 1-10)
-    { 2800, 22, 20, 18, 0 },    // Adept
-    { 4200, 33, 33, 34, 0 },    // Z-Fighter
-    { 5800, 47, 50, 52, 0 },    // Champion
-    { 8000, 58, 62, 58, 0 },    // Legend
+    {  700,  8,  8,  6, 0 },    // Rookie: open from the start (levels about 5-20)
+    { 1300, 13, 13, 12, 0 },    // Adept: after the Android 19 fight (about 20)
+    { 2200, 20, 20, 20, 0 },    // Z-Fighter: about 30
+    { 3400, 30, 32, 32, 0 },    // Champion: about 40
+    { 5200, 40, 42, 42, 0 },    // Legend: about 50
 };
 // power (percent of the tier base: HP x p, attack and defence x (100 + p) / 200) and the AI set that fits his
 // body (docs/sprites.md "AI sets": 21 the melee boss set for most; the Cells' own; 98 the dojo bodies; 29

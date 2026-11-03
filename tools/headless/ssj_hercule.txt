@@ -25,7 +25,7 @@ echo EXPECT \w+: {herc_record}
 peek P2+0x48
 echo EXPECT \w+: 030021e0
 peek P2+0x180
-echo EXPECT \w+: 803e3b30
+echo EXPECT \w+: 80503b30
 peek P2+0x160
 echo === A1 player 2 transforms (ability 18 = the stock Transformation B)
 poke8 0x0203F0B2 18
@@ -55,8 +55,8 @@ echo EXPECT \w+: {ssj_record}
 peek P2+0x48
 echo EXPECT \w+: 030021ec
 peek P2+0x180
-echo --- the Super Saiyan class: combat bytes +10 each (0x30 0x3b 0x3e -> 0x3a 0x45 0x48)
-echo EXPECT \w+: 8048453a
+echo --- the Super Saiyan class: combat bytes +10 each (0x30 0x3b 0x50 -> 0x3a 0x45 0x5a)
+echo EXPECT \w+: 805a453a
 peek P2+0x160
 peek S 4
 shot sh_02_p2_ssj

@@ -813,8 +813,8 @@ froze). The director's lists answer B by ending the talk (nothing changed).
 
 **Opponents' numbers** (stats 160-209 = 160 + fighter id; `tny_resolve_stat` from `bosses.c`'s `resolve_stat`, a
 `BOSS_NO_TWIN | BOSS_FLAT` rule from `boss_rule`; *decided*, to tune in play): a base per *tournament* tier (Rookie
-1400 HP, melee / ranged / defence 12 / 12 / 10; Adept 2800, 22 / 20 / 18; Z-Fighter 4200, 33 / 33 / 34; Champion 5800,
-47 / 50 / 52; Legend 8000, 58 / 62 / 58), times the fighter's power (75-140: HP x p %, attack and defence x
+700 HP, melee / ranged / defence 8 / 8 / 6; Adept 1300, 13 / 13 / 12; Z-Fighter 2200, 20 / 20 / 20; Champion 3400,
+30 / 32 / 32; Legend 5200, 40 / 42 / 42; lowered 2026-11-02, Ryan: two players at levels 17-20 could not pass a Rookie first round, `docs/perfect-pass.md` 9), times the fighter's power (75-140: HP x p %, attack and defence x
 (100 + p) / 200 %), the boss class of stat 29 (Cell Jr his own), no kill EXP; then the difficulty's boss HP and
 damage as for every boss. AI set: the one that fits the body (21 most, 98 Tien / Hercule, 129 Tao, 29 the androids,
 80 / 116 / 148 / 138 the Cells), else the first of 21, 98, 129, 11 whose pose groups the body has. A body without the

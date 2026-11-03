@@ -43,7 +43,7 @@ int is_any_enemy(const Entity *e) { return is_enemy(e); }
 // are left alone.
 static int is_boss_rec(const EnemyRecord *rec, const EnemyStat *st) {
     const BossRule *r = boss_rule(rec->stat_index);
-    if (r && (r->flags & BOSS_PAIR)) return 1;     // a pair under boss rules whatever its numbers
+    if (r && (r->flags & (BOSS_PAIR | BOSS_FLAT))) return 1;     // a pair or a tournament opponent: boss rules whatever the numbers
     return st->max_hp >= 1000 && (st->exp == 0 || rec->flags == 1);
 }
 static int is_boss(const Entity *e) { return is_boss_rec(record_of_const(e), (const EnemyStat *)e->behaviour); }
@@ -655,9 +655,13 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
     coop2.dmg_calls++;
     int player = defender == g_PlayerObject || defender == coop.p2;
     if (player) coop2.dmg_player++;
-    if (is_enemy(attacker) && player && !(coop2.off & COOP_OFF_DAMAGE) && diff_damage_pct() != 100) {
-        dmg = dmg * diff_damage_pct() / 100;   // co-op x 1.25 on Normal; alone by the difficulty (difficulty.h)
-        coop2.dmg_scaled++;
+    if (is_enemy(attacker) && player && !(coop2.off & COOP_OFF_DAMAGE)) {
+        int boss = is_a16(attacker) || is_s13(attacker) || (is_coop_enemy(attacker) ? is_boss(attacker) : ((const EnemyStat *)attacker->behaviour)->max_hp >= 1000);
+        int pct = boss ? diff_boss_damage_pct() : diff_damage_pct();   // co-op on Normal: bosses x 0.8, the rest x 1.25; alone by the difficulty (difficulty.h)
+        if (pct != 100) {
+            dmg = dmg * pct / 100;
+            coop2.dmg_scaled++;
+        }
     }
     if (hercule_bullet_hit(hit)) {                  // krillin.c: a shade weaker than a ki blast, and no ki: the hit tree that
         dmg = dmg * 3 / 4 > 0 ? dmg * 3 / 4 : 1;    // follows reads the punch's descriptor, so the androids' absorbers (id 9's

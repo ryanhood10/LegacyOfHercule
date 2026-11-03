@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-02
 
+- **Balance, Ryan's two-player note (`docs/perfect-pass.md` 9, `balance.txt`):** bosses' and tournament opponents' hits in co-op x 0.8 on Normal (x 1.25 before; Easy 0.6, Hard unchanged), Android 13 lighter in both fights, Hercule's endurance growth back up, every tournament tier's numbers down (Rookie 700 HP, 8 / 8 / 6).
 - **Chapters 3 and 4 played through in co-op (`docs/perfect-pass.md` 9, `p2_scenes.txt`):** player 2 is brought beside player 1 when a scene leaves him out of reach or inside something solid (the end of chapter 3 was a softlock); one Android 20; bullets go through the ki drinkers; Hercule 70 HP; small lines, an easter egg.
 - **Player 2's Start opens the pause menu** (his pad, his character; `agency.c`), and **a Super Saiyan going down turns back only his own form** (`ssj.c` `ssj_death_enter`; it was the active slot's, whoever fell). `p2_cases.txt` blocks 7 and 8.
 - **Hercule's kit and player 2's levels, Ryan's session notes (`docs/perfect-pass.md` 9, `docs/hercule.md` 3):** the Flash (freeze 320 -> 120 frames, a real

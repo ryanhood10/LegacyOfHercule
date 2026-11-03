@@ -88,7 +88,7 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 
 **Against the androids that drink ki** (19, 13 beside him, Gero: AI hit trees with id 9): the Ki Blast only feeds them, as for everyone; the Gun's hit reads the punch's descriptor once its damage is taken (`damage_calc_hook`, `ATTACK_PUNCH`), so a bullet is the one thing Hercule can throw at them. Bosses do not take the flash: their trees have no id 15 match.
 
-**Numbers:** 70 HP (Krillin's; 50 before: 19 and 13 put him down in about 4 s, and he is player 2's only choice there); start str 2.0 / pow 4.0 / end 1.5; growth str 200..340, pow 240..380, end 240..400 per level (Gohan 318..518 / 302..502 / 256..456). Pow was 0.5: the combat byte is `pow >> 8`, and a shot from a byte of 0 did no damage.
+**Numbers:** 70 HP (Krillin's; 50 before: 19 and 13 put him down in about 4 s, and he is player 2's only choice there); start str 2.0 / pow 4.0 / end 1.5; growth str 200..340, pow 240..380, end 360..520 per level (Gohan 318..518 / 302..502 / 256..456; end was 240..400 for a day: at level 17 the androids put him down in 6 hits, and Ryan's note was his punches; `hercule_lock` raises a save's at the load). Pow was 0.5: the combat byte is `pow >> 8`, and a shot from a byte of 0 did no damage.
 
 (Before 2026-11-02 the list was 14, 15, 16, 17 and the flags the stock row's 0x40: L could never leave the Taunt.) Super Hercule (18)
 is kept out of it by Ryan's no-reveal rule (2026-10-18): the late-story script calls

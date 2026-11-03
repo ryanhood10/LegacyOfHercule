@@ -68,7 +68,7 @@
       ]
     },
     "5": {
-      "_": "Ryan, 2026-11-02: his punches got too strong too quickly. 1.05 / 1.2 / 1.25 a level on average (Gohan 1.6 / 1.6 / 1.4); ssj.c's HERCULE_STR/POW/END are this for older saves",
+      "_": "Ryan, 2026-11-02: his punches got too strong too quickly. 1.05 / 1.2 / 1.7 a level on average (Gohan 1.6 / 1.6 / 1.4; his endurance was 1.25 until the androids took 6 hits to put him down); ssj.c's HERCULE_STR/POW/END are this for older saves",
       "str": [
         200,
         340
@@ -78,8 +78,8 @@
         380
       ],
       "end": [
-        240,
-        400
+        360,
+        520
       ]
     },
     "6": {

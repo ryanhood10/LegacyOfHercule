@@ -251,7 +251,7 @@ void hercule_awaken(void) {
 #define THREE_YEARS_FLAG 68       // set by the stock skip, as the two of them learn their moves
 #define HERCULE_STR(l) (0x200 + ((l) - 1) * 270)   // data/hercule.json: start + the growth's middle per level
 #define HERCULE_POW(l) (0x400 + ((l) - 1) * 310)
-#define HERCULE_END(l) (0x180 + ((l) - 1) * 320)
+#define HERCULE_END(l) (0x180 + ((l) - 1) * 440)
 int flag_test_hook(PartyState *p, u32 id);   // party.c
 void hercule_lock(PartyState *p) {
     CharacterEntry *c = &p->chars[HERCULE_SLOT_INDEX];
@@ -259,6 +259,10 @@ void hercule_lock(PartyState *p) {
     if (c->ability_list[2] == SSJ_ABILITY) c->ability_list[2] = 16;
     if (c->display_row == 0x16) c->display_row = 0x15;
 #endif
+    // His endurance came back up (Ryan, 2026-11-02: his punches were the problem, and with 320 a level the androids took 6 hits to
+    // put him down): a save that had it cut is raised at the load
+    int lv = Character_GetLevel(c);
+    if (c->end < HERCULE_END(lv)) c->end = (u16)HERCULE_END(lv);
     if ((c->flags & (HERCULE_FLASH_BIT | HERCULE_CHARGE_BIT)) == HERCULE_FLASH_BIT) return;
     c->flags = (c->flags | HERCULE_FLASH_BIT) & ~(HERCULE_CHARGE_BIT | HERCULE_KI_BIT);
     if (flag_test_hook(p, THREE_YEARS_FLAG)) c->flags |= HERCULE_KI_BIT;

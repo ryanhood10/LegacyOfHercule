@@ -13,7 +13,9 @@
 
 //                       Easy  Normal  Hard   (Normal is the co-op tuning from before the setting)
 #define DIFF_ENEMY_HP   { 100,  150,  200 }   // regular enemies' HP, percent, while player 2 is there
-#define DIFF_DAMAGE     {  75,  125,  150 }   // damage enemies deal the players, percent, while player 2 is there
+#define DIFF_DAMAGE     {  75,  125,  150 }   // damage regular enemies deal the players, percent, while player 2 is there
+#define DIFF_BOSS_DAMAGE {  60,   80,  150 }  // damage bosses deal the players, percent, while player 2 is there (Ryan, 2026-11-02: the androids killed
+                                              // both in a few hits; Normal was 125: 29 a hit on a level 18 Hercule's 181 HP, 1.8 hits a second standing still)
 #define DIFF_SPEED      { 100,  120,  130 }   // regular enemies' walk speed, percent, while player 2 is there
 #define DIFF_BOSS_HP    {  80,  100,  125 }   // bosses' HP, percent (every boss: stock, ours, Android 16, Super 13)
 #define DIFF_REVIVE_S   {  60,   60,   60 }   // seconds a downed player waits for a revive (revive.c; Ryan 2026-11-02: 60 on every difficulty, was 20 / 10 / 6)
@@ -27,6 +29,7 @@
 int difficulty(void);
 int diff_enemy_hp_pct(void);                        // co-op or alone, by p2_coming()
 int diff_damage_pct(void);                          // co-op or alone, by coop.p2
+int diff_boss_damage_pct(void);                     // the same for a boss's hit
 int diff_speed_pct(void);
 int diff_boss_hp_pct(void);
 int diff_revive_frames(void);
