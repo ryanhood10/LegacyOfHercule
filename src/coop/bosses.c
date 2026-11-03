@@ -53,6 +53,9 @@ static const ExtraStat cell_stats[] = {
 #define CELL_STAT_COUNT (sizeof cell_stats / sizeof cell_stats[0])
 
 static const BossRule rules[] = {
+    // Android 20 (zone 7 area 19) alone, with the lone boss's HP: the stock's defeat scene moves and removes one body by its
+    // sprite, and a twin was left standing through it and after, at HP 0 and past hurting, some ways still attacking (2026-11-02)
+    { 6,  0, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
     { 3,  50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },   // test build: 17 alone, ends at half health

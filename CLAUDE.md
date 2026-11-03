@@ -51,7 +51,7 @@ leftovers, Krillin stronger at level 1 with a Disc that hits in one-player games
 full regression clean (section 10). The two-player sessions started 2026-11-01 (Parsec; his brother's pad through
 `p2_keys.py`): player 2's pickups (`src/coop/pickup.c`) and resting heals (`src/coop/regen.c`) came out of the first
 (section 1 "First session", section 9); the second session's notes are section 11, built as a team (`pp2-*`, all merged 2026-11-02; agency.c, objroom.c), and
-section 12 is what Ryan will see, section 13 the loose ends cleaned up after it; then his notes on the tournament's screens (locked tiers listed, the bracket's layout, the champion's screen: `docs/tournament.md` 12) and on Hercule's kit and player 2's level-up box (`docs/hercule.md` 3, section 9). In `build/play`, not yet played. The combos' step tables wait for a longer session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
+section 12 is what Ryan will see, section 13 the loose ends cleaned up after it; then his notes on the tournament's screens (locked tiers listed, the bracket's layout, the champion's screen: `docs/tournament.md` 12) and on Hercule's kit and player 2's level-up box (`docs/hercule.md` 3, section 9), and a playthrough of chapters 3 and 4 (section 9, `p2_scenes.txt`). In `build/play`, not yet played. The combos' step tables wait for a longer session. The Buu campaign is decided as chapters inside our ROM and researched (`docs/story-buu-rom.md`), not planned.
 
 The World Tournament on Papaya Island (`docs/tournament.md`: the plan, 9b-13 the build, 14-23 playtest rounds, 24 open
 points, 25 the team combos, 25.4 colours, 25.5 the leftovers) and its team combos (`docs/tournament-combos.md`, both

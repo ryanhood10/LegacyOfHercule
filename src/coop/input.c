@@ -235,6 +235,7 @@ void input_poll_hook(InputSystem *in) {
     if (coop.p2 && !p2_present() && !coop_solo() && p1_controllable() && !scene_running())
         p2_drop_out();                     // player.c: the second controller went away
     p2_sync_combat();
+    p2_regroup_tick();     // player.c: a scene left player 2 out of reach, or in something solid
     duel_tick();
     coop_call_tick();
     wide_update();

@@ -2,7 +2,7 @@
 # kills every wolf and their defeat scripts roll the drops: one item lands at 228-244 x 256-272 (entity vtable
 # 0x08024C90; its touch box is the last pointer of the list at 0x03001FE0, class 0x08023F18). Walking there is a long
 # way round the rocks, so the box is moved onto player 2 instead (he stands alone at 540,424 after a short walk; player
-# 1 at 568). Stock, nothing happened for 120 frames; now he takes it within 60: Hercule's HP (0x0203F098) 100 -> 149
+# 1 at 568). Stock, nothing happened for 120 frames; now he takes it within 60: Hercule's HP (0x0203F098) 100 -> 172
 # (item 11), the list one shorter (the number of drops moves with the random draws: a map's barrier item for two players, agency.c, shifts them), the item entity gone, Piccolo's HP (0x0203F028) untouched, the active slot restored.
 #   python tools/headless/st_expect.py tools/headless/pickup.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl
 load menu.ss
@@ -35,8 +35,8 @@ poke16 BX+6 404
 poke16 BX+8 546
 poke16 BX+10 444
 frames 60
-echo == 60 frames: Hercule 149, Piccolo 100, the list 4, the active slot 1
-echo EXPECT 0203f098: 0095
+echo == 60 frames: Hercule 172, Piccolo 100, the list 4, the active slot 1
+echo EXPECT 0203f098: 00ac
 peek16 0x0203F098
 echo EXPECT 0203f028: 0064
 peek16 0x0203F028

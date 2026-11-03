@@ -3,7 +3,7 @@
   "free": "0x900000",
   "party": {
     "5": {
-      "hp": 50,
+      "hp": 70,
       "ep": 30,
       "str": 2.0,
       "_": "pow 4: the Gun's damage (Gohan starts at 5; at 0.5 a shot did nothing). flags 0x40 like every stock row plus bit 3: the ability cycle stops only on learned moves (8 << index), so the Flash (0) and the Gun (3); the three years add bit 4, the Ki Blast (1); bit 5 stays off: the Megaton Punch's slot and the charged A attack",

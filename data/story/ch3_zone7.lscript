@@ -19,9 +19,9 @@ sequence ch3_z7_cutaway
         WaitFrames 60
         PlayAudio 50
   stockseq @083d37bc 1 14                ; 20: "We will fight here", the tracking device, Super Saiyan, 19, 20
-  text 0 "@^ANDROID 13: Outta date already, huh?\x0bDon't sweat it, 20.  Whatever he turns into, he's still on Dr. Gero's list."
+  text 169 "ANDROID 13: Outta date already, huh?\x0bDon't sweat it, 20.  Whatever he turns into, he's still on Dr. Gero's list."
   stockseq @083d37bc 15 16               ; 20: "19 will demonstrate this by himself!"
-  text 0 "@^ANDROID 13: Suit yourself.  I'll be watchin', 19.\x0bHoller if you need a hand."
+  text 169 "ANDROID 13: Suit yourself.  I'll be watchin', 19.\x0bHoller if you need a hand."
   stockseq @083d37bc 17 19               ; Goku: "I wouldn't bank on it", flag 76, back to area 1
 end
 
@@ -39,8 +39,9 @@ sequence ch3_z7_battle
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
   stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
-  text 0 "@^ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
+  text 169 "ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
   stockseq @083d40c8 39 40               ; 20 flies up to watch; Vegeta: "does a machine experience fear?"
+  text 1 "#VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
   script                                 ; stock entry 41, plus 13's actor leaving for his boss twin
         SetPlayerVisible 1
         DespawnEntity 165
@@ -53,10 +54,10 @@ end
 ; 13 (still on the map, by his own sprite) gets up and flies off
 sequence ch3_z7_defeat
   stock @083d4174                        ; 19 explodes, EXP, the music
-  text 0 "@^ANDROID 13: Tch...  19's nothin' but scrap metal now.\x0bYou got lucky, Saiyan.  Real lucky."
+  text 169 "ANDROID 13: Tch...  19's nothin' but scrap metal now.\x0bYou got lucky, Saiyan.  Real lucky."
   text 1 "#VEGETA: Another tin can?  Stay down and I'll make it quick."
-  text 0 "@^ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
-  text 0 "@^And don't go thinkin' you've got Dr. Gero figured out.\x0bHeh...  Not even we know what the old man's true plan is."
+  text 169 "ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
+  text 169 "And don't go thinkin' you've got Dr. Gero figured out.\x0bHeh...  Not even we know what the old man's true plan is."
   script
         PlayAudio 26
         FlyToPosition 165, 640, 96
@@ -72,6 +73,15 @@ sequence ch3_three_years
   script
         PlayAudio 27
         SetCharacterFlag_Dynamic 5, 2
-  text 0 "@^Hercule has learned the Ki Blast!"
+  fmt 0 "@^Hercule has achieved Level %d!\x0bHercule has learned the Ki Blast!"
+        StackGetCharLevel 5
   stockseq @083b88a0 13 20               ; "It's about time to head to Amenbo Island" through the L Button's line
+end
+
+; ---- zone 7 area 2: an easter egg (Ryan, 2026-11-02: free rein): a wrecked robot's target list ----
+
+sequence ch3_z7_autograph
+  text 0 "@^A wrecked robot.  It sparks, and its speaker crackles to life..."
+  text 0 "@^TARGET LIST LOADED.  GOKU: ELIMINATE.\x0bVEGETA: ELIMINATE.  PICCOLO: ELIMINATE.\x0bHERCULE:  . . .  ERROR.  NO THREAT DETECTED."
+  text 0 "@^. . . REQUEST:  ONE AUTOGRAPH.\x0bFOR MY SON."
 end

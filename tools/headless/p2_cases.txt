@@ -380,8 +380,8 @@ poke16 0x0203F098 10
 poke16 0x0203F09C 0
 poke16 0x0203F028 10
 frames 1210
-echo --- about 20 s: two ticks of 5 % for him, 10 + 2 * 24 = 58 HP and 2 * 7 EP; player 1 is resting his way up to 2/3 (703)
-echo EXPECT 0203f098: 003a
+echo --- about 20 s: two ticks of 5 % for him, 10 + 2 * 36 = 82 HP and 2 * 7 EP; player 1 is resting his way up to 2/3 (703)
+echo EXPECT 0203f098: 0052
 peek16 0x0203F098
 echo EXPECT 0203f09c: 000e
 peek16 0x0203F09C

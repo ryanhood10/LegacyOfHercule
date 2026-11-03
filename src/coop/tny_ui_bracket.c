@@ -703,6 +703,12 @@ static void champ_line(Ui *u, const Champ *c) {
     char sa[24], sb[24], line[72];
     int n = 0;
     #define PUT(str) for (const char *p = (str); *p && n < (int)sizeof line - 1; p++) line[n++] = *p
+    if (c->n == 1 && (c->ids[0] == TF_HERCULE || c->ids[0] == TF_P_HERCULE)) {   // he never lets anyone forget it
+        PUT("The people's champ does it again!");
+        line[n] = 0;
+        banner(u, line, 0, 0, 0);
+        return;
+    }
     PUT(ui_short_name(tny_fighters[c->ids[0]].name, 76, sa, sizeof sa));
     if (c->n > 1) { PUT(" & "); PUT(ui_short_name(tny_fighters[c->ids[1]].name, 76, sb, sizeof sb)); }
     PUT(c->n > 1 ? " win the " : " wins the ");

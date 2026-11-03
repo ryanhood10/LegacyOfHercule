@@ -35,6 +35,36 @@ int p1_in_play(void) {
     return 0;
 }
 
+// Player 2 and a scene: a scene moves player 1 (flies him across a map, 19's arena; walks him through a door it then seals) and
+// holds player 2 where he stood. Left a screen apart the camera's midpoint and the leash pulled both into solid ground,
+// nobody could walk (zone 7 area 15: the whole chapter's end; found by a playthrough, 2026-11-02), and a seal could close on
+// him (zone 8 areas 27, 40). When a scene ends with player 2 out of reach or inside something solid he stands beside player
+// 1; so does a player 2 pushing against nothing at all, inside something solid, for REGROUP_STUCK polls.
+#define REGROUP_X 200
+#define REGROUP_Y 130
+#define REGROUP_STUCK 60
+static u8 regroup_scene __attribute__((section(".combo.ag")));
+static u8 regroup_stuck __attribute__((section(".combo.ag")));
+void p2_regroup_tick(void) {
+    Entity *p1 = g_PlayerObject, *p2 = coop.p2;
+    int was = regroup_scene;
+    regroup_scene = (u8)(scene_running() != 0);
+    if (!p1 || !p2 || regroup_scene || companion_active() || coop_solo() || coop2.duel_active || coop2.call_state
+        || tny_ring_active() || revive_is_down(p2) || revive_p1_down() || !p1_in_play()) { regroup_stuck = 0; return; }
+    s32 at[2] = { p2->x >> 8, p2->y >> 8 };
+    int solid = !Collision_Check(COLLISION_MAP, at, (u8 *)p2 + 0x154);
+    regroup_stuck = solid && (coop.input2.current & KEY_DPAD) ? (u8)(regroup_stuck + 1) : 0;
+    s32 dx = (p1->x - p2->x) >> 8, dy = (p1->y - p2->y) >> 8;
+    int far = dx > REGROUP_X || dx < -REGROUP_X || dy > REGROUP_Y || dy < -REGROUP_Y;
+    if (!(was && (far || solid)) && regroup_stuck < REGROUP_STUCK) return;
+    regroup_stuck = 0;
+    s32 px[2] = { (p1->x >> 8) - 16, p1->y >> 8 };
+    if (px[0] < 8 || !Collision_Check(COLLISION_MAP, px, (u8 *)p2 + 0x154)) px[0] = (p1->x >> 8) + 16;
+    if (!Collision_Check(COLLISION_MAP, px, (u8 *)p2 + 0x154)) px[0] = p1->x >> 8;
+    p2->x = px[0] << 8;
+    p2->y = px[1] << 8;
+}
+
 // agency.c: player 2 stands, walks or dashes (the player-driven states but the hurt one, the last)
 int p2_in_control(void) {
     if (!coop.p2 || !coop.p2->ctrl_state) return 0;

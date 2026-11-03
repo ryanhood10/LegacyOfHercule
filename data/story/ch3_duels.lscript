@@ -134,6 +134,9 @@ sequence ch3_landing
   text 67 "HERCULE: Thank God you've arrived!  We need you in the fight!"
   text 1 "#VEGETA: And who the hell are you?"
   text 67 "HERCULE: The name's Hercule!  World Martial Arts Champion!\x0bPiccolo told me to wait here and keep an eye out for you."
+  text 67 "HERCULE: Don't you worry, I came prepared!  See?  Loaded and everything!"
+  text 1 "#VEGETA: A gun.  You brought a gun.  To fight androids."
+  text 67 "HERCULE: ...It's a really good gun."
   text 1 "#VEGETA: Hmph.  Stay out of my way."
   script
         DespawnEntity 72

@@ -617,6 +617,7 @@ SpeedModule *ai_speed4_create_hook(const u32 *cls, const Entity *e) { return spe
 // what was left. A real hit now pops the set first, so the hit tree below it reacts as to any other hit (Ryan, 2026-11-02:
 // "when you punch an enemy that is frozen, they are supposed to un-freeze"). The waits themselves are data/hercule.json's.
 #define ATTACK_FLASH 15
+#define ATTACK_PUNCH ((const u8 *)0x086DB2DC)   // entry 2 of the table at 0x086DB2CC: Player_Attack's
 ROM_FN(void, Ai_Pop, (void *ai), 0x0801AAD5);
 ROM_FN(void, Entity_ClearAux, (Entity *e), 0x080076BD);
 static void flash_thaw(Entity *e) {
@@ -658,7 +659,10 @@ void damage_calc_hook(Entity *defender, Hit *hit) {
         dmg = dmg * diff_damage_pct() / 100;   // co-op x 1.25 on Normal; alone by the difficulty (difficulty.h)
         coop2.dmg_scaled++;
     }
-    if (hercule_bullet_hit(hit)) dmg = dmg * 3 / 4 > 0 ? dmg * 3 / 4 : 1;   // krillin.c: a shade weaker than a ki blast
+    if (hercule_bullet_hit(hit)) {                  // krillin.c: a shade weaker than a ki blast, and no ki: the hit tree that
+        dmg = dmg * 3 / 4 > 0 ? dmg * 3 / 4 : 1;    // follows reads the punch's descriptor, so the androids' absorbers (id 9's
+        hit->attack = ATTACK_PUNCH;                 // trees, Android 19's and 13's) cannot drink it
+    }
     if (!player && attack[1] != ATTACK_FLASH && is_enemy(defender)) flash_thaw(defender);
     hit->dmg = dmg;
     hit->secondary = (s32)(res * dmg) >> 7;

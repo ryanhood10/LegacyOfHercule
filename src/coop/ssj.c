@@ -268,4 +268,6 @@ void hercule_lock(PartyState *p) {
     if (c->str > HERCULE_STR(level)) c->str = (u16)HERCULE_STR(level);
     if (c->end > HERCULE_END(level)) c->end = (u16)HERCULE_END(level);
     c->pow = (u16)HERCULE_POW(level);
+    c->max_hp = (u16)(c->max_hp * 7 / 5);          // a new game's 70 HP against the old 50
+    c->hp = (u16)(c->hp * 7 / 5);
 }

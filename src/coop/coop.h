@@ -65,6 +65,7 @@ int p2_coming(void);         // player 2's entity, or a pad and a party member f
 void p2_drop_out(void);
 int p1_in_play(void);        // player 1 in a player-driven control state (player.c)
 void duel_p2_left(void);     // duel.c: player 2 left during a duel: player 1 wins      // the second pad went away: player 2's entity leaves (player.c)
+void p2_regroup_tick(void);
 int p1_controllable(void);   // player 1 is in a player-driven control state (not a cutscene)
 
 #define HUD2_X_OFFSET 144  // panel art spans x = 8..88; place the second copy at 152..232

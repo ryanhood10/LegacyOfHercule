@@ -15,7 +15,7 @@ sequence ch4_gero_first
         SetStoryFlag 90
         WalkToPosition 14, 192, 240
   stock @083d5ddc                        ; Gero: you'll never get inside!
-  text 0 "@^ANDROID 13: Remember me?\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
+  text 169 "ANDROID 13: Remember me?\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
   script                                 ; stock entry 2: Gero (and 13, his boss twin) fight
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 14, 1
@@ -44,7 +44,7 @@ sequence ch4_gero_door_a27
         SpawnCharacterEntity 165, 360, 176
         SetEntityFacing 165, 2
         WaitFrames 20
-  text 0 "@^ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
   script
         DespawnEntity 165
   stock @083d62dc                        ; the fight, stage 50-75
@@ -74,7 +74,7 @@ sequence ch4_gero_door_a40
         SpawnCharacterEntity 165, 232, 264
         SetEntityFacing 165, 2
         WaitFrames 20
-  text 0 "@^ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
   script
         DespawnEntity 165
   stock @083d7748                        ; the fight, stage 50-75
@@ -106,7 +106,7 @@ sequence ch4_lab
         WaitFrames 30
         SetEntityFacing 165, 1
         WaitFrames 20
-  text 0 "@^ANDROID 13: (Heh...  You built 'em too well, Doc.)"
+  text 169 "ANDROID 13: (Heh...  You built 'em too well, Doc.)"
   text 0 "@^(Don't you worry.  Whatever they do to you, I'll fulfill my destiny.\x0bGoku is mine.)"
   script
         WalkToPosition 165, 336, 296

@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## Scenes and player 2 (headless, 2026-11-02)
+
+`tools/headless/p2_scenes.txt` (self-checking, in `regfull.sh`): zone 7 area 15 (Vegeta flown into the arena, player 2 brought beside him, both walk, the flash holds no boss, bullets hit), zone 8 area 40 (the door's seal with player 2 inside its rect), zone 7 area 19 (one Android 20, nobody left after his scene). `waitnz 0x03001FDC N` then `stepz 0x03001FDC N`, or the steps run before the scene starts; pressing A past a scene's end leaves idle players to die and the game goes back to the title.
+
 ## Hercule's kit (headless, 2026-11-02)
 
 `tools/headless/hercule_kit.txt` (self-checking, in `regfull.sh`): the flags and list of a new game, L between the Flash and the Gun, the flash's two seconds and a punch thawing one enemy (test command 47 counts the held), the Ki Blast's and the Gun's damage at the same stats (printed: the bullet about 3/4), player 2's level-up box and status page, and the three-year scene from its trigger (flag 66 set, 68 clear: Hercule's flags 0x4B -> 0x5B). `ssj_lock.txt` takes an old save's Hercule through the load.

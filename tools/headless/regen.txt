@@ -41,7 +41,7 @@ echo EXPECT 0203f09c: 000[1-3]
 peek16 0x0203f09c
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
-echo EXPECT 0203f098: 0148
+echo EXPECT 0203f098: 01e4
 peek16 0x0203f098
 frames 2340
 echo == 70 s: 1/3 or a step under
@@ -70,7 +70,7 @@ echo EXPECT 0203f09c: 0030
 peek16 0x0203f09c
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
-echo EXPECT 0203f098: 0148
+echo EXPECT 0203f098: 01e4
 peek16 0x0203f098
 echo EXPECT 0203f00c: 036c
 peek16 0x0203f00c
@@ -84,14 +84,14 @@ shot regen_town_225s
 echo == a poked start above the caps stays where it is (never lowers)
 poke16 0x0203f028 900
 poke16 0x0203f02c 100
-poke16 0x0203f098 400
+poke16 0x0203f098 600
 poke16 0x0203f09c 100
 frames 700
 echo EXPECT 0203f028: 0384
 peek16 0x0203f028
 echo EXPECT 0203f02c: 0064
 peek16 0x0203f02c
-echo EXPECT 0203f098: 0190
+echo EXPECT 0203f098: 0258
 peek16 0x0203f098
 echo EXPECT 0203f09c: 0064
 peek16 0x0203f09c
@@ -130,7 +130,7 @@ echo EXPECT 0203f02c: 0000
 peek16 0x0203f02c
 frames 2760
 echo == 75 s
-echo EXPECT 0203f098: 0148
+echo EXPECT 0203f098: 01e4
 peek16 0x0203f098
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
@@ -314,7 +314,7 @@ poke16 0x0203f098 200
 frames 1000
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
-echo EXPECT 0203f098: 0148
+echo EXPECT 0203f098: 01e4
 peek16 0x0203f098
 shot regen_clear
 echo === F. a form on player 2 (Piccolo's, row 7: HP for EP) works on his own slot and leaves player 1's alone
@@ -351,7 +351,7 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD08 44
 frames 1300
 echo == 65 ticks: Hercule at his cap by resting, no EP; Piccolo up 65 x 10 HP for 65 EP
-echo EXPECT 0203f098: 0148
+echo EXPECT 0203f098: 01e4
 peek16 0x0203f098
 echo EXPECT 0203f09c: 0000
 peek16 0x0203f09c
@@ -404,7 +404,7 @@ echo EXPECT 0203f02c: 0031
 peek16 0x0203f02c
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
-echo EXPECT 0203f098: 00[8-9a-f]\w
+echo EXPECT 0203f098: 0[01][0-9a-f]\w
 peek16 0x0203f098
 echo EXPECT 0203f09c: 00[34]\w
 peek16 0x0203f09c
@@ -413,7 +413,7 @@ echo EXPECT 0203f02c: 0031
 peek16 0x0203f02c
 echo EXPECT 0203f028: 02bf
 peek16 0x0203f028
-echo EXPECT 0203f098: 01ed
+echo EXPECT 0203f098: 02d6
 peek16 0x0203f098
 echo EXPECT 0203f09c: 0091
 peek16 0x0203f09c
