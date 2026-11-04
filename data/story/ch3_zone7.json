@@ -16,7 +16,7 @@
       "map": {"zone": 7, "area": 2},
       "_": "Claude's extra, 2026-11-02 (Ryan: an easter egg): a wrecked robot with something to say",
       "add_records": [
-        {"kind": "npc", "sprite": 18, "x": 40, "y": 216, "facing": 3, "talk": "seq:ch3_z7_autograph"}
+        {"kind": "npc", "sprite": 46, "x": 200, "y": 240, "facing": 3, "talk": "seq:ch3_z7_autograph"}
       ]
     },
     {

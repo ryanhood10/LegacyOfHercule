@@ -1,0 +1,23 @@
+# The Eggbots (sprites 46, 47): no twin with two players, in regfull.sh (docs/coop-design.md "Difficulty"). A wolf map's twins are the control.
+# Zone 2 area 45: stat 40's three records, in co-op. Zone 7 area 2's wrecked robot is an Eggbot on open ground (200, 240).
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x2d02
+poke32 0x0203FD54 0x00a000a0
+poke32 0x0203FD08 5
+frames 400
+map
+shot egg_map
+echo --- three records, three Eggbots, player 1, the map's two helpers, player 2, a seventh: no twins (it was ten)
+echo EXPECT entities 7
+ents
+poke32 0x0203FD0C 0x0207
+poke32 0x0203FD54 0x00f00090
+poke32 0x0203FD08 5
+frames 400
+map
+shot egg_npc
+frames 60
+echo ALIVE

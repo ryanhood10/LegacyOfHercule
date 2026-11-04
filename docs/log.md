@@ -2,6 +2,10 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-04
+
+- **The Eggbots (sprites 46, 47) have no twin with two players** (`enemies.c` `no_twin`; Ryan). The wrecked robot of zone 7 area 2 is an Eggbot on open ground: it was a tiger bandit (sprite 18) inside solid terrain at (40, 216), never to be seen or reached.
+
 ## 2026-11-03
 
 - **Story bosses lighter with two players (a pair's bodies x 0.7, 19 + 13 x 0.5, a lone boss x 1.4; not the Cell Games), tournament EXP doubled** (`docs/perfect-pass.md` 9).

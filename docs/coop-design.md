@@ -1245,6 +1245,7 @@ Normal is exactly the co-op tuning from before.
 |---|---|---|---|
 | regular enemies' HP (with player 2) | x 1.0 | x 1.5 | x 2.0 |
 | damage regular enemies deal the players (with player 2) | x 0.75 | x 1.25 | x 1.5 |
+| (no twin at any difficulty: the Eggbots, sprites 46 and 47, Ryan 2026-11-04; the corn maze's triceratops do not spawn with two players) | | | |
 | damage bosses and tournament opponents deal the players (with player 2; 2026-11-02, Ryan: the androids killed both in a few hits; was the row above) | x 0.6 | x 0.8 | x 1.5 |
 | regular enemies' walk speed (with player 2) | x 1.0 | x 1.2 | x 1.3 |
 | twin regular enemies | no | yes | yes |

@@ -60,6 +60,10 @@ static int corn_maze_map(void) {
     return map[0] == 4 && (map[1] == 56 || map[1] == 57 || map[1] == 59);
 }
 static int corn_maze_single(const EnemyRecord *rec) { return rec->sprite_id == TRICERATOPS_SPRITE && corn_maze_map(); }
+// The Eggbots, which explode as they die: no twin with two players (Ryan, 2026-11-04). Each still has the co-op HP.
+#define EGGBOT_SPRITE_A 46
+#define EGGBOT_SPRITE_B 47
+static int no_twin(const EnemyRecord *rec) { return rec->sprite_id == EGGBOT_SPRITE_A || rec->sprite_id == EGGBOT_SPRITE_B; }
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
@@ -433,7 +437,7 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         }
         if (p) { tst = p; tstat = rule->partner_stat; }
     }
-    Entity *twin = ((coop2.off & COOP_OFF_TWINS) || (!boss && !diff_regular_twins())) ? 0
+    Entity *twin = ((coop2.off & COOP_OFF_TWINS) || (!boss && !diff_regular_twins()) || no_twin(rec)) ? 0
                  : create_coop_enemy(rec, tst, !boss, dx, (boss && !(coop2.off & COOP_OFF_PARTNER)) ? partner_sprite(rec->stat_index) : 0, 1, tstat);
     if (twin) {
         EntityList_Add(g_SceneTable[1], twin);   // the loader adds the returned original itself
