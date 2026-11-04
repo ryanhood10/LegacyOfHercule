@@ -354,6 +354,13 @@ static s32 boss_hp(s32 hp) {
     return hp >= 1000 && v < 1000 ? 1000 : v;
 }
 
+// A boss's HP as one of two bodies against two players; a boss that had 1000 stays one (is_boss_rec)
+static s32 coop_pair_hp(s32 hp, const BossRule *r) {
+    int pct = r && r->coop_hp_pct ? r->coop_hp_pct : r && r->hp_pct ? 100 : COOP_PAIR_HP_PCT;
+    s32 v = hp * pct / 100;
+    return hp >= 1000 && v < 1000 ? 1000 : v;
+}
+
 Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
@@ -373,9 +380,13 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = buf.max_hp * SOLO_PAIR_HP_PCT / 100;
     }
+    if (is_boss_rec(rec, st) && !alone && !solo_pair && (pair || (p2_coming() && !coop_solo())) && !(coop2.off & COOP_OFF_TWINS)) {   // two bodies, two players (bosses.h)
+        if (st != &buf) { buf = *st; st = &buf; }
+        buf.max_hp = coop_pair_hp(buf.max_hp, rule);
+    }
     if (alone && p2_coming() && !coop_solo() && !(rule->flags & BOSS_FLAT)) {   // one boss against two players: more HP (bosses.h)
         if (st != &buf) { buf = *st; st = &buf; }
-        buf.max_hp = buf.max_hp * COOP_LONE_BOSS_HP_PCT / 100;
+        buf.max_hp = buf.max_hp * (rule->hp_pct ? COOP_LONE_BOSS_HP_PCT : COOP_LONE_BOSS_LIGHT_PCT) / 100;
     }
     if (corn_maze_single(rec) && p2_coming() && !coop_solo()) {   // the corn maze with two players: no triceratops
         // the loader puts the returned entity on the list (a null crashes it), so the record's enemy is built and
@@ -415,6 +426,10 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
         if (p && solo_pair) {
             if (p != &tbuf) { tbuf = *p; p = &tbuf; }
             tbuf.max_hp = tbuf.max_hp * SOLO_PAIR_HP_PCT / 100;
+        }
+        if (p && !solo_pair) {
+            if (p != &tbuf) { tbuf = *p; p = &tbuf; }
+            tbuf.max_hp = coop_pair_hp(tbuf.max_hp, boss_rule(rule->partner_stat));
         }
         if (p) { tst = p; tstat = rule->partner_stat; }
     }

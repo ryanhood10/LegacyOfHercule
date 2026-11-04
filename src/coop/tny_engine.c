@@ -177,45 +177,60 @@ static TnyEng eng TNY_SECTION("eng") __attribute__((used));
 #define STANDIN_SPRITE    121    // Tien's body (AI set 98)
 
 // ---- opponents' numbers (stats 160-219) ------------------------------------------------------------------
-// Fixed per tier (the tournament's, not the fighter's own): a tier base times the fighter's power, then the
-// difficulty on top in enemy_spawn_hook. A match is a shorter thing than a story boss, and a tournament has three or
-// four of them: at the level a tier opens about 30 of a player's hits win it and about 20 of the opponent's lose it.
-// Ryan, 2026-11-02: two players at levels 17-20 could not get past a Rookie first round (was 1400, 12/12/10: 30 hits to
-// win, 9 on Hercule to lose; the higher tiers were story bosses' numbers).
-typedef struct TierBase { s32 hp; u8 melee, ranged, defence, _p; } TierBase;
-static const TierBase tier_base[TIER_COUNT] = {
-    {  700,  8,  8,  6, 0 },    // Rookie: open from the start (levels about 5-20)
-    { 1300, 13, 13, 12, 0 },    // Adept: after the Android 19 fight (about 20)
-    { 2200, 20, 20, 20, 0 },    // Z-Fighter: about 30
-    { 3400, 30, 32, 32, 0 },    // Champion: about 40
-    { 5200, 40, 42, 42, 0 },    // Legend: about 50
+// Every fighter has his own strength, and a tier is who is drawn (Ryan, 2026-11-03: "each fighter has a different level of strength and ability, its just
+// that we tier them in these divisions. TRY to make in anime-accurate, but it needs to at least be worth the fight"; a tier's numbers used to decide,
+// with a fighter's own a small part of it). His rating on one scale reads his numbers off opp_curve: 100 about a Rookie regular, 200 Adept, 300 Z-Fighter,
+// 400 Champion, 500 Legend. The difficulty goes on top in enemy_spawn_hook. At a tier's opening level about 30 of a player's hits win and about 20 of the
+// opponent's lose against one in the middle of it; the top of a tier is the fight of it. Our tuning, to be adjusted in play.
+typedef struct OppPoint { s16 rating, hp; u8 melee, ranged, defence, _p; } OppPoint;
+static const OppPoint opp_curve[] = {
+    {  50,  500,  6,  6,  4, 0 },
+    { 100,  900, 11, 11,  8, 0 },
+    { 150, 1150, 13, 13, 10, 0 },
+    { 200, 1400, 15, 15, 13, 0 },
+    { 250, 1800, 18, 18, 17, 0 },
+    { 300, 2200, 20, 20, 20, 0 },
+    { 350, 2800, 25, 26, 26, 0 },
+    { 400, 3400, 30, 32, 32, 0 },
+    { 450, 4300, 35, 37, 37, 0 },
+    { 500, 5200, 40, 42, 42, 0 },
+    { 550, 6100, 45, 47, 47, 0 },
+    { 600, 7000, 50, 52, 52, 0 },
 };
-// power (percent of the tier base: HP x p, attack and defence x (100 + p) / 200) and the AI set that fits his
-// body (docs/sprites.md "AI sets": 21 the melee boss set for most; the Cells' own; 98 the dojo bodies; 29
+#define OPP_POINTS (int)(sizeof opp_curve / sizeof opp_curve[0])
+// Below a tier's floor a fighter comes halfway up to it: still the weakest in the room, but a fight (Yamcha in a Z-Fighter bracket)
+static const s16 tier_floor[TIER_COUNT] = { 0, 150, 250, 350, 450 };
+// his rating and the AI set that fits his body (docs/sprites.md "AI sets": 21 the melee boss set for most; the Cells' own; 98 the dojo bodies; 29
 // the androids; 129 Tao's robot set); a body without the set's pose groups falls back (ai_for)
-typedef struct TOpp { u8 power, ai, base; } TOpp;
+typedef struct TOpp { u16 rating; u8 ai, base; } TOpp;
 #define B_BOSS 29                // stock stat copied first: the boss class (death without a script)
 #define B_JR   26                // Cell Jr's own class
 static const TOpp opp_tab[TF_GOHAN] = {
-    [TF_YAMCHA] = { 85, 21, B_BOSS },  [TF_TIEN] = { 95, 98, B_BOSS },     [TF_FRIEZA] = { 110, 21, B_BOSS },
-    [TF_MECHA_FRIEZA] = { 105, 21, B_BOSS }, [TF_KING_COLD] = { 115, 21, B_BOSS }, [TF_HERCULE] = { 75, 98, B_BOSS },
-    [TF_ROSHI] = { 100, 21, B_BOSS },  [TF_TAO] = { 95, 129, B_BOSS },     [TF_SPOPOVICH] = { 95, 21, B_BOSS },
-    [TF_YAMU] = { 85, 21, B_BOSS },    [TF_CHICHI] = { 80, 21, B_BOSS },   [TF_VIDEL] = { 85, 21, B_BOSS },
-    [TF_CHIAOTZU] = { 78, 21, B_BOSS },
-    [TF_A19] = { 95, 29, B_BOSS },     [TF_GERO] = { 90, 29, B_BOSS },     [TF_A13] = { 105, 29, B_BOSS },
-    [TF_A17] = { 110, 21, B_BOSS },    [TF_A18] = { 105, 21, B_BOSS },
-    [TF_IMPERFECT_CELL] = { 105, 80, B_BOSS }, [TF_A16] = { 110, 21, B_BOSS },
-    [TF_SEMI_CELL] = { 108, 116, B_BOSS }, [TF_PERFECT_CELL] = { 120, 148, B_BOSS }, [TF_CELL_JR] = { 85, 21, B_JR },
-    [TF_COOLER] = { 120, 21, B_BOSS }, [TF_NAMEKIAN] = { 95, 21, B_BOSS }, [TF_BROLY] = { 130, 21, B_BOSS },
-    [TF_PARAGUS] = { 90, 21, B_BOSS },
-    [TF_SUPER_PERFECT_CELL] = { 125, 138, B_BOSS }, [TF_SUPER13] = { 130, 21, B_BOSS }, [TF_BGOKU] = { 120, 21, B_BOSS },
-    [TF_MAJIN_VEGETA] = { 120, 21, B_BOSS }, [TF_MYSTIC_GOHAN] = { 125, 21, B_BOSS }, [TF_SAIYAMAN] = { 100, 21, B_BOSS },
-    [TF_BHERCULE] = { 80, 21, B_BOSS }, [TF_BPICCOLO] = { 105, 21, B_BOSS }, [TF_SUPER_BUU] = { 135, 21, B_BOSS },
-    [TF_PUIPUI] = { 110, 21, B_BOSS }, [TF_GOTEN] = { 100, 21, B_BOSS },   [TF_KID_TRUNKS] = { 100, 21, B_BOSS },
-    [TF_YAKON] = { 120, 21, B_BOSS },  [TF_PIKKON] = { 115, 21, B_BOSS },  [TF_DABURA] = { 120, 21, B_BOSS },
-    [TF_EVIL_BUU] = { 115, 21, B_BOSS }, [TF_KIBITO] = { 110, 21, B_BOSS }, [TF_FAT_BUU] = { 120, 21, B_BOSS },
-    [TF_JANEMBA] = { 125, 21, B_BOSS }, [TF_KID_BUU] = { 130, 21, B_BOSS }, [TF_GOTENKS] = { 125, 21, B_BOSS },
-    [TF_UUB] = { 125, 21, B_BOSS },    [TF_VEGITO] = { 140, 21, B_BOSS },
+    // the Rookie's people: earthlings at the bottom, Tien and the Saiyan saga's best near the top, Frieza's family (Trunks cut them down) above them
+    [TF_HERCULE] = { 60, 98, B_BOSS }, [TF_CHICHI] = { 65, 21, B_BOSS },   [TF_VIDEL] = { 70, 21, B_BOSS },
+    [TF_CHIAOTZU] = { 70, 21, B_BOSS }, [TF_YAMCHA] = { 85, 21, B_BOSS },  [TF_TAO] = { 90, 129, B_BOSS },
+    [TF_ROSHI] = { 95, 21, B_BOSS },   [TF_YAMU] = { 95, 21, B_BOSS },     [TF_SPOPOVICH] = { 105, 21, B_BOSS },
+    [TF_TIEN] = { 110, 98, B_BOSS },   [TF_KING_COLD] = { 135, 21, B_BOSS }, [TF_FRIEZA] = { 140, 21, B_BOSS },
+    [TF_MECHA_FRIEZA] = { 145, 21, B_BOSS },
+    // Adept: Gero's models, 17 and 18 well above 19 and Gero
+    [TF_GERO] = { 170, 29, B_BOSS },   [TF_A19] = { 185, 29, B_BOSS },     [TF_A13] = { 215, 29, B_BOSS },
+    [TF_A18] = { 230, 21, B_BOSS },    [TF_A17] = { 240, 21, B_BOSS },
+    // Z-Fighter
+    [TF_IMPERFECT_CELL] = { 300, 80, B_BOSS }, [TF_A16] = { 320, 21, B_BOSS },
+    // Champion: Cell Jr a real threat, Paragus the weak one beside Broly
+    [TF_PARAGUS] = { 340, 21, B_BOSS }, [TF_CELL_JR] = { 370, 21, B_JR },  [TF_SEMI_CELL] = { 380, 116, B_BOSS },
+    [TF_NAMEKIAN] = { 380, 21, B_BOSS }, [TF_COOLER] = { 410, 21, B_BOSS }, [TF_PERFECT_CELL] = { 430, 148, B_BOSS },
+    [TF_BROLY] = { 470, 21, B_BOSS },
+    // Legend: the Buu saga's comic relief, then the strongest of the game; Super Buu at the very top
+    [TF_BHERCULE] = { 330, 21, B_BOSS }, [TF_SAIYAMAN] = { 400, 21, B_BOSS }, [TF_BPICCOLO] = { 440, 21, B_BOSS },
+    [TF_SUPER13] = { 490, 21, B_BOSS }, [TF_MAJIN_VEGETA] = { 500, 21, B_BOSS }, [TF_BGOKU] = { 510, 21, B_BOSS },
+    [TF_SUPER_PERFECT_CELL] = { 515, 138, B_BOSS }, [TF_MYSTIC_GOHAN] = { 530, 21, B_BOSS }, [TF_SUPER_BUU] = { 550, 21, B_BOSS },
+    // the hidden challengers: above the tier they appear in
+    [TF_PUIPUI] = { 150, 21, B_BOSS }, [TF_GOTEN] = { 175, 21, B_BOSS },   [TF_KID_TRUNKS] = { 175, 21, B_BOSS },
+    [TF_YAKON] = { 190, 21, B_BOSS },  [TF_PIKKON] = { 280, 21, B_BOSS },  [TF_DABURA] = { 300, 21, B_BOSS },
+    [TF_EVIL_BUU] = { 300, 21, B_BOSS }, [TF_KIBITO] = { 340, 21, B_BOSS }, [TF_FAT_BUU] = { 380, 21, B_BOSS },
+    [TF_JANEMBA] = { 400, 21, B_BOSS }, [TF_UUB] = { 460, 21, B_BOSS },    [TF_KID_BUU] = { 480, 21, B_BOSS },
+    [TF_GOTENKS] = { 490, 21, B_BOSS }, [TF_VEGITO] = { 600, 21, B_BOSS },
 };
 
 // Pose groups each AI set plays (docs/sprites.md "AI sets"): a body must have them or the AI reads past the record
@@ -258,20 +273,27 @@ static int scale_tier(int id) {
     return tny_fighters[id].tier;
 }
 
+static int opp_lerp(int r, int r0, int r1, int a, int b) { return a + (b - a) * (r - r0) / (r1 - r0); }
+
 int tny_resolve_stat(int stat_index, EnemyStat *out) {
     int id = stat_index - TNY_STAT0;
     if (id < 0 || id >= TF_GOHAN) return 0;
     const TOpp *o = &opp_tab[id];
-    const TierBase *t = &tier_base[scale_tier(id)];
-    int p = o->power ? o->power : 100;
+    int r = o->rating, floor = tier_floor[scale_tier(id)];
+    if (r < floor) r = (r + floor) / 2;
+    int k = 0;
+    while (k < OPP_POINTS - 2 && r > opp_curve[k + 1].rating) k++;
+    const OppPoint *a = &opp_curve[k], *b = a + 1;
+    if (r < a->rating) r = a->rating;
+    if (r > b->rating) r = b->rating;
     *out = ENEMY_STATS[o->base];
     out->exp = 0;                               // no kill EXP: the engine pays a trickle per match
     out->ai_set = ai_for(id);
-    out->max_hp = t->hp * p / 100;
+    out->max_hp = opp_lerp(r, a->rating, b->rating, a->hp, b->hp);
     if (eng.magic == ENG_MAGIC && eng.lone) out->max_hp = out->max_hp * COOP_LONE_BOSS_HP_PCT / 100;
-    out->melee = (u8)cap(t->melee * (100 + p) / 200, 255);
-    out->ranged = (u8)cap(t->ranged * (100 + p) / 200, 255);
-    out->defence = (u8)cap(t->defence * (100 + p) / 200, 110);
+    out->melee = (u8)cap(opp_lerp(r, a->rating, b->rating, a->melee, b->melee), 255);
+    out->ranged = (u8)cap(opp_lerp(r, a->rating, b->rating, a->ranged, b->ranged), 255);
+    out->defence = (u8)cap(opp_lerp(r, a->rating, b->rating, a->defence, b->defence), 110);
     return 1;
 }
 
@@ -415,6 +437,14 @@ static int pool_of(int tier, u8 *out) {
     for (int id = 0; id < TF_GOHAN; id++)
         if ((opp_pools[id] >> tier & 1) && tny_in_pool(id) && !picked(id)) { if (out) out[n] = (u8)id; n++; }
     return n;
+}
+
+// The waiting room's crowd: the pool of the highest tier open now (tny_grounds.c)
+int tny_in_top_pool(int id) {
+    if (id < 0 || id >= TF_GOHAN) return 0;
+    int top = TIER_ROOKIE;
+    for (int t = TIER_ROOKIE; t < TIER_COUNT; t++) if (tny_tier_open(t)) top = t;
+    return (opp_pools[id] >> top & 1) && tny_in_pool(id);
 }
 
 int tny_unlocked(int id) {
@@ -1424,7 +1454,7 @@ static u32 power_of(int lead) {
     u32 p = 0;
     for (int i = 0; i < unit_w(); i++) {
         int id = eng.br.seat[lead + i];
-        if (id < TF_GOHAN) p += opp_tab[id].power;
+        if (id < TF_GOHAN) p += opp_tab[id].rating;
         else if (id != NO) p += 100;
     }
     return p ? p : 1;
@@ -1611,7 +1641,7 @@ static void rumble_round(void) {
             u8 pool[TF_GOHAN];
             int np = pool_of(eng.tier, pool), best = -1;
             for (int i = 0; i < np; i++)
-                if (!used(pool[i]) && (best < 0 || opp_tab[pool[i]].power > opp_tab[best].power)) best = pool[i];
+                if (!used(pool[i]) && (best < 0 || opp_tab[pool[i]].rating > opp_tab[best].rating)) best = pool[i];
             if (best >= 0) { ids[n++] = (u8)best; use(best); }
         }
         u8 help[MAX_OPP];
@@ -1665,7 +1695,7 @@ static void exp_trickle(int slot) {
     int lv = Character_GetLevel(c);
     if (lv >= 50) return;
     s32 span = Character_LevelExp(lv + 1) - Character_LevelExp(lv);
-    s32 amount = span / 16;                          // a Quick bracket: about a fifth of a level
+    s32 amount = span / 8;                           // a Quick bracket: about 3/8 of a level (span / 16 until 2026-11-03, Ryan: a little more)
     if (amount < 1) amount = 1;
     u32 *ev = Arena_Alloc(16);
     if (!ev) return;

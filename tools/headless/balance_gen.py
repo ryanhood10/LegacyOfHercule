@@ -27,15 +27,34 @@ out("poke32 0x0203FD0C 0xc07", "poke32 0x0203FD54 0x1e00f5", "poke32 0x0203FD08 
     "waitnz 0x03001FDC 300", "stepz 0x03001FDC 80", "frames 5", "map")
 full()
 out("watch 0x0203F098 300000000", "echo --- 9000 less the hit", r"echo EXPECT 0203f098: 23(0f|1[0-9a-f]|2[01])$", "peek16 0x0203F098 1")
-out("echo === 13 beside 19", "findent B 0x0203FB04", r"echo EXPECT \w+: 00000898", "peek B+0x188 1")
+out("echo === 13 beside 19, with two players: half of 2200", "findent B 0x0203FB04", r"echo EXPECT \w+: 0000044c", "peek B+0x188 1")
 
-out("echo === a Rookie first round: the opponent's HP, 700 x his power (78-115 %)", "load menu.ss", "p2 0", "maptest 13", "frames 300")
+out("echo === a Rookie first round: the opponent's HP off his own rating (580-1130 in that pool)", "load menu.ss", "p2 0", "maptest 13", "frames 300")
 cmd(23, 0)
 cmd(21, 42)
 cmd(5, 15 | 15 << 8, 168 | 306 << 16)
 out("frames 190", "key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80",
     "key 1 6", "frames 80", "key 1 6", "frames 80", "key 1 6", "frames 80", "p2 1", "frames 4", "p2 0", "frames 80",
-    "frames 400", "stepz 0x0203ECFC 200", "frames 60", "map", "deref O 0x03001130", r"echo EXPECT \w+: 00000(2[23][0-9a-f]|2[4-9a-f][0-9a-f]|3[0-2][0-9a-f])$", "peek O+0x188 1")
+    "frames 400", "stepz 0x0203ECFC 200", "frames 60", "map", "deref O 0x03001130", r"echo EXPECT \w+: 00000(2[4-9a-f][0-9a-f]|3[0-9a-f][0-9a-f]|4[0-6][0-9a-f])$", "peek O+0x188 1")
+# every fighter his own strength, the tier only who is drawn; below a tier's floor he comes halfway up to it: (name, tier, flags, id, expected HP in hex)
+for name, ti, flags, opp, hp in (("Chi-Chi in Rookie", 0, [], 10, "026c"), ("Yamcha in Z-Fighter", 2, [85, 127, 136], 0, "04d3"),
+                                 ("Super Buu in Legend", 4, [85, 127, 136, 146, 191, 301, 402, 421, 382], 35, "17d4")):
+    out(f"echo === {name}", "load menu.ss", "p2 0", "maptest 13", "frames 300")
+    cmd(23, 0)
+    cmd(21, 42, 0x7E000000 | opp)
+    if flags:
+        out("flags " + " ".join(f"+{f}" for f in flags), "frames 4")
+    cmd(5, 15 | 15 << 8, 168 | 306 << 16)
+    out("frames 190", "key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80")
+    for _ in range(ti):
+        out("key 0x80 6", "frames 20")
+    out("key 1 6", "frames 80", "key 1 6", "frames 80")
+    if ti:
+        out("key 1 6", "frames 80")
+    out("key 1 6", "frames 80", "p2 1", "frames 4", "p2 0", "frames 80")
+    if ti:
+        out("p2 1", "frames 4", "p2 0", "frames 80")
+    out("frames 400", "stepz 0x0203ECFC 200", "frames 60", "map", "deref O 0x03001130", rf"echo EXPECT \w+: 0000{hp}", "peek O+0x188 1", "ents")
 here = os.path.dirname(os.path.abspath(__file__))
 open(os.path.join(here, "balance.txt"), "w", newline="\n").write("\n".join(L) + "\n")
 print(f"balance.txt: {len(L)} lines")

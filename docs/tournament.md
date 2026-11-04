@@ -101,7 +101,7 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
   Tao, Spopovich, Yamu, Hercule), Villains (Frieza to Super 13), Buu Saga (the Legend imports).
 - **Co-op 1v1 flow:** the two players' matches alternate round by round, the other watches from the ring's
   edge in solo mode; the final between them is a duel.
-- **Stats:** opponents have fixed numbers per tier (the difficulty setting still multiplies them); a
+- **Stats** (2026-11-03: see section 12's numbers in `tny_engine.c` `opp_tab`, each fighter his own rating; a tier is who is drawn): the difficulty setting still multiplies them; a
   tournament-only playable derives his numbers from the lead's level with per-fighter multipliers (the
   Android 16 recipe), so your LoG2 strength carries over and a villain feels like himself.
 - **The director:** one list box (1v1 / 2v2 / Royal Rumble; 2v2 hidden in 1P), then Quick / Full for 1v1, then
@@ -115,8 +115,8 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 | tier | opens when | flag |
 |---|---|---|
 | 1 Rookie | from the start (Gohan's house flight spot) | none |
-| 2 Adept | the Android 19 + 13 fight is won (chapter 3) | `ch3_zone7`'s end flag (to confirm when built) |
-| 3 Z-Fighter | Gingertown is done (chapter 5) | `ch5_lookout`'s Gingertown end flag |
+| 2 Adept | the Android 19 + 13 fight is won (chapter 3) | 85 (the stock defeat scene, kept by `ch3_zone7`) |
+| 3 Z-Fighter | Gingertown is done (chapter 5) | 136 (`ch5_lookout`'s `ch5_gingertown_end`) |
 | 4 Champion | the ten-day wait begins (Perfect Cell, the Games announced) | 191 (the Cell Games landing opens) |
 | 5 Legend | Cell and Super 13 beaten (the post-game) | 382 (Super 13 beaten) |
 
@@ -415,7 +415,7 @@ the board and the waiting room's fighters. Code: `src/coop/tny_grounds.c` (CoopC
 | 12 | street (7/2) | 480 x 800 | vendor at the food stall, ZZTV reporter, three fans | gate (216, 0)-(264, 48) Up -> courtyard (240, 196); bottom (0, 764)-(480, 800) Down -> plaza (240, 64) |
 | 13 | courtyard (7/3) | 480 x 240 | the unlock board (our art, x 40-87, y 128-167; A in (36, 164)-(92, 204): CoopCall 28, 1); a fan | gate (216, 212)-(264, 240) Down -> street (240, 64); stadium door (216, 56)-(264, 100) Up -> infirmary (400, 120) |
 | 14 | infirmary (7/4) | 480 x 160 | a nurse | right (376, 136)-(424, 160) Down -> courtyard (240, 116); left (32, 136)-(56, 160) Down -> waiting room (360, 112) |
-| 15 | waiting room (7/5), the hub | 400 x 400 | save pad on Buu's pad (24, 264)-(65, 305); the director (168, 328) at the ring door; today's fighters (six spots) | top (336, 56)-(384, 100) Up -> infirmary (44, 120); ring door (96, 330)-(144, 360) Down -> ring walkway (360, 192) |
+| 15 | waiting room (7/5), the hub | 400 x 400 | save pad on Buu's pad (24, 264)-(65, 305); the director (168, 328) at the ring door; today's fighters (six spots, from the highest open tier's pool, drawn anew each visit) | top (336, 56)-(384, 100) Up -> infirmary (44, 120); ring door (96, 330)-(144, 360) Down -> ring walkway (360, 192) |
 | 16 | ring (7/6) | 720 x 720 | the platform x 232-487, y 256-511, closed all round; the walkway's end says "The ring is for fighters in a match" | walkway door (336, 120)-(384, 170) Up -> waiting room (120, 312) |
 
 Our calls (the grounds piece, Ryan: "you make the decisions"):
@@ -814,18 +814,15 @@ froze). The director's lists answer B by ending the talk (nothing changed).
    reload) drops the tournament; entries are restored only into the running game (never into a freshly loaded party).
 
 **Opponents' numbers** (stats 160-209 = 160 + fighter id; `tny_resolve_stat` from `bosses.c`'s `resolve_stat`, a
-`BOSS_NO_TWIN | BOSS_FLAT` rule from `boss_rule`; *decided*, to tune in play): a base per *tournament* tier (Rookie
-700 HP, melee / ranged / defence 8 / 8 / 6; Adept 1300, 13 / 13 / 12; Z-Fighter 2200, 20 / 20 / 20; Champion 3400,
-30 / 32 / 32; Legend 5200, 40 / 42 / 42; lowered 2026-11-02, Ryan: two players at levels 17-20 could not pass a Rookie first round, `docs/perfect-pass.md` 9), times the fighter's power (75-140: HP x p %, attack and defence x
-(100 + p) / 200 %), the boss class of stat 29 (Cell Jr his own), no kill EXP; then the difficulty's boss HP and
+`BOSS_NO_TWIN | BOSS_FLAT` rule from `boss_rule`; to tune in play): **each fighter's own rating since 2026-11-03** (Ryan: "each fighter has a different level of strength and ability, its just that we tier them in these divisions"; `opp_tab`, on one scale: Chi-Chi 65, Yamcha 85, Tien 110, Frieza 140, 19 185, 17 240, Imperfect Cell 300, Perfect Cell 430, Broly 470, Super Buu 550) read off `opp_curve` (100: 900 HP, 11 / 11 / 8; 200: 1400, 15 / 15 / 13; 300: 2200, 20 / 20 / 20; 400: 3400, 30 / 32 / 32; 500: 5200, 40 / 42 / 42). Below a tier's floor (`tier_floor`: 150, 250, 350, 450) a fighter comes halfway up to it (Yamcha in a Z-Fighter bracket 167). Before that a tier's numbers times a small part of a fighter's power. The boss class of stat 29 (Cell Jr his own), no kill EXP; then the difficulty's boss HP and
 damage as for every boss. AI set: the one that fits the body (21 most, 98 Tien / Hercule, 129 Tao, 29 the androids,
 80 / 116 / 148 / 138 the Cells), else the first of 21, 98, 129, 11 whose pose groups the body has. A body without the
 regular groups (Mecha Frieza's cutscene sprite 49) uses the fighter's play body, else he is not in the pool. **No
 twins** in tournament fights (the rule's `BOSS_NO_TWIN`; `BOSS_FLAT` skips the lone-boss x1.8, which the engine
 applies itself to a lone challenger).
 
-**EXP** (*decided*): a won fight pays each fighting player 1/16 of his level's span (to the player's own slot when he
-fought as a tournament playable); a Quick run nudges about a fifth of a level.
+**EXP** (*decided*; 1/16 until 2026-11-03, Ryan: a little more): a won fight pays each fighting player 1/8 of his level's span (to the player's own slot when he
+fought as a tournament playable); a Quick run is about 3/8 of a level.
 
 **The global record** on the save chip: 64 bytes at EEPROM offset 0x1E00 (clear of the three save slots at any
 `PARTY_SLOTS`; read from the game's 8 KiB RAM mirror, which boot fills from the chip; written through `Eeprom_Write`),

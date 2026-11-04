@@ -65,9 +65,10 @@ static const BossRule rules[] = {
 #endif
     { 4,  0, 0, 9,  0, 0, 0, 0 },
     // Android 19 + Android 13 (zone 7 area 15), Dr. Gero + Android 13 (the lab door): always a pair, so the
-    // story scripts (13's lines, 13 flying off) find 13 in single-player too
-    { 5,  0, BOSS_PAIR, A13_SPRITE, A13_STAT, 0, 0, 0 },
-    { A13_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
+    // story scripts (13's lines, 13 flying off) find 13 in single-player too. With two players 19 + 13 have what one player's
+    // pair has (Ryan, 2026-11-03: "we maybe did like 1/10th damage to them before they killed us"; 5170 HP together then)
+    { 5,  0, BOSS_PAIR, A13_SPRITE, A13_STAT, 0, 0, 50 },
+    { A13_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 50 },
     { 7,  0, BOSS_PAIR, A13_SPRITE, A13_GERO_STAT, 0, 0, 0 },
     { A13_GERO_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, 0, 0, 0 },
     // The forest spirit (zone 2 area 8, the stock dream's clearing): Frieza and Cooler, always a pair

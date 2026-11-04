@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## A stale ROM in WSL (2026-11-03)
+
+A headless run still going (a stopped task's children go on; `xargs` starts new ones) holds the ROM mapped, and WSL serves later runs that file's old pages after a rebuild: the numbers of the last build, with no error. Before trusting a run after a stopped one: `wsl -d Ubuntu -u root -- pgrep -fa st_headless` empty, then `sync; echo 3 > /proc/sys/vm/drop_caches`.
+
 ## Tournament pools (headless, 2026-11-03)
 
 `tools/headless/tny_pools.txt` (from `tny_pools_gen.py`; self-checking, in `regfull.sh`): three draws of each tier on the story's flags: the tops in the bracket's seats, nobody from outside the pool; a real first fight each tier, and three Legend 2 v 2 draws, both players mashing, for a crash.

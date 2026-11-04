@@ -40,7 +40,12 @@ typedef struct ExtraStat {
 #define BOSS_PARTNER_ONLY 8   // the rule of a pair's second boss: a record of this stat on its own is not a pair
 // 16 = BOSS_FLAT (tny_engine.h): a BOSS_NO_TWIN boss without the lone-boss HP below (the tournament's opponents)
 #define SOLO_PAIR_HP_PCT 50   // a story pair (BOSS_PAIR) against one player: both bosses' HP, percent
-#define COOP_LONE_BOSS_HP_PCT 180   // a BOSS_NO_TWIN boss against two players (the Cell Games' fights 3 / 7, Cell vs
+// With two players a boss is two bodies (his twin or his partner), each with the stat's full HP, or one with COOP_LONE_BOSS_HP_PCT: as long a fight as one
+// player's and twice the fists on each of them. Ryan, 2026-11-03: the androids took a tenth of their health before killing both, "im just concerned we may
+// have that issue while fighting other bosses". The Cell Games' fights, made tougher at his word (hp_pct), keep their HP.
+#define COOP_PAIR_HP_PCT 70
+#define COOP_LONE_BOSS_LIGHT_PCT 140
+#define COOP_LONE_BOSS_HP_PCT 180   // a BOSS_NO_TWIN boss with hp_pct against two players (the Cell Games' fights 3 / 7, Cell vs
                                     // Trunks + Krillin): stock HP made two players' fight half as long
 
 // Broly's rage when Paragus falls first (docs/story.md 4g); our tuning
@@ -57,7 +62,7 @@ typedef struct BossRule {
     s16 partner_stat;
     u16 hp_pct;          // 0 = 100
     u8 speed_pct;        // 0 = 100
-    u8 _pad;
+    u8 coop_hp_pct;      // a pair's HP with two players, percent (0 = COOP_PAIR_HP_PCT; a boss made tougher with hp_pct keeps 100); alone they have SOLO_PAIR_HP_PCT
 } BossRule;
 
 // Sprite ids of the new boss models (tools/bossmodels.py; the Makefile passes A13_SPRITE=165 and

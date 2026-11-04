@@ -957,7 +957,7 @@ Piccolo (player 1) and Hercule (player 2) at the level-30 stats of the Android 1
 | Cooler + King Cold's model (`partner(74)`) | crash "Jumped to invalid address C002E564" at the first charge/attack: record 74 has 5 groups and set 21 plays groups 5-8 |
 | Cooler + Android 17's model (`partner(9)`) | fights 40 s, no crash (the old note that any other model crashes was wrong) |
 
-Tuning (bosses.c): 13 beside 19 = 2200 HP, 17/14/11 (19: 2970, 21/14/11; 3200, 22/16/14 until 2026-11-02), because
+Tuning (bosses.c): with two players 19 + 13 have half these HP and Gero + 13 70 % (`coop_hp_pct`, 2026-11-03, Ryan: about 1/10 of their health was gone when both were down: what one player's pair has). 13 beside 19 = 2200 HP, 17/14/11 (19: 2970, 21/14/11; 3200, 22/16/14 until 2026-11-02), because
 the twin goes for the other player and 13 usually ends up on player 2 (Hercule beside Vegeta in the story). 13 beside
 Gero = 1900 HP, 20/17/14 (Gero 1900, 25/21/17; 2400, 24/20/16 until then). The Namekian = 6000
 HP, 74/70/68 (Cooler 10200, 75/85/79); at 68/60/64 he barely scratched Hercule. The autopilot only
@@ -1249,6 +1249,7 @@ Normal is exactly the co-op tuning from before.
 | regular enemies' walk speed (with player 2) | x 1.0 | x 1.2 | x 1.3 |
 | twin regular enemies | no | yes | yes |
 | boss HP (every boss, also Android 16 and Super 13; never below 1000 for a boss that had it) | x 0.8 | x 1.0 | x 1.25 |
+| on top, with two players (2026-11-03, `bosses.h`): each body of a boss's pair x 0.7 (19 + 13 x 0.5; `coop_hp_pct`), a lone boss x 1.4 (was x 1.8); bosses made tougher with `hp_pct` (the Cell Games) keep x 1.0 and x 1.8; 16 and Super 13 spawn on their own paths, unchanged | | | |
 | revive countdown | 60 s | 60 s | 60 s (Ryan, 2026-11-02: "turn the teammate revive timer to 60 seconds"; 20 / 10 / 6 before) |
 | drops | a second roll when the first gave nothing | as stock | one roll in three skipped |
 

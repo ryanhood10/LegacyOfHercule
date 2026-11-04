@@ -138,13 +138,15 @@ static int gr_sprite_ok(int sprite) {
     return sprite >= 7 && (unsigned)sprite < sprite_index_count && Character_GetSpriteRecord(sprite) != 0;
 }
 
-// The waiting room shows today's competition: this save's pool, minus the fighters a player has already unlocked
-// (they hang around in the courtyard instead) and minus Master Roshi (he gives advice out on the street).
+// The waiting room shows today's competition: the pool of the highest tier open, drawn anew each visit (Ryan, 2026-11-03: it used to
+// leave out everyone a player had unlocked, and with a tier beaten that left one Yamu), minus Master Roshi (he gives advice out on the street).
+// Who a player has unlocked stands in the courtyard too; they are two maps.
+int tny_in_top_pool(int id);
 static int gr_in_pool(int id) {
     const TFighter *f = &tny_fighters[id];
     if (id == TF_ROSHI || !(f->role & TR_OPPONENT)) return 0;
     if (gr.force_rookie) return f->tier == TIER_ROOKIE;
-    return tny_in_pool(id) && !tny_unlocked(id);
+    return tny_in_top_pool(id);
 }
 
 // The courtyard: fighters a player has unlocked (beaten ones and hidden challengers), Ryan 2026-10-25: "put some of

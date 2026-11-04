@@ -4,6 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-03
 
+- **Story bosses lighter with two players (a pair's bodies x 0.7, 19 + 13 x 0.5, a lone boss x 1.4; not the Cell Games), tournament EXP doubled** (`docs/perfect-pass.md` 9).
+- **The waiting room's crowd is the highest open tier's pool, unlocked fighters included** (it left them out: one Yamu after a beaten tier).
+- **Every tournament fighter has his own strength; a tier is who is drawn** (`tny_engine.c` `opp_tab` ratings, `opp_curve`; Ryan, 2026-11-03, one player: Rookie at 700, 8 / 8 / 6 was too easy; a Rookie regular now 900, 11 / 11 / 8).
 - **Each tournament tier has its own pool (`docs/tournament.md` 4d, `tny_pools.txt`):** Legend draws Super Buu, Super 13 and Super Perfect Cell every bracket, no more Yamcha or Chi-Chi there.
 - **A crash at player 2's level-up fixed (`docs/perfect-pass.md` 9, `p2_levelup.txt`):** player 1's body was given player 2's pose by the box's script; Hercule has no such pose. From the 2026-11-02 change to the box.
 
