@@ -821,8 +821,7 @@ regular groups (Mecha Frieza's cutscene sprite 49) uses the fighter's play body,
 twins** in tournament fights (the rule's `BOSS_NO_TWIN`; `BOSS_FLAT` skips the lone-boss x1.8, which the engine
 applies itself to a lone challenger).
 
-**EXP** (*decided*; 1/16 until 2026-11-03, Ryan: a little more): a won fight pays each fighting player 1/8 of his level's span (to the player's own slot when he
-fought as a tournament playable); a Quick run is about 3/8 of a level.
+**EXP** (Ryan, 2026-11-03; a won fight paid 1/16 of a level before, and a tournament fighter's was lost with his carrier's entry): a won fight pays 1/4 of the level's span to each player who fought, winning the tournament a whole level for both players the first time, half a level on every later win. Paid together when the tournament is over and the players stand on the map (`tny_engine.c` `pay_owed`), through the event an enemy's EXP uses, so the level-up box shows there. **A tournament-only fighter earns none:** in two players his share goes to the other player when the other is on one of the game's characters; two tournament-only fighters, or one alone, earn nothing and nothing is kept. Test `tny_xp.txt`.
 
 **The global record** on the save chip: 64 bytes at EEPROM offset 0x1E00 (clear of the three save slots at any
 `PARTY_SLOTS`; read from the game's 8 KiB RAM mirror, which boot fills from the chip; written through `Eeprom_Write`),

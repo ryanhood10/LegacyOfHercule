@@ -5,6 +5,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 ## 2026-11-03
 
 - **Story bosses lighter with two players (a pair's bodies x 0.7, 19 + 13 x 0.5, a lone boss x 1.4; not the Cell Games), tournament EXP doubled** (`docs/perfect-pass.md` 9).
+- **More tournament EXP, a level for winning a tournament:** 1/4 of a level a won match, a level for a tournament's first win, half on later ones; paid in the waiting room. A tournament-only fighter's share goes to his partner on a story character, else nobody (`docs/tournament.md` "EXP", `tny_xp.txt`).
 - **The waiting room's crowd is the highest open tier's pool, unlocked fighters included** (it left them out: one Yamu after a beaten tier).
 - **Every tournament fighter has his own strength; a tier is who is drawn** (`tny_engine.c` `opp_tab` ratings, `opp_curve`; Ryan, 2026-11-03, one player: Rookie at 700, 8 / 8 / 6 was too easy; a Rookie regular now 900, 11 / 11 / 8).
 - **Each tournament tier has its own pool (`docs/tournament.md` 4d, `tny_pools.txt`):** Legend draws Super Buu, Super 13 and Super Perfect Cell every bracket, no more Yamcha or Chi-Chi there.

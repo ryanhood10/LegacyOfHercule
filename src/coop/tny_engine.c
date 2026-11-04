@@ -163,6 +163,7 @@ typedef struct TnyEng {
     u8 br_shown;                         // the bracket screen has shown this draw (then phase 1 with the results)
     u8 *tint;                            // the same fighter twice on the floor: player 2's shadow remap (arena)
     struct { u8 head[4]; char text[100]; } say_entry;   // a line (the announcer's, the fallback pop-up)
+    u8 owed16[PARTY_SLOTS];              // EXP this tournament has earned per slot, in sixteenths of a level (pay_owed)
 } TnyEng;
 _Static_assert(sizeof(TnyEng) <= 0x240, ".tny.eng holds 0x240 bytes (docs/ids.md)");
 _Static_assert(__builtin_offsetof(TnyEng, rec) == 360 && __builtin_offsetof(TnyEng, pose_e) == 284, "the presentation fields fill the old line's 76 bytes");
@@ -1689,18 +1690,43 @@ static void rumble_round(void) {
 }
 
 // ---- prizes, unlocks ----------------------------------------------------------------------------------------
-static void exp_trickle(int slot) {
-    if (slot < 0 || slot >= PARTY_SLOTS || !in_party(slot)) return;
-    CharacterEntry *c = entry_of(slot);
-    int lv = Character_GetLevel(c);
-    if (lv >= 50) return;
-    s32 span = Character_LevelExp(lv + 1) - Character_LevelExp(lv);
-    s32 amount = span / 8;                           // a Quick bracket: about 3/8 of a level (span / 16 until 2026-11-03, Ryan: a little more)
-    if (amount < 1) amount = 1;
-    u32 *ev = Arena_Alloc(16);
-    if (!ev) return;
-    ev[0] = (u32)coop.exp_vtable; ev[1] = 1; ev[2] = (u32)amount; ev[3] = (u32)slot;   // exp.c's event
-    g_EntityList->events[g_EntityList->event_count++] = ev;
+// Tournament EXP (Ryan, 2026-11-03: more for a win, and a level or EXP for winning the tournament, one and two players), in sixteenths of the level's
+// span. It is owed and paid when the tournament is over and the players stand on the map again, as an enemy's EXP is: a fighter on a carrier slot had his
+// EXP written over when the slot's entry came back, and the box then named a character who was not on the floor.
+// Who gets it (Ryan, 2026-11-03): a player on one of the game's characters; a tournament-only fighter earns none, and in two players his share goes to the other,
+// when the other is on one of the game's characters; two tournament-only fighters, or one alone: nobody, and nothing is kept for later.
+#define OWED_MATCH 4             // a won match: a Quick bracket is 3/4 of a level
+#define OWED_FIRST_WIN 16        // a tournament's first win: a level (with the first-win capsule)
+#define OWED_LATER_WIN 8         // every later win: half a level, so that Rookie is not a way to level 50
+static void exp_owe(int slot, int sixteenths) {
+    if (slot < 0 || slot >= PARTY_SLOTS) return;
+    int v = eng.owed16[slot] + sixteenths;
+    eng.owed16[slot] = (u8)(v > 255 ? 255 : v);
+}
+static void exp_award(int k, int sixteenths) {
+    if (!(tny_fighters[eng.pick[k]].role & TR_STORY)) {
+        if (eng.players != 2) return;
+        k ^= 1;
+        if (!(tny_fighters[eng.pick[k]].role & TR_STORY)) return;
+    }
+    exp_owe(eng.slot[k], sixteenths);
+}
+static void pay_owed(void) {
+    for (int slot = 0; slot < PARTY_SLOTS; slot++) {
+        int owed = eng.owed16[slot];
+        if (!owed) continue;
+        eng.owed16[slot] = 0;
+        if (!in_party(slot)) continue;
+        int lv = Character_GetLevel(entry_of(slot));
+        if (lv >= 50) continue;
+        s32 span = Character_LevelExp(lv + 1) - Character_LevelExp(lv);
+        s32 amount = span * owed / 16;
+        if (amount < 1) amount = 1;
+        u32 *ev = Arena_Alloc(16);
+        if (!ev) return;
+        ev[0] = (u32)coop.exp_vtable; ev[1] = 1; ev[2] = (u32)amount; ev[3] = (u32)slot;   // exp.c's event
+        g_EntityList->events[g_EntityList->event_count++] = ev;
+    }
 }
 
 static void unlock(int id) {
@@ -1710,12 +1736,6 @@ static void unlock(int id) {
     eng.rec.unlocked[id >> 3] |= (u8)(1 << (id & 7));
     rec_save();
     tny_notify(new_fighter);
-}
-
-// The EXP goes to the player's story slot, or to his own character when he fought as a tournament fighter
-static int exp_slot(int k) {
-    const TFighter *f = &tny_fighters[eng.pick[k]];
-    return (f->role & TR_STORY) ? eng.slot[k] : eng.own[k];
 }
 
 // ---- director ----------------------------------------------------------------------------------------------
@@ -2015,8 +2035,8 @@ static void step_match_end(void) {
         if (eng.opp_by[i] && (tny_fighters[eng.opp_id[i]].role & TR_BEAT)) unlock(eng.opp_id[i]);
     heal_all();
     if (won) {
-        if (eng.fighter == 2 || eng.players == 1) { exp_trickle(exp_slot(0)); if (eng.players == 2) exp_trickle(exp_slot(1)); }
-        else exp_trickle(exp_slot(eng.fighter));
+        if (eng.fighter == 2 || eng.players == 1) { exp_award(0, OWED_MATCH); if (eng.players == 2) exp_award(1, OWED_MATCH); }
+        else exp_award(eng.fighter, OWED_MATCH);
     }
     int k = eng.fighter == 2 ? 0 : eng.fighter;
     if (eng.kind == K_CHALLENGE) {
@@ -2157,6 +2177,7 @@ static void step_prize(void) {
     if (eng.full && !(eng.rec.paid & (1u << (16 + eng.tier)))) { eng.rec.paid |= 1u << (16 + eng.tier); paid = 1; item_use_hook(capsule[(eng.tier + 1) % 3]); }
     if (paid) rec_save();
     else item_use_hook(ITEM_SENZU);
+    for (int k = 0; k < eng.players && k < 2; k++) exp_award(k, paid ? OWED_FIRST_WIN : OWED_LATER_WIN);   // both players, whoever took the final
     if (eng.division == DIV_RUMBLE && !eng.koed) item_use_hook(ITEM_SENZU);
     if (!pick_challengers(t)) { eng.phase = P_EXIT; return; }
     ann_show();
@@ -2177,6 +2198,7 @@ static void step_challenge(void) {
 
 // ---- leaving ---------------------------------------------------------------------------------------------------
 static void cleanup(int restore) {
+    if (!restore) memset(eng.owed16, 0, sizeof eng.owed16);   // a game over or a reload: the file may not be this one
     tny_rumble_mode(0);
     if (restore) { poses_release(); ann_hide(); } else { eng.npose = 0; eng.ann = 0; }
     eng.pres = 0;
@@ -2325,7 +2347,7 @@ void tny_engine_frame(void) {
             int p1side = (players_in(a) & 1) ? a : b;
             set_winner(r, m, coop2.duel_winner == 1 ? p1side : (p1side == a ? b : a));
             eng.out |= (u8)(coop2.duel_winner == 1 ? 2 : 1);
-            exp_trickle(exp_slot(coop2.duel_winner - 1));
+            exp_award(coop2.duel_winner - 1, OWED_MATCH);
             eng.pres = 3;                            // the dialogue seat, then the bracket (step_duel)
         }
         break;
@@ -2368,6 +2390,7 @@ void tny_engine_frame(void) {
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
+    if (eng.phase == P_IDLE && !eng.dark && !eng.qn) pay_owed();   // over, on the map, nothing on screen: as an enemy's EXP
     int want = 0;
     switch (eng.phase) {
     case P_IDLE: want = eng.qn != 0 || eng.dark; break;
