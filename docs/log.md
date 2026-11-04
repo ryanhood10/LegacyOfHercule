@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-03
 
+- **Each tournament tier has its own pool (`docs/tournament.md` 4d, `tny_pools.txt`):** Legend draws Super Buu, Super 13 and Super Perfect Cell every bracket, no more Yamcha or Chi-Chi there.
 - **A crash at player 2's level-up fixed (`docs/perfect-pass.md` 9, `p2_levelup.txt`):** player 1's body was given player 2's pose by the box's script; Hercule has no such pose. From the 2026-11-02 change to the box.
 
 ## 2026-11-02

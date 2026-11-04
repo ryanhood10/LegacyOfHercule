@@ -378,11 +378,42 @@ static void pair_up(u8 *pool, int n) {
         if (j < n) { u8 t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
     }
 }
-// The pool of a tier: everyone in the pool whose own tier is at or below it, but the players' picks
+// Each tier has its own draw (Ryan, 2026-11-03: "each difficulty of tournament is supposed to have its own pool of fighters ...
+// in the absolute hardest division we need the absolute best villians like super buu and super andriod 13"; a tier used to draw
+// from everyone at or below it, so a Legend bracket was 7 of about 40, Yamcha and Chi-Chi included). A tier's own fighters and the
+// strongest from below, enough for Full's 15 whatever the story flags; a tier's tops are always in a bracket (seed_tops).
+#define P_R (1 << TIER_ROOKIE)
+#define P_A (1 << TIER_ADEPT)
+#define P_Z (1 << TIER_ZFIGHTER)
+#define P_C (1 << TIER_CHAMPION)
+#define P_L (1 << TIER_LEGEND)
+static const u8 opp_pools[TF_GOHAN] = {
+    [TF_CHICHI] = P_R,                 [TF_CHIAOTZU] = P_R,                 [TF_HERCULE] = P_R,
+    [TF_VIDEL] = P_R | P_A,
+    [TF_YAMCHA] = P_R | P_A | P_Z,     [TF_ROSHI] = P_R | P_A | P_Z,        [TF_TAO] = P_R | P_A | P_Z,
+    [TF_TIEN] = P_R | P_A | P_Z | P_C, [TF_SPOPOVICH] = P_R | P_A | P_Z | P_C, [TF_YAMU] = P_R | P_A | P_Z | P_C,
+    [TF_FRIEZA] = P_R | P_A | P_Z | P_C, [TF_MECHA_FRIEZA] = P_R | P_A | P_Z | P_C, [TF_KING_COLD] = P_R | P_A | P_Z | P_C,
+    [TF_A19] = P_A | P_Z | P_C,        [TF_GERO] = P_A | P_Z | P_C,
+    [TF_A13] = P_A | P_Z | P_C | P_L,  [TF_A17] = P_A | P_Z | P_C | P_L,    [TF_A18] = P_A | P_Z | P_C | P_L,
+    [TF_IMPERFECT_CELL] = P_Z | P_C | P_L, [TF_A16] = P_Z | P_C | P_L,
+    [TF_CELL_JR] = P_C,                [TF_NAMEKIAN] = P_C,                 [TF_PARAGUS] = P_C,
+    [TF_SEMI_CELL] = P_C | P_L,        [TF_PERFECT_CELL] = P_C | P_L,       [TF_COOLER] = P_C | P_L,  [TF_BROLY] = P_C | P_L,
+    [TF_SUPER_PERFECT_CELL] = P_L,     [TF_SUPER13] = P_L,                  [TF_SUPER_BUU] = P_L,
+    [TF_BGOKU] = P_L,                  [TF_MAJIN_VEGETA] = P_L,             [TF_MYSTIC_GOHAN] = P_L,
+    [TF_BPICCOLO] = P_L,               [TF_SAIYAMAN] = P_L,                 [TF_BHERCULE] = P_L,
+};
+static const u8 tier_tops[TIER_COUNT][3] = {
+    { TF_KING_COLD, TF_FRIEZA, NO },
+    { TF_A17, TF_A18, TF_A19 },
+    { TF_IMPERFECT_CELL, TF_A16, NO },
+    { TF_BROLY, TF_PERFECT_CELL, TF_COOLER },
+    { TF_SUPER_BUU, TF_SUPER13, TF_SUPER_PERFECT_CELL },
+};
+// The pool of a tier, but the players' picks
 static int pool_of(int tier, u8 *out) {
     int n = 0;
     for (int id = 0; id < TF_GOHAN; id++)
-        if (tny_fighters[id].tier <= tier && tny_in_pool(id) && !picked(id)) { if (out) out[n] = (u8)id; n++; }
+        if ((opp_pools[id] >> tier & 1) && tny_in_pool(id) && !picked(id)) { if (out) out[n] = (u8)id; n++; }
     return n;
 }
 
@@ -1429,6 +1460,28 @@ static int find_next(void) {
 static void shuffle(u8 *a, int n) {
     for (int i = n - 1; i > 0; i--) { int j = (int)rnd((u32)i + 1); u8 t = a[i]; a[i] = a[j]; a[j] = t; }
 }
+// A shuffled pool whose first `seats` places hold the tier's tops, in a shuffled order among the rest of the draw
+static void seed_tops(u8 *pool, int n, int seats) {
+    int front = 0;
+    for (int t = 0; t < 3; t++)
+        for (int i = front; i < n; i++)
+            if (pool[i] == tier_tops[eng.tier][t]) { u8 x = pool[front]; pool[front++] = pool[i]; pool[i] = x; break; }
+    shuffle(pool, n < seats ? n : seats);
+}
+// pair_up may have moved a top out of the seats: he takes the place of the last one who is not a top
+static int is_top(int id) {
+    for (int t = 0; t < 3; t++) if (tier_tops[eng.tier][t] == id) return 1;
+    return 0;
+}
+static void keep_tops(u8 *pool, int n, int seats) {
+    int last = (n < seats ? n : seats) - 1;
+    for (int i = last + 1; i < n; i++) {
+        if (!is_top(pool[i])) continue;
+        while (last >= 0 && is_top(pool[last])) last--;
+        if (last < 0) return;
+        u8 x = pool[last]; pool[last--] = pool[i]; pool[i] = x;
+    }
+}
 
 static void draw_bracket(void) {
     TBracket *b = &eng.br;
@@ -1456,6 +1509,7 @@ static void draw_bracket(void) {
     u8 pool[TF_GOHAN];
     int n = pool_of(eng.tier, pool), k = 0;
     shuffle(pool, n);
+    seed_tops(pool, n, b->size - (b->p2_seat != NO ? 2 : 1));
     if (eng.force_opp != NO) {                      // test command 21: him first, into the seat across from player 1
         int j = 0;
         while (j < n && pool[j] != eng.force_opp) j++;
@@ -1463,7 +1517,7 @@ static void draw_bracket(void) {
         for (; j > 0; j--) pool[j] = pool[j - 1];
         pool[0] = eng.force_opp;
     }
-    if (w == 2) pair_up(pool, n);
+    if (w == 2) { pair_up(pool, n); keep_tops(pool, n, b->size - (b->p2_seat != NO ? 2 : 1)); }
     // fill unit by unit so a bye is a whole unit at the end of the draw (a 2 v 2 team is never half empty)
     for (int u = 0; u < nu; u++)
         for (int i = 0; i < w; i++) {

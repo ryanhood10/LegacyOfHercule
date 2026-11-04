@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## Tournament pools (headless, 2026-11-03)
+
+`tools/headless/tny_pools.txt` (from `tny_pools_gen.py`; self-checking, in `regfull.sh`): three draws of each tier on the story's flags: the tops in the bracket's seats, nobody from outside the pool; a real first fight each tier, and three Legend 2 v 2 draws, both players mashing, for a crash.
+
 ## Player 2's level-up box (headless, 2026-11-03)
 
 `tools/headless/p2_levelup.txt` (from `p2_levelup_gen.py`; self-checking, in `regfull.sh`): ten pairings of player 1 and player 2, player 2 levels up: player 1's entity intact, the EXP on player 2's slot, both slots unchanged.

@@ -215,6 +215,8 @@ one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived fr
 
 ## 4d. The pool and the unlocks, tier by tier (Ryan asked for exact counts, 2026-10-25)
 
+**Each tier has its own draw since 2026-11-03** (Ryan: "each difficulty of tournament is supposed to have its own pool of fighters ... in the absolute hardest division we need the absolute best villians like super buu and super andriod 13"; a tier drew from everyone at or below it, a Legend bracket 7 of about 40). `tny_engine.c` `opp_pools`: a tier's own fighters and the strongest from below, enough for Full's 15. `tier_tops`, always in a bracket: Rookie King Cold, Frieza; Adept 17, 18, 19; Z-Fighter Imperfect Cell, 16; Champion Broly, Perfect Cell, Cooler; Legend Super Buu, Super 13, Super Perfect Cell (each while his story flag and body allow). The Rookie pool is the table's; the opponent counts in the table's later rows are the old cumulative ones. Test `tny_pools.txt`.
+
 No mirrors: the counts are opponents other than your party. "Beat" = he becomes playable the first time a
 player beats him in any match (the last hit in a Rumble). An 8-man bracket needs 7 opponents, Full (16) 15,
 the Rookie Rumble (2 rounds of 3 and a headliner) 7 distinct fighters, later Rumbles up to 14.
