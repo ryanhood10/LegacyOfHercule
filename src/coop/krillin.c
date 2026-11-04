@@ -239,9 +239,20 @@ static void vm_push(s32 *stack, s32 v) {
     stack[1 + n] = v;
 }
 // (Super Saiyan 2 Gohan is "Gohan" in dialogue; "SSJ2 Gohan" is his status-screen title)
-static int box_slot(void) { return (exp_speaker & 0xF0) == SPEAKER_SET ? exp_speaker & 0xF : g_Party->active_slot; }
+static int box_slot(void) { int k = exp_speaker & 0xF0; return k == SPEAKER_SET || k == SPEAKER_USED ? exp_speaker & 0xF : g_Party->active_slot; }
 static int speaker_slot(void) { int s = box_slot(); return s == SSJ2_SLOT ? GOHAN_SLOT : s; }
-void vm_push_active_hook(s32 *stack) { vm_push(stack, box_slot()); }   // Step 11 PushActiveCharIndex (0x0800949C)
+// Step 11 PushActiveCharIndex (0x0800949C). The level-up box asks twice: the first entry for the level it prints, then the next
+// entry for the pose to play on actor 0, player 1's body, by the active index (slot 0 anim 4, 1 anim 8, 2 anim 16, ...). Answering
+// that with player 2's slot put Vegeta's pose on player 1's Hercule, whose record has no group 16: a null frame's unpack ran over the
+// heap and the game jumped to garbage (Ryan, 2026-11-03, player 2 at level 19). So the first answer is whoever levelled; after it,
+// when that is not player 1, nobody: no pose.
+#define VM_NOBODY 0xFF
+void vm_push_active_hook(s32 *stack) {
+    int s = box_slot();
+    if ((exp_speaker & 0xF0) == SPEAKER_SET) exp_speaker = (u8)(SPEAKER_USED | s);
+    else if ((exp_speaker & 0xF0) == SPEAKER_USED && s != g_Party->active_slot) s = VM_NOBODY;
+    vm_push(stack, s);
+}
 void vm_push_name_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_NAME + speaker_slot()]); }
 void vm_push_caps_hook(s32 *stack) { vm_push(stack, (s32)ui_strings[UI_CAPS + speaker_slot()]); }
 

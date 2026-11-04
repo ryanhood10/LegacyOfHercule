@@ -236,6 +236,7 @@ void ssj_frame(void);   // ssj.c: every input poll (a slot player 2 leaves turns
 int ssj_hum_count(void);
 extern u8 exp_speaker;                     // exp.c: the level-up box's character
 #define SPEAKER_SET 0xA0
+#define SPEAKER_USED 0xB0                  // krillin.c: the box has asked for his level
 #define HERCULE_GUN_ABILITY 25
 int hercule_bullet_hit(const Hit *hit);   // krillin.c
 void hercule_lock(PartyState *p);          // ssj.c: an older save's Hercule

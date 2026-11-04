@@ -2,6 +2,10 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-03
+
+- **A crash at player 2's level-up fixed (`docs/perfect-pass.md` 9, `p2_levelup.txt`):** player 1's body was given player 2's pose by the box's script; Hercule has no such pose. From the 2026-11-02 change to the box.
+
 ## 2026-11-02
 
 - **Balance, Ryan's two-player note (`docs/perfect-pass.md` 9, `balance.txt`):** bosses' and tournament opponents' hits in co-op x 0.8 on Normal (x 1.25 before; Easy 0.6, Hard unchanged), Android 13 lighter in both fights, Hercule's endurance growth back up, every tournament tier's numbers down (Rookie 700 HP, 8 / 8 / 6).

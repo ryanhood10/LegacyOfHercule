@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## Player 2's level-up box (headless, 2026-11-03)
+
+`tools/headless/p2_levelup.txt` (from `p2_levelup_gen.py`; self-checking, in `regfull.sh`): ten pairings of player 1 and player 2, player 2 levels up: player 1's entity intact, the EXP on player 2's slot, both slots unchanged.
+
 ## Balance (headless, 2026-11-02)
 
 `tools/headless/balance.txt` (from `balance_gen.py`; self-checking, in `regfull.sh`): one boss hit on a level 17 Hercule's endurance in the Android 19 + 13 fight (7-25, by `watch` on his HP), 13's HP, a Rookie first round's opponent's HP. To measure a real save: copy the `.sav`, `cart` it, Start, A, Down per file, A, A, B, then `poke32 0x0203FA44 0x91A7E250`, `poke32 0x0203FA48 2` (`players`: two players), HP 9000 and log the HP deltas every 12 frames.
