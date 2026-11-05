@@ -60,12 +60,16 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      (OBJ VRAM: the joined bytes, so take only the frames used); "frame" counts 32-byte
                                      units inside its part; "shape" 8x16, 16x32, 32x32 (default), 64x32; "visible": 0 starts
                                      hidden; "hits" makes it a breakable (item, handler 0x0800F9A3) running "drop"; the
-                                     Time Chamber's gate, jars, plaque (docs/time-chamber.md 12)
+                                     Time Chamber's gate, jars, plaque (docs/time-chamber.md 12); a part with "turn":
+                                     {"shape": "64x32", "rect": [x, y, w, h]} is that piece of its frame turned upright
+                                     into one 16x32 frame (the gate's beam across a door in a side wall)
   "onleave": "script:NAME",          the map's on-leave script (+0x34)
   an enemy record may name "behaviours": ["0x083EE430"] (inline pointers, as stock records have) instead of "like"
   a png op's "arg": draw(arg) for a tools/NAME.py that holds several pictures
   "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
-  "requires": "buu"                  only built when that ROM is given (--buu-rom)
+  "requires": "buu"                  only built when that ROM is given (--buu-rom); "unless": "buu" only without it
+                                     (a fallback map of the same zone / area); records, exits and triggers take the same
+                                     two keys
 }
 A stamp / fill / copy source "map" is [zone, area(, variation)] of this ROM, or a foreign variation record:
 {"rom": "buu", "variation": "0x0822229C"} (Buu's Fury: same map format; its tiles are converted to LoG2's
@@ -573,6 +577,32 @@ def nearest(pal, rgb):
     return _NEAR[key]
 
 
+def turn_frame(data, turn):
+    """A part's frame turned a quarter clockwise: {"shape": "64x32" (the frame read, 8bpp, 8x8 tiles in rows), "rect": [x, y,
+    w, h] (the piece of it taken)} -> one 16x32 frame (512 bytes) with the piece standing upright in its middle (w <= 32,
+    h <= 16). The gate's force beam across a door on the right (the Time Chamber's airship)."""
+    fw, fh = (int(v) for v in turn["shape"].split("x"))
+    px = [[0] * fw for _ in range(fh)]
+    for t in range(fw * fh // 64):
+        tx, ty = t % (fw // 8), t // (fw // 8)
+        for i in range(64):
+            px[ty * 8 + i // 8][tx * 8 + i % 8] = data[t * 64 + i]
+    x0, y0, w, h = turn["rect"]
+    if w > 32 or h > 16:
+        raise SpecError("turn: the piece must be at most 32 x 16")
+    out = [[0] * 16 for _ in range(32)]
+    ox, oy = (16 - h) // 2, (32 - w) // 2
+    for y in range(h):
+        for x in range(w):
+            out[oy + x][ox + (h - 1 - y)] = px[y0 + y][x0 + x]   # clockwise: the piece's top edge goes right
+    res = bytearray()
+    for ty in range(4):
+        for tx in range(2):
+            for i in range(64):
+                res.append(out[ty * 8 + i // 8][tx * 8 + i % 8])
+    return bytes(res)
+
+
 def recolor_table(pal, spec):
     """Palette index -> palette index. Rules are tried in order; a rule matches a colour by hue range
     (degrees), minimum saturation and luminance range, and maps it to a ramp by luminance:
@@ -905,6 +935,8 @@ def emit(b, pk):
         for part in objects["parts"]:
             whole = rom.resource(b.source(part["map"]).var.sheet)
             cut = whole[part.get("from", 0):part.get("from", 0) + part.get("bytes", len(whole))]
+            if "turn" in part:
+                cut = turn_frame(cut, part["turn"])
             if len(sheet_bytes) % 32 or len(cut) % 32:
                 raise SpecError("objects: a sheet part must be whole 32-byte units")
             starts.append(len(sheet_bytes) // 32)
@@ -1082,6 +1114,15 @@ def build_all(rom, specs, free, preview=None, buu_rom=None):
         if need and need not in foreign:
             print(f"map {spec['name']}: skipped (needs the {need} ROM)")
             continue
+        if spec.get("unless") and spec["unless"] in foreign:
+            print(f"map {spec['name']}: skipped (only built without the {spec['unless']} ROM)")
+            continue
+        # a record, exit or trigger with "requires" / "unless" a ROM is kept only with / without it (a sprite that ROM's art
+        # brings; a door into a map that has a fallback without it)
+        for key in ("records", "exits", "triggers"):
+            if key in spec:
+                spec[key] = [r for r in spec[key]
+                             if (not r.get("requires") or r["requires"] in foreign) and r.get("unless") not in foreign]
         b = Build(rom, spec, sources, foreign)
         for op in spec.get("ops", []):
             b.op(op)
