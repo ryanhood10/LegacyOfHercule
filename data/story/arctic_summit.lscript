@@ -113,7 +113,7 @@ sequence summit_scene
         SetEntityAnimation 165, 6
         PlayDamageEffect 9
         WaitFrames 30
-  text 0 "ANDROID 13: Ha!  The Dragon Balls brought your brother back...\x0band you came along too.  Just for me!"
+  text 169 "ANDROID 13: Ha!  The Dragon Balls brought your brother back...\x0band you came along too.  Just for me!"
   text 28 "ANDROID 17: Sis, get out of here!"
   text 29 "ANDROID 18: Not a chance.  We finish him together!"
   script                                 ; 13 absorbs 17
@@ -123,7 +123,7 @@ sequence summit_scene
         DespawnEntity 9
         ScreenShake 0, 10, 30
         WaitFrames 40
-  text 0 "ANDROID 13: Your power is mine!"
+  text 169 "ANDROID 13: This is for the Doc.\x0bYour power is mine!"
   script                                 ; then 18; the transformation (Ryan: more epic): the camera closes in, three surges
         WalkToPosition 165, 384, 316
         WhiteFlash 20
@@ -147,7 +147,7 @@ sequence summit_scene
         WhiteFlash 30
         ScreenShake 0, 18, 40
         WaitFrames 20
-  text 0 "ANDROID 13: Yes...  YES!  I can feel their power!"
+  text 169 "ANDROID 13: Yes...  YES!  I can feel their power!"
   script                                 ; the mountain shakes
         PlayAudio 20
         ScreenShake 0, 20, 120

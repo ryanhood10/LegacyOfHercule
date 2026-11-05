@@ -40,24 +40,35 @@ sequence z8_egg1
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 7
+        PushByte 9
         END
       free:
-        PlayAudio 47
         SetStoryFlag 117
-        FindEntityByType 7
         END
   [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
         PushActiveCharName
   [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
-  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+  [3] script
+        PlayAudio 21
+        FindEntityByType 7
+        WhiteFlash 10
+        WaitFrames 24
+  [4] fmt 1 "@%s: ...\x0bThat was like that when I got here."
         PushActiveCharName
-  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
-  [6] script -> 7
+  [5] script                             ; the ground shakes: she comes round the generator
+        PlayAudio 60
+        ScreenShake 0, 10, 30
+        WalkToPosition 245, 356, 340
+        SetEntityFacing 245, 2
+        SetEntityFacing 0, 3
+        WaitFrames 12
+  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
+        ScreenShake 0, 8, 20
         DespawnCharacterAndRecordPosition 245, 1
         DrawBossHealthBarRange 245, 50, 100
         SetActiveEntity 0
@@ -67,24 +78,35 @@ sequence z8_egg2
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 7
+        PushByte 9
         END
       free:
-        PlayAudio 47
         SetStoryFlag 118
-        FindEntityByType 8
         END
   [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
         PushActiveCharName
   [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
-  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+  [3] script
+        PlayAudio 21
+        FindEntityByType 8
+        WhiteFlash 10
+        WaitFrames 24
+  [4] fmt 1 "@%s: ...\x0bThat was like that when I got here."
         PushActiveCharName
-  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
-  [6] script -> 7
+  [5] script                             ; the ground shakes: she comes round the generator
+        PlayAudio 60
+        ScreenShake 0, 10, 30
+        WalkToPosition 245, 356, 340
+        SetEntityFacing 245, 2
+        SetEntityFacing 0, 3
+        WaitFrames 12
+  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
+        ScreenShake 0, 8, 20
         DespawnCharacterAndRecordPosition 245, 1
         DrawBossHealthBarRange 245, 50, 100
         SetActiveEntity 0
@@ -94,24 +116,35 @@ sequence z8_egg3
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 7
+        PushByte 9
         END
       free:
-        PlayAudio 47
         SetStoryFlag 119
-        FindEntityByType 9
         END
   [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
         PushActiveCharName
   [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
-  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+  [3] script
+        PlayAudio 21
+        FindEntityByType 9
+        WhiteFlash 10
+        WaitFrames 24
+  [4] fmt 1 "@%s: ...\x0bThat was like that when I got here."
         PushActiveCharName
-  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
-  [6] script -> 7
+  [5] script                             ; the ground shakes: she comes round the generator
+        PlayAudio 60
+        ScreenShake 0, 10, 30
+        WalkToPosition 245, 356, 340
+        SetEntityFacing 245, 2
+        SetEntityFacing 0, 3
+        WaitFrames 12
+  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
+        ScreenShake 0, 8, 20
         DespawnCharacterAndRecordPosition 245, 1
         DrawBossHealthBarRange 245, 50, 100
         SetActiveEntity 0
@@ -124,8 +157,11 @@ sequence z8_dino_hatch
         WaitFrames 30
   text 0 "@^MOTHER DINOSAUR: Hah...  hah...\x0bYou hit harder than you look."
   text 0 "@^MOTHER DINOSAUR: But you forgot about my other two."
+  script                                 ; the eggs that are left begin to rattle
+        ScreenShake 0, 4, 40
   text 0 "@^Behind her, the eggs that are left begin to rattle."
   script
+        ScreenShake 0, 10, 24
         SetStoryFlag 478
         WhiteFlash 20
         PlayAudio 47
@@ -155,7 +191,8 @@ sequence z8_dino_hatch
         SetActiveEntity 0
 end
 
-; the second half's record falls: she and her babies leave; the warp is what opens the tubes
+; the second half's record falls: the warp opens the tubes and clears any baby still standing, then she and two actors of them walk out (Ryan, 2026-11-05: not a line over a fade).
+; Two babies show one sprite: a sprite-addressed step finds the first, so the first leaves, and only then is the second addressed.
 sequence z8_dino_defeat
   script
         PlayAudio 60
@@ -163,12 +200,26 @@ sequence z8_dino_defeat
         AddEXP 1500
         WaitFrames 30
   text 0 "@^MOTHER DINOSAUR: Enough...  ENOUGH!\x0bCome, children.  We're leaving."
-  text 0 "@^She limps off into the hills, her babies at her heels.\x0bOne of them stops to kick dirt at you."
-  fmt 1 "@%s: ...I'm just gonna go break that generator now."
-        PushActiveCharName
   script
         SetStoryFlag 477
         FadeToWhite 10
         WarpToMapNoEntities 8, 50, 1, 288, 340
+        SpawnCharacterEntity 245, 352, 320
+        SpawnCharacterEntity 246, 320, 366
+        SpawnCharacterEntity 246, 384, 366
         FadeFromWhite 10
+        BeginCommandBatch
+        WalkToPosition 245, 480, 320
+        WalkToPosition 246, 480, 366
+        CommitCommandBatch
+        DespawnEntity 245
+        DespawnEntity 246
+        SetEntityFacing 246, 2
+        WaitFrames 20
+  text 0 "@^One baby stays behind just long enough to kick dirt at you."
+  script
+        WalkToPosition 246, 480, 366
+        DespawnEntity 246
+  fmt 1 "@%s: ...I'm just gonna go break that generator now."
+        PushActiveCharName
 end

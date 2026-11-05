@@ -8,15 +8,71 @@
 
 ; ---- zone 8 area 13: Gero's first stage ("You're trying to find my secret lab") ---------------------
 
+; Staging (Ryan, 2026-11-05: "account for 1 player or 2 player or what the combination of characters could be"; "dont have them stagnant"). Whoever nobody plays of Piccolo (103: his NPC sprite 73 has no walking group) and Hercule (72) walks in as an actor
+; (CoopCall 22 op 1), hangs back and leaves before the fight: the chapter's selectable characters are Piccolo, Hercule and Krillin, in either player's hands. Only actors and player 1 are moved: player 2 may show any sprite, and
+; a sprite-addressed step on a sprite nobody shows writes through a null pointer (docs/scripts.md). 13 comes in on foot or by air to the spot his boss twin takes (TWIN_OFFSET right of Gero), so the swap does not show.
+; Lines marked (draft) are Claude's, for Ryan to read.
+
 sequence ch4_gero_first
-  script                                 ; stock entry 0, plus 13 beside Gero
-        SpawnCharacterEntity 165, 224, 240
+  [0] script                             ; stock entry 0, with 13 walking down beside Gero and the two walking up
         PlayAudio 50
         SetStoryFlag 90
+        SpawnCharacterEntity 165, 216, 168
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse a
+        SpawnCharacterEntity 72, 164, 376
+      a:
+        CoopCall 22, 1, 1, 0
+        JumpIfFalse b
+        SpawnCharacterEntity 103, 220, 376
+      b:
+        BeginCommandBatch
         WalkToPosition 14, 192, 240
-  stock @083d5ddc                        ; Gero: you'll never get inside!
-  text 169 "ANDROID 13: Remember me?\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
-  script                                 ; stock entry 2: Gero (and 13, his boss twin) fight
+        WalkToPosition 165, 216, 240
+        WalkToPosition 0, 192, 280
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse c
+        WalkToPosition 72, 164, 300
+      c:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse d
+        WalkToPosition 103, 220, 296
+      d:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        SetEntityFacing 165, 0
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse e
+        SetEntityFacing 72, 1
+      e:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse f
+        SetEntityFacing 103, 1
+      f:
+        END
+  [1] stock @083d5ddc                    ; Gero: you'll never get inside!
+  [2] text 169 "ANDROID 13: Remember me?\x0bThe Doc's got me on guard duty.  Nobody gets near that lab while I'm around!"
+  [3] text 67 "HERCULE: Y-yeah, we remember!\x0bNice seeing you again.  You can go now."
+  [4] script                             ; Hercule's actor backs away; Piccolo's has a word first (next 5), else 6
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse a
+        WalkToPosition 72, 164, 376
+        DespawnEntity 72
+      a:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse b
+        PushByte 5
+        END
+      b:
+        PushByte 6
+        END
+  [5] text 3 "!PICCOLO: Keep them busy.\x0bI'll find another way in."
+  [6] script                             ; stock entry 2: Gero (and 13, his boss twin) fight
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse a
+        FlyToPosition 103, 360, 296
+        DespawnEntity 103
+      a:
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 14, 1
         DrawBossHealthBarRange 14, 75, 100
@@ -29,88 +85,275 @@ end
 ; returns is absolute, so the sequences are restated with it moved.
 
 sequence ch4_gero_door_a27
-  script
+  [0] script
         PlayAudio 50
         SetStoryFlag 89
         StackTestStoryFlag 88
         JumpIfFalse L1
-        PushByte 9
-      L1:
+        PushByte 12
         END
-  stock @083d6274                        ; Gero: I won't let you get into my lab!
-  text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
-  text 3 "!PICCOLO: Hercule.  Get behind me."
-  script
-        SpawnCharacterEntity 165, 360, 176
-        SetEntityFacing 165, 2
+      L1:
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse a
+        SpawnCharacterEntity 72, 552, 172
+      a:
+        CoopCall 22, 1, 1, 0
+        JumpIfFalse b
+        SpawnCharacterEntity 103, 552, 212
+      b:
+        BeginCommandBatch
+        WalkToPosition 0, 456, 192
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse c
+        WalkToPosition 72, 488, 172
+      c:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse d
+        WalkToPosition 103, 488, 212
+      d:
+        CommitCommandBatch
+        SetEntityFacing 0, 2
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse e
+        SetEntityFacing 72, 2
+      e:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse f
+        SetEntityFacing 103, 2
+      f:
+        END
+  [1] stock @083d6274                    ; Gero: I won't let you get into my lab!
+  [2] text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
+  [3] text 3 "!PICCOLO: Hercule.  Get behind me."
+  [4] script                             ; Piccolo steps up, Hercule's actor falls back; 13 drops in beside Gero
+        BeginCommandBatch
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse a
+        WalkToPosition 0, 428, 192
+      a:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse b
+        WalkToPosition 103, 428, 192
+      b:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse c
+        WalkToPosition 72, 500, 212
+      c:
+        WaitFrames 1
+        CommitCommandBatch
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse d
+        SetEntityFacing 72, 2
+      d:
+        WaitFrames 10
+        SpawnCharacterEntity 165, 360, 80
+        PlayAudio 60
+        FlyToPosition 165, 360, 176
+        SetEntityFacing 165, 3
         WaitFrames 20
-  text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
-  script
+        END
+  [5] text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  [6] text 67 "HERCULE: Run?  Now that's the first smart thing anyone's said all day!"
+  [7] script                             ; Hercule's actor takes him up on it; Piccolo's has a word first (next 8), else 9
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse a
+        WalkToPosition 72, 552, 212
+        DespawnEntity 72
+      a:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse b
+        PushByte 8
+        END
+      b:
+        PushByte 9
+        END
+  [8] text 3 "!PICCOLO: Keep them busy.\x0bI'll find another way in."
+  [9] script
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse a
+        FlyToPosition 103, 428, 40
+        DespawnEntity 103
+      a:
         DespawnEntity 165
-  stock @083d62dc                        ; the fight, stage 50-75
+  [10] stock @083d62dc                   ; the fight, stage 50-75
   stop
-  stock @083d6304                        ; Gero: the last generator
-  script
-        SpawnCharacterEntity 165, 360, 176
-        SetEntityFacing 165, 2
-        WaitFrames 30
+  [12] stock @083d6304                   ; Gero: the last generator
+  [13] script                            ; 13 drops in again
+        SpawnCharacterEntity 165, 360, 80
+        PlayAudio 60
+        FlyToPosition 165, 360, 176
+        SetEntityFacing 165, 3
+        WaitFrames 20
+  [14] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
+  [15] script
         DespawnEntity 165
-  stock @083d6360                        ; the fight, stage 25-50
+  [16] stock @083d6360                   ; the fight, stage 25-50
 end
 
 sequence ch4_gero_door_a40
-  script
+  [0] script
         PlayAudio 50
         SetStoryFlag 88
         StackTestStoryFlag 89
         JumpIfFalse L1
-        PushByte 9
-      L1:
+        PushByte 12
         END
-  stock @083d76e0                        ; Gero: I won't let you get into my lab!
-  text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
-  text 3 "!PICCOLO: Hercule.  Get behind me."
-  script
-        SpawnCharacterEntity 165, 232, 264
+      L1:
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse a
+        SpawnCharacterEntity 72, -16, 268
+      a:
+        CoopCall 22, 1, 1, 0
+        JumpIfFalse b
+        SpawnCharacterEntity 103, -16, 308
+      b:
+        BeginCommandBatch
+        WalkToPosition 0, 96, 288
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse c
+        WalkToPosition 72, 64, 268
+      c:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse d
+        WalkToPosition 103, 64, 308
+      d:
+        CommitCommandBatch
+        SetEntityFacing 0, 3
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse e
+        SetEntityFacing 72, 3
+      e:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse f
+        SetEntityFacing 103, 3
+      f:
+        END
+  [1] stock @083d76e0                    ; Gero: I won't let you get into my lab!
+  [2] text 67 "HERCULE: N-now hold on there, Doc!  No need for violence!\x0bLet's negotiate!  How about an autographed photo?  Two photos!"
+  [3] text 3 "!PICCOLO: Hercule.  Get behind me."
+  [4] script
+        BeginCommandBatch
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse a
+        WalkToPosition 0, 124, 288
+      a:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse b
+        WalkToPosition 103, 124, 288
+      b:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse c
+        WalkToPosition 72, 52, 308
+      c:
+        WaitFrames 1
+        CommitCommandBatch
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse d
+        SetEntityFacing 72, 3
+      d:
+        WaitFrames 10
+        SpawnCharacterEntity 165, 232, 168
+        PlayAudio 60
+        FlyToPosition 165, 232, 264
         SetEntityFacing 165, 2
         WaitFrames 20
-  text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
-  script
+        END
+  [5] text 169 "ANDROID 13: Negotiate?  Heh.  Here's my offer, chump:\x0bturn around and run, or me and the Doc scrap ya both."
+  [6] text 67 "HERCULE: Run?  Now that's the first smart thing anyone's said all day!"
+  [7] script
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse a
+        WalkToPosition 72, -16, 308
+        DespawnEntity 72
+      a:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse b
+        PushByte 8
+        END
+      b:
+        PushByte 9
+        END
+  [8] text 3 "!PICCOLO: Keep them busy.\x0bI'll find another way in."
+  [9] script
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse a
+        FlyToPosition 103, 124, 168
+        DespawnEntity 103
+      a:
         DespawnEntity 165
-  stock @083d7748                        ; the fight, stage 50-75
+  [10] stock @083d7748                   ; the fight, stage 50-75
   stop
-  stock @083d7770                        ; Gero: the last generator
-  script
-        SpawnCharacterEntity 165, 232, 264
+  [12] stock @083d7770                   ; Gero: the last generator
+  [13] script
+        SpawnCharacterEntity 165, 232, 168
+        PlayAudio 60
+        FlyToPosition 165, 232, 264
         SetEntityFacing 165, 2
-        WaitFrames 30
+        WaitFrames 20
+  [14] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
+  [15] script
         DespawnEntity 165
-  stock @083d77cc                        ; the fight, stage 25-50
+  [16] stock @083d77cc                   ; the fight, stage 25-50
 end
 
 ; ---- zone 8 area 46: the cutaway into the lab (map 8/60): Gero wakes 17 and 18; 13 watches ----------
 
 sequence ch4_lab
-  script                                 ; stock entry 0, plus 13 in the corner
+  script                                 ; stock entry 0, with 13 waiting just out of view
         SetPlayerVisible 0
         PanCameraToPosition 72, 392, 3
         WaitFrames 60
         SetMapRestoreFlag
         PlayMusic 7
         LoadMapWithEntities 8, 60, 1, 184, 168
-        SpawnCharacterEntity 165, 304, 184
-        SetEntityFacing 165, 2
+        SpawnCharacterEntity 165, 344, 184
         PlayAudio 50
-  stockseq @083d9f5c 1 27                ; Gero, 17, 18, the controller, "not going to put us to sleep again"
+  stockseq @083d9f5c 1 1                 ; Gero: the time has come
+  script                                 ; 13 strolls in to watch
+        WalkToPosition 165, 304, 184
+        SetEntityFacing 165, 3
+  stockseq @083d9f5c 2 24                ; 17 and 18 wake; 17 takes the controller
+  script                                 ; 13 takes a step back
+        WalkToPosition 165, 316, 176
+        SetEntityFacing 165, 3
+  stockseq @083d9f5c 25 27               ; "You destroyed it!", "not going to put us to sleep again"
+  script                                 ; 17 finishes him, and 13 has seen it
+        WalkToPosition 9, 250, 216
+        SetEntityAnimation 9, 6
+        PlayAudio 21
+        WhiteFlash 20
+        DespawnEntity 14
+        WaitFrames 50
+        PlayAudio 50
+  text 169 "ANDROID 13: DOC!"
   script
-        WaitFrames 30
-        SetEntityFacing 165, 1
+        WalkToPosition 165, 284, 204
+        SetEntityFacing 165, 2
+        SetEntityFacing 9, 3
+        SetEntityFacing 11, 3
         WaitFrames 20
-  text 169 "ANDROID 13: (Heh...  You built 'em too well, Doc.)"
-  text 0 "@^(Don't you worry.  Whatever they do to you, I'll fulfill my destiny.\x0bGoku is mine.)"
+  text 169 "ANDROID 13: You...  You killed him!\x0bHe gave you life, and you killed him!  That man was my father!"
+  text 169 "I'll get you for this, ya hear me?\x0bI swear it!  The both of you!"
+  script                                 ; Ryan, 2026-11-05: his revenge, the blasts, and he flies off to the arctic
+        NPCFireKiBlastAtEntity 165, 9, 30
+        WaitFrames 12
+        NPCFireKiBlastAtEntity 165, 11, 30
+        WaitFrames 30
+        WhiteFlash 12
+        PlayAudio 21
+        WaitFrames 40
+  text 28 "ANDROID 17: ...Was that it?"
+  text 169 "ANDROID 13: Laugh it up.\x0bNext time I see you two, I'll be stronger than the both of you put together."
   script
-        WalkToPosition 165, 336, 296
+        FlyToPosition 165, 330, 40
         DespawnEntity 165
+        WaitFrames 30
+  text 29 "ANDROID 18: He's heading north.  Should we bother?"
+  text 28 "ANDROID 17: Forget him.\x0bWe have Goku to find."
   stock @083d9f44                        ; back to area 46, flag 124
 end
 
@@ -118,27 +361,94 @@ end
 
 sequence ch4_road
   stockseq @083d8b60 0 22                ; the car talk, 16 refuses, 18: "I'll handle this."
-  script                                 ; co-op: Vegeta's arrival (next 24), else the fight (29)
+  [23] script                            ; a white cut: the heroes catch up, whoever they are, and walk the last steps
+        FadeToWhite 16
+        PanCameraToPosition 144, 232, 8
+        SetEntityPositionInstant 0, 240, 346
         CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 24
+        JumpIfFalse a
+        CoopCall 9, 1, 204, 346
+      a:
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse b
+        SpawnCharacterEntity 72, 200, 360
+      b:
+        CoopCall 22, 1, 1, 0
+        JumpIfFalse c
+        SpawnCharacterEntity 103, 276, 360
+      c:
+        FadeFromWhite 16
+        BeginCommandBatch
+        WalkToPosition 0, 240, 312
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse d
+        WalkToPosition 72, 200, 322
+      d:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse e
+        WalkToPosition 103, 276, 322
+      e:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse f
+        SetEntityFacing 72, 1
+      f:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse g
+        SetEntityFacing 103, 1
+      g:
         END
-      L1:
-        PushByte 29
+  [24] text 67 "HERCULE: Uh...  Hey, look at the time!\x0bI'd love to stay, but I promised I'd guard the...  the road!"
+  [25] script                            ; Hercule's actor goes to guard it; co-op: Vegeta's arrival (next 26), else 31
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse a
+        WalkToPosition 72, 200, 410
+        DespawnEntity 72
+      a:
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse b
+        PushByte 26
         END
-  text 67 "HERCULE: Uh...  Hey, look at the time!\x0bI'd love to stay, but I promised I'd guard the...  the road!"
-  text 4 "!VEGETA: Out of my way, clown.\x0bThe machines are mine.  Namek, try to keep up."
-  script                                 ; player 2 plays Vegeta for the fight; Hercule steps back
+      b:
+        PushByte 31
+        END
+  [26] script                            ; Vegeta drops in from the sky
+        SpawnCharacterEntity 137, 204, 180
+        PlayAudio 60
+        FlyToPosition 137, 204, 300
+        SetEntityFacing 137, 3
+        WaitFrames 16
+  [27] text 4 "!VEGETA: Out of my way, clown.\x0bThe machines are mine.  Namek, try to keep up."
+  [28] script                            ; player 2 plays Vegeta for the fight, where his actor stood; Hercule steps back
         FadeOut 30
         WaitFrames 20
+        DespawnEntity 137
         ClearCharacterFlag_Bit1 0
         ClearCharacterFlag_Bit1 5
         SetCharacterFlag_Bit1 2
         CoopCall 6, 2, 0, 0
+        CoopCall 9, 1, 204, 300
         FadeFromWhite 30
-  text 28 "ANDROID 17: Vegeta, isn't it?  Then I'll take you.\x0b18, the green one's yours."
-  text 29 "ANDROID 18: Fine by me."
-  stock @083d8b38                        ; the fight: 18 (and 17, her twin)
+  [29] text 28 "ANDROID 17: Vegeta, isn't it?  Then I'll take you.\x0b18, the green one's yours."
+  [30] text 29 "ANDROID 18: Fine by me."
+  [31] script                            ; Piccolo's actor, when nobody plays him, leaves it to them (next 32), else 33
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse a
+        PushByte 32
+        END
+      a:
+        PushByte 33
+        END
+  [32] text 3 "!PICCOLO: You want this fight so badly?\x0bIt's yours."
+  [33] script
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse a
+        FlyToPosition 103, 276, 180
+        DespawnEntity 103
+      a:
+        END
+  [34] stock @083d8b38                   ; the fight: 18 (and 17, her twin)
 end
 
 ; 18 (or the pair) beaten: she gets up and blasts Piccolo; player 2 is Hercule again for the stock ending
@@ -150,7 +460,15 @@ sequence ch4_road_end
         ClearCharacterFlag_Bit1 2
         SetCharacterFlag_Bit1 0
         SetCharacterFlag_Bit1 5
+        PushActiveCharIndex
+        PushByte 5
+        CmpEq
+        JumpIfFalse pl2
+        CoopCall 6, 1, 0, 0                ; player 1 is Hercule: player 2 is Piccolo again
+        Jump pl3
+      pl2:
         CoopCall 6, 5, 0, 0
+      pl3:
         PanCameraToPosition 152, 296, 10
         WaitFrames 60
         SetEntityPositionInstant 0, 0, 0
@@ -184,6 +502,27 @@ sequence ch4_road_end
         WaitFrames 60
         SetEntityAnimation 76, 4
   stockseq @083d98ac 3 11                ; 17: "We want Goku", the birds, Krillin's plea
+  script                                 ; Hercule's actor unless player 2 plays him: player 1 is off the stage here
+        CoopCall 5, 0, 0, 0
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpEq
+        And
+        JumpIfFalse sp
+        Jump nosp
+      sp:
+        SpawnCharacterEntity 72, 60, 372
+        WalkToPosition 72, 128, 372
+        SetEntityFacing 72, 3
+      nosp:
+        END
   text 67 "#HERCULE: Y-yeah!  What the little guy said!\x0bLeave Goku alone, or...  or you'll have to deal with me!"
+  script                                 ; ...and thinks better of it
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse a
+        WalkToPosition 72, 16, 372
+        DespawnEntity 72
+      a:
+        END
   stockseq @083d98ac 12 48               ; 17's game, the kiss, Vegeta storms off, Piccolo leaves alone
 end
