@@ -767,7 +767,8 @@ death and game over, the room's state cleared (checked by hand).
   are headless numbers; Ryan's play decides. The levels at the wait are still not measured.
 - The cut-away loads the open area without entities from a room (the engine stashes the room's entity list, 0x08006F4A,
   and brings it back at `RestoreMap`): fine in every headless lineup, with player 2 and with transformed players.
-- `WIDE=1`, `BUU=0` and `PARTY_SLOTS=8` builds compile; only the default build was run.
+- `WIDE=1`, `BUU=0` and `PARTY_SLOTS=8` builds compile; `chamber_room` also passes on the `BUU=0` build (161 checks); the
+  wide view was not run.
 - The gate's stamped pillars carry a few stock pebbles beside their inner edge (zone 8 area 16's art); harmless.
 - Phase 4: five rooms (rows and maps); the pirates' crew before Tao needs one more state before R_ARMED (a wave of regulars,
   then the boss). Phase 5: the entrances' art in the 588 slots. Phase 6: the hidden room (a trigger between the pillars,
