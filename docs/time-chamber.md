@@ -764,6 +764,8 @@ cut-away with the light on then off, the flag, the door open, Gohan's gift, the 
 room); `gohan_ssj1` (Gohan as player 1 and as player 2); `chamber_save`. A death in the room (one player at 1 HP): the stock
 death and game over, the room's state cleared (checked by hand).
 
+**Full regression** (`regfull.sh build/t`, 2026-11-05, final build of the branch): 90 blocks, no FAIL, TIMEOUT or CRASH.
+
 ### 12.5 Not verified, open
 
 - Real time: the feel of the refill, of 14 bodies, and the room fight's balance (Roshi 2800 HP alone; 1960 + 1792 for two)
