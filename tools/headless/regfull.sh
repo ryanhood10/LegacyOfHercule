@@ -41,6 +41,9 @@ for s in tools/headless/staging_*.txt; do
   echo "## $(basename "$s" .txt)" >> "$LOG"
   python tools/headless/staging_run.py "$s" "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 done
+# The tournament's scenes as staged, every lineup (docs/testing.md "Tournament scenes"): self-checking, the `ents` lists too
+echo "## tny_scenes" >> "$LOG"
+python tools/headless/staging_run.py tools/headless/tny_scenes.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 # The Time Chamber (docs/testing.md "Time Chamber"): the open area and gate, each tier, Roshi's dojo in every kind of lineup, the five
 # other rooms (one and two players, transformed, the sixth lever through the lab), a real save's load
 for t in chamber_gate chamber_tiers chamber_room chamber_rooms; do
