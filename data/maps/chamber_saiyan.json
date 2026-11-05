@@ -1,0 +1,248 @@
+{
+ "_": "A Time Chamber room (docs/time-chamber.md 12): the Saiyan ship, the Broly chapter's round room again (Buu's Fury's 6/6, variation 0x082546A0 there, as saiyan_ship.json): its Capsule Corp pad (BG2) cleared, the side openings and the top doorway closed, the bottom opening the door (the map is 16 px taller: the way out below it), a black plaque (8/37's) on the back wall right of the doorway (BG1). Broly, with two players Paragus (his fall first enrages Broly: chamber.c RF_RAGE). Without roms/buu.gba chamber_saiyan_plain.json stands here.",
+ "name": "chamber_saiyan",
+ "zone": 15,
+ "area": 24,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  240,
+  256
+ ],
+ "priorities": [
+  2,
+  3,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082546A0"
+    },
+    "rect": [
+     0,
+     0,
+     30,
+     30
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    20,
+    9
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     16,
+     16,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false,
+   "recolor": false
+  }
+ ],
+ "layers": {
+  "2": [
+   {
+    "op": "clear",
+    "rect": [
+     5,
+     19,
+     9,
+     7
+    ],
+    "_": "the Capsule Corp pad"
+   }
+  ]
+ },
+ "collision": [
+  {
+   "op": "block",
+   "rect": [
+    0,
+    17,
+    4,
+    6
+   ],
+   "_": "the left opening"
+  },
+  {
+   "op": "block",
+   "rect": [
+    26,
+    17,
+    4,
+    6
+   ],
+   "_": "the right opening"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    13,
+    30,
+    4,
+    2
+   ],
+   "_": "the way out below the bottom opening"
+  },
+  {
+   "op": "block",
+   "rect": [
+    20,
+    11,
+    3,
+    4
+   ],
+   "_": "the plaque"
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 512,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 160,
+    "y": 72,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 80,
+    "y": 207,
+    "shape": "64x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 159,
+   "x": 56,
+   "y": 136,
+   "facing": 0,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 170,
+   "x": 200,
+   "y": 150,
+   "facing": 0,
+   "condition": "script:ch_partner_cond"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    24,
+    184,
+    216,
+    204
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:509"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    160,
+    104,
+    184,
+    144
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    104,
+    240,
+    136,
+    256
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    240,
+    1156
+   ],
+   "facing": 0
+  }
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  120,
+  212
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}
