@@ -135,8 +135,9 @@ def fight_on(s, hp):
     s.flag(512, True)
 
 
-def win_and_end(s, first, answer, items_before, two):
-    """test command 7: his HP to 0 through his own OnHit (no dodge); the arms out, the end scene, the reward, the question"""
+def win_and_end(s, first, items_before, two):
+    """test command 7: his HP to 0 through his own OnHit (no dodge); the arms out, the end scene, the reward; A mashed through
+    it all (stepz) asks nothing and changes no light: he stays, the door opens, flag 530"""
     s.echo("he stands in view (beside player 1) for the shot of his arms out")
     s.out("find PO 0x4F504F50", "deref B PO+8", "deref P1 0x03001FA8", "peek P1+0x158 2")
     s.place(200, 260, p2=two)
@@ -149,10 +150,8 @@ def win_and_end(s, first, answer, items_before, two):
     s.state(P_OUTRO)
     s.out("frames 60", f"shot {s.tag}_far")
     s.actor(1)
-    s.echo("on to the question: A through his line and the reward's pop-ups (the question arms CoopCall 18 before its box)")
-    s.out("find CG 0xCE11CA3E", "stepnz CG+0x18 30")    # cellgames.c cg_state: +0x18 the question armed
-    s.expect(r"\w+: 01$", "peek8 CG+0x18 1")
-    s.out("frames 60", f"shot {s.tag}_ask")
+    s.echo("A on both pads through his lines and the reward's pop-ups to the scene's end: no question")
+    s.out(f"stepz {SCENE} 30", "frames 60", f"shot {s.tag}_after")
     senzu, caps = items_before
     if first:
         s.echo("the first win: a Senzu bean and a +3 capsule of each; flag 513")
@@ -164,10 +163,39 @@ def win_and_end(s, first, answer, items_before, two):
         s.echo("a later win: a Senzu bean, no capsules")
         s.count(SENZU, senzu + 1, "Senzu beans")
         s.count(STR3, caps, "Strength +3")
-    s.out("key 1 6" if answer else "key 2 6", "frames 90", f"shot {s.tag}_answer", f"stepz {SCENE} 20", "frames 60")
-    s.echo("the door is open again: state 7, the beam hidden")
+    s.echo("the door is open again: state 7, the beam hidden; beaten this time round (flag 530); the lights untouched by the A's")
     s.state(P_DONE)
     s.deco(0, 0)
+    s.flag(530, True)
+    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
+    s.actor(1)
+
+
+def talk(s, fight, loop=None, by_p2=False):
+    """walk up to him at the far end and press A facing him (player 1, or player 2 through his agency): after a beat "Fight
+    Popo again?" (CoopCall 18 armed: cellgames.c cg_state +0x18); fight = A, else B and the loop's question: loop = A / B"""
+    s.echo(f"talk to him ({'player 2' if by_p2 else 'player 1'}): fight again {'yes' if fight else 'no'}"
+           + ("" if fight else f", start again {'yes' if loop else 'no'}"))
+    s.out("find CG 0xCE11CA3E", "poke8 CG+0x18 0")
+    if by_p2:
+        s.place(200, 200, p2=False)
+        s.out("deref P2 0x0203FF08", f"poke32 P2+0x158 {244 << 8:#x}", f"poke32 P2+0x15C {100 << 8:#x}", "frames 4",
+              "p2 0x40", "frames 4", "p2 0", "frames 2", "p2 1", "frames 6", "p2 0")
+    else:
+        s.place(244, 100, p2=False)
+        s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "frames 2", "key 1 6")
+    s.out("frames 20")
+    s.echo("a beat: not armed yet 20 frames after the press")
+    s.expect(r"\w+: 00$", "peek8 CG+0x18 1")
+    s.out("frames 50")
+    s.expect(r"\w+: 01$", "peek8 CG+0x18 1")
+    s.out("frames 40", f"shot {s.tag}_ask_fight")
+    if fight:
+        s.out("key 1 6", "frames 60", f"stepz {SCENE} 20", "frames 30")
+        return
+    s.out("key 2 6", "frames 60", "stepnz CG+0x18 30", "frames 60", f"shot {s.tag}_ask_loop")
+    s.out("key 1 6" if loop else "key 2 6", "frames 60", f"stepz {SCENE} 20", "frames 60")
+    s.state(P_DONE)
 
 
 def out_of_room(s, p2):
@@ -236,31 +264,54 @@ def main_script():
     s.echo("his HP is under his max (punches landed) and he dodged at least once")
     s.expect(r"0203fd0c: (?!1450)[0-9a-f]{4}[0-9a-f]{4}", f"peek {ARG} 1")
     s.popo_expect(3, r"000[1-9a-f][0-9a-f]{4}")
-    win_and_end(s, True, False, (0, 0), False)
-    s.echo("answered no: the lights stay out, no time round")
+    win_and_end(s, True, (0, 0), False)
+    s.echo("talking to him: no fight, no start again: the lights stay out, no time round")
+    talk(s, False, False)
     s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
-    s.popo_expect(0, r"000[37]0007")
+    s.popo_expect(0, r"000[bf]0007")
     out_of_room(s, p2=False)
 
-    s.echo("--- a later visit (one line and the fight), won, answered yes: the loop")
-    s.tag = "again"
+    s.echo("--- back in the room after the win: no scene, he stands facing them; asked, a fight again, won; then the loop")
+    s.tag = "back"
     s.full()
     into_room(s, p2=False)
-    s.out("frames 60", f"waitnz {SCENE} 300", "frames 60", f"shot {s.tag}_line")
-    s.state(P_SCENE)
-    s.out(f"stepz {SCENE} 20", "frames 30")
+    s.out("frames 150")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.state(P_DONE)
+    s.actor(1)
+    s.out(f"shot {s.tag}_stands")
+    talk(s, True)
     fight_on(s, 5200)
-    win_and_end(s, False, True, (1, 1), False)
-    s.echo("answered yes: the six lights back on, time round 1 (flag 520)")
+    win_and_end(s, False, (1, 1), False)
+    talk(s, False, True)
+    s.echo("started again: the six lights back on, time round 1 (flag 520), flag 530 clear")
     s.expect(r"\w+: 00$", "peek8 FLAGS+0x3F 1")
     s.flag(520, True)
-    s.popo_expect(0, r"000[37]0107")
+    s.flag(530, False)
+    s.echo("asked once more: only his line (nothing armed), still standing")
+    s.out("find CG 0xCE11CA3E", "poke8 CG+0x18 0")
+    s.place(244, 100, p2=False)
+    s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "frames 2", "key 1 6", "frames 90", f"shot {s.tag}_go")
+    s.expect(r"\w+: 00$", "peek8 CG+0x18 1")
+    s.out(f"stepz {SCENE} 20", "frames 30")
+    s.state(P_DONE)
     out_of_room(s, p2=False)
     s.echo("outside: the gate's lights and beams stand again at the next load, the way shut")
     s.out("frames 60")
     for i in range(9):
         s.deco(i, 1)
     s.out(f"shot {s.tag}_gate")
+
+    s.echo("--- six lights out again (round 1): the later visit's scene (one line) and the fight, a step stronger (6100 HP)")
+    s.tag = "again"
+    s.lights(0x3F)
+    s.door()
+    s.full()
+    into_room(s, p2=False)
+    s.out("frames 60", f"waitnz {SCENE} 300", "frames 60", f"shot {s.tag}_line")
+    s.state(P_SCENE)
+    s.out(f"stepz {SCENE} 20", "frames 30")
+    fight_on(s, 6100)
 
     # ---- two players: Goku + Hercule, the lone boss's HP --------------------------------------------------------------
     s.begin("two players: Goku and Hercule, the lone boss's HP (180 %), the win by the autopilot", GOKU, HERCULE, "two_goku")
@@ -285,9 +336,14 @@ def main_script():
     s.popo(2, 0)
     s.state(P_YIELD + 1)                            # the arms out are 40 frames: by now the end scene
     s.actor(1)
+    s.echo("A on both pads through the end: no question, the lights untouched")
     s.out(f"stepz {SCENE} 30", "frames 60")
     s.state(P_DONE)
+    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
     s.out(f"shot {s.tag}_done")
+    s.echo("player 2 walks up and asks: no fight, no start again")
+    talk(s, False, False, by_p2=True)
+    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
 
     # ---- more lineups: the scene's routes and bodies -------------------------------------------------------------------
     for tag, p1, p2 in (("hercule_vegeta", HERCULE, VEGETA), ("krillin_alone", KRILLIN, None), ("gohan_piccolo", GOHAN, PICCOLO),

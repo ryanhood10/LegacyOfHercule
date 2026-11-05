@@ -12,6 +12,7 @@
 #define CH_FLAG_POPO     513     // Popo beaten at least once (his big first reward paid)
 #define CH_FLAG_FIRST0   514     // 514-519: room n's first win paid (its +3 capsule; later rounds pay a Senzu)
 #define CH_FLAG_ROUND0   520     // 520-521: times round (0-3, bit 0 / bit 1)
+#define CH_FLAG_ROUND_WON 530    // Popo beaten in this time round: he stands and talks (the fight and the loop on A), no scene
 #define CH_ROUND_MAX     3
 #ifndef POPO_SPRITE
 #define POPO_SPRITE      163     // tools/popoart.py (Makefile POPO_SPRITE)

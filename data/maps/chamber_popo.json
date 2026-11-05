@@ -1,5 +1,5 @@
 {
-  "_": "The Time Chamber's hidden room behind the gate (docs/time-chamber.md 5 and 12.7): a plain white room, the gate's two pillars again on either side of the door at the bottom (the way back to the open area, 15/18 below the gate), four stone jars in the corners with the big drop (ch_popo_jar: 30 % food and 30 % energy, 3 hits), Mr. Popo's actor at the far end with his back turned (sprite 163, POPO_SPRITE, tools/popoart.py). Decorations: 0 the gate's beam across the door (hidden; shown while the fight seals it), 1-4 the jars. The scenes and the fight are src/coop/popo.c and data/story/chamber_popo.lscript.",
+  "_": "The Time Chamber's hidden room behind the gate (docs/time-chamber.md 5 and 12.7): a plain white room, the gate's two pillars again on either side of the door at the bottom (the way back to the open area, 15/18 below the gate), four stone jars in the corners with the big drop (ch_popo_jar: 30 % food and 30 % energy, 3 hits), Mr. Popo's actor at the far end with his back turned (sprite 163, POPO_SPRITE, tools/popoart.py); in front of him a talk trigger (A facing him, either player: ch_popo_talk, the fight again or the loop once he is beaten this time round). Decorations: 0 the gate's beam across the door (hidden; shown while the fight seals it), 1-4 the jars. The scenes and the fight are src/coop/popo.c and data/story/chamber_popo.lscript.",
   "name": "chamber_popo",
   "zone": 15, "area": 25,
   "base": [9, 1],
@@ -29,6 +29,9 @@
   },
   "records": [
     {"kind": "actor", "sprite": 163, "x": 244, "y": 72, "facing": 1}
+  ],
+  "triggers": [
+    {"type": "dialogue", "rect": [220, 52, 268, 108], "payload": "seq:ch_popo_talk", "activation": "facing"}
   ],
   "exits": [
     {"type": "door", "rect": [224, 376, 264, 392], "dir": "down", "to": [15, 18, 1], "at": [1028, 420], "facing": 0}

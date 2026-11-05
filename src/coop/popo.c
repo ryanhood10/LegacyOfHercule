@@ -10,8 +10,12 @@
 // later visits one line (ch_popo_again). The scene's last part seals the door; its end swaps the actor for the fighter
 // (tny_moves.c tny_moves_popo_spawn: his own kit, far hops, the dodge, no stock AI). At 0 HP he does not fall (KF_YIELD):
 // the arms out, then ch_popo_end: a flash, he stands at the far end, his line, the reward (the first time a Senzu and a
-// +3 capsule of each, later a Senzu), the offer to start again (the loop: the six lights back on, the tier back to 0,
-// every boss CH_LOOP_STEP stronger, a room's first-win capsule then a Senzu), the door opens.
+// +3 capsule of each, later a Senzu), the door opens and he stays, standing at the far end (flag 530: beaten this time
+// round). Walking up to him and pressing A (either player: a "facing" talk trigger, ch_popo_talk) asks, after a beat, "Fight
+// Popo again?" and, if not, whether he should start again (the loop: the six lights back on, the tier back to 0, every boss
+// CH_LOOP_STEP stronger, a room's first-win capsule then a Senzu). A load while 530 is set has no scene: he stands and waits.
+// (Until the coordinator's note of 2026-11-05 the loop's question came at the end of the fight, where mashing A through
+// his lines answered it yes and put six lights of progress back.)
 //
 // The states:
 //   P_IDLE   nothing (not loaded through ch_popo_onload, or done)
@@ -21,6 +25,7 @@
 //   P_FIGHT  his HP at 0 -> P_YIELD (the bar slides out)
 //   P_YIELD  YIELD_FRAMES of the arms-out pose, then ch_popo_end -> P_OUTRO
 //   P_OUTRO  the end scene; its op POPO_OPEN opens the door -> P_DONE
+//   P_DONE   he stands at the far end facing them; ch_popo_talk on A: the fight again (POPO_FIGHT -> P_ARMED) or the loop
 // Every line is Claude's draft (DRAFT), in data/story/chamber_popo.lscript.
 #include "popo.h"
 #include "chamber.h"
@@ -210,6 +215,12 @@ void popo_tick(void) {
     case P_WAIT: {
         if (scene_running() || !p1_controllable()) { po.timer = 0; break; }
         if (++po.timer < WAIT_FRAMES) break;
+        if (flag(CH_FLAG_ROUND_WON)) {              // beaten this time round: no scene, he stands and waits to be asked
+            Entity *a = actor();
+            if (a) a->facing = LOOK_DOWN;
+            po.state = P_DONE;
+            break;
+        }
         const void *seq = flag(CH_FLAG_SCENE) && po.seq[1] ? po.seq[1] : po.seq[0];
         po.timer = 0;
         po.state = seq ? P_SCENE : P_IDLE;
@@ -265,8 +276,10 @@ enum {
     POPO_ROOM_OWED,     // (a room's lever, chamber.lscript) -> 1 when its win pays: the first win, or any win once round
     POPO_ROOM_PRIZE,    // -> the item: the room's first win a +3 capsule (flag 514 + light), later a Senzu
     POPO_CAM_X, POPO_CAM_Y,   // -> the view's top-left with player 1 in the middle (PanCameraToPosition)
+    POPO_ROUND_WON,     // the end scene: beaten this time round (flag 530); a load from now on has no scene
+    POPO_TALK,          // (ch_popo_talk) -> its entry: 1 the offer, 11 the line after the loop, 12 nothing (not now)
 };
-_Static_assert(POPO_ROOM_OWED == 19 && POPO_CAM_Y == 22, "the op numbers data/story/chamber_popo.lscript and chamber.lscript use");
+_Static_assert(POPO_ROOM_OWED == 19 && POPO_CAM_Y == 22 && POPO_TALK == 24, "the op numbers data/story/chamber_popo.lscript and chamber.lscript use");
 
 // the intro's entries (data/story/chamber_popo.lscript ch_popo_intro, `[n]` there)
 #define E_P1_LINE0      1             // 1-9 player 1's line by party slot, 10 the fallback
@@ -274,6 +287,9 @@ _Static_assert(POPO_ROOM_OWED == 19 && POPO_CAM_Y == 22, "the op numbers data/st
 #define E_P2_LINE0      12            // 12-20 player 2's reply by party slot, 21 the fallback
 #define E_P2_FALLBACK   21
 #define E_POPO_TURNS    22
+#define E_TALK_OFFER    1             // ch_popo_talk's entries
+#define E_TALK_LOOPED   11
+#define E_TALK_NONE     12
 #define LINE_SLOTS      9
 
 static int bar_short(const CharacterEntry *c, int ep) { return ep ? c->ep < c->max_ep : c->hp < c->max_hp; }
@@ -353,6 +369,10 @@ int popo_call(s32 op, s32 a, s32 b, s32 *push) {
     }
     case POPO_FIGHT:
         if (!here()) return 0;
+        for (int i = 0; i < 2; i++) {               // nobody stands in the door's strip (or below it) when it seals
+            Entity *p = i ? p2 : p1;
+            if (p && (p->y >> 8) > seal[1] - 8) p->y = (seal[1] - 16) << 8;
+        }
         door(0);
         flag_set_hook(g_Party, CH_FLAG_SCENE);
         po.first = !flag(CH_FLAG_POPO);
@@ -379,6 +399,7 @@ int popo_call(s32 op, s32 a, s32 b, s32 *push) {
         for (int i = 0; i < CH_ROOMS; i++) flag_clear_hook(g_Party, CH_FLAG_LEVER0 + i);
         int n = chamber_round();
         if (n < CH_ROUND_MAX) set_round(n + 1);
+        flag_clear_hook(g_Party, CH_FLAG_ROUND_WON);   // the next visit (six lights out again) is a fight with its scene
         return 0;
     }
     case POPO_OPEN:
@@ -397,6 +418,11 @@ int popo_call(s32 op, s32 a, s32 b, s32 *push) {
         else *push = ITEM_SENZU;
         return 1;
     }
+    case POPO_ROUND_WON: flag_set_hook(g_Party, CH_FLAG_ROUND_WON); return 0;
+    case POPO_TALK:
+        if (!here() || po.state != P_DONE) *push = E_TALK_NONE;     // a scene or the fight: the trigger does nothing
+        else *push = flag(CH_FLAG_ROUND_WON) ? E_TALK_OFFER : E_TALK_LOOPED;
+        return 1;
     case POPO_CAM_X: *push = p1 ? view(p1->x >> 8, 120, 480) : 0; return 1;
     case POPO_CAM_Y: *push = p1 ? view(p1->y >> 8, 80, 400) : 0; return 1;
     default:
@@ -408,9 +434,9 @@ int popo_call(s32 op, s32 a, s32 b, s32 *push) {
 void popo_test(u32 arg, u32 arg2) {
     state_check();
     switch (arg) {
-    case 0:                                         // state | round << 8 | flag 512 << 16 | 513 << 17 | first << 18
+    case 0:                                         // state | round << 8 | flag 512 << 16 | 513 << 17 | first << 18 | 530 << 19
         coop2.cmd_arg = (u32)po.state | (u32)chamber_round() << 8 | (u32)flag(CH_FLAG_SCENE) << 16
-                      | (u32)flag(CH_FLAG_POPO) << 17 | (u32)po.first << 18;
+                      | (u32)flag(CH_FLAG_POPO) << 17 | (u32)po.first << 18 | (u32)flag(CH_FLAG_ROUND_WON) << 19;
         break;
     case 1:                                         // his HP := arg2 (bit 31: arg2 & 0xFF percent of his max)
         if (po.boss && in_list(po.boss) && po.boss->hp > 0) {

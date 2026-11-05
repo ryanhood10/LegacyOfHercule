@@ -114,7 +114,7 @@ sequence ch_popo_again
   [3] stop 0x0
 end
 
-; ---- his HP at 0: he does not fall (the arms out, popo.c P_YIELD), then a flash and he stands at the far end -------------
+; ---- his HP at 0: he does not fall (the arms out, popo.c P_YIELD), then a flash and he stands at the far end; he stays -----
 sequence ch_popo_end
   [0] script                             ; -> 1 the first win ever, 3 a later one
         WhiteFlash 10
@@ -137,8 +137,48 @@ sequence ch_popo_end
   [3] text 82 "MR. POPO: Again you win.  Popo is happy.\x0bTake this." -> 4
   [4] script
         PickUpItem 0
+  [5] text 82 "MR. POPO: Popo will stay here.\x0bTalk to Popo when you want more."
+  [6] script                             ; beaten this time round (flag 530); the door opens; the view back on player 1
+        CoopCall 36, 23, 0, 0
+        CoopCall 36, 17, 0, 0
+        PlayAudio 47
+        CoopCall 36, 21, 0, 0
+        CoopCall 36, 22, 0, 0
+        PushByte 3
+        Step PanCameraToPosition
+        WaitFrames 30
+        SetActiveEntity 0
+  [7] stop 0x0
+end
+
+; ---- talking to him after a win (the map's "facing" trigger in front of him: either player's A) ---------------------------
+; Nothing is asked at the end of the fight (mashing A through his lines must not put six lights of progress back): here a
+; beat first (an A held from the walk is no press: CoopCall 18 ignores a held button), then the fight again, else the loop.
+sequence ch_popo_talk
+  [0] script                             ; -> 1 the offer, 11 the line after the loop, 12 nothing (a scene or the fight)
+        CoopCall 36, 24, 0, 0
+        END
+  [1] script
+        WaitFrames 30
+        CoopCall 18, 1, 0, 0
+  [2] text 82 "MR. POPO: Fight Popo again?  (A: Yes  B: No)"
+  [3] script
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PlayAudio 47
+        ScreenShake 0, 2, 12
+        CoopCall 36, 12, 0, 0
+        PushByte 4
+        END
+      L1:
+        PushByte 5
+        END
+  [4] text 82 "MR. POPO: Good.  Popo is ready." -> 12
   [5] text 82 "MR. POPO: Popo can light the six lights again.\x0bEveryone inside will be stronger."
-  [6] script                             ; the loop (decision 4): a yes / no question (CoopCall 18: A yes, B no)
+  [6] script
+        WaitFrames 20
         CoopCall 18, 1, 0, 0
   [7] text 82 "MR. POPO: Shall Popo start again?  (A: Yes  B: No)"
   [8] script
@@ -152,16 +192,8 @@ sequence ch_popo_end
       L1:
         PushByte 10
         END
-  [9] text 82 "MR. POPO: Good.  The lights are on again.\x0bGo.  Come back stronger." -> 11
-  [10] text 82 "MR. POPO: Then Popo will wait here.\x0bCome back when you want to fight." -> 11
-  [11] script                            ; the door opens; the view back on player 1
-        CoopCall 36, 17, 0, 0
-        PlayAudio 47
-        CoopCall 36, 21, 0, 0
-        CoopCall 36, 22, 0, 0
-        PushByte 3
-        Step PanCameraToPosition
-        WaitFrames 30
-        SetActiveEntity 0
+  [9] text 82 "MR. POPO: Good.  The lights are on again.\x0bGo.  Come back stronger." -> 12
+  [10] text 82 "MR. POPO: Then Popo will wait here." -> 12
+  [11] text 82 "MR. POPO: Go.  Popo will be here\x0bwhen the six lights are out again." -> 12
   [12] stop 0x0
 end

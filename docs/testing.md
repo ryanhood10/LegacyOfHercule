@@ -770,9 +770,11 @@ an empty one ran the balance's cases on from each other's state).
   are read during the fight).
 - **A win:** `COOP_CMD_STORY_WIN` (7): his own OnHit, so no dodge; or op 1 (HP) and the autopilot (op 2), or test command 27 op 6
   (punches from beside him: kit 0; some miss, his dodge).
-- **The question:** `find CG 0xCE11CA3E` (`cellgames.c` `cg_state`), `stepnz CG+0x18 30` presses A until it is armed (+0x18),
-  then 60 frames and `key 2 6` (B, no) or `key 1 6` (A, yes). The question is a box of its own: on a page after the first, B
-  only turned the page and the next A answered yes.
+- **The questions** (only from talking to him after a win: player 1 at (244, 100), Up, A; player 2 the same with `p2`):
+  `find CG 0xCE11CA3E` (`cellgames.c` `cg_state`), `poke8 CG+0x18 0`, then +0x18 is 0 for the 30 frames' beat and 1 once "Fight
+  Popo again?" is armed; `key 1 6` fights, `key 2 6` goes on: `stepnz CG+0x18 30` presses A through his line to the loop's
+  question, then `key 1 6` / `key 2 6`. Each question is a box of its own: on a page after the first, B only turned the page and
+  the next A answered yes. The end of a fight asks nothing: `stepz 0x03001FDC` (A on both pads) runs it to its end.
 - **The camera:** a scene that pans must end with `SetActiveEntity 0`, or the view stays where it left it (the first films:
   Piccolo walked off the top of the screen for the whole fight).
 - **The balance:** `chamber_popo_bal.txt` runs the autopilot 7200 frames a case on the Map Test party's own bars and prints

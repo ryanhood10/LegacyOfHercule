@@ -359,13 +359,10 @@ shot one_piccolo_far
 deref R TBL+0x270
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R
-echo on to the question: A through his line and the reward's pop-ups (the question arms CoopCall 18 before its box)
-find CG 0xCE11CA3E
-stepnz CG+0x18 30
-echo EXPECT \w+: 01$
-peek8 CG+0x18 1
+echo A on both pads through his lines and the reward's pop-ups to the scene's end: no question
+stepz 0x03001FDC 30
 frames 60
-shot one_piccolo_ask
+shot one_piccolo_after
 echo the first win: a Senzu bean and a +3 capsule of each; flag 513
 echo Senzu beans: 1
 echo EXPECT 0203f17f: 01$
@@ -382,26 +379,62 @@ peek8 0x203f188 1
 echo flag 513 set
 echo EXPECT \w+: (02|03|06|07|0a|0b|0e|0f|12|13|16|17|1a|1b|1e|1f|22|23|26|27|2a|2b|2e|2f|32|33|36|37|3a|3b|3e|3f|42|43|46|47|4a|4b|4e|4f|52|53|56|57|5a|5b|5e|5f|62|63|66|67|6a|6b|6e|6f|72|73|76|77|7a|7b|7e|7f|82|83|86|87|8a|8b|8e|8f|92|93|96|97|9a|9b|9e|9f|a2|a3|a6|a7|aa|ab|ae|af|b2|b3|b6|b7|ba|bb|be|bf|c2|c3|c6|c7|ca|cb|ce|cf|d2|d3|d6|d7|da|db|de|df|e2|e3|e6|e7|ea|eb|ee|ef|f2|f3|f6|f7|fa|fb|fe|ff)$
 peek8 FLAGS+0x40 1
-key 2 6
-frames 90
-shot one_piccolo_answer
-stepz 0x03001FDC 20
-frames 60
-echo the door is open again: state 7, the beam hidden
+echo the door is open again: state 7, the beam hidden; beaten this time round (flag 530); the lights untouched by the A's
 find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo answered no: the lights stay out, no time round
+echo flag 530 set
+echo EXPECT \w+: (04|05|06|07|0c|0d|0e|0f|14|15|16|17|1c|1d|1e|1f|24|25|26|27|2c|2d|2e|2f|34|35|36|37|3c|3d|3e|3f|44|45|46|47|4c|4d|4e|4f|54|55|56|57|5c|5d|5e|5f|64|65|66|67|6c|6d|6e|6f|74|75|76|77|7c|7d|7e|7f|84|85|86|87|8c|8d|8e|8f|94|95|96|97|9c|9d|9e|9f|a4|a5|a6|a7|ac|ad|ae|af|b4|b5|b6|b7|bc|bd|be|bf|c4|c5|c6|c7|cc|cd|ce|cf|d4|d5|d6|d7|dc|dd|de|df|e4|e5|e6|e7|ec|ed|ee|ef|f4|f5|f6|f7|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 3f$
+peek8 FLAGS+0x3F 1
+deref R TBL+0x270
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R
+echo talking to him: no fight, no start again: the lights stay out, no time round
+echo talk to him (player 1): fight again no, start again no
+find CG 0xCE11CA3E
+poke8 CG+0x18 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0xf400
+poke32 P1+0x15C 0x6400
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 20
+echo a beat: not armed yet 20 frames after the press
+echo EXPECT \w+: 00$
+peek8 CG+0x18 1
+frames 50
+echo EXPECT \w+: 01$
+peek8 CG+0x18 1
+frames 40
+shot one_piccolo_ask_fight
+key 2 6
+frames 60
+stepnz CG+0x18 30
+frames 60
+shot one_piccolo_ask_loop
+key 2 6
+frames 60
+stepz 0x03001FDC 20
+frames 60
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
 echo EXPECT \w+: 3f$
 peek8 FLAGS+0x3F 1
 poke32 0x0203FD0C 0x0
 poke32 0x0203FD54 0x0
 poke32 0x0203FD08 49
 frames 2
-echo EXPECT 0203fd0c: 000[37]0007
+echo EXPECT 0203fd0c: 000[bf]0007
 peek 0x0203FD0C 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0xf400
@@ -413,7 +446,274 @@ keys 0
 frames 120
 echo EXPECT map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d
 map
-echo --- a later visit (one line and the fight), won, answered yes: the loop
+echo --- back in the room after the win: no scene, he stands facing them; asked, a fight again, won; then the loop
+poke16 0x203f00c 9999
+poke16 0x203f00e 9999
+poke16 0x203f010 400
+poke16 0x203f012 400
+poke16 0x203f028 9999
+poke16 0x203f02a 9999
+poke16 0x203f02c 400
+poke16 0x203f02e 400
+poke16 0x203f044 9999
+poke16 0x203f046 9999
+poke16 0x203f048 400
+poke16 0x203f04a 400
+poke16 0x203f060 9999
+poke16 0x203f062 9999
+poke16 0x203f064 400
+poke16 0x203f066 400
+poke16 0x203f07c 9999
+poke16 0x203f07e 9999
+poke16 0x203f080 400
+poke16 0x203f082 400
+poke16 0x203f098 9999
+poke16 0x203f09a 9999
+poke16 0x203f09c 400
+poke16 0x203f09e 400
+poke16 0x203f0b4 9999
+poke16 0x203f0b6 9999
+poke16 0x203f0b8 400
+poke16 0x203f0ba 400
+deref P1 0x03001FA8
+poke32 P1+0x158 0x40400
+poke32 P1+0x15C 0x15a00
+frames 4
+keys 0x40
+waitmap 15 25 300
+keys 0
+frames 40
+echo EXPECT map zone 15 area 25 
+map
+frames 150
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
+deref R TBL+0x270
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R
+shot back_stands
+echo talk to him (player 1): fight again yes
+find CG 0xCE11CA3E
+poke8 CG+0x18 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0xf400
+poke32 P1+0x15C 0x6400
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 20
+echo a beat: not armed yet 20 frames after the press
+echo EXPECT \w+: 00$
+peek8 CG+0x18 1
+frames 50
+echo EXPECT \w+: 01$
+peek8 CG+0x18 1
+frames 40
+shot back_ask_fight
+key 1 6
+frames 60
+stepz 0x03001FDC 20
+frames 30
+echo the fight: state 4, the door sealed (the beam shows), his HP, the first scene's flag
+find PO 0x4F504F50
+echo EXPECT \w+: 04
+peek8 PO+4 1
+deref D 0x3001128
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref R TBL+0x270
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 49
+frames 2
+echo EXPECT 0203fd0c: 00001450
+peek 0x0203FD0C 1
+echo flag 512 set
+echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
+peek8 FLAGS+0x40 1
+echo he stands in view (beside player 1) for the shot of his arms out
+find PO 0x4F504F50
+deref B PO+8
+deref P1 0x03001FA8
+peek P1+0x158 2
+deref P1 0x03001FA8
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0x10400
+poke32 B+0x158 0xF000
+poke32 B+0x15C 0x10400
+frames 2
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 7
+frames 4
+echo HP 0: he does not fall; the bar goes, the arms out (state 5)
+find PO 0x4F504F50
+echo EXPECT \w+: 05
+peek8 PO+4 1
+frames 20
+shot back_yield
+frames 40
+echo the end scene: the flash, he stands at the far end facing them (an actor again, not the fighter)
+find PO 0x4F504F50
+echo EXPECT \w+: 06
+peek8 PO+4 1
+frames 60
+shot back_far
+deref R TBL+0x270
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R
+echo A on both pads through his lines and the reward's pop-ups to the scene's end: no question
+stepz 0x03001FDC 30
+frames 60
+shot back_after
+echo a later win: a Senzu bean, no capsules
+echo Senzu beans: 2
+echo EXPECT 0203f17f: 02$
+peek8 0x203f17f 1
+echo Strength +3: 1
+echo EXPECT 0203f182: 01$
+peek8 0x203f182 1
+echo the door is open again: state 7, the beam hidden; beaten this time round (flag 530); the lights untouched by the A's
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
+deref D 0x3001128
+echo EXPECT \w+: 00000000
+peek D+0x10 1
+echo flag 530 set
+echo EXPECT \w+: (04|05|06|07|0c|0d|0e|0f|14|15|16|17|1c|1d|1e|1f|24|25|26|27|2c|2d|2e|2f|34|35|36|37|3c|3d|3e|3f|44|45|46|47|4c|4d|4e|4f|54|55|56|57|5c|5d|5e|5f|64|65|66|67|6c|6d|6e|6f|74|75|76|77|7c|7d|7e|7f|84|85|86|87|8c|8d|8e|8f|94|95|96|97|9c|9d|9e|9f|a4|a5|a6|a7|ac|ad|ae|af|b4|b5|b6|b7|bc|bd|be|bf|c4|c5|c6|c7|cc|cd|ce|cf|d4|d5|d6|d7|dc|dd|de|df|e4|e5|e6|e7|ec|ed|ee|ef|f4|f5|f6|f7|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 3f$
+peek8 FLAGS+0x3F 1
+deref R TBL+0x270
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R
+echo talk to him (player 1): fight again no, start again yes
+find CG 0xCE11CA3E
+poke8 CG+0x18 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0xf400
+poke32 P1+0x15C 0x6400
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 20
+echo a beat: not armed yet 20 frames after the press
+echo EXPECT \w+: 00$
+peek8 CG+0x18 1
+frames 50
+echo EXPECT \w+: 01$
+peek8 CG+0x18 1
+frames 40
+shot back_ask_fight
+key 2 6
+frames 60
+stepnz CG+0x18 30
+frames 60
+shot back_ask_loop
+key 1 6
+frames 60
+stepz 0x03001FDC 20
+frames 60
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
+echo started again: the six lights back on, time round 1 (flag 520), flag 530 clear
+echo EXPECT \w+: 00$
+peek8 FLAGS+0x3F 1
+echo flag 520 set
+echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
+peek8 FLAGS+0x41 1
+echo flag 530 clear
+echo EXPECT \w+: (00|01|02|03|08|09|0a|0b|10|11|12|13|18|19|1a|1b|20|21|22|23|28|29|2a|2b|30|31|32|33|38|39|3a|3b|40|41|42|43|48|49|4a|4b|50|51|52|53|58|59|5a|5b|60|61|62|63|68|69|6a|6b|70|71|72|73|78|79|7a|7b|80|81|82|83|88|89|8a|8b|90|91|92|93|98|99|9a|9b|a0|a1|a2|a3|a8|a9|aa|ab|b0|b1|b2|b3|b8|b9|ba|bb|c0|c1|c2|c3|c8|c9|ca|cb|d0|d1|d2|d3|d8|d9|da|db|e0|e1|e2|e3|e8|e9|ea|eb|f0|f1|f2|f3|f8|f9|fa|fb)$
+peek8 FLAGS+0x42 1
+echo asked once more: only his line (nothing armed), still standing
+find CG 0xCE11CA3E
+poke8 CG+0x18 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0xf400
+poke32 P1+0x15C 0x6400
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 90
+shot back_go
+echo EXPECT \w+: 00$
+peek8 CG+0x18 1
+stepz 0x03001FDC 20
+frames 30
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0xf400
+poke32 P1+0x15C 0x17000
+frames 2
+keys 0x80
+waitmap 15 18 200
+keys 0
+frames 120
+echo EXPECT map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d
+map
+echo outside: the gate's lights and beams stand again at the next load, the way shut
+frames 60
+deref D 0x3001128
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x300112c
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001130
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001134
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001138
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x300113c
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001140
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001144
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+deref D 0x3001148
+echo EXPECT \w+: 00000001
+peek D+0x10 1
+shot back_gate
+echo --- six lights out again (round 1): the later visit's scene (one line) and the fight, a step stronger (6100 HP)
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x3f
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD0C 0x309
+poke32 0x0203FD54 0xa00060
+poke32 0x0203FD08 5
+frames 150
+keys 0x40
+frames 20
+keys 0
+key 1 6
+waitmap 15 18 600
+frames 260
 poke16 0x203f00c 9999
 poke16 0x203f00e 9999
 poke16 0x203f010 400
@@ -475,120 +775,11 @@ poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x0
 poke32 0x0203FD08 49
 frames 2
-echo EXPECT 0203fd0c: 00001450
+echo EXPECT 0203fd0c: 000017d4
 peek 0x0203FD0C 1
 echo flag 512 set
 echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
 peek8 FLAGS+0x40 1
-echo he stands in view (beside player 1) for the shot of his arms out
-find PO 0x4F504F50
-deref B PO+8
-deref P1 0x03001FA8
-peek P1+0x158 2
-deref P1 0x03001FA8
-poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x10400
-poke32 B+0x158 0xF000
-poke32 B+0x15C 0x10400
-frames 2
-poke32 0x0203FD0C 0x0
-poke32 0x0203FD54 0x0
-poke32 0x0203FD08 7
-frames 4
-echo HP 0: he does not fall; the bar goes, the arms out (state 5)
-find PO 0x4F504F50
-echo EXPECT \w+: 05
-peek8 PO+4 1
-frames 20
-shot again_yield
-frames 40
-echo the end scene: the flash, he stands at the far end facing them (an actor again, not the fighter)
-find PO 0x4F504F50
-echo EXPECT \w+: 06
-peek8 PO+4 1
-frames 60
-shot again_far
-deref R TBL+0x270
-echo EXPECT entrec [0-9a-f]+: 1$
-entrec R
-echo on to the question: A through his line and the reward's pop-ups (the question arms CoopCall 18 before its box)
-find CG 0xCE11CA3E
-stepnz CG+0x18 30
-echo EXPECT \w+: 01$
-peek8 CG+0x18 1
-frames 60
-shot again_ask
-echo a later win: a Senzu bean, no capsules
-echo Senzu beans: 2
-echo EXPECT 0203f17f: 02$
-peek8 0x203f17f 1
-echo Strength +3: 1
-echo EXPECT 0203f182: 01$
-peek8 0x203f182 1
-key 1 6
-frames 90
-shot again_answer
-stepz 0x03001FDC 20
-frames 60
-echo the door is open again: state 7, the beam hidden
-find PO 0x4F504F50
-echo EXPECT \w+: 07
-peek8 PO+4 1
-deref D 0x3001128
-echo EXPECT \w+: 00000000
-peek D+0x10 1
-echo answered yes: the six lights back on, time round 1 (flag 520)
-echo EXPECT \w+: 00$
-peek8 FLAGS+0x3F 1
-echo flag 520 set
-echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
-peek8 FLAGS+0x41 1
-poke32 0x0203FD0C 0x0
-poke32 0x0203FD54 0x0
-poke32 0x0203FD08 49
-frames 2
-echo EXPECT 0203fd0c: 000[37]0107
-peek 0x0203FD0C 1
-deref P1 0x03001FA8
-poke32 P1+0x158 0xf400
-poke32 P1+0x15C 0x17000
-frames 2
-keys 0x80
-waitmap 15 18 200
-keys 0
-frames 120
-echo EXPECT map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d
-map
-echo outside: the gate's lights and beams stand again at the next load, the way shut
-frames 60
-deref D 0x3001128
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x300112c
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001130
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001134
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001138
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x300113c
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001140
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001144
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001148
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-shot again_gate
 echo === two players: Goku and Hercule, the lone boss's HP (180 %), the win by the autopilot
 load menu.ss
 p2 0
@@ -829,12 +1020,56 @@ peek8 PO+4 1
 deref R TBL+0x270
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R
+echo A on both pads through the end: no question, the lights untouched
 stepz 0x03001FDC 30
 frames 60
 find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
+echo EXPECT \w+: 3f$
+peek8 FLAGS+0x3F 1
 shot two_goku_done
+echo player 2 walks up and asks: no fight, no start again
+echo talk to him (player 2): fight again no, start again no
+find CG 0xCE11CA3E
+poke8 CG+0x18 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0xc800
+deref P2 0x0203FF08
+poke32 P2+0x158 0xf400
+poke32 P2+0x15C 0x6400
+frames 4
+p2 0x40
+frames 4
+p2 0
+frames 2
+p2 1
+frames 6
+p2 0
+frames 20
+echo a beat: not armed yet 20 frames after the press
+echo EXPECT \w+: 00$
+peek8 CG+0x18 1
+frames 50
+echo EXPECT \w+: 01$
+peek8 CG+0x18 1
+frames 40
+shot two_goku_ask_fight
+key 2 6
+frames 60
+stepnz CG+0x18 30
+frames 60
+shot two_goku_ask_loop
+key 2 6
+frames 60
+stepz 0x03001FDC 20
+frames 60
+find PO 0x4F504F50
+echo EXPECT \w+: 07
+peek8 PO+4 1
+echo EXPECT \w+: 3f$
+peek8 FLAGS+0x3F 1
 echo === lineup hercule_vegeta: the scene and the fight's start
 load menu.ss
 p2 0

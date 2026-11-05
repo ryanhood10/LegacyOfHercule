@@ -23,9 +23,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
   library with a kit of his own (`tny_moves.c`: no stock AI, far hops 96-176 px from both players, a dodge one hit in three,
   blasts, angrier at half HP); rating 500 (5200 HP, 180 % with two players). At 0 HP he does not fall: arms out, a flash, he
   stands at the far end, a reward (the first time a Senzu and a capsule of each, later a Senzu) and the offer to start again:
-  yes puts the six lights back on and makes every boss 50 rating stronger (times round in flags 520-521); a room's first win
+  yes (asked only when a player walks up to him afterwards and presses A, after a beat, never at the fight's end) puts the six lights back on and makes every boss 50 rating stronger (times round in flags 520-521); a room's first win
   pays a +3 capsule, later rounds a Senzu. His body is Buu's Fury r.183 with the hit-stun, knock-down and lying drawn by code
-  (sprite 163; LoG2's 93 with `BUU=0`). `chamber_popo.txt` (131 checks) in `regfull.sh`; an autopilot's balance runs. All lines
+  (sprite 163; LoG2's 93 with `BUU=0`). `chamber_popo.txt` (159 checks) in `regfull.sh`; an autopilot's balance runs. All lines
   are Claude's drafts.
 - **A tournament of 32 (`docs/tournament.md` 2b, 26, `tny_n32.txt`; Ryan: "we can use lower-tier fighters, but we must fill the tournament FIRST with the fighters from that division selected"):** a 2 v 2 of 16 teams. Only Legend can fill it (30 to 34 opponents with the lower tiers; Champion reaches 26 at most): offered there once the count is 30 after up to two pickable fighters are set aside, in practice Super 13 beaten and Cooler beaten or the Broly chapter done; locked with a footer otherwise. The division's all in, then the strongest from below, never a repeat, never a mirror. 8 and 16 draw as before (60 draws compared). The screen: blocks A to D, each like an 8-team half, and the "Final four" page, never more than 8 faces on a page. `TBracket.seat` is 32; 4 rounds were enough (a unit is a team).
 - **The Time Chamber, phases 1-3 (`docs/time-chamber.md` 12; branch `nb-chamber`):** the Lookout's door opens on a white void of
