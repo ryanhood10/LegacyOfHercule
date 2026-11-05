@@ -18,6 +18,7 @@ inspection goes through the GDB stub.
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
+| Tournament bracket | 8, 16 and 8-team brackets filmed, the page's slide, the skip, BG2's map back, frame stalls on a screen |
 | Tournament in co-op | every tournament with player 2 in, the director and picks by pad presses, to the record and the prize |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
@@ -1142,6 +1143,16 @@ Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone
 ## The generator's eggs (headless, 2026-11-04)
 
 `tools/headless/ch4_eggs.txt` (from `ch4_eggs_gen.py`; self-checking, in `regfull.sh`): two players and one, the door of area 44, the first egg, the scene, the fight's flags, an egg pressed during the fight (nothing), her end, the other eggs, the three tubes to the generator's end. **No test warp once in the room:** a load spawns her record and tests the tube items by itself, and an early version only worked because the test warped. `ReloadMap` (step 74) does neither: it does not bring a record in or test an item again.
+
+## Tournament bracket (headless, 2026-11-05, branch `nb-bracket`)
+
+`tools/headless/tny_bracket.txt` (self-checking, in `regfull.sh`; `docs/tournament.md` 26): every bracket through the ui's stand-ins (test command 29, 3: arg2 size | coop << 8 | 2 v 2 << 9), filmed: Full one player (the first look at each half, the slide's frames, the results, the sweep, A at once, the final page, the champion), Full two players (player 1 loses: his road goes), 8 teams, Quick and 4 teams, a Rumble board; the map's registers after the wide BG1, the plaza's BG2 map (blanked by `ui_bg1_wide`) back after a Full bracket; last the real thing by pad presses, one player, Legend, 16 fighters: the engine's draw, a decided fight, its results, A to the end of the tournament. Shots `b*`, `c*`, `d*`, `e*`, `f*`, `g*`.
+
+```
+python tools/headless/st_expect.py tools/headless/tny_bracket.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
+
+**Does the screen stand still?** `UiState.anim_frames` (UI+0x82) counts the bracket's steps: `frames 1` and `peek16 UI+0x82 1` in a loop across a screen, and any frame where it does not move is a frame the screen stood still (one frame at a page's empty middle and at a landing is what it does now). For where the time goes, the hardware timer: `*(u16 *)0x0400010E = 0x83` starts timer 3 at 16,384 Hz (274 ticks a frame), read 0x0400010C around a piece of code into RAM past `UiState` and peek it. Temporary code, not committed.
 
 ## Tournament sizes (headless, 2026-11-04)
 

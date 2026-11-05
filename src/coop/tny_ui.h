@@ -91,6 +91,7 @@ struct Ui {
     u16 qmark_tile;             // OBJ tiles of the "?" mark (0xFFFF none)
     u8 idle;                    // the screen waits for a button this frame (on_step sets it; tests read it)
     u8 shrink;                  // giants' 64 x 64 faces at half size (OBJ affine; the bracket, the Rumble board)
+    u16 bg1_x;                  // the bitmap's horizontal scroll, written in the vblank (the bracket's page slide)
 };
 
 int  ui_run(void (*on_open)(Ui *), void (*on_step)(Ui *), void (*on_close)(Ui *), void *ctx, int pads);
@@ -103,8 +104,10 @@ enum { UI_SFX_MOVE, UI_SFX_OK, UI_SFX_BACK, UI_SFX_BUZZ, UI_SFX_SLIDE, UI_SFX_WI
 void bm_fill(int x, int y, int w, int h, int c);
 void bm_frame(int x, int y, int w, int h, int c);       // 1 px outline
 void bm_clear(void);
+void bm_clear_below_title(void);
 void bm_hline(int x, int y, int w, int c);
 void bm_vline(int x, int y, int h, int c);
+void ui_bg1_wide(void);                                 // BG1 512 px wide, the right half blank: the page can scroll off screen
 // Text (the dialogue font, about 12 px tall; y is the top of the line). align 0 left, 1 centre (x = centre), 2 right.
 void ui_text(Ui *u, int x, int y, int align, int colour, const char *s);
 int  ui_text_width(const char *s);

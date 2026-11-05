@@ -2,6 +2,10 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-05
+
+- **The bracket, one half at a time (`docs/tournament.md` 26, `tny_bracket.txt`; Ryan's note, our calls):** a 16-seat bracket (16 fighters, 8 teams) is a left half, a right half and a final page, slid between; every name on its own row, the faces zigzag beside them, the player's road in his colour to the final; a first look at each half; the round's other matches in one sweep; the screen no longer stands still for 4-9 frames (`bm_fill` by DMA, the page's names and faces drawn during the slide). No 32-fighter bracket: the reasons in the section.
+
 ## 2026-11-04
 
 - **The generator's eggs are a mini boss (`docs/scripts.md` `ch4_eggs`, `ch4_eggs.txt`; Ryan):** in zone 8 area 50 no more carrying eggs to the brontosaurus: the first egg smashes, the mother (King Triceratops recoloured pink, orange and green) turns on the players, at half her health the other two hatch and her babies fight beside her; when she falls the tubes break as before.

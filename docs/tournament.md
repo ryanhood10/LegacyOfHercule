@@ -4,7 +4,7 @@ Status: **plan done (Ryan, 2026-10-25); built by the team (9a-13), polished (14)
 the scenes, 16 the grounds' people, 17 the easter eggs, 18 the plaza's flight spot, 19 the overhead HP bars, 20 the
 art fixes, 21 the fight fixes, 22 the sprite leftovers, 23 the second polish pass (the curtain, the talk seat); the
 fighters' dialogue in `docs/tournament-dialogue.md` (approved and built); 24 what is still open and the plan to fix
-it (the next session starts there); 25 the team combos (built 2026-10-31).** Every decision below is Ryan's unless marked "our
+it (the next session starts there); 25 the team combos (built 2026-10-31); 26 the bracket one half at a time (2026-11-05).** Every decision below is Ryan's unless marked "our
 call" (the few he left to us when he closed the plan). Build in the order of section 9; numbers (HP, damage,
 EP costs) are set when built and tuned in play. Research behind it: three read-only passes on 2026-10-24 (the Buu's Fury maps, the
 fighter roster, the duel / boss / menu infrastructure), the sprite checks in `build/wm/` (`fighters_sheet.png`
@@ -112,7 +112,7 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 
 ## 2b. Sizes, and the Rumble in co-op (Ryan, 2026-11-04)
 
-After the division the director asks **"How many fighters?"**, in every division, one and two players: 8 or 16. 16 is shown locked until the tier's pool has 15 opponents (`FULL_POOL`): never Rookie, whose pool is 13; Adept after the road; the tiers above always. Our call on Ryan's question about 32 for a 2 v 2: **no 32.** No tier's pool has 30 opponents (the largest about 24), and a bracket holds 16 seats. A 2 v 2 is 4 teams (8 fighters, 2 rounds) or 8 teams (16 fighters, 3 rounds, one page by the teams' first seats, `tny_ui_bracket.c` `team16`).
+After the division the director asks **"How many fighters?"**, in every division, one and two players: 8 or 16. 16 is shown locked until the tier's pool has 15 opponents (`FULL_POOL`): never Rookie, whose pool is 13; Adept after the road; the tiers above always. Our call on Ryan's question about 32 for a 2 v 2: **no 32.** No tier's pool has 30 opponents (the largest about 24), and a bracket holds 16 seats. A 2 v 2 is 4 teams (8 fighters, 2 rounds) or 8 teams (16 fighters, 3 rounds, a page per half: section 26). Ryan said "32" again on 2026-11-05; still no 32, the reasons in section 26.
 
 **The Royal Rumble with two players is 2 v 2 v 2 every round:** four opponents in two pairs (`tny_moves_team`), who go for each other too; the headliner's round is his pair against another. 8 fighters: a round and the headliner's; 16: three rounds and the headliner's. One player: the rounds of section 1, 16 fighters two more. A summon does nothing in a Rumble (two more bodies). The screen between rounds names the round and, with two players, shows the three teams, the fighters arriving in turn (`tny_ui_rumble_board`).
 
@@ -701,7 +701,7 @@ ours all-black for silhouettes. Player 2's HUD panel is re-composed after a scre
   starts on the player's own party character. Player 1's pad for player 0, player 2's (`coop.input2`) for player 1
   (the cursor frame is blue for player 2). A on a locked fighter buzzes; A on a pickable one flashes and returns 1;
   B returns 0. The same fighter twice (the violet shadow) is the engine's to apply in the match.
-- **Bracket** (`tny_ui_bracket`): a two-sided tree (round 1 down both edges with names, winners one column in per
+- **Bracket** (`tny_ui_bracket`; **16 seats, the timing and the page's slide: section 26**, which replaces what this paragraph says of them): a two-sided tree (round 1 down both edges with names, winners one column in per
   round, the champion top centre); Quick one page, Full a page per half and a page for the final. Players' names in
   red (player 1) / blue (player 2), the fallen grey, the next match's others gold. Phase 0 draws the bracket as it stands;
   phase 1 first animates every result since the screen was last shown (the seats and winners last drawn are kept in
@@ -1777,3 +1777,54 @@ villains' 1590 to 1626). Slowdown 1 to 7 % (it was 0 to 7 %): the coloured uploa
 moves filmed, 16 and 13 in a Rumble held through Spopovich & Yamu's combo (their animation timer +0x12 stays put, then
 runs again), the copies' facings and the decode path (Cell Jr. poked to face down: modes 2). `tny_combo_tune.txt` also
 prints the copies' state at four shots (`.combo.run` +0x88).
+
+## 26. The bracket, one half at a time (Ryan, 2026-11-05, branch `nb-bracket`)
+
+Ryan, after checking the tournament: "i dont like how you display the 32 player tournament or 16. we can do better! lets figure out something that works. we could show left half of the bracket, and then right half. but bracket animations and timing need to be touched up too", "dont over-do it i just want things to be SMOOTH", "just dont add bugs". He was asleep; these are our calls, with the reasons. Code: `src/coop/tny_ui_bracket.c`; test: `tools/headless/tny_bracket.txt` (`docs/testing.md` "Tournament bracket").
+
+**"32": there is still no 32-fighter bracket.** The biggest bracket is 16 seats: 16 fighters, or a 2 v 2 of 8 teams (section 2b). We did not add 16 teams: it needs 30 opponents, no tier's pool has them (the largest about 24), and `TBracket` holds 16 seats. Ryan's "32" is read as the biggest 2 v 2 he saw, the screen that was worst: 8 teams on one page with only the first seat of each team showing. **If he wants a true 32, that is a pool and engine question first;** a half page as built holds 8 rows, so 16 teams would need a quarter at a time.
+
+**What the player sees:**
+
+| bracket | screen |
+|---|---|
+| 8 fighters, 4 teams | one page, the two-sided tree as before. New: the whole tree's lines are there from the start (dark), the player's road, the new timing. |
+| 16 fighters | a **left half** and a **right half** page, a page for the **final**. |
+| 8 teams (16 fighters) | the same pages: a half is four teams, every fighter with his own name and face (before: the partner's name under the lead's, the partner's face nowhere). |
+
+- **A half page is one-sided**, seats on the outer edge, the tree running inwards to a gold "Final" box on the inner edge; the right half is the left half mirrored. The old "half" pages were each drawn as a small two-sided bracket with a champion's spot at the top: nothing on them said they were half of anything. Now the box says where the half leads, and the two pages read as one bracket opened in the middle.
+- **Every name on its own row** (8 rows, 13 px apart: `HR(i)`), in a dark column so that they read over the checker. Eight bodies do not fit one column, so they **zigzag** in two columns on their lines (x 60 and 82; 26 px apart in a column, the bodies being 24-28 tall): a name's row runs straight to its face. Tall bodies touch a neighbour a little (Spopovich, Super Buu); no worse than the 8 bracket's giants.
+- **The final page**: the two finalists (or teams) low on either side, names under them, the lines up to a gold box in the middle, where the champion walks.
+- **The player's road** (`draw_players`): from his seat all the way to the final, in his colour (red, player 2 blue; a team one line), what he has won and what lies ahead, on every bracket. It goes when he loses (`erase_road`).
+- **No boxes on a half page's first round**: the faces stand too close; the gold names, the gold lines and the other faces dimming say which match is next.
+
+**The first look.** The draw (phase 0) of a 16-seat bracket shows the left half, slides to the right half, then slides to the page of the next match (no slide if it is there): each half held 1.5 s, the bar saying whose it is ("GOHAN starts here", "GOHAN & KRILLIN start here", or "The other half"; these are our lines). A skips all of it. A later screen shows only the pages with results on them.
+
+**The page turn is a slide**, not a cut: the whole bitmap and its faces leave (accelerating) and the next page arrives from the other side (decelerating), 20 + 20 frames. Direction follows the floor plan left half, final, right half. BG1 is 512 px wide for it (`ui_bg1_wide`: the second block all tile 0; that is the map's BG2 map block, and `UiMap_Refresh` puts it back, checked on the plaza where it is full of tiles), the scroll goes in at the vblank with the OAM (`Ui.bg1_x`, `slot_done`), so faces and lines stay together.
+
+**Timing** (`T_*` at the top of the file; frames at 60 a second):
+
+| beat | was | now |
+|---|---|---|
+| before the results | 30 | 24 |
+| the players' match: loser greys / winner walks / a beat on the result | 30 / 44 / 40 | 24 / 40 / 32 |
+| another match | 8 / 20 / 12 each, one after another | a **sweep**: all of a page's others in that round together, each starting 8 after the last, 6 / 22, then 14 once |
+| page turn, then a beat | a cut, 30 | 40, 12 |
+| the next match lit / the two walk to the bar | 45 / 36 | 40 / 30 |
+| the screen closes itself | 300 | 240 (A as always) |
+
+The sweep is the big one: a round's seven other matches took 280 frames one by one and now about 125, plus the slide. The whole of a 16-seat first round, results to "A vs B", went from about 565 frames to about 405 (6.8 s); an 8 bracket's from 345 to about 250 (4.2 s). All moves ease in and out (`ease`; before they only eased out, which reads as a jump at the start).
+
+**A skips**: every result left is in at once, drawn in place (no clearing, so no blink), a slide still in progress runs three times as fast, the next match is lit, the two go to the bar; a second A closes, as before.
+
+**Smooth was mostly not the animation.** Counting screen steps against emulated frames (the probe in `docs/testing.md` "Tournament bracket") showed the screen standing still for 4-9 frames at a time: at a page build, when the next match lit up, when the two left for the bar. The hardware timer says why: a bar across the screen took over a frame (`bm_fill` worked out a pixel address for every two pixels), a name a third of a frame (the stock canvas's text, about 20,000 cycles a letter), eight new faces two frames on their first update. So:
+- `bm_fill` does whole tiles by DMA and walks a pointer through the rest. Every screen gets this; their pictures are unchanged.
+- A page turn draws only what the eye would catch in the one frame while the screen is empty. The faces (two a frame, nearest the final first) and the names (one a frame) follow during the slide in, while the page's outer edge is still off screen; the page's label and the bar's line when it lands. The title stays in the bitmap, a page turn only clears below it.
+- Lighting the next match redraws its two names and lines, not all the names; the faces take their dim looks two a frame.
+- Nothing is redrawn per frame while a thing walks: positions only, at most eight faces. All this is on modal screens: fights, `tny_hpbars` and the combo meter are not touched.
+
+The probe's result on a 16-seat bracket: from stalls of 9, 7, 4, 3 frames to single frames, at the moment a page is empty or something has just landed.
+
+**Left as it was:** the Rumble's screens (`tny_ui_rumble_board`, `BOARD_ARRIVE`): they read well and Ryan's note was about the bracket. The champion's screen. The engine and the "How many fighters?" menu.
+
+**Not checked by a person:** all of this is headless, shot by shot. How a slide and the sweep feel at speed, and on Ryan's screen, wants his eyes; the numbers are one line each to change.

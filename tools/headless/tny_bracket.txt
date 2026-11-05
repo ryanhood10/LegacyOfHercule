@@ -1,0 +1,400 @@
+# The bracket's sizes, filmed (docs/testing.md "Tournament bracket"; docs/tournament.md 26). Every bracket through the
+# ui's stand-ins (test commands 28 / 29), co-op Map Test: the first look at each half, the page's slide, the results, the
+# next match, the skip, the final page. st_expect.py checks: OBJ VRAM back as it was, no allocation failure, the
+# banner's seats, the map's registers and BG2 map after the wide BG1.
+find UI 0x7A1C0002
+p2 0
+load menu.ss
+p2 0
+maptest 149
+frames 300
+poke32 0x0203FD0C 0
+poke32 0x0203FD08 29
+frames 20
+find UI 0x7A1C0002
+echo == the map's registers before any bracket
+echo EXPECT 04000008: 1c81 1d81 1e83 1f83
+peek16 0x04000008 4
+shot b00_map_before
+# ---- the Full bracket, one player (1 v 1, 16 seats), let run
+echo === Full 1 v 1, one player: the look at each half, the slide, then the next match
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x10
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 60
+shot b01_full_left_look
+frames 40
+shot b02_full_pan_out
+frames 10
+shot b03_full_pan_out2
+frames 14
+shot b04_full_pan_in
+frames 16
+shot b05_full_pan_in2
+frames 30
+shot b06_full_right_look
+frames 80
+shot b07_full_pan_back
+waitnz UI+0x88 600
+shot b08_full_vs
+echo EXPECT 0203[0-9a-f]{4}: 00 01
+peek8 UI+141 2
+key 1 4
+frames 100
+echo EXPECT 0203[0-9a-f]{4}: (6c00|[0-9a-f]{4}) \1
+peek16 UI+0x7C 2
+echo == first round's results: the player's match, the sweep, the slide, the other half's sweep, the slide back
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 36
+shot b09_loser_grey
+frames 30
+shot b10_winner_walks
+frames 60
+shot b11_sweep
+frames 40
+shot b12_sweep_end
+frames 44
+shot b13_other_half_arrives
+frames 30
+shot b14_other_sweep
+waitnz UI+0x88 1500
+shot b15_quarters_vs
+key 1 4
+frames 100
+echo == the next round, skipped with A at once: the results in place, no blank frame
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 44
+key 1 4
+shot b16_skip_now
+frames 6
+shot b17_skip_after
+waitnz UI+0x88 400
+shot b18_semis_vs
+key 1 4
+frames 100
+echo == the half's final
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 100
+shot b19_half_winner
+waitnz UI+0x88 1500
+shot b20_final_vs
+key 1 4
+frames 100
+echo == the final: the champion
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot b21_champion
+key 1 4
+frames 100
+echo EXPECT 0203[0-9a-f]{4}: (6c00|[0-9a-f]{4}) \1
+peek16 UI+0x7C 2
+echo == the map's registers as they were, BG1 256 px wide again
+echo EXPECT 04000008: 1c81 1d81 1e83 1f83
+peek16 0x04000008 4
+shot b22_map_after
+# ---- two players, 1 v 1: opposite halves
+echo === Full 1 v 1, two players: red on the left, blue on the right; player 1 loses in the first round
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x110
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 60
+shot c01_coop_left
+frames 120
+shot c02_coop_right
+waitnz UI+0x88 600
+shot c03_coop_vs
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 110
+shot c04_coop_lost
+waitnz UI+0x88 1500
+shot c05_coop_next
+key 1 4
+frames 100
+echo EXPECT 0203[0-9a-f]{4}: (6c00|[0-9a-f]{4}) \1
+peek16 UI+0x7C 2
+# ---- 2 v 2, 8 teams (16 fighters)
+echo === 2 v 2, 8 teams: a half is four teams, two names to a team
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x310
+poke32 0x0203FD08 29
+frames 20
+poke8 UI+0x4A 2
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+frames 60
+shot d01_team_left
+frames 120
+shot d02_team_right
+waitnz UI+0x88 600
+shot d03_team_vs
+echo EXPECT 0203[0-9a-f]{4}: 00 02
+peek8 UI+141 2
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 70
+shot d04_team_walks
+waitnz UI+0x88 1500
+shot d05_team_semis
+echo EXPECT 0203[0-9a-f]{4}: 00 04
+peek8 UI+141 2
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot d06_team_final
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot d07_team_champion
+key 1 4
+frames 100
+echo EXPECT 0203[0-9a-f]{4}: (6c00|[0-9a-f]{4}) \1
+peek16 UI+0x7C 2
+# ---- the 8 bracket and the 4 teams: one page as before, with the road
+echo === Quick 8 and 4 teams: one page
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x108
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot e01_quick_vs
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+frames 60
+shot e02_quick_walk
+frames 70
+shot e03_quick_sweep
+waitnz UI+0x88 1500
+shot e04_quick_semis
+key 1 4
+frames 100
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x308
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+waitnz UI+0x88 600
+shot e05_teams4_vs
+key 1 4
+frames 100
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 1
+poke32 0x0203FD08 28
+waitnz UI+0x88 1500
+shot e06_teams4_final
+key 1 4
+frames 100
+# ---- BG2's map, which the page's slide blanks, comes back: the plaza's has tiles from its first row (0x01Dn)
+echo === the plaza's BG2 map after a Full bracket
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 0xc0f
+poke32 0x0203FD54 0x4000f0
+poke32 0x0203FD08 5
+frames 200
+map
+echo EXPECT 0600f000: 01d0 01d1 01d1 01d2
+peek16 0x0600F000 4
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 0x110
+poke32 0x0203FD08 29
+frames 20
+poke32 0x0203FD0C 4
+poke32 0x0203FD54 0
+poke32 0x0203FD08 28
+waitnz UI+0x88 800
+key 1 4
+frames 100
+echo EXPECT 0600f000: 01d0 01d1 01d1 01d2
+peek16 0x0600F000 4
+shot b23_plaza_after
+# ---- the Rumble's screens are their own
+echo === the Rumble board still draws
+poke32 0x0203FD0C 5
+poke32 0x0203FD54 0x5
+poke32 0x0203FD08 28
+waitnz UI+0x88 800
+shot f01_board
+key 1 4
+frames 100
+echo == no allocation failures (UI+0x80)
+echo EXPECT 0203[0-9a-f]{4}: 0000
+peek16 UI+0x80 1
+# ---- the real thing, one player: Legend 1 v 1, 16 fighters, by pad presses; test command 40 decides the fight
+echo === one player, Legend, 16 fighters: the engine's bracket, the first round's results after a real match
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0x1e
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 40
+frames 10
+poke32 0x0203FD0C 0x2a
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+flags +85 +127 +136 +146 +191 +301 +402 +421 +382
+frames 4
+poke32 0x0203FD0C 0xf0f
+poke32 0x0203FD54 0x13200a8
+poke32 0x0203FD08 5
+frames 200
+key 0x80 6
+key 1 10
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 80
+key 0x80 6
+frames 20
+key 0x80 6
+frames 20
+key 0x80 6
+frames 20
+key 0x80 6
+frames 20
+key 1 6
+frames 80
+key 1 6
+frames 80
+shot g00_menu
+key 0x80 6
+frames 20
+key 1 6
+frames 80
+key 1 6
+frames 80
+frames 60
+shot g01_left
+frames 110
+shot g02_right
+waitnz UI+0x88 800
+shot g03_vs
+echo EXPECT 0203ec6c: 10 04
+peek8 0x0203EC6C 2
+key 1 4
+frames 60
+echo == the fight, decided; A every 100 frames until the next screen opens: the engine's results, filmed
+poke16 UI+0x82 0
+stepnz UI+0x82 200
+shot g05_real_a
+frames 40
+shot g06_real_b
+frames 50
+shot g07_real_c
+frames 50
+shot g09_real_d
+waitnz UI+0x88 900
+shot g08_real_next
+key 1 4
+frames 60
+echo == A every 100 frames to the end of the tournament: the screens skipped in passing, the record, the waiting room
+stepz 0x0203ECFD 400
+frames 30
+shot g04_end
+echo EXPECT map zone 15 area 15
+map
+echo == no allocation failures (UI+0x80)
+echo EXPECT 0203[0-9a-f]{4}: 0000
+peek16 UI+0x80 1
