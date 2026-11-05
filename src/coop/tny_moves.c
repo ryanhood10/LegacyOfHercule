@@ -1789,6 +1789,25 @@ void tny_moves_final_form(Entity *e) {
     }
 }
 
+// The Broly chapter's rage rule in a Time Chamber room (chamber.c RF_RAGE): his partner fell first. Full HP and, now, the
+// power-up of his kit's first transform not yet fired (the pose, the shake and the flashes), else a plain one (the library's
+// stat boost); whatever special he was in ends
+void tny_moves_rage(Entity *e) {
+    TKit *k = kit_of(e);
+    if (!k || k->down || e->hp <= 0) return;
+    e->hp = k->stat.max_hp;
+    const TMove *m = &lib_default[MK_TRANSFORM];
+    for (int i = 0; i < KIT_MOVES; i++) {
+        const TMove *t = &k->def->m[i];
+        if (t->kind != MK_TRANSFORM || (k->done & (1 << i))) continue;
+        k->done |= (u8)(1 << i);
+        m = t;
+        break;
+    }
+    if (k->cur) finish(k);
+    begin(k, m, nearest_player_of(e));
+}
+
 // A Rumble's pack in teams: a pair does not go for its own (tny_engine.c); a fighter without a kit has no side to set
 void tny_moves_team(Entity *e, int team) {
     TKit *k = kit_of(e);
