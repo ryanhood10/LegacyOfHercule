@@ -56,32 +56,64 @@ static inline void bm_put(int x, int y, int c) {
 }
 
 // DMA fill from a RAM word: with a ROM source the GBA's DMA ignores "fixed" and increments
-static void vram_zero(u32 dst, int words) {
-    volatile u32 zero = 0;
+static void vram_fill(u32 dst, int words, u32 value) {
+    volatile u32 v = value;
+    u16 ime = *(volatile u16 *)0x04000208;
+    *(volatile u16 *)0x04000208 = 0;   // nothing else takes DMA 3 between these writes
     REG_DMA3CNT_H = 0;
-    REG_DMA3SAD = (u32)&zero;
+    REG_DMA3SAD = (u32)&v;
     REG_DMA3DAD = dst;
     REG_DMA3CNT_L = (u16)words;
-    REG_DMA3CNT_H = 0x8500;   // 32-bit, fixed source
+    REG_DMA3CNT_H = 0x8500;   // 32-bit, fixed source; the CPU waits for it
+    *(volatile u16 *)0x04000208 = ime;
 }
+static void vram_zero(u32 dst, int words) { vram_fill(dst, words, 0); }
 
 void bm_clear(void) {
     vram_zero(BM_BASE, 240 * 160 / 4);
 }
+// All but the top two tile rows (y < 16): the bracket's next page keeps its title
+void bm_clear_below_title(void) {
+    vram_zero(BM_BASE + 2 * 30 * 64, 240 * 144 / 4);
+}
 
+// A pixel row runs through 30 tiles, 8 px (4 halfwords) in each, the next tile 32 halfwords on: a pointer walks them
+static void fill_rows(int x, int y, int w, int h, int c) {
+    if (w <= 0 || h <= 0) return;
+    u16 cc = (u16)(c | (c << 8));
+    int left = (x + 1) & ~1;                     // the halfwords of a row: from an even x to an even x
+    int even = (x + w - left) & ~1;
+    if (even < 0) even = 0;
+    for (int yy = y; yy < y + h; yy++) {
+        if (x & 1) bm_put(x, yy, c);
+        int xx = left, end = left + even;
+        volatile u16 *p = bm_half(xx, yy);
+        while (xx < end) {
+            int n = 8 - (xx & 7);
+            if (n > end - xx) n = end - xx;
+            xx += n;
+            for (int i = n >> 1; i > 0; i--) *p++ = cc;
+            if (!(xx & 7)) p += 28;
+        }
+        if (left + even < x + w) bm_put(left + even, yy, c);
+    }
+}
+
+// The whole tiles inside the box by DMA, the edges by pixel rows (a bar across the screen was over a frame's work)
 void bm_fill(int x, int y, int w, int h, int c) {
     if (x < 0) { w += x; x = 0; }
     if (y < 0) { h += y; y = 0; }
     if (x + w > 240) w = 240 - x;
     if (y + h > 160) h = 160 - y;
     if (w <= 0 || h <= 0) return;
-    u16 cc = (u16)(c | (c << 8));
-    for (int yy = y; yy < y + h; yy++) {
-        int xx = x, end = x + w;
-        if (xx & 1) { bm_put(xx, yy, c); xx++; }
-        for (; xx + 1 < end; xx += 2) *bm_half(xx, yy) = cc;
-        if (xx < end) bm_put(xx, yy, c);
-    }
+    int tx0 = (x + 7) >> 3, tx1 = (x + w) >> 3, ty0 = (y + 7) >> 3, ty1 = (y + h) >> 3;
+    if (tx1 <= tx0 || ty1 <= ty0) { fill_rows(x, y, w, h, c); return; }
+    u32 cc = (u32)c * 0x01010101u;
+    for (int ty = ty0; ty < ty1; ty++) vram_fill(BM_BASE + (ty * 30 + tx0) * 64, (tx1 - tx0) * 16, cc);
+    fill_rows(x, y, w, ty0 * 8 - y, c);                      // above
+    fill_rows(x, ty1 * 8, w, y + h - ty1 * 8, c);            // below
+    fill_rows(x, ty0 * 8, tx0 * 8 - x, (ty1 - ty0) * 8, c);  // left
+    fill_rows(tx1 * 8, ty0 * 8, x + w - tx1 * 8, (ty1 - ty0) * 8, c);   // right
 }
 void bm_hline(int x, int y, int w, int c) { bm_fill(x, y, w, 1, c); }
 void bm_vline(int x, int y, int h, int c) { bm_fill(x, y, 1, h, c); }
@@ -455,6 +487,13 @@ static void display_init(Ui *u) {
     u->fade = 16;
 }
 
+// The second map block (0xF000, the map's own BG2 map: UiMap_Refresh puts it back like the others) all tile 0, so the
+// bitmap can slide off the screen on either side and show only the backdrop (the bracket's pages)
+void ui_bg1_wide(void) {
+    vram_zero(0x0600F000u, 0x200);
+    REG_BG1CNT = 0x5D82;            // as display_init, 512 x 256
+}
+
 static int slot_nop(Ui *u) { (void)u; return 0; }
 static void slot_dtor(Ui *u, int f) { (void)u; (void)f; }
 
@@ -533,6 +572,7 @@ static void slot_update(Ui *u) {
 
 static int slot_done(Ui *u) {
     UiEntityList_EndDraw(g_EntityList);
+    REG_BG1HOFS = u->bg1_x;
     return u->done;
 }
 
@@ -769,18 +809,18 @@ static const char *const demo_div[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
 static const char *const demo_size[2] = { "Quick (8 fighters)", "Full (16 fighters)" };
 
 // A fake bracket from the fighters this build has (the engine's stand-in for the ui's tests): players first.
-static void fake_bracket(int size, int coop_players) {
+static void fake_bracket(int size, int coop_players, int team) {
     TBracket *b = &ui_st.br;
     memset(b, 0xFF, sizeof *b);
     b->size = (u8)(size == 16 ? 16 : 8);
-    b->rounds = b->size == 16 ? 4 : 3;
+    b->rounds = (u8)((b->size == 16 ? 4 : 3) - (team ? 1 : 0));
     b->round = 0;
     b->match = 0;
     b->tier = TIER_ROOKIE;
-    b->division = DIV_1V1;
+    b->division = team ? DIV_2V2 : DIV_1V1;
     int k = 0, id = 0;
     for (int s = 0; s < b->size; s++) {
-        if (s == 0 || (coop_players && s == b->size / 2)) continue;   // the players' seats
+        if (s == 0 || (team ? s == 1 : coop_players && s == b->size / 2)) continue;   // the players' seats
         while (id < TF_COUNT && (!(tny_fighters[id].role & TR_OPPONENT) || !ui_fighter_ok(id))) id++;
         b->seat[s] = (u8)(id < TF_COUNT ? id : TF_YAMCHA);
         if (id < TF_COUNT) id++;
@@ -788,12 +828,13 @@ static void fake_bracket(int size, int coop_players) {
     }
     b->seat[0] = TF_GOHAN;
     b->p1_seat = 0;
-    if (coop_players) { b->seat[b->size / 2] = TF_KRILLIN; b->p2_seat = (u8)(b->size / 2); }
+    if (team) { b->seat[1] = TF_KRILLIN; b->p2_seat = 1; }
+    else if (coop_players) { b->seat[b->size / 2] = TF_KRILLIN; b->p2_seat = (u8)(b->size / 2); }
     ui_st.fake |= 2;
 }
 
 static int match_seat(const TBracket *b, int r, int m, int side) {
-    if (r == 0) return m * 2 + side;
+    if (r == 0) return (m * 2 + side) * (b->division == DIV_2V2 ? 2 : 1);
     return b->winner[r - 1][m * 2 + side];
 }
 
@@ -801,7 +842,7 @@ static int match_seat(const TBracket *b, int r, int m, int side) {
 static void fake_round(int players_win) {
     TBracket *b = &ui_st.br;
     if (b->round >= b->rounds) return;
-    int r = b->round, n = b->size >> (r + 1);
+    int r = b->round, n = (b->division == DIV_2V2 ? b->size / 2 : b->size) >> (r + 1);
     for (int m = 0; m < n; m++) {
         int s0 = match_seat(b, r, m, 0), s1 = match_seat(b, r, m, 1);
         int pl0 = s0 == b->p1_seat || s0 == b->p2_seat, pl1 = s1 == b->p1_seat || s1 == b->p2_seat;
@@ -813,7 +854,7 @@ static void fake_round(int players_win) {
     b->round++;
     b->match = 0;
     if (b->round < b->rounds) {   // the next match shown: the one with player 1 in it, else the first
-        int n2 = b->size >> (b->round + 1);
+        int n2 = (b->division == DIV_2V2 ? b->size / 2 : b->size) >> (b->round + 1);
         for (int m = 0; m < n2; m++)
             if (match_seat(b, b->round, m, 0) == b->p1_seat || match_seat(b, b->round, m, 1) == b->p1_seat) b->match = (u8)m;
     }
@@ -848,7 +889,7 @@ void tny_ui_test(u32 cmd, u32 arg, u32 arg2) {
         case 0: ui_st.fake = 0; ui_st.shown_ok = 0; break;
         case 1: ui_st.unlock[0] = arg2; ui_st.fake |= 1; break;
         case 2: ui_st.unlock[1] = arg2; ui_st.fake |= 1; break;
-        case 3: fake_bracket((int)(arg2 & 0xFF), (arg2 >> 8) & 1); break;
+        case 3: fake_bracket((int)(arg2 & 0xFF), (arg2 >> 8) & 1, (arg2 >> 9) & 1); break;
         case 4: fake_round((int)arg2); break;
         case 5: ui_st.tiers = (u8)arg2; ui_st.fake |= 4; break;
         }

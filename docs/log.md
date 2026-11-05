@@ -6,6 +6,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - **Cutscenes staged (Ryan's rule: `docs/howto.md` "Stage a scene"):** Gero's three stages, the lab, the road and the mother dinosaur (`docs/scripts.md`, `ch4_staging.txt`). Whoever nobody plays has a body and moves; nobody pops. Found: walking Piccolo's NPC sprite 73 (one group) overwrites the heap; 103 walks.
 - **Android 13's motive (Ryan):** 17 and 18 kill Gero, 13 swears revenge for his father, blasts them and flies north, tucked away until the post-game's Super 13 (`docs/story.md`). The lab's old lines "You built 'em too well" and "Goku is mine" went with it; all his new lines are drafts for Ryan.
+- **The bracket, one half at a time (`docs/tournament.md` 26, `tny_bracket.txt`; Ryan's note, our calls):** a 16-seat bracket (16 fighters, 8 teams) is a left half, a right half and a final page, slid between; every name on its own row, the faces zigzag beside them, the player's road in his colour to the final; a first look at each half; the round's other matches in one sweep; the screen no longer stands still for 4-9 frames (`bm_fill` by DMA, the page's names and faces drawn during the slide). No 32-fighter bracket: the reasons in the section.
 
 ## 2026-11-04
 
