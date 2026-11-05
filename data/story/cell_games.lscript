@@ -5,6 +5,10 @@
 ;   7 Super Saiyan 2 Gohan + Hercule; 8 Gohan + Hercule against two Perfect Cells; the beam struggle.
 ; Solo fights: CoopCall 15 (cellgames.c): 1 player 1 alone, 2 player 2 alone on player 1's entity, 0 both.
 ; Stock text is referenced (stock / stockseq), never restated; edited scripts are spelled out.
+; Staging (Ryan, 2026-11-05: "characters shouldnt be stagnant", "account for 1p mode or 2p mode"). Player 2 has no entity in any scene here: the solo
+; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. So every scene plays one staging
+; in both modes with Hercule's actor (sprite 72, only ever walked: his fly pose is a stub); before a team fight he stands where player 2 will respawn and
+; goes as it does; alone he has a line and clears off. Lines marked (draft) are Claude's, for Ryan to read.
 
 ; ---- map 324 (zone 14 area 2), the ring ----
 
@@ -117,28 +121,64 @@ sequence cg_fight2_end
         DespawnEntity 30
         TriggerMapEvent 5
         SetActiveCharacter 0
-        DespawnEntity 72
         CoopCall 15, 0, 0, 0
         CoopCall 6, 5, 0, 0
         SetEntityFacing 30, 2
         SetEntityFacing 0, 3
+        SpawnCharacterEntity 72, 356, 440
+        SetEntityFacing 72, 3
         PanCameraToPosition 328, 344, 10
         SpawnCharacterEntity 60, 552, 96
         FadeFromWhite 120
         WaitFrames 60
         SetActiveEntity 0
-        SetPlayerVisible 1
+  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 26
+        END
+      L1:
+        END
+  text 67 "HERCULE: Go ahead, kid, you warm him up for me!\x0bI'll, uh...  study his weak points from back here!"    ; (draft)
+  script
+        WalkToPosition 72, 308, 448
+        DespawnEntity 72
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END
   script                                 ; fight 3
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse H1
+        DespawnEntity 72
+      H1:
+        SetPlayerVisible 1
         DrawBossHealthBarRange 30, 60, 100
         SetStoryFlag 192
         END
 end
 
 sequence cg_fight3_end
-  stockseq @083e9d4c 0 25    ; Cell and Gohan, 16's last stand (his bomb was removed), "Still not angry enough?"
+  script                                 ; stock entry 0, with Hercule's actor beyond Cell (the warp took player 2's entity): flat on his back if player 2 just fought as him, alone he has crept back
+        PlayAudio 60
+        SetPlayerVisible 0
+        FindPlayerEntity
+        FadeOut 120
+        WarpToMapNoEntities 14, 3, 1, 400, 440
+        DisableLayer 0
+        PanCameraToPosition 328, 304, 10
+        SpawnCharacterEntity 60, 552, 96
+        SpawnCharacterEntity 72, 540, 400
+        SetEntityFacing 72, 2
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse H1
+        SetEntityAnimation 72, 3
+      H1:
+        SetEntityFacing 0, 3
+        SetEntityFacing 30, 2
+        FadeFromWhite 120
+        PlayAudio 50
+        END
+  stockseq @083e9d4c 1 25    ; Cell and Gohan, 16's last stand (his bomb was removed), "Still not angry enough?"
   script                                 ; stock entry 26 with six Juniors (Ryan: Vegeta and Trunks face two each)
         FadeToWhite 5
         SpawnCharacterEntity 31, 408, 392
@@ -168,18 +208,19 @@ sequence cg_fight3_end
         SetEntityAnimation 0, 4
         END
   stockseq @083e9d4c 27 29    ; "What the heck are those things?", "My children!  Give them pain!"
-  script                                 ; player 2's Hercule steps back
+  script                                 ; Hercule's actor picks himself up; player 2 watches from here
         CoopCall 15, 1, 0, 0
-        SpawnCharacterEntity 72, 480, 320
+        SetEntityAnimation 72, 0
         SetEntityFacing 72, 2
+        WaitFrames 30
   text 67 "HERCULE: Uh...  this fight is a little too much for the champ right now.\x0bI'll, uh...  supervise from over there!"
   script
         WalkToPosition 72, 640, 240
         DespawnEntity 72
-  script                                 ; stock entry 30: Krillin is player 1 for the first Junior (J1)
+  script                                 ; stock entry 30: Krillin is player 1 for the first Junior (J1), flying down from the crowd
         FadeOut 120
         PlayMusic 35
-        SetEntityPositionInstant 0, 432, 296
+        SetEntityPositionInstant 0, 432, 232
         DespawnEntity 76
         DespawnEntity 31
         DespawnEntity 31
@@ -195,6 +236,10 @@ sequence cg_fight3_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
+        PlayAudio 26
+        FlyToPosition 0, 432, 296
+        SetEntityFacing 0, 0
+        WaitFrames 20
   fmt 0 "%s"
         CoopCall 14, 3, 0, 0
         END
@@ -212,7 +257,7 @@ sequence cg_j1_end
         SetPlayerVisible 0
         FadeOut 120
         PlayMusic 39
-        SetEntityPositionInstant 0, 432, 296
+        SetEntityPositionInstant 0, 432, 232
         PanCameraToPosition 320, 256, 10
         DespawnEntity 103
         SetActiveCharacter 1
@@ -222,6 +267,10 @@ sequence cg_j1_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
+        PlayAudio 26
+        FlyToPosition 0, 432, 296
+        SetEntityFacing 0, 0
+        WaitFrames 20
   fmt 0 "%s"
         CoopCall 14, 3, 1, 0
         END
@@ -239,7 +288,7 @@ sequence cg_j2_end
         SetPlayerVisible 0
         FadeOut 120
         PlayMusic 38
-        SetEntityPositionInstant 0, 432, 296
+        SetEntityPositionInstant 0, 432, 232
         PanCameraToPosition 320, 256, 10
         DespawnEntity 137
         SetActiveCharacter 2
@@ -249,6 +298,10 @@ sequence cg_j2_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
+        PlayAudio 26
+        FlyToPosition 0, 432, 296
+        SetEntityFacing 0, 0
+        WaitFrames 20
   fmt 0 "%s"
         CoopCall 14, 3, 0, 0
         END
@@ -266,7 +319,7 @@ sequence cg_j3_end
         SetPlayerVisible 0
         FadeOut 120
         PlayMusic 39
-        SetEntityPositionInstant 0, 432, 296
+        SetEntityPositionInstant 0, 432, 232
         PanCameraToPosition 320, 256, 10
         DespawnEntity 132
         SetActiveCharacter 3
@@ -276,6 +329,10 @@ sequence cg_j3_end
         SetEntityFacing 31, 1
         FadeFromWhite 120
         WaitFrames 40
+        PlayAudio 26
+        FlyToPosition 0, 432, 296
+        SetEntityFacing 0, 0
+        WaitFrames 20
   fmt 0 "%s"
         CoopCall 14, 3, 1, 0
         END
@@ -327,19 +384,33 @@ sequence cg_head_scene
         WhiteFadeOut 10
         END
   stockseq @083ea400 27 30    ; "Gohan has entered Super Saiyan Rage!", "NOW TASTE MY TRUE POWER"
-  script                                 ; Hercule comes back
-        SpawnCharacterEntity 72, 600, 300
-        WalkToPosition 72, 520, 330
+  script                                 ; Hercule comes back the way he left, to Gohan's side
+        SpawnCharacterEntity 72, 648, 320
+        WalkToPosition 72, 564, 376
         SetEntityFacing 72, 2
   text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   script                                 ; player 2 is Hercule again
-        DespawnEntity 72
         CoopCall 15, 0, 0, 0
         CoopCall 6, 5, 0, 0
+  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 38
+        END
+      L1:
+        END
+  text 67 "...Right behind you, kid!\x0bWay, way behind you!"    ; (draft)
+  script
+        WalkToPosition 72, 648, 320
+        DespawnEntity 72
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END
   script                                 ; stock entry 31: fight 7
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse H1
+        DespawnEntity 72
+      H1:
         SetActiveEntity 0
         SetPlayerVisible 1
         DrawBossHealthBarRange 30, 25, 100
@@ -347,8 +418,75 @@ sequence cg_head_scene
 end
 
 sequence cg_fight7_end
-  stockseq @083eb704 0 38    ; Cell spits out 18, swells, Goku's Instant Transmission, "He's back!!!!"
-  script                                 ; stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30)
+  script                                 ; stock entry 0, with Hercule's actor on the field (the warp took player 2's entity)
+        SetEntityAnimation 30, 3
+        PlayAudio 60
+        FindPlayerEntity
+        SetPlayerVisible 0
+        WaitFrames 50
+        FadeOut 60
+        WarpToMapNoEntities 14, 3, 1, 432, 416
+        SetEntityAnimation 30, 3
+        PanCameraToPosition 320, 344, 30
+        SetEntityPositionInstant 30, 428, 408
+        SetEntityFacing 0, 1
+        SpawnCharacterEntity 72, 500, 440
+        SetEntityFacing 72, 2
+        FadeFromWhite 60
+        WaitFrames 40
+        SetEntityAnimation 30, 0
+        WaitFrames 40
+        BeginCommandBatch
+        SetEntityAnimation 0, 7
+        EntityWaitTouchPlayer 30
+        PlaySFX 30, 35
+        PlayDamageEffect 30
+        SetEntityAnimation 30, 2
+        SpawnDustCloud 0, 440, 384
+        CommitCommandBatch
+        FadeToWhite 10
+        SpawnCharacterEntity 11, 464, 408
+        DespawnEntity 30
+        SpawnCharacterEntity 29, 428, 408
+        WhiteFadeOut 10
+        WalkToPosition 0, 432, 440
+        SetEntityFacing 0, 1
+        PlayAudio 50
+        END
+  stockseq @083eb704 1 6    ; Cell spits out 18, "I'm going to blow myself up now!"
+  script                                 ; stock entry 7: everyone gathers; Hercule's actor backs away from the bomb
+        FadeToWhite 30
+        DespawnEntity 29
+        SpawnCharacterEntity 27, 428, 408
+        WhiteFadeOut 30
+        WaitFrames 60
+        WalkToPosition 0, 432, 464
+        SetEntityFacing 0, 1
+        SpawnCharacterEntity 121, 280, 360
+        SpawnCharacterEntity 156, 272, 408
+        SpawnCharacterEntity 60, 424, 96
+        BeginCommandBatch
+        WalkToPosition 72, 536, 484
+        FlyToPosition 121, 368, 456
+        FlyToPosition 156, 392, 488
+        FlyToPosition 60, 464, 472
+        FlyToPosition 137, 352, 424
+        FlyToPosition 132, 344, 448
+        FlyToPosition 76, 496, 456
+        FlyToPosition 103, 520, 432
+        SetEntityFollow 72, 27
+        SetEntityFollow 121, 27
+        SetEntityFollow 60, 27
+        SetEntityFollow 137, 27
+        SetEntityFollow 132, 27
+        SetEntityFollow 76, 27
+        SetEntityFollow 103, 27
+        SetEntityFollow 156, 27
+        CommitCommandBatch
+        SetEntityAnimation 121, 4
+        END
+  stockseq @083eb704 8 38    ; Goku's Instant Transmission, "He's back!!!!"
+  script                                 ; stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest
         SpawnCharacterEntity 30, 428, 328
         SpawnCharacterEntity 162, 468, 328
         WalkToPosition 162, 468, 400
@@ -372,6 +510,8 @@ sequence cg_fight7_end
         SetEntityAnimation 76, 4
         SetEntityAnimation 137, 4
         SetEntityAnimation 156, 4
+        SetEntityFollow 72, 132
+        SetEntityAnimation 72, 4
         SetEntityAnimation 121, 4
         CommitCommandBatch
         SetActiveEntity 30
@@ -381,7 +521,7 @@ sequence cg_fight7_end
   text 40 "When I exploded, two pieces of my core survived...\x0b...and each one grew back perfect!"
   text 40 "SECOND CELL: Twice the perfection!"
   stockseq @083eb704 41 50    ; Vegeta, "part of my design", Trunks falls, Vegeta's attack
-  script                                 ; stock entry 51: both Cells cleared, record 12 brings the pair
+  script                                 ; stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side
         FadeOut 120
         PlayMusic 33
         GetActiveEntityContext
@@ -393,6 +533,8 @@ sequence cg_fight7_end
         DespawnEntity 162
         SetEntityPositionInstant 0, 432, 472
         SetEntityFacing 0, 3
+        SetEntityPositionInstant 72, 420, 472
+        SetEntityFacing 72, 3
         TriggerMapEvent 12
         SetEntityFacing 30, 2
         PanCameraToPosition 360, 352, 10
@@ -401,10 +543,25 @@ sequence cg_fight7_end
   stockseq @083eb704 52 63    ; "ultimate perfection", Goku from the Other World, "I will!"
   script
         SetEntityFacing 0, 3
+  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 70
+        END
+      L1:
+        END
+  text 67 "HERCULE: Tell you what, kid...  this one's all yours.\x0bThe champ wouldn't dream of stealing your moment!"    ; (draft)
+  script
+        WalkToPosition 72, 340, 480
+        DespawnEntity 72
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END
   script                                 ; fight 8: two Perfect Cells (stat 25 + its pair, both-down), fought to 0: the bars run over the whole HP
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse H1
+        DespawnEntity 72
+      H1:
         DrawBossHealthBarRange 30, 0, 100
         SetPlayerVisible 1
         SetActiveEntity 0
@@ -828,19 +985,54 @@ sequence cg_beam_struggle
         PanCameraToPosition 320, 344, 30
         SpawnCharacterEntity 56, 432, 440
         SetEntityFacing 56, 1
-        SpawnCharacterEntity 121, 496, 432
+        SpawnCharacterEntity 121, 572, 432
         SetEntityFacing 121, 2
-        SpawnCharacterEntity 137, 360, 456
+        SpawnCharacterEntity 137, 308, 456
         SetEntityFacing 137, 3
-        SpawnCharacterEntity 156, 376, 408
+        SpawnCharacterEntity 156, 376, 336
         SetEntityFacing 156, 0
-        SpawnCharacterEntity 76, 400, 480
+        SpawnCharacterEntity 76, 400, 516
         SetEntityFacing 76, 1
         FadeFromWhite 120
+        BeginCommandBatch
+        WalkToPosition 121, 496, 432
+        WalkToPosition 137, 360, 456
+        WalkToPosition 156, 376, 408
+        WalkToPosition 76, 400, 480
+        CommitCommandBatch
+        SetEntityFacing 121, 2
+        SetEntityFacing 137, 3
+        SetEntityFacing 156, 0
+        SetEntityFacing 76, 1
         SetEntityAnimation 0, 4
         PlayAudio 50
         END
-  stockseq @083ec758 20 48    ; the aftermath, Vegeta's thoughts, "I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!"
+  stockseq @083ec758 20 25    ; the aftermath: "Cell's energy completely vanished!"
+  script                                 ; Hercule's actor takes it in
+        WalkToPosition 72, 516, 410
+        SetEntityFacing 72, 2
+  text 67 "HERCULE: Is...  is it over?\x0bHa!  Hahaha!  Of course it's over!  Did everybody see that?!"    ; (draft)
+  stockseq @083ec758 26 35    ; Krillin, Tien, 18, "You guys go ahead!"
+  script                                 ; stock entry 36: they fly off, and nobody saw Hercule's actor; he goes to find the cameras
+        SetEntityFacing 137, 1
+        PlayAudio 26
+        FlyToPosition 156, 280, 512
+        DespawnEntity 156
+        BeginCommandBatch
+        PlaySFX 76, 26
+        FlyToPosition 76, 344, 520
+        DespawnEntity 76
+        FlyToPosition 56, 384, 536
+        DespawnEntity 56
+        FlyToPosition 121, 448, 512
+        DespawnEntity 121
+        CommitCommandBatch
+        WalkToPosition 72, 584, 440
+        DespawnEntity 72
+        SetEntityFacing 0, 2
+        PanCameraToPosition 304, 408, 2
+        END
+  stockseq @083ec758 37 48    ; Vegeta's thoughts, "I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!"
   script                                 ; stock entry 49: the statue for beating Cell, flag 195; no Hercule join (he is in the party already)
         WaitFrames 60
         FadeOut 240

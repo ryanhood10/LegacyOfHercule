@@ -1,36 +1,73 @@
 ; Chapter 7 (docs/story.md section 0 item 7, section 4f), applied by ch7_cell.json. Out of the chamber
-; Vegeta is player 1 and Trunks player 2 (the chamber exit, ch7_cell.json edit). Semi-Perfect Cell
+; Vegeta is player 1 and Trunks player 2 (the chamber exit, ch7_cell.json edit: every other character's selectable bit
+; is cleared, so nobody else, Hercule included, can be player 2 before Perfect Cell's end). Semi-Perfect Cell
 ; (stat 76) splits into a Multi-Form duplicate in co-op (bosses.c default twin) and takes the fallen
-; body back after the fight; Trunks' stock fly-in is skipped when he is already player 2. After Cell's
-; kick knocks Vegeta out, player 1 is Trunks (stock) and in co-op the pad that played Vegeta takes
-; Krillin, who flies in (CoopCall 6, 6 and 7, PadSwap); Perfect Cell (stats 78 / 79, no twin, ends
-; at half health: bosses.c) knocks Krillin out with one hit at the start of the ending. Afterwards
-; Trunks and Krillin are the default pair, Vegeta, Piccolo and Hercule selectable.
+; body back after the fight. After Cell's kick knocks Vegeta out, player 1 is Trunks (stock) and in co-op the pad that
+; played Vegeta takes Krillin (CoopCall 6, 6 and 7, PadSwap); Perfect Cell (stats 78 / 79, no twin, ends at half
+; health: bosses.c) knocks Krillin out with one hit at the start of the ending. Afterwards Trunks and Krillin are the
+; default pair, Vegeta, Piccolo and Hercule selectable.
 ; Speakers: 1 the active character, 4 Vegeta (zone 12), 39 Semi-Perfect Cell, 40 Perfect Cell,
-; 73 Krillin, 99 Trunks.
+; 73 Krillin, 99 / 100 Trunks.
+;
+; Staging (Ryan, 2026-11-05: "characters shouldnt be stagnant", "account for 1p mode or 2p mode", "dont over-do it"). Lineups:
+;   the fight with Semi-Perfect Cell: Vegeta alone, or Vegeta + Trunks. The scene after it: player 2's Trunks hands over to
+;   his actor in the fade and flies in as he does alone, so both modes play one staging (player 2 has no entity in areas 5 and 6).
+;   Perfect Cell: Trunks alone, or Trunks + Krillin. Krillin flies in in both modes. In co-op his actor lands on the spot where
+;   player 2's entity respawns (12 px left of player 1, player.c ensure_p2), so the handover does not show; alone he keeps to
+;   Vegeta's side through the fight and rushes from there. Vegeta's body lies on the field from the kick until he gets up.
+;   Actor sprites moved here have the poses used (docs/sprites.md: 29 and 30 walk, 30 flies, 76 flies, punches, falls; 132 flies).
+; Lines marked (draft) are Claude's, for Ryan to read.
 
 ; ---- zone 12 area 4: Vegeta (and Trunks) against Semi-Perfect Cell --------------------------------
 
 sequence ch7_semi_perfect
-  stockseq @083e6620 0 11                ; Cell and Vegeta, "a power not seen for thousands of years", "It's your end!"
-  script                                 ; co-op: the split (next 13), else the fight (16)
-        CoopCall 5, 0, 0, 0
+  [0] stockseq @083e6620 0 0             ; Vegeta player 1 behind a fade (ch7_cell.json pre_edit), the music
+  [1] script                             ; Cell turns; Vegeta walks up to him
+        SetEntityFacing 29, 2
+        WalkToPosition 0, 176, 300
+        SetEntityFacing 0, 3
+  [2] stockseq @083e6620 1 7             ; Cell and Vegeta, "It's obvious where your strength comes from", "the strongest being in the universe"
+  [9] script                             ; Vegeta takes one more step
+        WalkToPosition 0, 184, 300
+        SetEntityFacing 0, 3
+  [10] stockseq @083e6620 8 9            ; "a power not seen for thousands of years", "What is this?"
+  [12] script                            ; stock entry 10 (its index moved): transform unless already; Cell gives ground
+        PushActiveCharIsTransformed
         JumpIfFalse L1
         PushByte 13
         END
       L1:
-        PushByte 16
+        SetEntityAnimation 0, 35
+        WalkToPosition 29, 216, 272
+        SetEntityFacing 29, 2
+  [13] stock @083e65f4                   ; "It's your end!"
+  [14] script                            ; co-op: the split (next 15), else the fight (20)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 15
         END
-  text 39 "CELL: Two Saiyans against me?  Then I'll even the odds."
-  text 99 "TRUNKS: Father, he's split in two!\x0bThat's the trick Piccolo told us about at Gingertown!"
-  text 4 "VEGETA: Hmph.  Then I'll destroy both halves."
-  stock @083e6608                        ; the fight (25-100)
+      L1:
+        PushByte 20
+        END
+  [15] text 39 "CELL: Two Saiyans against me?  Then I'll even the odds."
+  [16] script                            ; a second body stands up out of Cell and walks to the spot of his boss twin (TWIN_OFFSET right of the first)
+        WhiteFlash 10
+        PlayAudio 26
+        SpawnCharacterEntity 29, 216, 272
+        WalkToPosition 29, 240, 272
+        SetEntityFacing 29, 2
+        WaitFrames 30
+  [17] text 99 "TRUNKS: Father, he's split in two!\x0bThat's the trick Piccolo told us about at Gingertown!"
+  [18] text 4 "VEGETA: Hmph.  Then I'll destroy both halves."
+  [19] script                            ; the body that walked goes (a step finds the same one first); the record stands on the other and its twin on this spot
+        DespawnEntity 29
+  [20] stock @083e6608                   ; the fight (25-100)
 end
 
 ; Semi-Perfect Cell beaten: the duplicate is taken back in co-op; Cell talks Vegeta into letting him
 ; absorb 18; Perfect Cell's kick; Trunks player 1 and, in co-op, Krillin on the pad that played Vegeta
 sequence ch7_semi_perfect_end
-  script                                 ; co-op: the reabsorption (next 1), else the stock scene (3)
+  [0] script                             ; co-op: the reabsorption (next 1), else the stock scene (3)
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 1
@@ -38,24 +75,36 @@ sequence ch7_semi_perfect_end
       L1:
         PushByte 3
         END
-  script
+  [1] script
         WhiteFlash 10
         DespawnEntity 29
         SetEntityAnimation 29, 0
         WaitFrames 30
-  text 4 "VEGETA: Taking your other half back won't save you."
-  stockseq @083e6f30 0 6                 ; "You're not Vegeta", "push-ups and sit-ups", "outclassed in every way"
-  script                                 ; stock entry 7: Trunks flies in (player 2 already plays him in co-op)
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        Jump L2
-      L1:
-        SpawnCharacterEntity 132, 64, 416
-        FlyToPosition 132, 144, 328
+  [2] text 4 "VEGETA: Taking your other half back won't save you."
+  [3] script                             ; stock entry 0; in the fade player 2's Trunks makes way for the actor stock entry 7 flies in (his entity is not back before Krillin's fight)
+        SetEntityAnimation 29, 3
+        PlayAudio 60
+        FindPlayerEntity
+        WaitFrames 60
+        AddEXP 30000
+        SetPlayerVisible 0
+        WaitFrames 50
+        FadeOut 120
+        CoopCall 31, 3, 0, 0
+        SetEntityPositionInstant 0, 168, 312
+        SetEntityFacing 0, 1
+        SetEntityPositionInstant 29, 176, 294
+        FadeFromWhite 120
+        WaitFrames 60
+        SetEntityAnimation 29, 0
+        SetEntityFacing 29, 0
+        PlayAudio 50
+  [4] stockseq @083e6f30 1 12            ; "You're not Vegeta", "push-ups and sit-ups", Trunks flies in, "Here's my son!", the deal
+  [16] script                            ; Trunks steps up
+        WalkToPosition 132, 152, 320
         SetEntityFacing 132, 1
-      L2:
-  stockseq @083e6f30 8 21                ; "Here's my son!", the deal, 18 absorbed, Perfect Cell, the kick
-  script                                 ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
+  [17] stockseq @083e6f30 13 21          ; "He's trying to deceive you!", the deal, 18 absorbed, Perfect Cell, the kick
+  [26] script                            ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
         BeginCommandBatch                ; for the pad that played Vegeta (the pads trade players)
         SetEntityAnimation 30, 6
         EntityWaitTouchPlayer 0
@@ -81,58 +130,111 @@ sequence ch7_semi_perfect_end
         TypeOp 15
         SetEntityPositionInstant 0, 128, 540
         SetEntityPositionInstant 30, 248, 280
+        SpawnCharacterEntity 137, 296, 262
+        SetEntityAnimation 137, 3
         FadeFromWhite 120
         FlyToPosition 0, 240, 368
         WalkToPosition 0, 248, 320
         PanCameraToPosition 136, 192, 2
         WaitFrames 120
-  stock @083e6e60                        ; Trunks: "as long as there is breath in my body, I WILL FIGHT!"
-  script                                 ; co-op: Krillin's arrival (next 28), else the transformation (31)
+  [27] stock @083e6e60                   ; Trunks: "as long as there is breath in my body, I WILL FIGHT!"
+  [28] script                            ; Krillin flies in, to the spot player 2's entity will take
+        WaitFrames 20
+        SpawnCharacterEntity 76, 200, 380
+        PlayAudio 26
+        FlyToPosition 76, 236, 320
+        SetEntityFacing 76, 1
+  [29] text 73 "KRILLIN: Trunks!  I got here as fast as I could!\x0bOh man...  Vegeta?!  Cell did that to him?"
+  [30] text 1 "@TRUNKS: Krillin, stay back!  He's too strong!"
+  [31] script                            ; co-op: he stays and fights (next 32), alone he goes to Vegeta (34)
         CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 28
-        END
-      L1:
-        PushByte 31
-        END
-  text 73 "KRILLIN: Trunks!  I got here as fast as I could!\x0bOh man...  Vegeta?!  Cell did that to him?"
-  text 1 "@TRUNKS: Krillin, stay back!  He's too strong!"
-  text 73 "KRILLIN: No way.  Two of us have a better shot than one!"
-  script                                 ; stock entry 24 (its index moved): transform unless already
-        PushActiveCharIsTransformed
         JumpIfFalse L1
         PushByte 32
         END
       L1:
-        SetEntityAnimation 0, 35
-  stock @083e6f16                        ; the fight: Perfect Cell (stat 78, then 79)
-end
-
-; ---- zone 12 area 6: Perfect Cell laughs it off; in co-op Krillin's rush and one-hit KO first ------
-
-sequence ch7_perfect_end
-  stock @083e7110                        ; EXP, the music
-  script                                 ; co-op: Krillin's rush (next 2), else the stock lines (6)
-        CoopCall 5, 0, 0, 0
+        PushByte 34
+        END
+  [32] text 73 "KRILLIN: No way.  Two of us have a better shot than one!"
+  [33] script                            ; player 2 takes over on the spot when player 1 is free
+        DespawnEntity 76
+        PushByte 36
+        END
+  [34] text 73 "KRILLIN: ...Yeah.  You're right.\x0bI'll get Vegeta out of the line of fire.  Give him one for me!"       ; (draft) alone
+  [35] script
+        WalkToPosition 76, 288, 280
+        SetEntityFacing 76, 1
+  [36] script                            ; stock entry 24 (its index moved): transform unless already
+        PushActiveCharIsTransformed
         JumpIfFalse L1
-        PushByte 2
+        PushByte 37
         END
       L1:
-        PushByte 6
-        END
-  text 73 "KRILLIN: He's wide open!  Now's my chance!  Hyaaaah!"
-  script
-        PlayAudio 26
+        SetEntityAnimation 0, 35
+  [37] stock @083e6f16                   ; the fight: Perfect Cell (stat 78, then 79)
+end
+
+; ---- zone 12 area 6: Perfect Cell laughs it off; Krillin's rush and one-hit KO first (in both modes) ------
+
+sequence ch7_perfect_end
+  [0] stock @083e7110                    ; EXP, the music
+  [1] script                             ; in a short fade Trunks, Cell and Krillin take their marks (the fight left them anywhere); player 2's Krillin hands over to the actor
+        FadeOut 40
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse L1
+        DespawnEntity 76
+      L1:
+        CoopCall 31, 3, 0, 0
+        SetEntityPositionInstant 0, 248, 320
+        SetEntityFacing 0, 1
+        SetEntityPositionInstant 30, 248, 280
+        SetEntityFacing 30, 0
+        SpawnCharacterEntity 76, 216, 324
+        SetEntityFacing 76, 3
+        FadeFromWhite 40
         WaitFrames 20
+  [2] text 73 "KRILLIN: He's wide open!  Now's my chance!  Hyaaaah!"
+  [3] script                             ; the rush, one kick, Krillin thrown past Trunks
+        PlayAudio 26
+        FlyToPosition 76, 248, 290
+        SetEntityFacing 76, 1
+        SetEntityAnimation 76, 6
+        PlayAudio 20
+        WaitFrames 20
+        BeginCommandBatch
+        SetEntityAnimation 30, 6
+        EntityWaitTouchPlayer 76
+        PlaySFX 76, 34
+        PlayDamageEffect 76
+        SetEntityAnimation 76, 2
+        CommitCommandBatch
         WhiteFlash 10
         ScreenShake 0, 20, 30
-        PlayAudio 20
+        GlideToPosition 76, 212, 340, 300
+        SetEntityAnimation 76, 3
         WaitFrames 40
-  text 40 "CELL: Hmph.  Was that supposed to be an attack?"
-  text 73 "KRILLIN: Ugh...  One hit...  He took me out with one hit..."
+  [4] text 40 "CELL: Hmph.  Was that supposed to be an attack?"
+  [5] text 73 "KRILLIN: Ugh...  One hit...  He took me out with one hit..."
   stockseq @083e77b0 1 13                ; "pump up your muscles", the tournament in ten days, Cell leaves
-  script                                 ; stock entry 14, then Trunks + Krillin by default with Vegeta,
-        FindEntityByType 1               ; Piccolo and Hercule selectable too
+  script                                 ; stock entry 14, with Krillin on his feet and Vegeta up from where he fell; then Trunks + Krillin
+        SetEntityAnimation 76, 0         ; by default with Vegeta, Piccolo and Hercule selectable too
+        SetEntityFacing 76, 1
+        CoopCall 5, 0, 0, 0              ; ReloadMap keeps actors: in co-op Krillin goes back to where player 2 respawns, alone he flies on ahead
+        JumpIfFalse K1
+        WalkToPosition 76, 236, 320
+        SetEntityFacing 76, 1
+        Jump K2
+      K1:
+        PlayAudio 26
+        FlyToPosition 76, 212, 190
+        DespawnEntity 76
+      K2:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse L1
+        SetEntityAnimation 137, 0
+        WalkToPosition 137, 248, 272
+        DespawnEntity 137
+      L1:
+        FindEntityByType 1
         TriggerMapEvent 3
         SetEntityFacing 137, 0
         WaitFrames 40
@@ -165,6 +267,10 @@ sequence ch7_perfect_end
         SetCharacterFlag_Bit1 3
         SetCharacterFlag_Bit1 5
         SetCharacterFlag_Bit1 6
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse L2
+        DespawnEntity 76
+      L2:
         PlayAudio 62
   stock @083e7798                        ; Journal Updated!
 end

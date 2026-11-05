@@ -2,6 +2,10 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-05
+
+- **The Cell saga's scenes staged for every lineup (`docs/story.md` 4f and 4h "Staging", `cell_staging.txt`; Ryan: "characters shouldnt be stagnant", "account for 1p mode or 2p mode"):** no new story beats. Zone 12: Vegeta walks up to Cell, a second Cell walks out of the first in co-op, Trunks flies in in both modes, Vegeta's body lies on the field from the kick, Krillin flies in and rushes Cell in one-player games too (one new line). The Games: Hercule's actor stands in every scene (player 2 has no entity in any of them), stands where player 2 respawns before a team fight, and alone has a line and clears off (three new lines); each Junior fighter flies down; a line and an exit for Hercule in the aftermath. All new lines are Claude's drafts.
+
 ## 2026-11-04
 
 - **The generator's eggs are a mini boss (`docs/scripts.md` `ch4_eggs`, `ch4_eggs.txt`; Ryan):** in zone 8 area 50 no more carrying eggs to the brontosaurus: the first egg smashes, the mother (King Triceratops recoloured pink, orange and green) turns on the players, at half her health the other two hatch and her babies fight beside her; when she falls the tubes break as before.
