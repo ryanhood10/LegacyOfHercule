@@ -28,6 +28,10 @@ script watch_gohan
     PushByte 8
     CmpNe
     And
+    CoopCall 8, 0, 0, 0
+    PushByte 8
+    CmpNe
+    And
 end
 
 script watch_piccolo
@@ -105,6 +109,73 @@ sequence summit_scene
   script                                 ; 13 against 17 and 18 at the centre of the clearing
         SetPlayerVisible 1
         PanCameraToPosition 228, 220, 3        ; the pan names the view's top-left corner
+        ; the others run in from the rim to the view's edges (Ryan, 2026-11-05: no stagnant characters; only actors move, by their own sprites)
+        BeginCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Pa
+        WalkToPosition 103, 240, 250
+      Pa:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Ga
+        WalkToPosition 56, 258, 280
+      Ga:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Ka
+        WalkToPosition 76, 240, 300
+      Ka:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Ha
+        WalkToPosition 72, 232, 330
+      Ha:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Va
+        WalkToPosition 137, 456, 250
+      Va:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Ta
+        WalkToPosition 132, 438, 280
+      Ta:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Na
+        WalkToPosition 121, 456, 300
+      Na:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Ya
+        WalkToPosition 156, 440, 328
+      Ya:
+        CommitCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Paf
+        SetEntityFacing 103, 3
+      Paf:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Gaf
+        SetEntityFacing 56, 3
+      Gaf:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Kaf
+        SetEntityFacing 76, 3
+      Kaf:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Haf
+        SetEntityFacing 72, 3
+      Haf:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Vaf
+        SetEntityFacing 137, 2
+      Vaf:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Taf
+        SetEntityFacing 132, 2
+      Taf:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Naf
+        SetEntityFacing 121, 2
+      Naf:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Yaf
+        SetEntityFacing 156, 2
+      Yaf:
         BeginCommandBatch
         SetEntityAnimation 9, 6
         NPCFireKiBlastAtEntity 11, 165, 100
@@ -133,6 +204,10 @@ sequence summit_scene
         WaitFrames 40
         WalkToPosition 165, 348, 300
         SetEntityFacing 165, 0
+        CoopCall 22, 2, 76, 0                  ; Krillin starts forward at the sight of 18 going
+        JumpIfFalse Ks
+        WalkToPosition 76, 268, 306
+      Ks:
         PanCameraToPosition 228, 230, 2        ; 13 at the centre of the view
         WaitFrames 30
         PlayAudio 55
@@ -151,6 +226,73 @@ sequence summit_scene
   script                                 ; the mountain shakes
         PlayAudio 20
         ScreenShake 0, 20, 120
+        ; and all of them fall back
+        BeginCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Pb
+        WalkToPosition 103, 224, 250
+      Pb:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Gb
+        WalkToPosition 56, 242, 280
+      Gb:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Kb
+        WalkToPosition 76, 224, 300
+      Kb:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Hb
+        WalkToPosition 72, 216, 344
+      Hb:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Vb
+        WalkToPosition 137, 472, 250
+      Vb:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Tb
+        WalkToPosition 132, 454, 280
+      Tb:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Nb
+        WalkToPosition 121, 472, 300
+      Nb:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Yb
+        WalkToPosition 156, 456, 328
+      Yb:
+        CommitCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Pbf
+        SetEntityFacing 103, 3
+      Pbf:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Gbf
+        SetEntityFacing 56, 3
+      Gbf:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Kbf
+        SetEntityFacing 76, 3
+      Kbf:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Hbf
+        SetEntityFacing 72, 3
+      Hbf:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Vbf
+        SetEntityFacing 137, 2
+      Vbf:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Tbf
+        SetEntityFacing 132, 2
+      Tbf:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Nbf
+        SetEntityFacing 121, 2
+      Nbf:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Ybf
+        SetEntityFacing 156, 2
+      Ybf:
         WaitFrames 30
   text 0 "@^The whole mountain is shaking..."
   script                                 ; the reveal: a long white-out, Super 13, the biggest shake, his music
@@ -215,7 +357,73 @@ sequence summit_scene
   fmt 0 "%s: Let's take him down together!"
         CoopCall 14, 2, 0, 0
         END
-  script                                 ; the fight: the boss record (stat 145, sprite 180)
+  script                                 ; the fight: the boss record (stat 145, sprite 180); the others clear the field to the rim's edge
+        BeginCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Pc
+        WalkToPosition 103, 190, 280
+      Pc:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Gc
+        WalkToPosition 56, 190, 330
+      Gc:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Kc
+        WalkToPosition 76, 190, 380
+      Kc:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Hc
+        WalkToPosition 72, 170, 430
+      Hc:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Vc
+        WalkToPosition 137, 530, 280
+      Vc:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Tc
+        WalkToPosition 132, 530, 330
+      Tc:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Nc
+        WalkToPosition 121, 530, 380
+      Nc:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Yc
+        WalkToPosition 156, 530, 430
+      Yc:
+        CommitCommandBatch
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse Pcf
+        SetEntityFacing 103, 3
+      Pcf:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse Gcf
+        SetEntityFacing 56, 3
+      Gcf:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse Kcf
+        SetEntityFacing 76, 3
+      Kcf:
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse Hcf
+        SetEntityFacing 72, 3
+      Hcf:
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse Vcf
+        SetEntityFacing 137, 2
+      Vcf:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse Tcf
+        SetEntityFacing 132, 2
+      Tcf:
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse Ncf
+        SetEntityFacing 121, 2
+      Ncf:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Ycf
+        SetEntityFacing 156, 2
+      Ycf:
         DespawnEntity 180
         TriggerMapEvent 11
         DrawBossHealthBar 180
@@ -233,6 +441,27 @@ sequence summit_13_end
         PlayAudio 20
         WaitFrames 60
         FadeToWhite 30
+        CoopCall 22, 2, 137, 0                 ; behind the white, Vegeta's actor comes over from the rim to say it
+        JumpIfFalse V1
+        PushByte 137
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 36
+        Add
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 6
+        Sub
+        Step SetEntityPositionInstant
+        SetEntityFacing 137, 2
+        SetEntityFacing 0, 3
+      V1:
         WaitFrames 30
         WhiteFadeOut 60
   text 106 "VEGETA: *spits*  At last.  The end of those clankers."

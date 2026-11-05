@@ -99,7 +99,6 @@ sequence ch1_krillin_visit
   text 73 "KRILLIN: I'll come with you.  With Frieza around, two of us are safer than one."
   text 1 "#Thanks, Krillin!  The cave is in the forest, just past our house."
   script
-        DespawnEntity 76
         SetCharacterInPartyFlag 6
         SetCharacterFlag_Bit1 6
         RemoveItem 37
@@ -109,15 +108,19 @@ sequence ch1_krillin_visit
   text 0 "@^Krillin is now available!"
   stock @083b9f82                        ; Journal Updated!
   script                                 ; Gohan gets up from the desk (the stock sit puts him inside its collision)
-        SpawnCharacterEntity 76, 144, 108
-        SetEntityFacing 76, 2
         SetEntityPositionInstant 0, 136, 104
         WalkToPosition 0, 136, 120
         BeginCommandBatch
         WalkToPosition 76, 160, 120
         WalkToPosition 0, 152, 132
         CommitCommandBatch
+        CoopCall 5, 0, 0, 0                   ; two players: he ends where player 2's entity appears (12 px left of player 1)
+        JumpIfFalse K1
+        WalkToPosition 76, 140, 132
+        Jump K2
+      K1:
         WalkToPosition 76, 216, 148
+      K2:
         DespawnEntity 76
         SetPlayerVisible 1
 end
@@ -128,26 +131,86 @@ end
 sequence ch1_spirit
   script
         SetPlayerVisible 0
-        WalkToPosition 0, 96, 176
-        SetEntityFacing 0, 1
         CoopCall 22, 1, 0, 0                  ; nobody plays Gohan (alone as Krillin): he walks up beside him (sprite 53)
-        JumpIfFalse G1
+        JumpIfFalse G0
         SpawnCharacterEntity 53, 128, 260
+      G0:
+        CoopCall 22, 1, 6, 0                  ; nobody plays Krillin (alone as Gohan): the same, sprite 76
+        JumpIfFalse K0
+        SpawnCharacterEntity 76, 64, 260
+      K0:
+        BeginCommandBatch
+        WalkToPosition 0, 96, 176
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
         WalkToPosition 53, 128, 176
-        SetEntityFacing 53, 1
       G1:
-        PanCameraToPosition 0, 0, 2
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        WalkToPosition 76, 64, 176
+      K1:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G2
+        SetEntityFacing 53, 1
+      G2:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K2
+        SetEntityFacing 76, 1
+      K2:
+        PanCameraToPosition 0, 104, 2         ; (was 0, 0: the box hid Frieza and the players stood below the view)
         WaitFrames 40
         PlayAudio 50
   text 1 "#GOHAN: Krillin, wait...\x0bHuh?  The whole forest just went quiet."
+  script                                 ; the actor turns to the other, then back at the forest
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        SetEntityFacing 76, 3
+        WaitFrames 20
+      K1:
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
+        SetEntityFacing 53, 2
+        WaitFrames 20
+      G1:
   text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us."
   script
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        SetEntityFacing 76, 1
+      K1:
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
+        SetEntityFacing 53, 1
+      G1:
         FadeToWhite 120
         TriggerMapEvent 1
         WhiteFadeOut 30
         WhiteFlash 40
   stock @083b952c                        ; Frieza: your dad isn't coming back!
   text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
+  script                                 ; they recoil a step
+        BeginCommandBatch
+        WalkToPosition 0, 96, 186
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
+        WalkToPosition 53, 128, 186
+      G1:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        WalkToPosition 76, 64, 186
+      K1:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G2
+        SetEntityFacing 53, 1
+      G2:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K2
+        SetEntityFacing 76, 1
+      K2:
   text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
   stock @083b958c                        ; boss bar, battle music, control back
   script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top);
@@ -155,6 +218,10 @@ sequence ch1_spirit
         JumpIfFalse G1
         WalkToPosition 53, 168, 240
       G1:
+        CoopCall 22, 2, 76, 0                 ; Krillin's too
+        JumpIfFalse K1
+        WalkToPosition 76, 48, 236
+      K1:
         SetActiveEntity 0
 end
 
@@ -176,16 +243,50 @@ sequence ch1_spirit_end
         JumpIfFalse G1
         SpawnCharacterEntity 53, 128, 176
         SetEntityFacing 53, 2
+        SetEntityFacing 0, 3
       G1:
+        CoopCall 22, 1, 6, 0                  ; Krillin the same
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 64, 176
+        SetEntityFacing 76, 3
+        SetEntityFacing 0, 2
+      K1:
         WhiteFadeOut 120
         PlayAudio 50
   text 0 "@^The two figures melted away into the mist..."
   text 1 "#GOHAN: They're gone...  Were they even real?"
+  script                                 ; the voice comes from everywhere: they look up
+        SetEntityFacing 0, 1
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
+        SetEntityFacing 53, 1
+      G1:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        SetEntityFacing 76, 1
+      K1:
+        WaitFrames 20
   text 0 "@^VOICE: Do not be afraid, children.  You did not fight Frieza and Cooler...\x0b...but the spirit of the forest, wearing the faces of your fears."
+  script                                 ; and back at each other
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse G1
+        SetEntityFacing 53, 2
+        SetEntityFacing 0, 3
+      G1:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse K1
+        SetEntityFacing 76, 3
+        SetEntityFacing 0, 2
+      K1:
   text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
   text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
   script
-        CoopCall 22, 2, 53, 0                 ; his actor runs on ahead, west to the forest and the cave
+        CoopCall 22, 2, 76, 0                 ; his actor runs on ahead, west to the forest and the cave
+        JumpIfFalse K1
+        WalkToPosition 76, 0, 176
+        DespawnEntity 76
+      K1:
+        CoopCall 22, 2, 53, 0
         JumpIfFalse G1
         WalkToPosition 53, 0, 176
         DespawnEntity 53

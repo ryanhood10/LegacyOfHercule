@@ -36,6 +36,11 @@ done
 # The frame budget, West City's arrival, the eviction, the plaza's sign (docs/testing.md "Frame time and OAM probe"): self-checking
 echo "## perf_budget" >> "$LOG"
 python tools/headless/perf_budget.py "$ROM" "$OUT/menu.ss" --out "$OUT" 2>&1 | grep -E "^==|^perf |FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+# Scene staging per lineup (docs/testing.md "Scene staging"): self-checking, the `ents` lists' sanity too (staging_run.py)
+for s in tools/headless/staging_*.txt; do
+  echo "## $(basename "$s" .txt)" >> "$LOG"
+  python tools/headless/staging_run.py "$s" "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+done
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt "$PLAY" --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"

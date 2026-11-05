@@ -14,6 +14,7 @@ inspection goes through the GDB stub.
 | Full regression | before merging or handing Ryan a build: every chapter and tournament script, both modes, one command |
 | Frame time and OAM probe | lag, frame budget, OBJ count, what vanished and why, which function eats the frame: alone vs with player 2, on any map |
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
+| Scene staging | who stands, walks and talks in our added scenes for every lineup (one player, two, any selectable character): `staging_*.txt` |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
@@ -678,6 +679,22 @@ player 1 is Piccolo (`poke8 0x0203F000 0` then a warp makes Gohan player 1). `ST
 `tools/fork/st_preset.py`; player 1's L + R + Up wins the fights) are for interactive fork sessions;
 `tools/fork/st_run.ps1` launches the fork without the debugger and `st_place.ps1` moves a window out
 from under another session's.
+
+## Scene staging (`tools/headless/staging_*`, 2026-11-05)
+
+Ryan: "account for 1p mode or 2p mode and a combination of different characters that could arrive to our cutscenes". One script per chapter
+(`staging_ch1`, `ch2`, `ch3`, `ch5`, `ch6`, `ch8`, `ch9`, `broly`, `arctic`), written by `staging_ch1_gen.py`, `staging_ch23_gen.py`, `staging_ch568_gen.py`,
+`staging_ch9_gen.py` on `staging_lib.py`, run by regfull through the glob, or alone:
+`python tools/headless/staging_run.py tools/headless/staging_broly.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6`. Each scene: Map Test the inert
+entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the scene's own map starts it before the poke), check sprite records, the scene's end
+(`stepz`; 0x03001FDC is 0 after, a hung scene times out) and the map it ends on; shots for the eye.
+
+- `staging_run.py` is `st_expect.py` plus the `ents` lists: an entity whose vtable is no ROM or EWRAM address fails. An actor animated on a pose group its
+  sprite lacks writes through a null descriptor, the heap goes and the game crashes a little later, while the runner keeps going: "no CRASH line" is not enough.
+- `entrec` counts a player on that record too: played Gohan shows 53, played Hercule 72; a played Krillin shows 161, so 76 is his actor only.
+- Slot 8 for a test: `poke16 0x0203F0EC..F2` HP / EP, `poke8 0x0203F0F4 28` the row, flags `0x7F` at `0x0203F100` (as `ssj2_join` leaves him; only poking the flags
+  leaves row 0 and an empty entry: the scene never starts).
+- Real party at Krillin's visit: flags byte 0 on slots 1-8 (`flags_of`), `p2 off`, then `p2 0`: player 2's entity is born only when Krillin joins.
 
 ## Time Chamber waves and Roshi's sparring (headless, merged 2026-10-19)
 

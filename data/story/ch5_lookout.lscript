@@ -8,8 +8,17 @@
 
 sequence ch5_lookout_first
   stockseq @083df720 0 16                ; Kami and Piccolo: "I'll be waiting."
-  text 67 "HERCULE: So, uh...  we're waiting?  Up here?\x0bGreat!  Nice view.  Nice and far away from those Androids!"
-  text 1 "@PICCOLO: You stay here, Hercule.  And don't touch anything."
+  script                                 ; nobody plays Hercule: he comes over, taking in the view
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse H1
+        SpawnCharacterEntity 72, 112, 262
+        WalkToPosition 72, 112, 234
+        WalkToPosition 72, 140, 206
+        SetEntityFacing 72, 2
+        SetEntityFacing 0, 3
+      H1:
+  text 67 "!HERCULE: So, uh...  we're waiting?  Up here?\x0bGreat!  Nice view.  Nice and far away from those Androids!"
+  text 3 "!PICCOLO: You stay here, Hercule.  And don't touch anything."
   script                                 ; stock entry 17, with Hercule (5) and Krillin (6) locked too and
         SetStoryFlag 129                 ; player 2 on Gohan after the warp to Gohan's house
         FadeOut 90
@@ -45,7 +54,7 @@ end
 sequence ch5_fusion
   stockseq @083e0dbc 0 35                ; the cicada skin, the news from Gingertown, "So you finally came to your senses?"
   script
-        SpawnCharacterEntity 72, 232, 152
+        SpawnCharacterEntity 72, 296, 176
         WalkToPosition 72, 216, 136
         SetEntityFacing 72, 2
         SetEntityFacing 73, 3
@@ -65,9 +74,15 @@ sequence ch5_fusion
         WaitFrames 30
   fmt 0 "@^Hercule has achieved Level %d!"
         StackGetCharLevel 5
+  script                                 ; he tries it out
+        SetEntityAnimation 72, 6
+        SetEntityAnimation 72, 0
+        SetEntityFacing 72, 2
   text 67 "HERCULE: Whoa...  I feel like I could lift a truck!\x0bHa ha ha!  Not that I couldn't before, of course!"
   text 90 "PICCOLO: Hmph.  Don't let it go to your head."
-  script
+  script                                 ; and gives Piccolo and Kami the floor
+        WalkToPosition 72, 240, 152
+        SetEntityFacing 72, 2
         SetEntityFacing 73, 0
   stockseq @083e0dbc 36 47               ; "Our union will make you more powerful", Popo's goodbye, the Namek
   script                                 ; stock entry 48: Piccolo and Hercule fly to Gingertown together
