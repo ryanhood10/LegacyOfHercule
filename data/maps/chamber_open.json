@@ -750,17 +750,6 @@
     "0x083EE430"
    ],
    "action": "script:ch_enemy_drop"
-  },
-  {
-   "kind": "enemy",
-   "stat": 155,
-   "sprite": 148,
-   "x": 1016,
-   "y": 1000,
-   "behaviours": [
-    "0x083EE430"
-   ],
-   "action": "script:ch_enemy_drop"
   }
  ],
  "triggers": [

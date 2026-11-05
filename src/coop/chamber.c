@@ -27,9 +27,10 @@
 #define CH_TICK         16            // frames between the open area's checks
 #define CH_FAR_X        300           // px from the players' midpoint: a body beyond this leaves
 #define CH_FAR_Y        220
-#define CH_TARGET       7             // records standing (twins double them in co-op); chosen from the measures, section 12
+#define CH_TARGET       7             // records standing with two players (14 bodies, each with his twin): the measures, section 12
+#define CH_TARGET_ONE   10            // bodies standing with one player
 #define CH_REFILL_WAIT  90            // frames after a kill before a record comes in
-#define CH_MIN_FREE     0x800         // bytes of OBJ VRAM a spawn asks for (two 1 KB bodies)
+#define CH_MIN_FREE     0x1800        // OBJ VRAM's largest free block a spawn asks for: two bodies and room for blasts and drops
 #define CH_FALL_FRAMES  48            // a fallen boss lies this long before his last line
 #define CH_BLINK        24            // ... and blinks this long before he goes
 #define CH_MAP_W        2048
@@ -74,6 +75,7 @@ static const ChFoe tiers[CH_ROOMS + 1][KINDS] = {
 // ---- the rooms -----------------------------------------------------------------------------------------------------
 // One row per room: docs/time-chamber.md 12 "Adding a room".
 #define NONE 0xFF
+#define CH_LINE_SLOTS 9         // the lines by party slot (Gohan .. Super Saiyan 2 Gohan), whatever PARTY_SLOTS a build has
 typedef struct ChBoss { u8 fighter; s16 rating; u8 hp_pct; const char *won; } ChBoss;
 typedef struct ChRoom {
     u8 area;                    // zone 15 area of its map
@@ -84,7 +86,7 @@ typedef struct ChRoom {
     s16 seal[4];                // the door's rect: blocked during the fight (x1, y1, x2, y2)
     s16 line_y;                 // a player below this when the scene starts is brought up beside the other
     const char *open;           // the boss's opening line (a `%` is a format here: none)
-    const char *open_by[PARTY_SLOTS];   // his line for player 1's character instead (0: open)
+    const char *open_by[CH_LINE_SLOTS];   // his line for player 1's character (party slot) instead (0: open)
     const char *partner_line;   // the partner's line (with two players)
 } ChRoom;
 #define RATING_STEP 25          // rating per light already out: the last room is the hardest whichever it is (decision 3)
@@ -104,10 +106,10 @@ static const ChRoom rooms[] = {
         .open = "ROSHI: Hoho! So Popo set me up in here, did he?\x0bCome on, then. Let's see what you've learned.",
         .open_by = {
             [0] = "ROSHI: Little Gohan! Not so little any more.\x0bShow this old man what your father taught you.",
-            [1] = "ROSHI: Piccolo, eh? I've knocked you into a wall before.\x0bDon't think I've forgotten how.",
+            [1] = "ROSHI: Piccolo, eh? The last of your kind I met cost me my life.\x0bI've had time to practise.",
             [2] = "ROSHI: The Saiyan prince in my dojo!\x0bWipe your boots and mind the furniture.",
             [3] = "ROSHI: Bulma's boy! Give her my love, won't you?\x0bHoho! After I've thrashed you, of course.",
-            [4] = "ROSHI: Goku! Come to see your old master?\x0bLet's see you beat me again, then.",
+            [4] = "ROSHI: Goku! Come to see your old master?\x0bLet's see how far you've come, then.",
             [5] = "ROSHI: The champion himself!\x0bThose belts look heavy, my boy. Let's see what's under them.",
             [6] = "ROSHI: Krillin! Been training, or chasing girls?\x0bDon't answer. I can tell.",
             [7] = "ROSHI: An android who likes birds, they tell me.\x0bNo hard feelings, tin man.",
@@ -119,7 +121,7 @@ static const ChRoom rooms[] = {
 #define ROOM_COUNT (int)(sizeof rooms / sizeof rooms[0])
 
 // A player's reply when a boss has spoken, by party slot. DRAFT lines, Claude's.
-static const char *const replies[PARTY_SLOTS] = {
+static const char *const replies[CH_LINE_SLOTS] = {
     [0] = "GOHAN: I won't hold back.",
     [1] = "PICCOLO: Enough talk.",
     [2] = "VEGETA: Another phantom. Get on with it.",
@@ -130,7 +132,7 @@ static const char *const replies[PARTY_SLOTS] = {
     [7] = "ANDROID 16: ...Very well.",
     [8] = "GOHAN: Let's finish this quickly.",
 };
-static const u8 slot_fighter[PARTY_SLOTS] = {
+static const u8 slot_fighter[CH_LINE_SLOTS] = {
     TF_GOHAN, TF_PICCOLO, TF_VEGETA, TF_TRUNKS, TF_GOKU, TF_P_HERCULE, TF_KRILLIN, TF_P_A16, TF_SSJ2_GOHAN,
 };
 
@@ -140,7 +142,7 @@ typedef struct ChState {
     u32 magic;
     u8 state;              // R_*
     u8 timer;              // frames in R_FALL / R_CLEAR
-    u8 target;             // the open area's records standing (CH_TARGET; test command 48 op 2)
+    u8 target;             // the open area's records standing with two players (CH_TARGET; test command 48 op 2)
     u8 frozen;             // tests: the open area's tick does nothing
     Entity *boss[2];       // the room's fighters
     const u32 *action;     // the open area's drop (the spot records'): the refill's records use it
@@ -290,7 +292,7 @@ static void open_tick(void) {
     }
     if ((u8)n < ch.standing && !far) ch.wait = CH_REFILL_WAIT;   // a kill: a breath before the next one comes
     ch.standing = (u8)n;
-    int bodies = ch.target * ((p2_coming() && !coop_solo()) ? 2 : 1);
+    int bodies = (p2_coming() && !coop_solo()) ? ch.target * 2 : ch.target + CH_TARGET_ONE - CH_TARGET;
     if (n < bodies && ch.wait <= 0 && largest >= CH_MIN_FREE) {
         spawn_near(p1, cx, cy);
         ch.standing = (u8)(n + 1);                  // a twin's count comes with the next check
@@ -352,6 +354,12 @@ static Entity *swap_in(const ChBoss *b, const ChRoom *r, int i) {
 static void fight_begin(const ChRoom *r) {
     tny_rumble_mode(0);
     const ChBoss *lead = lead_of(r), *part = partner_of(r);
+    // who stands decides, not the pad now: player 2 may have dropped out (or in) since the load stood the actors
+    if (r->pair[1].fighter != NONE) {
+        int stands = actor_of(tny_fighters[r->pair[1].fighter].sprite) != 0;
+        part = stands ? &r->pair[1] : 0;
+        lead = stands ? &r->pair[0] : &r->alone;
+    }
     ch.boss[0] = swap_in(lead, r, 0);
     ch.boss[1] = part ? swap_in(part, r, 1) : 0;
     int nbar = 0;
@@ -492,11 +500,11 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
         const char *lines[4];
         u8 faces[4];
         int n = 0;
-        const char *open = slot < PARTY_SLOTS && r->open_by[slot] ? r->open_by[slot] : r->open;
+        const char *open = slot < CH_LINE_SLOTS && r->open_by[slot] ? r->open_by[slot] : r->open;
         faces[n] = tny_fighters[lead->fighter].portrait; lines[n++] = open;
         if (part && r->partner_line) { faces[n] = tny_fighters[part->fighter].portrait; lines[n++] = r->partner_line; }
-        if (slot < PARTY_SLOTS && replies[slot]) { faces[n] = tny_fighters[slot_fighter[slot]].portrait; lines[n++] = replies[slot]; }
-        if (coop.p2 && coop.p2_slot < PARTY_SLOTS && two_players() && replies[coop.p2_slot]) {
+        if (slot < CH_LINE_SLOTS && replies[slot]) { faces[n] = tny_fighters[slot_fighter[slot]].portrait; lines[n++] = replies[slot]; }
+        if (coop.p2 && coop.p2_slot < CH_LINE_SLOTS && two_players() && replies[coop.p2_slot]) {
             faces[n] = tny_fighters[slot_fighter[coop.p2_slot]].portrait;
             lines[n++] = replies[coop.p2_slot];
         }
