@@ -846,6 +846,10 @@ lever through the lab (Krillin + Vegeta, five lights out: the beams fall). Each:
 lineup, the plaque clicking twice, the intro, the seal holding, the HP by lights, the fall, the bodies gone, the cut-away with
 this room's light, the flag, the door, the gift, the way back below the entrance, a return to an empty room.
 
+**Full regression** (`regfull.sh build/t`, `PLAY=` a private play ROM, 2026-11-05, the branch's final build): 92 blocks, no FAIL,
+TIMEOUT or CRASH (`chamber_gate` 94, `chamber_tiers` 36, `chamber_room` 166, `chamber_rooms` 356, `gohan_ssj1` 21 checks). On a
+`BUU=0` build: `chamber_rooms_plain` 343 and `chamber_room` 166 checks, clean.
+
 **Not verified.** Real-time feel and balance: headless numbers only, no fight played by hand (Broly and King Cold, 64 x 64,
 in the two smaller rooms; Frieza's ship is a ring round the crystal, its corridors 56 px wide; the Henchmen's ranged fire on the
 deck). In the headless runs the crew stood a while before closing in (the stock wander, then the chase near a player).
