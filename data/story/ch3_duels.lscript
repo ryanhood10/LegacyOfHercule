@@ -123,7 +123,9 @@ end
 
 ; zone 6 area 22: Vegeta lands; Hercule was told by Piccolo to wait for him (the duel's loser plays him)
 sequence ch3_landing
-  stock @083d196c                        ; sound
+  script                                 ; stock's sound; player 2's entity (whoever the duel left him) waits out the scene, he comes back as Hercule
+        PlayAudio 50
+        CoopCall 31, 3, 0, 0
   stock @083d1974                        ; Vegeta: those Androids must be here by now
   script
         SpawnCharacterEntity 72, 344, 352
@@ -138,7 +140,43 @@ sequence ch3_landing
   text 1 "#VEGETA: A gun.  You brought a gun.  To fight androids."
   text 67 "HERCULE: ...It's a really good gun."
   text 1 "#VEGETA: Hmph.  Stay out of my way."
-  script
+  script                                 ; two players: Hercule goes to where player 2's entity appears (12 px left of player 1); alone he walks off
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse H1
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 12
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 24
+        Add
+        Step WalkToPosition
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 12
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        Jump H2
+      H1:
+        WalkToPosition 72, 344, 352
+      H2:
         DespawnEntity 72
         SetCharacterFlag_Bit1 5
         CoopCall 6, 5, 0, 0                ; player 2's entity (kept across the warp) plays Hercule now

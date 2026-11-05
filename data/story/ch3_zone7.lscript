@@ -19,9 +19,15 @@ sequence ch3_z7_cutaway
         WaitFrames 60
         PlayAudio 50
   stockseq @083d37bc 1 14                ; 20: "We will fight here", the tracking device, Super Saiyan, 19, 20
+  script                                 ; 13 strolls up to have his say
+        WalkToPosition 165, 508, 384
+        SetEntityFacing 165, 2
   text 169 "ANDROID 13: Outta date already, huh?\x0bDon't sweat it, 20.  Whatever he turns into, he's still on Dr. Gero's list."
   stockseq @083d37bc 15 16               ; 20: "19 will demonstrate this by himself!"
   text 169 "ANDROID 13: Suit yourself.  I'll be watchin', 19.\x0bHoller if you need a hand."
+  script                                 ; and steps back
+        WalkToPosition 165, 528, 384
+        SetEntityFacing 165, 2
   stockseq @083d37bc 17 19               ; Goku: "I wouldn't bank on it", flag 76, back to area 1
 end
 
@@ -39,10 +45,70 @@ sequence ch3_z7_battle
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
   stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
-  text 169 "ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
+  text 169 "!ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
+  script                                 ; 13 walks up beside 19, to the spot his boss twin takes (TWIN_OFFSET right of 19), so the swap does not show
+        WalkToPosition 165, 504, 408
+        SetEntityFacing 165, 2
   stockseq @083d40c8 39 40               ; 20 flies up to watch; Vegeta: "does a machine experience fear?"
-  text 1 "#VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
+  script                                 ; alone Vegeta's "clown" runs up behind him (player 2 plays him otherwise)
+        CoopCall 22, 1, 5, 0
+        JumpIfFalse H1
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 96
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 12
+        Add
+        Step SpawnCharacterEntity
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 30
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 12
+        Add
+        Step WalkToPosition
+        SetEntityFacing 72, 3
+      H1:
+  text 1 "!VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
   script                                 ; stock entry 41, plus 13's actor leaving for his boss twin
+        CoopCall 22, 2, 72, 0            ; Hercule's actor takes the advice from further away
+        JumpIfFalse H1
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 96
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 12
+        Add
+        Step WalkToPosition
+        DespawnEntity 72
+      H1:
         SetPlayerVisible 1
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 12, 2
@@ -54,6 +120,25 @@ end
 ; 13 (still on the map, by his own sprite) gets up and flies off
 sequence ch3_z7_defeat
   stock @083d4174                        ; 19 explodes, EXP, the music
+  script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two
+        SetEntityAnimation 165, 0
+        WaitFrames 30
+        PushByte 165
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 56
+        Add
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step FlyToPosition
+        SetEntityFacing 165, 2
+        SetEntityFacing 0, 3
   text 169 "ANDROID 13: Tch...  19's nothin' but scrap metal now.\x0bYou got lucky, Saiyan.  Real lucky."
   text 1 "#VEGETA: Another tin can?  Stay down and I'll make it quick."
   text 169 "ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
