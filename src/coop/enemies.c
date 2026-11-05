@@ -61,9 +61,10 @@ static int corn_maze_map(void) {
 }
 static int corn_maze_single(const EnemyRecord *rec) { return rec->sprite_id == TRICERATOPS_SPRITE && corn_maze_map(); }
 // The Eggbots, which explode as they die: no twin with two players (Ryan, 2026-11-04). Each still has the co-op HP.
-#define EGGBOT_SPRITE_A 46
-#define EGGBOT_SPRITE_B 47
-static int no_twin(const EnemyRecord *rec) { return rec->sprite_id == EGGBOT_SPRITE_A || rec->sprite_id == EGGBOT_SPRITE_B; }
+// One robot in four records: 44 (zone 8, most of them), 45 (zone 10), 46 (zone 4), 47 (zone 2).
+#define EGGBOT_SPRITE_FIRST 44
+#define EGGBOT_SPRITE_LAST 47
+static int no_twin(const EnemyRecord *rec) { return rec->sprite_id >= EGGBOT_SPRITE_FIRST && rec->sprite_id <= EGGBOT_SPRITE_LAST; }
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.
