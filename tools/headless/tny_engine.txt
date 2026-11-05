@@ -281,7 +281,7 @@ poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10
 stepz 0x0203ECFD 80
-echo == 10. co-op Royal Rumble Rookie: two rounds, King Cold's round, Yakon
+echo == 10. co-op Royal Rumble Rookie, 8 fighters: a round, King Cold's round, Yakon
 poke32 0x0203FD0C 3
 poke32 0x0203FD08 21
 frames 10
@@ -291,10 +291,6 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 80
 shot e10_rumble
-poke32 0x0203FD0C 0
-poke32 0x0203FD08 22
-frames 10
-stepz 0x0203ECFC 80
 poke32 0x0203FD0C 0
 poke32 0x0203FD08 22
 frames 10

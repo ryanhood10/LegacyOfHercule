@@ -47,8 +47,7 @@ for ti, (name, flags, tops, never) in enumerate(TIERS):
             out("key 0x80 6", "frames 20")
         p1(1)
         p1(1)                # 1 v 1
-        if ti:
-            p1(1)            # Quick (the pool has 15)
+        p1(1)                # 8 fighters
         p1(1)
         p2(1)
         if ti:
@@ -74,6 +73,7 @@ for name, ti, flags in (("Legend", 4, TIERS[4][1]),):
         p1(1)
         out("key 0x80 6", "frames 20")
         p1(1)
+        p1(1)                # 8 fighters
         p1(1)
         p2(1)
         out("frames 100", r"echo EXPECT \w+:(?=.*\b23\b)(?=.*\b1c\b)(?=.*\b1b\b)", f"peek8 {ENG_BR + SEATS:#x} 8", "frames 300", "stepz 0x0203ECFC 200", "frames 60", "map")

@@ -42,6 +42,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 stepz 0x0203ECFD 300
 frames 60
 stepz 0x0203ECFD 20
@@ -94,6 +96,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -164,6 +168,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -224,6 +230,8 @@ frames 80
 key 0x1 6
 frames 80
 key 0x80 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -291,6 +299,8 @@ frames 80
 key 0x1 6
 frames 80
 key 0x80 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -364,6 +374,8 @@ frames 80
 key 0x1 6
 frames 80
 key 0x80 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80

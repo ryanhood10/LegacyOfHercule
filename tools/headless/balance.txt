@@ -79,6 +79,8 @@ key 1 6
 frames 80
 key 1 6
 frames 80
+key 1 6
+frames 80
 p2 1
 frames 4
 p2 0
@@ -113,6 +115,8 @@ key 1 10
 frames 60
 key 1 6
 frames 60
+key 1 6
+frames 80
 key 1 6
 frames 80
 key 1 6

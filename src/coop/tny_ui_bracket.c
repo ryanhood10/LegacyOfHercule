@@ -68,7 +68,9 @@ static int same_bytes(const u8 *a, const u8 *b, int n) {
 }
 
 // A 2 v 2's bracket: teams of two seats (the engine's unit), the first seat speaks for the team
-static int is_team(const TBracket *b) { return b->division == DIV_2V2 && b->size == 8; }
+static int is_team(const TBracket *b) { return b->division == DIV_2V2; }
+// 8 teams: one page, laid out as 8 fighters by the teams' first seats, the partner's name under the lead's
+static int team16(const TBracket *b) { return b->division == DIV_2V2 && b->size == 16; }
 static int lead_of(const Br *br, int s) { return is_team(&br->b) ? s & ~1 : s; }
 static int matches(const TBracket *b, int r) { return (is_team(b) ? b->size / 2 : b->size) >> (r + 1); }
 static int match_of(const Br *br, int s, int r) { return (is_team(&br->b) ? s >> 1 : s) >> (r + 1); }
@@ -92,20 +94,21 @@ static int is_out(const Br *br, int s) {
     u8 w = br->shown[l][match_of(br, lead, l)];
     return w != 0xFF && w != lead;
 }
-static int full(const Br *br) { return br->b.size == 16; }
+static int full(const Br *br) { return br->b.size == 16 && !team16(&br->b); }
 static int page_of_match(const Br *br, int r, int m) {
     if (!full(br)) return 0;
     if (r >= 3) return 2;
     return m >> (2 - r);
 }
 static int seat_on_page(const Br *br, int s) {
+    if (team16(&br->b)) return !(s & 1);
     if (!full(br) || br->page < 2) return !full(br) || (s >> 3) == br->page;
     return level_of(br, s) >= 3;     // the final page: the two half champions
 }
 
 // Centre of seat s drawn at level l on the page drawn.
 static void seat_pos(const Br *br, int s, int l, int *x, int *y) {
-    if (is_team(&br->b) && l > 0) {                  // a team: the partners one above the other, then side by side
+    if (br->b.size == 8 && is_team(&br->b) && l > 0) {   // a team: the partners one above the other, then side by side
         int side = s >> 2, second = s & 1;
         if (l == 1) { *x = side ? 156 : 84; *y = ROW_Y0 + ROW_DY + ROW_DY / 2 + (second ? 14 : -14); }
         else { *x = second ? 134 : 106; *y = CHAMP_Y; }
@@ -117,7 +120,7 @@ static void seat_pos(const Br *br, int s, int l, int *x, int *y) {
         *y = 84;
         return;
     }
-    int local = s & 7;
+    int local = team16(&br->b) ? (s >> 1) & 7 : s & 7;
     if (l == 0) {
         int side = local >> 2, row = local & 3;
         *x = side ? 226 : 14;
@@ -169,7 +172,7 @@ static void draw_match(Br *br, int r, int m) {
         seat_pos(br, s, r + 1, &x1, &y1);
         u8 w = br->shown[r][m];
         int c = next ? C_GOLD : w == 0xFF ? C_DARK : w == s ? C_LINE : C_DARK;
-        if (is_team(&br->b) && r == 0) {     // the two seats join, then the team's line runs in
+        if (br->b.size == 8 && is_team(&br->b) && r == 0) {     // the two seats join, then the team's line runs in
             int xb, yb, xj = (s >> 2) ? 166 : 74;
             seat_pos(br, s + 1, 0, &xb, &yb);
             int ax = x0 < xj ? x0 : xj, w0 = x0 < xj ? xj - x0 : x0 - xj;
@@ -204,8 +207,10 @@ static void draw_name(Ui *u, Br *br, int s, int colour) {
         return;
     }
     seat_pos(br, s, 0, &x, &y);
-    int right = (s & 7) >= 4;
+    int right = (team16(&br->b) ? (s >> 1) & 7 : s & 7) >= 4;
     ui_text(u, right ? x - 13 : x + 13, y - 12, right ? 2 : 0, colour, ui_short_name(name, NAME_W, sb, sizeof sb));
+    if (team16(&br->b) && br->b.seat[s + 1] != 0xFF)
+        ui_text(u, right ? x - 13 : x + 13, y - 3, right ? 2 : 0, colour, ui_short_name(tny_fighters[br->b.seat[s + 1]].name, NAME_W, sb, sizeof sb));
 }
 
 static void draw_names(Ui *u, Br *br) {
@@ -594,11 +599,24 @@ void tny_ui_bracket(int phase) {
 // ---- the Rumble board ----------------------------------------------------------------------------------------------
 typedef struct Board {
     u8 ids[8], down[8];
-    u8 n, shown_down, t;
+    u8 n, shown_down, t, shown;
+    u8 teams;                // two players: their team on top, the pairs below
+    u8 round, rounds;
     Entity *face[8];
 } Board;
 
+// The next round's screen (Ryan, 2026-11-04: a Rumble had no real screen between rounds): which round, and with two players the three teams,
+// yours on top, the two others below, every fighter arriving in turn.
+#define BOARD_ARRIVE 14
 static void board_pos(const Board *bd, int i, int *x, int *y) {
+    if (bd->teams) {
+        // bd's first two places are the players', then the pairs
+        if (i < 2) { *x = i ? 150 : 90; *y = 42; return; }
+        int k = i - 2;
+        *x = (k < 2 ? 30 : 150) + (k & 1) * 60;
+        *y = 106;
+        return;
+    }
     int cols = bd->n <= 4 ? bd->n : (bd->n + 1) / 2;
     int row = i / cols, col = i % cols;
     int rows = (bd->n + cols - 1) / cols;
@@ -612,28 +630,45 @@ static void board_open(Ui *u) {
     u->shrink = 1;
     bm_fill(0, 0, 240, 16, C_PANEL);
     bm_hline(0, 16, 240, C_BORDER);
-    ui_text(u, 120, 2, 1, C_GOLD, "Royal Rumble");
-    char sb[24];
-    for (int i = 0; i < bd->n; i++) {
-        int x, y;
-        board_pos(bd, i, &x, &y);
-        bm_fill(x - 24, y - 20, 48, 52, C_CELL);
-        bm_frame(x - 24, y - 20, 48, 52, C_PANEL2);
-        bd->face[i] = ui_face(tny_fighters[bd->ids[i]].sprite, x, y - 2);
-        ui_face_look(bd->face[i], 0, 0);
-        ui_text(u, x, y + 18, 1, C_WHITE, ui_short_name(tny_fighters[bd->ids[i]].name, 50, sb, sizeof sb));
+    char head[32] = "Royal Rumble";
+    if (bd->rounds) {
+        char *o = head + 12;
+        const char *t = bd->round + 1 >= bd->rounds ? ":  the final round" : ":  round ";
+        while (*t) *o++ = *t++;
+        if (bd->round + 1 < bd->rounds) *o++ = (char)('1' + bd->round);
+        *o = 0;
     }
-    int left = 0;
-    for (int i = 0; i < bd->n; i++) left += !bd->down[i];
-    char line[24] = "Standing: ";
-    line[10] = (char)('0' + left);
-    line[11] = 0;
-    ui_text(u, 120, 140, 1, C_LINE, line);
+    ui_text(u, 120, 2, 1, C_GOLD, head);
+    if (bd->teams) {
+        ui_text(u, 120, 76, 1, C_WHITE, "VS");
+        ui_text(u, 120, 112, 1, C_WHITE, "VS");
+    }
+    bd->shown = 0;
+    bd->t = BOARD_ARRIVE;
+}
+
+// the next fighter's cell, his face and his name
+static void board_arrive(Ui *u, Board *bd, int i) {
+    char sb[24];
+    int x, y;
+    board_pos(bd, i, &x, &y);
+    bm_fill(x - 24, y - 20, 48, 52, C_CELL);
+    bm_frame(x - 24, y - 20, 48, 52, C_PANEL2);
+    bd->face[i] = ui_face(tny_fighters[bd->ids[i]].sprite, x, y - 2);
+    ui_face_look(bd->face[i], 0, 0);
+    ui_text(u, x, y + 18, 1, C_WHITE, ui_short_name(tny_fighters[bd->ids[i]].name, 50, sb, sizeof sb));
 }
 
 static void board_step(Ui *u) {
     Board *bd = u->ctx;
     bd->t++;
+    if (bd->shown < bd->n) {                       // they arrive in turn; A shows the rest at once
+        if (bd->t < BOARD_ARRIVE && !(u->keys & (KEY_A | KEY_B | KEY_START))) return;
+        bd->t = 0;
+        do board_arrive(u, bd, bd->shown++); while ((u->keys & (KEY_A | KEY_B | KEY_START)) && bd->shown < bd->n);
+        ui_sfx(UI_SFX_MOVE);
+        return;
+    }
     if (bd->shown_down < bd->n && bd->t >= 24) {   // the fallen grey one after another
         bd->t = 0;
         int i = bd->shown_down++;
@@ -657,6 +692,14 @@ void tny_ui_rumble_board(const u8 *ids, const u8 *down, int n) {
     if (!ids || n <= 0) return;
     Board bd;
     memset(&bd, 0, sizeof bd);
+    int round, rounds;
+    const u8 *picks = tny_rumble_info(&round, &rounds);
+    bd.round = (u8)round;
+    bd.rounds = (u8)rounds;
+    if (picks && n <= 4 && !down[0]) {              // two players: their team first
+        bd.teams = 1;
+        for (int i = 0; i < 2; i++) bd.ids[bd.n++] = picks[i];
+    }
     for (int i = 0; i < n && bd.n < 8; i++) {
         if (ids[i] >= TF_COUNT) continue;
         bd.ids[bd.n] = ids[i];

@@ -110,6 +110,14 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 - **Pop-up wording:** "New tournament fighter!" / "New tournament tier: Champion!" / "New division: Full
   bracket!", one line each, the journal pop-up's style.
 
+## 2b. Sizes, and the Rumble in co-op (Ryan, 2026-11-04)
+
+After the division the director asks **"How many fighters?"**, in every division, one and two players: 8 or 16. 16 is shown locked until the tier's pool has 15 opponents (`FULL_POOL`): never Rookie, whose pool is 13; Adept after the road; the tiers above always. Our call on Ryan's question about 32 for a 2 v 2: **no 32.** No tier's pool has 30 opponents (the largest about 24), and a bracket holds 16 seats. A 2 v 2 is 4 teams (8 fighters, 2 rounds) or 8 teams (16 fighters, 3 rounds, one page by the teams' first seats, `tny_ui_bracket.c` `team16`).
+
+**The Royal Rumble with two players is 2 v 2 v 2 every round:** four opponents in two pairs (`tny_moves_team`), who go for each other too; the headliner's round is his pair against another. 8 fighters: a round and the headliner's; 16: three rounds and the headliner's. One player: the rounds of section 1, 16 fighters two more. A summon does nothing in a Rumble (two more bodies). The screen between rounds names the round and, with two players, shows the three teams, the fighters arriving in turn (`tny_ui_rumble_board`).
+
+**Frame time** (`tny_blasts`-style, both players firing, late frames): summons off, the overhead bars and the combo strip redrawn every 8th frame (they were 15 % and 9 % of a Rumble's frame). Champion and Legend still run late on 3-28 % of frames with several 64 x 64 bodies firing: their frame unpacks are 40 % of the frame. Tried: a port of the stock draw (0x08007772) spreading the unpacks over frames: Legend from 40 late frames to 36, and it crashed Gero's bunker (`ch9_gero.txt`, frame 10579, an entity's memory): taken out.
+
 ## 3. Tiers and their story triggers
 
 | tier | opens when | flag |

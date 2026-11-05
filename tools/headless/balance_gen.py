@@ -34,7 +34,7 @@ cmd(23, 0)
 cmd(21, 42)
 cmd(5, 15 | 15 << 8, 168 | 306 << 16)
 out("frames 190", "key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80",
-    "key 1 6", "frames 80", "key 1 6", "frames 80", "key 1 6", "frames 80", "p2 1", "frames 4", "p2 0", "frames 80",
+    "key 1 6", "frames 80", "key 1 6", "frames 80", "key 1 6", "frames 80", "key 1 6", "frames 80", "p2 1", "frames 4", "p2 0", "frames 80",
     "frames 400", "stepz 0x0203ECFC 200", "frames 60", "map", "deref O 0x03001130", r"echo EXPECT \w+: 00000(2[4-9a-f][0-9a-f]|3[0-9a-f][0-9a-f]|4[0-6][0-9a-f])$", "peek O+0x188 1")
 # every fighter his own strength, the tier only who is drawn; below a tier's floor he comes halfway up to it: (name, tier, flags, id, expected HP in hex)
 for name, ti, flags, opp, hp in (("Chi-Chi in Rookie", 0, [], 10, "026c"), ("Yamcha in Z-Fighter", 2, [85, 127, 136], 0, "04d3"),
@@ -48,9 +48,7 @@ for name, ti, flags, opp, hp in (("Chi-Chi in Rookie", 0, [], 10, "026c"), ("Yam
     out("frames 190", "key 0x80 6", "key 1 10", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 80")
     for _ in range(ti):
         out("key 0x80 6", "frames 20")
-    out("key 1 6", "frames 80", "key 1 6", "frames 80")
-    if ti:
-        out("key 1 6", "frames 80")
+    out("key 1 6", "frames 80", "key 1 6", "frames 80", "key 1 6", "frames 80")
     out("key 1 6", "frames 80", "p2 1", "frames 4", "p2 0", "frames 80")
     if ti:
         out("p2 1", "frames 4", "p2 0", "frames 80")

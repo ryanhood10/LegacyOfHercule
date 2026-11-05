@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## Tournament sizes (headless, 2026-11-04)
+
+`tools/headless/tny_sizes.txt` (from `tny_sizes_gen.py`; self-checking, in `regfull.sh`): the size menu by pad presses, Rookie's 16 locked, the seats and rounds of each size, real 2 v 2 v 2 Rumble fights on three tiers for a crash.
+
 ## Tournament EXP (headless, 2026-11-03)
 
 `tools/headless/tny_xp.txt` (from `tny_xp_gen.py`; self-checking, in `regfull.sh`): a Rookie won with test command 40 in six pick combinations, one and two players, the game's characters and tournament-only fighters: who gets what, paid in the waiting room, player 1 intact.

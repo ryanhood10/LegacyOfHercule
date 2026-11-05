@@ -39,6 +39,8 @@ frames 80
 shot st00_next
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -95,6 +97,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st01_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1
@@ -155,6 +159,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st02_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1
@@ -286,6 +292,8 @@ frames 80
 shot st11_next
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -348,6 +356,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st12_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1
@@ -483,6 +493,8 @@ frames 80
 shot st21_next
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -547,6 +559,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st22_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1
@@ -686,6 +700,8 @@ frames 80
 shot st31_next
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -752,6 +768,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st32_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1
@@ -895,6 +913,8 @@ frames 80
 shot st41_next
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -963,6 +983,8 @@ frames 20
 key 0x1 6
 frames 80
 shot st42_next
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 p2 0x1

@@ -43,6 +43,7 @@ def run(name, two, double, pick1, pick2, sixteenths1, sixteenths5):
     if double:
         p1(0x80)
     p1(1)                # the division
+    p1(1)                # 8 fighters
     if pick1:
         p1(0x100)
     p1(1)

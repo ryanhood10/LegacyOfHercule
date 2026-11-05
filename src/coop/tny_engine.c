@@ -432,6 +432,7 @@ static const u8 tier_tops[TIER_COUNT][3] = {
     { TF_BROLY, TF_PERFECT_CELL, TF_COOLER },
     { TF_SUPER_BUU, TF_SUPER13, TF_SUPER_PERFECT_CELL },
 };
+#define FULL_POOL 15             // 16 fighters: the players are one or two of them
 // The pool of a tier, but the players' picks
 static int pool_of(int tier, u8 *out) {
     int n = 0;
@@ -851,6 +852,7 @@ static int spawn_waiting(int budget, int alone) {
         if (y < TNY_RING_Y0 + 8) y = TNY_RING_Y0 + 8;
         if (y > TNY_RING_Y1 - 8) y = TNY_RING_Y1 - 8;
         Entity *e = spawn_opp(eng.opp_id[i], x, y);
+        if (e && eng.kind == K_RUMBLE && eng.players == 2) tny_moves_team(e, i / 2);   // pairs: a 2 v 2 v 2
         eng.opp[i] = e;
         eng.opp_in[i] = e ? 1 : 2;                  // no body (heap): counts as down
         if (e) { load += w; spawned++; eng.nwait--; }
@@ -1517,8 +1519,8 @@ static void keep_tops(u8 *pool, int n, int seats) {
 static void draw_bracket(void) {
     TBracket *b = &eng.br;
     memset(b, NO, sizeof *b);
-    b->size = (u8)(eng.division == DIV_2V2 ? 8 : eng.full ? 16 : 8);
-    b->rounds = (u8)(eng.division == DIV_2V2 ? 2 : eng.full ? 4 : 3);
+    b->size = (u8)(eng.full ? 16 : 8);              // fighters: a 2 v 2 is 4 or 8 teams
+    b->rounds = (u8)((eng.full ? 4 : 3) - (eng.division == DIV_2V2 ? 1 : 0));
     b->round = 0;
     b->match = 0;
     b->tier = eng.tier;
@@ -1574,6 +1576,17 @@ static void draw_bracket(void) {
 // helpers. Giants: the Z-Fighter's last round has one, the Legend's rounds from the second on may.
 static const u8 rumble_counts[TIER_COUNT][4] = { { 3, 3 }, { 3, 4, 4 }, { 4, 4, 4 }, { 4, 4, 4, 4 }, { 4, 4, 4, 4 } };
 static const u8 rumble_rounds[TIER_COUNT] = { 2, 3, 3, 4, 4 };
+// With two players every round is 2 v 2 v 2 (Ryan, 2026-11-04: a round of 2 v 1 was no contest): four opponents, two teams of two, who go for each other too.
+// 8 fighters are a round and the headliner's, 16 three rounds and the headliner's. One player: the table above, 16 fighters two rounds more.
+#define RUMBLE_TEAMS_PACK 4
+#define RUMBLE_FULL_EXTRA 2
+static int rumble_regular(void) { return eng.rb_rounds - 1; }
+// The round's screen (tny_ui_bracket.c): this round and how many; with two players their picks, else 0
+const u8 *tny_rumble_info(int *round, int *rounds) {
+    *round = eng.rb_round;
+    *rounds = eng.rb_rounds;
+    return eng.players == 2 ? eng.pick : 0;
+}
 static const u8 headliners[TIER_COUNT][2] = {
     { TF_KING_COLD, NO }, { TF_A17, TF_A18 }, { TF_A16, NO }, { TF_BROLY, NO }, { TF_SUPER_BUU, NO } };
 
@@ -1622,10 +1635,10 @@ static int draw_pack(u8 *out, int slots, int giant) {
 static void rumble_round(void) {
     u8 ids[MAX_OPP];
     int n;
-    int regular = rumble_rounds[eng.tier];
+    int regular = rumble_regular();
     if (eng.rb_round < regular) {
-        int slots = rumble_counts[eng.tier][eng.rb_round] - eng.players;
-        if (slots < 1) slots = 1;
+        int slots = eng.players == 2 ? RUMBLE_TEAMS_PACK : rumble_counts[eng.tier][eng.rb_round < 3 ? eng.rb_round : 3] - 1;
+        if (slots < 1) slots = rumble_counts[eng.tier][0] - 1;
         int giant = -1;
         if (eng.tier == TIER_ZFIGHTER && eng.rb_round == regular - 1) giant = 1;
         if (eng.tier == TIER_LEGEND && eng.rb_round >= 1) giant = 1;
@@ -1655,7 +1668,7 @@ static void rumble_round(void) {
                     help[h++] = pool[i]; use(pool[i]);
                 }
         }
-        h += draw_pack(help + h, 3 - n - h, -1);
+        h += draw_pack(help + h, (eng.players == 2 ? RUMBLE_TEAMS_PACK : 3) - n - h, -1);
         // the headliner enters last: helpers first in the list (spawn order)
         u8 all[MAX_OPP];
         int a = 0;
@@ -1783,7 +1796,7 @@ static void begin_tournament(void) {
     else eng.rng ^= g_FrameCounter * 2654435761u;
     eng.br.size = 0;
     if (eng.division == DIV_RUMBLE) {
-        eng.rb_rounds = (u8)(rumble_rounds[eng.tier] + 1);
+        eng.rb_rounds = (u8)(eng.players == 2 ? (eng.full ? 4 : 2) : rumble_rounds[eng.tier] + (eng.full ? RUMBLE_FULL_EXTRA : 0) + 1);
         memset(&eng.br, NO, sizeof eng.br);
         eng.br.size = 0;
         eng.br.tier = eng.tier;
@@ -1805,7 +1818,7 @@ static int director_menus(int players) {
     if (locked == (1u << TIER_COUNT) - 1) return 0;
     static const char *const div2[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
     static const char *const div1[2] = { "1 v 1", "Royal Rumble" };
-    static const char *const size[2] = { "Quick (8 fighters)", "Full (16 fighters)" };
+    static const char *const size[2] = { "8 fighters", "16 fighters" };
     while (stage != DS_DONE) {
         u8 p = NO;
         switch (stage) {
@@ -1823,13 +1836,12 @@ static int director_menus(int players) {
             eng.full = 0;
             stage = DS_SIZE;
             break;
-        case DS_SIZE:
-            sized = eng.division == DIV_1V1 && eng.tier != TIER_ROOKIE && pool_of(eng.tier, 0) >= 15;
-            if (sized) {
-                c = tny_ui_choose("Which bracket?", size, 2);
-                if (c < 0) { stage = DS_DIV; break; }
-                eng.full = (u8)c;
-            }
+        case DS_SIZE:                                // every division (Ryan, 2026-11-04); 16 waits for a pool that fills it
+            c = tny_ui_choose_locked("How many fighters?", size, 2, pool_of(eng.tier, 0) >= FULL_POOL ? 0 : 2,
+                                     "16 opens as more fighters join", "Not enough fighters yet: come back later!");
+            if (c < 0) { stage = DS_DIV; break; }
+            eng.full = (u8)c;
+            sized = 1;
             stage = DS_P1;
             break;
         case DS_P1:

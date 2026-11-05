@@ -397,16 +397,19 @@ static void bars_draw(u32 **oam) {
         && (M.pstate == PS_READY || (M.pstate == PS_FILL && M.pfill > 0));
     M.drawn = (u8)show;
     if (!show) { bars_free(); return; }
+    int fresh = !M.tile;
     if (!M.tile) {
         u16 t = ObjVram_Alloc(g_ObjVramList, 192);
         if (!t || t == 0xFFFF) return;
         M.tile = t;
     }
-    u8 buf[192];
-    u8 colour = M.pstate == PS_READY ? (((g_FrameCounter >> 3) & 1) ? C_WHITE : C_YEL) : C_CYAN;
-    bar(buf, M.pfill, colour);
-    u8 *vram = (u8 *)(OBJ_VRAM + M.tile * 0x20);
-    for (int j = 0; j < 192; j += 4) *(u32 *)(vram + j) = *(u32 *)(buf + j);
+    if (fresh || !(g_FrameCounter & 7)) {       // the strip every 8th frame, as its colour turns: every frame it was 9 % of a Rumble's frame
+        u8 buf[192];
+        u8 colour = M.pstate == PS_READY ? (((g_FrameCounter >> 3) & 1) ? C_WHITE : C_YEL) : C_CYAN;
+        bar(buf, M.pfill, colour);
+        u8 *vram = (u8 *)(OBJ_VRAM + M.tile * 0x20);
+        for (int j = 0; j < 192; j += 4) *(u32 *)(vram + j) = *(u32 *)(buf + j);
+    }
     int y = coop.hud2.y + 17;                   // just under the panels (the HUD's y, as hud.c sets it)
     for (int k = 0; k < 2; k++) {
         int x = k ? wide_w() - 96 + 12 : 12;    // under the HP bar of player 1's panel / player 2's

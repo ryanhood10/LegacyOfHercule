@@ -68,6 +68,8 @@ WEAK void tny_moves_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (vo
 WEAK void tny_moves_frame(void) {}
 WEAK void tny_moves_attach(Entity *e, int fighter_id) { (void)e; (void)fighter_id; }
 WEAK void tny_rumble_mode(int on) { (void)on; }
+WEAK void tny_moves_team(Entity *e, int team) { (void)e; (void)team; }
+WEAK const u8 *tny_rumble_info(int *round, int *rounds) { *round = 0; *rounds = 0; return 0; }
 WEAK void tny_moves_final_form(Entity *e) { (void)e; }
 
 WEAK int  tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push) { (void)fn; (void)a; (void)b; (void)c; (void)push; return 0; }

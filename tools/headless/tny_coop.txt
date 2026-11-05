@@ -47,6 +47,8 @@ key 0x80 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 shot c1_p1_select
 echo EXPECT 0203ec04: 01 00 00 00 01 00 02
 peek8 0x0203EC04 7
@@ -113,11 +115,15 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 shot c2_p2_select
 key 0x2 6
 frames 80
 shot c2_back_p1
 key 0x1 6
+frames 80
+key 0x2 6
 frames 80
 key 0x2 6
 frames 80
@@ -163,6 +169,8 @@ frames 80
 key 0x1 6
 frames 80
 key 0x80 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -220,6 +228,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -272,6 +282,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -315,6 +327,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -350,6 +364,8 @@ frames 60
 key 1 6
 frames 60
 key 1 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -400,6 +416,8 @@ frames 80
 key 0x1 6
 frames 80
 key 0x80 6
+frames 80
+key 0x1 6
 frames 80
 key 0x1 6
 frames 80
@@ -505,6 +523,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -543,6 +563,8 @@ key 0x1 6
 frames 80
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6
@@ -587,6 +609,8 @@ key 0x80 6
 frames 20
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6
@@ -683,6 +707,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -725,6 +751,8 @@ key 0x80 6
 frames 20
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6
@@ -825,6 +853,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -869,6 +899,8 @@ key 0x80 6
 frames 20
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6
@@ -973,6 +1005,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -1019,6 +1053,8 @@ key 0x80 6
 frames 20
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6
@@ -1127,6 +1163,8 @@ key 0x1 6
 frames 80
 key 0x1 6
 frames 80
+key 0x1 6
+frames 80
 p2 0x1
 frames 4
 p2 0
@@ -1175,6 +1213,8 @@ key 0x80 6
 frames 20
 key 0x80 6
 frames 20
+key 0x1 6
+frames 80
 key 0x1 6
 frames 80
 key 0x1 6

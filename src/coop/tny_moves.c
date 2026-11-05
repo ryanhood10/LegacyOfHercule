@@ -1076,6 +1076,7 @@ static void heal_side(TKit *k, int pct) {
 }
 
 static void summon(TKit *k, const TMove *m) {
+    if (mv.rumble) return;                         // a Rumble's round is its fighters: two more bodies cost a third of the frames (measured, Legend, 2026-11-04)
     int who = m->b == SELF ? k->fighter : m->b;
     Entity *e = k->e;
     for (int i = 0; i < m->a; i++) {
@@ -1780,6 +1781,12 @@ void tny_moves_final_form(Entity *e) {
         k->done |= (u8)(1 << i);
         transform(k, m);
     }
+}
+
+// A Rumble's pack in teams: a pair does not go for its own (tny_engine.c); a fighter without a kit has no side to set
+void tny_moves_team(Entity *e, int team) {
+    TKit *k = kit_of(e);
+    if (k) k->team = (u8)(200 + team);
 }
 
 void tny_rumble_mode(int on) {

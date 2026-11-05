@@ -69,8 +69,8 @@ for si, (name, flags, top) in enumerate(STAGES):
             out("key 0x80 6", "frames 20")
         p1(1)               # the division
         out(f"shot st{si}{d}_next")
-        if d == 0 and top:
-            p1(1)           # Quick, when the pool has 15 (else this A lands on player 1's own pick)
+        if True:
+            p1(1)           # 8 fighters; Quick, when the pool has 15 (else this A lands on player 1's own pick)
         p1(1)
         p2(1)
         if d == 0 and top:

@@ -216,6 +216,8 @@ void tny_popup_show(const char *line);                           // the pop-up's
 void tny_moves_test(u32 cmd, u32 arg, u32 arg2);                 // test commands 26-27
 void tny_moves_frame(void);                                      // every frame: kits, transforms, statuses
 void tny_moves_attach(Entity *e, int fighter_id);                // give a spawned opponent his kit
+const u8 *tny_rumble_info(int *round, int *rounds);              // the Rumble's round; with two players their picks, else 0
+void tny_moves_team(Entity *e, int team);                        // a Rumble's pack in teams
 void tny_rumble_mode(int on);                                    // NPCs hit each other, target weights on / off
 void tny_moves_final_form(Entity *e);                            // every transform of his kit now (a final-form fight)
 // grounds
