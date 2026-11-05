@@ -1,6 +1,6 @@
-# The Hyperbolic Time Chamber as a game mode (plan, 2026-11-05, nothing built)
+# The Hyperbolic Time Chamber as a game mode (plan approved by Ryan, 2026-11-05; state of the build at section 12 when started)
 
-**Status: a plan to discuss.** No game data changed, no flag, stat, sprite, map or CoopCall taken. Ryan reads part 1
+**Status: approved, to build (section 10).** Ryan reads part 1
 first (what the player sees), part 2 for what the stock game really has, parts 3-6 for the content, part 7 for the
 technical notes, then the phases, the risks and the decisions (section 10). Facts carry their source; anything not
 checked is marked **(not verified)** and listed again in section 11. All dialogue here is Claude's draft or a
@@ -553,21 +553,19 @@ The whole is much smaller than the tournament was, because the fighters, moves, 
 
 ---
 
-## 10. Decisions for Ryan
+## 10. Decisions, settled (Ryan, 2026-11-05: "yes lets build it like that. itll take a very large time chamber area")
 
-1. **The gate:** copy the Lab's gate as it is, white pillars with six red lights and three beams, one light per room?
-2. **The six rooms:** Roshi, the pirates and Tao, the Frieza family, Piccolo, plus which two? (Mine: the Lab with 17 and 18, the
-   Saiyan ship with Broly. Others: Cooler's ship; Gero and 19.)
-3. **Order:** rooms in any order with bosses growing by lights out (mine), or a fixed order with stock level-gate numbers?
-4. **After Popo:** the lights stay out for good, or he offers to start again harder (mine)?
-5. **The ten rounds:** gone (mine), or kept as a choice on the panel?
-6. **Gohan's Super Saiyan:** at the first lever (mine), the gate, or Popo?
-7. **The enemies:** do you mean the Warlord's Henchmen by "grenadiers"? Are the tiers in section 4 what you pictured, with
-   first-tier bears and snakes strong enough for that point of the story, or do you want the truly weak ones?
-8. **Pirates:** Warlord's Henchmen as they are (mine, to start), recoloured, or Buu's pirate robot as a mini boss too?
-9. **Popo:** how hard (top of the game, or above it?), and what is the big reward?
-10. **Big area:** one map at about 16 enemies at once with a refill as you walk (mine), or several linked maps?
-11. **First build:** the panel and the trophy hall now, or after the rest has been played (mine)?
+1. **The gate:** a copy of the Lab's gate, white pillars, six red lights, three beams, one light per room.
+2. **The six rooms:** Roshi, the pirates and Tao, the Frieza family, Piccolo, the Lab with 17 and 18, the Saiyan ship with Broly.
+3. **Order:** rooms in any order, bosses growing by lights out.
+4. **After Popo:** he offers to start again, harder.
+5. **The ten rounds:** gone, their enemies become the tiers (test commands 13 / 14 and `CoopCall 14, 2` stay).
+6. **Gohan's Super Saiyan:** at the first lever thrown.
+7. **The enemies:** "grenadiers" are taken as the Warlord's Henchmen, and section 4's table stands until play says otherwise (Claude's call, Ryan had no objection; easy to change).
+8. **Pirates:** Warlord's Henchmen as they are, to start.
+9. **Popo:** about rating 500, the top of the game as section 5 starts him; the reward as section 6.3 (Claude's call, tune in play).
+10. **Big area:** one very large map with about 16 enemies at once and a refill as you walk. Ryan expects it very large; go as big as the tile and memory budgets allow.
+11. **First build:** the panel and the trophy hall after the rest has been played.
 
 ---
 
