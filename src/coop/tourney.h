@@ -226,6 +226,13 @@ int  tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push);  // CoopCall 30
 void tny_grounds_test(u32 cmd, u32 arg, u32 arg2);               // test command 30
 void tny_talk_test(u32 cmd, u32 arg, u32 arg2);                  // test command 31 (tny_talk.c)
 void tny_talk_frame(void);                                       // tny_talk.c: Start skips a talk
+int  tny_talk_call(int fn, s32 a, s32 b, s32 c, s32 *push);    // CoopCall 24: a talk's line hook (tny_talk.c, pushes the line's slot)
+// The ring's staging per line (tny_engine.c, docs/tournament.md 27): a talk's line starts; seats are side << 4 | index
+// (side 0 the opening side, 1 the players'), `who` speaks to `to`
+int  tny_stage_line(int who, int to);                         // 1: the speaker stands high in the view (his box goes to the bottom)
+// A pose group of e's body as the engine holds poses: its four facing arrays when drawable in e's facing, with *last its
+// last frame there, else 0 (tny_engine.c; the grounds' scenes hold the announcer's microphone with it)
+const u32 *tny_pose_group(const Entity *e, int group, int *last);
 void tny_grounds_frame(void);                                    // every frame (held poses on the grounds)
 // playables
 int  tny_play_row(int id);                                       // display row of a tournament playable (0 = none)

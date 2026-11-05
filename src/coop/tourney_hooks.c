@@ -40,6 +40,9 @@ WEAK int  tny_challenge_tried(int id) { (void)id; return 0; }
 WEAK void tny_notify(const char *line) { (void)line; }
 WEAK int  tny_curtain(void) { return 0; }
 WEAK int  tny_talk_hook(const TTalkSeat *seat) { (void)seat; return 0; }   // the dialogue seat: nothing shown
+WEAK int  tny_talk_call(int fn, s32 a, s32 b, s32 c, s32 *push) { (void)fn; (void)a; (void)b; (void)c; *push = 6; return 1; }   // the line hook: the end
+WEAK int  tny_stage_line(int who, int to) { (void)who; (void)to; return 0; }
+WEAK const u32 *tny_pose_group(const Entity *e, int group, int *last) { (void)e; (void)group; *last = 0; return 0; }
 
 WEAK int  tny_ui_call(int fn, s32 a, s32 b, s32 c, s32 *push) { (void)fn; (void)a; (void)b; (void)c; (void)push; return 0; }
 WEAK void tny_ui_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (void)arg2; }
@@ -84,6 +87,7 @@ WEAK void tny_play_entry(int id, CharacterEntry *out, const CharacterEntry *lead
 
 // The dispatchers the game calls (vmcall.c, enemies.c, input.c): fixed here, so pieces never touch those files.
 int tny_coop_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
+    if (fn == 24) return tny_talk_call(fn, a, b, c, push);           // a talk's line hook (tny_talk.c)
     if (fn >= 23 && fn <= 27) return tny_engine_call(fn, a, b, c, push);
     if (fn >= 28 && fn <= 29) return tny_ui_call(fn, a, b, c, push);
     if (fn == 30) return tny_grounds_call(fn, a, b, c, push);

@@ -4,6 +4,13 @@
 // specific first: meeting yourself and rival exchanges (tny_talk_pairs), in 2 v 2 the team-vs-team lines, a rival
 // across the teams, then each side's team line or the fighters' own opener / reply. Start skips the rest: the
 // sequence's later slots become stop words, so the box on screen is the last.
+//
+// The ring's staging per line (docs/tournament.md 27): every line of a fight's talk is reached through one shared ROM
+// script entry (`line_hook`, sequence slot 1) that calls CoopCall 24 (tny_talk_call): the line's speaker and whom he
+// speaks to go to the engine (tny_stage_line: the others on the floor turn to the speaker, he turns to whom he
+// addresses and strikes his pose), and the call pushes the slot of that line, so the sequence needs no more slots than
+// before (7) and no frame is added: the hook runs between two boxes. Each line's seats are kept in the spare bytes of
+// its entry's args script (after its END): a seat is side << 4 | index, side 0 the opening side, 1 the answering one.
 #include "tny_talk.h"
 
 #define SCENE_RUNNING  (*(volatile u32 *)0x03001FDC)
@@ -14,6 +21,10 @@
 
 typedef struct { u8 head[4]; const char *fmt; u8 script[4]; } TalkEnt;   // u16 next, mode, speaker; format; args script
 _Static_assert(sizeof(TalkEnt) == 12, "TalkEnt");
+#define ENT_WHO(e)     ((e)->script[1])              // the line's speaker's seat (after the args script's END)
+#define ENT_TO(e)      ((e)->script[2])              // whom he speaks to
+#define SEAT_OPP       0x00                          // seats: side << 4 | index (the talk's opening side is 0)
+#define SEAT_MINE      0x10
 
 static struct {
     u32 magic;
@@ -21,10 +32,19 @@ static struct {
     const void *seq[TALK_MAX + 3];
     TalkEnt ent[TALK_MAX];
     u8 n, live, wait;                                // live: 1 queued (no scene yet), 2 on screen
+    u8 line;                                         // the next line the hook stages (talk.n: the talk is over)
 } talk TNY_SECTION("talk");
+_Static_assert(sizeof(talk) <= 0x5C, ".tny.talk keeps its size (tourneyram is full)");
 
 // WaitFrames 12 before the first box (the walk-in's last step settles)
 static const u8 talk_wait[] __attribute__((aligned(4))) = { 1, 0, 0, 0x00, 12, 0x02, 0x45, OP_END };
+// The line hook (slot 1): CoopCall 24, 0, 0, 0 pushes the slot of the next line, which overrides the head's next (6, the
+// last slot, always the end: what a build without the call does)
+#define HOOK_SLOT      1
+#define END_SLOT       (TALK_MAX + 2)
+static const u8 line_hook[] __attribute__((aligned(4))) = {
+    END_SLOT, 0, 0, 0x00, 24, 0x00, 0, 0x00, 0, 0x00, 0, 0x02, 59, OP_END,
+};
 
 // The same voice: your party's Hercule and 16 speak as the opponents' ones; Super Saiyan 2 Gohan meets his rivals
 // as Gohan (his own lines are his)
@@ -41,28 +61,52 @@ static const char *voice(int id, int k) {
 }
 static int same(int table_id, int id, int loose) { return table_id == id || (loose && table_id == canon(id)); }
 
-static void add(int id, const char *line) {
+static void add(int seat, int id, const char *line) {
     if (!line || talk.n >= TALK_MAX) return;
     TalkEnt *e = &talk.ent[talk.n];
     e->head[2] = MODE_FORMAT;
     e->head[3] = id >= 0 && id < TF_COUNT ? tny_fighters[id].portrait : 0;
     e->fmt = line;
     e->script[0] = OP_END;
+    ENT_WHO(e) = (u8)seat;
     talk.n++;
 }
+// Whom each line is said to: the next speaker when he is someone else, else the one before, else the other side's first
+static void aim(void) {
+    for (int i = 0; i < talk.n; i++) {
+        int who = ENT_WHO(&talk.ent[i]), to = (who ^ SEAT_MINE) & 0xF0;
+        if (i + 1 < talk.n && ENT_WHO(&talk.ent[i + 1]) != who) to = ENT_WHO(&talk.ent[i + 1]);
+        else if (i > 0 && ENT_WHO(&talk.ent[i - 1]) != who) to = ENT_WHO(&talk.ent[i - 1]);
+        ENT_TO(&talk.ent[i]) = (u8)to;
+    }
+}
+// [0] the wait, [1] the line hook, [2 .. n + 1] the lines (each goes back to the hook), then the end
 static int run(void) {
     if (!talk.n) return 0;
+    aim();
     talk.seq[0] = talk_wait;
+    talk.seq[HOOK_SLOT] = line_hook;
     for (int i = 0; i < talk.n; i++) {
-        u16 next = (u16)(i + 2);                    // seq[i + 1] is entry i; seq[n + 1] the end
-        talk.ent[i].head[0] = (u8)next;
-        talk.ent[i].head[1] = (u8)(next >> 8);
-        talk.seq[i + 1] = &talk.ent[i];
+        talk.ent[i].head[0] = HOOK_SLOT;
+        talk.ent[i].head[1] = 0;
+        talk.seq[i + 2] = &talk.ent[i];
     }
-    talk.seq[talk.n + 1] = 0;
+    for (int i = talk.n + 2; i < TALK_MAX + 3; i++) talk.seq[i] = 0;
+    talk.line = 0;
     coop_run_sequence(talk.action, talk.seq);
     talk.live = 1;
     talk.wait = 0;
+    return 1;
+}
+// CoopCall 24 (the line hook): stage line `talk.line` and push its slot; past the last line (or after Start) the end
+int tny_talk_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
+    (void)fn; (void)a; (void)b; (void)c;
+    *push = END_SLOT;
+    if (talk.magic != TALK_MAGIC || talk.line >= talk.n) return 1;
+    TalkEnt *e = &talk.ent[talk.line];
+    // the box opens at the top ("!": tools/tnytalk.py), unless the speaker stands high in the view: then at the bottom
+    if (tny_stage_line(ENT_WHO(e), ENT_TO(e)) && e->fmt && e->fmt[0] == '!') e->fmt++;
+    *push = 2 + talk.line++;
     return 1;
 }
 static void start(void) {
@@ -79,8 +123,8 @@ static const TalkPair *pair_of(const TalkPair *tab, int a, int b, int *swap) {
         }
     return 0;
 }
-static void add_pair(const TalkPair *p, int a, int b, int swap) {
-    for (int k = 0; k < p->n; k++) add((p->spk[k] ^ swap) ? b : a, p->l[k]);
+static void add_pair(const TalkPair *p, int a, int b, int swap, int sa, int sb) {
+    for (int k = 0; k < p->n; k++) { int w = p->spk[k] ^ swap; add(w ? sb : sa, w ? b : a, p->l[k]); }
 }
 
 static int ok(int id) { return id >= 0 && id < TF_COUNT; }
@@ -113,37 +157,43 @@ int tny_talk_pre(const u8 *opp, int nopp, const u8 *mine, int nmine) {
         int who[4];
         const TalkTvt *t = tvt_of(x, y, who);
         if (t) {
-            for (int k = 0; k < t->n; k++) add(who[t->spk[k]], t->l[k]);
+            // who[] holds the ids in the table's order; each one's seat on the floor
+            for (int k = 0; k < t->n; k++) {
+                int id = who[t->spk[k]];
+                add(id == a0 ? SEAT_OPP : id == a1 ? SEAT_OPP + 1 : id == b0 ? SEAT_MINE : SEAT_MINE + 1, id, t->l[k]);
+            }
             return run();
         }
         const int as[2] = { a0, a1 }, bs[2] = { b0, b1 };
         for (int i = 0; i < 2; i++)                 // a rival across the ring
             for (int j = 0; j < 2; j++) {
                 const TalkPair *p = pair_of(tny_talk_pairs, as[i], bs[j], &swap);
-                if (p) { add_pair(p, as[i], bs[j], swap); return run(); }
+                if (p) { add_pair(p, as[i], bs[j], swap, SEAT_OPP + i, SEAT_MINE + j); return run(); }
             }
         const TalkPair *ta = pair_of(tny_talk_teams, a0, a1, &swap);
-        if (ta) add_pair(ta, a0, a1, swap);
-        else add(a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
+        if (ta) add_pair(ta, a0, a1, swap, SEAT_OPP, SEAT_OPP + 1);
+        else add(SEAT_OPP, a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
         const TalkPair *tb = pair_of(tny_talk_teams, b0, b1, &swap);
-        if (tb) add_pair(tb, b0, b1, swap);
-        else add(b0, voice(b0, TALK_REPLY));
+        if (tb) add_pair(tb, b0, b1, swap, SEAT_MINE, SEAT_MINE + 1);
+        else add(SEAT_MINE, b0, voice(b0, TALK_REPLY));
         return run();
     }
     const TalkPair *p = pair_of(tny_talk_pairs, a0, b0, &swap);
-    if (p) add_pair(p, a0, b0, swap);
+    if (p) add_pair(p, a0, b0, swap, SEAT_OPP, SEAT_MINE);
     else {
-        add(a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
-        add(b0, voice(b0, TALK_REPLY));
+        add(SEAT_OPP, a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
+        add(SEAT_MINE, b0, voice(b0, TALK_REPLY));
     }
     return run();
 }
 
-int tny_talk_win(int id) {
+// The winner's line: `seat` his place on the floor (the answering side's first, the players, unless the other side won)
+static int talk_win_at(int seat, int id) {
     start();
-    add(id, voice(id, TALK_WIN));
+    add(seat, id, voice(id, TALK_WIN));
     return run();
 }
+int tny_talk_win(int id) { return talk_win_at(SEAT_MINE, id); }
 
 // The Time Chamber's room scenes (tny_talk.h): seq[0] first, seq[1..n] the lines, seq[n + 1] last (its next is 6), seq[6] the
 // stop word it reaches
@@ -181,9 +231,8 @@ void tny_talk_frame(void) {
     }
     if (!SCENE_RUNNING) { talk.live = 0; return; }
     if (!(g_InputSystem->pressed & KEY_START)) return;
-    // the box on screen is the last: the game read its `next` when it opened, so the sequence's later slots become
-    // stop words (the open box's entry was read already)
-    for (int i = 2; i <= talk.n; i++) talk.seq[i] = 0;
+    // the box on screen is the last: its `next` is the line hook, which now ends the talk
+    talk.line = talk.n;
 }
 
 void tny_talk_test(u32 cmd, u32 arg, u32 arg2) {
@@ -199,8 +248,6 @@ int tny_talk_hook(const TTalkSeat *s) {
     if (s->kind == TALK_RUMBLE) return 0;
     if (s->when == TALK_BEFORE)
         return tny_talk_pre(s->opp, s->nopp > 2 ? 2 : s->nopp, s->mine, s->nmine > 2 ? 2 : s->nmine);
-    int id;
-    if (s->kind == TALK_FINAL) id = s->result == 2 ? s->opp[0] : s->mine[0];
-    else id = s->result == 1 ? s->mine[0] : s->opp[0];
-    return tny_talk_win(id);
+    int opp_won = s->kind == TALK_FINAL ? s->result == 2 : s->result != 1;
+    return talk_win_at(opp_won ? SEAT_OPP : SEAT_MINE, opp_won ? s->opp[0] : s->mine[0]);
 }
