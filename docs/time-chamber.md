@@ -724,9 +724,12 @@ HP) R_FALL (bars out, 48 frames) -> R_TALK (the lead's `won` line) -> R_CLEAR (2
 | rating | `rating + 25 x lights out` on the tournament's curve (`opp_curve` through `tny_resolve_stat`, `chamber_rating`): 350 = 2800 HP, 25 / 26 / 26; 475 = 4750 HP. The difficulty's boss HP goes on top, as for every boss |
 | `mark[2]` | where the lead and the partner walk to before the fight ((124, 136), (164, 136)) |
 | `seal` | the door's strip, blocked during the fight ((120, 272)-(160, 280)) |
-| `line_y` | a player below it when the scene starts is put beside player 1 (256) |
-| `open`, `open_by[9]` | the boss's opening line, and one per player 1's party slot (0 = `open`) |
+| `line` | a player past it (below; with `look` left, right of it) when the scene starts is put beside player 1 (256; until phase 4 `line_y`) |
+| `open`, `open_by` | the boss's opening line, and a table of nine by party slot: player 1's character's line, else player 2's (a fighter meeting himself, a player's own story people), else `open` (since phase 4 a pointer to a shared table, 0 = none) |
 | `partner_line` | the partner's line (two players) |
+| `flags` | (phase 4) `RF_CREW`: the actors showing `crew_sprite` become regular enemies when the intro ends (twins with two players), the lead watches; when the last is down, `crew_line` as he steps 24 px towards the players (`ch_crew_parts`, ops 21 / 22), then his fight. `RF_RAGE`: the partner falling first enrages the lead once (`rage_line`; `tny_moves_rage`: full HP, his kit's next transform or the library's power-up, the pose and the shake) |
+| `look` | (phase 4) the way both players face at the intro: `LOOK_UP` (the bosses above) or `LOOK_LEFT` (the airship: the door on the right) |
+| `plain` | (phase 4) the row a build without `roms/buu.gba` uses (`have_buu()`: Buu-saga Piccolo's art is in the build): its fallback map's places and fighters |
 
 The lines' order: the boss, the partner (two players), player 1's reply, player 2's reply (`replies[]`, one per party
 slot, shared by every room; at most four lines, `tny_talk_scene`). The box sits at the bottom (no `!`): the bosses stand above.
@@ -775,6 +778,75 @@ death and game over, the room's state cleared (checked by hand).
 - `WIDE=1`, `BUU=0` and `PARTY_SLOTS=8` builds compile; `chamber_room` also passes on the `BUU=0` build (161 checks); the
   wide view was not run.
 - The gate's stamped pillars carry a few stock pebbles beside their inner edge (zone 8 area 16's art); harmless.
-- Phase 4: five rooms (rows and maps); the pirates' crew before Tao needs one more state before R_ARMED (a wave of regulars,
+- (Phases 4 and 5 are built: 12.6.) Phase 4: five rooms (rows and maps); the pirates' crew before Tao needs one more state before R_ARMED (a wave of regulars,
   then the boss). Phase 5: the entrances' art in the 588 slots. Phase 6: the hidden room (a trigger between the pillars,
   open once all six are out). Phase 8: rewards (flags 514-519 kept for first wins).
+
+### 12.6 The five rooms and the entrances (phases 4 and 5, branch `nb-chamber-rooms`, 2026-11-05)
+
+Every room is one row of `rooms[]` (`chamber.c`) and a map, on 12.4's framework. Each has its own plaque colour (8/37's), the
+gate's beam across its door during the fight, its lever's light (flag 504 + n) and the same lever, cut-away, gift and door as the
+dojo. Ratings rise by 25 a light out; HP below is at no light out, Normal. Every line is Claude's DRAFT (`chamber.c`, marked).
+
+| room (area, light) | the map | alone | two players | special |
+|---|---|---|---|---|
+| Roshi's dojo (19, 0) | 6/70 | Roshi 350: 2800 | Roshi + Chiaotzu: 1960 + 1792 | as 12.4 |
+| Pirate airship (20, 1) | Buu's Fury's deck 12/1, its pad planked over, a generated sky (its own sky layers do not import), entered by the gangway on the right | a crew of three Warlord's Henchmen (stat 12, 900 HP), then General Tao 360: 2920 | the crew with twins (six), then a lone Tao at 180 %: 5256 | from three lights out the crew are the stronger Henchmen (51 / sprite 143) |
+| Frieza's ship (21, 2) | Buu's 8/19, the crystal room; Frieza and Cold come down the sides of the crystal | Frieza 360: 2920, Mecha Frieza at 40 % (his kit: the play body 238) | Frieza + King Cold: 2044 + 1876 | |
+| Namek ship (22, 3) | LoG2's Capsule Ship 3 (6/58) with a green floor | Buu-saga Piccolo 380: 3160 | Piccolo + the Namekian Warrior: 2128 + 1960 | |
+| The lab (23, 4) | Dr. Gero's computer room 8/63 | Android 18 360: 2920 | 18 + 17: 2044 + 2128 | |
+| Saiyan ship (24, 5) | the Broly chapter's round room (Buu's 6/6), entered from below | Broly 390: 3280, his rage at 50 % (kit) | Broly + Paragus: 2212 + 1792; Paragus down first: Broly back to full and powered up, "Pa... ra... gus...? RRRAAAAAAGH!!" | |
+
+**What the player sees.** At the far end of each room the boss stands (with two players his partner beside him; on the airship
+Tao among three Henchmen). A few steps in, the players turn to them, the bosses walk to their marks, the boss's line for whoever
+player 1 is (else player 2: Piccolo meeting himself, Vegeta and Trunks meeting Frieza, Krillin meeting 18, Goku meeting Broly
+...), the partner's line, each player's reply, the door's beam and a shake, boss bars. On the airship the Henchmen come at the
+players first while Tao watches; when the last falls Tao says his line, steps forward, and his bar comes up. Frieza alone turns
+into Mecha Frieza at 40 %. With two players, felling Paragus before Broly brings Broly's rage. Then the dojo's ending: the fall,
+the last line, the bodies blink out, the plaque, the cut-away with this room's light going out, the door open, the next tier.
+
+**Lines (DRAFT).** Openings by player 1's character (else player 2's), the partner, the crew line, the last line:
+
+| room | default | by character | partner / crew / rage | last line |
+|---|---|---|---|---|
+| airship | TAO: General Tao. Someone has paid well for your heads. / Men! Deal with them. | Goku: the brat who broke my Dodon Ray, rebuilt since; Hercule: killed for less; Krillin: the little monk, not grown an inch; 16: took the Red Ribbon's money too, scrap it | crew down: Useless, the lot of you! / Very well. I'll kill them myself. | Beaten... again... / Take your switch, and be gone. |
+| Frieza | FRIEZA: A monkey's training room. How quaint. / Let me show you what real power looks like. | Gohan (and SSJ2): the little Saiyan from Namek; Piccolo: another Namekian; Vegeta: the proud little prince, killed once; Trunks: the boy with the sword, this time I do the cutting; Goku: even here you haunt me; Hercule: a clown?; Krillin: such a lovely explosion | KING COLD: Careful, my son. / Do leave a little for your father. | Impossible! Beaten by the likes of you? / Fine. Pull your little switch. |
+| Namek | PICCOLO: So this is what Popo dreamed up. / Show me you've been training, or get out. | Piccolo (himself): ...Me? Heh. Popo has a sense of humour. / Let's see which of us is the real one.; Gohan: don't hold back because it's me; Vegeta: still second best; Goku: I always said I'd beat you; Hercule: do you even know where you are? | NAMEKIAN: For Namek! / I fight beside you, Piccolo. | Hmph. Not bad. / Go on. Throw the switch. |
+| lab | ANDROID 18: So I'm a training dummy now. Fine. / Don't expect me to go easy. | Vegeta: I broke your arm last time; Trunks: the boy who hates us so much; Goku: Gero built us to kill you; Hercule: cute belts; Krillin: you again, the one with the remote; 16: whose side are you on now? | ANDROID 17: Relax, sis. / I'll take the other one. | Tch. Fine, you win. / The switch is over there. |
+| Saiyan ship | BROLY: ...More of you. / I will crush you all. | Gohan: Kakarot's... son; Vegeta: Prince... Vegeta. You will kneel.; Goku: Ka... ka... rot... / KAKAROT!! | PARAGUS: Steady, Broly. / Show them what a true Saiyan is. Rage: Pa... ra... gus...? / RRRAAAAAAGH!! | Impossible... / I am... the strongest... |
+
+**Without `roms/buu.gba` (risk 7).** A `BUU=0` build has neither Buu-saga Piccolo nor Broly nor the Buu interiors. Mapbuild's
+`"unless": "buu"` builds `chamber_pirate_plain`, `chamber_frieza_plain`, `chamber_saiyan_plain` (Capsule Ship 3 in brown,
+purple, grey) on the same areas, the open map's doors carry both arrivals (`requires` / `unless`), and the rows' `plain` twins
+stand Tao with his crew, Frieza with King Cold, the Namekian alone (180 % with two players) and Paragus alone there. Tested:
+`chamber_rooms_plain.txt` on a `BUU=0` build, all eleven cases clean (343 checks).
+
+**Two fixes in the framework, found here.** (1) A dialogue trigger starts its next run at the index its last stop word names: the
+lever's plain `stop` (index 3) made the second press of a plaque start at the throw without asking `CH_LEVER`, so pressing a
+dojo's plaque twice before the fight threw it, and in any other room the cut-away put out light 0 (the room index was never
+set). Both stop words of `ch_lever` are 0 now and the tests press every plaque twice before the fight. (2) In C, `"\x0bDon't"` is
+the escape `\x0bD` (hex escapes take every hex digit): the second page lost its first letter whenever it began with A-F or a
+digit (Roshi's "Come on" and "Go on" lines too). Every page break in `chamber.c` now ends its literal (`"\x0b" "Don't"`).
+
+**The entrances (phase 5).** `tools/chamberart.py` draws all six by code (no ROM data), 96 x 80, left-right mirrored so the
+right half reuses the left's tiles flipped, exact BG palette colours: Roshi's dojo front (tiled roof, red pillars, sign board,
+curtained door), the pirate airship (red gas bag with a skull, planked hull with portholes, a gangway hatch), Frieza's saucer
+(white and lilac, yellow lights, purple windows, a lowered ramp), the Namekian dome (white, green bands, round windows), Gero's
+bunker (a rock mound, a steel door slid open under a chevron lintel), Paragus' round ship (`shipart.py`'s design, small). Slots
+(unique tiles with flips): Namek 42, Frieza 43, Saiyan 52, pirate 56, lab 53, dojo 55; the open map is at **602 of 896** (372
+with the placeholders), about 290 left. The doorways stay where the collision and the exits expect them (x 32-63, y 56-79 of
+each picture). Previews: `chamberart.py OUT.png --x4 OUT_x4.png`.
+
+**Tests** (`chamber_gen.py` `rooms()`, self-checking, in `regfull.sh`): `chamber_rooms.txt`, eleven cases, 356 checks: the
+airship alone as Krillin (punches) and with Super Saiyan Goku + Hercule at three lights out (the stronger crew, six bodies);
+Frieza alone as Super Saiyan Vegeta (Mecha at 35 %) and Trunks + Gohan with player 2 throwing the lever; Namek alone as Piccolo
+(himself) and Hercule + Super Saiyan Vegeta on player 2's B; the lab alone as Hercule and Super Saiyan Goku + Krillin; the Saiyan
+ship alone as Super Saiyan Goku (punches through the rage) and Gohan + Piccolo (Paragus first: the rage, full HP); the sixth
+lever through the lab (Krillin + Vegeta, five lights out: the beams fall). Each: the door from the open area, the actors by
+lineup, the plaque clicking twice, the intro, the seal holding, the HP by lights, the fall, the bodies gone, the cut-away with
+this room's light, the flag, the door, the gift, the way back below the entrance, a return to an empty room.
+
+**Not verified.** Real-time feel and balance: headless numbers only, no fight played by hand (Broly and King Cold, 64 x 64,
+in the two smaller rooms; Frieza's ship is a ring round the crystal, its corridors 56 px wide; the Henchmen's ranged fire on the
+deck). In the headless runs the crew stood a while before closing in (the stock wander, then the chase near a player).
+`WIDE=1` and `PARTY_SLOTS=8` builds compile; neither was run.

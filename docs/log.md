@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-05
 
+- **The Time Chamber, phases 4 and 5 (`docs/time-chamber.md` 12.6; branch `nb-chamber-rooms`):** the five rooms beyond the dojo,
+  each complete as the dojo is. The pirate airship (Buu's Fury's deck): three Warlord's Henchmen first (twins with two players,
+  the stronger ones from three lights out), then General Tao steps up (`RF_CREW`). Frieza's ship (Buu's crystal room): Frieza
+  alone turns Mecha at 40 %, Frieza and King Cold together. The Namek ship (Capsule Ship 3 in green): Buu-saga Piccolo, with
+  the Namekian. The lab (Gero's computer room): 18, with 17. The Saiyan ship (the Broly chapter's room): Broly with his rage,
+  with Paragus, whose fall first enrages Broly (`RF_RAGE`, `tny_moves_rage`). Lines by who meets whom (DRAFT), a fallback
+  row and map for each Buu-dependent room on a `BUU=0` build (mapbuild `"unless"`, per record / exit / trigger `requires` /
+  `unless`), the gate's beam turned upright for a side door (`"turn"`). The six entrances drawn by code
+  (`tools/chamberart.py`: 42-56 slots each, the open map at 602 of 896). Fixed on the way: the lever's stop words (a second
+  press of a plaque threw it unchecked) and page breaks that ate a letter (`\x0bD`). Tests `chamber_rooms` (356 checks, in
+  regfull), `chamber_rooms_plain` (a `BUU=0` build).
 - **A tournament of 32 (`docs/tournament.md` 2b, 26, `tny_n32.txt`; Ryan: "we can use lower-tier fighters, but we must fill the tournament FIRST with the fighters from that division selected"):** a 2 v 2 of 16 teams. Only Legend can fill it (30 to 34 opponents with the lower tiers; Champion reaches 26 at most): offered there once the count is 30 after up to two pickable fighters are set aside, in practice Super 13 beaten and Cooler beaten or the Broly chapter done; locked with a footer otherwise. The division's all in, then the strongest from below, never a repeat, never a mirror. 8 and 16 draw as before (60 draws compared). The screen: blocks A to D, each like an 8-team half, and the "Final four" page, never more than 8 faces on a page. `TBracket.seat` is 32; 4 rounds were enough (a unit is a team).
 - **The Time Chamber, phases 1-3 (`docs/time-chamber.md` 12; branch `nb-chamber`):** the Lookout's door opens on a white void of
   2048 x 2048 (the most the collision takes; 372 of 896 tile slots, 588 left for six entrances of 98) with the living
