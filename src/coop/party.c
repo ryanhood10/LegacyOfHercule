@@ -26,7 +26,8 @@ ROM_FN(int, Modal_Run, (void), 0x0801F2F5);                                     
 #define SCRIPT_ENTITY_LIST (*(void **)0x083B5C80)   // the script module's entity list word (its table + 8)
 #define ITEM_TABLE         ((const u8 *)0x086ADE24)  // 0x38 bytes per item; +0 usable, +2 popup, +3 max count, +0x30 handler
 #define PARTY_FLAG_BANK_ZEROED 50     // Party_Init zeroes 25 halfwords of each bank
-#define PARTY_WAIT_FLAG_BYTES 17      // story flags 400-535 (the ten-day wait's side chapters, the post-game, the Time Chamber) start clear too
+#define PARTY_WAIT_FLAG_BYTES 13      // story flags 400-503 (the ten-day wait's side chapters, the post-game) start clear too
+#define CHAMBER_FLAG_BYTE 63          // flags 504-535, the Time Chamber's (chamber.h): cleared at a new game by party_new_game
 #define PARTY_COUNTER_BANK_START (0x12A + PARTY_TAIL_SHIFT)   // the stock DMA target 0x12B rounds down
 
 // Party_Init 0x08003C24: new-game defaults. The stock code DMAs 6 x 0x1C from the default table and
@@ -40,7 +41,7 @@ void party_init_hook(PartyState *p) {
     p->active_slot = 3;
     memcpy(p->chars, PARTY_DEFAULTS, PARTY_SLOTS * sizeof(CharacterEntry));
     memset(p->event_flags, 0, PARTY_FLAG_BANK_ZEROED);
-    memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // our chapters' flags 400-535 (17 bytes)
+    memset(p->event_flags + PARTY_FLAG_BANK_ZEROED, 0, PARTY_WAIT_FLAG_BYTES);   // our chapters' flags 400-503 (13 bytes)
     memset((u8 *)p + PARTY_COUNTER_BANK_START, 0, PARTY_FLAG_BANK_ZEROED);
     flag_set_hook(p, KRILLIN_LIFT_FLAG);       // a new game starts with Krillin's current numbers (krillin_lift)
     const StoryTest *t = STORY_TEST_RAM;      // chapter-test preset (coop.h)
@@ -51,6 +52,13 @@ void party_init_hook(PartyState *p) {
         for (int i = 0; i < 16 && t->set[i] != 0xFFFF; i++) flag_set_hook(p, t->set[i]);
         for (int i = 0; i < 8 && t->clear[i] != 0xFFFF; i++) flag_clear_hook(p, t->clear[i]);
     }
+}
+
+// A new game (party_save.c's start game; not the debug Map Test): flags 504-535, the Time Chamber's, start clear too. Kept out of
+// party_init_hook on purpose: a Map Test runs that one, and the headless tests seeded by a Map Test (pickup, regen, hercule_kit)
+// change their draws when its length changes by a few cycles (found 2026-11-05)
+void party_new_game(PartyState *p) {
+    memset(p->event_flags + CHAMBER_FLAG_BYTE, 0, 4);
 }
 
 // Party_AddExp 0x08003D58 (the EXP event's fire, exp.c): the stock code reaches its module words (SFX

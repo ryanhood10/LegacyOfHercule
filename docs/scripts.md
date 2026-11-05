@@ -176,7 +176,7 @@ lock), and a stock chapter lock applies to player 2 too.
 ### 2.5 Story flags
 
 Stock scripts use flags up to 306. `Party_Init` clears flags 0-399 at a new game and `party.c` also
-clears 400-503 (our chapters and the post-game); flags 504-535 are the Time Chamber's (504-509 the six levers; cleared at a new game since 2026-11-05, `PARTY_WAIT_FLAG_BYTES` 17); 536+ survive a new game, so avoid them.
+clears 400-503 (our chapters and the post-game); flags 504-535 are the Time Chamber's (504-509 the six levers; cleared at a new game since 2026-11-05 by `party.c` `party_new_game`); 536+ survive a new game, so avoid them.
 **The allocation by range and every flag's meaning are in `docs/ids.md` "Story flags"**; take new
 flags there. Chapter-specific notes: 441 the tournament grounds' welcome seen (`papaya`), 360 Krillin has visited, 361 inside Triceratops Jungle, 362
 Hercule's deal, 363-375 Roshi's gym rounds, 381 / 382 the arctic open / Super 13 beaten (the arctic

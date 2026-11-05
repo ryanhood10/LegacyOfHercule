@@ -638,7 +638,10 @@ pillars is open (nothing is behind it yet: phase 6). A room once won is empty, i
 
 **Flags.** 504-509: room 0-5's lever thrown (= light n out). 510-535 reserved for the rest of the plan (section 6.2's
 table: first entry, the gate's fall seen, the hidden room, Popo beaten, first wins 514-519, times round, panel, trophy
-hall). `party.c` `PARTY_WAIT_FLAG_BYTES` 13 -> 17: a new game clears 400-535.
+hall). A new game clears them (`party.c` `party_new_game`, called by the save menu's start game; tested in `chamber_gate`).
+Not in `party_init_hook` (`PARTY_WAIT_FLAG_BYTES` stays 13): a Map Test runs that one, and the Map-Test-seeded tests
+`pickup`, `regen` and `hercule_kit` drew differently when it grew by four bytes' worth of cycles (found in the full
+regression, 2026-11-05).
 
 **An existing save is safe (proved 2026-11-05).** The party block and the EEPROM layout do not change (flags 504-535 were
 always inside the 816-flag bank). Ryan's `build/play/legacy-of-hercule.sav`, copied (the original untouched, its hash

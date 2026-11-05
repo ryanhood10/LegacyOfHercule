@@ -9,7 +9,7 @@ the code on 2026-10-19 (main e45c765).
 
 | kind | taken | kept for the rest of the plan |
 |---|---|---|
-| flags | 504-509 a room's lever thrown (light n out) | 510-535 (cleared at a new game since `PARTY_WAIT_FLAG_BYTES` is 17): 510 first entry, 511 the gate's fall seen, 512 the hidden room's first scene, 513 Popo beaten, 514-519 each room's first win, 520-521 times round, 522-524 the panel, 525-529 the trophy hall, 530-535 free |
+| flags | 504-509 a room's lever thrown (light n out) | 510-535 (cleared at a new game by `party.c` `party_new_game`): 510 first entry, 511 the gate's fall seen, 512 the hidden room's first scene, 513 Popo beaten, 514-519 each room's first win, 520-521 times round, 522-524 the panel, 525-529 the trophy hall, 530-535 free |
 | stats | 155 `CH_SPOT_STAT`: an open-area spot record (the tier picks the real stat) | 156 Popo's spawn, 157 the crew if recoloured (section 6.2) |
 | CoopCall | 35 Chamber (op, a, b): `chamber.c` `chamber_call`, ops in its enum (1 room load .. 20 open the door) | |
 | test commands | 48 CHAMBER (`chamber_test`): `arg` 0 the levers := `arg2` bits 0-5; 1 `cmd_arg` := bodies at the last check \| the smallest largest-free OBJ VRAM block (32-byte units) << 16; 2 records with two players := `arg2`; 3 the refill frozen := `arg2`; 4 reset that smallest block; 5 the old rounds on 15/2 from round `arg2` (no captions); 6 `cmd_arg` := lights out \| the room's state << 8 | |
@@ -90,8 +90,8 @@ The bank sits after the party entries, so it moves with `PARTY_SLOTS`: `0x0203F0
 (0x0203F0EC with 8 slots). Headless scripts use the runner's `FLAGS` variable (`docs/testing.md`).
 
 Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and `party.c` also clears
-400-535 (`PARTY_WAIT_FLAG_BYTES` 17, raised from 13 for the Time Chamber on 2026-11-05: old saves read 504-535 as clear,
-`docs/time-chamber.md` 12.2). Each flag's meaning is in `docs/scripts.md` 2.5.
+400-503 (`PARTY_WAIT_FLAG_BYTES` 13); a new game (not a Map Test) also clears the Time Chamber's 504-535 (`party_new_game`, 2026-11-05;
+old saves read them as clear, `docs/time-chamber.md` 12.2). Each flag's meaning is in `docs/scripts.md` 2.5.
 
 | range | owner | in use |
 |---|---|---|

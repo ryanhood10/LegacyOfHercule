@@ -163,6 +163,12 @@ def gate():
         s.deco(i)
         s.expect(rf"\w+: 0000000{0 if (0x05 >> i) & 1 else 1}", "peek D+0x10 1")
     s.out("ents")
+
+    s.echo("=== a new game clears flags 504-535 (party_new_game), not 496-503's neighbour 536+: set at the title after a soft reset")
+    s.out("load menu.ss", "p2 off", "maptest 7", "frames 300", "key 0xF 6", "frames 400", "key 8 6", "frames 200", "key 8 6", "frames 200",
+          "key 8 6", "frames 200", "poke8 FLAGS+62 0x80", "poke8 FLAGS+63 0x3f", "poke8 FLAGS+66 0x80", "poke8 FLAGS+67 0x01",
+          "key 1 6", "frames 200", "key 0x80 6", "frames 60", "key 1 6", "frames 600")
+    s.expect(r"0203f146: 00 00 00 00 00 01", "peek8 FLAGS+62 6")
     s.write("chamber_gate.txt")
 
 

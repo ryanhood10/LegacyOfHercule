@@ -60,6 +60,7 @@ ROM_FN(void, Scene_Transition, (void), 0x0801F2CF);
 ROM_FN(int, Scene_Run, (void), 0x0801F2F5);
 
 void party_init_hook(PartyState *p);   // party.c
+void party_new_game(PartyState *p);    // party.c: the Time Chamber's flags
 int flag_test_hook(PartyState *p, u32 id);   // party.c
 void flag_set_hook(PartyState *p, u32 id);
 const CharacterEntry *party_default_entries(void);   // party.c: the N-entry default table
@@ -272,6 +273,7 @@ int save_menu_start_hook(u8 *menu) {
         ((void (*)(u32 *))((u32)vt + vt[2]))(cell);
     } else {
         party_init_hook(party);
+        party_new_game(party);
         int v = MapEntry_Variation(NEW_GAME_ENTRY, 0);
         const u8 *sub = MapEntry_Sub(NEW_GAME_ENTRY, v);
         u32 *fade = Arena_Alloc(4);

@@ -12,8 +12,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
   walk: 7 records with two players (14 bodies), 10 alone, chosen from measures of OBJ VRAM and frame time. Roshi's dojo end to
   end as a table-driven room (`chamber.c` `rooms[]`): actors by lineup, a staged intro with a line per character, the
   tournament's kits outside the ring, the fall watched, the plaque's cut-away to the gate, the door, the next tier;
-  Gohan's Super Saiyan at the first lever. The ten rounds retired (tests keep them). `PARTY_WAIT_FLAG_BYTES` 17 (504-535
-  cleared at a new game); Ryan's save proved to load unchanged. Tests `chamber_gate`, `chamber_tiers`, `chamber_room`,
+  Gohan's Super Saiyan at the first lever. The ten rounds retired (tests keep them). 504-535 cleared at a new game
+  (`party_new_game`); Ryan's save proved to load unchanged. Tests `chamber_gate`, `chamber_tiers`, `chamber_room`,
   `gohan_ssj1`, `chamber_save`.
 - **Cutscenes staged (Ryan's rule: `docs/howto.md` "Stage a scene"):** Gero's three stages, the lab, the road and the mother dinosaur (`docs/scripts.md`, `ch4_staging.txt`). Whoever nobody plays has a body and moves; nobody pops. Found: walking Piccolo's NPC sprite 73 (one group) overwrites the heap; 103 walks.
 - **Android 13's motive (Ryan):** 17 and 18 kill Gero, 13 swears revenge for his father, blasts them and flies north, tucked away until the post-game's Super 13 (`docs/story.md`). The lab's old lines "You built 'em too well" and "Goku is mine" went with it; all his new lines are drafts for Ryan.
