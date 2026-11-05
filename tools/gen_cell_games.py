@@ -53,8 +53,41 @@ def script(lines, comment=""):
     for l in lines:
         emit(("      " if re.match(r"^\w+:$", l) else "        ") + l)
 
-def text(speaker, s):
-    emit(f'  text {speaker} "{s}"')
+def text(speaker, s, draft=False):
+    emit(f'  text {speaker} "{s}"' + ("    ; (draft)" if draft else ""))
+
+def label(name):
+    """Marks the next entry; `PushByte {name}` in this sequence becomes its index (resolve_labels, at the end)."""
+    emit(f"  [label:{name}]")
+
+def resolve_labels(lines):
+    """Entry indexes for the branches: count the entries of each sequence, drop the marks, fill the {name} tokens."""
+    res, start, n, labels = [], 0, 0, {}
+    for l in lines:
+        if l.startswith("sequence "):
+            start, n, labels = len(res), 0, {}
+        m = re.match(r"^  \[label:(\w+)\]$", l)
+        if m:
+            labels[m.group(1)] = n
+            continue
+        m = re.match(r"^  stockseq \S+ (\d+) (\d+)", l)
+        if m:
+            n += int(m.group(2)) - int(m.group(1)) + 1
+        elif re.match(r"^  (script|text|fmt|stock)\b", l):
+            n += 1
+        res.append(l)
+        if l == "end":
+            for i in range(start, len(res)):
+                for k, v in labels.items():
+                    res[i] = res[i].replace("{" + k + "}", str(v))
+    return res
+
+def alone_or_duo(duo_label):
+    """A branch on player 2: two players go to the fight's title card, alone Hercule's actor has a line and clears off."""
+    script(["CoopCall 5, 0, 0, 0", "JumpIfFalse L1", f"PushByte {{{duo_label}}}", "END", "L1:", "END"], "two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries")
+
+# Hercule's actor hands over to player 2's entity by standing where it respawns (12 px left of player 1, player.c ensure_p2)
+HANDOVER = ["CoopCall 22, 2, 72, 0", "JumpIfFalse H1", "DespawnEntity 72", "H1:"]
 
 def stockseq(seqs, name, a, b, comment=""):
     emit(f"  stockseq {addr(seqs, name)} {a} {b}" + (f"    ; {comment}" if comment else ""))
@@ -74,6 +107,10 @@ emit(";   3 Gohan + Hercule; J1-J4 Cell Juniors alone: Krillin (1), Piccolo (2),
 emit(";   7 Super Saiyan 2 Gohan + Hercule; 8 Gohan + Hercule against two Perfect Cells; the beam struggle.")
 emit("; Solo fights: CoopCall 15 (cellgames.c): 1 player 1 alone, 2 player 2 alone on player 1's entity, 0 both.")
 emit("; Stock text is referenced (stock / stockseq), never restated; edited scripts are spelled out.")
+emit("; Staging (Ryan, 2026-11-05: \"characters shouldnt be stagnant\", \"account for 1p mode or 2p mode\"). Player 2 has no entity in any scene here: the solo")
+emit("; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. So every scene plays one staging")
+emit("; in both modes with Hercule's actor (sprite 72, only ever walked: his fly pose is a stub); before a team fight he stands where player 2 will respawn and")
+emit("; goes as it does; alone he has a line and clears off. Lines marked (draft) are Claude's, for Ryan to read.")
 emit("")
 
 # ---------------------------------------------------------------- map 324: the ring ------------------
@@ -135,17 +172,30 @@ text(67, "HERCULE: Well...  since the kid insists...\\x0bstand back, boy, and wa
 emit(f"  stock @{A3['m325_r0_defeat']['entries'][19]['head'].split('@')[1].split()[0]}    ; \"Wonderful.  Let's get started!\"")
 b = body(A3, "m325_r0_defeat", 20)
 i = b.index("SetActiveCharacter 0")
-b = b[:i + 1] + ["DespawnEntity 72", "CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"] + b[i + 1:]
+b = b[:i + 1] + ["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"] + b[i + 1:]
+i = b.index("SetEntityFacing 0, 3")
+b = b[:i + 1] + ["SpawnCharacterEntity 72, 356, 440", "SetEntityFacing 72, 3"] + b[i + 1:]   # the warp took his actor: he stands at Gohan's side
 j = b.index("DrawBossHealthBarRange 30, 60, 100")
-tail = b[j:]
-script(b[:j], "stock entry 20: Gohan player 1, player 2 is Hercule")
+tail = ["SetPlayerVisible 1"] + b[j:]            # the HUD after the card, as fights 7 and 8
+b = [x for x in b[:j] if x != "SetPlayerVisible 1"]
+script(b, "stock entry 20: Gohan player 1, player 2 is Hercule")
+alone_or_duo("card3")
+text(67, "HERCULE: Go ahead, kid, you warm him up for me!\\x0bI'll, uh...  study his weak points from back here!", draft=True)
+script(["WalkToPosition 72, 308, 448", "DespawnEntity 72"])
+label("card3")
 title(BOTH)
-script(tail, "fight 3")
+script(HANDOVER + tail, "fight 3")
 emit("end")
 emit("")
 
+FLY_DOWN = ["PlayAudio 26", "FlyToPosition 0, 432, 296", "SetEntityFacing 0, 0", "WaitFrames 20"]   # each fighter comes down from the crowd
+
 emit("sequence cg_fight3_end")
-stockseq(A3, "m325_r5_defeat", 0, 25, "Cell and Gohan, 16's last stand (his bomb was removed), \"Still not angry enough?\"")
+b = body(A3, "m325_r5_defeat", 0)
+k = b.index("SetEntityFacing 0, 3")
+b = b[:k] + ["SpawnCharacterEntity 72, 540, 400", "SetEntityFacing 72, 2", "CoopCall 5, 0, 0, 0", "JumpIfFalse H1", "SetEntityAnimation 72, 3", "H1:"] + b[k:]
+script(b, "stock entry 0, with Hercule's actor beyond Cell (the warp took player 2's entity): flat on his back if player 2 just fought as him, alone he has crept back")
+stockseq(A3, "m325_r5_defeat", 1, 25, "Cell and Gohan, 16's last stand (his bomb was removed), \"Still not angry enough?\"")
 b = body(A3, "m325_r5_defeat", 26)
 k = b.index("SetEntityFacing 0, 1")
 b = b[:k] + ["WaitFrames 40", "FadeToWhite 5", "SpawnCharacterEntity 31, 480, 376", "WhiteFadeOut 5"] + \
@@ -153,7 +203,7 @@ b = b[:k] + ["WaitFrames 40", "FadeToWhite 5", "SpawnCharacterEntity 31, 480, 37
     ["WaitFrames 40", "FadeToWhite 5", "SpawnCharacterEntity 31, 504, 392", "WhiteFadeOut 5"] + b[k:]
 script(b, "stock entry 26 with six Juniors (Ryan: Vegeta and Trunks face two each)")
 stockseq(A3, "m325_r5_defeat", 27, 29, "\"What the heck are those things?\", \"My children!  Give them pain!\"")
-script(["CoopCall 15, 1, 0, 0", "SpawnCharacterEntity 72, 480, 320", "SetEntityFacing 72, 2"], "player 2's Hercule steps back")
+script(["CoopCall 15, 1, 0, 0", "SetEntityAnimation 72, 0", "SetEntityFacing 72, 2", "WaitFrames 30"], "Hercule's actor picks himself up; player 2 watches from here")
 text(67, "HERCULE: Uh...  this fight is a little too much for the champ right now.\\x0bI'll, uh...  supervise from over there!")
 script(["WalkToPosition 72, 640, 240", "DespawnEntity 72"])
 b = body(A3, "m325_r5_defeat", 30)
@@ -161,8 +211,9 @@ b = ["DespawnEntity 76" if x == "DespawnEntity 103" else x for x in b]
 k = b.index("DespawnEntity 30")
 b = b[:k] + ["DespawnEntity 31"] * 3 + b[k:]
 b = ["SetActiveCharacter 6" if x == "SetActiveCharacter 1" else x for x in b]
+b = ["SetEntityPositionInstant 0, 432, 232" if x == "SetEntityPositionInstant 0, 432, 296" else x for x in b]
 j = b.index("SetPlayerVisible 1")
-script(b[:j], "stock entry 30: Krillin is player 1 for the first Junior (J1)")
+script(b[:j] + FLY_DOWN, "stock entry 30: Krillin is player 1 for the first Junior (J1), flying down from the crowd")
 title(P1)
 script(b[j:])
 emit("end")
@@ -177,8 +228,9 @@ def junior_end(name, src, actor, slot, mode, nxt, music, which, comment):
     b = [f"PlayMusic {music}" if x.startswith("PlayMusic ") else x for x in b]
     k = b.index(f"SetActiveCharacter {slot}")
     b = b[:k + 1] + [f"CoopCall 15, {mode}, 0, 0"] + b[k + 1:]
+    b = ["SetEntityPositionInstant 0, 432, 232" if x == "SetEntityPositionInstant 0, 432, 296" else x for x in b]
     j = b.index("SetPlayerVisible 1")
-    script(b[:j], comment)
+    script(b[:j] + FLY_DOWN, comment)
     title(which)
     script(b[j:])
     emit("end")
@@ -202,20 +254,37 @@ k = b.index("SetEntityAnimationNoWait 0, 9")
 b = b[:k + 1] + ["WaitFrames 60"] + b[k + 1:]
 script(b, "stock entry 26, the power-up without the blocking wait (it never ended in co-op tests): Super Saiyan 2")
 stockseq(A3, "m325_r10_defeat", 27, 30, "\"Gohan has entered Super Saiyan Rage!\", \"NOW TASTE MY TRUE POWER\"")
-script(["SpawnCharacterEntity 72, 600, 300", "WalkToPosition 72, 520, 330", "SetEntityFacing 72, 2"], "Hercule comes back")
+script(["SpawnCharacterEntity 72, 648, 320", "WalkToPosition 72, 564, 376", "SetEntityFacing 72, 2"], "Hercule comes back the way he left, to Gohan's side")
 text(67, "HERCULE: The champ is back!\\x0bLet's finish this together, kid!")
-script(["DespawnEntity 72", "CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
+script(["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
+alone_or_duo("card7")
+text(67, "...Right behind you, kid!\\x0bWay, way behind you!", draft=True)
+script(["WalkToPosition 72, 648, 320", "DespawnEntity 72"])
+label("card7")
 title(BOTH)
-script(body(A3, "m325_r10_defeat", 31), "stock entry 31: fight 7")
+script(HANDOVER + body(A3, "m325_r10_defeat", 31), "stock entry 31: fight 7")
 emit("end")
 emit("")
 
 emit("sequence cg_fight7_end")
-stockseq(A3, "m325_r11_defeat", 0, 38, "Cell spits out 18, swells, Goku's Instant Transmission, \"He's back!!!!\"")
+b = body(A3, "m325_r11_defeat", 0)
+k = b.index("FadeFromWhite 60")
+b = b[:k] + ["SpawnCharacterEntity 72, 500, 440", "SetEntityFacing 72, 2"] + b[k:]
+script(b, "stock entry 0, with Hercule's actor on the field (the warp took player 2's entity)")
+stockseq(A3, "m325_r11_defeat", 1, 6, "Cell spits out 18, \"I'm going to blow myself up now!\"")
+b = body(A3, "m325_r11_defeat", 7)
+k = b.index("FlyToPosition 121, 368, 456")
+b = b[:k] + ["WalkToPosition 72, 536, 484"] + b[k:]
+k = b.index("SetEntityFollow 121, 27")
+b = b[:k] + ["SetEntityFollow 72, 27"] + b[k:]
+script(b, "stock entry 7: everyone gathers; Hercule's actor backs away from the bomb")
+stockseq(A3, "m325_r11_defeat", 8, 38, "Goku's Instant Transmission, \"He's back!!!!\"")
 b = body(A3, "m325_r11_defeat", 39)
 k = b.index("SpawnCharacterEntity 30, 428, 328")
 b = b[:k + 1] + ["SpawnCharacterEntity 162, 468, 328", "WalkToPosition 162, 468, 400"] + b[k + 1:]
-script(b, "stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30)")
+k = b.index("SetEntityAnimation 121, 4")
+b = b[:k] + ["SetEntityFollow 72, 132", "SetEntityAnimation 72, 4"] + b[k:]
+script(b, "stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest")
 emit(f"  stock @{A3['m325_r11_defeat']['entries'][40]['head'].split('@')[1].split()[0]}    ; \"Surprised to see me?\"")
 text(40, "When I exploded, two pieces of my core survived...\\x0b...and each one grew back perfect!")
 text(40, "SECOND CELL: Twice the perfection!")
@@ -223,13 +292,19 @@ stockseq(A3, "m325_r11_defeat", 41, 50, "Vegeta, \"part of my design\", Trunks f
 b = body(A3, "m325_r11_defeat", 51)
 k = b.index("DespawnEntity 30")
 b = b[:k + 1] + ["DespawnEntity 162"] + b[k + 1:]
-script(b, "stock entry 51: both Cells cleared, record 12 brings the pair")
+k = b.index("SetEntityFacing 0, 3")
+b = b[:k + 1] + ["SetEntityPositionInstant 72, 420, 472", "SetEntityFacing 72, 3"] + b[k + 1:]   # at Gohan's side, where player 2 respawns
+script(b, "stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side")
 stockseq(A3, "m325_r11_defeat", 52, 63, "\"ultimate perfection\", Goku from the Other World, \"I will!\"")
 b = body(A3, "m325_r11_defeat", 64)
 script(b[:1])
+alone_or_duo("card8")
+text(67, "HERCULE: Tell you what, kid...  this one's all yours.\\x0bThe champ wouldn't dream of stealing your moment!", draft=True)
+script(["WalkToPosition 72, 340, 480", "DespawnEntity 72"])
+label("card8")
 title(BOTH)
 b = ["DrawBossHealthBarRange 30, 0, 100" if x.startswith("DrawBossHealthBarRange 30,") else x for x in b]   # Ryan: to 0 HP
-script(b[1:], "fight 8: two Perfect Cells (stat 25 + its pair, both-down), fought to 0: the bars run over the whole HP")
+script(HANDOVER + b[1:], "fight 8: two Perfect Cells (stat 25 + its pair, both-down), fought to 0: the bars run over the whole HP")
 emit("end")
 emit("")
 
@@ -315,8 +390,22 @@ k = b.index("DespawnEntity 162")
 b = b[:k + 1] + b[k + 1:]
 k = max(n for n, x in enumerate(b) if x == "CommitCommandBatch")
 b = b[:k + 1] + ["CoopCall 16, 72, 0, 0"] + b[k + 1:]   # Hercule lowers his hands once Cell is gone
+# the aftermath's four standing fighters walk in from outside the view instead of standing there when the fade lifts (Gohan lies where he fell)
+for x, y, far in ((121, "496, 432", "572, 432"), (137, "360, 456", "308, 456"), (156, "376, 408", "376, 336"), (76, "400, 480", "400, 516")):
+    b[b.index(f"SpawnCharacterEntity {x}, {y}")] = f"SpawnCharacterEntity {x}, {far}"
+k = b.index("SetEntityAnimation 0, 4", b.index("FadeFromWhite 120"))
+b = b[:k] + ["BeginCommandBatch", "WalkToPosition 121, 496, 432", "WalkToPosition 137, 360, 456", "WalkToPosition 156, 376, 408", "WalkToPosition 76, 400, 480", "CommitCommandBatch",
+             "SetEntityFacing 121, 2", "SetEntityFacing 137, 3", "SetEntityFacing 156, 0", "SetEntityFacing 76, 1"] + b[k:]
 script(b, "stock entry 19: two Kamehamehas, both Cells destroyed (the second explodes too), Hercule stays")
-stockseq(A3, "m325_r12_defeat", 20, 48, "the aftermath, Vegeta's thoughts, \"I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!\"")
+stockseq(A3, "m325_r12_defeat", 20, 25, "the aftermath: \"Cell's energy completely vanished!\"")
+script(["WalkToPosition 72, 516, 410", "SetEntityFacing 72, 2"], "Hercule's actor takes it in")
+text(67, "HERCULE: Is...  is it over?\\x0bHa!  Hahaha!  Of course it's over!  Did everybody see that?!", draft=True)
+stockseq(A3, "m325_r12_defeat", 26, 35, "Krillin, Tien, 18, \"You guys go ahead!\"")
+b = body(A3, "m325_r12_defeat", 36)
+k = b.index("SetEntityFacing 0, 2")
+b = b[:k] + ["WalkToPosition 72, 584, 440", "DespawnEntity 72"] + b[k:]
+script(b, "stock entry 36: they fly off, and nobody saw Hercule's actor; he goes to find the cameras")
+stockseq(A3, "m325_r12_defeat", 37, 48, "Vegeta's thoughts, \"I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!\"")
 # stock 49 picked 50 (Hercule joins) or 53 (journal); ours always goes to the journal step, now right after it
 b = body(A3, "m325_r12_defeat", 49)
 cut = b.index("SetStoryFlag 195")
@@ -354,5 +443,5 @@ for l in ["StackTestStoryFlag 191", "StackTestStoryFlag 421", "And", "END"]:
     emit("    " + l)
 emit("end")
 
-open("data/story/cell_games.lscript", "w", encoding="utf-8", newline="\n").write("\n".join(out) + "\n")
+open("data/story/cell_games.lscript", "w", encoding="utf-8", newline="\n").write("\n".join(resolve_labels(out)) + "\n")
 print(len(out), "lines")

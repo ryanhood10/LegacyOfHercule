@@ -1079,6 +1079,10 @@ script saves `cg_pre8.ss` before the final fight; filming the struggle from it: 
 Junior each (stat 26 at 432, 359, 63 px below the fighter at 432, 296), J3 and J4 two each (the 141 / 142 pair at
 432, 359 and 451, 359-368): 1 + 1 + 2 + 2, no co-op twin on top (solo fights), all six seen in the scene.
 
+## Cell saga staging (headless, 2026-11-05)
+
+`tools/headless/cell_staging_gen.py` writes `cell_staging.txt`, self-checking: zone 12 for Vegeta alone, Trunks alone, Vegeta + Trunks and Trunks + Vegeta (in by the real pad of area 15), the Games for alone and player 2 as Hercule, Krillin or Vegeta at the ring; every scene pressed through until `0x03001FDC` clears, so a hung walk fails the next EXPECT. Run it with `st_expect.py` into a log, then `python tools/headless/cell_staging_gen.py check LOG`: every vtable in the `ents` lists must be sane (a sprite without the group an animation needs corrupts the heap and the runner keeps going). About ten minutes. In a solo-2 scene only player 2's A advances the text, and `load` forgets the runner's `p2`: write `p2 0` after it. An actor sprite's groups: `*0x0800959C + (id - 7) * 4` is the record, +2 the group count, +0x4C the four pointers per group.
+
 ## Gohan's Super Saiyan from the Time Chamber (headless, 2026-11-01)
 
 `tools/headless/gohan_ssj1.txt`: Map Test the chamber room (263) with the wait's flags, Gohan player 1 (row 0, kid

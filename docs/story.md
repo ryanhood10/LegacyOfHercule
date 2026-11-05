@@ -286,6 +286,13 @@ the plea; the kiss stays Krillin's.
   with no partner; the fight ends at about half of Cell's health when he laughs it off ("All you've
   done is pump up your muscles"), and Krillin's rush and one-hit KO is the opening beat of the
   scripted ending. Trunks' transformation beats stay as scripted.
+- **Staging (Ryan, 2026-11-05: "characters shouldnt be stagnant", "account for 1p mode or 2p mode"; built, `ch7_cell.lscript`):** who can
+  be here: Vegeta alone or Vegeta + Trunks, then Trunks alone or Trunks + Krillin; the chamber exit clears everyone else's selectable bit, so
+  Hercule cannot be player 2 before Perfect Cell's end. Player 2's Trunks makes way for the actor in the fade after the first fight (he has no
+  entity in areas 5 and 6 anyway), so "Here's my son!" flies him in in both modes. In co-op Cell's split shows: a second body walks out of the
+  first to the spot his twin takes. Vegeta's body lies right of Cell from the kick until he gets up. **Krillin now flies in in one-player
+  games too** and stays beside Vegeta through the fight, so his rush and one-hit KO are the same story alone. Draft line, alone only, Claude's:
+  KRILLIN: "...Yeah. You're right. I'll get Vegeta out of the line of fire. Give him one for me!"
 - **After Perfect Cell:** the default pair is Trunks + Krillin; Vegeta stays selectable (his
   barriers are needed to progress), Piccolo and Hercule too; the pad lets players change.
 
@@ -599,6 +606,18 @@ The stock ending follows, including Hercule's "I DEFEATED CELL! SINGLE HANDEDLY!
 **Hercule's beam pose (Ryan): new art**, copied from how Goku and Gohan look in their Kamehameha
 (built and merged 2026-10-19: sprite 72 group 18, `tools/herculesprites.py`). Every other Cell Games
 decision above is made.
+
+**Staging (Ryan, 2026-11-05: "Hercule needs to be written into all the Cell scenes because P2 could be them", "dont over-do it"; built, `tools/gen_cell_games.py`).**
+Player 1 is Goku at the ring, player 2 anyone selectable, but player 2's choice changes nothing: his entity is gone in every scene (solo modes, warps
+without entities) and he is bound to Hercule for fights 3, 7 and 8. So each scene plays one staging with Hercule's actor, in both modes: flat on his back after
+fight 3 (alone, on his feet: he had left), up for "supervise from over there" and off to where 16's head finds him; back the way he left, to Gohan's side; on the field after fight
+7, backing away from the bomb and jumping with the rest at Cell's return; at Gohan's side before fight 8. Before a team fight he stands where player 2 respawns
+(12 px left of player 1), so the handover does not show. Alone there is no partner in those fights, and he says so and clears off, which suits him. Each Junior
+fighter flies down from the crowd. In the aftermath the four standing fighters walk in; Hercule takes it in, gets ignored, and goes to find the cameras. Draft lines, Claude's:
+- before fight 3, alone: HERCULE: "Go ahead, kid, you warm him up for me! I'll, uh... study his weak points from back here!"
+- before fight 7, alone, after "Let's finish this together, kid!": "...Right behind you, kid! Way, way behind you!"
+- before fight 8, alone: HERCULE: "Tell you what, kid... this one's all yours. The champ wouldn't dream of stealing your moment!"
+- the aftermath, both modes: HERCULE: "Is... is it over? Ha! Hahaha! Of course it's over! Did everybody see that?!"
 
 **Triggers and side content around the Games (Ryan, 2026-10-19):**
 - **The arena stays locked until the Krillin + 16 chapter is done** (flag 421), on top of the stock
