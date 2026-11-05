@@ -12,6 +12,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `PLAYING.md` | the players' guide: build, connecting player 2, controls, difficulty, co-op rules, the story in short | before playing |
 | `CLAUDE.md` | rules, current phase, build and test commands, key addresses, where to start per task | every session |
 | `docs/ids.md` | registry: every flag, stat, sprite, row, portrait, ability, CoopCall, test command, zone-15 area and RAM region the mod uses, and what is free | before taking any new number |
+| `docs/review-2026-11-05.md` | the overnight polish for Ryan: what changed, decisions waiting, draft lines, what could not be checked | start of the next session with him |
 | `docs/howto.md` | recipes: add a chapter, CoopCall, boss, sprite, portrait, playable character, map; test; run parallel sessions; find things fast | doing a common job |
 | `docs/log.md` | dated progress log: what landed, what is open | resuming work |
 | `docs/testing.md` | test loop: Windows mGBA, WSL fork, pad senders, GDB stub, savestates | before testing anything |
