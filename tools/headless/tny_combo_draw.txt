@@ -64,7 +64,7 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 12
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2
 echo == 2b. seed 9
 load cd_setup.ss
 frames 2
@@ -79,7 +79,7 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 12
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2
 echo == 2c. seed 21
 load cd_setup.ss
 frames 2
@@ -94,4 +94,4 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 12
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2

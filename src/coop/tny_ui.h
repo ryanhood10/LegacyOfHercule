@@ -154,8 +154,7 @@ typedef struct UiState {
     u8 screens;                 // screens opened (tests)
     u32 unlock[2];              // fake unlock bits, fighters 0..63
     TBracket br;                // fake bracket (test command 29)
-    u8 shown_seat[16];          // the bracket as last drawn
-    u8 shown_win[4][8];
+    u8 shown_win[4][8];         // the bracket as last drawn (its seats: ui_shown_seat, tny_ui_bracket.c)
     u16 vram_before, vram_after;   // largest free OBJ VRAM block before / after the last screen (tests)
     u16 heap_fail;              // allocation failures seen (tests)
     u16 anim_frames;            // frames the last bracket animation ran (tests)

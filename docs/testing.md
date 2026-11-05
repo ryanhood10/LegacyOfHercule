@@ -20,6 +20,7 @@ inspection goes through the GDB stub.
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
 | Tournament bracket | 8, 16 and 8-team brackets filmed, the page's slide, the skip, BG2's map back, frame stalls on a screen |
+| Tournament of 32 | 16 teams: the menu's locks, the draw, the blocks and the final four filmed, whole tournaments by pad presses |
 | Tournament in co-op | every tournament with player 2 in, the director and picks by pad presses, to the record and the prize |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
 | Team combos: the tuned eight | every combo once, filmed a shot every 8 frames, each with its damage at equal attacker stats |
@@ -1169,13 +1170,22 @@ Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone
 
 ## Tournament bracket (headless, 2026-11-05, branch `nb-bracket`)
 
-`tools/headless/tny_bracket.txt` (self-checking, in `regfull.sh`; `docs/tournament.md` 26): every bracket through the ui's stand-ins (test command 29, 3: arg2 size | coop << 8 | 2 v 2 << 9), filmed: Full one player (the first look at each half, the slide's frames, the results, the sweep, A at once, the final page, the champion), Full two players (player 1 loses: his road goes), 8 teams, Quick and 4 teams, a Rumble board; the map's registers after the wide BG1, the plaza's BG2 map (blanked by `ui_bg1_wide`) back after a Full bracket; last the real thing by pad presses, one player, Legend, 16 fighters: the engine's draw, a decided fight, its results, A to the end of the tournament. Shots `b*`, `c*`, `d*`, `e*`, `f*`, `g*`.
+`tools/headless/tny_bracket.txt` (self-checking, in `regfull.sh`; `docs/tournament.md` 26): every bracket through the ui's stand-ins (test command 29, 3: arg2 size (8, 16; 32 with 2 v 2) | coop << 8 | 2 v 2 << 9), filmed: Full one player (the first look at each half, the slide's frames, the results, the sweep, A at once, the final page, the champion), Full two players (player 1 loses: his road goes), 8 teams, Quick and 4 teams, a Rumble board; the map's registers after the wide BG1, the plaza's BG2 map (blanked by `ui_bg1_wide`) back after a Full bracket; last the real thing by pad presses, one player, Legend, 16 fighters: the engine's draw, a decided fight, its results, A to the end of the tournament. Shots `b*`, `c*`, `d*`, `e*`, `f*`, `g*`.
 
 ```
 python tools/headless/st_expect.py tools/headless/tny_bracket.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
 ```
 
 **Does the screen stand still?** `UiState.anim_frames` (UI+0x82) counts the bracket's steps: `frames 1` and `peek16 UI+0x82 1` in a loop across a screen, and any frame where it does not move is a frame the screen stood still (one frame at a page's empty middle and at a landing is what it does now). For where the time goes, the hardware timer: `*(u16 *)0x0400010E = 0x83` starts timer 3 at 16,384 Hz (274 ticks a frame), read 0x0400010C around a piece of code into RAM past `UiState` and peek it. Temporary code, not committed.
+
+## Tournament of 32 (headless, 2026-11-05, branch `nb-bracket32`)
+
+`tools/headless/tny_n32.txt` (from `tny_n32_gen.py`; self-checking, in `regfull.sh`; about a minute; `docs/tournament.md` 2b, 26). On the ui's stand-in, filmed (shots `f*`): the first look at blocks A to D, a round's results, the sweep, a slide, the skip, the final four, the champion, the players out in the first round; OBJ VRAM back as it was, no allocation failure, the map's registers. By pad presses on the story's flags, test command 40 deciding the fights: the menu's locks (Rookie, Z-Fighter, Champion with everything open, Legend at 30 with somebody pickable; A refused, B back); Legend at exactly 30 (every seat taken); 1 v 1 without the line; three draws (seats all taken, nobody twice, the division's all in, the 13 strongest from below in, the weakest out); picks out of the pool (test command 25, `full` 2); the whole bracket, both players up, filmed to the champion (`w*`, nobody went down, the record's wins and Full win); real fights with both pads mashing, then **player 2 at 1 HP standing still until he falls** (`koed` 1, `out` 0), the team fights on and wins (`k*`); three more real first fights for a crash; the team out in the first round, the rest to a champion, no prize (`l*`). A press on a locked line is checked by the phase and B going back.
+
+```
+python tools/headless/tny_n32_gen.py
+python tools/headless/st_expect.py tools/headless/tny_n32.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
 
 ## Tournament sizes (headless, 2026-11-04)
 

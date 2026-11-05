@@ -88,7 +88,7 @@
 
 // RAM: the tournament region `tourneyram` (coop.ld, 0x0203EC00, 0x400 bytes; the heap cap ends there). Each
 // piece keeps its state in its own section: engine `.tny.eng` (<= 0x240), ui `.tny.ui` (<= 0x100), moves
-// `.tny.mv` (<= 0x80), grounds `.tny.gr` (<= 0x40), test command 40 `.tny.cp` (<= 0x20). State is NOLOAD: guard it with a magic word.
+// `.tny.mv` (<= 0x80), grounds `.tny.gr` (<= 0x40), test command 40 `.tny.cp` (<= 0x20), the pop-up queue `.tny.eq` and the bracket's last seats `.tny.us` (0x10 each). State is NOLOAD: guard it with a magic word.
 #define TNY_SECTION(name)   __attribute__((section(".tny." name)))
 // ROM: big generated art goes in the second blob `rom2` (0x08E00000, 2 MiB): mark frame data with TNY_ART.
 #define TNY_ART             __attribute__((section(".rodata.art")))
@@ -189,10 +189,11 @@ typedef struct TTalkSeat {
 int  tny_talk_hook(const TTalkSeat *seat);
 // The bracket the engine runs and the ui draws. seat[] holds fighter ids (TF_*), 0xFF = empty; a player sits in
 // a seat with his pick's id and p1_seat / p2_seat say which (0xFF = none). winner[r][m] is the winning seat of
-// match m in round r (0xFF = not played yet). Quick: size 8, 3 rounds; Full: size 16, 4 rounds.
+// match m in round r (0xFF = not played yet). Quick: size 8, 3 rounds; Full: size 16, 4 rounds. A 2 v 2's unit is a team (seats 2k, 2k + 1), one round
+// fewer: 4 teams 2 rounds, 8 teams 3, 16 teams (size 32, a 2 v 2's only: docs/tournament.md 2b) 4. So 4 rounds of at most 8 matches hold every size.
 typedef struct TBracket {
     u8 size, rounds, round, match;          // the next match to play / show
-    u8 seat[16];
+    u8 seat[32];
     u8 winner[4][8];
     u8 p1_seat, p2_seat;
     u8 tier, division;

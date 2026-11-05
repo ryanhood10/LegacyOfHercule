@@ -118,8 +118,7 @@ typedef struct TnyEng {
     Entity *from;                        // player 1's entity when a warp was asked for (arrived())
     TBracket br;
     CharacterEntry backup[2];
-    // pop-ups
-    const char *queue[4];
+    // pop-ups (the queue itself: tny_queue, below; it left here so that TBracket's 16 more seats moved nothing after this)
     u8 qn, shown;                        // queued, shown since boot (tests)
     u8 force_tiers, force_flags;         // test command 24: tiers forced open, TFORCE_* bits
     u16 seen_tiers, seen_story;          // story watch: what was open / in the party last time
@@ -171,7 +170,9 @@ _Static_assert(__builtin_offsetof(TnyEng, rec) == 360 && __builtin_offsetof(TnyE
 _Static_assert(__builtin_offsetof(TnyEng, phase) == 4 && __builtin_offsetof(TnyEng, pick) == 12 &&
                __builtin_offsetof(TnyEng, rng) == 100 && __builtin_offsetof(TnyEng, br) == 108 &&
                __builtin_offsetof(TnyEng, qn) == 236 && __builtin_offsetof(TnyEng, t_nofight) == 252 && __builtin_offsetof(TnyEng, rec) == 360, "TnyEng layout (tests)");
+_Static_assert(sizeof(TBracket) == 72 && __builtin_offsetof(TBracket, p1_seat) == 68, "TBracket layout (tests: p1_seat is eng + 0xB0)");
 static TnyEng eng TNY_SECTION("eng") __attribute__((used));
+static const char *tny_queue[4] TNY_SECTION("eq") __attribute__((used));   // the pop-ups queued: eng.qn of them
 
 #define TFORCE_POOL_FLAGS 1      // ignore the fighters' story flags (pool_flag)
 #define TFORCE_STANDIN    2      // a fighter whose art is not in this build fights with a stock stand-in body
@@ -441,6 +442,34 @@ static int pool_of(int tier, u8 *out) {
     return n;
 }
 
+// The biggest 2 v 2: 16 teams, 32 fighters, 30 of them opponents (Ryan, 2026-11-05: "we can use lower-tier fighters, but we must fill the tournament FIRST
+// with the fighters from that division selected"). No tier's own draw has 30: this one bracket adds the fighters from below who are not in it, strongest
+// first. 8 and 16 never come here: they draw as they did.
+#define TEAMS_POOL 30
+static int in_fill(int tier, int id) {
+    return tny_fighters[id].tier < tier && !(opp_pools[id] >> tier & 1) && tny_in_pool(id) && !picked(id);
+}
+static int fill_count(int tier) {
+    int n = 0;
+    for (int id = 0; id < TF_GOHAN; id++) if (in_fill(tier, id)) n++;
+    return n;
+}
+// The next ones from below, each once, until the seats are full (fewer than that: the menu and step_director do not let it come to this)
+static int fill_from_below(u8 *pool, int n, int seats) {
+    while (n < seats) {
+        int best = -1;
+        for (int id = 0; id < TF_GOHAN; id++) {
+            if (!in_fill(eng.tier, id) || (best >= 0 && opp_tab[id].rating <= opp_tab[best].rating)) continue;
+            int have = 0;
+            for (int i = 0; i < n; i++) if (pool[i] == id) have = 1;
+            if (!have) best = id;
+        }
+        if (best < 0) break;
+        pool[n++] = (u8)best;
+    }
+    return n;
+}
+
 // The waiting room's crowd: the pool of the highest tier open now (tny_grounds.c)
 int tny_in_top_pool(int id) {
     if (id < 0 || id >= TF_GOHAN) return 0;
@@ -526,8 +555,8 @@ static const char new_full[] = "New division: Full bracket!";
 void tny_notify(const char *line) {
     state_check();
     if (!line) return;
-    for (int i = 0; i < eng.qn; i++) if (eng.queue[i] == line) return;
-    if (eng.qn < 4) eng.queue[eng.qn++] = line;
+    for (int i = 0; i < eng.qn; i++) if (tny_queue[i] == line) return;
+    if (eng.qn < 4) tny_queue[eng.qn++] = line;
 }
 
 // The ui's tny_popup_show, unless only the weak default (an empty function: bx lr) is linked: then the line
@@ -1519,8 +1548,9 @@ static void keep_tops(u8 *pool, int n, int seats) {
 static void draw_bracket(void) {
     TBracket *b = &eng.br;
     memset(b, NO, sizeof *b);
-    b->size = (u8)(eng.full ? 16 : 8);              // fighters: a 2 v 2 is 4 or 8 teams
-    b->rounds = (u8)((eng.full ? 4 : 3) - (eng.division == DIV_2V2 ? 1 : 0));
+    int big = eng.full == 2 && eng.division == DIV_2V2;   // 16 teams: a 2 v 2's alone (the rounds are the teams')
+    b->size = (u8)(big ? 32 : eng.full ? 16 : 8);   // fighters: a 2 v 2 is 4, 8 or 16 teams
+    b->rounds = (u8)((big ? 5 : eng.full ? 4 : 3) - (eng.division == DIV_2V2 ? 1 : 0));
     b->round = 0;
     b->match = 0;
     b->tier = eng.tier;
@@ -1540,9 +1570,13 @@ static void draw_bracket(void) {
     b->seat[b->p1_seat] = eng.pick[0];
     if (b->p2_seat != NO) b->seat[b->p2_seat] = eng.pick[1];
     u8 pool[TF_GOHAN];
-    int n = pool_of(eng.tier, pool), k = 0;
+    int n = pool_of(eng.tier, pool), k = 0, seats = b->size - (b->p2_seat != NO ? 2 : 1);
     shuffle(pool, n);
-    seed_tops(pool, n, b->size - (b->p2_seat != NO ? 2 : 1));
+    seed_tops(pool, n, seats);
+    if (big) {                                      // the division's fighters all in, those from below after them, then all of them shuffled together
+        n = fill_from_below(pool, n, seats);
+        shuffle(pool, n < seats ? n : seats);
+    }
     if (eng.force_opp != NO) {                      // test command 21: him first, into the seat across from player 1
         int j = 0;
         while (j < n && pool[j] != eng.force_opp) j++;
@@ -1550,7 +1584,7 @@ static void draw_bracket(void) {
         for (; j > 0; j--) pool[j] = pool[j - 1];
         pool[0] = eng.force_opp;
     }
-    if (w == 2) { pair_up(pool, n); keep_tops(pool, n, b->size - (b->p2_seat != NO ? 2 : 1)); }
+    if (w == 2) { pair_up(pool, n); keep_tops(pool, n, seats); }
     // fill unit by unit so a bye is a whole unit at the end of the draw (a 2 v 2 team is never half empty)
     for (int u = 0; u < nu; u++)
         for (int i = 0; i < w; i++) {
@@ -1806,6 +1840,15 @@ static void begin_tournament(void) {
     }
 }
 
+// Can a 2 v 2 of 16 teams be filled right now, whoever the players pick? A pick is never also drawn (picked()), so up to two of the pool's fighters the
+// players can pick do not count: with a pick of theirs the seats would stay empty, and the menu must not promise what the select screen takes away.
+static int fills_teams(int tier) {
+    int n = pool_of(tier, 0) + fill_count(tier), spare = 0;
+    for (int id = 0; id < TF_GOHAN && spare < 2; id++)
+        if (((opp_pools[id] >> tier & 1) || in_fill(tier, id)) && tny_in_pool(id) && pick_playable(id)) spare++;
+    return n - spare >= TEAMS_POOL;
+}
+
 // The director's menus, one step at a time (docs/perfect-pass.md 11.5): B goes back one step, past the first it leaves
 // (0). Player 2's screen answers to both his face buttons and player 1's B is the way back from it (tny_ui_grid.c): his
 // pad's "A" is the GBA's B under p2_keys.py's default, and that B used to end the whole tournament the moment he picked
@@ -1818,7 +1861,7 @@ static int director_menus(int players) {
     if (locked == (1u << TIER_COUNT) - 1) return 0;
     static const char *const div2[3] = { "1 v 1", "2 v 2", "Royal Rumble" };
     static const char *const div1[2] = { "1 v 1", "Royal Rumble" };
-    static const char *const size[2] = { "8 fighters", "16 fighters" };
+    static const char *const size[3] = { "8 fighters", "16 fighters", "32 fighters" };
     while (stage != DS_DONE) {
         u8 p = NO;
         switch (stage) {
@@ -1836,14 +1879,28 @@ static int director_menus(int players) {
             eng.full = 0;
             stage = DS_SIZE;
             break;
-        case DS_SIZE:                                // every division (Ryan, 2026-11-04); 16 waits for a pool that fills it
-            c = tny_ui_choose_locked("How many fighters?", size, 2, pool_of(eng.tier, 0) >= FULL_POOL ? 0 : 2,
-                                     "16 opens as more fighters join", "Not enough fighters yet: come back later!");
+        case DS_SIZE: {                              // every division (Ryan, 2026-11-04); 16 waits for a pool that fills it, 32 is a 2 v 2's, the same
+            u32 shut = pool_of(eng.tier, 0) >= FULL_POOL ? 0 : 2;
+            const char *hint = "16 opens as more fighters join", *why = "Not enough fighters yet: come back later!";
+            int lines = 2;
+            if (eng.division == DIV_2V2) {
+                lines = 3;
+                if (!shut && fills_teams(eng.tier)) hint = "32 fighters: 16 teams of two";
+                else {
+                    shut |= 4;
+                    if (!(shut & 2)) {                // only Legend ever has them: no "come back later" for the others
+                        hint = eng.tier == TIER_LEGEND ? "32 opens as more fighters join" : "32 needs the Legend tier's fighters";
+                        if (eng.tier != TIER_LEGEND) why = hint;
+                    }
+                }
+            }
+            c = tny_ui_choose_locked("How many fighters?", size, lines, shut, hint, why);
             if (c < 0) { stage = DS_DIV; break; }
             eng.full = (u8)c;
             sized = 1;
             stage = DS_P1;
             break;
+        }
         case DS_P1:
             if (!tny_ui_select(0, eng.tier, &p)) { stage = sized ? DS_SIZE : DS_DIV; break; }
             eng.pick[0] = pick_playable(p) ? p : (u8)own_pick(eng.own[0]);
@@ -1875,6 +1932,7 @@ static void step_director(void) {
         }
     } else if (!director_menus(players)) { eng.phase = P_IDLE; return; }
     if (eng.division == DIV_2V2 && players < 2) eng.division = DIV_1V1;   // 2 v 2 is co-op only
+    if (eng.full == 2 && (eng.division != DIV_2V2 || pool_of(eng.tier, 0) + fill_count(eng.tier) < TEAMS_POOL)) eng.full = 1;
     if (eng.full && pool_of(eng.tier, 0) < 15) eng.full = 0;
     eng.preset = 0;
     resolve_slots();
@@ -2240,8 +2298,8 @@ static void step_exit(void) {
 
 static int popup_step(void) {
     if (!eng.qn) return 0;
-    const char *line = eng.queue[0];
-    for (int i = 1; i < eng.qn; i++) eng.queue[i - 1] = eng.queue[i];
+    const char *line = tny_queue[0];
+    for (int i = 1; i < eng.qn; i++) tny_queue[i - 1] = tny_queue[i];
     eng.qn--;
     eng.shown++;
     if (popup_is_stub()) say(line, 0, 0, 0, 0);
@@ -2450,7 +2508,7 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 //                 lost; 2: the running duel ends, arg2 = the winner (1 / 2)
 //   23 RECORD     arg 0: wipe the record; 1 / 2: set / clear fighter arg2's unlock bit; 3: reread it into eng.rec
 //   24 FORCE_POOL arg = tiers forced open (bits 0-4), arg2 = TFORCE_* (1 ignore story flags, 2 stand-in bodies)
-//   25 START      a tournament without the screens: arg = division | full << 4 | tier << 8, arg2 = pick 1 | pick 2 << 8
+//   25 START      a tournament without the screens: arg = division | full << 4 (2: 32 fighters, a 2 v 2's) | tier << 8, arg2 = pick 1 | pick 2 << 8
 //                 (0xFF = his own character); from wherever player 1 stands (that is also the way back)
 //   38 CHECKS     the perfecting pass's checks (docs/ids.md). arg 0: a check, arg2 = kind << 16 | n; the answer
 //                 replaces the argument word coop2.cmd_arg (0x0203FD0C), 0 = no, so a test posts arg 0 and waits for
@@ -2527,7 +2585,7 @@ void tny_engine_test(u32 cmd, u32 arg, u32 arg2) {
     case 25:
         if (eng.phase != P_IDLE || !g_PlayerObject) break;
         eng.division = (u8)(arg & 3);
-        eng.full = (u8)((arg >> 4) & 1);
+        eng.full = (u8)((arg >> 4) & 3);
         eng.tier = (u8)((arg >> 8) & 7);
         if (eng.tier >= TIER_COUNT) eng.tier = 0;
         eng.preset_pick[0] = (u8)arg2;

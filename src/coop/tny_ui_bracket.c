@@ -6,8 +6,10 @@
 // 16 seats (a Full bracket, 8 teams): one half at a time. A half page is one-sided (docs/tournament.md 26): all eight names
 // in a column on its outer edge, each on its own row, their faces zigzag in two columns beside them on the line, the tree
 // runs inwards to the "Final" box on the inner edge; the right half is the left half mirrored; the final has its own page.
+// 32 seats (16 teams, a 2 v 2's alone; docs/tournament.md 26): four "block" pages, each as an 8-team half page (four teams, their two rounds, the box they lead
+// to), then the "Final four" page, the 4-team tree (the block winners, the semifinals, the final). Never more than 8 faces on a page, as on every other page.
 // The pages slide (S_PAN): BG1 scrolls out, the page is drawn while off screen, it scrolls in from the other side.
-// Phase 0 shows the bracket as it stands and presents the next match: with 16 seats first a look at each half; the next
+// Phase 0 shows the bracket as it stands and presents the next match: with 16 seats first a look at each half, with 32 at each block; the next
 // match's lines (and boxes) light up, then both faces leave the tree for the ends of the bar at the bottom and the bar says
 // "GOHAN vs FRIEZA". Phase 1 first animates every result since the screen was last shown (kept in the ui's RAM): the players'
 // match first, the loser greys and the winner walks to the next column with a sound, then the page's other matches in one
@@ -54,12 +56,15 @@
 #define T_PAGE 12            // a beat after a page has slid in, before its results
 #define T_PAN 20             // a page's slide: out, then the next one in (240 px each)
 #define T_TOUR 90            // the first look at each half
+#define T_TOUR_B 60          // ... at each of 16 teams' four blocks
 #define T_SPOT 40            // the next match lit on the tree, before the two leave it
 #define T_VS 30
 #define T_WAIT 240
 #define T_WAIT_CHAMP 150     // the champion's own screen follows
 
 _Static_assert(__builtin_offsetof(UiState, vs) == 141, "tny_coop.txt peeks the banner's seats");
+#define ALL_SEATS 32         // "the rest of the page": no page has more
+static u8 ui_shown_seat[16] TNY_SECTION("us") __attribute__((used));   // the bracket's first seats as last drawn: the same draw? (UiState.shown_ok)
 
 // One result being animated: the winner (and a team's partner) on his way
 typedef struct Walk {
@@ -72,8 +77,8 @@ typedef struct Br {
     int phase;
     TBracket b;
     u8 shown[4][8];          // winners as drawn so far
-    u8 page;                 // page drawn: 16 seats 0 / 1 the halves, 2 the final
-    Entity *face[16];        // per seat, on the page drawn
+    u8 page;                 // page drawn: 16 seats 0 / 1 the halves, 2 the final; 32 seats 0-3 the blocks, 4 the final four
+    Entity *face[ALL_SEATS]; // per seat, on the page drawn
     u8 ev_r[16], ev_m[16];   // results still to animate
     u8 n_ev, ev;
     u8 state;
@@ -91,7 +96,7 @@ typedef struct Br {
     s8 pan_dir;              // the pages move: -1 to the left
     s16 pan_off;             // the page's x offset now (the faces have it added)
     u8 name_i;               // the page that slides in: its names, one a frame (seats from here on still to draw)
-    u16 face_done;           // ... and its faces, two a frame (seats done)
+    u32 face_done;           // ... and its faces, two a frame (seats done)
     u8 dim_i;                // S_SPOT: the faces take their looks a few a frame (seats from here on)
     u8 titled;               // the title is drawn (it stays through the page turns, but for "Left half")
 } Br;
@@ -107,6 +112,21 @@ static int same_bytes(const u8 *a, const u8 *b, int n) {
 static int is_team(const TBracket *b) { return b->division == DIV_2V2; }
 // 16 seats: 16 fighters or 8 teams, a page per half
 static int halves(const TBracket *b) { return b->size == 16; }
+// 32 seats: 16 teams, a page per block of four teams
+static int blocks(const TBracket *b) { return b->size == 32; }
+static int paged(const TBracket *b) { return b->size != 8; }
+static int final_page(const TBracket *b) { return blocks(b) ? 4 : 2; }
+// A page of the one-sided kind: a half or a block
+static int on_side_page(const Br *br) { return paged(&br->b) && br->page < final_page(&br->b); }
+// The 16-seat bracket's own final page
+static int on_final2(const Br *br) { return halves(&br->b) && br->page == 2; }
+// A page of the two-sided tree: the 8-seat bracket's, or 32 seats' last, which is that same picture of 4 teams
+static int on_tree(const Br *br) { return !paged(&br->b) || (blocks(&br->b) && br->page == 4); }
+// The round that page's seats stand in, and a seat's place in its 8-seat picture
+static int tree_r0(const Br *br) { return blocks(&br->b) ? 2 : 0; }
+static int tree_seat(const Br *br, int s) { return blocks(&br->b) ? ((s >> 3) << 1) | (s & 1) : s; }
+// On the right of the floor plan (a half page and a block mirror there)
+static int seat_right(const Br *br, int s) { return blocks(&br->b) ? s >> 4 : s >> 3; }
 static int lead_of(const Br *br, int s) { return is_team(&br->b) ? s & ~1 : s; }
 static int matches(const TBracket *b, int r) { return (is_team(b) ? b->size / 2 : b->size) >> (r + 1); }
 static int match_of(const Br *br, int s, int r) { return (is_team(&br->b) ? s >> 1 : s) >> (r + 1); }
@@ -131,22 +151,23 @@ static int is_out(const Br *br, int s) {
     return w != 0xFF && w != lead;
 }
 static int page_of_match(const Br *br, int r, int m) {
-    if (!halves(&br->b)) return 0;
+    if (!paged(&br->b)) return 0;
+    if (blocks(&br->b)) return r >= 2 ? 4 : r ? m : m >> 1;   // eight matches, then four: two on a block, then its winner's; the rest on the last page
     if (r >= br->b.rounds - 1) return 2;
     return m >> (br->b.rounds - 2 - r);
 }
 static int seat_on_page(const Br *br, int s) {
-    if (!halves(&br->b)) return 1;
-    if (br->page < 2) return (s >> 3) == br->page;
-    return level_of(br, s) >= br->b.rounds - 1;     // the final page: the two half champions
+    if (!paged(&br->b)) return 1;
+    if (br->page < final_page(&br->b)) return (s >> 3) == br->page;
+    return level_of(br, s) >= br->b.rounds - (blocks(&br->b) ? 2 : 1);   // the last page: the half / block champions
 }
 
-static int h_x(int s, int x) { return (s >> 3) ? 239 - x : x; }
+static int h_x(const Br *br, int s, int x) { return seat_right(br, s) ? 239 - x : x; }
 
 // A half page or the final page: centre of seat s at level l
 static void half_pos(const Br *br, int s, int l, int *x, int *y) {
     int team = is_team(&br->b), local = s & 7, second = team ? s & 1 : 0;
-    if (br->page == 2) {
+    if (on_final2(br)) {
         int side = s >> 3;
         if (team) {
             if (l >= 3) { *x = second ? 134 : 106; *y = 44; }
@@ -164,13 +185,16 @@ static void half_pos(const Br *br, int s, int l, int *x, int *y) {
     else if (l == 1) { xx = 112; yy = (HR(local & 6) + HR((local & 6) + 1)) / 2; }
     else if (l == 2) { xx = 146; yy = (HR(local & 4) + HR((local & 4) + 3)) / 2; }
     else { xx = 180; yy = H_MID; }
-    *x = h_x(s, xx);
+    *x = h_x(br, s, xx);
     *y = yy;
 }
 
 // Centre of seat s drawn at level l on the page drawn.
 static void seat_pos(const Br *br, int s, int l, int *x, int *y) {
-    if (halves(&br->b)) { half_pos(br, s, l, x, y); return; }
+    if (!on_tree(br)) { half_pos(br, s, l, x, y); return; }
+    s = tree_seat(br, s);
+    l -= tree_r0(br);
+    if (l < 0) l = 0;
     if (is_team(&br->b) && l > 0) {   // a team: the partners one above the other, then side by side
         int side = s >> 2, second = s & 1;
         if (l == 1) { *x = side ? 156 : 84; *y = ROW_Y0 + ROW_DY + ROW_DY / 2 + (second ? 14 : -14); }
@@ -224,20 +248,20 @@ static void seat_line(Br *br, int s, int r, int c) {
     int x0, y0, x1, y1;
     seat_pos(br, s, r, &x0, &y0);
     seat_pos(br, s, r + 1, &x1, &y1);
-    int team = is_team(&br->b);
-    if (team && (r > 0 || halves(&br->b))) {        // from the team's middle to the team's middle
+    int team = is_team(&br->b), tree = on_tree(br), rt = tree ? r - tree_r0(br) : r;
+    if (team && (rt > 0 || !tree)) {                // from the team's middle to the team's middle
         int xb, yb;
         seat_pos(br, s + 1, r, &xb, &yb);
         x0 = (x0 + xb) / 2; y0 = (y0 + yb) / 2;
         seat_pos(br, s + 1, r + 1, &xb, &yb);
         x1 = (x1 + xb) / 2; y1 = (y1 + yb) / 2;
     }
-    if (halves(&br->b)) {
-        if (br->page == 2) y1 = F_BOX_Y + F_BOX_H;  // up to the champion's box
+    if (!tree) {
+        if (on_final2(br)) y1 = F_BOX_Y + F_BOX_H;  // up to the champion's box
         if (r == 0) {
-            x0 = h_x(s, H_LINE_X);
+            x0 = h_x(br, s, H_LINE_X);
             if (team) {                             // the two seats' lines join, the team's runs on from there
-                int xj = h_x(s, H_TEAM_J), ya = HR(s & 7), yb = HR((s & 7) + 1);
+                int xj = h_x(br, s, H_TEAM_J), ya = HR(s & 7), yb = HR((s & 7) + 1);
                 int a = x0 < xj ? x0 : xj, w = x0 < xj ? xj - x0 : x0 - xj;
                 bm_fill(a, ya, w + 2, 2, c);
                 bm_fill(a, yb, w + 2, 2, c);
@@ -249,9 +273,9 @@ static void seat_line(Br *br, int s, int r, int c) {
         elbow(x0, y0, x1, y1, c);
         return;
     }
-    if (team && r == 0) {                           // the two seats join, then the team's line runs in
-        int xb, yb, xj = (s >> 2) ? 166 : 74;
-        seat_pos(br, s + 1, 0, &xb, &yb);
+    if (team && rt == 0) {                          // the two seats join, then the team's line runs in
+        int xb, yb, xj = (tree_seat(br, s) >> 2) ? 166 : 74;
+        seat_pos(br, s + 1, r, &xb, &yb);
         int ax = x0 < xj ? x0 : xj, w0 = x0 < xj ? xj - x0 : x0 - xj;
         bm_fill(ax, y0 + 6, w0 + 2, 2, c);
         bm_fill(ax, yb + 6, w0 + 2, 2, c);
@@ -259,7 +283,7 @@ static void seat_line(Br *br, int s, int r, int c) {
         elbow(xj, (y0 + yb) / 2 + 6, x1, ROW_Y0 + ROW_DY + ROW_DY / 2, c);
         return;
     }
-    elbow(x0, r ? y0 : y0 + 6, x1, y1, c);
+    elbow(x0, rt ? y0 : y0 + 6, x1, y1, c);
 }
 
 static void draw_match(Br *br, int r, int m) {
@@ -273,11 +297,11 @@ static void draw_match(Br *br, int r, int m) {
     }
 }
 
-// A half page: the line from the half's last column to the "Final" box
+// A half page or a block: the line from its last column to the box it leads to
 static void final_stub(Br *br, int c) {
     int s = br->page << 3;
     int xs = is_team(&br->b) ? 172 : 180;
-    elbow(h_x(s, xs), H_MID, h_x(s, H_BOX_X), H_MID, c);
+    elbow(h_x(br, s, xs), H_MID, h_x(br, s, H_BOX_X), H_MID, c);
 }
 
 // The players' road: what they have won and what is ahead of them, in their colours, until they lose
@@ -290,7 +314,7 @@ static void draw_players(Br *br) {
             if (r >= l && out) break;
             if (page_of_match(br, r, match_of(br, lead, r)) == br->page) seat_line(br, lead, r, c);
         }
-        if (!out && halves(&br->b) && br->page < 2 && (lead >> 3) == br->page) final_stub(br, c);
+        if (!out && on_side_page(br) && (lead >> 3) == br->page) final_stub(br, c);
     }
 }
 
@@ -298,11 +322,11 @@ static void draw_players(Br *br) {
 static void erase_road(Br *br, int lead, int r) {
     for (r++; r < br->b.rounds; r++)
         if (page_of_match(br, r, match_of(br, lead, r)) == br->page) seat_line(br, lead, r, C_CLEAR);
-    if (halves(&br->b) && br->page < 2 && (lead >> 3) == br->page) final_stub(br, C_CLEAR);
+    if (on_side_page(br) && (lead >> 3) == br->page) final_stub(br, C_CLEAR);
 }
 
 static void draw_lines(Br *br) {
-    if (halves(&br->b) && br->page < 2) final_stub(br, br->shown[br->b.rounds - 2][br->page] == 0xFF ? C_DARK : C_LINE);
+    if (on_side_page(br)) final_stub(br, br->shown[blocks(&br->b) ? 1 : br->b.rounds - 2][br->page] == 0xFF ? C_DARK : C_LINE);
     for (int r = 0; r < br->b.rounds; r++) {
         int n = matches(&br->b, r);
         for (int m = 0; m < n && m < 8; m++)
@@ -317,17 +341,17 @@ static void draw_name(Ui *u, Br *br, int s, int colour) {
     char sb[24];
     const char *name = tny_fighters[br->b.seat[s]].name;
     int x, y;
-    if (halves(&br->b)) {
-        if (br->page == 2) {
+    if (!on_tree(br)) {
+        if (on_final2(br)) {
             if (is_team(&br->b)) ui_text(u, (s >> 3) ? 174 : 66, 102 + (s & 1) * 12, 1, colour, ui_short_name(name, 76, sb, sizeof sb));
             else { seat_pos(br, s, br->b.rounds - 1, &x, &y); ui_text(u, x, y + 18, 1, colour, ui_short_name(name, 76, sb, sizeof sb)); }
             return;
         }
-        ui_text(u, h_x(s, H_NAME_X), HR(s & 7) - 6, (s >> 3) ? 2 : 0, colour, ui_short_name(name, H_NAME_W, sb, sizeof sb));
+        ui_text(u, h_x(br, s, H_NAME_X), HR(s & 7) - 6, seat_right(br, s) ? 2 : 0, colour, ui_short_name(name, H_NAME_W, sb, sizeof sb));
         return;
     }
-    seat_pos(br, s, 0, &x, &y);
-    int right = (s & 7) >= 4;
+    seat_pos(br, s, tree_r0(br), &x, &y);
+    int right = tree_seat(br, s) >= 4;
     ui_text(u, right ? x - 13 : x + 13, y - 12, right ? 2 : 0, colour, ui_short_name(name, NAME_W, sb, sizeof sb));
 }
 
@@ -350,7 +374,9 @@ static void vs_names(Ui *u, Br *br) {
 }
 
 static void draw_page_label(Ui *u, Br *br) {
-    if (halves(&br->b) && br->page < 2) ui_text(u, 130, 2, 1, C_GREY, br->page ? "Right half" : "Left half");
+    static const char *const block[5] = { "Block A", "Block B", "Block C", "Block D", "Final four" };
+    if (blocks(&br->b)) ui_text(u, 130, 2, 1, C_GREY, block[br->page]);
+    else if (on_side_page(br)) ui_text(u, 130, 2, 1, C_GREY, br->page ? "Right half" : "Left half");
 }
 
 static void draw_title(Ui *u, Br *br) {
@@ -379,7 +405,7 @@ static void vs_boxes(Br *br, int page, int fill) {
             int s = k ? br->vs_b : br->vs_a, x, y;
             for (int i = 0; i < (is_team(&br->b) ? 2 : 1); i++) {   // a team: both seats
                 int l = level_of(br, s + i);
-                if (l == 0 && halves(&br->b)) continue;
+                if (l == 0 && !on_tree(br)) continue;
                 seat_pos(br, s + i, l, &x, &y);
                 bm_fill(x - 12, y - 13, 24, 26, fill);
                 if (fill) bm_frame(x - 12, y - 13, 24, 26, C_GOLD);
@@ -405,7 +431,7 @@ static void faces_step(Br *br, int n) {
             if (l > best_l) { best = s; best_l = l; }
         }
         if (best < 0) return;
-        br->face_done |= (u16)(1 << best);
+        br->face_done |= 1u << best;
         int x, y;
         seat_pos(br, best, best_l, &x, &y);
         br->face[best] = ui_face(tny_fighters[br->b.seat[best]].sprite, x + br->pan_off, y);
@@ -417,7 +443,7 @@ static void faces_step(Br *br, int n) {
 // frames' on their first update, and the page's outer edge is the last to come on screen: drawn a little a frame while
 // it is still off screen, the slide never stops. (Opened from black: all at once.)
 static void build_page(Ui *u, Br *br, int page, int later) {
-    for (int s = 0; s < 16; s++) { ui_face_kill(br->face[s]); br->face[s] = 0; }
+    for (int s = 0; s < ALL_SEATS; s++) { ui_face_kill(br->face[s]); br->face[s] = 0; }
     br->face_done = 0;
     br->name_i = 0;
     br->page = (u8)page;
@@ -427,21 +453,21 @@ static void build_page(Ui *u, Br *br, int page, int later) {
     bm_fill(102, 0, 58, 16, C_PANEL);               // the page's label: when it lands
     if (!later) draw_page_label(u, br);
     bar_clear();
-    if (halves(&br->b) && page < 2) {               // the names' column; the box the half leads to
-        int s = page << 3;
-        bm_fill(page ? 239 - H_LINE_X - 1 : 0, 17, H_LINE_X + 2, BAR_Y - 17, C_NAVY);
-        int bx = page ? 239 - H_BOX_X - H_BOX_W + 1 : H_BOX_X;
+    if (on_side_page(br)) {                         // the names' column; the box the half or the block leads to
+        int s = page << 3, right = seat_right(br, s);
+        bm_fill(right ? 239 - H_LINE_X - 1 : 0, 17, H_LINE_X + 2, BAR_Y - 17, C_NAVY);
+        int bx = right ? 239 - H_BOX_X - H_BOX_W + 1 : H_BOX_X;
         bm_fill(bx, H_MID - 8, H_BOX_W, 18, C_PANEL);
         bm_frame(bx, H_MID - 8, H_BOX_W, 18, C_GOLD);
-        ui_text(u, h_x(s, H_BOX_X + H_BOX_W / 2), H_MID - 6, 1, C_GOLD, "Final");
-    } else if (halves(&br->b)) {                    // the champion's box, the finalists come to it
+        ui_text(u, h_x(br, s, H_BOX_X + H_BOX_W / 2), H_MID - 6, 1, C_GOLD, blocks(&br->b) ? "Semis" : "Final");
+    } else if (on_final2(br)) {                     // the champion's box, the finalists come to it
         int w = is_team(&br->b) ? 60 : 32;
         bm_fill(120 - w / 2, F_BOX_Y, w, F_BOX_H, C_PANEL);
         bm_frame(120 - w / 2, F_BOX_Y, w, F_BOX_H, C_GOLD);
     }
     vs_boxes(br, page, C_GOLD_DARK);
     draw_lines(br);
-    if (!later) { names_step(u, br, 16); faces_step(br, 16); }
+    if (!later) { names_step(u, br, ALL_SEATS); faces_step(br, ALL_SEATS); }
 }
 
 // One line in the bar; a match between its two faces (two: the teams' longer names, one above the other)
@@ -485,7 +511,7 @@ static void collect_events(Br *br) {
         int n = matches(&br->b, r);
         for (int m = 0; m < n && m < 8; m++)
             if (pending(br, r, m) && players_match(br, r, m)) { add_event(br, r, m); last_page = page_of_match(br, r, m); }
-        for (int pass = 0; pass < 4; pass++) {          // pass 0: last_page; passes 1-3: pages 0, 1, 2 (others)
+        for (int pass = 0; pass <= final_page(&br->b) + 1; pass++) {   // pass 0: last_page; then pages 0, 1, 2 ... (others)
             for (int m = 0; m < n && m < 8; m++) {
                 if (!pending(br, r, m) || players_match(br, r, m)) continue;
                 int pg = page_of_match(br, r, m);
@@ -563,28 +589,30 @@ static int ease(int a, int b, int t, int d) {
 static void pan_set(Ui *u, Br *br, int off) {
     int d = off - br->pan_off;
     if (d)
-        for (int s = 0; s < 16; s++)
+        for (int s = 0; s < ALL_SEATS; s++)
             if (br->face[s]) ui_face_move(br->face[s], ui_face_x(br->face[s]) + d, ui_face_y(br->face[s]));
     br->pan_off = (s16)off;
     u->bg1_x = (u16)(-off & 511);
 }
 
 static void start_pan(Br *br, int page, int after) {
-    static const u8 place[3] = { 0, 2, 1 };          // left half, right half, final: their order on the floor
+    static const u8 place[2][5] = { { 0, 2, 1 },     // left half, right half, final: their order on the floor
+                                    { 0, 1, 3, 4, 2 } };   // blocks A, B, C, D, the final four: A B, the final four, C D
+    const u8 *floor = place[blocks(&br->b)];
     br->pan_to = (u8)page;
     br->pan_after = (u8)after;
     br->pan_in = 0;
-    br->pan_dir = place[page] > place[br->page] ? -1 : 1;
+    br->pan_dir = floor[page] > floor[br->page] ? -1 : 1;
     br->state = S_PAN;
     br->t = 0;
     ui_sfx(UI_SFX_SLIDE);
 }
 
-// The first look at a half: whose half it is
+// The first look at a half or a block: whose it is
 static void tour_banner(Ui *u, Br *br) {
     int p = br->b.p1_seat, q = br->b.p2_seat;
     int s = p != 0xFF && (p >> 3) == br->page ? p : q != 0xFF && (q >> 3) == br->page ? q : 0xFF;
-    if (s == 0xFF) banner(u, "The other half", 0, 0, 0);
+    if (s == 0xFF) banner(u, blocks(&br->b) ? "Another block" : "The other half", 0, 0, 0);
     else banner_unit(u, br, lead_of(br, s), " starts here", " start here");
 }
 
@@ -700,14 +728,14 @@ static void finish_all(Ui *u, Br *br) {
 static void bracket_open(Ui *u) {
     Br *br = u->ctx;
     u->shrink = 1;                                // giants' faces at half size (tny_ui.c shrink_giants)
-    int tour = br->phase == 0 && halves(&br->b) && !br->n_ev;
-    if (halves(&br->b)) ui_bg1_wide();
+    int tour = br->phase == 0 && paged(&br->b) && !br->n_ev;
+    if (paged(&br->b)) ui_bg1_wide();
     br->state = tour ? S_TOUR : S_START;
     int page = 0;
     if (tour) page = 0;
     else if (br->n_ev) page = page_of_match(br, br->ev_r[0], br->ev_m[0]);
     else if (br->b.round < br->b.rounds) page = page_of_match(br, br->b.round, br->b.match);
-    else if (halves(&br->b)) page = 2;
+    else if (paged(&br->b)) page = final_page(&br->b);
     find_next(br);
     if (br->n_ev || tour) br->vs_a = br->vs_b = 0xFF;   // the boxes come once the results are in
     build_page(u, br, page, 0);
@@ -734,9 +762,9 @@ static void bracket_step(Ui *u) {
     case S_START:
         if (++br->t >= T_START) { br->t = 0; br->state = br->ev < br->n_ev ? S_EVENT : S_NEXT; }
         break;
-    case S_TOUR:                                   // a look at each half, left then right
-        if (++br->t >= T_TOUR) {
-            if (br->page == 0) start_pan(br, 1, S_TOUR);
+    case S_TOUR:                                   // a look at each half, left then right; at each block, in order
+        if (++br->t >= (blocks(&br->b) ? T_TOUR_B : T_TOUR)) {
+            if (br->page < final_page(&br->b) - 1) start_pan(br, br->page + 1, S_TOUR);
             else { br->t = 0; br->state = S_NEXT; }
         }
         break;
@@ -756,8 +784,8 @@ static void bracket_step(Ui *u) {
             }
         } else {                                   // in, slower and slower
             pan_set(u, br, -br->pan_dir * 240 * k * k / (d * d));
-            faces_step(br, t >= d ? 16 : 2);
-            if (t >= 3 || t >= d) names_step(u, br, t >= d ? 16 : 1);   // the name column: on screen last, past frame 10
+            faces_step(br, t >= d ? ALL_SEATS : 2);
+            if (t >= 3 || t >= d) names_step(u, br, t >= d ? ALL_SEATS : 1);   // the name column: on screen last, past frame 10
             if (t >= d) {
                 pan_set(u, br, 0);
                 draw_page_label(u, br);
@@ -786,7 +814,7 @@ static void bracket_step(Ui *u) {
         find_next(br);
         int champ = champion(br);
         if (br->vs_a == 0xFF && champ == 0xFF) { br->state = S_WAIT; br->t = 0; break; }
-        int pg = champ != 0xFF ? (halves(&br->b) ? 2 : 0) : page_of_match(br, br->b.round, br->b.match);
+        int pg = champ != 0xFF ? (paged(&br->b) ? final_page(&br->b) : 0) : page_of_match(br, br->b.round, br->b.match);
         if (pg != br->page) { start_pan(br, pg, S_NEXT); break; }
         // the boxes are drawn in place (polish2: a full rebuild cleared the bitmap and the screen showed one frame
         // without names or lines), and only what changes: a name is a third of a frame's work
@@ -811,10 +839,10 @@ static void bracket_step(Ui *u) {
         break;
     }
     case S_SPOT: {                                 // the next match lit on the tree, then the two come down to the bar
-        for (int n = 0; n < 2 && br->dim_i < 16; br->dim_i++)   // a look re-decodes the frame: a few a frame
+        for (int n = 0; n < 2 && br->dim_i < ALL_SEATS; br->dim_i++)   // a look re-decodes the frame: a few a frame
             if (br->face[br->dim_i]) { face_state(br, br->dim_i); n++; }
         if (br->t++ < br->wait) break;
-        for (; br->dim_i < 16; br->dim_i++) face_state(br, br->dim_i);
+        for (; br->dim_i < ALL_SEATS; br->dim_i++) face_state(br, br->dim_i);
         vs_boxes(br, br->page, C_CLEAR);
         draw_lines(br);
         Entity *a = br->face[br->vs_a], *b = br->face[br->vs_b];
@@ -864,7 +892,7 @@ static void bracket_step(Ui *u) {
 
 void tny_ui_bracket(int phase) {
     const TBracket *src = ui_bracket();
-    if (!src || (src->size != 8 && src->size != 16)) return;
+    if (!src || (src->size != 8 && src->size != 16 && src->size != 32)) return;
     Br *br = Arena_Alloc(sizeof(Br));
     if (!br) { ui_st.heap_fail++; return; }
     memset(br, 0, sizeof *br);
@@ -872,7 +900,7 @@ void tny_ui_bracket(int phase) {
     br->b = *src;
     if (br->b.rounds > 4) br->b.rounds = 4;
     // what the screen showed last time: the results to animate are the difference
-    int same = ui_st.magic == UI_MAGIC && ui_st.shown_ok && same_bytes(ui_st.shown_seat, br->b.seat, 16);
+    int same = ui_st.magic == UI_MAGIC && ui_st.shown_ok && same_bytes(ui_shown_seat, br->b.seat, sizeof ui_shown_seat);
     if (phase == 0 || !same) {
         memset(br->shown, 0xFF, sizeof br->shown);
         if (phase == 0) memcpy(br->shown, br->b.winner, sizeof br->shown);
@@ -883,7 +911,7 @@ void tny_ui_bracket(int phase) {
     ui_st.anim_frames = 0;
     ui_run(bracket_open, bracket_step, 0, br, UI_PAD_BOTH);
     memcpy(ui_st.shown_win, br->b.winner, sizeof ui_st.shown_win);
-    memcpy(ui_st.shown_seat, br->b.seat, 16);
+    memcpy(ui_shown_seat, br->b.seat, sizeof ui_shown_seat);
     ui_st.shown_ok = 1;
     Arena_Free(br);
 }

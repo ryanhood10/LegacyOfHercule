@@ -28,7 +28,7 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 20
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2
 shot nm1
 echo == 2. seed 7
 load nm_setup.ss
@@ -42,7 +42,7 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 20
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2
 echo == 3. seed 23
 load nm_setup.ss
 frames 2
@@ -55,4 +55,4 @@ poke32 0x0203FD08 25
 frames 10
 stepz 0x0203ECFC 200
 peek8 0x0203EC6C 20
-peek8 0x0203ECA0 2
+peek8 0x0203ECB0 2

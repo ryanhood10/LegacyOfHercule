@@ -812,8 +812,8 @@ static const char *const demo_size[2] = { "Quick (8 fighters)", "Full (16 fighte
 static void fake_bracket(int size, int coop_players, int team) {
     TBracket *b = &ui_st.br;
     memset(b, 0xFF, sizeof *b);
-    b->size = (u8)(size == 16 ? 16 : 8);
-    b->rounds = (u8)((b->size == 16 ? 4 : 3) - (team ? 1 : 0));
+    b->size = (u8)(size == 32 && team ? 32 : size == 16 ? 16 : 8);   // 32: 16 teams, a 2 v 2's alone
+    b->rounds = (u8)((b->size == 32 ? 5 : b->size == 16 ? 4 : 3) - (team ? 1 : 0));
     b->round = 0;
     b->match = 0;
     b->tier = TIER_ROOKIE;

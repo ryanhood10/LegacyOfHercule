@@ -112,7 +112,24 @@ attack set), and the world-map photos (`build/wm/mosaic_half.png`).
 
 ## 2b. Sizes, and the Rumble in co-op (Ryan, 2026-11-04)
 
-After the division the director asks **"How many fighters?"**, in every division, one and two players: 8 or 16. 16 is shown locked until the tier's pool has 15 opponents (`FULL_POOL`): never Rookie, whose pool is 13; Adept after the road; the tiers above always. Our call on Ryan's question about 32 for a 2 v 2: **no 32.** No tier's pool has 30 opponents (the largest about 24), and a bracket holds 16 seats. A 2 v 2 is 4 teams (8 fighters, 2 rounds) or 8 teams (16 fighters, 3 rounds, a page per half: section 26). Ryan said "32" again on 2026-11-05; still no 32, the reasons in section 26.
+After the division the director asks **"How many fighters?"**, in every division, one and two players: 8 or 16. 16 is shown locked until the tier's pool has 15 opponents (`FULL_POOL`): never Rookie, whose pool is 13; Adept after the road; the tiers above always. A 2 v 2 is 4 teams (8 fighters, 2 rounds), 8 teams (16 fighters, 3 rounds, a page per half: section 26) or **16 teams (32 fighters, 4 rounds, a page per block: section 26)**.
+
+**32 fighters (Ryan, 2026-11-05: "in 2 player it would have to be a 32 player tournament since its 2v2"; "we can use lower-tier fighters, but we must fill the tournament FIRST with the fighters from that division selected").** A third line on the menu, in a 2 v 2 only. It needs 30 opponents. No mirrors of the party and no empty seats, so:
+
+- **The draw:** all the division's own fighters (`opp_pools`, `seed_tops` keeps its tops), then the fighters of lower tiers not in that draw, strongest first by rating (`opp_tab`), each once, until 30; then all 30 shuffled together, known pairs side by side as ever. A fighter from above never comes down. 8 and 16 draw exactly as before: same seeds, same seats (60 draws compared against the build before it).
+- **The count, tier by tier (a fighter counts while his own tier is open and his story flag is set; Hercule is out while he is in the party, 16 once he is the players', flag 421, which the Cell Games need anyway):**
+
+| tier | own draw | + from below, at most | total | reaches 30? |
+|---|---|---|---|---|
+| Rookie | 12-13 | - | 13 | no |
+| Adept | 13-15 | 2-3 | 15-18 | no |
+| Z-Fighter | 14-16 | 3-4 | 17-20 | no |
+| Champion | 15-20 | 6 | 21-26 | **no, at any point of the story** |
+| Legend (flag 382) | 15-17 | 15-17 | **30, + 2 for Cooler beaten (301), + 2 for the Broly chapter (402): 30 to 34** | **yes, only here** |
+
+- **So: only Legend, only the 2 v 2, and 32 is offered when the count is 30 after setting aside the fighters the players could pick** (`fills_teams`): a pick is never also drawn, so up to two pool fighters who are unlocked do not count; otherwise the select screen could take away a seat the menu promised. In a real game somebody has been beaten by then, so in practice: **Super 13 beaten and Cooler beaten or the Broly chapter done** (32 to 34 in the pool). With neither side chapter it opens only while nobody in the pool is pickable (a record that has beaten none of them).
+- **Locked:** the line shows with its padlock and a footer: "Not enough fighters yet: come back later!" (Legend short of them, and tiers whose 16 is locked as well), "32 needs the Legend tier's fighters" (every other tier: no "come back later" that would be a lie); with the cursor elsewhere, "32 opens as more fighters join" or the same Legend line. Open: "32 fighters: 16 teams of two". These lines are ours. In 1 v 1 and the Rumble the menu is as it was, 8 and 16 alone.
+- **Prizes:** a win counts as Full (the record's `full_wins`, the Full capsule once per tier, shared with 16). EXP: 4 wins at `OWED_MATCH` are the same as a 16-fighter 1 v 1's, a level. Nothing else about the fights changes: each is two opponents with the 8-team bracket's spawns, bars and body limits (`opp_budget`).
 
 **The Royal Rumble with two players is 2 v 2 v 2 every round:** four opponents in two pairs (`tny_moves_team`), who go for each other too; the headliner's round is his pair against another. 8 fighters: a round and the headliner's; 16: three rounds and the headliner's. One player: the rounds of section 1, 16 fighters two more. A summon does nothing in a Rumble (two more bodies). The screen between rounds names the round and, with two players, shows the three teams, the fighters arriving in turn (`tny_ui_rumble_board`).
 
@@ -223,7 +240,7 @@ one (Frieza -> Mecha, Cell -> Super Perfect, Buu's chain), with stats derived fr
 
 ## 4d. The pool and the unlocks, tier by tier (Ryan asked for exact counts, 2026-10-25)
 
-**Each tier has its own draw since 2026-11-03** (Ryan: "each difficulty of tournament is supposed to have its own pool of fighters ... in the absolute hardest division we need the absolute best villians like super buu and super andriod 13"; a tier drew from everyone at or below it, a Legend bracket 7 of about 40). `tny_engine.c` `opp_pools`: a tier's own fighters and the strongest from below, enough for Full's 15. `tier_tops`, always in a bracket: Rookie King Cold, Frieza; Adept 17, 18, 19; Z-Fighter Imperfect Cell, 16; Champion Broly, Perfect Cell, Cooler; Legend Super Buu, Super 13, Super Perfect Cell (each while his story flag and body allow). The Rookie pool is the table's; the opponent counts in the table's later rows are the old cumulative ones. Test `tny_pools.txt`.
+**Each tier has its own draw since 2026-11-03** (Ryan: "each difficulty of tournament is supposed to have its own pool of fighters ... in the absolute hardest division we need the absolute best villians like super buu and super andriod 13"; a tier drew from everyone at or below it, a Legend bracket 7 of about 40). `tny_engine.c` `opp_pools`: a tier's own fighters and the strongest from below, enough for Full's 15 (a 2 v 2 of 32 fills on from below: section 2b). `tier_tops`, always in a bracket: Rookie King Cold, Frieza; Adept 17, 18, 19; Z-Fighter Imperfect Cell, 16; Champion Broly, Perfect Cell, Cooler; Legend Super Buu, Super 13, Super Perfect Cell (each while his story flag and body allow). The Rookie pool is the table's; the opponent counts in the table's later rows are the old cumulative ones. Test `tny_pools.txt`.
 
 No mirrors: the counts are opponents other than your party. "Beat" = he becomes playable the first time a
 player beats him in any match (the last hit in a Rumble). An 8-man bracket needs 7 opponents, Full (16) 15,
@@ -1782,7 +1799,7 @@ prints the copies' state at four shots (`.combo.run` +0x88).
 
 Ryan, after checking the tournament: "i dont like how you display the 32 player tournament or 16. we can do better! lets figure out something that works. we could show left half of the bracket, and then right half. but bracket animations and timing need to be touched up too", "dont over-do it i just want things to be SMOOTH", "just dont add bugs". He was asleep; these are our calls, with the reasons. Code: `src/coop/tny_ui_bracket.c`; test: `tools/headless/tny_bracket.txt` (`docs/testing.md` "Tournament bracket").
 
-**"32": there is still no 32-fighter bracket.** The biggest bracket is 16 seats: 16 fighters, or a 2 v 2 of 8 teams (section 2b). We did not add 16 teams: it needs 30 opponents, no tier's pool has them (the largest about 24), and `TBracket` holds 16 seats. Ryan's "32" is read as the biggest 2 v 2 he saw, the screen that was worst: 8 teams on one page with only the first seat of each team showing. **If he wants a true 32, that is a pool and engine question first;** a half page as built holds 8 rows, so 16 teams would need a quarter at a time.
+**"32"** first read as the biggest 2 v 2 he saw (8 teams on one page, only the first seat of each team showing); he then asked for the true 32: built, the pool's side in section 2b, the screen in "16 teams" below.
 
 **What the player sees:**
 
@@ -1791,6 +1808,7 @@ Ryan, after checking the tournament: "i dont like how you display the 32 player 
 | 8 fighters, 4 teams | one page, the two-sided tree as before. New: the whole tree's lines are there from the start (dark), the player's road, the new timing. |
 | 16 fighters | a **left half** and a **right half** page, a page for the **final**. |
 | 8 teams (16 fighters) | the same pages: a half is four teams, every fighter with his own name and face (before: the partner's name under the lead's, the partner's face nowhere). |
+| 16 teams (32 fighters) | **four block pages (A to D) and a "Final four" page**: see "16 teams" below. |
 
 - **A half page is one-sided**, seats on the outer edge, the tree running inwards to a gold "Final" box on the inner edge; the right half is the left half mirrored. The old "half" pages were each drawn as a small two-sided bracket with a champion's spot at the top: nothing on them said they were half of anything. Now the box says where the half leads, and the two pages read as one bracket opened in the middle.
 - **Every name on its own row** (8 rows, 13 px apart: `HR(i)`), in a dark column so that they read over the checker. Eight bodies do not fit one column, so they **zigzag** in two columns on their lines (x 60 and 82; 26 px apart in a column, the bodies being 24-28 tall): a name's row runs straight to its face. Tall bodies touch a neighbour a little (Spopovich, Super Buu); no worse than the 8 bracket's giants.
@@ -1825,6 +1843,15 @@ The sweep is the big one: a round's seven other matches took 280 frames one by o
 
 The probe's result on a 16-seat bracket: from stalls of 9, 7, 4, 3 frames to single frames, at the moment a page is empty or something has just landed.
 
-**Left as it was:** the Rumble's screens (`tny_ui_rumble_board`, `BOARD_ARRIVE`): they read well and Ryan's note was about the bracket. The champion's screen. The engine and the "How many fighters?" menu.
+**16 teams (Ryan's idea was halves; 16 seats a half do not fit 240 x 160, so a block at a time, our call).** 16 rows of a name and a face would be 7 px each, or 16 faces at once. A **block** is one page exactly like an 8-team half: four teams, eight names, eight faces, the first round and the second, on to a gold **"Semis"** box. Blocks A and B stand on the left of the floor plan, C and D on the right (mirrored, as the right half), the **"Final four"** page in the middle: the four block winners on the picture a 4-team bracket has always had (two-sided tree, the champion at the top), the semifinals and the final. So 5 pages for 4 rounds: rounds 1 and 2 on the blocks (two matches each, then the block's own), rounds 3 and 4 on the last. **Never more than 8 faces on a page**, the same OBJ VRAM and the same frame work as every page before it, whichever fighters are drawn (Legend's giants at half size as ever).
+- The first look shows blocks A, B, C, D (`T_TOUR_B`, 60 frames each, not 90: four of them), then slides to the page of the next match; "GOHAN & KRILLIN start here" on theirs, "Another block" on the others. A skips.
+- The title's middle says the page: "Block A", ... "Final four"; the corner the round: First round, Quarterfinals, Semifinals, Final (all ours).
+- Everything else is what it was: the road (`draw_players`), the sweep (a block has at most two others in a round), the skip, `T_*`, the slide. A page turn is one slide whichever two pages it joins; the direction follows the floor plan A, B, final four, C, D.
+- **What it costs in time:** a first round's results, the players' match and the seven others over four pages, take about 610 frames (10 s) to "A vs B", a second round's about 540 (9 s), against 396 for an 8-team bracket's (A at once, as always). It is `T_*`, one line each, if Ryan finds it long.
+- The probe (`docs/testing.md` "Tournament bracket") on 32 seats: single stalls of one frame at a page's empty middle and at a landing, a two-frame one per screen, as the 8-team bracket has. The 16-seat brackets gained one single frame's stall on the first look's 584 (116 frames against 115 to the bar's line) and nothing else; the shots against the build before are the same but for the backdrop's phase after that and which of two overlapping faces is on top. The entity list draws faces by their `y` field, which a portrait never sets, so that order follows whatever the arena's memory held: it was never fixed, it just landed differently.
+
+**The engine's side.** `TBracket.seat` is 32. A unit is a team, so 16 teams are 4 rounds of at most 8 matches: `winner[4][8]`, `played[4]`, `shown[4][8]` and the events hold them as they are; the fifth round asked for is not needed, and 1 v 1 has no 32. `eng.full` is 0, 1 or 2 (every other reader asks only whether it is set). RAM: the 16 more seats moved nothing the tests or other pieces read: `eng`'s pop-up queue went to `.tny.eq`, `UiState.shown_seat` to `.tny.us` (still the first 16 seats: enough to tell two draws apart), so `.tny.eng` and `.tny.ui` keep their size and every offset from `qn` (eng + 0xEC) and `shown_win` on. Inside the bracket `winner` moved (+0x24), `p1_seat` is eng + 0xB0 (was + 0xA0: `tny_combo_draw.txt`, `tny_nomirror.txt`), a fake bracket's `tier` is UI + 0x5A (`tny_bracket.txt`). The record on the save chip and its copy at eng + 360 did not move. `tourneyram` has 8 bytes left (`docs/ids.md`).
+
+**Left as it was:** the Rumble's screens (`tny_ui_rumble_board`, `BOARD_ARRIVE`): they read well and Ryan's note was about the bracket. The champion's screen.
 
 **Not checked by a person:** all of this is headless, shot by shot. How a slide and the sweep feel at speed, and on Ryan's screen, wants his eyes; the numbers are one line each to change.

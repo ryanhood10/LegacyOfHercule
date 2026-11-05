@@ -87,6 +87,8 @@ SECTIONS
         KEEP(*(.tny.talk))   /* the fighters' dialogue (tny_talk.c, 0x58) */
         KEEP(*(.tny.cap))    /* the Rumble announcer's calls (tny_caption.c, 0x10) */
         KEEP(*(.tny.cp))     /* test command 40's state (tny_engine.c, <= 0x20) */
+        KEEP(*(.tny.eq))     /* the pop-up queue (tny_engine.c, 0x10; out of TnyEng when TBracket grew: eng's later offsets stay) */
+        KEEP(*(.tny.us))     /* the bracket's seats as last drawn (tny_ui_bracket.c, 0x10; out of UiState for the same reason) */
     } > tourneyram
 
     .combo (NOLOAD) : {
