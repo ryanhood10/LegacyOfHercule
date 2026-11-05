@@ -32,16 +32,22 @@ sequence ch8_cooler
   stock @083d29ee                        ; Trunks: "Who are you?"
   stock @083d2a08
   stock @083d2a78 -> 10                  ; "I'll destroy you!"
-  script                                 ; co-op: the servant (next 11), else the fight (14)
+  script                                 ; co-op: the servant (next 11), else the fight (16)
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 11
         END
       L1:
-        PushByte 14
+        PushByte 16
         END
   text 44 "COOLER: And you brought a friend?  Then I'll bring mine.\x0bA Namekian warrior my father took from Namek long ago.  He serves me now."
+  script                                 ; the servant walks up to the spot his boss twin takes (TWIN_OFFSET right of Cooler), so the swap does not show
+        SpawnCharacterEntity 166, 344, 264
+        WalkToPosition 166, 224, 264
+        SetEntityFacing 166, 0
   text 0 "@^NAMEKIAN: ...As you command, Lord Cooler."
   text 1 "A Namekian...  serving Frieza's family?!"
-  stock @083d2a98                        ; the fight (Cooler, and his servant in co-op)
+  script                                 ; [15] his actor makes way for the twin
+        DespawnEntity 166
+  stock @083d2a98                        ; [16] the fight (Cooler, and his servant in co-op)
 end
