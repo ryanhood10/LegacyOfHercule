@@ -712,6 +712,10 @@ adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gat
   the door's `FadeFromWhite` scene runs about 230 frames after the map changes, and a test warp (`COOP_CMD_WARP`) issued inside
   that scene breaks the modal stack and crashes when the scene ends (frame 756 in the first runs): a test artefact, not the game.
 - **The open area's load** is 78 frames of black (`waitmap` returns when the map state changes, before the load ends).
+- **A stale `menu.ss` (found 2026-11-05):** a script's `load menu.ss` loads `--out`'s `menu.ss`, not the STATE argument. One made
+  right after a rebuild while another run still read the old ROM (`docs/testing.md` "A stale ROM in WSL") differed from a fresh
+  one and turned `pickup`, `regen` and `hercule_kit` red. Make the menu with nothing else of yours running, and compare two
+  (`cmp`): mkmenu is deterministic.
 - **Lights:** test command 48 op 0 sets flags 504-509 from `arg2`'s bits, then a test warp onto 15/18 reloads it (records too).
   A decoration's +0x10 is its "shown" word (0x08007298 / 0x080074D4, message 4); the list's first entries are decorations
   0..8 in order (`deref D 0x03001128 + 4n`).
