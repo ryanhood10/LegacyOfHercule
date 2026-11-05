@@ -129,7 +129,9 @@ sequence ch9_workshop
         And
         JumpIfFalse L1
         SpawnCharacterEntity 76, 224, 400
-        WalkToPosition 76, 288, 232
+        WalkToPosition 76, 320, 300                ; round the table
+        WalkToPosition 76, 320, 200
+        WalkToPosition 76, 300, 176
         SetEntityFacing 76, 3
       L1:
         END
@@ -170,6 +172,21 @@ sequence ch9_workshop
         SpawnCharacterEntity 76, 356, 176
         SetEntityFacing 76, 2
       L3:
+        WaitFrames 60                             ; and goes on ahead, out of the room's door
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse L4
+        WalkToPosition 8, 320, 200
+        WalkToPosition 8, 320, 300
+        WalkToPosition 8, 224, 400
+        DespawnEntity 8
+      L4:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse L5
+        WalkToPosition 76, 320, 200
+        WalkToPosition 76, 320, 300
+        WalkToPosition 76, 224, 400
+        DespawnEntity 76
+      L5:
         SetActiveEntity 0
         SetPlayerVisible 1
         END
@@ -444,35 +461,82 @@ sequence ch9_bunker_won
         SetEntityFacing 8, 1
       B2:
         SetPlayerVisible 0
-        PanCameraToPosition 56, 200, 10
+        PanCameraToPosition 56, 240, 10
         WhiteFadeOut 30
         WaitFrames 60
-        SpawnCharacterEntity 63, 70, 220          ; two hawks glide over the clearing and settle above him
-        SpawnCharacterEntity 64, 90, 236
+        SpawnCharacterEntity 63, 150, 184         ; two hawks glide in over the clearing and settle above him (a walk: birds have no flying pose, group 12)
+        SpawnCharacterEntity 64, 176, 192
         BeginCommandBatch
-        FlyToPosition 63, 220, 250
-        FlyToPosition 64, 244, 262
+        WalkToPosition 63, 220, 250
+        WalkToPosition 64, 244, 262
         CommitCommandBatch
         WaitFrames 30
+        CoopCall 22, 2, 76, 0                     ; Krillin wanders over to 16, who is watching them
+        JumpIfFalse B3
+        WalkToPosition 76, 176, 328
+        SetEntityFacing 76, 3
+        END
+      B3:
+        WalkToPosition 0, 176, 328
+        SetEntityFacing 0, 3
         END
   [7] text 73 "KRILLIN: Well, that's the last of Gero's toys.  ...16?  What are you looking at?"
   [8] text 26 "ANDROID 16: The birds.\x0bDr. Gero built me to destroy Goku.  He did not build me to watch birds.\x0b...I like them."
   [9] text 73 "KRILLIN: Heh.  You're full of surprises, big guy.  So what now?"
-  [10] text 26 "ANDROID 16: Cell will destroy everything on this planet.  The birds too.\x0bI will go to the Cell Games."
-  [11] text 73 "KRILLIN: Then I guess we'll see you there.  I'm heading back to Capsule Corp."
-  [12] script
+  [10] script                            ; 16 turns from the birds to Krillin
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse B4
+        SetEntityFacing 8, 2
+        END
+      B4:
+        SetEntityFacing 0, 2
+        END
+  [11] text 26 "ANDROID 16: Cell will destroy everything on this planet.  The birds too.\x0bI will go to the Cell Games."
+  [12] text 73 "KRILLIN: Then I guess we'll see you there.  I'm heading back to Capsule Corp."
+  [13] script
         FadeOut 60
         CoopCall 12, 0, 0, 0
         SetActiveCharacterNoReset 6
         CoopCall 6, 5, 0, 0
-        WarpToMapWithEntities 6, 5, 1, 224, 300
-        SetEntityFacing 0, 1
+        WarpToMapWithEntities 6, 5, 1, 328, 188   ; by Briefs' table, with Bulma and her father on screen
+        SetEntityFacing 0, 3
         SetPlayerVisible 0
         END
-  [13] text 36 "BULMA: Krillin!  You're back!  So?  What happened with Gero's computer?"
-  [14] text 73 "KRILLIN: Scrap metal.  And 16 is coming to the Cell Games.  He's on our side."
-  [15] text 67 "HERCULE: Did somebody say the Cell Games?  Ha!  Don't worry, little buddy.\x0bThe world champion will handle that Cell personally!"
-  [16] script
+  [14] text 36 "BULMA: Krillin!  You're back!  So?  What happened with Gero's computer?"
+  [15] text 73 "KRILLIN: Scrap metal.  And 16 is coming to the Cell Games.  He's on our side."
+  [16] script                            ; nobody has a Hercule on the map yet (player 2's entity went at the warp out of the bunker, alone there is none): he walks in
+        SpawnCharacterEntity 72, 224, 400
+        WalkToPosition 72, 320, 300
+        WalkToPosition 72, 318, 220
+        WalkToPosition 72, 298, 178
+        SetEntityFacing 72, 3
+        SetEntityFacing 0, 2
+        END
+  [17] text 67 "HERCULE: Did somebody say the Cell Games?  Ha!  Don't worry, little buddy.\x0bThe world champion will handle that Cell personally!"
+  [18] script                            ; two players: he ends where player 2's entity appears (12 px left of player 1); alone he struts back out
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse H1
+        PushByte 72
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 12
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        Jump H2
+      H1:
+        WalkToPosition 72, 318, 220
+        WalkToPosition 72, 320, 300
+        WalkToPosition 72, 224, 400
+      H2:
+        DespawnEntity 72
         SetActiveEntity 0
         SetPlayerVisible 1
         END
