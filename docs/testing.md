@@ -1141,6 +1141,8 @@ Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone
 
 ## The generator's eggs (headless, 2026-11-04)
 
+`tools/headless/ch4_staging.txt` (from `ch4_staging_gen.py`; self-checking, in `regfull.sh`; 38 blocks, about 25 minutes run alone): Gero's stages and the road for seven lineups, the second generators, the trigger rects' far corners: every scene ends, the player sits at a sane position. Split at its `===` lines to run it in parallel.
+
 `tools/headless/ch4_eggs.txt` (from `ch4_eggs_gen.py`; self-checking, in `regfull.sh`): two players and one, the door of area 44, the first egg, the scene, the fight's flags, an egg pressed during the fight (nothing), her end, the other eggs, the three tubes to the generator's end. **No test warp once in the room:** a load spawns her record and tests the tube items by itself, and an early version only worked because the test warped. `ReloadMap` (step 74) does neither: it does not bring a record in or test an item again.
 
 ## Tournament sizes (headless, 2026-11-04)

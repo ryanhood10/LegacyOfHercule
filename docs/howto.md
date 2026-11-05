@@ -34,6 +34,19 @@ Rules that bite: one player controls the world map; no Hercule-hero reveal befor
 the duplicate-NPC rule hides town NPCs of a character a player controls, but cutscene actors need
 per-scene edits; a Map Test party has everyone in it, so check party flags by peeking.
 
+## Stage a scene (Ryan's rule, 2026-11-05)
+
+"Characters shouldnt be stagnant, we should tell the story with animations too, not just dialogue. and we need to account for 1p mode or 2p mode and a combination of different characters that could arrive to our cutscenes. we also need to think about the progression of the story and where our new characters fit in. dont over-do it i just want things to be SMOOTH."
+
+1. **List the lineups:** who is selectable comes from the `SetCharacterFlag_Bit1` and `P2Bind` calls before the scene; player 1 alone, or player 2 on any of them.
+2. **Whoever speaks has a body.** `CoopCall 22, 1, SLOT, 0` -> 1 when that slot is in the party and neither player plays him: spawn his actor, off view, and walk him in. `CoopCall 22, 2, SPRITE, 0` -> 1 when an actor (not a player) shows that sprite: only then move or despawn it. Never address a sprite a player may be showing (use char 0 for player 1); a sprite nobody shows is a write through a null pointer.
+3. **Moving sprites need the groups:** walk is group 1, flight group 12. A missing group overwrites the heap and only crashes later (Piccolo's NPC 73 has one group: use 103; `docs/sprites.md`). In tests look at `ents` (sane vtables), not only for a CRASH line: the runner carries on after one.
+4. **Nobody pops.** Walk or fly in and out from off view; a white cut (`FadeToWhite`, place everyone, `FadeFromWhite`) when the distance is long. Partner bosses: walk the actor to his twin's spot (`TWIN_OFFSET` 24 px right of the partner) so the swap to the boss does not show.
+5. **Small is enough:** a turn, a step back, a shake (`ScreenShake 0, strength, frames`), one reaction line. No long new beats.
+6. **Test every lineup** with a generator: `tools/headless/ch4_staging_gen.py` is the pattern; look at the frames.
+
+Facing: 0 down, 1 up, 2 left, 3 right. A `stop` line counts as an entry for absolute indexes. Two actors showing one sprite: a step finds the first, so move and despawn the first before addressing the second (`z8_dino_defeat`).
+
 ## Call C from a script (CoopCall)
 
 Reference: `src/coop/vmcall.c` (game action 59). Take the next number from `docs/ids.md`, add a

@@ -2,6 +2,11 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-05
+
+- **Cutscenes staged (Ryan's rule: `docs/howto.md` "Stage a scene"):** Gero's three stages, the lab, the road and the mother dinosaur (`docs/scripts.md`, `ch4_staging.txt`). Whoever nobody plays has a body and moves; nobody pops. Found: walking Piccolo's NPC sprite 73 (one group) overwrites the heap; 103 walks.
+- **Android 13's motive (Ryan):** 17 and 18 kill Gero, 13 swears revenge for his father, blasts them and flies north, tucked away until the post-game's Super 13 (`docs/story.md`). The lab's old lines "You built 'em too well" and "Goku is mine" went with it; all his new lines are drafts for Ryan.
+
 ## 2026-11-04
 
 - **The generator's eggs are a mini boss (`docs/scripts.md` `ch4_eggs`, `ch4_eggs.txt`; Ryan):** in zone 8 area 50 no more carrying eggs to the brontosaurus: the first egg smashes, the mother (King Triceratops recoloured pink, orange and green) turns on the players, at half her health the other two hatch and her babies fight beside her; when she falls the tubes break as before.

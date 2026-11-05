@@ -216,8 +216,10 @@ gets a line per scene: scared of the lab door, hiding behind Piccolo when 17 and
 **Gero's lab door:** the players fight Dr. Gero (Android 20) at the door in his three stages, with
 robot escorts, and **Android 13 backs Gero up** as his partner (stat 112, both-down); 13 flies off
 when the pair is beaten. Hercule offers to "negotiate". Inside the lab (zone 8 area 60) the stock
-scene plays: Gero wakes 17 and 18 and dies at their hands; 13 watches, then leaves promising his
-master he will fulfil his destiny.
+scene plays: Gero wakes 17 and 18 and dies at their hands; 13 watches, then **swears revenge for his
+father (Ryan, 2026-11-05), blasts 17 and 18 and flies north: that is where he goes until the post-game**
+(the summit: "This is for the Doc"). 17 and 18 shrug it off. Hercule and Piccolo stand as actors when nobody
+plays them (`docs/howto.md` "Stage a scene").
 
 **The road: Piccolo and Vegeta fight 17 and 18.** In the series it is Vegeta who fights 18 on this
 road and loses, with Piccolo beaten too, so this is closer to the source than the stock scene. For
@@ -324,7 +326,8 @@ sparring match names the winner's character instead), and both players are back 
 - **Android 13 is held back until after Cell.** He absorbs 17 and 18 to become Super 13, so his
   return comes after the Dragon Ball wish brings everyone (17 and 18 included) back to life. The
   arctic encounter built in chapter 8 came out of the wait; his earlier appearances (beside 19,
-  beside Gero, watching in the lab) stay.
+  beside Gero, watching in the lab) stay. **His motive (Ryan, 2026-11-05): 17 and 18 killed Gero, his father;
+  he swears revenge in the lab and flies off, and waits in the arctic for the post-game.**
 - **Kept as planned:** Roshi's 2v2 gym and its finale; Cooler with his Namekian servant, reachable
   in the wait (the gate is the stock "Only Piccolo" barrier; there is no level gate).
 - **Roshi's dojo sparring (built and merged 2026-10-19, `data/story/wait_spar`):** once the players

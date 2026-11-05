@@ -48,7 +48,7 @@ similar body and recoloured).
 | 60-62 | 9-10 | Goku (base, SSJ) | yes (stock) |
 | 66-71 | 3 | Vegeta forms as NPC/enemy-grade sets | partly; 137-140 look like the playable Vegeta/Goku sets (9-10) |
 | 72 | 9 | Hercule | yes (stock) |
-| 73, 103, 104 | 1 / 10 / 9 | Piccolo (NPC, playable with cape, variant) | yes (103) |
+| 73, 103, 104 | 1 / 10 / 9 | Piccolo (NPC, playable with cape, variant); 73 has one group: never walk it (`docs/howto.md` "Stage a scene") | yes (103) |
 | 76 | 13 (7 used) | **Krillin** NPC set: idle, walk, run, knock-down, shout, ki pose, punch combo, lying (12) | playable as **sprite 161** (below) |
 | 121 | 7 | **Tien** (bald, green pants, attack and hurt poses) | yes, needs abilities + a row |
 | 75 | 1 | a white-robed figure (an earlier note said Master Roshi: wrong; **Roshi is 88**, bald, red sunglasses, white beard, orange shirt; checked 2026-10-25) | no (idle only) |
