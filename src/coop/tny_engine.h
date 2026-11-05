@@ -40,6 +40,7 @@
 #define TNY_STAT_COUNT      60
 #define BOSS_FLAT           16      // bosses.h rule flag: no x1.8 "lone boss against two players" HP (enemies.c)
 int tny_resolve_stat(int stat_index, EnemyStat *out);
+int tny_rating_stat(int rating, EnemyStat *out);     // a boss outside the roster on the rating scale (popo.c)
 const BossRule *tny_boss_rule(int stat_index);
 
 int  tny_ring_active(void);                                     // a tournament runs and the players are in the ring

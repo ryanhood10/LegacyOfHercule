@@ -820,6 +820,27 @@
  ],
  "exits": [
   {
+   "_": "the way between the gate's pillars to the hidden room (15/25, Mr. Popo: popo.c): inside the rect that stays blocked until all six lights are out (ch_open_onload)",
+   "type": "door",
+   "rect": [
+    1008,
+    320,
+    1048,
+    336
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    25,
+    1
+   ],
+   "at": [
+    244,
+    340
+   ],
+   "facing": 1
+  },
+  {
    "type": "door",
    "rect": [
     976,

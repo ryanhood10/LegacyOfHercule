@@ -48,6 +48,8 @@
 //                                       3 gone: wait for 3 after his defeat before the scene goes on); op 2 spawns him
 //                                       beside player 1 with a boss bar
 //  35 Chamber (op, a, b) [-> value]     the Time Chamber's rooms and drops (chamber.c `chamber_call`, data/story/chamber.lscript)
+//  36 Popo (op, a, b) [-> value]        the Time Chamber's hidden room, Mr. Popo, the loop, the rooms' prizes (popo.c `popo_call`,
+//                                       data/story/chamber_popo.lscript)
 //  31 P2Actor (op) [-> value]           scenes (companion.c, the perfecting pass): op 0 -> 1 when player 2's entity
 //                                       stands; op 1 / 2 -> its x / y in px; op 3 removes it (respawned beside player 1
 //                                       once he is free): the script stands an actor of his sprite on that spot first
@@ -58,6 +60,7 @@
 #include "ssj2gohan.h"
 #include "super13.h"
 #include "chamber.h"
+#include "popo.h"
 
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_NAME + slot = a character's name
 
@@ -208,6 +211,7 @@ void vm_coop_call(s32 *st) {
     case 22: vm_push(st, companion_call(a, b)); break;   // the lead's actor in scenes (companion.c)   // the 1 / 2 players answer (players.c): pushes the next entry
     case 31: { s32 v = p2_actor_call(a); if (a != 3) vm_push(st, v); break; }   // player 2 into a scene actor (companion.c)
     case 35: { s32 v; if (chamber_call(a, b, c, &v)) vm_push(st, v); break; }   // the Time Chamber (chamber.c)
+    case 36: { s32 v; if (popo_call(a, b, c, &v)) vm_push(st, v); break; }      // its hidden room and Mr. Popo (popo.c)
     case 17:
         if (a == 1) vm_push(st, s13_call(1, 0, 0));
         else s13_call(a, b, c);

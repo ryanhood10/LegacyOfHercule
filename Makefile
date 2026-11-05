@@ -111,6 +111,12 @@ TNY_PORTRAITS ?= 140=10 141=16 142=126 143=160 144=119 145=116 146=83 147=113 14
 PP_PORTRAITS ?= 169=a13 170=celljr 171=namek 172=evilbuu
 OBJS += $(BUILD)/obj/pp_portraits_data.o
 EXTRA_SPRITES += $(KING_COLD_SPRITE)=tny_cold_record $(ROSHI_SPRITE)=tny_roshi_record $(CHICHI_SPRITE)=tny_chichi_record $(VIDEL_SPRITE)=tny_videl_record $(CHIAOTZU_SPRITE)=tny_chiaotzu_record
+# Mr. Popo, the Time Chamber's hidden room (tools/popoart.py, TNY_ART: Buu's Fury r.183, LoG2's sprite 93 without roms/buu.gba;
+# src/coop/popo.c, data/maps/chamber_popo.json's actor)
+POPO_SPRITE ?= 163
+OBJS += $(BUILD)/obj/popo_sprites_data.o
+EXTRA_SPRITES += $(POPO_SPRITE)=popo_record
+CFLAGS += -DPOPO_SPRITE=$(POPO_SPRITE)
 
 ifeq ($(BUU),1)
 OBJS += $(BUILD)/obj/buu_sprites_data.o $(BUILD)/obj/tny_buu_sprites_data.o
@@ -301,6 +307,15 @@ $(BUILD)/gen/tny_sprites_data.c: tools/tnysprites.py tools/lying.py tools/headch
 	$(PYTHON) tools/tnysprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD) --ids $(KING_COLD_SPRITE),$(ROSHI_SPRITE),$(CHICHI_SPRITE),$(VIDEL_SPRITE),$(CHIAOTZU_SPRITE)
 
 $(BUILD)/obj/tny_sprites_data.o: $(BUILD)/gen/tny_sprites_data.c src/coop/rom.h src/coop/tourney.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# Mr. Popo (never committed); preview popo_preview.png beside it
+$(BUILD)/gen/popo_sprites_data.c: tools/popoart.py tools/lying.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM)) $(BUILD)/.spriteflags
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/popoart.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
+
+$(BUILD)/obj/popo_sprites_data.o: $(BUILD)/gen/popo_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

@@ -99,6 +99,7 @@ SECTIONS
         KEEP(*(.combo.pf))     /* objroom.c: OBJ VRAM's room for the text box (0x10) */
         KEEP(*(.combo.ag))     /* agency.c: player 2's agency (<= 0x40) */
         KEEP(*(.combo.ch))     /* chamber.c: the Time Chamber's state (<= 0x30) */
+        KEEP(*(.combo.po))     /* popo.c: the hidden room and Mr. Popo (<= 0x30) */
     } > comboram
 
     .bss (NOLOAD) : {

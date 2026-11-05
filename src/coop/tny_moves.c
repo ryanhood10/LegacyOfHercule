@@ -71,6 +71,16 @@
 #define KB_FALL_PX      24      // px: the blow that knocks him out
 #define FALL_FRAMES     18      // frames of the knock-down (pose group 3) before he lies still
 #define HELPER_GONE     90      // frames a fallen helper / copy lies before he leaves (the engine clears its own)
+// a kit outside the ring with no stock AI (Mr. Popo, the Time Chamber's hidden room: docs/time-chamber.md 5; popo.c)
+#define DODGE_ROLL      3       // KF_DODGE: one player hit in this many misses and he hops far ...
+#define DODGE_GAP       120     // ... at most once in this many frames (a combo is not all misses)
+#define KEEP_NEAR       48      // KF_FAR: a player this close (px) for KEEP_LINGER frames and he hops far ...
+#define KEEP_LINGER     40      // ... (a window for three or four punches: the autopilot could land none at once, 12.6)
+#define KEEP_GAP        150     // ... at most once in this many frames (two thirds once a transform fired)
+#define FAR_MIN         96      // MF_FAR: the spot is at least this far (px) from both players ...
+#define FAR_MAX         176     // ... and the nearer one at most this far (a hop across the whole room made the chase long)
+#define FAR_TRIES       16      // ... the first of this many random tries inside his arena that is (else the farthest one)
+#define FLINCH_FRAMES   10      // KF_STAND: the hit-stun pose after a hit that lands
 
 // ---- ROM functions and layouts -----------------------------------------------------------------------------------
 typedef struct Desc { s8 xo, yo; u8 w, h; u32 attr; const void *blob; } Desc;
@@ -152,6 +162,7 @@ enum { MK_NONE, MK_BEAM, MK_BALL, MK_HOMING, MK_VOLLEY, MK_WAVE, MK_NOVA, MK_RUS
 #define MF_TARGET   MF_THIN // stun: the target only, at range (psychic hold)
 #define MF_KI       MF_THIN // volley / homing: blue ki blasts
 #define MF_DODGE    MF_THIN // teleport: hop away instead of striking
+#define MF_FAR      MF_COST // teleport: to a spot FAR_MIN px or more from both players, inside his arena (Mr. Popo)
 #define MF_STEAL    MF_COST // rush: each hit takes STEAL_KI from a player and turns it into HP (Energy Steal)
 #define MF_LOWHP    MF_SELFKO   // rush: only once his HP is at half or below, and then before his other moves
 
@@ -187,12 +198,18 @@ typedef struct TMove {
 // kit flags
 #define KF_NATIVE 0x01      // his own AI does his specials (Android 16, Super 13): only Rumble hits and targeting
 #define KF_POISE  0x02      // a stun opens a poise window (giants, bruisers)
+#define KF_STAND  0x04      // no stock AI (Ai_Tick never runs): he never walks up or swings; he stands, turns to his target and
+                            // shoots. Every player hit does damage only (no AI hit reaction), a short flinch and the push
+#define KF_DODGE  0x08      // a player hit that would land misses one time in DODGE_ROLL and he hops far (DODGE_GAP apart), out
+                            // of a special too (not out of a hop or the transform)
+#define KF_FAR    0x10      // keeps away: a player within KEEP_NEAR px and he hops far (KEEP_GAP apart)
+#define KF_YIELD  0x20      // at HP 0 he does not fall: the arms-out pose, untouchable, until the caller removes him
 #define KIT_MOVES 6
 typedef struct TKitDef {
     u8 flags;
     u8 range;               // px: a special starts only with the target this close (0 = 170)
     u8 pace;                // frames between specials / 2 (0 = 75: 150 frames)
-    u8 _pad;
+    u8 pace2;               // the same once a transform fired (0 = pace); then his cooldowns run at two thirds too
     TMove m[KIT_MOVES];
 } TKitDef;
 
@@ -285,6 +302,20 @@ static const TMove lib_stun_proj = STUNP(0x200, 45, MF_PROJ, 0);
 static const TMove lib_beam_stun = BEAM(0x200, 32, MF_THIN | MF_STUN, 0);
 static const TMove lib_self_ko = NOVA(0x700, 56, 8, MF_SELFKO, 0);
 static const TMove lib_summon_self = SUMMON(1, SELF, 0, 0);
+static const TMove lib_far_hop = TELE(0, MF_DODGE | MF_FAR, 0);
+
+// Mr. Popo, the Time Chamber's hidden room (docs/time-chamber.md 5; popo.c spawns him): not a tournament fighter, so not a
+// row of tny_kits[]; his kit's fighter id is TK_POPO, past the roster (every roster lookup checks the id against TF_COUNT).
+// Ryan: "he teleports to keep distance from you and shoots blasts, and he has decent dodge." Numbers ours, tuned headless
+// (docs/time-chamber.md 12.6), to be tuned in play.
+#define TK_POPO TF_COUNT
+static const TKitDef popo_kit = { KF_STAND | KF_DODGE | KF_FAR | KF_YIELD, 230, 40, 26, {
+    VOLLEY(0x280, 5, 8, MF_KI, 240),        // a fan of ki blasts
+    BALL(0x480, 1, 30, 0, 300),             // a fast orb
+    HOMING(0x380, 2, 1, 0, 420),            // two orbs that follow you
+    TELE(0, MF_DODGE | MF_FAR, 420),        // a far hop between shots
+    XFORM(50, 0, 8, 4),                     // at half HP: angrier (ranged and melee +8, defence +4), faster (pace2)
+} };
 
 // ---- state ---------------------------------------------------------------------------------------------------------
 struct TKit;
@@ -340,6 +371,11 @@ typedef struct TKit {
     s16 push_t, down_t;   // down_t: frames since he fell (HP 0)
     u16 last_hit_f;       // g_FrameCounter of the last hit that pushed him
     u8 combo, down;       // melee hits in this combo; 1 = he fell
+    u8 raged, _p2;        // a transform fired (pace2)
+    s16 dodge_gap, keep_gap, flinch;   // KF_DODGE / KF_FAR frames to wait; KF_STAND the hit-stun pose's frames left
+    s16 near_t;           // KF_FAR: frames a player has stood within KEEP_NEAR
+    u16 hops, dodged;     // MF_FAR hops made, KF_DODGE dodges (tests: tny_moves_popo_counts)
+    s16 arena[4];         // MF_FAR's spots stay inside (x1, y1, x2, y2 px; x2 <= x1: round him)
     Entity *target;       // the special's target
     Entity *rtarget;      // the Rumble target (re-rolled)
     Entity *last_hitter;  // the last accepted hit's player or fighter (tny_moves_last_hitter)
@@ -1032,7 +1068,7 @@ static void finish(TKit *k) {
     if (k->held) { k->held->kind = K_SHOT; k->held->fuse = 1; k->held = 0; }   // fizzles
     k->cur = 0;
     k->hit_mask = 0;
-    int pace = k->def->pace ? k->def->pace * 2 : 150;
+    int pace = k->raged && k->def->pace2 ? k->def->pace2 * 2 : k->def->pace ? k->def->pace * 2 : 150;
     k->gcd = (s16)(pace + Rand_Range(pace / 2));
     if (e->ctrl_state == &k->ctrl) Entity_SetAnimation(e, 0);
 }
@@ -1053,6 +1089,39 @@ static void stun_around(TKit *k, int r, int frames) {
 static int walkable(Entity *e, s32 x, s32 y) {
     s32 px[2] = { x, y };
     return x > 8 && y > 8 && Collision_Check(COLLISION_MAP, px, (u8 *)e + 0x154);
+}
+
+// MF_FAR: a walkable spot inside his arena (k->arena, else 160 px round him) at least FAR_MIN px from both players' feet and
+// at most FAR_MAX from the nearer: the first of FAR_TRIES random tries that is, else the try farthest from the nearer player.
+// 0 = no walkable try at all.
+static int far_spot(TKit *k, s32 *ox, s32 *oy) {
+    Entity *e = k->e;
+    s32 x1 = k->arena[0], y1 = k->arena[1], x2 = k->arena[2], y2 = k->arena[3];
+    if (x2 <= x1 || y2 <= y1) {
+        x1 = (e->x >> 8) - 160; y1 = (e->y >> 8) - 160; x2 = x1 + 320; y2 = y1 + 320;
+        if (x1 < 16) x1 = 16;
+        if (y1 < 16) y1 = 16;
+    }
+    s32 best = -1;
+    for (int i = 0; i < FAR_TRIES; i++) {
+        s32 x = x1 + (s32)Rand_Range((u32)(x2 - x1)), y = y1 + (s32)Rand_Range((u32)(y2 - y1));
+        if (!walkable(e, x, y)) continue;
+        s32 near = 0x7FFFFFFF;
+        for (int p = 0; p < 2; p++) {
+            Entity *pl = real_player(p);
+            if (!pl) continue;
+            s32 dx = (pl->x >> 8) - x, dy = (pl->y >> 8) - y, d = dx * dx + dy * dy;
+            if (d < near) near = d;
+        }
+        if (near >= FAR_MIN * FAR_MIN && near <= FAR_MAX * FAR_MAX) { *ox = x; *oy = y; return 1; }
+        if (near > best) { best = near; *ox = x; *oy = y; }
+    }
+    return best >= 0;
+}
+static const TMove *far_move(const TKit *k) {   // his own far hop (its cooldown aside), else the library's
+    for (int i = 0; i < KIT_MOVES; i++)
+        if (k->def->m[i].kind == MK_TELEPORT && (k->def->m[i].flags & MF_FAR)) return &k->def->m[i];
+    return &lib_far_hop;
 }
 
 static void melee_burst(TKit *k, const u32 *atk, s32 mult, int stun) {
@@ -1114,6 +1183,7 @@ static void transform(TKit *k, const TMove *m) {
     k->stat.melee = e->stat_melee;
     k->stat.ranged = e->stat_ranged;
     k->stat.defence = e->defence;
+    k->raged = 1;
     mv.transforms++;
 }
 
@@ -1322,17 +1392,22 @@ static void step(TKit *k) {
             flash(x, y, ART_ORB_M, 10);
             static const s8 behind[4][2] = { { 0, -22 }, { 0, 22 }, { 24, 0 }, { -24, 0 } };   // behind a target facing down/up/left/right
             s32 nx, ny;
-            if (m->flags & MF_DODGE) {
-                s32 tx, ty;
-                centre(t, &tx, &ty);
-                set_len(x - tx, y - ty, 56, &nx, &ny);
-                nx += e->x >> 8; ny += e->y >> 8;
+            if (m->flags & MF_FAR) {                   // far from both players, inside his arena (Mr. Popo)
+                if (far_spot(k, &nx, &ny)) { e->x = nx << 8; e->y = ny << 8; }
+                k->hops++;
             } else {
-                nx = (t->x >> 8) + behind[t->facing & 3][0];
-                ny = (t->y >> 8) + behind[t->facing & 3][1];
+                if (m->flags & MF_DODGE) {
+                    s32 tx, ty;
+                    centre(t, &tx, &ty);
+                    set_len(x - tx, y - ty, 56, &nx, &ny);
+                    nx += e->x >> 8; ny += e->y >> 8;
+                } else {
+                    nx = (t->x >> 8) + behind[t->facing & 3][0];
+                    ny = (t->y >> 8) + behind[t->facing & 3][1];
+                }
+                if (!walkable(e, nx, ny)) { nx = (t->x >> 8) - behind[t->facing & 3][0]; ny = (t->y >> 8) - behind[t->facing & 3][1]; }
+                if (walkable(e, nx, ny)) { e->x = nx << 8; e->y = ny << 8; }
             }
-            if (!walkable(e, nx, ny)) { nx = (t->x >> 8) - behind[t->facing & 3][0]; ny = (t->y >> 8) - behind[t->facing & 3][1]; }
-            if (walkable(e, nx, ny)) { e->x = nx << 8; e->y = ny << 8; }
             centre(e, &x, &y);
             flash(x, y, ART_ORB_M, 10);
             sfx(SFX_LAUNCH);
@@ -1463,7 +1538,7 @@ static void schedule(TKit *k, Entity *t) {
     }
     if (!n) return;
     const TMove *m = pick[Rand_Range(n)];
-    k->cd[m - k->def->m] = (s16)m->cd;
+    k->cd[m - k->def->m] = (s16)(k->raged && k->def->pace2 ? m->cd * 2 / 3 : m->cd);
     begin(k, m, t);
 }
 
@@ -1579,6 +1654,43 @@ static void fallen(TKit *k) {
     Entity_BaseUpdate(e);
 }
 
+// KF_YIELD: at HP 0 no fall (Mr. Popo does not lose): the arms out, untouchable as a fallen fighter (no hits, no AI, not a
+// target: alive_kit), until the caller removes him (popo.c)
+static void yielded(TKit *k) {
+    Entity *e = k->e;
+    if (!k->down) {
+        k->down = 1;
+        k->down_t = 0;
+        if (k->cur) { beam_end(k); if (k->held) { k->held->kind = K_SHOT; k->held->fuse = 1; k->held = 0; } k->cur = 0; }
+        k->stun = 0;
+        k->poise = 0;
+        k->flinch = 0;
+        k->push_t = 0;
+        E32(e, 0x168) = 0;                          // the stock message handler's "hittable" word
+        mv.falls++;
+    }
+    if (k->down_t < 0x7FFF) k->down_t++;
+    if (e->ctrl_state != &k->ctrl) Entity_SetCtrlState(e, &k->ctrl);
+    pose(k, G_CHARGE(k), (k->down_t >> 4) & 1);
+    Entity_BaseUpdate(e);
+}
+
+// KF_STAND: his frame without the stock AI (Ai_Tick never runs: nothing walks him up or swings): the idle state, facing
+// his target; a hit that landed shows the hit-stun pose for FLINCH_FRAMES
+static void stand(TKit *k, Entity *t) {
+    Entity *e = k->e;
+    if (k->flinch > 0) {
+        k->flinch--;
+        if (e->ctrl_state != &k->ctrl) Entity_SetCtrlState(e, &k->ctrl);
+        pose(k, G_HURT(k), 0);
+        Entity_BaseUpdate(e);
+        return;
+    }
+    if (e->ctrl_state != ENEMY_STATES[0]) { Entity_SetCtrlState(e, ENEMY_STATES[0]); Entity_SetAnimation(e, 0); }
+    if (t) face(e, t);
+    Entity_BaseUpdate(e);
+}
+
 static void unregister(TKit *k) {
     for (int i = 0; i < KIT_MAX; i++) if (mv.reg[i] == k) mv.reg[i] = 0;
 }
@@ -1608,7 +1720,11 @@ static void kit_update(Entity *e) {
         base_update(e);                             // natives (Android 16, Super 13) aim at players and end themselves
         return;
     }
-    if (e->hp <= 0 || k->down) { fallen(k); return; }   // he fell: no AI (it kept fighting at HP 0 before)
+    if (e->hp <= 0 || k->down) {                    // he fell: no AI (it kept fighting at HP 0 before)
+        if (k->def->flags & KF_YIELD) yielded(k);
+        else fallen(k);
+        return;
+    }
     push_step(k);
     Entity *saved = g_PlayerObject;
     Entity *t = g_PlayerObject;
@@ -1624,6 +1740,8 @@ static void kit_update(Entity *e) {
     if (k->poise > 0) k->poise--;
     for (int i = 0; i < KIT_MOVES; i++) if (k->cd[i] > 0) k->cd[i]--;
     if (k->gcd > 0) k->gcd--;
+    if (k->dodge_gap > 0) k->dodge_gap--;
+    if (k->keep_gap > 0) k->keep_gap--;
     if (++k->regen_t >= 60) {
         k->regen_t = 0;
         for (int i = 0; i <= KIT_MOVES; i++) {
@@ -1650,10 +1768,21 @@ static void kit_update(Entity *e) {
         }
     } else {
         u16 calls = coop2.dmg_calls;
-        base_update(e);                             // the stock AI (chase, swings) at this frame's target
+        if (k->def->flags & KF_STAND) stand(k, t);  // no stock AI: he stands and turns
+        else base_update(e);                        // the stock AI (chase, swings) at this frame's target
         if (coop2.dmg_calls != calls && coop2.last_attacker == e && coop2.last_defender != e)
             on_hit_effects(k, coop2.last_defender, coop2.last_dmg);   // drain on his melee hits
-        if (!k->cur && e->hp > 0) schedule(k, t);
+        if ((k->def->flags & KF_FAR) && !k->cur && e->hp > 0) {   // too close for too long: away
+            Entity *n = nearest_player_of(e);
+            if (!n || dist2(e, n) > KEEP_NEAR * KEEP_NEAR) k->near_t = 0;
+            else if (k->near_t < 0x7FFF) k->near_t++;
+            if (n && k->near_t >= KEEP_LINGER && k->keep_gap <= 0 && !k->flinch) {
+                k->keep_gap = (s16)(k->raged ? KEEP_GAP * 2 / 3 : KEEP_GAP);
+                k->near_t = 0;
+                begin(k, far_move(k), n);
+            }
+        }
+        if (!k->cur && !k->flinch && e->hp > 0) schedule(k, t);
     }
     if (g_PlayerObject == t) g_PlayerObject = saved;
 }
@@ -1675,8 +1804,23 @@ static int kit_message(Entity *e, int msg, u8 *m) {
     s32 exp = k->stat.exp;
     if (conv) k->stat.exp = 0;                      // an NPC's kill gives nobody EXP
     int r, pushed_only_damage = 0;
+    int stands = (k->def->flags & KF_STAND) != 0;
+    if ((k->def->flags & KF_DODGE) && !k->native && !conv && (m[0] == 1 || m[0] == 2) && k->dodge_gap <= 0
+        && (!k->cur || (k->cur->kind != MK_TELEPORT && k->cur->kind != MK_TRANSFORM)) && E32(e, 0x168) && Rand_Range(DODGE_ROLL) == 0) {
+        s32 b[4];                                   // a hit that would land (the stock test) misses: he hops far
+        const s32 *mb = (const s32 *)(m + 4);
+        Entity_GetBox(b, e);
+        if (mb[0] < b[2] && b[0] < mb[2] && mb[1] < b[3] && b[1] < mb[3]) {
+            k->dodge_gap = DODGE_GAP;
+            k->dodged++;
+            k->flinch = 0;
+            if (k->cur) finish(k);                  // out of a blast he was throwing
+            begin(k, far_move(k), nearest_player_of(e));
+            return 0;
+        }
+    }
     mv.dying = 0;
-    if (!k->native && (m[0] == 1 || m[0] == 2) && (k->cur || k->poise > 0)) {
+    if (!k->native && (m[0] == 1 || m[0] == 2) && (k->cur || k->poise > 0 || stands)) {
         r = 0;
         pushed_only_damage = 1;                     // a special / the poise window: damage only, no push
         if (E32(e, 0x168)) {                        // hittable right now (as the stock test)
@@ -1725,19 +1869,27 @@ static int kit_message(Entity *e, int msg, u8 *m) {
         if (!pushed_only_damage) {                  // the stock reaction ran: push him away from the hitter
             const u8 *atk = *(const u8 **)(m + 0x1C);
             knock(k, who, atk && atk[0] == 0, e->hp <= 0);
+        } else if (stands && !k->cur && e->hp > 0) {   // KF_STAND: no stock reaction ever; the flinch and the push are his
+            const u8 *atk = *(const u8 **)(m + 0x1C);
+            k->flinch = FLINCH_FRAMES;
+            knock(k, who, atk && atk[0] == 0, 0);
         }
     }
     return r;
 }
 
 // ---- the contract (tourney.h) -------------------------------------------------------------------------------------------
+static void attach_def(Entity *e, int fighter_id, const TKitDef *def);
 void tny_moves_attach(Entity *e, int fighter_id) {
     mv_init();
     if (!e || fighter_id < 0 || fighter_id >= TF_COUNT) return;
+    attach_def(e, fighter_id, &tny_kits[fighter_id]);
+}
+static void attach_def(Entity *e, int fighter_id, const TKitDef *def) {
     TKit *old = kit_of(e);
     if (old) {                                      // a new kit on the same body
         old->fighter = (u8)fighter_id;
-        old->def = &tny_kits[fighter_id];
+        old->def = def;
         old->native = (old->def->flags & KF_NATIVE) != 0;
         return;
     }
@@ -1752,7 +1904,7 @@ void tny_moves_attach(Entity *e, int fighter_id) {
     k->e = e;
     k->base = vt;
     k->fighter = (u8)fighter_id;
-    k->def = &tny_kits[fighter_id];
+    k->def = def;
     k->native = (k->def->flags & KF_NATIVE) || is_a16(e) || is_s13(e);
     k->team = ++mv.team_seq ? mv.team_seq : ++mv.team_seq;
     k->gcd = FIRST_DELAY;
@@ -1774,6 +1926,43 @@ void tny_moves_attach(Entity *e, int fighter_id) {
     e->vtable = k->vt;
     mv.reg[slot] = k;
     mv.attached++;
+}
+
+// The Time Chamber's Mr. Popo (popo.c): his own kit (popo_kit), stat and body at (x, y), his far hops inside `arena` (x1, y1,
+// x2, y2 px); never twinned; the caller adds his bar. 0 when the stat, the body or the heap is missing (mv.spawn_fail).
+Entity *tny_moves_popo_spawn(s32 x, s32 y, int stat, int sprite, const s16 *arena) {
+    static const u32 face_wait[2] = { 0x0800CB0Fu, 0x00027D00u };   // NpcBehavior_FaceAndWait
+    static const u32 no_action[2] = { ENEMY_ACTION_NONE, 0 };
+    mv_init();
+    EnemyStat st;
+    if (!resolve_stat(stat, &st)) { mv.spawn_fail = 3; return 0; }
+    if (!tny_moves_body_fits(sprite, st.ai_set)) { mv.spawn_fail = 4; return 0; }
+    struct { EnemyRecord r; const void *beh[1]; } rec;
+    memset(&rec, 0, sizeof rec);
+    rec.r.handler = (void *)0x0800E77Fu;
+    rec.r.stat_index = stat;
+    rec.r.x = (s16)x;
+    rec.r.y = (s16)y;
+    rec.r.sprite_id = sprite;
+    rec.r.action = (void *)no_action;
+    rec.r.behaviour_count = 1;
+    rec.beh[0] = face_wait;
+    u16 off = coop2.off;
+    coop2.off |= COOP_OFF_TWINS;
+    Entity *e = enemy_spawn_hook(&rec.r);
+    coop2.off = off;
+    if (!e) { mv.spawn_fail = 3; return 0; }
+    EntityList_Add(g_SceneTable[1], e);
+    attach_def(e, TK_POPO, &popo_kit);
+    TKit *k = kit_of(e);
+    if (!k) return e;                               // no heap for the kit: a stock boss on set 21 (never seen)
+    if (arena) for (int i = 0; i < 4; i++) k->arena[i] = arena[i];
+    return e;
+}
+// Tests: a kit's MF_FAR hops | KF_DODGE dodges << 16 (0 for anyone else)
+u32 tny_moves_popo_counts(const Entity *e) {
+    TKit *k = kit_of(e);
+    return k ? (u32)k->hops | (u32)k->dodged << 16 : 0;
 }
 
 // His final form at once (the engine's final-form challenge: Super Buu, Gohan absorbed, after the Legend Rumble):

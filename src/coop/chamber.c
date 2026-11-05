@@ -22,6 +22,7 @@
 #include "tourney.h"
 #include "chamber.h"
 #include "revive.h"
+#include "popo.h"         // the hidden room and Mr. Popo, the loop's times round (popo.c)
 
 #define CH_MAGIC        0x4348414Du   // "CHAM"
 #define CH_TICK         16            // frames between the open area's checks
@@ -341,7 +342,7 @@ static Entity *swap_in(const ChBoss *b, const ChRoom *r, int i) {
     s32 x = a ? a->x >> 8 : r->mark[i][0], y = a ? a->y >> 8 : r->mark[i][1];
     int facing = a ? a->facing : 0;
     if (a) EntityList_Remove(g_SceneTable[1], a, 0);
-    ch.rate = (s16)(b->rating + RATING_STEP * chamber_lights());
+    ch.rate = (s16)(b->rating + RATING_STEP * chamber_lights() + CH_LOOP_STEP * chamber_round());   // + the loop's (popo.h)
     ch.rate_id = b->fighter;
     ch.rate_pct = b->hp_pct;
     ch.rate_on = 1;
@@ -446,6 +447,7 @@ void chamber_tick(void) {
     const u8 *m = map_here();
     if (!m || m[0] != CH_ZONE) { ch.state = R_IDLE; return; }
     if (m[1] == CH_OPEN_AREA) { open_tick(); return; }      // a lever's cut-away too: a scene, open_tick does nothing
+    if (m[1] == POPO_AREA) { ch.state = R_IDLE; popo_tick(); return; }   // the hidden room (popo.c)
     const ChRoom *r = room_here();
     if (!r) { ch.state = R_IDLE; return; }
     if (!g_PlayerObject || !in_list(g_PlayerObject)) return;   // a game over's title, a load: nothing below is valid
@@ -475,6 +477,7 @@ _Static_assert(CH_FIGHT == 13 && CH_OPEN == 20, "the op numbers data/story/chamb
 
 // The room whose lever runs: the map says while in the room; in the cut-away the map is the open area, so CH_LEVER notes it
 static const ChRoom *cut_room(void) { return &rooms[ch.cut < ROOM_COUNT ? ch.cut : 0]; }
+int chamber_cut_light(void) { state_check(); return cut_room()->light; }   // popo.c: the room prize after the lever
 
 int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
     (void)b;
