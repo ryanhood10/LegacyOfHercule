@@ -18,7 +18,7 @@ _Static_assert(sizeof(TalkEnt) == 12, "TalkEnt");
 static struct {
     u32 magic;
     u32 action[2];
-    const void *seq[TALK_MAX + 2];
+    const void *seq[TALK_MAX + 3];
     TalkEnt ent[TALK_MAX];
     u8 n, live, wait;                                // live: 1 queued (no scene yet), 2 on screen
 } talk TNY_SECTION("talk");
@@ -143,6 +143,33 @@ int tny_talk_win(int id) {
     start();
     add(id, voice(id, TALK_WIN));
     return run();
+}
+
+// The Time Chamber's room scenes (tny_talk.h): seq[0] first, seq[1..n] the lines, seq[n + 1] last (its next is 6), seq[6] the
+// stop word it reaches
+int tny_talk_scene(const void *first, const u8 *faces, const char *const *lines, int n, const void *last) {
+    start();
+    for (int i = 0; i < n && i < TALK_MAX; i++) {
+        if (!lines[i]) continue;
+        TalkEnt *e = &talk.ent[talk.n];
+        e->head[2] = MODE_FORMAT;
+        e->head[3] = faces[i];
+        e->fmt = lines[i];
+        e->script[0] = OP_END;
+        talk.n++;
+    }
+    if (!talk.n && !first && !last) return 0;
+    talk.seq[0] = first ? first : talk_wait;
+    for (int i = 0; i < talk.n; i++) {
+        talk.ent[i].head[0] = (u8)(i + 2);
+        talk.ent[i].head[1] = 0;
+        talk.seq[i + 1] = &talk.ent[i];
+    }
+    for (int i = talk.n + 1; i < TALK_MAX + 3; i++) talk.seq[i] = 0;
+    talk.seq[talk.n + 1] = last;
+    coop_run_sequence(talk.action, talk.seq);
+    talk.live = 0;                                  // no skip: `last` must run
+    return 1;
 }
 
 void tny_talk_frame(void) {

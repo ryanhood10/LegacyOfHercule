@@ -1019,6 +1019,12 @@ static Entity *spawn_fighter(int id, s32 x, s32 y, int stat, int team) {
     return e;
 }
 
+// A Time Chamber room's fighter (chamber.c): his stat through the engine's row, his kit, no twin; the caller's bar
+Entity *tny_moves_room_spawn(int id, s32 x, s32 y) {
+    mv_init();
+    return spawn_fighter(id, x, y, 0, 0);
+}
+
 // ---- the specials ----------------------------------------------------------------------------------------------------
 static void finish(TKit *k) {
     Entity *e = k->e;

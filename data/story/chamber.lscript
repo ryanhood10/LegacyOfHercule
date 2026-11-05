@@ -1,0 +1,164 @@
+; The Hyperbolic Time Chamber as a game mode (docs/time-chamber.md; state of the build and how to add a room: section 12).
+; Shared by the open area (data/maps/chamber_open.json) and every room's map (data/maps/chamber_dojo.json is the pattern); the
+; rows and the lines are in src/coop/chamber.c. CoopCall 35's op numbers are chamber.c's enum.
+; Every line here is Claude's draft (DRAFT), not dictated.
+
+; ---- the open area --------------------------------------------------------------------------------------------------
+
+; the gate as stock zone 8 area 16 has it, with six flags, one light each: decorations 0-5 the lights, 6-8 the beams
+script ch_open_onload
+        PlayAudioVolume 17, 40
+        StackTestStoryFlag 504
+        JumpIfFalse L1
+        FindEntityByType 0
+      L1:
+        StackTestStoryFlag 505
+        JumpIfFalse L2
+        FindEntityByType 1
+      L2:
+        StackTestStoryFlag 506
+        JumpIfFalse L3
+        FindEntityByType 2
+      L3:
+        StackTestStoryFlag 507
+        JumpIfFalse L4
+        FindEntityByType 3
+      L4:
+        StackTestStoryFlag 508
+        JumpIfFalse L5
+        FindEntityByType 4
+      L5:
+        StackTestStoryFlag 509
+        JumpIfFalse L6
+        FindEntityByType 5
+      L6:
+        CoopCall 35, 15, 0, 0
+        JumpIfFalse L7
+        StopAudio 17
+        FindEntityByType 6
+        FindEntityByType 7
+        FindEntityByType 8
+        SetCollisionRect 1008, 320, 1048, 400
+      L7:
+end
+
+script ch_open_onleave
+        StopAudio 17
+end
+
+; a jar's drop and a regular enemy's: both read both players' bars (chamber.c drop_item)
+script ch_jar_drop
+        CoopCall 35, 17, 0, 0
+end
+
+script ch_enemy_drop
+        CoopCall 35, 18, 0, 0
+end
+
+; DRAFT placeholder: phase 4 gives these five doors their rooms
+sequence ch_door_shut
+  script
+        PlayAudio 19
+  text 0 "The door will not open."
+end
+
+; ---- a room ---------------------------------------------------------------------------------------------------------
+
+script ch_room_onload
+        CoopCall 35, 1, 0, 0
+        JumpIfFalse L1
+        FindCharacterEntity 0
+      L1:
+end
+
+script ch_boss_cond
+        CoopCall 35, 2, 0, 0
+end
+
+script ch_partner_cond
+        CoopCall 35, 3, 0, 0
+end
+
+; walking in: the scene is built in C (tny_talk_scene): ch_room_parts [0], the lines of the room's row and each player's reply,
+; ch_room_parts [1]
+sequence ch_room_intro
+  script
+        CoopCall 35, 4, seq:ch_room_parts, 0
+end
+
+; indexes: [0] -> 1 is the first line; [1] -> 6 is the scene's stop word (tny_talk_scene)
+sequence ch_room_parts
+  script -> 1
+        CoopCall 35, 5, 0, 0
+        BeginCommandBatch
+        CoopCall 35, 6, 0, 0
+        CoopCall 35, 7, 0, 0
+        CoopCall 35, 8, 0, 0
+        Step WalkToPosition
+        CoopCall 35, 9, 0, 0
+        JumpIfFalse L1
+        CoopCall 35, 10, 0, 0
+        CoopCall 35, 11, 0, 0
+        CoopCall 35, 12, 0, 0
+        Step WalkToPosition
+      L1:
+        CommitCommandBatch
+        WaitFrames 15
+  script -> 6
+        PlayAudio 47
+        ScreenShake 0, 2, 12
+        CoopCall 35, 13, 0, 0
+        WaitFrames 20
+end
+
+; the plaque: refused (the stock click) until the room's boss is down and its bodies gone, and once thrown
+sequence ch_lever
+  script
+        CoopCall 35, 14, 0, 0
+        END
+  script
+        PlayAudio 19
+  stop
+  script
+        FindCharacterEntity 0
+        PlayAudio 57
+        WaitFrames 40
+        SetMapRestoreFlag
+        LoadMapNoEntities 15, 18, 1, 908, 284
+        WaitFrames 60
+        PlayAudio 47
+        CoopCall 35, 16, 0, 0
+        Step FindEntityByType
+        WaitFrames 90
+        CoopCall 35, 19, 0, 0
+        CoopCall 35, 15, 0, 0
+        JumpIfFalse L1
+        FindEntityByType 6
+        WaitFrames 25
+        FindEntityByType 7
+        WaitFrames 25
+        FindEntityByType 8
+        PlayAudio 47
+        WaitFrames 80
+        StopAudio 17
+        PlayAudio 18
+        WaitFrames 90
+      L1:
+        RestoreMap
+        CoopCall 35, 20, 0, 0
+        PlayAudio 47
+        StackTestStoryFlagNot 468
+        StackTestStoryFlagNot 193
+        And
+        JumpIfFalse L2
+        SetStoryFlag 468
+        SetCharacterTransformation 0, 56
+        PlayAudio 62
+        PushByte 4
+        END
+      L2:
+        PushByte 5
+        END
+  text 0 "@^Gohan can now transform into a Super Saiyan!"
+  stop
+end
