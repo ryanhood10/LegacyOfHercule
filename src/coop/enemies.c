@@ -14,6 +14,7 @@
 #include "bosses.h"
 #include "super13.h"
 #include "tny_engine.h"
+#include "chamber.h"
 
 ROM_FN(void, Enemy_UpdateStates, (Entity *e), 0x0800772B);   // aux + control state; the AI tick follows in 0x0800E5A5
 #define ENEMY_UPDATE 0x0800E5A5u
@@ -373,10 +374,17 @@ Entity *enemy_spawn_hook(const EnemyRecord *rec) {
     coop_init_once();
     if (rec->stat_index == A16_STAT) return a16_spawn(rec);   // Android 16: single boss, own AI (android16.c)
     if (rec->stat_index == S13_STAT) return s13_spawn(rec);   // Super Android 13: single boss, own AI (super13.c)
+    struct { EnemyRecord r; const void *beh[1]; } spot;   // a Time Chamber spot: the current tier's enemy (chamber.c)
+    s32 spot_exp = 0;
+    if (rec->stat_index == CH_SPOT_STAT) { chamber_spot(rec, &spot.r, &spot_exp); rec = &spot.r; }
     const BossRule *rule = boss_rule(rec->stat_index);
     EnemyStat buf;
     const EnemyStat *st = dojo_stat(spawn_stat(rec->stat_index, rule, &buf), &buf, rec->stat_index);
     if (!st) return 0;
+    if (spot_exp) {                                   // a private stat: the record is on the stack, so every path below copies it
+        if (st != &buf) { buf = *st; st = &buf; }
+        buf.exp = spot_exp;
+    }
     if (is_boss_rec(rec, st) && diff_boss_hp_pct() != 100) {   // the difficulty's boss HP (difficulty.h)
         if (st != &buf) { buf = *st; st = &buf; }
         buf.max_hp = boss_hp(buf.max_hp);
@@ -523,6 +531,8 @@ void coop_debug_tick(void) {
         tny_test_cmd(cmd, coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == COOP_CMD_REGEN) {
         regen_test(coop2.cmd_arg);
+    } else if (cmd == 48) {                     // the Time Chamber (chamber.c, docs/ids.md)
+        chamber_test(coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == 45) {                     // objroom.c: hold OBJ VRAM (perf_budget.py)
         obj_room_test(coop2.cmd_arg);
     } else if (cmd == 47) {                     // Hercule's kit (hercule_kit.txt): arg 0 the enemies the flash holds, 1 the last hit's damage, 2 EXP for slot arg2

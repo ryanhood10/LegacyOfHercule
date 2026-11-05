@@ -53,6 +53,17 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      plain 32x32 decorations on a stock map's sheet (OBJ VRAM: the whole sheet; after "rocks" on
                                      another sheet the two are joined, and "frame" counts in this one); the flight
                                      sign is frame 0 of zone 7 area 1's 1 KB sheet (docs/maps.md "Flight spot to the world map")
+  "objects": {"parts": [{"map": [8, 16], "from": 0, "bytes": 2176}, ...],
+              "list": [{"part": 0, "frame": 4, "x":, "y":, "shape": "64x32", "visible": 1},
+                       {"part": 1, "frame": 0, "x":, "y":, "hits": 3, "drop": "script:NAME"}, ...]},
+                                     decorations in list order (their ids) on one sheet joined from parts of stock sheets
+                                     (OBJ VRAM: the joined bytes, so take only the frames used); "frame" counts 32-byte
+                                     units inside its part; "shape" 8x16, 16x32, 32x32 (default), 64x32; "visible": 0 starts
+                                     hidden; "hits" makes it a breakable (item, handler 0x0800F9A3) running "drop"; the
+                                     Time Chamber's gate, jars, plaque (docs/time-chamber.md 12)
+  "onleave": "script:NAME",          the map's on-leave script (+0x34)
+  an enemy record may name "behaviours": ["0x083EE430"] (inline pointers, as stock records have) instead of "like"
+  a png op's "arg": draw(arg) for a tools/NAME.py that holds several pictures
   "spawn": [x, y], "name_id": 233, "music": 5, "flags": 1,
   "requires": "buu"                  only built when that ROM is given (--buu-rom)
 }
@@ -462,7 +473,8 @@ class Build:
         del g
 
     def png_op(self, bg, op):
-        im = art_module(op["draw"]).draw() if "draw" in op else None
+        mod = art_module(op["draw"]) if "draw" in op else None
+        im = (mod.draw(op["arg"]) if "arg" in op else mod.draw()) if mod else None
         if im is None:
             from PIL import Image
             im = Image.open(op["file"])
@@ -721,6 +733,17 @@ def emit_records(b, pk, refs):
             ptrs.append(pk.put(struct.pack("<IIhhIIII", HANDLER_NPC, cond, x, y, talk, sprite, 1, beh),
                                f"{b.spec['name']} npc record"))
         elif r["kind"] == "enemy":
+            if "behaviours" in r:   # inline behaviour pointers (the record's +0x1C.., what the engine reads)
+                act = r.get("action", "none")
+                if act == "none":
+                    action = pk.put(struct.pack("<II", ACTION_NONE, 0), "enemy action")
+                else:
+                    fn = ACTION_SCRIPT if refs.kind(act) == "script" else ACTION_DIALOG
+                    action = pk.put(struct.pack("<II", fn, refs.ref(act)), "enemy action")
+                beh = [int(v, 0) for v in r["behaviours"]]
+                ptrs.append(pk.put(struct.pack("<IIIhhIII", HANDLER_ENEMY, cond, r["stat"], x, y, sprite, action, len(beh))
+                                   + b"".join(struct.pack("<I", v) for v in beh), f"{b.spec['name']} enemy record"))
+                continue
             z, a, n = r["like"]
             src = rom.u32(L.find_entry(rom, z, a).scripts + 4 * n)
             cnt, beh_arr = rom.u32(src + 0x18), rom.u32(src + 0x1C)
@@ -872,6 +895,29 @@ def emit(b, pk):
     # collision
     walk = pk.put(lz(b.walk), f"{spec['name']} walk collision")
     proj = walk if spec.get("projectile", "walk") == "walk" else pk.put(lz(b.proj), f"{spec['name']} projectile mask")
+    # decorations on one sheet joined from parts of stock sheets, breakables among them (docs/time-chamber.md 12)
+    objects = spec.get("objects")
+    object_items = []
+    if objects:
+        if b.decos:
+            raise SpecError("objects: the map already has decorations")
+        sheet_bytes, starts = b"", []
+        for part in objects["parts"]:
+            whole = rom.resource(b.source(part["map"]).var.sheet)
+            cut = whole[part.get("from", 0):part.get("from", 0) + part.get("bytes", len(whole))]
+            if len(sheet_bytes) % 32 or len(cut) % 32:
+                raise SpecError("objects: a sheet part must be whole 32-byte units")
+            starts.append(len(sheet_bytes) // 32)
+            sheet_bytes += cut
+        b.sheet = pk.put(lz(sheet_bytes), f"{spec['name']} decoration sheet")
+        shapes = {"8x16": (8, 16, 0xA000, 0x0000), "16x32": (16, 32, 0xA000, 0x8000), "32x32": (32, 32, 0x2000, 0x8000),
+                  "64x32": (64, 32, 0x6000, 0xC000)}
+        for r in objects["list"]:
+            w, h, a0, a1 = shapes[r.get("shape", "32x32")]
+            if "hits" in r:
+                object_items.append((len(b.decos), r))
+            b.decos.append(struct.pack("<iiiiHHHBB", r["x"], r["y"], r["x"] + w, r["y"] + h, a0, a1,
+                                       starts[r["part"]] + r.get("frame", 0), 0x28, r.get("visible", 1)))
     # breakable rocks (docs/maps.md 7): decorations on a stock map's sheet; their items are added with the barrier's
     rocks = spec.get("rocks")
     rock_items = []
@@ -933,6 +979,10 @@ def emit(b, pk):
     for k, r in rock_items:
         items.append(pk.put(struct.pack("<IBBBBII", 0, k, r.get("hits", 3), 3, 0, ITEM_SCRIPT_HANDLER,
                                         int(r.get("drop", "0x083EE6A8"), 0)), "rock item"))
+    for k, r in object_items:
+        drop = r["drop"]
+        drop = refs.ref(drop) if drop.startswith(("script:", "seq:")) else int(drop, 0)
+        items.append(pk.put(struct.pack("<IBBBBII", 0, k, r["hits"], 3, 0, ITEM_SCRIPT_HANDLER, drop), "object item"))
     item_arr = pk.put(b"".join(struct.pack("<I", p) for p in items)) if items else 0
     trig = []
     for cond, data, _ in b.triggers:
@@ -1011,7 +1061,8 @@ def emit(b, pk):
     struct.pack_into("<I", row, 0x0C, spec.get("name_id", be.name if be else 0xDD))
     struct.pack_into("<IIIII", row, 0x10, trig_arr, rec_arr, item_arr, 0, gate_ptr)
     struct.pack_into("<I", row, 0x24, spec.get("music", be.music if be else 2))
-    struct.pack_into("<IIII", row, 0x28, 0, var_arr, onload, 0)
+    onleave = refs.ref(spec["onleave"]) if spec.get("onleave") else 0
+    struct.pack_into("<IIII", row, 0x28, 0, var_arr, onload, onleave)
     info = dict(name=spec["name"], zone=spec["zone"], area=spec["area"], size=[b.W * 8, b.H * 8], spawn=[sx, sy],
                 slots=len(b.ts.slots), new_tiles=len(raw), chunks=len(chunk_cache), variation=hex(var_ptr))
     return bytes(row), info

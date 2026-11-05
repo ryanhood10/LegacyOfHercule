@@ -17,6 +17,9 @@ extern const TalkTvt tny_talk_tvt[];
 int  tny_talk_pre(const u8 *opp, int nopp, const u8 *mine, int nmine);
 // The winner's line after the end pose (1 = it runs)
 int  tny_talk_win(int id);
+// A scene with lines (the Time Chamber's rooms): `first` (a dialogue entry whose next is 1; 0 = the short wait), up to 4 lines
+// with their portraits, `last` (an entry whose next is 6, lscript `-> 6`; 0 = none). 1 = it runs. Start does not skip it.
+int tny_talk_scene(const void *first, const u8 *faces, const char *const *lines, int n, const void *last);
 // Every frame (tny_frame): Start skips the rest of a talk
 void tny_talk_frame(void);
 // Test command 31 (TNY_TALK): arg = the opening side (id | id << 8, 0xFF nobody), arg2 = the answering side; arg

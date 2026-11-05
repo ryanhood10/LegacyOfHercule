@@ -1,3 +1,5 @@
+// RETIRED for players (2026-11-05, docs/time-chamber.md decision 5): the chamber's door leads to the open area (chamber.c); only
+// tests start these rounds now (test command 48 op 5, CoopCall 13), test commands 13 / 14 and CoopCall 14 (ops 2, 3) stay in use.
 // Hyperbolic Time Chamber training waves (docs/story.md 4g, docs/scripts.md "CoopCall"). From Cell's
 // announcement on, the Lookout's chamber door (zone 9 area 3) warps the players into the chamber (zone
 // 15 area 2) and calls WaveStart with the round sequence. Ten rounds of stock enemies follow, fixed per
@@ -182,7 +184,8 @@ void waves_tick(void) {
         if (waves.timer) { waves.timer--; break; }
         waves.round++;
         waves.state = waves.round > WAVE_ROUNDS ? WS_DONE : WS_ANNOUNCE;
-        coop_run_sequence(waves.action, waves.seq);
+        if (waves.seq) coop_run_sequence(waves.action, waves.seq);
+        else wave_spawn();                          // test command 48 op 5: no captions (the door no longer starts the rounds)
         break;
     case WS_FIGHT: {
         if (waves.timer) { waves.timer--; break; }

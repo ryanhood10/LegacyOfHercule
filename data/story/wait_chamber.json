@@ -1,5 +1,5 @@
 {
-  "_": "Time Chamber training waves (docs/story.md 4g): the Lookout's chamber door opens after Cell's announcement (flag 157) and starts the waves (src/coop/waves.c, CoopCall 13/14); Mr. Popo beside the door points the players to it. Scripts in wait_chamber.lscript; the chamber map is data/maps/time_chamber.json.",
+  "_": "The Time Chamber's door (docs/time-chamber.md): the Lookout's chamber door opens after Cell's announcement (flag 157) onto the open area (zone 15 area 18, data/maps/chamber_open.json); Mr. Popo beside the door points the players to it. Scripts in wait_chamber.lscript.",
   "sources": [
     "data/story/wait_chamber.lscript"
   ],

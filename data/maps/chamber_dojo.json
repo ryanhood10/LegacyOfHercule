@@ -1,0 +1,169 @@
+{
+ "_": "A Time Chamber room, the pattern for the next five (docs/time-chamber.md 12 'Adding a room'): Roshi's own gym (zone 6 area 70) with a plaque on the back wall (zone 8 area 37's, OFF painted, ON a hidden decoration), the gate's force beam across the door (a hidden decoration, shown while the fight seals it). The row is in src/coop/chamber.c rooms[]. Priorities 1, 2, 3, 3: at stock 1, 1, 3, 3 the floor (BG1) covers OBJ priority 2, where beams and these decorations draw.",
+ "name": "chamber_dojo",
+ "zone": 15,
+ "area": 19,
+ "base": [
+  6,
+  70
+ ],
+ "tileset": "base",
+ "layout": "base",
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    16,
+    5
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     12,
+     15,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    16,
+    10,
+    3,
+    1
+   ]
+  }
+ ],
+ "sources": [
+  "data/story/chamber.lscript"
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 0,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 128,
+    "y": 40,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 108,
+    "y": 240,
+    "shape": "64x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 186,
+   "x": 124,
+   "y": 100,
+   "facing": 0,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 189,
+   "x": 164,
+   "y": 100,
+   "facing": 0,
+   "condition": "script:ch_partner_cond"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    24,
+    150,
+    256,
+    200
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:504"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    120,
+    72,
+    152,
+    112
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    120,
+    280,
+    160,
+    296
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    1616,
+    1764
+   ],
+   "facing": 0
+  }
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  140,
+  252
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "priorities": [
+  1,
+  2,
+  3,
+  3
+ ]
+}

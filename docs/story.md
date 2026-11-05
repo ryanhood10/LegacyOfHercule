@@ -104,7 +104,7 @@ looked at:
 | 8 | Ten-day wait: Roshi's 2v2 gym and the animal-ninja finale (4f) | any (save pad) | `ch8_gym` | merged 2026-10-18 |
 | 8 | Cooler with his Namekian servant, Piccolo gate (4f) | any | `ch8_cooler` | merged 2026-10-18 |
 | 8 | Roshi's dojo sparring, players 1 v 1 (4g) | the two players | `wait_spar` | merged 2026-10-19 |
-| 8 | Time Chamber training waves, ten rounds (4g) | any | `wait_chamber` | merged 2026-10-19 |
+| 8 | Time Chamber training waves, ten rounds (4g); since 2026-11-05 the Time Chamber mode (`docs/time-chamber.md`: phases 1-3 built, the rounds retired) | any | `wait_chamber`, `chamber` | merged 2026-10-19; mode on `nb-chamber` |
 | 8 | Broly side chapter (4g) | Vegeta / Trunks on arrival, any of the trip's five | `broly` | merged 2026-10-19 |
 | 8 | "Gero's computer": Krillin + 16 back to the lab, two 19s, ends as Krillin + Hercule (4g) | Krillin / Android 16 | `ch9_gero` | merged 2026-10-19 |
 | 9 | The Cell Games: solo fights, the Cell Juniors, Goku names Hercule, the beam struggle, Super Saiyan 2 Gohan joins (4h) | per fight, each player alone (4h) | `cell_games` | built 2026-10-19 |
@@ -349,7 +349,7 @@ sparring match names the winner's character instead), and both players are back 
   Corp. Alone, Roshi says you need a partner. Tested headless (both outcomes, the repeat, single-player).
 - **Dragon Ball race:** dropped (Ryan).
 - **Time Chamber training waves (approved by Ryan; built and merged 2026-10-19,
-  `data/story/wait_chamber`, `src/coop/waves.c`):** instead of grinding in the wild, the players
+  `data/story/wait_chamber`, `src/coop/waves.c`; **superseded 2026-11-05 by the Time Chamber mode, `docs/time-chamber.md` 12: the door leads to the open area, Gohan's Super Saiyan comes at the first lever**):** instead of grinding in the wild, the players
   enter the Hyperbolic Time Chamber (zone 15 area 2) from Kami's Lookout and fight ten rounds of stock
   enemies in fixed tiers, harder as the rounds go up. It opens at the start of the ten-day wait (flag
   157, after Cell's announcement; the game never shows Goku and Gohan coming out). Mr. Popo stands

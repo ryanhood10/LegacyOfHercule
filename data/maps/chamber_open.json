@@ -1,0 +1,871 @@
+{
+ "_": "The Time Chamber's open area (docs/time-chamber.md, section 12 the state of the build): the largest map the collision bitmap takes, white void floor, the living quarters (the Lookout's facade, as time_chamber.json), the gate (decorations 0-8), six entrances (placeholder art, chamberart.py; only the dojo's door leads anywhere so far), jars, spot records (stat 155: chamber.c gives each the tier's enemy). Slot budget: leave room for six real entrances of about 96 x 80.",
+ "name": "chamber_open",
+ "zone": 15,
+ "area": 18,
+ "base": [
+  9,
+  1
+ ],
+ "tileset": "fresh",
+ "layout": [
+  2048,
+  2048
+ ],
+ "priorities": [
+  1,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "texture",
+   "bg": 3,
+   "rect": [
+    0,
+    0,
+    256,
+    256
+   ],
+   "color": [
+    252,
+    252,
+    252
+   ],
+   "variants": 8,
+   "seed": 7,
+   "speckle": [
+    {
+     "color": [
+      232,
+      236,
+      246
+     ],
+     "density": 0.035
+    },
+    {
+     "color": [
+      214,
+      222,
+      238
+     ],
+     "density": 0.008
+    }
+   ]
+  },
+  {
+   "op": "walk",
+   "rect": [
+    0,
+    0,
+    256,
+    256
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    113,
+    129
+   ],
+   "src": {
+    "map": [
+     9,
+     1
+    ],
+    "rect": [
+     82,
+     13,
+     29,
+     19
+    ]
+   },
+   "layers": [
+    1
+   ],
+   "to_layers": [
+    2
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    116,
+    130
+   ],
+   "src": {
+    "map": [
+     9,
+     1
+    ],
+    "rect": [
+     85,
+     14,
+     23,
+     5
+    ]
+   },
+   "layers": [
+    0
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    121,
+    135
+   ],
+   "src": {
+    "map": [
+     9,
+     1
+    ],
+    "rect": [
+     90,
+     19,
+     12,
+     21
+    ]
+   },
+   "layers": [
+    0
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false
+  },
+  {
+   "op": "clear",
+   "bg": 2,
+   "rect": [
+    141,
+    128,
+    1,
+    20
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    113,
+    128,
+    29,
+    16
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "block",
+   "rect": [
+    119,
+    144,
+    17,
+    4
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "block",
+   "rect": [
+    121,
+    148,
+    12,
+    6
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    123,
+    40
+   ],
+   "src": {
+    "map": [
+     8,
+     16
+    ],
+    "rect": [
+     20,
+     8,
+     3,
+     9
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "collision": false
+  },
+  {
+   "op": "stamp",
+   "at": [
+    131,
+    40
+   ],
+   "src": {
+    "map": [
+     8,
+     16
+    ],
+    "rect": [
+     20,
+     8,
+     3,
+     9
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "flip": "h",
+   "collision": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    123,
+    40,
+    11,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    150,
+    150
+   ],
+   "src": {
+    "map": [
+     13,
+     7
+    ],
+    "rect": [
+     7,
+     13,
+     8,
+     8
+    ]
+   },
+   "collision": false
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "namek",
+   "at": [
+    48,
+    60
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    48,
+    60,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    52,
+    67,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "frieza",
+   "at": [
+    196,
+    60
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    196,
+    60,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    200,
+    67,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "saiyan",
+   "at": [
+    24,
+    132
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    24,
+    132,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    28,
+    139,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "pirate",
+   "at": [
+    220,
+    132
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    220,
+    132,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    224,
+    139,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "lab",
+   "at": [
+    48,
+    208
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    48,
+    208,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    52,
+    215,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberart",
+   "arg": "dojo",
+   "at": [
+    196,
+    208
+   ]
+  },
+  {
+   "op": "block",
+   "rect": [
+    196,
+    208,
+    12,
+    10
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "walk",
+   "rect": [
+    200,
+    215,
+    4,
+    3
+   ],
+   "mask": "both"
+  },
+  {
+   "op": "border",
+   "width": 1,
+   "mask": "both"
+  }
+ ],
+ "sources": [
+  "data/story/chamber.lscript"
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     16
+    ]
+   },
+   {
+    "map": [
+     14,
+     2
+    ]
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 988,
+    "y": 338,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 1060,
+    "y": 338,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 988,
+    "y": 353,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 1060,
+    "y": 353,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 988,
+    "y": 368,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 1060,
+    "y": 368,
+    "shape": "8x16"
+   },
+   {
+    "part": 0,
+    "frame": 4,
+    "x": 988,
+    "y": 317,
+    "shape": "64x32"
+   },
+   {
+    "part": 0,
+    "frame": 4,
+    "x": 988,
+    "y": 332,
+    "shape": "64x32"
+   },
+   {
+    "part": 0,
+    "frame": 4,
+    "x": 988,
+    "y": 347,
+    "shape": "64x32"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 336,
+    "y": 576,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 496,
+    "y": 576,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1520,
+    "y": 576,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1680,
+    "y": 576,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 144,
+    "y": 1152,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 304,
+    "y": 1152,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1712,
+    "y": 1152,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1872,
+    "y": 1152,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 336,
+    "y": 1760,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 496,
+    "y": 1760,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1520,
+    "y": 1760,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1680,
+    "y": 1760,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 952,
+    "y": 448,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1072,
+    "y": 448,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 904,
+    "y": 1096,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 1200,
+    "y": 1096,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 872,
+   "y": 1200,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 1168,
+   "y": 1320,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 864,
+   "y": 1344,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 1016,
+   "y": 1420,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 1180,
+   "y": 1180,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 840,
+   "y": 1272,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  },
+  {
+   "kind": "enemy",
+   "stat": 155,
+   "sprite": 148,
+   "x": 1200,
+   "y": 1420,
+   "behaviours": [
+    "0x083EE430"
+   ],
+   "action": "script:ch_enemy_drop"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "savepad",
+   "rect": [
+    1200,
+    1208,
+    1249,
+    1249
+   ]
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    416,
+    536,
+    448,
+    576
+   ],
+   "payload": "seq:ch_door_shut",
+   "activation": "facing"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    1600,
+    536,
+    1632,
+    576
+   ],
+   "payload": "seq:ch_door_shut",
+   "activation": "facing"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    224,
+    1112,
+    256,
+    1152
+   ],
+   "payload": "seq:ch_door_shut",
+   "activation": "facing"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    1792,
+    1112,
+    1824,
+    1152
+   ],
+   "payload": "seq:ch_door_shut",
+   "activation": "facing"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    416,
+    1720,
+    448,
+    1760
+   ],
+   "payload": "seq:ch_door_shut",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    976,
+    1224,
+    1048,
+    1256
+   ],
+   "dir": "up",
+   "to": [
+    9,
+    3,
+    1
+   ],
+   "at": [
+    96,
+    168
+   ]
+  },
+  {
+   "type": "door",
+   "rect": [
+    1600,
+    1720,
+    1632,
+    1760
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    19,
+    1
+   ],
+   "at": [
+    140,
+    252
+   ],
+   "facing": 1
+  }
+ ],
+ "onload": "script:ch_open_onload",
+ "onleave": "script:ch_open_onleave",
+ "spawn": [
+  1016,
+  1304
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1
+}

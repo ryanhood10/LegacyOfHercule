@@ -5,6 +5,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 ## 2026-11-05
 
 - **A tournament of 32 (`docs/tournament.md` 2b, 26, `tny_n32.txt`; Ryan: "we can use lower-tier fighters, but we must fill the tournament FIRST with the fighters from that division selected"):** a 2 v 2 of 16 teams. Only Legend can fill it (30 to 34 opponents with the lower tiers; Champion reaches 26 at most): offered there once the count is 30 after up to two pickable fighters are set aside, in practice Super 13 beaten and Cooler beaten or the Broly chapter done; locked with a footer otherwise. The division's all in, then the strongest from below, never a repeat, never a mirror. 8 and 16 draw as before (60 draws compared). The screen: blocks A to D, each like an 8-team half, and the "Final four" page, never more than 8 faces on a page. `TBracket.seat` is 32; 4 rounds were enough (a unit is a team).
+- **The Time Chamber, phases 1-3 (`docs/time-chamber.md` 12; branch `nb-chamber`):** the Lookout's door opens on a white void of
+  2048 x 2048 (the most the collision takes; 372 of 896 tile slots, 588 left for six entrances of 98) with the living
+  quarters, a save pad, sixteen jars that read both players' bars, six placeholder entrances, and the stock gate of zone 8
+  area 16 with six lights (flags 504-509, one per room) and three beams. Enemies by lights out (seven tiers from section 4,
+  spot records through `enemy_spawn_hook`, an EXP ladder of about 35-45 kills a level), refilled round the players as they
+  walk: 7 records with two players (14 bodies), 10 alone, chosen from measures of OBJ VRAM and frame time. Roshi's dojo end to
+  end as a table-driven room (`chamber.c` `rooms[]`): actors by lineup, a staged intro with a line per character, the
+  tournament's kits outside the ring, the fall watched, the plaque's cut-away to the gate, the door, the next tier;
+  Gohan's Super Saiyan at the first lever. The ten rounds retired (tests keep them). 504-535 cleared at a new game
+  (`party_new_game`); Ryan's save proved to load unchanged. Tests `chamber_gate`, `chamber_tiers`, `chamber_room`,
+  `gohan_ssj1`, `chamber_save`.
 - **Cutscenes staged (Ryan's rule: `docs/howto.md` "Stage a scene"):** Gero's three stages, the lab, the road and the mother dinosaur (`docs/scripts.md`, `ch4_staging.txt`). Whoever nobody plays has a body and moves; nobody pops. Found: walking Piccolo's NPC sprite 73 (one group) overwrites the heap; 103 walks.
 - **Android 13's motive (Ryan):** 17 and 18 kill Gero, 13 swears revenge for his father, blasts them and flies north, tucked away until the post-game's Super 13 (`docs/story.md`). The lab's old lines "You built 'em too well" and "Goku is mine" went with it; all his new lines are drafts for Ryan.
 - **The bracket, one half at a time (`docs/tournament.md` 26, `tny_bracket.txt`; Ryan's note, our calls):** a 16-seat bracket (16 fighters, 8 teams) is a left half, a right half and a final page, slid between; every name on its own row, the faces zigzag beside them, the player's road in his colour to the final; a first look at each half; the round's other matches in one sweep; the screen no longer stands still for 4-9 frames (`bm_fill` by DMA, the page's names and faces drawn during the slide). No 32-fighter bracket: the reasons in the section.

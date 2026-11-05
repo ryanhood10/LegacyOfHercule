@@ -15,7 +15,7 @@ for t in a16_moves tny_eggs tny_crowd tny_npcs tny_polish tny_engine tny_ui tny_
          tny_artbuu tny_grounds cell_games cell_games_1p krillin_disc arctic_summit postgame ch9_gero p2_special revive difficulty \
          journal dropout ch1_room_forest scene_actor exp_credit a16_gone broly_ride duel_end tny_hpbars tny_fightfix \
          tny_nomirror tny_talk tny_combo_draw tny_combo_meter tny_combo_run tny_combo_tune wm_landmark tny_pp_combo \
-         tny_caption tny_annwalk tny_turn tny_walk gohan_ssj1 cell_juniors ch9_actors ch1_notes player_lines lead_scenes; do
+         tny_caption tny_annwalk tny_turn tny_walk cell_juniors ch9_actors ch1_notes player_lines lead_scenes; do
   run $t tools/headless/$t.txt
 done
 for t in arctic_summit postgame ch9_gero; do
@@ -29,7 +29,7 @@ python tools/headless/st_expect.py tools/headless/ssj_hercule.txt "$ROM" "$OUT/m
 echo "## softreset" >> "$LOG"
 python tools/headless/st_expect.py tools/headless/softreset.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 # Resting heals, player 2's pickups, West City's arrival, the tournament in co-op, player 2's agency (docs/testing.md "Resting heals", "Player 2's pickups", "West City's arrival", "Tournament in co-op", "Player 2's agency"): self-checking
-for t in regen pickup wc_arrival corn_maze ssj_lock hercule_kit tny_coop p2_agency p2_cases p2_scenes balance p2_levelup tny_pools tny_xp eggbot tny_sizes ch4_eggs ch4_staging tny_bracket tny_n32 cell_staging; do
+for t in regen pickup wc_arrival corn_maze ssj_lock hercule_kit tny_coop p2_agency p2_cases p2_scenes balance p2_levelup tny_pools tny_xp eggbot tny_sizes ch4_eggs ch4_staging tny_bracket tny_n32 cell_staging gohan_ssj1; do
   echo "## $t" >> "$LOG"
   python tools/headless/st_expect.py tools/headless/$t.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 done
@@ -41,6 +41,13 @@ for s in tools/headless/staging_*.txt; do
   echo "## $(basename "$s" .txt)" >> "$LOG"
   python tools/headless/staging_run.py "$s" "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 done
+# The Time Chamber (docs/testing.md "Time Chamber"): the open area and gate, each tier, Roshi's dojo in every kind of lineup, a real save's load
+for t in chamber_gate chamber_tiers chamber_room; do
+  echo "## $t" >> "$LOG"
+  python tools/headless/staging_run.py tools/headless/$t.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 6 2>&1 | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
+done
+echo "## chamber_save" >> "$LOG"
+python tools/headless/chamber_save.py load "$ROM" "${SAVE:-F:/MeltyCreations/log2/build/play/legacy-of-hercule.sav}" --out "$OUT" 2>&1 | grep -E "^slot|FAIL|skipped|^chamber_save|rror|TIMEOUT|CRASH" >> "$LOG"
 echo "## prologue (play ROM)" >> "$LOG"
 python tools/headless/st_test.py tools/headless/prologue_companion.txt "$PLAY" --out "$DIR/play" 2>&1 | grep -E "^==|^0[0-9a-f]{7}:|stepnz|rror" >> "$LOG"
 echo done >> "$LOG"

@@ -19,6 +19,7 @@
 // A map change away from the ring (a game over, a reload) drops the tournament: entries are restored only while
 // the same game is still running (player 1 present), never into a freshly loaded party.
 #include "tny_engine.h"
+#include "chamber.h"
 #include "tny_combo.h"
 #include "revive.h"
 #include "super13.h"
@@ -282,7 +283,9 @@ int tny_resolve_stat(int stat_index, EnemyStat *out) {
     if (id < 0 || id >= TF_GOHAN) return 0;
     const TOpp *o = &opp_tab[id];
     int r = o->rating, floor = tier_floor[scale_tier(id)];
-    if (r < floor) r = (r + floor) / 2;
+    int room_pct = 100, room = chamber_rating(id, &room_pct);    // a Time Chamber room spawns him: its own rating (chamber.c)
+    if (room) r = room;
+    else if (r < floor) r = (r + floor) / 2;
     int k = 0;
     while (k < OPP_POINTS - 2 && r > opp_curve[k + 1].rating) k++;
     const OppPoint *a = &opp_curve[k], *b = a + 1;
@@ -292,7 +295,8 @@ int tny_resolve_stat(int stat_index, EnemyStat *out) {
     out->exp = 0;                               // no kill EXP: the engine pays a trickle per match
     out->ai_set = ai_for(id);
     out->max_hp = opp_lerp(r, a->rating, b->rating, a->hp, b->hp);
-    if (eng.magic == ENG_MAGIC && eng.lone) out->max_hp = out->max_hp * COOP_LONE_BOSS_HP_PCT / 100;
+    if (room) out->max_hp = out->max_hp * room_pct / 100;
+    else if (eng.magic == ENG_MAGIC && eng.lone) out->max_hp = out->max_hp * COOP_LONE_BOSS_HP_PCT / 100;
     out->melee = (u8)cap(opp_lerp(r, a->rating, b->rating, a->melee, b->melee), 255);
     out->ranged = (u8)cap(opp_lerp(r, a->rating, b->rating, a->ranged, b->ranged), 255);
     out->defence = (u8)cap(opp_lerp(r, a->rating, b->rating, a->defence, b->defence), 110);
