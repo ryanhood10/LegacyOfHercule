@@ -1,6 +1,7 @@
-# The Hyperbolic Time Chamber as a game mode (plan approved by Ryan, 2026-11-05; state of the build at section 12 when started)
+# The Hyperbolic Time Chamber as a game mode (plan approved by Ryan, 2026-11-05; state of the build at section 12)
 
-**Status: approved, to build (section 10).** Ryan reads part 1
+**Status: phases 1-3 built on branch `nb-chamber` (section 12: what stands, the numbers measured, how to add a room); phases 4-9 to
+come.** Ryan reads part 1
 first (what the player sees), part 2 for what the stock game really has, parts 3-6 for the content, part 7 for the
 technical notes, then the phases, the risks and the decisions (section 10). Facts carry their source; anything not
 checked is marked **(not verified)** and listed again in section 11. All dialogue here is Claude's draft or a
@@ -585,3 +586,189 @@ Read from code and dumps but not run; each is a thing to test in its phase, none
 - How the Buu interiors look in LoG2's palette without their non-chunk layers; all interior choices are from renders of the
   stock maps, decorations excluded, not from a build.
 - Slot counts are single rects on one map's slot table, a good estimate of what a stamp adds, not a `mapbuild` result.
+
+(Phases 1-3 settled several of these: the cut-away from a room, the kits, the fall and the boss bars outside the ring,
+CoopCall-based record conditions at load, old saves reading 504-535 as clear. Section 12.5 lists what is still open.)
+
+---
+
+## 12. State of the build (phases 1-3, branch `nb-chamber`, 2026-11-05)
+
+Built: the open area with its gate, jars, save pad and enemy tiers; the room framework; Roshi's dojo end to end; the ten
+rounds retired for players. Code: `src/coop/chamber.c` / `chamber.h`; scripts `data/story/chamber.lscript`; maps
+`data/maps/chamber_open.json` (15/18), `chamber_dojo.json` (15/19); placeholder entrances `tools/chamberart.py`; tests
+`tools/headless/chamber_gen.py` (writes `chamber_gate.txt`, `chamber_tiers.txt`, `chamber_room.txt`, `gohan_ssj1.txt`,
+`chamber_perf.txt`) and `tools/headless/chamber_save.py`. Every line of dialogue is Claude's draft (marked DRAFT).
+
+### 12.1 What a player sees
+
+Mr. Popo beside the Lookout's chamber door (from flag 157) says the chamber has six rooms and a gate with six lights
+(`wait_chamber.lscript` `lk_popo`; his old "ten rounds" line replaced). Through the door: a fade, the white void, the living
+quarters behind the players, the gate's two pillars far to the north with six red lights and three humming pink beams, six
+coloured placeholder buildings round the void, grey stone jars beside each and two at the gate, a save pad right of the
+quarters. Bears and snakes come at them; walking away, the far ones leave off screen and new ones walk in out of view ahead
+(the refill), so the void always has company. The beams stop anyone walking between the pillars. Five buildings say "The
+door will not open." (placeholder, phase 4). The red one's door is Roshi's dojo.
+
+In the dojo (Roshi's own gym, the kanji on the mat) Roshi stands at the far end, Chiaotzu beside him with two players. A plaque
+on the back wall clicks when pressed. A few steps in: both players turn to him, Roshi (and Chiaotzu) walk up, Roshi has a line
+for whoever player 1 is (one per character, a default), Chiaotzu his, each player's character replies, the door's beam
+flashes across it with a shake, boss bars, the fight (the tournament's kits: Kamehameha, Thunder Shock, Drunken Fist, MAX
+Power; Chiaotzu's Dodon Ray and psychic hold). When both are down the bars slide away, Roshi's last line from the floor
+("throw that switch on the wall"), the bodies blink out. The door stays sealed: the plaque is the way out. A press: it flips
+to ON, the screen cuts to the gate, one light goes dark with the stock power-down sound, back in the dojo the door's beam
+goes, and the first time before the Cell Games: "Gohan can now transform into a Super Saiyan!" (decision 6). Outside, the
+next tier. The sixth lever also drops the three beams one by one and the hum stops, and from then on the way between the
+pillars is open (nothing is behind it yet: phase 6). A room once won is empty, its plaque on.
+
+### 12.2 The open area (phase 1)
+
+| thing | built |
+|---|---|
+| map | 15/18, **2048 x 2048 px**: the most the collision bitmaps take (256 x 256 tiles, `docs/maps.md` 6), about 8.5 x 12.8 screens |
+| tile slots | **372 of 896**: floor and quarters 214, the gate's pillars and the save pad 94, the six placeholders 64. Without the placeholders 308, so **588 slots are left for six entrances: 98 each** |
+| layout (px) | quarters' door (976, 1224)-(1048, 1256) back to 9/3; arrival (1016, 1272); gate pillars x 984-1072, y 320-400 (between them x 1008-1048 blocked until all six); entrances 96 x 80 at Namek (384, 480), Frieza (1568, 480), Saiyan (192, 1056), pirate (1760, 1056), lab (384, 1664), dojo (1568, 1664), each with its door 32 px wide at +32, +56; save pad (1200, 1208)-(1249, 1249) |
+| header | flags +0x08 = 1: the world switch every ability reads (0x0300208C) is 1 there (tested) |
+| decorations | one sheet joined from parts of stock sheets (`mapbuild` `objects`): 0-5 the lights (8 x 16, 8/16's sheet), 6-8 the beams (64 x 32), 9-24 sixteen jars (14/2's stone pot, 3 hits); 3200 bytes of OBJ VRAM |
+| on-load | `ch_open_onload`: the hum (`PlayAudioVolume 17, 40`); flag 504 + n hides light n; all six (`CoopCall 35, 15`): the hum off, 6-8 hidden, the gate's rect open. On-leave `ch_open_onleave` stops the hum (also when a cut-away's `RestoreMap` leaves) |
+| jars | drop `ch_jar_drop` (`CoopCall 35, 17`, `chamber.c` `drop_item`): both players' bars; nothing when both are full (the stock rule), else food or energy by which bars are short, 10 % half the time, 20 %, 30 % |
+| enemies' drops | `ch_enemy_drop` (`CoopCall 35, 18`): a quarter of kills roll the same table |
+| save pad | the stock pad (13/7's art): a save there loads back in the open area with the lights as saved (tested) |
+| load time | 78 frames of black (stock: the Lookout 9/1 54, the old chamber 48, West City 24): the tile banks and the bitmaps |
+
+**Flags.** 504-509: room 0-5's lever thrown (= light n out). 510-535 reserved for the rest of the plan (section 6.2's
+table: first entry, the gate's fall seen, the hidden room, Popo beaten, first wins 514-519, times round, panel, trophy
+hall). `party.c` `PARTY_WAIT_FLAG_BYTES` 13 -> 17: a new game clears 400-535.
+
+**An existing save is safe (proved 2026-11-05).** The party block and the EEPROM layout do not change (flags 504-535 were
+always inside the 816-flag bank). Ryan's `build/play/legacy-of-hercule.sav`, copied (the original untouched, its hash
+unchanged): all three slots valid, flags 504-535 clear in each, nothing above 503 set; the same in all 41 backups in
+`build/play/backup/`; no code writes a flag above 503. A real load of each slot in the new ROM gives the same party block,
+byte for byte, as the same load in the current play ROM (`chamber_save.py load ROM SAVE --base PLAYROM`), flags 504-535
+clear. The bytes a load changes in slots 0 and 2 are the older load fixes `hercule_lock` / `krillin_lift` (both ROMs
+alike); `chamber_save.py` allows exactly those (`LOAD_FIXES`). It is in `regfull.sh` (`SAVE=` for another file).
+
+### 12.3 Tiers and the refill (phase 2)
+
+**Way B.** The map's seven "spot" records have stat 155 (`CH_SPOT_STAT`); `enemy_spawn_hook` hands such a record to
+`chamber_spot`, which gives it the next kind of `tiers[lights out]` (stat, sprite, EXP), the wild-wolf wander and the
+record's own drop, on a private stat copy (so one-player spawns copy it too). Twins as everywhere (Eggbots none). The tier
+is the lights out now, so a lever's change shows at the next load of the open area (the door back from the room).
+
+| lights out | kinds (stat / sprite) | EXP a kill |
+|---|---|---|
+| 0 | Kuma Mercenary 71 / 92, snake 14 / 116 | 3000 |
+| 1 | wolf 57 / 148, hawk 107 / 64, sabre-toothed tiger 92 / 108 | 4000 |
+| 2 | big Kuma 70 / 91, Warlord's Henchman 12 / 142 | 6000 |
+| 3 | ninja 75 / 96, warthog 56 / 145, stronger Henchman 51 / 143 | 9000 |
+| 4 | Tiger Bandit 10 / 19, stronger hawk 84 / 65, Eggbot 40 / 47 | 13000 |
+| 5 | stronger ninja 86 / 98, stronger tiger 89 / 110, scorpion 47 / 112 | 18000 |
+| 6 | top snake 48 / 117, top wolf 50 / 147, one Destroyer 32 / 38 (4 KB: at most one, and only with 5 KB free) | 25000 |
+
+**EXP (risk 4).** Stock EXP is uneven (a warthog paid 25000, a wolf 1680). The stock award (0x0800E4D2, `exp.c`) clamps
+a kill to between 1/128 and 1/2 of the killer's level span. The ladder above is about 35-45 kills a level where each tier
+is met: tier 0 at level 33 (span about 190000) is 66 kills, tier 3 at level 36 (330000) 37, tier 6 at level 42 (1.1
+million) 44. Every body pays, a twin pair is two kills. Tested: a body's stat carries the table's EXP, a kill at level 36
+pays.
+
+**The refill.** Every 16 frames (`open_tick`; not during a scene, nor while player 1 is not free): a body more than
+300 x 220 px from the players' midpoint leaves (one a check, its OBJ VRAM freed; the list removal the tournament uses);
+while fewer bodies stand than the target, one record comes in 170 px left or right or 125 px above or below (twelve
+spots, a walkable one), never inside the 240 x 160 view; 90 frames' breath after a kill; never while OBJ VRAM's largest
+free block is under 6 KB.
+
+**The enemy count, from the measures** (`chamber_perf.txt`, headless; both players idle, then both holding B with their ki
+topped up; tiers 1 / 4 / 6; "records" is the target with two players):
+
+| two players | bodies | largest free OBJ VRAM | busy avg standing | firing: lagged frames of 120, busy avg |
+|---|---|---|---|---|
+| 5 records | 10 | 13.3 KB (tier 6: 8.2) | 55-59 % | 3-23, 62-78 % |
+| 6 | 12 | 12.3 KB (tier 6: 6.1) | 60-64 % | 9-33, 67-100 % |
+| **7 (chosen)** | **14** | **10.2 / 9.2 KB (tier 6: 3.1, the spawn floor holds it)** | **62-65 %** | **9-18, 67-80 %** |
+| 8 | 16 | 7.2 KB (tier 6: 2.0) | 61-66 % | 9-25, 70-88 % |
+| 9 | 18 | 6.1 KB (tier 6: 0.4) | 63-68 % | 9-29, 70-94 % |
+| 10 | 20 | 4.1 KB (tier 6: 0.4) | 63-71 % | 11-26, 72-91 % |
+
+| one player | bodies | largest free | busy avg | firing |
+|---|---|---|---|---|
+| 7-10 | as many | 19 KB down to 14 KB | 39-44 % | no lagged frame at any count |
+
+**Chosen: 7 records with two players (14 bodies), 10 bodies alone** (`CH_TARGET`, `CH_TARGET_ONE`). With two players
+the firing lag at 7 is what the stock's doubled wolves showed (`docs/perfect-pass.md` 11.6: 8-12 of 120) and grows past
+8; OBJ VRAM at 8 and more leaves too little for the text box's 14 KB to come from off-screen bodies. Alone the frame never
+lags, so 10 (the plan's 12-14 would fit too; 10 keeps one player's fight readable). A text box evicts off-screen bodies first
+(`objroom.c`): the save pad's menu works on a full void (tested).
+
+**The old rounds.** The Lookout's door no longer starts them; `waves.c` stays: test commands 13 (every standing enemy
+dies) and 14 (skip to round N) and `CoopCall 14` ops 2 / 3 (player 2's name, the Cell Games' cards) work as before; test
+command 48 op 5 starts the rounds on 15/2 without their captions (`chamber_tiers.txt` checks 13 and 14 there).
+
+### 12.4 A room (phase 3): the framework, and how to add one
+
+One row of `rooms[]` in `chamber.c` plus a map. Shared by every room: `ch_room_onload`, `ch_boss_cond`, `ch_partner_cond`,
+`ch_room_intro` / `ch_room_parts`, `ch_lever` (`data/story/chamber.lscript`) and `chamber.c`'s state machine (`room_tick`):
+R_IDLE -> (the intro's last entry, `CoopCall 35, 13`) R_ARMED -> (the scene ends: the actors become fighters on their
+spots, `tny_moves_room_spawn`, bars; who stands decides the pair, not the pad at that moment) R_FIGHT -> (every fighter at 0
+HP) R_FALL (bars out, 48 frames) -> R_TALK (the lead's `won` line) -> R_CLEAR (24 frames' blink, bodies removed) -> R_WON
+(the lever answers). Leaving the map resets it; a death in a room is the stock death and game over.
+
+| row field | meaning (Roshi's value) |
+|---|---|
+| `area` | the map's zone 15 area (19) |
+| `light` | 0-5: the lever's flag 504 + light, and the gate's decoration `light` (0) |
+| `alone` | one player: `{fighter, rating at 0 lights, HP %, won line}` (Roshi, 350, 100) |
+| `pair[2]` | two players: the lead and the partner (Roshi 350, 70 %; Chiaotzu 330, 70 %); `pair[1].fighter = NONE`: a lone boss against two (give him about 180 %) |
+| rating | `rating + 25 x lights out` on the tournament's curve (`opp_curve` through `tny_resolve_stat`, `chamber_rating`): 350 = 2800 HP, 25 / 26 / 26; 475 = 4750 HP. The difficulty's boss HP goes on top, as for every boss |
+| `mark[2]` | where the lead and the partner walk to before the fight ((124, 136), (164, 136)) |
+| `seal` | the door's strip, blocked during the fight ((120, 272)-(160, 280)) |
+| `line_y` | a player below it when the scene starts is put beside player 1 (256) |
+| `open`, `open_by[9]` | the boss's opening line, and one per player 1's party slot (0 = `open`) |
+| `partner_line` | the partner's line (two players) |
+
+The lines' order: the boss, the partner (two players), player 1's reply, player 2's reply (`replies[]`, one per party
+slot, shared by every room; at most four lines, `tny_talk_scene`). The box sits at the bottom (no `!`): the bosses stand above.
+
+**The map** (copy `chamber_dojo.json`): a base or a stamp; `"priorities"` with the floor's layer at 2 or more (at the stock
+dojo's 1 the floor covered the door's beam and every Kamehameha); `objects`: decoration 0 the plaque's ON frame (16 x 32,
+8/37's sheet: frame 0 red, 16 black, 32 purple, 48 yellow, 64 green, 80 blue; a colour per room) and 1 the gate's beam (64 x
+32) across the door, both `"visible": 0`; the plaque's OFF art stamped from 8/37 (`[12, 15, 3, 6]` on BG2 is the red one;
+the others stand at 8/37's decorations' places) and its legs' row blocked; records: the lead's actor (his
+`tny_fighters[].sprite`, condition `script:ch_boss_cond`) and the partner's (`script:ch_partner_cond`); triggers:
+`ch_room_intro` on a rect across the room some steps in from the door (`"activation": "enter"`, condition `noflag:` the
+lever's flag), `ch_lever` on the plaque (`"activation": "facing"`, its rect from about 16 px above the plaque's foot to 24
+below: the box test does not see a player standing right at the wall otherwise); the door exit below the seal (reachable
+only while the seal is open); `"onload": "script:ch_room_onload"`; `"flags": 1`. On the open map: the entrance's door exit
+to the room; the room's exit back to just below that door.
+
+**Adding a room, the whole list:**
+1. A map `data/maps/chamber_<name>.json` as above (areas 20-24 are kept for the rooms, `docs/ids.md`).
+2. A row in `rooms[]` (`chamber.c`), its lines marked DRAFT.
+3. In `chamber_open.json`: the entrance's door exit to the new area, in place of its `ch_door_shut` trigger.
+4. The bosses' sprites must have walk group 1 (`docs/sprites.md`); the tournament's fighters all do.
+5. Tests: `chamber_gen.py` `room()`'s cases go to Roshi's door and check his actors: make the door spot, the sprites and
+   the light parameters of `case()` with the second room, add its cases, regenerate, run with `staging_run.py`.
+6. `docs/ids.md` (the area) and this section.
+
+**What the tests cover** (self-checking, in `regfull.sh`): `chamber_gate` (93 checks: the door, the switch, each light and
+pairs of lights by flags at a load, the beams shut and, with six, open the way; a jar with both bars full drops nothing,
+one for a hurt player 2 drops; the four corners and the border; a save at the pad, a soft reset, a load with two lights
+out); `chamber_tiers` (each tier with two players and alone: the bodies, the stat's EXP and HP, a kill's EXP, the refill
+back to the target; the old rounds' commands); `chamber_room` (161 checks: one player Piccolo winning by real punches; Gohan
++ Piccolo with player 2 throwing the lever; Super Saiyan Goku (a real B before the room) + Hercule; Hercule + Super Saiyan
+Vegeta on player 2's B; Krillin + Vegeta with five lights out: HP by lights, the sixth lever's beams falling one by one;
+each: the actors by lineup, the plaque's click before, the intro's scene ends, the seal, the fall, the bodies gone, the
+cut-away with the light on then off, the flag, the door open, Gohan's gift, the next tier outside, a return to an empty
+room); `gohan_ssj1` (Gohan as player 1 and as player 2); `chamber_save`. A death in the room (one player at 1 HP): the stock
+death and game over, the room's state cleared (checked by hand).
+
+### 12.5 Not verified, open
+
+- Real time: the feel of the refill, of 14 bodies, and the room fight's balance (Roshi 2800 HP alone; 1960 + 1792 for two)
+  are headless numbers; Ryan's play decides. The levels at the wait are still not measured.
+- The cut-away loads the open area without entities from a room (the engine stashes the room's entity list, 0x08006F4A,
+  and brings it back at `RestoreMap`): fine in every headless lineup, with player 2 and with transformed players.
+- `WIDE=1`, `BUU=0` and `PARTY_SLOTS=8` builds compile; only the default build was run.
+- The gate's stamped pillars carry a few stock pebbles beside their inner edge (zone 8 area 16's art); harmless.
+- Phase 4: five rooms (rows and maps); the pirates' crew before Tao needs one more state before R_ARMED (a wave of regulars,
+  then the boss). Phase 5: the entrances' art in the 588 slots. Phase 6: the hidden room (a trigger between the pillars,
+  open once all six are out). Phase 8: rewards (flags 514-519 kept for first wins).

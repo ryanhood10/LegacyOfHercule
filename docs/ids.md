@@ -5,6 +5,18 @@ ranges here and update this page in the same commit.** Before parallel sessions 
 its own range of every kind (`docs/howto.md` "Work in parallel sessions"). Last checked against
 the code on 2026-10-19 (main e45c765).
 
+## The Time Chamber (2026-11-05, `docs/time-chamber.md` 12; branch `nb-chamber`)
+
+| kind | taken | kept for the rest of the plan |
+|---|---|---|
+| flags | 504-509 a room's lever thrown (light n out) | 510-535 (cleared at a new game since `PARTY_WAIT_FLAG_BYTES` is 17): 510 first entry, 511 the gate's fall seen, 512 the hidden room's first scene, 513 Popo beaten, 514-519 each room's first win, 520-521 times round, 522-524 the panel, 525-529 the trophy hall, 530-535 free |
+| stats | 155 `CH_SPOT_STAT`: an open-area spot record (the tier picks the real stat) | 156 Popo's spawn, 157 the crew if recoloured (section 6.2) |
+| CoopCall | 35 Chamber (op, a, b): `chamber.c` `chamber_call`, ops in its enum (1 room load .. 20 open the door) | |
+| test commands | 48 CHAMBER (`chamber_test`): `arg` 0 the levers := `arg2` bits 0-5; 1 `cmd_arg` := bodies at the last check \| the smallest largest-free OBJ VRAM block (32-byte units) << 16; 2 records with two players := `arg2`; 3 the refill frozen := `arg2`; 4 reset that smallest block; 5 the old rounds on 15/2 from round `arg2` (no captions); 6 `cmd_arg` := lights out \| the room's state << 8 | |
+| zone 15 areas | 18 the open area (`chamber_open.json`), 19 Roshi's dojo (`chamber_dojo.json`) | 20-24 the five other rooms, 25 the hidden room, 26 the quarters (the panel) |
+| RAM | `.combo.ch` 0x30 at most (`ChState`, magic 0x4348414D "CHAM"; after `.combo.ag`): +4 room state, timer, target, frozen; +8 / +0xC the room's fighters; +0x10 the drop; +0x14 the smallest largest-free OBJ VRAM block; +0x16 spawned; +0x18 removed; +0x1E bodies at the last check | |
+| sprites, portraits | none (the tournament's bodies and portraits) | 163-164, 167-169, 171-174 free for Popo and a crew |
+
 ## Allocations for the perfecting pass (2026-11-01, `docs/perfect-pass.md` 7)
 
 Each piece takes numbers only from its own row and says in its report if it needs more. RAM: a story piece takes a
@@ -78,7 +90,8 @@ The bank sits after the party entries, so it moves with `PARTY_SLOTS`: `0x0203F0
 (0x0203F0EC with 8 slots). Headless scripts use the runner's `FLAGS` variable (`docs/testing.md`).
 
 Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and `party.c` also clears
-400-503 (`PARTY_WAIT_FLAG_BYTES` 13). Each flag's meaning is in `docs/scripts.md` 2.5.
+400-535 (`PARTY_WAIT_FLAG_BYTES` 17, raised from 13 for the Time Chamber on 2026-11-05: old saves read 504-535 as clear,
+`docs/time-chamber.md` 12.2). Each flag's meaning is in `docs/scripts.md` 2.5.
 
 | range | owner | in use |
 |---|---|---|
@@ -96,11 +109,12 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 462 | Krillin's numbers lifted (`krillin.h` `KRILLIN_LIFT_FLAG`): set at every new game; a save without it gets `krillin_lift` once on load (2026-11-01) | |
 | 463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
-| 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first "Training completed!" (`wait_chamber`); 469-475 free |
+| 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first lever thrown (`chamber.lscript` `ch_lever`; until 2026-11-05 the first "Training completed!"); 469-475 free |
 | 476-478 | the generator's eggs (`data/story/ch4_eggs.*`): 476 the mother's fight begun, 478 the eggs hatched, 477 she is down | |
 | 479 | free (the map piece's: the allocation table above) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
-| 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
+| 504-535 | the Time Chamber (`chamber.h`): 504-509 room 0-5's lever thrown, 510-535 kept (the table at the top) | cleared at a new game |
+| 536-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
 Stock flags the mod's scripts test (meanings from the script dump):
 
@@ -142,7 +156,9 @@ sprite 72) for Roshi's gym.
 | 140-144 | allocated to the Cell Games chapter | | |
 | 145 | Super Android 13 (own spawn path, `s13_stat`; `BOSS_NO_TWIN` by construction: no twin, no stat-table row) | (own row: 10000 HP, 48 / 64 / 56, AI set 21) | `super13.c` |
 | 146-149 | Super 13's allocation, unused | | |
-| 150+ | 150-154 allocated to the post-game chapter; 155+ free | | |
+| 150+ | 150-154 allocated to the post-game chapter | | |
+| 155 | the Time Chamber's spot record (`CH_SPOT_STAT`): never a real stat, `chamber_spot` replaces it by the tier's | | `chamber.c` |
+| 156-159 | 156-157 kept for the Time Chamber (Popo, a crew); 158-159 free | | |
 | 160-209 | the tournament's opponents: stat 160 + fighter id (`tourney.h` TF_*), resolved per tournament tier (`tny_engine.c` `tny_resolve_stat`; the rule `BOSS_NO_TWIN \| BOSS_FLAT`); 16 and Super 13 keep 109 / 145 | (boss class of 29; Cell Jr 26) | engine |
 | 210-219 | the engine's, free | | |
 
@@ -282,7 +298,8 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 24-27 | the tournament engine, free | |
 | 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
 | 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
-| 32+ | free (32 the story piece's) | |
+| 32+ | free (32 the story piece's; 33-34 agency's, unused) | |
+| 35 | Chamber (op, a, b) [-> value]: the Time Chamber's rooms, the gate's six, the drops (`chamber.c`, `data/story/chamber.lscript`) | Time Chamber |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -307,6 +324,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 15 | SOLO | solo mode `arg` (Cell Games) |
 | 16 | WIN_STAT | the fight of stat `arg` wins itself once it stands and player 1 is free (tests write `cg_state + 5` directly: the command only runs between scenes) |
 | 17+ | free | |
+| 48 | CHAMBER (`chamber.c` `chamber_test`, the Time Chamber) | the ops: the table "The Time Chamber" at the top |
 | 15-16 | allocated to the Cell Games chapter | |
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
@@ -353,7 +371,9 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 15 | `papaya_waiting.json` | the fighters' waiting room (Buu 7/5), the hub: save pad, the director (CoopCall 23), today's fighters (CoopCall 30, 0) |
 | 16 | `papaya_ring.json` | the ring with the stands (Buu 7/6, 720 x 720): the engine's stage (`src/coop/tny_ring.h`) |
 | 17 | `papaya_secret.json` | the hidden arena (Buu's Other World Stadium, 1/20 there): Pikkon, the Senzu (flag 442); an easter egg |
-| 18-19 | free | |
+| 18 | `chamber_open.json` | the Time Chamber's open area (2048 x 2048): the gate, the jars, the save pad, the spot records |
+| 19 | `chamber_dojo.json` | the Time Chamber: Roshi's dojo (zone 6 area 70's gym with a plaque) |
+| 20-26 | kept | the Time Chamber: 20-24 the other five rooms, 25 the hidden room, 26 the quarters |
 
 ## World-map landmarks (decorations of zone 6 area 99, `docs/maps.md` 9e)
 
@@ -393,7 +413,8 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F000 | 0xB00 region | `partyram` (9 slots): `g_party_block` (party, flags at +0x108, 0x1B8), `party_save` store (0x564), `switch` (0x1B8) |
 | 0x0203F8D4 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
-| 0x0203F914 | 0x9C | `.party.wv` `waves` (Time Chamber; 0x0203F880 with 8 slots); moves when anything before it grows |
+| 0x0203F914 | 0x9C | `.party.wv` `waves` (the old Time Chamber rounds, tests only since 2026-11-05; 0x0203F880 with 8 slots); moves when anything before it grows |
+| 0x0203EB88 | 0x30 | `.combo.ch` the Time Chamber (`chamber.c` `ChState`, magic "CHAM"; after `.combo.ag`: find it by the magic) |
 | 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |

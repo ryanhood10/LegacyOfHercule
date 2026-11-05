@@ -696,7 +696,44 @@ entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the 
   leaves row 0 and an empty entry: the scene never starts).
 - Real party at Krillin's visit: flags byte 0 on slots 1-8 (`flags_of`), `p2 off`, then `p2 0`: player 2's entity is born only when Krillin joins.
 
-## Time Chamber waves and Roshi's sparring (headless, merged 2026-10-19)
+## Time Chamber (headless, 2026-11-05, branch `nb-chamber`; `docs/time-chamber.md` 12)
+
+```
+python -I tools/headless/chamber_gen.py                     # writes chamber_gate / chamber_tiers / chamber_room / gohan_ssj1 / chamber_perf .txt
+python tools/headless/staging_run.py tools/headless/chamber_room.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+python tools/headless/chamber_save.py load build/<dir>/log2-coop.gba F:/MeltyCreations/log2/build/play/legacy-of-hercule.sav --out build/<dir>/hl [--base PLAYROM]
+python -I tools/headless/chamber_save.py check SAVE.sav ...    # read only: each slot's checksum, map, flags 504-535
+```
+
+All self-checking and in `regfull.sh` (`chamber_save` skips when the save file is not there; `SAVE=` another). `staging_run.py`
+adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gate), 6 (tiers), 9 (room), 2 (gohan_ssj1).
+
+- **Into the open area:** Map Test 263 with the wait's flags, test-warp to (96, 160), Up, A, `waitmap 15 18`, then **260 frames**:
+  the door's `FadeFromWhite` scene runs about 230 frames after the map changes, and a test warp (`COOP_CMD_WARP`) issued inside
+  that scene breaks the modal stack and crashes when the scene ends (frame 756 in the first runs): a test artefact, not the game.
+- **The open area's load** is 78 frames of black (`waitmap` returns when the map state changes, before the load ends).
+- **Lights:** test command 48 op 0 sets flags 504-509 from `arg2`'s bits, then a test warp onto 15/18 reloads it (records too).
+  A decoration's +0x10 is its "shown" word (0x08007298 / 0x080074D4, message 4); the list's first entries are decorations
+  0..8 in order (`deref D 0x03001128 + 4n`).
+- **Into the dojo:** poke both players to (1616, 1752) on the open map, hold Up, `waitmap 15 19`. The intro fires on the rect
+  (24, 150)-(256, 200): poke player 1 to (140, 215) and walk Up. `stepz 0x03001FDC` ends the scene. The room's state is the low
+  byte of `CH+4` (`find CH 0x4348414D`): 1 armed, 2 fight, 3 the fall, 4 the line, 5 the blink, 6 won. The fighters: `CH+8`, `CH+0xC`.
+- **A win:** `COOP_CMD_STORY_WIN` (7), or by punches: test command 27 op 2 (HP := 1) then op 6 (player 1 punches kit `reg`).
+- **The lever:** player 1 at (136, 96), Up, A. `waitmap 15 18` (the cut-away), the light still shown 120 frames later, out 70
+  frames after that; with five lights out the beams 6, 7, 8 go 90, 115, 140 frames after the light. About 130 frames more and
+  the room is back.
+- **Transformed:** `poke32 0x0300208C 1` (a Map Test leaves the switch 0), the ability index 2 and `poke32 PARTY+8 0`, then B
+  (player 2: `p2 2`).
+- **The measures** (`chamber_perf.txt`, not in regfull, about 20 minutes): `perf` lines per tier and records standing,
+  idle and with both players holding B; `vram` and test command 48 op 1 (bodies, the smallest largest-free block).
+- **A save:** `chamber_save.py load` copies the file into `--out` and loads each slot (Start, A, Down per slot, A, A, A) in
+  the ROM, then compares the party block (`peek PARTY 110`) with the file; the file keeps every 8 bytes reversed (mGBA's
+  EEPROM order). The runner's `cartout` does not work for this save type.
+
+## Time Chamber waves and Roshi's sparring (headless, merged 2026-10-19; the waves for tests only since 2026-11-05)
+
+The Lookout's door now leads to the open area: start the old rounds with test command 48 op 5 on 15/2 (no captions), or
+`CoopCall 13` from a script. What follows is the old recipe.
 
 Build `make BUILD=build/lk DEBUG_MENU=1` (and `BUILD=build/lkw WIDE=1 DEBUG_MENU=1` for the lag check),
 make the menu state per build, then Map Test the Lookout's chamber room (entry 263) with the wait's flags
@@ -1083,7 +1120,11 @@ Junior each (stat 26 at 432, 359, 63 px below the fighter at 432, 296), J3 and J
 
 `tools/headless/cell_staging_gen.py` writes `cell_staging.txt`, self-checking: zone 12 for Vegeta alone, Trunks alone, Vegeta + Trunks and Trunks + Vegeta (in by the real pad of area 15), the Games for alone and player 2 as Hercule, Krillin or Vegeta at the ring; every scene pressed through until `0x03001FDC` clears, so a hung walk fails the next EXPECT. Run it with `st_expect.py` into a log, then `python tools/headless/cell_staging_gen.py check LOG`: every vtable in the `ents` lists must be sane (a sprite without the group an animation needs corrupts the heap and the runner keeps going). About ten minutes. In a solo-2 scene only player 2's A advances the text, and `load` forgets the runner's `p2`: write `p2 0` after it. An actor sprite's groups: `*0x0800959C + (id - 7) * 4` is the record, +2 the group count, +0x4C the four pointers per group.
 
-## Gohan's Super Saiyan from the Time Chamber (headless, 2026-11-01)
+## Gohan's Super Saiyan from the Time Chamber (headless, 2026-11-01; since 2026-11-05 at the first lever)
+
+Now generated by `chamber_gen.py` and self-checking (`regfull.sh`'s `st_expect` list): Gohan as player 1, then as player 2,
+through Roshi's dojo to the first lever; "Gohan can now transform into a Super Saiyan!" after the cut-away, row 2, flag 468,
+then B: row 5 (the other player's row untouched). The old recipe below is the rounds' version.
 
 `tools/headless/gohan_ssj1.txt`: Map Test the chamber room (263) with the wait's flags, Gohan player 1 (row 0, kid
 Gohan), through the door, round 1, then `COOP_CMD_WAVE_SKIP` 11 and `COOP_CMD_WAVE_CLEAR`: "Training completed!",
