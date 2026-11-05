@@ -1,5 +1,5 @@
 {
- "_": "The Time Chamber's open area (docs/time-chamber.md, section 12 the state of the build): the largest map the collision bitmap takes, white void floor, the living quarters (the Lookout's facade, as time_chamber.json), the gate (decorations 0-8), six entrances (placeholder art, chamberart.py; only the dojo's door leads anywhere so far), jars, spot records (stat 155: chamber.c gives each the tier's enemy). Slot budget: leave room for six real entrances of about 96 x 80.",
+ "_": "The Time Chamber's open area (docs/time-chamber.md, section 12 the state of the build): the largest map the collision bitmap takes, white void floor, the living quarters (the Lookout's facade, as time_chamber.json), the gate (decorations 0-8), six entrances (tools/chamberart.py: drawn by code, mirrored; each door leads to its room, 15/19-24), jars, spot records (stat 155: chamber.c gives each the tier's enemy).",
  "name": "chamber_open",
  "zone": 15,
  "area": 18,
@@ -761,61 +761,6 @@
     1249,
     1249
    ]
-  },
-  {
-   "type": "dialogue",
-   "rect": [
-    416,
-    536,
-    448,
-    576
-   ],
-   "payload": "seq:ch_door_shut",
-   "activation": "facing"
-  },
-  {
-   "type": "dialogue",
-   "rect": [
-    1600,
-    536,
-    1632,
-    576
-   ],
-   "payload": "seq:ch_door_shut",
-   "activation": "facing"
-  },
-  {
-   "type": "dialogue",
-   "rect": [
-    224,
-    1112,
-    256,
-    1152
-   ],
-   "payload": "seq:ch_door_shut",
-   "activation": "facing"
-  },
-  {
-   "type": "dialogue",
-   "rect": [
-    1792,
-    1112,
-    1824,
-    1152
-   ],
-   "payload": "seq:ch_door_shut",
-   "activation": "facing"
-  },
-  {
-   "type": "dialogue",
-   "rect": [
-    416,
-    1720,
-    448,
-    1760
-   ],
-   "payload": "seq:ch_door_shut",
-   "activation": "facing"
   }
  ],
  "exits": [
@@ -876,6 +821,172 @@
    "at": [
     140,
     252
+   ],
+   "facing": 1
+  },
+  {
+   "type": "door",
+   "rect": [
+    416,
+    536,
+    448,
+    576
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    22,
+    1
+   ],
+   "at": [
+    160,
+    286
+   ],
+   "facing": 1
+  },
+  {
+   "type": "door",
+   "rect": [
+    1600,
+    536,
+    1632,
+    576
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    21,
+    1
+   ],
+   "at": [
+    200,
+    326
+   ],
+   "facing": 1,
+   "requires": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    1600,
+    536,
+    1632,
+    576
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    21,
+    1
+   ],
+   "at": [
+    160,
+    286
+   ],
+   "facing": 1,
+   "unless": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    224,
+    1112,
+    256,
+    1152
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    24,
+    1
+   ],
+   "at": [
+    120,
+    212
+   ],
+   "facing": 1,
+   "requires": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    224,
+    1112,
+    256,
+    1152
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    24,
+    1
+   ],
+   "at": [
+    160,
+    286
+   ],
+   "facing": 1,
+   "unless": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    1792,
+    1112,
+    1824,
+    1152
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    20,
+    1
+   ],
+   "at": [
+    364,
+    128
+   ],
+   "facing": 2,
+   "requires": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    1792,
+    1112,
+    1824,
+    1152
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    20,
+    1
+   ],
+   "at": [
+    160,
+    286
+   ],
+   "facing": 1,
+   "unless": "buu"
+  },
+  {
+   "type": "door",
+   "rect": [
+    416,
+    1720,
+    448,
+    1760
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    23,
+    1
+   ],
+   "at": [
+    216,
+    326
    ],
    "facing": 1
   }

@@ -1,4 +1,4 @@
-r"""Writes tools/headless/chamber_popo.txt (self-checking; docs/testing.md "Time Chamber: Mr. Popo", docs/time-chamber.md 12.6): the hidden
+r"""Writes tools/headless/chamber_popo.txt (self-checking; docs/testing.md "Time Chamber: Mr. Popo", docs/time-chamber.md 12.7): the hidden
 room behind the gate in one and two players and several characters: the way in (open only with all six lights out), the scene by
 lineup, the door sealed, his far hops and dodges, the fight won by the test autopilot or by test command 7, the arms out and the end
 scene, the first reward and a later one, the loop's question answered no and yes (lights back on, a time round, every boss a step
@@ -177,7 +177,7 @@ def out_of_room(s, p2):
 
 
 def main_script():
-    s = S(["Mr. Popo's hidden room behind the gate (docs/time-chamber.md 5 and 12.6), in one and two players and several lineups."])
+    s = S(["Mr. Popo's hidden room behind the gate (docs/time-chamber.md 5 and 12.7), in one and two players and several lineups."])
 
     # ---- the way in: shut with five lights, open with six -------------------------------------------------------------
     s.begin("the gate: five lights out, no way through; six, the hidden room", PICCOLO, None)
@@ -333,7 +333,7 @@ def main_script():
     s.count(STR3, 0, "Strength +3")
 
     # ---- the big jars --------------------------------------------------------------------------------------------------
-    s.begin("the big jars: both players full, nothing; player 2 hurt and player 1 out of ki: 30 % food and 30 % energy", PICCOLO, HERCULE)
+    s.begin("the big jars: both players full, nothing; player 2 hurt and out of ki: 30 % food and 30 % energy", PICCOLO, HERCULE, "jars")
     s.lights(0x3F)
     s.door()
     s.full()
@@ -343,12 +343,17 @@ def main_script():
     s.place(40, 64)
     s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "key 1 6", "frames 30", "key 1 6", "frames 30", "key 1 6", "frames 60")
     s.expect(r"findent IT = 00000000", "findent IT 0x08024C90")
-    s.out(f"poke16 {entry(HERCULE):#x} 100", f"poke16 {entry(PICCOLO) + 4:#x} 10")
+    s.out(f"poke16 {entry(HERCULE):#x} 100", f"poke16 {entry(HERCULE) + 4:#x} 10")
     s.place(440, 64)
-    s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "key 1 6", "frames 30", "key 1 6", "frames 30", "key 1 6", "frames 30")
+    s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "key 1 6", "frames 30", "key 1 6", "frames 30", "key 1 6", "frames 20")
     s.out("shot jar_drop", "ents")
-    s.out("findent IT 0x08024C90")
-    s.expect(r"\w+: 08024c90", "peek IT 1")
+    s.echo("player 1 full, player 2 hurt and out of ki: both drop (player 2's bars), he walks over them: 30 % of 9999 HP and of 400 ki back")
+    s.place(440, 40)
+    s.out("frames 10")
+    s.place(440, 48)
+    s.out("frames 30")
+    s.expect(r"\w+: (?!0064)[0-9a-f]{4}$", f"peek16 {entry(HERCULE):#x} 1")
+    s.expect(r"\w+: (?!000a)[0-9a-f]{4}$", f"peek16 {entry(HERCULE) + 4:#x} 1")
     s.write("chamber_popo.txt")
 
 
@@ -369,7 +374,7 @@ def room_win(s, hp):
 
 
 def balance():
-    s = S(["The balance numbers (docs/time-chamber.md 12.6): the test autopilot (both players walk up and punch, no dodging, no abilities)",
+    s = S(["The balance numbers (docs/time-chamber.md 12.7): the test autopilot (both players walk up and punch, no dodging, no abilities)",
            "against Popo at round 0 and 2, two players and one, the Map Test party (level about 40, the wait's top) on its own full bars.",
            "Every 300 frames:",
            "test command 49 op 5 (frames | his HP << 16) and both players' HP. Not self-checking; read the log."])

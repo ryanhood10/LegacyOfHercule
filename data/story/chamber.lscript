@@ -55,13 +55,6 @@ script ch_enemy_drop
         CoopCall 35, 18, 0, 0
 end
 
-; DRAFT placeholder: phase 4 gives these five doors their rooms
-sequence ch_door_shut
-  script
-        PlayAudio 19
-  text 0 "The door will not open."
-end
-
 ; ---- a room ---------------------------------------------------------------------------------------------------------
 
 script ch_room_onload
@@ -83,7 +76,7 @@ end
 ; ch_room_parts [1]
 sequence ch_room_intro
   script
-        CoopCall 35, 4, seq:ch_room_parts, 0
+        CoopCall 35, 4, seq:ch_room_parts, seq:ch_crew_parts
 end
 
 ; indexes: [0] -> 1 is the first line; [1] -> 6 is the scene's stop word (tny_talk_scene)
@@ -111,14 +104,33 @@ sequence ch_room_parts
         WaitFrames 20
 end
 
-; the plaque: refused (the stock click) until the room's boss is down and its bodies gone, and once thrown
+; a room with a crew first (the airship): the crew is down, the lead's line (built in C) as he steps up 24 px towards the
+; players, then the fight; indexes as ch_room_parts
+sequence ch_crew_parts
+  script -> 1
+        BeginCommandBatch
+        CoopCall 35, 6, 0, 0
+        CoopCall 35, 21, 0, 0
+        CoopCall 35, 22, 0, 0
+        Step WalkToPosition
+        CommitCommandBatch
+        WaitFrames 10
+  script -> 6
+        ScreenShake 0, 2, 12
+        CoopCall 35, 13, 0, 0
+        WaitFrames 20
+end
+
+; the plaque: refused (the stock click) until the room's boss is down and its bodies gone, and once thrown. Both stop words are
+; 0: a dialogue trigger starts its next run at the index its last stop word names, so a plain `stop` here made the second press
+; start at the throw (entry 3) without asking CH_LEVER (found 2026-11-05: a click before the fight, then any press threw it)
 sequence ch_lever
   script
         CoopCall 35, 14, 0, 0
         END
   script
         PlayAudio 19
-  stop
+  stop 0x0
   script
         FindCharacterEntity 0
         PlayAudio 57
@@ -165,5 +177,5 @@ sequence ch_lever
         PushByte 5
         END
   text 0 "@^Gohan can now transform into a Super Saiyan!"
-  stop
+  stop 0x0
 end

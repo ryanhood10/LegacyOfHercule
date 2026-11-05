@@ -700,14 +700,30 @@ entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the 
 ## Time Chamber (headless, 2026-11-05, branch `nb-chamber`; `docs/time-chamber.md` 12)
 
 ```
-python -I tools/headless/chamber_gen.py                     # writes chamber_gate / chamber_tiers / chamber_room / gohan_ssj1 / chamber_perf .txt
+python -I tools/headless/chamber_gen.py                     # writes chamber_gate / chamber_tiers / chamber_room / chamber_rooms(_plain) / gohan_ssj1 / chamber_perf .txt
 python tools/headless/staging_run.py tools/headless/chamber_room.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+python tools/headless/staging_run.py tools/headless/chamber_rooms.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+python tools/headless/staging_run.py tools/headless/chamber_rooms_plain.txt build/<dir0>/log2-coop.gba build/<dir0>/hl/menu.ss --out build/<dir0>/hl   # a BUU=0 build
 python tools/headless/chamber_save.py load build/<dir>/log2-coop.gba F:/MeltyCreations/log2/build/play/legacy-of-hercule.sav --out build/<dir>/hl [--base PLAYROM]
 python -I tools/headless/chamber_save.py check SAVE.sav ...    # read only: each slot's checksum, map, flags 504-535
 ```
 
 All self-checking and in `regfull.sh` (`chamber_save` skips when the save file is not there; `SAVE=` another). `staging_run.py`
-adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gate), 6 (tiers), 9 (room), 2 (gohan_ssj1).
+adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gate), 6 (tiers), 9 (room), 2 (gohan_ssj1); on 2026-11-05's
+machine `chamber_rooms` (eleven cases, 356 checks) ran in about a minute.
+
+- **The five rooms (`chamber_rooms.txt`, phase 4; `docs/time-chamber.md` 12.6):** `chamber_gen.py` `ROOMS` holds each room's door on
+  the open map, its arrival's way back (a regex), the actors' sprites, ratings, the spot to walk into the intro from and the key, the
+  plaque's spot, the seal's test spot and the key out; `PLAIN` the same for a `BUU=0` build (`chamber_rooms_plain.txt`, not in
+  regfull: run it on a `make BUILD=build/<dir0> BUU=0 DEBUG_MENU=1` build). The crew (airship): state 7 after the intro, test
+  command 13 kills them, Tao's scene, state 2. Frieza's Mecha form: test command 27 op 2 with `0x80000023` (35 %), then
+  `entrec` of sprite 238. Broly's rage: Paragus (kit reg 1) to HP 1 and punched (op 2, op 6), the rage line's box, then test
+  command 48 op 6 reads raged in bit 16 (**test commands wait while a box is up**: read it after `stepz`). A plaque is pressed
+  twice before every fight: both clicks, still the room's map (a trigger resumes at its stop word's index).
+- **A long EXPECT is cut by the runner** (2026-11-05): an alternation of 128 values lost its tail and the last `\w+:` matched
+  anything. Keep a regex short (a flag bit is a character class on one hex digit: `chamber_gen.py` `flag_re`).
+- **Test command 13 kills every standing regular enemy** on any map (`wave_clear_all`), not only in the old rounds: the
+  airship's crew.
 
 - **Into the open area:** Map Test 263 with the wait's flags, test-warp to (96, 160), Up, A, `waitmap 15 18`, then **260 frames**:
   the door's `FadeFromWhite` scene runs about 230 frames after the map changes, and a test warp (`COOP_CMD_WARP`) issued inside
@@ -735,7 +751,7 @@ adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gat
   the ROM, then compares the party block (`peek PARTY 110`) with the file; the file keeps every 8 bytes reversed (mGBA's
   EEPROM order). The runner's `cartout` does not work for this save type.
 
-## Time Chamber: Mr. Popo (headless, 2026-11-05, branch `nb-chamber-popo`; `docs/time-chamber.md` 12.6)
+## Time Chamber: Mr. Popo (headless, 2026-11-05, branch `nb-chamber-popo`; `docs/time-chamber.md` 12.7)
 
 ```
 python tools/headless/popo_gen.py                  # writes chamber_popo.txt (self-checking, in regfull.sh); --balance: chamber_popo_bal.txt

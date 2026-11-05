@@ -1,0 +1,214 @@
+{
+ "_": "A Time Chamber room (docs/time-chamber.md 12): Frieza's ship, Buu's Fury's crystal room inside Babidi's ship (zone 8 area 19, variation 0x0822EAA0 there) imported whole, its top doorway and right opening closed, the bottom corridor the door; a purple plaque (8/37's) on the back wall left of the top doorway (BG1, empty there). Frieza (Mecha Frieza at 40 %), with two players King Cold: they come down the sides of the crystal. Without roms/buu.gba chamber_frieza_plain.json stands here.",
+ "name": "chamber_frieza",
+ "zone": 15,
+ "area": 21,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  400,
+  400
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0822EAA0"
+    },
+    "rect": [
+     0,
+     0,
+     50,
+     50
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    10,
+    7
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     21,
+     14,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false,
+   "recolor": false
+  }
+ ],
+ "collision": [
+  {
+   "op": "block",
+   "rect": [
+    23,
+    7,
+    4,
+    6
+   ],
+   "_": "the top doorway"
+  },
+  {
+   "op": "block",
+   "rect": [
+    42,
+    24,
+    5,
+    4
+   ],
+   "_": "the right opening"
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 1024,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 80,
+    "y": 56,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 160,
+    "y": 311,
+    "shape": "64x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 48,
+   "x": 104,
+   "y": 240,
+   "facing": 0,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 185,
+   "x": 296,
+   "y": 232,
+   "facing": 0,
+   "condition": "script:ch_partner_cond"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    64,
+    296,
+    336,
+    316
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:506"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    80,
+    88,
+    104,
+    128
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    184,
+    344,
+    216,
+    368
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    1616,
+    580
+   ],
+   "facing": 0
+  }
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  200,
+  326
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

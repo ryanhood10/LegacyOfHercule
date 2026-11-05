@@ -80,7 +80,7 @@ peek D+0x10 1
 deref D 0x300112c
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo the plaque clicks before the fight
+echo the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8800
 poke32 P1+0x15C 0x6000
@@ -89,7 +89,11 @@ keys 0x40
 frames 6
 keys 0
 key 1 4
-frames 20
+frames 30
+key 1 4
+frames 120
+echo EXPECT map zone 15 area 19 
+map
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1
@@ -485,7 +489,7 @@ peek D+0x10 1
 deref D 0x300112c
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo the plaque clicks before the fight
+echo the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8800
 poke32 P1+0x15C 0x6000
@@ -497,7 +501,11 @@ keys 0x40
 frames 6
 keys 0
 key 1 4
-frames 20
+frames 30
+key 1 4
+frames 120
+echo EXPECT map zone 15 area 19 
+map
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1
@@ -913,7 +921,7 @@ peek D+0x10 1
 deref D 0x300112c
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo the plaque clicks before the fight
+echo the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8800
 poke32 P1+0x15C 0x6000
@@ -925,7 +933,11 @@ keys 0x40
 frames 6
 keys 0
 key 1 4
-frames 20
+frames 30
+key 1 4
+frames 120
+echo EXPECT map zone 15 area 19 
+map
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1
@@ -1340,7 +1352,7 @@ peek D+0x10 1
 deref D 0x300112c
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo the plaque clicks before the fight
+echo the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8800
 poke32 P1+0x15C 0x6000
@@ -1352,7 +1364,11 @@ keys 0x40
 frames 6
 keys 0
 key 1 4
-frames 20
+frames 30
+key 1 4
+frames 120
+echo EXPECT map zone 15 area 19 
+map
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1
@@ -1756,7 +1772,7 @@ peek D+0x10 1
 deref D 0x300112c
 echo EXPECT \w+: 00000000
 peek D+0x10 1
-echo the plaque clicks before the fight
+echo the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8800
 poke32 P1+0x15C 0x6000
@@ -1768,7 +1784,11 @@ keys 0x40
 frames 6
 keys 0
 key 1 4
-frames 20
+frames 30
+key 1 4
+frames 120
+echo EXPECT map zone 15 area 19 
+map
 deref D 0x3001128
 echo EXPECT \w+: 00000000
 peek D+0x10 1

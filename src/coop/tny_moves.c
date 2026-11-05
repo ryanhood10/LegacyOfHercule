@@ -75,7 +75,7 @@
 #define DODGE_ROLL      3       // KF_DODGE: one player hit in this many misses and he hops far ...
 #define DODGE_GAP       120     // ... at most once in this many frames (a combo is not all misses)
 #define KEEP_NEAR       48      // KF_FAR: a player this close (px) for KEEP_LINGER frames and he hops far ...
-#define KEEP_LINGER     40      // ... (a window for three or four punches: the autopilot could land none at once, 12.6)
+#define KEEP_LINGER     40      // ... (a window for three or four punches: the autopilot could land none at once, 12.7)
 #define KEEP_GAP        150     // ... at most once in this many frames (two thirds once a transform fired)
 #define FAR_MIN         96      // MF_FAR: the spot is at least this far (px) from both players ...
 #define FAR_MAX         176     // ... and the nearer one at most this far (a hop across the whole room made the chase long)
@@ -307,7 +307,7 @@ static const TMove lib_far_hop = TELE(0, MF_DODGE | MF_FAR, 0);
 // Mr. Popo, the Time Chamber's hidden room (docs/time-chamber.md 5; popo.c spawns him): not a tournament fighter, so not a
 // row of tny_kits[]; his kit's fighter id is TK_POPO, past the roster (every roster lookup checks the id against TF_COUNT).
 // Ryan: "he teleports to keep distance from you and shoots blasts, and he has decent dodge." Numbers ours, tuned headless
-// (docs/time-chamber.md 12.6), to be tuned in play.
+// (docs/time-chamber.md 12.7), to be tuned in play.
 #define TK_POPO TF_COUNT
 static const TKitDef popo_kit = { KF_STAND | KF_DODGE | KF_FAR | KF_YIELD, 230, 40, 26, {
     VOLLEY(0x280, 5, 8, MF_KI, 240),        // a fan of ki blasts
@@ -1976,6 +1976,25 @@ void tny_moves_final_form(Entity *e) {
         k->done |= (u8)(1 << i);
         transform(k, m);
     }
+}
+
+// The Broly chapter's rage rule in a Time Chamber room (chamber.c RF_RAGE): his partner fell first. Full HP and, now, the
+// power-up of his kit's first transform not yet fired (the pose, the shake and the flashes), else a plain one (the library's
+// stat boost); whatever special he was in ends
+void tny_moves_rage(Entity *e) {
+    TKit *k = kit_of(e);
+    if (!k || k->down || e->hp <= 0) return;
+    e->hp = k->stat.max_hp;
+    const TMove *m = &lib_default[MK_TRANSFORM];
+    for (int i = 0; i < KIT_MOVES; i++) {
+        const TMove *t = &k->def->m[i];
+        if (t->kind != MK_TRANSFORM || (k->done & (1 << i))) continue;
+        k->done |= (u8)(1 << i);
+        m = t;
+        break;
+    }
+    if (k->cur) finish(k);
+    begin(k, m, nearest_player_of(e));
 }
 
 // A Rumble's pack in teams: a pair does not go for its own (tny_engine.c); a fighter without a kit has no side to set

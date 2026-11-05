@@ -1,5 +1,5 @@
 // The Time Chamber's hidden room and Mr. Popo (docs/time-chamber.md 5, 6.3, decisions 4 and 9; the state of the build:
-// section 12.6). Ryan: "when you go into that hidden room it custscenes, its shaking and mysterious, and then you have a
+// section 12.7). Ryan: "when you go into that hidden room it custscenes, its shaking and mysterious, and then you have a
 // boss fight with Mr Popo. he teleports to keep distance from you and shoots blasts, and he has decent dodge. we can put a
 // couple jars in this room that give big reward on food/energy."
 //

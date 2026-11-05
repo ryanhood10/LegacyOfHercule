@@ -279,9 +279,10 @@ def room():
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.deco(1)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
-        s.echo("the plaque clicks before the fight")
+        s.echo("the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)")
         s.place(136, 96, p2=p2 is not None)
-        s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "frames 20")
+        s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "frames 30", "key 1 4", "frames 120")
+        s.expect(r"map zone 15 area 19 ", "map")
         s.expect(r"\w+: 00$|\w+: 0[0-9a-f]$", f"peek8 FLAGS+0x3F 1") if False else None
         s.deco(0)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
@@ -403,6 +404,263 @@ def room():
 
 
 
+# ---- chamber_rooms: the five rooms beyond the dojo (phase 4) -----------------------------------------------------------
+# The rating curve (tny_engine.c opp_curve) and a room's HP: rating + 25 per light out, then the row's percent
+CURVE = [(50, 500), (100, 900), (150, 1150), (200, 1400), (250, 1800), (300, 2200), (350, 2800), (400, 3400), (450, 4300), (500, 5200),
+         (550, 6100), (600, 7000)]
+
+
+def room_hp(rating, lights, pct):
+    r = rating + 25 * lights
+    k = 0
+    while k < len(CURVE) - 2 and r > CURVE[k + 1][0]:
+        k += 1
+    (r0, h0), (r1, h1) = CURVE[k], CURVE[k + 1]
+    r = max(r0, min(r1, r))
+    return (h0 + (h1 - h0) * (r - r0) // (r1 - r0)) * pct // 100
+
+
+UP, DOWN, LEFT, RIGHT = 0x40, 0x80, 0x20, 0x10
+# Capsule Ship 3 (6/58): the Namek ship, and the fallbacks without roms/buu.gba (chamber_*_plain.json)
+CAPSULE = dict(intro=(160, 286), walk=UP, plaque=(204, 180), seal=(160, 290), out=DOWN, seal_re=r"\d+,2[6-9]\d")
+ROOMS = {
+    # area, light, the door on the open map (inside its rect), the way back's position (regex), the lead / partner / crew
+    # sprites, ratings (alone, pair lead, pair partner, pair pct), where the intro is walked into, the plaque, the seal
+    "pirate": dict(area=20, light=1, door=(1808, 1140), back=r"18\d\d,11\d\d", lead=50, partner=None, crew=142,
+                   rate=(360, 360, None, 180), intro=(360, 128), walk=LEFT, plaque=(44, 92), seal=(340, 128), out=RIGHT,
+                   seal_re=r"3[0-5]\d,1[0-4]\d"),
+    "frieza": dict(area=21, light=2, door=(1616, 560), back=r"16\d\d,5\d\d", lead=48, partner=185,
+                   rate=(360, 360, 340, 70), intro=(200, 326), walk=UP, plaque=(92, 124), seal=(200, 330), out=DOWN,
+                   seal_re=r"\d+,3[0-3]\d"),
+    "namek": dict(area=22, light=3, door=(432, 560), back=r"4\d\d,5\d\d", lead=222, partner=166,
+                  rate=(380, 370, 350, 70), **CAPSULE),
+    "lab": dict(area=23, light=4, door=(432, 1744), back=r"4\d\d,17\d\d", lead=11, partner=9,
+                rate=(360, 360, 370, 70), intro=(216, 326), walk=UP, plaque=(76, 176), seal=(216, 330), out=DOWN,
+                seal_re=r"\d+,3[0-3]\d"),
+    "saiyan": dict(area=24, light=5, door=(240, 1136), back=r"2\d\d,11\d\d", lead=159, partner=170,
+                   rate=(390, 380, 330, 70), intro=(120, 212), walk=UP, plaque=(172, 126), seal=(120, 220), out=DOWN,
+                   seal_re=r"\d+,2[12]\d", rage=True),
+}
+# without roms/buu.gba (BUU=0): the Capsule Ship for the pirates, Frieza and the Saiyan ship; the Namekian alone, Paragus alone
+PLAIN = {
+    "pirate": dict(ROOMS["pirate"], **CAPSULE),
+    "frieza": dict(ROOMS["frieza"], **CAPSULE),
+    "namek": dict(ROOMS["namek"], lead=166, partner=None, rate=(370, 370, None, 180)),
+    "lab": ROOMS["lab"],
+    "saiyan": dict(ROOMS["saiyan"], lead=170, partner=None, rate=(360, 360, None, 180), rage=False, **CAPSULE),
+}
+
+
+def flag_re(bit):
+    """FLAGS+0x3F (flags 504-511) with flag 504 + bit set (short: the runner cuts a long EXPECT line)"""
+    digits = "".join(f"{v:x}" for v in range(16) if (v >> (bit & 3)) & 1)
+    return rf"\w+: [0-9a-f][{digits}]$" if bit < 4 else rf"\w+: [{digits}][0-9a-f]$"
+
+
+def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the dojo"):
+    s = S([f"The Time Chamber's rooms (docs/time-chamber.md 12, phase 4): {head}, each in one and two players and with a transformed",
+           "player: the door from the open area, the actors by lineup, the intro, the seal, the crew first (the airship), Frieza's Mecha form,",
+           "Paragus' fall enraging Broly, the fall, the lever's cut-away and its light, the door, the next tier, a return; the sixth lever through a",
+           "real room (the beams fall)."])
+
+    def case(tag, key, p1, p2, transform=False, by_punch=False, lever_by_p2=False, mask=0, base_row=0, mecha=False):
+        R = table[key]
+        two = p2 is not None
+        s.tag = tag
+        s.begin(tag, p1, p2)
+        s.lights(mask)
+        lights = bin(mask).count("1")
+        s.full()
+        if transform:
+            s.echo("transformed before the room, by a real B")
+            who = p2 if transform == "p2" else p1
+            s.out("poke32 0x0300208C 1", f"poke8 {entry(who) + 9:#x} 2", "poke32 PARTY+8 0")
+            s.out(*(("p2 2", "frames 4", "p2 0") if transform == "p2" else ("key 2 4",)))
+            s.out("frames 200", f"poke16 {entry(who) + 4:#x} 400")
+            s.expect(r"\w+: (?!%02x)" % base_row, f"peek8 {entry(who) + 8:#x} 1")
+        s.door()
+        s.place(*R["door"], p2=two)
+        s.out("frames 4", "keys 0x40", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
+        s.expect(rf"map zone 15 area {R['area']} ", "map")
+        s.out(f"shot {tag}_in")
+        s.echo("the lead stands; the partner only with two players; the crew; the plaque and the beam hidden")
+        s.actor(R["lead"], 1)
+        if R["partner"]:
+            s.actor(R["partner"], 1 if two else 0)
+        if R.get("crew"):
+            s.actor(R["crew"], 3)
+        s.deco(0)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.deco(1)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.echo("the plaque clicks before the fight, pressed twice (a trigger resumes at its stop word's index: both are 0)")
+        s.place(*R["plaque"], p2=two)
+        s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "frames 30", "key 1 4", "frames 120")
+        s.expect(rf"map zone 15 area {R['area']} ", "map")
+        s.deco(0)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.echo("walking in: the intro")
+        s.place(*R["intro"], p2=two)
+        s.out("frames 4", f"keys {R['walk']:#x}", "frames 60", "keys 0", "frames 110")
+        s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+        s.out(f"shot {tag}_walk", f"stepz {SCENE} 40", "frames 90", f"stepz {SCENE} 10")
+        s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+        s.out("ents", "vram")
+        s.echo("the door is sealed: the beam shows")
+        s.deco(1)
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        if R.get("crew"):
+            hard = lights >= 3
+            body = 143 if hard else R["crew"]
+            s.echo(f"the crew stands up as enemies ({'the stronger Henchmen, 3 lights out' if hard else 'the Henchmen'}), twins with two players; the lead waits")
+            s.state(r"[0-9a-f]{6}07$")
+            s.actor(body, 6 if two else 3)
+            s.actor(R["lead"], 1)
+            s.full()
+            s.out("frames 150", "ents", f"shot {tag}_crew")
+            s.full()
+            s.out(f"poke32 {CMD} 13", "frames 60")
+            s.echo("the crew down: the lead's line as he steps up, then the fight")
+            s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+            s.out(f"shot {tag}_crewdown", f"stepz {SCENE} 20", "frames 60")
+            s.state(r"[0-9a-f]{6}02$")
+            s.out("ents")
+        else:
+            s.state(r"[0-9a-f]{6}0[12]$")
+        s.out("frames 20", "ents", "vram", f"shot {tag}_fight")
+        s.full()
+        s.out("find CH 0x4348414D", "deref B0 CH+8")
+        alone, lead2, part2, pct = R["rate"]
+        hp = room_hp(alone, lights, 100) if not two else room_hp(lead2, lights, pct if part2 is None else 70)
+        s.echo(f"the lead's HP: {hp} (rating by lights out {lights})")
+        s.expect(rf"\w+: 0*{hp:x}$", "peek B0+0x188 1")
+        if two and part2:
+            s.out("deref B1 CH+0xC")
+            s.expect(rf"\w+: 0*{room_hp(part2, lights, 70):x}$", "peek B1+0x188 1")
+        s.echo("the seal holds: a player stops before the door")
+        s.place(*R["seal"], p2=False)
+        s.out(f"keys {R['out']:#x}", "frames 30", "keys 0", "frames 4")
+        s.expect(rf"map zone 15 area {R['area']} var 1 player {R['seal_re']}", "map")
+        s.full()
+        s.out("frames 200")
+        s.full()
+        s.out(f"shot {tag}_fight2")
+        if mecha:
+            s.echo("Frieza at 35 %: he turns into Mecha Frieza (the play body 238: sprite 49 lacks the attack groups)")
+            s.out(f"poke32 {ARG} 0x02000000", f"poke32 {ARG2} 0x80000023", f"poke32 {CMD} 27", "frames 160")
+            s.actor(238, 1)
+            s.out(f"shot {tag}_mecha")
+            s.full()
+        if R.get("rage") and two:
+            s.echo("Paragus falls first (HP 1, a punch): Broly rages, full HP, his line")
+            s.out(f"poke32 {ARG} 0x02000100", f"poke32 {ARG2} 1", f"poke32 {CMD} 27", "frames 2")
+            s.out(f"poke32 {ARG} 0x06000101", f"poke32 {CMD} 27", "frames 40")
+            s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+            s.out(f"shot {tag}_rage", f"stepz {SCENE} 10", "frames 60")
+            s.echo("(test commands wait while a box is up: the state after it) raged, the fight on")
+            s.out(f"poke32 {ARG} 6", f"poke32 {CMD} 48", "frames 2")
+            s.expect(r"0203fd0c: 0001020\d", f"peek {ARG} 1")
+            s.expect(rf"\w+: 0*{hp:x}$", "peek B0+0x188 1")
+            s.out(f"shot {tag}_raged")
+        s.echo("the fall")
+        if by_punch:
+            s.echo("by real punches: his HP to 1, player 1 next to him")
+            s.out(f"poke32 {ARG} 0x02000000", f"poke32 {ARG2} 1", f"poke32 {CMD} 27", "frames 2")
+            s.out(f"poke32 {ARG} 0x06000001", f"poke32 {CMD} 27", "frames 40")
+            if two and part2:
+                s.out(f"poke32 {ARG} 0x02000100", f"poke32 {ARG2} 1", f"poke32 {CMD} 27", "frames 2")
+                s.out(f"poke32 {ARG} 0x06000101", f"poke32 {CMD} 27", "frames 40")
+            s.out("frames 10")
+        else:
+            s.out(f"poke32 {CMD} 7", "frames 4")
+        s.out("frames 30", f"shot {tag}_fall", "frames 60")
+        s.out(f"stepz {SCENE} 8", "frames 60", f"shot {tag}_won")
+        s.echo("state 6: the bodies are gone")
+        s.state(r"[0-9a-f]{6}06$")
+        s.actor(R["lead"], 0)
+        if R["partner"]:
+            s.actor(R["partner"], 0)
+        s.deco(1)
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.echo("the lever" + (" by player 2" if lever_by_p2 else ""))
+        s.full()
+        if lever_by_p2:
+            s.place(*R["intro"], p2=False)
+            px, py = R["plaque"]
+            s.out("deref P2 0x0203FF08", f"poke32 P2+0x158 {px << 8:#x}", f"poke32 P2+0x15C {py << 8:#x}", "frames 4", "p2 0x40", "frames 6",
+                  "p2 0", "frames 2", "p2 1", "frames 4", "p2 0")
+        else:
+            s.place(*R["plaque"], p2=two)
+            s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4")
+        s.out("waitmap 15 18 300")
+        s.echo("the cut-away: the open area, the room's light still on")
+        s.out("frames 120")
+        s.expect(r"map zone 15 area 18 ", "map")
+        s.deco(R["light"])
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.out(f"shot {tag}_gate0", "frames 70", f"shot {tag}_gate1")
+        s.echo("its light is out")
+        s.deco(R["light"])
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        if mask | (1 << R["light"]) == 0x3F:
+            s.out("frames 62")
+            s.echo("the sixth: the beams go down one by one")
+            s.deco(6)
+            s.expect(r"\w+: 00000000", "peek D+0x10 1")
+            s.deco(7)
+            s.expect(r"\w+: 00000001", "peek D+0x10 1")
+            s.out(f"shot {tag}_beam0", "frames 26")
+            s.deco(7)
+            s.expect(r"\w+: 00000000", "peek D+0x10 1")
+            s.out("frames 26", f"shot {tag}_beam2")
+            s.deco(8)
+            s.expect(r"\w+: 00000000", "peek D+0x10 1")
+            s.out("frames 170")
+        s.out("frames 130", "frames 200", "frames 100", f"shot {tag}_gift", "mash 2 90", "frames 60")
+        s.expect(rf"map zone 15 area {R['area']} ", "map")
+        s.out("ents", f"shot {tag}_back")
+        s.echo(f"back in the room: flag {504 + R['light']}, the plaque on, the door open")
+        s.expect(flag_re(R["light"]), "peek8 FLAGS+0x3F 1")
+        s.deco(0)
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.deco(1)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.echo("Gohan's Super Saiyan at the first lever: his row 2")
+        s.expect(r"\w+: 02", f"peek8 {entry(GOHAN) + 8:#x} 1")
+        s.echo("out of the door to the open area, below this room's entrance")
+        s.place(*R["seal"], p2=two)
+        s.out("frames 2", f"keys {R['out']:#x}", "waitmap 15 18 200", "keys 0", "frames 200")
+        s.expect(rf"map zone 15 area 18 var 1 player {R['back']}", "map")
+        s.out(f"shot {tag}_out", "frames 200", "ents")
+        s.full()
+        s.echo("a return: the room empty, the plaque on, no scene")
+        s.place(*R["door"], p2=two)
+        s.out("frames 4", "keys 0x40", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
+        s.actor(R["lead"], 0)
+        if R.get("crew"):
+            s.actor(R["crew"], 0)
+        s.deco(0)
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.place(*R["intro"], p2=two)
+        s.out("frames 4", f"keys {R['walk']:#x}", "frames 60", "keys 0", "frames 30")
+        s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+        s.state(r"[0-9a-f]{6}00$")
+        s.out("ents")
+
+    case("pirate_one", "pirate", KRILLIN, None, by_punch=True)
+    case("pirate_two_ss", "pirate", GOKU, HERCULE, transform="p1", base_row=0x0F, mask=0x0D)
+    case("frieza_one_ss", "frieza", VEGETA, None, transform="p1", base_row=9, mecha=True)
+    case("frieza_two", "frieza", TRUNKS, GOHAN, lever_by_p2=True)
+    case("namek_one", "namek", PICCOLO, None, by_punch=True)
+    case("namek_two_ss", "namek", HERCULE, VEGETA, transform="p2", base_row=9)
+    case("lab_one", "lab", HERCULE, None)
+    case("lab_two_ss", "lab", GOKU, KRILLIN, transform="p1", base_row=0x0F)
+    case("saiyan_one_ss", "saiyan", GOKU, None, transform="p1", base_row=0x0F, by_punch=True)
+    case("saiyan_two", "saiyan", GOHAN, PICCOLO)
+    case("six_lab", "lab", KRILLIN, VEGETA, mask=0x2F)
+    s.write(name)
+
+
 # ---- chamber_perf (not in regfull: the measures behind CH_TARGET, docs/time-chamber.md 12) ----------------------------
 def perf():
     s = S(["The measures behind chamber.c's CH_TARGET: bodies standing, OBJ VRAM's largest free block and frame time, by records standing and tier,",
@@ -471,4 +729,6 @@ if __name__ == "__main__":
     gate()
     tiers()
     room()
+    rooms()
+    rooms(PLAIN, "chamber_rooms_plain.txt", "the same on a BUU=0 build (the fallback maps and fighters; not in regfull)")
     perf()

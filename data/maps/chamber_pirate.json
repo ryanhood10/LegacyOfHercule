@@ -1,0 +1,276 @@
+{
+ "_": "A Time Chamber room (docs/time-chamber.md 12): the pirate airship, Buu's Fury's deck (zone 12 area 1, variation 0x081FEF3C there) imported whole, its Capsule Corp pad covered with the deck's planks (copied from four slats to the left), a sky under it (generated tiles), a yellow plaque (8/37's) on the back rail, the gate's beam turned upright across the gangway on the right while the fight seals it. General Tao and three Warlord's Henchmen: the crew fights first (chamber.c RF_CREW). The row is in src/coop/chamber.c rooms[]; without roms/buu.gba chamber_pirate_plain.json stands here. Priorities 2, 3, 2, 3: the plaque (BG2) over the deck (BG1).",
+ "name": "chamber_pirate",
+ "zone": 15,
+ "area": 20,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  400,
+  320
+ ],
+ "priorities": [
+  2,
+  3,
+  2,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x081FEF3C"
+    },
+    "rect": [
+     0,
+     0,
+     50,
+     40
+    ]
+   },
+   "layers": [
+    0,
+    1
+   ],
+   "to_layers": [
+    0,
+    1
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    4,
+    3
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     25,
+     16,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    2
+   ],
+   "collision": false,
+   "recolor": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    4,
+    8,
+    3,
+    1
+   ]
+  }
+ ],
+ "layers": {
+  "1": [
+   {
+    "op": "copy",
+    "src": {
+     "map": {
+      "rom": "buu",
+      "variation": "0x081FEF3C"
+     },
+     "bg": 1,
+     "rect": [
+      18,
+      11,
+      8,
+      8
+     ]
+    },
+    "at": [
+     30,
+     11
+    ],
+    "_": "the Capsule Corp pad, under the deck's planks"
+   }
+  ],
+  "3": [
+   {
+    "op": "texture",
+    "rect": [
+     0,
+     0,
+     50,
+     40
+    ],
+    "color": [
+     57,
+     123,
+     222
+    ],
+    "variants": 4,
+    "seed": 7,
+    "speckle": [
+     {
+      "color": [
+       189,
+       222,
+       255
+      ],
+      "density": 0.01
+     }
+    ],
+    "_": "the sky under the deck"
+   }
+  ]
+ },
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 1536,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048,
+    "turn": {
+     "shape": "64x32",
+     "rect": [
+      16,
+      25,
+      32,
+      7
+     ]
+    }
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 32,
+    "y": 24,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 348,
+    "y": 112,
+    "shape": "16x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 50,
+   "x": 80,
+   "y": 136,
+   "facing": 3,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 142,
+   "x": 200,
+   "y": 88,
+   "facing": 3,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 142,
+   "x": 200,
+   "y": 176,
+   "facing": 3,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 142,
+   "x": 248,
+   "y": 136,
+   "facing": 3,
+   "condition": "script:ch_boss_cond"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    296,
+    64,
+    336,
+    200
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:505"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    32,
+    56,
+    56,
+    96
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    376,
+    112,
+    400,
+    144
+   ],
+   "dir": "right",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    1808,
+    1156
+   ],
+   "facing": 0
+  }
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  364,
+  128
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

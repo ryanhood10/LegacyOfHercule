@@ -1,4 +1,4 @@
-// The Time Chamber's hidden room and Mr. Popo (docs/time-chamber.md 5, 6.3 and 12.6): the room behind the gate (zone 15
+// The Time Chamber's hidden room and Mr. Popo (docs/time-chamber.md 5, 6.3 and 12.7): the room behind the gate (zone 15
 // area 25), the scene, his fight, his reward, and the loop (decision 4: he lights the six lights again, every boss a step
 // stronger). popo.c; the scripts are data/story/chamber_popo.lscript, the map data/maps/chamber_popo.json.
 #pragma once

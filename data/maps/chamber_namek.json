@@ -1,0 +1,218 @@
+{
+ "_": "A Time Chamber room (docs/time-chamber.md 12): the Namek ship, LoG2's Capsule Ship 3 (zone 6 area 58) whole with its red floor recoloured green (its seats, on BG0, are not drawn there nor solid), a green plaque (8/37's) on the hull right of the energy column (BG1 at priority 2, as the dojo's floor). Buu-saga Piccolo and, with two players, the Namekian Warrior; without roms/buu.gba the Namekian alone (the records' requires / unless; chamber.c namek_plain).",
+ "name": "chamber_namek",
+ "zone": 15,
+ "area": 22,
+ "base": [
+  6,
+  58
+ ],
+ "tileset": "base",
+ "layout": "base",
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    24,
+    15
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     29,
+     16,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    1
+   ],
+   "collision": false,
+   "recolor": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    24,
+    20,
+    3,
+    1
+   ]
+  }
+ ],
+ "recolor": {
+  "rules": [
+   {
+    "_": "the red floor",
+    "hue": [
+     330,
+     25
+    ],
+    "sat": [
+     0.35,
+     1
+    ],
+    "ramp": [
+     [
+      0,
+      57,
+      0
+     ],
+     [
+      57,
+      123,
+      57
+     ],
+     [
+      90,
+      189,
+      90
+     ],
+     [
+      180,
+      240,
+      170
+     ]
+    ]
+   }
+  ]
+ },
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 2048,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 192,
+    "y": 120,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 120,
+    "y": 271,
+    "shape": "64x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 222,
+   "x": 120,
+   "y": 176,
+   "facing": 0,
+   "condition": "script:ch_boss_cond",
+   "requires": "buu"
+  },
+  {
+   "kind": "actor",
+   "sprite": 166,
+   "x": 200,
+   "y": 176,
+   "facing": 0,
+   "condition": "script:ch_partner_cond",
+   "requires": "buu"
+  },
+  {
+   "kind": "actor",
+   "sprite": 166,
+   "x": 120,
+   "y": 176,
+   "facing": 0,
+   "condition": "script:ch_boss_cond",
+   "unless": "buu"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    48,
+    256,
+    272,
+    280
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:507"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    192,
+    144,
+    216,
+    184
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    144,
+    304,
+    176,
+    320
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    432,
+    580
+   ],
+   "facing": 0
+  }
+ ],
+ "priorities": [
+  1,
+  2,
+  3,
+  3
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  160,
+  286
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

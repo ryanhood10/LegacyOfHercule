@@ -1,0 +1,164 @@
+{
+ "_": "A Time Chamber room (docs/time-chamber.md 12): the lab, Dr. Gero's computer room (zone 8 area 63) whole, a blue plaque (8/37's) at the top of the left bay (BG2, the computer's layer, empty there). Android 18, with two players Android 17 too.",
+ "name": "chamber_lab",
+ "zone": 15,
+ "area": 23,
+ "base": [
+  8,
+  63
+ ],
+ "tileset": "base",
+ "layout": "base",
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    8,
+    14
+   ],
+   "src": {
+    "map": [
+     8,
+     37
+    ],
+    "rect": [
+     33,
+     17,
+     3,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    2
+   ],
+   "collision": false,
+   "recolor": false
+  },
+  {
+   "op": "block",
+   "rect": [
+    8,
+    18,
+    3,
+    2
+   ]
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     8,
+     37
+    ],
+    "from": 2560,
+    "bytes": 512
+   },
+   {
+    "map": [
+     8,
+     16
+    ],
+    "from": 128,
+    "bytes": 2048
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 64,
+    "y": 112,
+    "shape": "16x32",
+    "visible": 0
+   },
+   {
+    "part": 1,
+    "frame": 0,
+    "x": 176,
+    "y": 311,
+    "shape": "64x32",
+    "visible": 0
+   }
+  ]
+ },
+ "records": [
+  {
+   "kind": "actor",
+   "sprite": 11,
+   "x": 128,
+   "y": 200,
+   "facing": 0,
+   "condition": "script:ch_boss_cond"
+  },
+  {
+   "kind": "actor",
+   "sprite": 9,
+   "x": 240,
+   "y": 200,
+   "facing": 0,
+   "condition": "script:ch_partner_cond"
+  }
+ ],
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    40,
+    280,
+    330,
+    312
+   ],
+   "payload": "seq:ch_room_intro",
+   "activation": "enter",
+   "condition": "noflag:508"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    64,
+    144,
+    88,
+    184
+   ],
+   "payload": "seq:ch_lever",
+   "activation": "facing"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    200,
+    344,
+    232,
+    368
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    18,
+    1
+   ],
+   "at": [
+    432,
+    1764
+   ],
+   "facing": 0
+  }
+ ],
+ "onload": "script:ch_room_onload",
+ "spawn": [
+  216,
+  326
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}
