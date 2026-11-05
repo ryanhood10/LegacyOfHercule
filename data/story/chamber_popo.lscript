@@ -1,0 +1,199 @@
+; The Time Chamber's hidden room and Mr. Popo (docs/time-chamber.md 5, 6.3, 12.7): the map data/maps/chamber_popo.json (zone
+; 15 area 25, behind the gate), the C in src/coop/popo.c (CoopCall 36: its op numbers are popo.c's enum). The scenes run
+; when popo.c starts them (ch_popo_onload hands it their addresses). Every line here is Claude's draft (DRAFT), not dictated.
+; Absolute entry indexes: popo.c's E_* name them in ch_popo_intro; keep the `[n]` checks when editing.
+
+script ch_popo_onload
+        CoopCall 36, 1, seq:ch_popo_intro, seq:ch_popo_again
+        CoopCall 36, 2, seq:ch_popo_end, 0
+end
+
+script ch_popo_onleave
+        StopAudio 17
+end
+
+; a big jar (3 hits): 30 % food and 30 % energy, each while either player's bar is short (popo.c big_jar)
+script ch_popo_jar
+        CoopCall 36, 18, 0, 0
+end
+
+; ---- the first visit (section 5's scene) ----------------------------------------------------------------------------
+sequence ch_popo_intro
+  [0] script                             ; the arrival: the gate's hum, low; a slow shake; the players walk in, look round
+        CoopCall 36, 3, 0, 0
+        PlayAudioVolume 17, 30
+        CoopCall 36, 8, 1, 0
+        WhiteFlash 5
+        WaitFrames 30
+        BeginCommandBatch
+        CoopCall 36, 4, 0, 0
+        CommitCommandBatch
+        CoopCall 36, 5, 2, 0
+        WaitFrames 24
+        CoopCall 36, 5, 3, 0
+        WaitFrames 24
+        CoopCall 36, 5, 4, 0
+        WaitFrames 30
+        CoopCall 36, 5, 1, 0
+        PanCameraToPosition 124, 0, 2          ; far up the room: a small figure, his back turned
+        WaitFrames 100
+        PanCameraToPosition 124, 224, 2
+        WaitFrames 60
+        CoopCall 36, 6, 0, 0                   ; -> player 1's line (1-9 by party slot, 10 the fallback)
+        END
+  [1] text 60 "GOHAN: Someone's standing up there...\x0bMr. Popo?  What's he doing in here?" -> 11
+  [2] text 90 "PICCOLO: ...Popo.\x0bKami's memories know that stillness.  Be careful." -> 11
+  [3] text 106 "VEGETA: Kami's little attendant?\x0bSo you're the one behind this circus." -> 11
+  [4] text 103 "TRUNKS: Who's there?\x0b...Mr. Popo?  He's the one who let us in here." -> 11
+  [5] text 63 "GOKU: Hey, that's Mr. Popo!\x0bHuh...  How come he's not saying anything?" -> 11
+  [6] text 67 "HERCULE: Wh-who's there?!  I'm warning you,\x0byou're looking at the World Martial Arts Champion!" -> 11
+  [7] text 73 "KRILLIN: Uh...  is that Mr. Popo?\x0bAnd why is the floor shaking?" -> 11
+  [8] text 26 "ANDROID 16: Someone is there.\x0bMy scanner returns nothing.  Nothing at all." -> 11
+  [9] text 61 "GOHAN: Mr. Popo...\x0bYou were watching us the whole time, weren't you?" -> 11
+  [10] text 250 "Who's there?" -> 11
+  [11] script                            ; -> player 2's reply (12-20 by party slot, 21 the fallback), 22 alone
+        CoopCall 36, 7, 0, 0
+        END
+  [12] text 60 "GOHAN: Something's wrong.  I can't sense him at all." -> 22
+  [13] text 90 "PICCOLO: Stay sharp.  He's far stronger than he looks." -> 22
+  [14] text 106 "VEGETA: Hmph.  Servant or not, he's in my way." -> 22
+  [15] text 103 "TRUNKS: I've got a bad feeling about this." -> 22
+  [16] text 63 "GOKU: Heh!  I bet he wants to see how strong we got!" -> 22
+  [17] text 67 "HERCULE: M-maybe we should come back later!\x0bThe champ has a, uh, prior engagement!" -> 22
+  [18] text 73 "KRILLIN: Why does this always happen to me?" -> 22
+  [19] text 26 "ANDROID 16: He is not moving.  Be careful." -> 22
+  [20] text 61 "GOHAN: Whatever he wants, I'm ready." -> 22
+  [21] text 0 "Who's there?" -> 22
+  [22] script                            ; the shaking stops: he turns and walks down, halfway
+        CoopCall 36, 8, 0, 0
+        StopAudio 17
+        CoopCall 36, 9, 0, 0
+        WaitFrames 30
+        PanCameraToPosition 124, 186, 2
+        WaitFrames 40
+        BeginCommandBatch
+        CoopCall 36, 10, 244, 220
+        CommitCommandBatch
+        WaitFrames 10
+  [23] text 82 "MR. POPO: Popo filled this chamber.\x0bEvery room.  Every fighter.  Popo watched every fight."
+  [24] text 82 "MR. POPO: Six lights are out.  Popo is pleased.\x0bBut Popo wants to see one more thing..."
+  [25] script                            ; a flash: he stands behind them, they spin round; the door seals
+        WhiteFlash 10
+        PlayAudio 26
+        CoopCall 36, 11, 0, 0
+        PanCameraToPosition 124, 224, 6
+        WaitFrames 24
+        PlayAudio 47
+        ScreenShake 0, 2, 12
+        CoopCall 36, 12, 0, 0
+        WaitFrames 16
+        SetActiveEntity 0                      ; the camera follows player 1 again (after the scene's pans)
+  [26] text 82 "MR. POPO: ...how strong you are.\x0bWith Popo's own eyes!"
+  [27] stop 0x0
+end
+
+; ---- a later visit: one line and the fight -----------------------------------------------------------------------------
+sequence ch_popo_again
+  [0] script
+        CoopCall 36, 3, 0, 0
+        BeginCommandBatch
+        CoopCall 36, 4, 0, 0
+        CommitCommandBatch
+        CoopCall 36, 9, 0, 0
+        PanCameraToPosition 124, 0, 3
+        WaitFrames 50
+  [1] text 82 "MR. POPO: You came back.  Good.\x0bPopo is ready."
+  [2] script
+        PanCameraToPosition 124, 224, 4
+        WaitFrames 30
+        PlayAudio 47
+        ScreenShake 0, 2, 12
+        CoopCall 36, 12, 0, 0
+        WaitFrames 20
+        SetActiveEntity 0
+  [3] stop 0x0
+end
+
+; ---- his HP at 0: he does not fall (the arms out, popo.c P_YIELD), then a flash and he stands at the far end; he stays -----
+sequence ch_popo_end
+  [0] script                             ; -> 1 the first win ever, 3 a later one
+        WhiteFlash 10
+        PlayAudio 26
+        CoopCall 36, 13, 0, 0
+        WaitFrames 20
+        PanCameraToPosition 124, 0, 3
+        WaitFrames 60
+        CoopCall 36, 14, 0, 0
+        END
+  [1] text 82 "MR. POPO: Enough.  Popo has seen enough.\x0bYou are strong now.  Popo has something for you." -> 2
+  [2] script                             ; the first reward: a Senzu bean and a +3 capsule of each
+        PickUpItem 0
+        PickUpItem 3
+        PickUpItem 6
+        PickUpItem 9
+        CoopCall 36, 15, 0, 0
+        PushByte 5
+        END
+  [3] text 82 "MR. POPO: Again you win.  Popo is happy.\x0bTake this." -> 4
+  [4] script
+        PickUpItem 0
+  [5] text 82 "MR. POPO: Popo will stay here.\x0bTalk to Popo when you want more."
+  [6] script                             ; beaten this time round (flag 530); the door opens; the view back on player 1
+        CoopCall 36, 23, 0, 0
+        CoopCall 36, 17, 0, 0
+        PlayAudio 47
+        CoopCall 36, 21, 0, 0
+        CoopCall 36, 22, 0, 0
+        PushByte 3
+        Step PanCameraToPosition
+        WaitFrames 30
+        SetActiveEntity 0
+  [7] stop 0x0
+end
+
+; ---- talking to him after a win (the map's "facing" trigger in front of him: either player's A) ---------------------------
+; Nothing is asked at the end of the fight (mashing A through his lines must not put six lights of progress back): here a
+; beat first (an A held from the walk is no press: CoopCall 18 ignores a held button), then the fight again, else the loop.
+sequence ch_popo_talk
+  [0] script                             ; -> 1 the offer, 11 the line after the loop, 12 nothing (a scene or the fight)
+        CoopCall 36, 24, 0, 0
+        END
+  [1] script
+        WaitFrames 30
+        CoopCall 18, 1, 0, 0
+  [2] text 82 "MR. POPO: Fight Popo again?  (A: Yes  B: No)"
+  [3] script
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PlayAudio 47
+        ScreenShake 0, 2, 12
+        CoopCall 36, 12, 0, 0
+        PushByte 4
+        END
+      L1:
+        PushByte 5
+        END
+  [4] text 82 "MR. POPO: Good.  Popo is ready." -> 12
+  [5] text 82 "MR. POPO: Popo can light the six lights again.\x0bEveryone inside will be stronger."
+  [6] script
+        WaitFrames 20
+        CoopCall 18, 1, 0, 0
+  [7] text 82 "MR. POPO: Shall Popo start again?  (A: Yes  B: No)"
+  [8] script
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        CoopCall 36, 16, 0, 0
+        PushByte 9
+        END
+      L1:
+        PushByte 10
+        END
+  [9] text 82 "MR. POPO: Good.  The lights are on again.\x0bGo.  Come back stronger." -> 12
+  [10] text 82 "MR. POPO: Then Popo will wait here." -> 12
+  [11] text 82 "MR. POPO: Go.  Popo will be here\x0bwhen the six lights are out again." -> 12
+  [12] stop 0x0
+end

@@ -15,6 +15,18 @@ Newest first. One entry per landed piece or decision; details live in the linked
   (`tools/chamberart.py`: 42-56 slots each, the open map at 602 of 896). Fixed on the way: the lever's stop words (a second
   press of a plaque threw it unchecked) and page breaks that ate a letter (`\x0bD`). Tests `chamber_rooms` (356 checks, in
   regfull), `chamber_rooms_plain` (a `BUU=0` build).
+- **The Time Chamber's Mr. Popo and the loop (`docs/time-chamber.md` 12.7; branch `nb-chamber-popo`; Ryan: "he teleports to keep distance from you and shoots blasts, and he has decent dodge"):**
+  the way between the gate's pillars, open once all six lights are out, leads into a white room (15/25) with four big jars
+  (30 % food and 30 % energy, both players' bars). A scene by lineup: a shake, a low hum, the players walk in and look round,
+  the camera finds a small figure with his back turned, player 1's character speaks and player 2's answers (a line each per
+  character), Popo walks down in his third person, a flash and he is behind them. His fight runs on the tournament's kit
+  library with a kit of his own (`tny_moves.c`: no stock AI, far hops 96-176 px from both players, a dodge one hit in three,
+  blasts, angrier at half HP); rating 500 (5200 HP, 180 % with two players). At 0 HP he does not fall: arms out, a flash, he
+  stands at the far end, a reward (the first time a Senzu and a capsule of each, later a Senzu) and the offer to start again:
+  yes (asked only when a player walks up to him afterwards and presses A, after a beat, never at the fight's end) puts the six lights back on and makes every boss 50 rating stronger (times round in flags 520-521); a room's first win
+  pays a +3 capsule, later rounds a Senzu. His body is Buu's Fury r.183 with the hit-stun, knock-down and lying drawn by code
+  (sprite 163; LoG2's 93 with `BUU=0`). `chamber_popo.txt` (159 checks) in `regfull.sh`; an autopilot's balance runs. All lines
+  are Claude's drafts.
 - **A tournament of 32 (`docs/tournament.md` 2b, 26, `tny_n32.txt`; Ryan: "we can use lower-tier fighters, but we must fill the tournament FIRST with the fighters from that division selected"):** a 2 v 2 of 16 teams. Only Legend can fill it (30 to 34 opponents with the lower tiers; Champion reaches 26 at most): offered there once the count is 30 after up to two pickable fighters are set aside, in practice Super 13 beaten and Cooler beaten or the Broly chapter done; locked with a footer otherwise. The division's all in, then the strongest from below, never a repeat, never a mirror. 8 and 16 draw as before (60 draws compared). The screen: blocks A to D, each like an 8-team half, and the "Final four" page, never more than 8 faces on a page. `TBracket.seat` is 32; 4 rounds were enough (a unit is a team).
 - **The Time Chamber, phases 1-3 (`docs/time-chamber.md` 12; branch `nb-chamber`):** the Lookout's door opens on a white void of
   2048 x 2048 (the most the collision takes; 372 of 896 tile slots, 588 left for six entrances of 98) with the living

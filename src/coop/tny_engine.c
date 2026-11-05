@@ -303,6 +303,24 @@ int tny_resolve_stat(int stat_index, EnemyStat *out) {
     return 1;
 }
 
+// A boss outside the roster on the same scale (the Time Chamber's Mr. Popo, popo.c): the boss class of stat 29, AI set 21, no
+// kill EXP, HP and attack numbers read off opp_curve at `rating` (clamped to the curve's ends)
+int tny_rating_stat(int rating, EnemyStat *out) {
+    int r = rating, k = 0;
+    while (k < OPP_POINTS - 2 && r > opp_curve[k + 1].rating) k++;
+    const OppPoint *a = &opp_curve[k], *b = a + 1;
+    if (r < a->rating) r = a->rating;
+    if (r > b->rating) r = b->rating;
+    *out = ENEMY_STATS[B_BOSS];
+    out->exp = 0;
+    out->ai_set = 21;
+    out->max_hp = opp_lerp(r, a->rating, b->rating, a->hp, b->hp);
+    out->melee = (u8)cap(opp_lerp(r, a->rating, b->rating, a->melee, b->melee), 255);
+    out->ranged = (u8)cap(opp_lerp(r, a->rating, b->rating, a->ranged, b->ranged), 255);
+    out->defence = (u8)cap(opp_lerp(r, a->rating, b->rating, a->defence, b->defence), 110);
+    return 1;
+}
+
 // Every tournament opponent: never twinned, no lone-boss HP (the engine scales a lone challenger itself)
 static const BossRule tny_rule = { TNY_STAT0, 0, BOSS_NO_TWIN | BOSS_FLAT, 0, 0, 0, 0, 0 };
 const BossRule *tny_boss_rule(int stat_index) {

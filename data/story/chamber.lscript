@@ -159,6 +159,11 @@ sequence ch_lever
         RestoreMap
         CoopCall 35, 20, 0, 0
         PlayAudio 47
+        CoopCall 36, 19, 0, 0                  ; the room's prize (popo.c): its first win a +3 capsule, any win once round a Senzu
+        JumpIfFalse P1
+        CoopCall 36, 20, 0, 0
+        Step PickUpItem
+      P1:
         StackTestStoryFlagNot 468
         StackTestStoryFlagNot 193
         And

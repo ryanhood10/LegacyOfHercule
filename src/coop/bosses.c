@@ -2,6 +2,7 @@
 // extra stat names a stock stat to start from and overrides what differs.
 #include "bosses.h"
 #include "tny_engine.h"   // stats 160-219: the tournament's opponents (tny_engine.c)
+#include "popo.h"         // stat 156: the Time Chamber's Mr. Popo (popo.c)
 
 const ExtraStat extra_stats[] = {
     // 110 Android 13, base form (not yet "Super"): Android 19's AI set (29) and boss class. Lighter than
@@ -116,6 +117,8 @@ static const BossRule rules[] = {
     { CELL2_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, CELL_HP_PCT, CELL_SPEED_PCT, 0 },
     { JR_PAIR_STAT, 0, BOSS_PAIR, 31, JR_PAIR2_STAT, CELL_JR_HP_PCT, CELL_SPEED_PCT, 0 },
     { JR_PAIR2_STAT, 0, BOSS_PAIR | BOSS_PARTNER_ONLY, 0, 0, CELL_JR_HP_PCT, CELL_SPEED_PCT, 0 },
+    // The Time Chamber's Mr. Popo (popo.c): one boss, and against two players the lone boss's HP (hp_pct: 180 %)
+    { POPO_STAT, 0, BOSS_NO_TWIN, 0, 0, 100, 0, 0 },
     // Imperfect Cell (60) and Semi-Perfect Cell (76) use the default: a same-model Multi-Form twin
     { -1, 0, 0, 0, 0, 0, 0, 0 },
 };
@@ -133,6 +136,7 @@ int resolve_stat(int stat_index, EnemyStat *out) {
         return 1;
     }
     if (stat_index >= TNY_STAT0 && stat_index < TNY_STAT0 + TNY_STAT_COUNT) return tny_resolve_stat(stat_index, out);
+    if (stat_index == POPO_STAT) return popo_stat(out);   // his rating, a step more each time round (popo.c)
     int i = stat_index - EXTRA_STAT_BASE;
     const ExtraStat *x;
     if (stat_index >= GERO_STAT_BASE && (u32)(stat_index - GERO_STAT_BASE) < GERO_STAT_COUNT)

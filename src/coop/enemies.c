@@ -15,6 +15,7 @@
 #include "super13.h"
 #include "tny_engine.h"
 #include "chamber.h"
+#include "popo.h"
 
 ROM_FN(void, Enemy_UpdateStates, (Entity *e), 0x0800772B);   // aux + control state; the AI tick follows in 0x0800E5A5
 #define ENEMY_UPDATE 0x0800E5A5u
@@ -533,6 +534,8 @@ void coop_debug_tick(void) {
         regen_test(coop2.cmd_arg);
     } else if (cmd == 48) {                     // the Time Chamber (chamber.c, docs/ids.md)
         chamber_test(coop2.cmd_arg, coop2.cmd_arg2);
+    } else if (cmd == 49) {                     // the Time Chamber's Mr. Popo (popo.c, docs/ids.md)
+        popo_test(coop2.cmd_arg, coop2.cmd_arg2);
     } else if (cmd == 45) {                     // objroom.c: hold OBJ VRAM (perf_budget.py)
         obj_room_test(coop2.cmd_arg);
     } else if (cmd == 47) {                     // Hercule's kit (hercule_kit.txt): arg 0 the enemies the flash holds, 1 the last hit's damage, 2 EXP for slot arg2

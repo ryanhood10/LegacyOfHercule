@@ -354,9 +354,9 @@ deref P1 0x03001FA8
 poke32 P1+0x158 0x40400
 poke32 P1+0x15C 0x1ae00
 keys 0x40
-frames 90
+frames 50
 keys 0
-echo EXPECT map zone 15 area 18 var 1 player 10\d\d,(2\d\d|3[0-4]\d)
+echo EXPECT map zone 15 area 18 var 1 player 10\d\d,3[4-8]\d
 map
 shot g_open
 poke32 0x0203FD0C 0
@@ -520,6 +520,13 @@ poke32 0x0203FD0C 0x120f
 poke32 0x0203FD54 0x4cc04c8
 poke32 0x0203FD08 5
 frames 150
+echo (no body near the pad: the refill frozen, the standing ones gone; a hit on the way in kept the menu shut once)
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 1
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD08 13
+frames 30
 deref P1 0x03001FA8
 poke32 P1+0x158 0x4c800
 poke32 P1+0x15C 0x4cc00
