@@ -1,0 +1,156 @@
+; The generator's eggs, zone 8 area 50 (Ryan, 2026-11-04: instead of carrying them to safety, the first one smashes and the mother turns on you, a mini boss; at half her health the two eggs left hatch, and her two babies fight beside her).
+; Flags: stock 117, 118, 119 an egg gone (its decoration hidden at the load, its tube breakable: the item's condition, tested at a load only, so her end warps to the same room, a white blink), our 476 the fight begun, 478 the eggs hatched, 477 she is down.
+; Records: 0 the mother standing, 1 the fight to half her health, 2 the rest of it, 3-5 a baby at each egg (spawned by TriggerMapEvent only).
+; She ends the fight: babies still standing go with her, by the warp; a room left and entered again brings her back without them, so nothing can be left unfinished. Lines are Claude's drafts.
+
+; an egg's A, as the map loads: while it is whole and the fight has not begun (the sequences check again: a trigger's condition is a load's)
+script z8_egg_open1
+        StackTestStoryFlagNot 117
+        StackTestStoryFlagNot 476
+        And
+end
+
+script z8_egg_open2
+        StackTestStoryFlagNot 118
+        StackTestStoryFlagNot 476
+        And
+end
+
+script z8_egg_open3
+        StackTestStoryFlagNot 119
+        StackTestStoryFlagNot 476
+        And
+end
+
+; her records, on a load during the fight (a player left the room and came back)
+script z8_dino_first_half
+        StackTestStoryFlag 476
+        StackTestStoryFlagNot 478
+        And
+end
+
+script z8_dino_second_half
+        StackTestStoryFlag 478
+        StackTestStoryFlagNot 477
+        And
+end
+
+; one sequence an egg. Entry 0: once the fight has begun an egg does nothing (next index 5: the end)
+sequence z8_egg1
+  [0] script
+        StackTestStoryFlag 476
+        JumpIfFalse free
+        PushByte 5
+        END
+      free:
+        PlayAudio 47
+        SetStoryFlag 117
+        FindEntityByType 7
+        END
+  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
+  [2] text 1 "#...Oops."
+  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
+  [4] script -> 5
+        SetStoryFlag 476
+        WhiteFlash 20
+        PlayAudio 60
+        DespawnCharacterAndRecordPosition 245, 1
+        DrawBossHealthBarRange 245, 50, 100
+        SetActiveEntity 0
+end
+
+sequence z8_egg2
+  [0] script
+        StackTestStoryFlag 476
+        JumpIfFalse free
+        PushByte 5
+        END
+      free:
+        PlayAudio 47
+        SetStoryFlag 118
+        FindEntityByType 8
+        END
+  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
+  [2] text 1 "#...Oops."
+  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
+  [4] script -> 5
+        SetStoryFlag 476
+        WhiteFlash 20
+        PlayAudio 60
+        DespawnCharacterAndRecordPosition 245, 1
+        DrawBossHealthBarRange 245, 50, 100
+        SetActiveEntity 0
+end
+
+sequence z8_egg3
+  [0] script
+        StackTestStoryFlag 476
+        JumpIfFalse free
+        PushByte 5
+        END
+      free:
+        PlayAudio 47
+        SetStoryFlag 119
+        FindEntityByType 9
+        END
+  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
+  [2] text 1 "#...Oops."
+  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
+  [4] script -> 5
+        SetStoryFlag 476
+        WhiteFlash 20
+        PlayAudio 60
+        DespawnCharacterAndRecordPosition 245, 1
+        DrawBossHealthBarRange 245, 50, 100
+        SetActiveEntity 0
+end
+
+; half her health: the first half's record falls; the eggs left hatch, and she stands again on the second half's
+sequence z8_dino_hatch
+  script
+        PlayAudio 60
+        WaitFrames 30
+  text 0 "@^The dinosaur staggers...\x0bAnd behind her, the eggs begin to shake!"
+  script
+        SetStoryFlag 478
+        WhiteFlash 20
+        PlayAudio 47
+        StackTestStoryFlagNot 117
+        JumpIfFalse a
+        FindEntityByType 7
+        TriggerMapEvent 3
+      a:
+        StackTestStoryFlagNot 118
+        JumpIfFalse b
+        FindEntityByType 8
+        TriggerMapEvent 4
+      b:
+        StackTestStoryFlagNot 119
+        JumpIfFalse c
+        FindEntityByType 9
+        TriggerMapEvent 5
+      c:
+        SetStoryFlag 117
+        SetStoryFlag 118
+        SetStoryFlag 119
+        DespawnCharacterAndRecordPosition 245, 2
+        DrawBossHealthBarRange 245, 0, 50
+  text 0 "@^CRACK!  Two babies burst from the shells, the image of their mother.\x0bAnd every bit as angry!"
+  script
+        SetActiveEntity 0
+end
+
+; the second half's record falls: she and her babies leave; the warp is what opens the tubes
+sequence z8_dino_defeat
+  script
+        PlayAudio 60
+        WaitFrames 40
+        AddEXP 1500
+        WaitFrames 30
+  text 0 "@^The dinosaur crashes to the ground, then limps off into the hills, her babies at her heels.\x0bNothing guards the generator now."
+  script
+        SetStoryFlag 477
+        FadeToWhite 10
+        WarpToMapNoEntities 8, 50, 1, 288, 340
+        FadeFromWhite 10
+end

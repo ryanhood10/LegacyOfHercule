@@ -97,7 +97,8 @@ Stock scripts use flags up to 306. `Party_Init` clears 0-399 at a new game, and 
 | 463 | free | |
 | 464-467 | the story's lead (slot + 1), noted by the SetActiveCharacter steps (`companion.c`) | |
 | 468-475 | the perfecting pass's story piece (`pp-story`) | 468 Gohan's Super Saiyan given at the Time Chamber's first "Training completed!" (`wait_chamber`); 469-475 free |
-| 476-479 | free (476-477 the ssj piece's, 478-479 the map piece's: the allocation table above) | |
+| 476-478 | the generator's eggs (`data/story/ch4_eggs.*`): 476 the mother's fight begun, 478 the eggs hatched, 477 she is down | |
+| 479 | free (the map piece's: the allocation table above) | |
 | 480-503 | the post-game (480 wishes, 483 finale; cleared at a new game) | |
 | 504-815 | free (not cleared at a new game: avoid, or extend `PARTY_WAIT_FLAG_BYTES` in `party.c`) | |
 
@@ -130,7 +131,8 @@ sprite 72) for Roshi's gym.
 | 114 | Android 13 in the arctic (unused since 2026-10-18) | 5 | bosses |
 | 115 | Broly | 29 | Broly chapter |
 | 116 | Paragus (`BOSS_RAGE`) | 29 | Broly chapter |
-| 117-119 | free | | |
+| 117 / 118 | the mother dinosaur at the generator's eggs (`bosses.c`, `BOSS_NO_TWIN`; `data/story/ch4_eggs.*`), to half her health / the half left | 101 | zone 8 area 50 |
+| 119 | the mother dinosaur's babies (`bosses.c`: a stat 94's numbers on stat 54's class and AI set) | 54 | zone 8 area 50 |
 | 120 / 121 | the bunker's two Android 19s (`gero_stats[]`) | 5 | Gero's computer |
 | 122-124 | reserved for Gero's computer, unused | | |
 | 125-139 | allocated to the Lookout session, unused | | |
@@ -169,7 +171,8 @@ sprite 72) for Roshi's gym.
 | 180 | Super Android 13 (Buu's Fury Broly recoloured; Perfect Cell's groups as a stand-in with `BUU=0`) | `tools/super13sprites.py` | `S13_SPRITE` |
 | 181-184 | Super 13's allocation, unused | | |
 | 235-244 | the tournament's player-layout LoG2 bodies (`tourney.h` `TS_P_*`): 235 Yamcha (156), 236 Tien (121), 237 Frieza (48), 238 Mecha Frieza (49 + 48's attacks), 239 Tao (50), 240 Android 13 (`a13_record`'s frames rebuilt), 241 Android 17 (9), 242 Android 18 (11), 243 Perfect Cell (30, 64 x 64), 244 Cooler (34, 64 x 64) | `tools/tnyplayables.py` (`TNY_ART`) | `TNY_PLAY_SPRITES` |
-| 245-249 | the playables' allocation, unused | | |
+| 245, 246 | the mother dinosaur, her babies: King Triceratops (127) and a triceratops (125) recoloured (`tools/dinosprites.py`, `data/story/ch4_eggs.*`) | | |
+| 247-249 | the playables' allocation, unused | | |
 | 195-222 | the tournament's Buu's Fury fighters (art-buu, `tourney.h` TS_*): 195 Spopovich (Buu r.242), 196 Yamu (293), 197 Pui Pui (224), 198 Yakon (290), 199 Kibito (148), 200 Pikkon (214), 201 Dabura (63), 202 Fat Buu (33), 203 Evil Buu (32), 204 Kid Buu (37), 205 / 206 / 207 Super Buu, Gotenks absorbed, Gohan absorbed (40 / 41 / 43), 208 Super Janemba (144), 209 Goten SSJ (114), 210 Kid Trunks SSJ (260), 211 / 212 / 213 Gotenks, SSJ, SSJ3 (116 / 119 / 120), 214 Vegito SSJ (92), 215 Uub (263), 216 / 217 / 218 Goku, SSJ, SSJ3 (105 / 108 / 110), 219 Majin Vegeta (274), 220 Mystic Gohan (100), 221 Great Saiyaman (101), 222 Piccolo with the cape (212); Hercule's 21-group layout, second ROM blob | `tools/buu2log2.py --spec data/tny_buu.txt --fit --section .rodata.art` | `TNY_BUU_IDS` (with `BUU=1`) |
 | 223-229 | art-buu's allocation, unused | | |
 | 230 | the World Tournament announcer (Buu r.8, NPC: idle, walk, mic raised in group 4; town NPC 80's 5-group layout) | `data/tny_buu.txt` `230=8 @80` | `TNY_BUU_IDS` |

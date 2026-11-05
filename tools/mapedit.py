@@ -290,6 +290,8 @@ class MapEditor:
             payload = self.ref(t["payload"])
         if "condition" in t:
             cond = self.condition(t["condition"])
+        if "activation" in t:                 # how it fires: 0x0800D87F A pressed facing the rect; default walking in
+            fn = num(t["activation"])
         data = self.put(struct.pack("<II4hI", cfn, fn, *rect, payload), 4, f"{tag} new trigger {count} data")
         self.append_trigger(me, count, cond, data, tag)
 
@@ -393,6 +395,8 @@ class MapEditor:
             else:
                 p = self.ref(act)
                 fn = sa.ACTION_SCRIPT if self.ref_kind(act) == "script" else sa.ACTION_DIALOG
+            if spec.get("wander"):    # the stock regular enemies' roaming (zone 4 area 60's Eggbots): the default waits about 9 minutes
+                behaviour = struct.pack("<II", 0x0800D0AF, 0x99)
             at = (self.placer.free + 3) & ~3
             base = ROM_BASE + at
             data = struct.pack("<IIIhhIIII", sa.HANDLER_ENEMY, cond, num(spec["stat"]), x, y, sprite, base + 0x28, 1,

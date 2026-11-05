@@ -78,7 +78,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o $(BUILD)/obj/tny_combo_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/dino_sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o $(BUILD)/obj/tny_combo_data.o
 
 SSJ_TEST ?= 0
 
@@ -97,7 +97,7 @@ SSJ_SPRITE ?= 157
 # 58=ssj2_record: Super Saiyan 2 Gohan's stock record with the hurt / lying / tumble groups (tools/ssj2sprites.py)
 # 235-244: the tournament's player-layout LoG2 bodies (tools/tnyplayables.py; ids in src/coop/tourney.h TS_P_*)
 TNY_PLAY_SPRITES := 235=tnyp_yamcha_record 236=tnyp_tien_record 237=tnyp_frieza_record 238=tnyp_mecha_record 239=tnyp_tao_record 240=tnyp_a13_record 241=tnyp_a17_record 242=tnyp_a18_record 243=tnyp_pcell_record 244=tnyp_cooler_record
-EXTRA_SPRITES := $(TNY_PLAY_SPRITES) 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
+EXTRA_SPRITES := 245=dino_record 246=dino_baby_record $(TNY_PLAY_SPRITES) 72=herc_record 58=ssj2_record $(CELL2_SPRITE)=@30 $(A16_SPRITE)=a16_record $(A16P_SPRITE)=a16p_record $(KRILLIN_SPRITE)=krillin_record $(A13_SPRITE)=a13_record $(NAMEK_SPRITE)=namek_record $(PARAGUS_SPRITE)=paragus_record $(HALO_GOKU_SPRITE)=halo_goku_record $(HALO_SSJ_SPRITE)=halo_ssj_record $(S13_SPRITE)=s13_record
 
 # The tournament's Buu's Fury imports (art-buu): sprite ids 195-222 and 230 from data/tny_buu.txt (one line per
 # record: id, Buu record, group map, template), converted by buu2log2.py into the second ROM blob (TNY_ART); their
@@ -224,6 +224,14 @@ $(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py
 	$(PYTHON) tools/herculesprites.py $(ROM) $@ --preview-dir $(BUILD)
 
 $(BUILD)/obj/hercule_sprites_data.o: $(BUILD)/gen/hercule_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# The mother dinosaur: King Triceratops recoloured (tools/dinosprites.py, data/story/ch4_eggs.*; never committed); preview beside them
+$(BUILD)/gen/dino_sprites_data.c: tools/dinosprites.py tools/brolysprites.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py $(ROM)
+	$(PYTHON) tools/dinosprites.py $(ROM) $@ --preview-dir $(BUILD)
+
+$(BUILD)/obj/dino_sprites_data.o: $(BUILD)/gen/dino_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

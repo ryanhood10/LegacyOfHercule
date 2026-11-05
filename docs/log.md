@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-04
 
+- **The generator's eggs are a mini boss (`docs/scripts.md` `ch4_eggs`, `ch4_eggs.txt`; Ryan):** in zone 8 area 50 no more carrying eggs to the brontosaurus: the first egg smashes, the mother (King Triceratops recoloured pink, orange and green) turns on the players, at half her health the other two hatch and her babies fight beside her; when she falls the tubes break as before.
 - **Tournament sizes and the co-op Rumble (`docs/tournament.md` 2b, `tny_sizes.txt`):** "How many fighters?" after the division in every division, 8 or 16; a 2 v 2 of 8 teams; the Rumble with two players is 2 v 2 v 2 every round, a new screen between rounds. Rumble frame time: summons off, overlays every 8th frame.
 - **The Eggbots (sprites 44-47) have no twin with two players** (`enemies.c` `no_twin`; Ryan). The wrecked robot of zone 7 area 2 is an Eggbot on open ground: it was a tiger bandit (sprite 18) inside solid terrain at (40, 216), never to be seen or reached.
 

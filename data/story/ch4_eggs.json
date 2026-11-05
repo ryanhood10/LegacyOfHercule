@@ -1,0 +1,31 @@
+{
+  "_": "The third generator's eggs (Ryan, 2026-11-04; docs/scripts.md ch4_eggs): the north door of zone 8 area 44 always leads to area 50, the generator without the painted brontosaurus of area 45 (flag 113 stays clear, so the south door stays area 43, no nest). Area 50: the mother (sprite 245, King Triceratops recoloured) beside the generator; A on an egg smashes it: flags 117-119, whose stock conditions hide the egg and open its tube. An old save with 113 set still has area 51 and her stock lines.",
+  "sources": ["data/story/ch4_eggs.lscript"],
+  "maps": [
+    {
+      "map": {"zone": 8, "area": 44},
+      "triggers": {"0": {"payload": "0x01320801"}}
+    },
+    {
+      "map": {"zone": 8, "area": 50},
+      "triggers": {
+        "1": {"condition": "never"},
+        "2": {"condition": "never"},
+        "3": {"condition": "never"}
+      },
+      "add_triggers": [
+        {"kind": "dialogue", "activation": "0x0800D87F", "rect": [240, 296, 257, 313], "payload": "seq:z8_egg1", "condition": "script:z8_egg_open1"},
+        {"kind": "dialogue", "activation": "0x0800D87F", "rect": [280, 296, 297, 313], "payload": "seq:z8_egg2", "condition": "script:z8_egg_open2"},
+        {"kind": "dialogue", "activation": "0x0800D87F", "rect": [320, 296, 337, 313], "payload": "seq:z8_egg3", "condition": "script:z8_egg_open3"}
+      ],
+      "add_records": [
+        {"kind": "actor", "sprite": 245, "x": 430, "y": 344, "facing": 2, "condition": "noflag:476"},
+        {"kind": "enemy", "stat": 117, "sprite": 245, "x": 430, "y": 344, "condition": "script:z8_dino_first_half", "action": "seq:z8_dino_hatch"},
+        {"kind": "enemy", "stat": 118, "sprite": 245, "x": 430, "y": 344, "condition": "script:z8_dino_second_half", "action": "seq:z8_dino_defeat"},
+        {"kind": "enemy", "stat": 119, "sprite": 246, "x": 248, "y": 326, "condition": "never", "wander": true},
+        {"kind": "enemy", "stat": 119, "sprite": 246, "x": 288, "y": 326, "condition": "never", "wander": true},
+        {"kind": "enemy", "stat": 119, "sprite": 246, "x": 328, "y": 326, "condition": "never", "wander": true}
+      ]
+    }
+  ]
+}

@@ -64,7 +64,10 @@ static int corn_maze_single(const EnemyRecord *rec) { return rec->sprite_id == T
 // One robot in four records: 44 (zone 8, most of them), 45 (zone 10), 46 (zone 4), 47 (zone 2).
 #define EGGBOT_SPRITE_FIRST 44
 #define EGGBOT_SPRITE_LAST 47
-static int no_twin(const EnemyRecord *rec) { return rec->sprite_id >= EGGBOT_SPRITE_FIRST && rec->sprite_id <= EGGBOT_SPRITE_LAST; }
+#define DINO_BABY_SPRITE 246                   // the mother dinosaur's two babies (data/story/ch4_eggs.*) are two
+static int no_twin(const EnemyRecord *rec) {
+    return (rec->sprite_id >= EGGBOT_SPRITE_FIRST && rec->sprite_id <= EGGBOT_SPRITE_LAST) || rec->sprite_id == DINO_BABY_SPRITE;
+}
 
 // Partner model for boss twins: stat index -> sprite id (0 = same model). See docs/coop-design.md
 // "Boss roster" for how the fights were identified.

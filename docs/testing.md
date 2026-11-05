@@ -1139,6 +1139,10 @@ MSYS_NO_PATHCONV=1 ST_HEADLESS=/root/st_perf python tools/headless/st_test.py to
 
 Reach a Rumble's fight with `stepz 0x0203ECFC 120` (no fight flag): frames alone leave the test behind the announcer's line, and its numbers measure a text box.
 
+## The generator's eggs (headless, 2026-11-04)
+
+`tools/headless/ch4_eggs.txt` (from `ch4_eggs_gen.py`; self-checking, in `regfull.sh`): two players and one, the door of area 44, the first egg, the scene, the fight's flags, an egg pressed during the fight (nothing), her end, the other eggs, the three tubes to the generator's end. **No test warp once in the room:** a load spawns her record and tests the tube items by itself, and an early version only worked because the test warped. `ReloadMap` (step 74) does neither: it does not bring a record in or test an item again.
+
 ## Tournament sizes (headless, 2026-11-04)
 
 `tools/headless/tny_sizes.txt` (from `tny_sizes_gen.py`; self-checking, in `regfull.sh`): the size menu by pad presses, Rookie's 16 locked, the seats and rounds of each size, real 2 v 2 v 2 Rumble fights on three tiers for a crash.

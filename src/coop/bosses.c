@@ -30,6 +30,12 @@ const ExtraStat extra_stats[] = {
     // 116 Paragus beside him: the same AI set, a fraction of Broly's numbers (he is the weak one); when he
     // falls first Broly rages (BOSS_RAGE below).
     { 29, -1, 2000, -1, 24, 22, 20, 0 },
+    // 117 / 118 the mother dinosaur at the generator's eggs (data/story/ch4_eggs.*), her two halves: King Triceratops' AI set and class, a mini boss's numbers at about level 20
+    // (stock King 850 HP, 21/1/25). 117 ends at half (rule below; the eggs hatch), 118 is the half left.
+    { 101, -1, 1200, 0, 16, 1, 16, 0 },
+    { 101, -1, 600, 0, 16, 1, 16, 0 },
+    // 119 her babies: a normal triceratops' numbers (stat 94: 275 HP, 20/1/20, EXP 225) on stat 54's class and AI set: nothing hurt a stat 94 (measured, 16 punches, 2026-11-05)
+    { 54, -1, 275, 225, 20, 1, 20, 0 },
 };
 const u32 extra_stat_count = sizeof extra_stats / sizeof extra_stats[0];
 
@@ -57,6 +63,8 @@ static const BossRule rules[] = {
     // Android 20 (zone 7 area 19) alone, with the lone boss's HP: the stock's defeat scene moves and removes one body by its
     // sprite, and a twin was left standing through it and after, at HP 0 and past hurting, some ways still attacking (2026-11-02)
     { 6,  0, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
+    { 117, 50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },  // one mother dinosaur, to half her health
+    { 118, 0, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
     { 3,  50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },   // test build: 17 alone, ends at half health
