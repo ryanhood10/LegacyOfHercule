@@ -235,7 +235,14 @@ end
 
 sequence ch6_goku_wakes
   stockseq @083e42f4 0 36                ; Piccolo and Chi-Chi, Goku wakes, "Kamiccolo", "Meet me at Kami's Lookout."
-  text 73 "KRILLIN: I'll stay here and keep an eye on things, Trunks.\x0bIf the Androids show up, somebody has to warn everybody!"
+  script                                 ; nobody plays Krillin: he comes up to say it
+        CoopCall 22, 1, 6, 0
+        JumpIfFalse K1
+        SpawnCharacterEntity 76, 184, 200
+        WalkToPosition 76, 160, 168
+        SetEntityFacing 76, 1
+      K1:
+  text 73 "!KRILLIN: I'll stay here and keep an eye on things, Trunks.\x0bIf the Androids show up, somebody has to warn everybody!"
   script                                 ; stock entry 37, with Krillin's selectable bit cleared
         WalkToPosition 60, 88, 152
         SetEntityFacing 60, 2
