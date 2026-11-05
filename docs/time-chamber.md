@@ -907,14 +907,14 @@ goes out (`ch_lever`, CoopCall 36 ops 19-20): its first win ever a +3 capsule (S
 
 **Balance (headless, `chamber_popo_bal.txt`, the Map Test party at level about 40, Normal).** The test autopilot (test command 49
 op 2; popo.c `bot_pad`) walks up beside him and punches: no dodging, no abilities, a lower bound on two people. Over 7372 frames
-(about 2 minutes):
+(about 2 minutes), on the build merged with the five rooms (the numbers move a little with every build: the dice):
 
 | lineup | his HP | the end |
 |---|---|---|
-| Piccolo + Hercule, round 0 | 9360 -> 4565 (51 % dealt) | both standing (627 / 1055, 371 / 726); 55 hops, 20 dodges |
-| Piccolo alone, round 0 | 5200 -> 812 (84 %) | Piccolo down at about 118 s |
-| Goku alone, round 0 | 5200 -> 1781 (66 %) | Goku down at about 108 s |
-| Piccolo + Hercule, round 2 | 12600 -> 8353 (34 %) | both standing (494, 283) |
+| Piccolo + Hercule, round 0 | 9360 -> 3297 (65 % dealt) | both standing (277 / 1055, 370 / 726); 54 hops, 16 dodges |
+| Piccolo alone, round 0 | 5200 -> 901 (83 %) | Piccolo down at about 73 s |
+| Goku alone, round 0 | 5200 -> 2123 (59 %) | Goku down at about 113 s |
+| Piccolo + Hercule, round 2 | 12600 -> 6068 (52 %) | both standing (368, 309); 53 hops, 15 dodges |
 
 The first kit (blasts at about a third of these, a hop as soon as a player came within 56 px, anywhere in the room) was not a
 fight: the autopilot landed almost nothing (the hops) and Popo took a few per cent of its HP in two minutes. Tuned to the
@@ -934,6 +934,9 @@ set: a Senzu; the big jars: both players full nothing; player 1 full and player 
 walks over them (his HP 100 -> 3071 of 9999, his ki 10 -> 130 of 400). `chamber_gate`'s check of
 the open way walks 50 frames instead of 90 (90 now reaches the door) and clears the save pad's surroundings first (the new
 timing put a hawk on the player and the menu stayed shut).
+
+**Full regression** (`regfull.sh build/t`, merged with the five rooms, 2026-11-05): 93 blocks, no FAIL, TIMEOUT or CRASH;
+`chamber_popo` and `chamber_rooms_plain` clean on a `BUU=0` build; a `WIDE=1` build compiles.
 
 **Not verified, open.** Real-time feel (the hops, the dodge, the blasts' danger; the balance above is an autopilot's).
 Popo's line naming whoever threw the last lever (section 5, step 4) is not built (nobody records the thrower). The yes / no
