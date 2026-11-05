@@ -778,3 +778,88 @@ death and game over, the room's state cleared (checked by hand).
 - Phase 4: five rooms (rows and maps); the pirates' crew before Tao needs one more state before R_ARMED (a wave of regulars,
   then the boss). Phase 5: the entrances' art in the 588 slots. Phase 6: the hidden room (a trigger between the pillars,
   open once all six are out). Phase 8: rewards (flags 514-519 kept for first wins).
+
+### 12.6 Mr. Popo's hidden room and the loop (phase 6, phase 8's loop; branch `nb-chamber-popo`, 2026-11-05)
+
+Built: the hidden room behind the gate, its scene by lineup, Popo's fight, his reward, the loop (decision 4) and the rooms'
+prizes. Code: `src/coop/popo.c` / `popo.h` (CoopCall 36, test command 49, RAM `.combo.po`), Popo's kit in `src/coop/tny_moves.c`
+(`popo_kit`, `tny_moves_popo_spawn`), his stat through `tny_rating_stat` (`tny_engine.c`); script `data/story/chamber_popo.lscript`;
+map `data/maps/chamber_popo.json` (15/25); body `tools/popoart.py` (sprite 163); tests `tools/headless/popo_gen.py` (writes
+`chamber_popo.txt`, in `regfull.sh`, and `chamber_popo_bal.txt`). In `chamber.c` only a few lines: the tick hands 15/25 to
+`popo_tick`, the rooms' rating adds the loop's step, `chamber_cut_light` for the prize; in `chamber.lscript` `ch_lever` pays the
+room's prize. Every line is Claude's draft (DRAFT).
+
+**What a player sees.** With all six lights out the way between the pillars is open, and walking up it is a door (an exit
+inside the rect that stays blocked until then, `chamber_open.json`). A plain white room of 480 x 400, the gate's two pillars
+again either side of the door at the bottom, a stone jar in each corner, far up a small figure with his back turned. A white
+flash, the gate's hum low, a slow shake; the players walk in side by side to their marks, look left, right, at each other
+(alone: up). The camera pans up to the figure, holds, comes back. Player 1's character speaks (a line per character, a
+fallback), player 2's answers (the same). The shaking stops, the hum cuts: Popo turns and walks down halfway, the camera between
+them; two lines in his third person ("Popo filled this chamber... Popo watched every fight", "Six lights are out. Popo is
+pleased. But Popo wants to see one more thing..."); a flash and he stands behind them, they spin round, the door's beam
+flashes on with a shake: "...how strong you are. With Popo's own eyes!" Boss bar, the fight. Later visits: the players walk in,
+he turns round far up, one line, the fight.
+
+**The fight.** He never walks up or swings (no stock AI: `KF_STAND`); he turns and throws: a fan of five blue ki blasts, a fast
+orb, two orbs that follow you, and between them a hop away. A player who stays within 48 px of him for 40 frames sees him
+vanish in a flash and reappear 96-176 px from both players, inside the room (`KF_FAR`, `MF_FAR`; at most every 150 frames).
+One hit in three that would land misses and he hops instead (`KF_DODGE`, at most every 120 frames, also out of a blast he was
+throwing; never out of a hop or the rage). A hit that lands shows his hit-stun for 10 frames and pushes him a little. At half
+HP he rages: +8 to his attacks, +4 defence, specials a third more often (the kit's `pace2`), hops 100 frames apart. At 0 HP he
+does not fall (`KF_YIELD`): his arms out, untouchable; 40 frames later a flash, his body is gone and he stands at the far end
+facing them (an actor again), the camera on him: first win ever "Enough. Popo has seen enough. You are strong now. Popo has
+something for you." and a Senzu bean with a Strength, a Power and an Endurance +3 capsule (flag 513); later wins "Again you
+win. Popo is happy. Take this." and a Senzu bean. Then the offer, the question on its own page: "Shall Popo start again? (A: Yes
+B: No)" (CoopCall 18; B or no answer is no). Yes: "Good. The lights are on again." The door opens.
+
+**The loop (decision 4).** Yes clears flags 504-509 (the six lights back on: the next load of the open area has tier 0 and the
+gate shut, the rooms' bosses back) and counts a time round (flags 520-521, 0-3; a fourth yes keeps 3). Every boss is
+`CH_LOOP_STEP` (50) rating a round stronger: the rooms (`rating + 25 x lights out + 50 x rounds`, Roshi alone 3400 HP in round
+1) and Popo (500 + 50 a round: 5200, 6100, 7000 HP; the curve ends at 600). A room's win pays at its lever, after the light
+goes out (`ch_lever`, CoopCall 36 ops 19-20): its first win ever a +3 capsule (Strength, Power, Endurance by its light % 3; flags
+514-519), any win once round a Senzu bean. Gohan's Super Saiyan stays at the first lever only (flag 468).
+
+| thing | built |
+|---|---|
+| map | 15/25, 480 x 400, 33 tile slots; spawn (244, 340) facing up; the door (224, 376)-(264, 392) down to the open area's (1028, 420) below the gate; the seal (224, 360)-(264, 376) blocked with the gate's beam (decoration 0, 64 x 32 at (212, 352)) shown during the fight; jars decorations 1-4 at (24, 24), (424, 24), (24, 296), (424, 296), 14/2's stone pot, 3 hits, `ch_popo_jar`; his actor (sprite 163) at (244, 72) facing up; on-load `ch_popo_onload` (hands popo.c the three scenes), on-leave stops the hum |
+| jars | `POPO_JAR`: item 13 (30 % food) while either player's HP is short, item 16 (30 % energy) while either's ki is; both full, nothing (the stock rule) |
+| his numbers | stat 156 (`POPO_STAT`): `tny_rating_stat(500 + 50 x rounds)`: the boss class of stat 29, AI set 21 (never ticked), no kill EXP, 5200 HP, 40 / 42 / 42. Rule `BOSS_NO_TWIN` with `hp_pct`: two players get the lone boss's 180 % (9360 HP); the difficulty's boss HP on top |
+| his kit | `KF_STAND \| KF_DODGE \| KF_FAR \| KF_YIELD`, range 230, pace 40 (80 frames), pace2 26: `VOLLEY(0x280, 5, 8, MF_KI, 240)`, `BALL(0x480, 1, 30, 0, 300)`, `HOMING(0x380, 2, 1, 0, 420)`, `TELE(0, MF_DODGE \| MF_FAR, 420)`, `XFORM(50, 0, 8, 4)`; fighter id `TK_POPO` = `TF_COUNT` (not a roster row: every roster lookup checks the id) |
+| his body | sprite 163 (`tools/popoart.py`, `docs/sprites.md` "Mr. Popo"): Buu's Fury r.183 (idle, walk, arms out) in Hercule's 21-group layout, hit-stun, knock-down and lying drawn by code; with `BUU=0` the same from LoG2's sprite 93 (his idle for the arms-out pose): he fights in every build |
+| states | popo.c's header: P_WAIT (20 frames after the load's fade) -> P_SCENE -> P_ARMED (`POPO_FIGHT` sealed the door) -> P_FIGHT -> P_YIELD (40 frames) -> P_OUTRO -> P_DONE (`POPO_OPEN`). A scene that never seals gives up after 90 frames with the door open; a fighter that vanishes opens the door: the room never traps anyone |
+| camera | the scenes pan with `PanCameraToPosition` (view top-left) and end with `SetActiveEntity 0`: without it the camera stayed where the last pan left it for the whole fight (found in the first films) |
+
+**Balance (headless, `chamber_popo_bal.txt`, the Map Test party at level about 40, Normal).** The test autopilot (test command 49
+op 2; popo.c `bot_pad`) walks up beside him and punches: no dodging, no abilities, a lower bound on two people. Over 7372 frames
+(about 2 minutes):
+
+| lineup | his HP | the end |
+|---|---|---|
+| Piccolo + Hercule, round 0 | 9360 -> 4565 (51 % dealt) | both standing (627 / 1055, 371 / 726); 55 hops, 20 dodges |
+| Piccolo alone, round 0 | 5200 -> 812 (84 %) | Piccolo down at about 118 s |
+| Goku alone, round 0 | 5200 -> 1781 (66 %) | Goku down at about 108 s |
+| Piccolo + Hercule, round 2 | 12600 -> 8353 (34 %) | both standing (494, 283) |
+
+The first kit (blasts at about a third of these, a hop as soon as a player came within 56 px, anywhere in the room) was not a
+fight: the autopilot landed almost nothing (the hops) and Popo took a few per cent of its HP in two minutes. Tuned to the
+numbers above: a window of 40 frames before he hops, hops of 96-176 px, the blasts' multipliers raised. Alone the autopilot
+nearly wins, so a player who dodges and uses his abilities should; with two the lone-boss HP makes it about twice as long.
+Ryan's play decides.
+
+**Tests** (`chamber_popo.txt`, 130 checks, on both a `BUU=1` and a `BUU=0` build): five lights shut the way, six open it into
+the room; the actor, the door's beam hidden; one player (Piccolo): the scene's routes, the fight, 5200 HP, flag 512, the seal
+(walking down stops above the door), a hop to 96 px or more, twelve punches and the autopilot (HP down, dodges), the win, the
+arms out, the end scene, the first reward (a Senzu, three capsules, flag 513), the question answered no (lights stay out), the
+door open, out to the gate; a second visit (one line), the later reward (a Senzu only), answered yes (lights back on, round 1),
+the gate shut again outside; two players (Goku + Hercule): 9360 HP, the autopilot's win from 5 %, the end with A; five more
+lineups (Hercule + Vegeta, Krillin alone, Gohan + Piccolo, Trunks + Krillin, Vegeta + Goku): the scene's routes and the fight's
+start; round 2: 7000 HP; a room's prize in round 1: Roshi at 3400 HP, his first win's Strength +3 and flag 514; again with 514
+set: a Senzu; the big jars: both players full nothing, player 2 hurt and player 1 out of ki a drop. `chamber_gate`'s check of
+the open way walks 50 frames instead of 90 (90 now reaches the door) and clears the save pad's surroundings first (the new
+timing put a hawk on the player and the menu stayed shut).
+
+**Not verified, open.** Real-time feel (the hops, the dodge, the blasts' danger; the balance above is an autopilot's).
+Popo's line naming whoever threw the last lever (section 5, step 4) is not built (nobody records the thrower). The yes / no
+takes an A pressed while the question's box is on screen as yes, as Dende's does: a player mashing A through the end accepts
+the loop. Music stays the chamber's (39). The wide view was not run. The trophy hall and the panel (phase 8's other parts)
+are not built.

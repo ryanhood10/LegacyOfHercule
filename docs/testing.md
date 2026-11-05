@@ -735,6 +735,33 @@ adds the `ents` sanity (a heap stomp shows as garbage vtables). About 3 min (gat
   the ROM, then compares the party block (`peek PARTY 110`) with the file; the file keeps every 8 bytes reversed (mGBA's
   EEPROM order). The runner's `cartout` does not work for this save type.
 
+## Time Chamber: Mr. Popo (headless, 2026-11-05, branch `nb-chamber-popo`; `docs/time-chamber.md` 12.6)
+
+```
+python tools/headless/popo_gen.py                  # writes chamber_popo.txt (self-checking, in regfull.sh); --balance: chamber_popo_bal.txt
+python tools/headless/staging_run.py tools/headless/chamber_popo.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+python tools/headless/st_test.py tools/headless/chamber_popo_bal.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+```
+
+About a minute each. `--out` must be the directory that holds this build's `menu.ss` (a script's `load menu.ss` reads `--out`'s:
+an empty one ran the balance's cases on from each other's state).
+
+- **In:** test command 48 op 0 with `arg2` 0x3F, the door into the open area (`chamber_gen.py`'s recipe), player 1 at (1028, 346)
+  between the pillars, Up, `waitmap 15 25`. The scene starts 20 frames after the load's fade: `waitnz 0x03001FDC`, then
+  `stepz 0x03001FDC 60` to the fight. popo.c's state is the byte at `PO+4` (`find PO 0x4F504F50`): 1 waiting, 2 the scene, 3
+  armed, 4 the fight, 5 his arms out, 6 the end scene, 7 done; the fighter at `PO+8`.
+- **Test commands run between scenes only:** test command 49 during a scene does nothing until it ends (the scene's routes, op 8,
+  are read during the fight).
+- **A win:** `COOP_CMD_STORY_WIN` (7): his own OnHit, so no dodge; or op 1 (HP) and the autopilot (op 2), or test command 27 op 6
+  (punches from beside him: kit 0; some miss, his dodge).
+- **The question:** `find CG 0xCE11CA3E` (`cellgames.c` `cg_state`), `stepnz CG+0x18 30` presses A until it is armed (+0x18),
+  then 60 frames and `key 2 6` (B, no) or `key 1 6` (A, yes). The question is a box of its own: on a page after the first, B
+  only turned the page and the next A answered yes.
+- **The camera:** a scene that pans must end with `SetActiveEntity 0`, or the view stays where it left it (the first films:
+  Piccolo walked off the top of the screen for the whole fight).
+- **The balance:** `chamber_popo_bal.txt` runs the autopilot 7200 frames a case on the Map Test party's own bars and prints
+  test command 49 op 5 (frames, his HP << 16) and the players' HP every 300 frames; numbers in `docs/time-chamber.md` 12.6.
+
 ## Time Chamber waves and Roshi's sparring (headless, merged 2026-10-19; the waves for tests only since 2026-11-05)
 
 The Lookout's door now leads to the open area: start the old rounds with test command 48 op 5 on 15/2 (no captions), or

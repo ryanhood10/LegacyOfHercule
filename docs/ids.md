@@ -9,13 +9,13 @@ the code on 2026-10-19 (main e45c765).
 
 | kind | taken | kept for the rest of the plan |
 |---|---|---|
-| flags | 504-509 a room's lever thrown (light n out) | 510-535 (cleared at a new game by `party.c` `party_new_game`): 510 first entry, 511 the gate's fall seen, 512 the hidden room's first scene, 513 Popo beaten, 514-519 each room's first win, 520-521 times round, 522-524 the panel, 525-529 the trophy hall, 530-535 free |
-| stats | 155 `CH_SPOT_STAT`: an open-area spot record (the tier picks the real stat) | 156 Popo's spawn, 157 the crew if recoloured (section 6.2) |
-| CoopCall | 35 Chamber (op, a, b): `chamber.c` `chamber_call`, ops in its enum (1 room load .. 20 open the door) | |
-| test commands | 48 CHAMBER (`chamber_test`): `arg` 0 the levers := `arg2` bits 0-5; 1 `cmd_arg` := bodies at the last check \| the smallest largest-free OBJ VRAM block (32-byte units) << 16; 2 records with two players := `arg2`; 3 the refill frozen := `arg2`; 4 reset that smallest block; 5 the old rounds on 15/2 from round `arg2` (no captions); 6 `cmd_arg` := lights out \| the room's state << 8 | |
-| zone 15 areas | 18 the open area (`chamber_open.json`), 19 Roshi's dojo (`chamber_dojo.json`) | 20-24 the five other rooms, 25 the hidden room, 26 the quarters (the panel) |
-| RAM | `.combo.ch` 0x30 at most (`ChState`, magic 0x4348414D "CHAM"; after `.combo.ag`): +4 room state, timer, target, frozen; +8 / +0xC the room's fighters; +0x10 the drop; +0x14 the smallest largest-free OBJ VRAM block; +0x16 spawned; +0x18 removed; +0x1E bodies at the last check | |
-| sprites, portraits | none (the tournament's bodies and portraits) | 163-164, 167-169, 171-174 free for Popo and a crew |
+| flags | 504-509 a room's lever thrown (light n out); 512 the hidden room's first scene seen, 513 Popo beaten (his first reward paid), 514-519 room n's first win paid (its +3 capsule), 520-521 times round (bits 0 / 1, 0-3) (`popo.h`, branch `nb-chamber-popo`) | 510-535 (cleared at a new game by `party.c` `party_new_game`): 510 first entry, 511 the gate's fall seen, 522-524 the panel, 525-529 the trophy hall, 530-535 free |
+| stats | 155 `CH_SPOT_STAT`: an open-area spot record (the tier picks the real stat); 156 `POPO_STAT` Mr. Popo (`popo.c` `popo_stat`: the rating curve at 500 + 50 a time round; `bosses.c` rule `BOSS_NO_TWIN`, hp_pct 100: the lone boss's 180 % with two players) | 157 the crew if recoloured (section 6.2) |
+| CoopCall | 35 Chamber (op, a, b): `chamber.c` `chamber_call`, ops in its enum (1 room load .. 20 open the door); 36 Popo (op, a, b): `popo.c` `popo_call`, ops in its enum (1 the hidden room's load .. 18 a big jar, 19 / 20 a room's prize, 21 / 22 the view on player 1) | |
+| test commands | 48 CHAMBER (`chamber_test`): `arg` 0 the levers := `arg2` bits 0-5; 1 `cmd_arg` := bodies at the last check \| the smallest largest-free OBJ VRAM block (32-byte units) << 16; 2 records with two players := `arg2`; 3 the refill frozen := `arg2`; 4 reset that smallest block; 5 the old rounds on 15/2 from round `arg2` (no captions); 6 `cmd_arg` := lights out \| the room's state << 8; 49 POPO (`popo_test`): `arg` 0 `cmd_arg` := popo.c's state \| times round << 8 \| flag 512 << 16 \| 513 << 17 \| this win is the first << 18; 1 his HP := `arg2` (bit 31: `arg2 & 0xFF` percent); 2 the autopilot := `arg2`; 3 `cmd_arg` := his far hops \| dodges << 16; 4 times round := `arg2` (0-3); 5 `cmd_arg` := the fight's frames \| his HP << 16; 6 his max HP; 7 his distance from the nearer player (px); 8 the intro's entries for this lineup (player 1's \| player 2's << 8). Test commands run between scenes only | |
+| zone 15 areas | 18 the open area (`chamber_open.json`), 19 Roshi's dojo (`chamber_dojo.json`), 25 the hidden room (`chamber_popo.json`, Mr. Popo) | 20-24 the five other rooms, 26 the quarters (the panel) |
+| RAM | `.combo.ch` 0x30 at most (`ChState`, magic 0x4348414D "CHAM"; after `.combo.ag`): +4 room state, timer, target, frozen; +8 / +0xC the room's fighters; +0x10 the drop; +0x14 the smallest largest-free OBJ VRAM block; +0x16 spawned; +0x18 removed; +0x1E bodies at the last check; `.combo.po` 0x28 of at most 0x30 (`popo.c` `PopoState`, magic 0x4F504F50 "POPO"; after `.combo.ch`, 0x0203EBB0 in this build): +4 state, timer, autopilot, first win; +8 the fighter; +0xC the three scenes; +0x18 the scene's action; +0x20 the fight's frames; +0x22 the autopilot's pads | |
+| sprites, portraits | 163 `POPO_SPRITE` Mr. Popo (`tools/popoart.py`); no new portrait (Popo's stock 82) | 164, 167-169, 171-174 free for a crew |
 
 ## Allocations for the perfecting pass (2026-11-01, `docs/perfect-pass.md` 7)
 
@@ -158,7 +158,8 @@ sprite 72) for Roshi's gym.
 | 146-149 | Super 13's allocation, unused | | |
 | 150+ | 150-154 allocated to the post-game chapter | | |
 | 155 | the Time Chamber's spot record (`CH_SPOT_STAT`): never a real stat, `chamber_spot` replaces it by the tier's | | `chamber.c` |
-| 156-159 | 156-157 kept for the Time Chamber (Popo, a crew); 158-159 free | | |
+| 156 | the Time Chamber's Mr. Popo (`POPO_STAT`): `popo_stat` reads the tournament's rating curve at 500 + 50 a time round (5200 HP, 40 / 42 / 42 at round 0) | 29 (the boss class) | `popo.c`, `bosses.c` |
+| 157-159 | 157 kept for the Time Chamber (a crew); 158-159 free | | |
 | 160-209 | the tournament's opponents: stat 160 + fighter id (`tourney.h` TF_*), resolved per tournament tier (`tny_engine.c` `tny_resolve_stat`; the rule `BOSS_NO_TWIN \| BOSS_FLAT`); 16 and Super 13 keep 109 / 145 | (boss class of 29; Cell Jr 26) | engine |
 | 210-219 | the engine's, free | | |
 
@@ -174,7 +175,8 @@ sprite 72) for Roshi's gym.
 | 160 | Android 16 boss | `tools/a16sprites.py` | `A16_SPRITE` |
 | 161 | Krillin (playable) | `tools/krillinsprites.py` | `KRILLIN_SPRITE` |
 | 162 | the second Perfect Cell: a copy of record 30 (header and group table; frames stay the ROM's) so scripts can address it apart | `tools/spriteclone.py` `@30` | `CELL2_SPRITE` |
-| 163-164 | free | | |
+| 163 | Mr. Popo, the Time Chamber's hidden room (Buu's Fury r.183 in Hercule's 21-group layout, hit-stun, knock-down and lying drawn by code; LoG2's 93 with `BUU=0`) | `tools/popoart.py` (`.rodata.art` blob) | `POPO_SPRITE` (a literal in `data/maps/chamber_popo.json`) |
+| 164 | free | | |
 | 165 | Android 13 | `tools/bossmodels.py` | `A13_SPRITE` |
 | 166 | Cooler's Namekian servant | `tools/bossmodels.py` | `NAMEK_SPRITE` |
 | 167-169 | free | | |
@@ -300,6 +302,7 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 30 | Grounds (op, b): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition) | tournament grounds (`tny_grounds.c`) |
 | 32+ | free (32 the story piece's; 33-34 agency's, unused) | |
 | 35 | Chamber (op, a, b) [-> value]: the Time Chamber's rooms, the gate's six, the drops (`chamber.c`, `data/story/chamber.lscript`) | Time Chamber |
+| 36 | Popo (op, a, b) [-> value]: the Time Chamber's hidden room, Mr. Popo's scenes and fight, the loop, a room's prize (`popo.c`, `data/story/chamber_popo.lscript`, `ch_lever`) | Time Chamber |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 
@@ -325,6 +328,7 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 16 | WIN_STAT | the fight of stat `arg` wins itself once it stands and player 1 is free (tests write `cg_state + 5` directly: the command only runs between scenes) |
 | 17+ | free | |
 | 48 | CHAMBER (`chamber.c` `chamber_test`, the Time Chamber) | the ops: the table "The Time Chamber" at the top |
+| 49 | POPO (`popo.c` `popo_test`, the Time Chamber's Mr. Popo) | the ops: the table "The Time Chamber" at the top |
 | 15-16 | allocated to the Cell Games chapter | |
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
@@ -373,7 +377,8 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 17 | `papaya_secret.json` | the hidden arena (Buu's Other World Stadium, 1/20 there): Pikkon, the Senzu (flag 442); an easter egg |
 | 18 | `chamber_open.json` | the Time Chamber's open area (2048 x 2048): the gate, the jars, the save pad, the spot records |
 | 19 | `chamber_dojo.json` | the Time Chamber: Roshi's dojo (zone 6 area 70's gym with a plaque) |
-| 20-26 | kept | the Time Chamber: 20-24 the other five rooms, 25 the hidden room, 26 the quarters |
+| 20-24, 26 | kept | the Time Chamber: 20-24 the other five rooms, 26 the quarters |
+| 25 | `chamber_popo.json` | the Time Chamber's hidden room behind the gate: Mr. Popo (`docs/time-chamber.md` 12.6) |
 
 ## World-map landmarks (decorations of zone 6 area 99, `docs/maps.md` 9e)
 
@@ -415,6 +420,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
 | 0x0203F914 | 0x9C | `.party.wv` `waves` (the old Time Chamber rounds, tests only since 2026-11-05; 0x0203F880 with 8 slots); moves when anything before it grows |
 | 0x0203EB88 | 0x30 | `.combo.ch` the Time Chamber (`chamber.c` `ChState`, magic "CHAM"; after `.combo.ag`: find it by the magic) |
+| 0x0203EBB0 | 0x28 of 0x30 | `.combo.po` the Time Chamber's Mr. Popo (`popo.c` `PopoState`, magic "POPO"; after `.combo.ch`: find it by the magic) |
 | 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |

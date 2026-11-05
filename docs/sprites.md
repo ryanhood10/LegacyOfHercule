@@ -645,6 +645,20 @@ for 64 x 64), and the map box (`+0x154`) from header bytes 3 / 4; so a body of a
 (`player.c` `p2_bind` rebuilds player 2). 64 x 64 bodies play fine as players (Perfect Cell, Cooler, Broly 159, Super
 13 180). The Kamehameha (animation 48) plays with a group 18 alone (no 19).
 
+## Mr. Popo (id 163, the Time Chamber's hidden room; `tools/popoart.py`, 2026-11-05)
+
+One record in Hercule's 21-group player layout (sprite 72's groups and frame counts, its header with the hurt box set to
+(-2, -21, 18, 10): LoG2's standard body box lowered to his height), so AI set 21's groups (0-2, 5-8) are all there whether or
+not his AI plays them (`KF_STAND`: it never ticks), and the same record is his scene actor. Source with `roms/buu.gba`: Buu's
+Fury record 183 (anims 0 idle, 2 frames; 1 walk, 4; 12 arms held out, 2: 32 x 32 front and back, 16 x 32 sides, no remap),
+nearest colour to LoG2's OBJ palette; without it LoG2's own sprite 93 (idle 2, walk 4, 16 x 32; its idle stands in for the
+arms out). Drawn by code: the hit-stun (the first idle frame: the side views sheared back from the way he faces, 3 px at the
+head, widened to 32 px; the front and back views two rows shorter at the waist), the knock-down (hit-stun twice, then lying)
+and the lying pose (the hit-stun turned, `tools/lying.py`). Groups: 0 idle, 1 walk, 2 / 11 hit-stun, 3 knock-down, 4-8 the
+arms out (5, the charge, holds the first frame), 12 lying, 13 / 17 idle, 20 hit-stun then lying; 9, 10, 14-16, 18, 19 empty as
+in Hercule's. 39 frame blobs, 11.4 KB compressed (29, 7.5 KB from 93), in the second ROM blob (`.rodata.art`). Preview
+`$(BUILD)/popo_preview.png` (every group x 4 facings, the hurt box in red). His portrait is the stock 82.
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control
