@@ -2,6 +2,10 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-05
+
+- **Scene staging, chapters 1, 2, 3, 5, 6, Cooler, Gero's computer, Broly, the summit (`docs/story.md` 0 "Staging pass", `staging_*.txt`; Ryan):** every speaker has a body for every lineup, nobody pops in or vanishes on screen, frozen actors walk; no new lines. Bug found on the way: the birds of Gero's chapter were flown on sprites with no pose group 12 (heap risk), they walk now.
+
 ## 2026-11-04
 
 - **The generator's eggs are a mini boss (`docs/scripts.md` `ch4_eggs`, `ch4_eggs.txt`; Ryan):** in zone 8 area 50 no more carrying eggs to the brontosaurus: the first egg smashes, the mother (King Triceratops recoloured pink, orange and green) turns on the players, at half her health the other two hatch and her babies fight beside her; when she falls the tubes break as before.
