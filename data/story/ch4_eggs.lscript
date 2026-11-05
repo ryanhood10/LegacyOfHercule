@@ -35,22 +35,26 @@ script z8_dino_second_half
         And
 end
 
-; one sequence an egg. Entry 0: once the fight has begun an egg does nothing (next index 5: the end)
+; one sequence an egg. Entry 0: once the fight has begun an egg does nothing (next index 7: the end)
 sequence z8_egg1
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 5
+        PushByte 7
         END
       free:
         PlayAudio 47
         SetStoryFlag 117
         FindEntityByType 7
         END
-  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
-  [2] text 1 "#...Oops."
-  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
-  [4] script -> 5
+  [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
+        PushActiveCharName
+  [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
+  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+        PushActiveCharName
+  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] script -> 7
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
@@ -63,17 +67,21 @@ sequence z8_egg2
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 5
+        PushByte 7
         END
       free:
         PlayAudio 47
         SetStoryFlag 118
         FindEntityByType 8
         END
-  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
-  [2] text 1 "#...Oops."
-  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
-  [4] script -> 5
+  [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
+        PushActiveCharName
+  [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
+  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+        PushActiveCharName
+  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] script -> 7
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
@@ -86,17 +94,21 @@ sequence z8_egg3
   [0] script
         StackTestStoryFlag 476
         JumpIfFalse free
-        PushByte 5
+        PushByte 7
         END
       free:
         PlayAudio 47
         SetStoryFlag 119
         FindEntityByType 9
         END
-  [1] text 0 "@^You reach for the egg...\x0bIt slips, and smashes on the ground."
-  [2] text 1 "#...Oops."
-  [3] text 0 "@^The dinosaur beside the generator rears up.\x0bShe saw that.  She is NOT happy."
-  [4] script -> 5
+  [1] fmt 1 "@%s: Eggs, sitting right on the generator?\x0bEasy does it.  Just gonna move this one out of the way."
+        PushActiveCharName
+  [2] text 0 "@^The shell is slick, and heavier than it looks...\x0bCRACK!"
+  [3] fmt 1 "@%s: ...\x0bThat was like that when I got here."
+        PushActiveCharName
+  [4] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [5] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] script -> 7
         SetStoryFlag 476
         WhiteFlash 20
         PlayAudio 60
@@ -110,7 +122,9 @@ sequence z8_dino_hatch
   script
         PlayAudio 60
         WaitFrames 30
-  text 0 "@^The dinosaur staggers...\x0bAnd behind her, the eggs begin to shake!"
+  text 0 "@^MOTHER DINOSAUR: Hah...  hah...\x0bYou hit harder than you look."
+  text 0 "@^MOTHER DINOSAUR: But you forgot about my other two."
+  text 0 "@^Behind her, the eggs that are left begin to rattle."
   script
         SetStoryFlag 478
         WhiteFlash 20
@@ -135,7 +149,8 @@ sequence z8_dino_hatch
         SetStoryFlag 119
         DespawnCharacterAndRecordPosition 245, 2
         DrawBossHealthBarRange 245, 0, 50
-  text 0 "@^CRACK!  Two babies burst from the shells, the image of their mother.\x0bAnd every bit as angry!"
+  text 0 "@^CRACK!  CRACK!\x0bTwo tiny, furious dinosaurs burst out of their shells!"
+  text 0 "@^MOTHER DINOSAUR: That's my babies!\x0bGet 'em!"
   script
         SetActiveEntity 0
 end
@@ -147,7 +162,10 @@ sequence z8_dino_defeat
         WaitFrames 40
         AddEXP 1500
         WaitFrames 30
-  text 0 "@^The dinosaur crashes to the ground, then limps off into the hills, her babies at her heels.\x0bNothing guards the generator now."
+  text 0 "@^MOTHER DINOSAUR: Enough...  ENOUGH!\x0bCome, children.  We're leaving."
+  text 0 "@^She limps off into the hills, her babies at her heels.\x0bOne of them stops to kick dirt at you."
+  fmt 1 "@%s: ...I'm just gonna go break that generator now."
+        PushActiveCharName
   script
         SetStoryFlag 477
         FadeToWhite 10
