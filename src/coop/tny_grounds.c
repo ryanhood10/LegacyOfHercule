@@ -9,6 +9,10 @@
 //         stand-in: record conditions in data/story/papaya.lscript).
 //   op 2  pushes 1 when the grounds' maps are in this build (zone 15 area 11 is in the map table; they need
 //         roms/buu.gba): the world-map landing's conditions, so a BUU=0 build has no landing into a missing map.
+//   op 7  scenes on the grounds (docs/tournament.md 27): player 2's entity faces b (player 1: SetEntityFacing 0).
+//   op 8  every actor on sprite b (never a player's body) holds pose group c & 0xFF at its last frame (0: idle again),
+//         turned to facing (c >> 8) - 1 first (c >> 8 = 0: as he stands). Only a group his record has: an animation
+//         on a missing group overwrites the heap. Nothing is pushed; a sprite nobody shows is no-op (no null write).
 // Test command 30 (coop2.cmd = 30, cmd_arg): 0 the real pool again, 1 force the pool to the Rookie opponents
 // (a stand-in while the engine's tny_in_pool is the weak default), 2 spawn the fighters now beside the rest.
 #include "tourney.h"
@@ -283,6 +287,28 @@ int tny_grounds_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
     case 5:                                        // an item with its pop-up (the hidden arena's Senzu: item b)
         item_use_hook((int)b);
         return 0;
+    case 7:
+        if (coop.p2 && b >= 0 && b < 4) coop.p2->facing = (u8)b;
+        return 0;
+    case 8: {
+        void *rec = gr_sprite_ok((int)b) ? Character_GetSpriteRecord((int)b) : 0;
+        EntityList *list = g_EntityList;
+        int g = (int)(c & 0xFF), f = (int)(c >> 8) & 0xFF;
+        for (int i = 0; rec && i < list->count; i++) {
+            Entity *e = list->items[i];
+            if (!e || e->sprite_record != rec || e == g_PlayerObject || e == coop.p2) continue;
+            if (f) e->facing = (u8)((f - 1) & 3);
+            int last;
+            const u32 *grp = g ? tny_pose_group(e, g, &last) : 0;
+            if (!g) Entity_SetAnimation(e, 0);
+            else if (grp) {
+                *(u32 *)((u8 *)e + 0x4C) = (u32)grp;
+                *(u16 *)((u8 *)e + 0x14) = (u16)last;
+                *(u16 *)((u8 *)e + 0x12) = 0;
+            }
+        }
+        return 0;
+    }
     case 6: {                                      // every entity on sprite b plays group c (a held pose: Yamcha
         void *rec = gr_sprite_ok((int)b) ? Character_GetSpriteRecord((int)b) : 0;   // in bed). The script
         EntityList *list = g_EntityList;           // command waits for the animation to end, which a lying pose
