@@ -324,8 +324,19 @@ emit("sequence cg_fight7_end")
 b = body(A3, "m325_r11_defeat", 0)
 k = b.index("FadeFromWhite 60")
 b = b[:k] + ["CoopCall 5, 0, 0, 0", "JumpIfFalse HS1", "SpawnCharacterEntity 72, 500, 440", "SetEntityFacing 72, 2", "HS1:"] + b[k:]
-script(b, "stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity)")
-stockseq(A3, "m325_r11_defeat", 1, 6, "Cell spits out 18, \"I'm going to blow myself up now!\"")
+k = b.index("SpawnCharacterEntity 11, 464, 408")
+b = b[:k + 1] + ["SetEntityFacing 11, 3"] + b[k + 1:]
+k = b.index("WhiteFadeOut 10")     # she flies clear of where the fighters gather and the two Cells will stand (her hurt pose, group 3), falls and lies
+b = b[:k + 1] + ["BeginCommandBatch", "SetEntityAnimation 11, 3", "GlideToPosition 11, 516, 392, 3000", "CommitCommandBatch",
+                 "SetEntityAnimationNoWait 11, 12", "SpawnDustCloud 11, 520, 398"] + b[k + 1:]
+script(b, "stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity); 18 is thrown clear and lies")
+stockseq(A3, "m325_r11_defeat", 1, 2, "\"You're not a boy!  You're a monster!\", \"He spit out Android 18!\"")
+# Stock entry 3 walked 18 off the screen by herself, and "She needs our help!  She's still alive!" was later said of nobody. She lies where
+# she was thrown (her fight set's knock-down, group 12) until the field is cleared for the two Cells (entry 51's fade).
+b = body(A3, "m325_r11_defeat", 3)
+assert b[1:3] == ["WalkToPosition 11, 512, 328", "DespawnEntity 11"]
+script(b[:1] + b[3:], "stock entry 3 without 18's walk off the screen")
+stockseq(A3, "m325_r11_defeat", 4, 6, "\"I'll get you for this!!!!\", \"I'm going to blow myself up now!\"")
 b = body(A3, "m325_r11_defeat", 7)
 k = b.index("FlyToPosition 121, 368, 456")
 b = b[:k] + guard72(["WalkToPosition 72, 536, 484"], "a") + b[k:]
@@ -345,7 +356,7 @@ text(40, "SECOND CELL: Twice the perfection!")
 stockseq(A3, "m325_r11_defeat", 41, 50, "Vegeta, \"part of my design\", Trunks falls, Vegeta's attack")
 b = body(A3, "m325_r11_defeat", 51)
 k = b.index("DespawnEntity 30")
-b = b[:k + 1] + ["DespawnEntity 162"] + b[k + 1:]
+b = b[:k + 1] + ["DespawnEntity 162", "CoopCall 22, 2, 11, 0", "JumpIfFalse A18", "DespawnEntity 11", "A18:"] + b[k + 1:]   # 18, lying since Cell spat her out
 k = b.index("SetEntityFacing 0, 3")
 b = b[:k + 1] + guard72(["SetEntityPositionInstant 72, 420, 472", "SetEntityFacing 72, 3"], "a") + b[k + 1:]   # with two players at Gohan's side, where player 2 respawns
 script(b, "stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side")

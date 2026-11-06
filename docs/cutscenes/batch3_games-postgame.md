@@ -373,8 +373,12 @@ a step that is moved or removed breaks an insertion further down, so change one 
      toward them on his line.
   9. Two players: Hercule's actor ends his retreat behind a rock (his stock walk to (536, 484)), peeks out after the
      silence.
-- **Risks:** 18's sprite 11 is a fight set with 13 groups; which index lies down must be checked before `SetEntityAnimation
-  11, 3` (the stock never lays her down here). The swollen Cell 27 is a large body with nine actors and a player: OBJ
+- **Built so far (`nb-cs3`, 2026-11-06), beat 1 (the defect):** 18 is thrown clear in her hurt pose (group 3) to (516, 392), falls (her fight
+  set's knock-down, group 12, which holds its last frame) and lies there until the two Cells' fade despawns her; the stock walk off the screen
+  is gone, so "She needs our help!  She's still alive!" is said of a body. Test: `cell_staging.txt` (sprite 11 stands after the bomb's lines,
+  gone at fight 8).
+- **Risks:** 18's sprite 11 is a fight set with 13 groups: **group 3 is her hurt pose, 12 the knock-down** (checked on film; `GlideToPosition`
+  puts a body back on its idle pose when it arrives, so the knock-down is played after the glide). The swollen Cell 27 is a large body with nine actors and a player: OBJ
   VRAM is already at its busiest here; add no bodies, and measure with the runner's `vram` after adding dust. The stock
   batches use `SetEntityFollow` on seven sprites: the generator finds its insertion points by those exact strings.
 

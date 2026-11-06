@@ -140,7 +140,11 @@ def games(tag, p2):
     p2_stands(coop)
     herc(1 if coop else 0)
     win(25, duo)
+    # Android 18 lies where Cell spat her out until the two Cells' fade (she walked off by herself; 3.7): there after the bomb's lines, gone at fight 8
+    out("deref TBL 0x0800959C", f"deref R11 TBL+{(11 - 7) * 4:#x}", "mash 14 100", f"shot cs_{tag}_18")
+    expect("entrec [0-9a-f]+: 1$", "entrec R11")
     scene_done(f"{tag}_f8")      # fight 8
+    expect("entrec [0-9a-f]+: 0$", "entrec R11")
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")
     p2_stands(coop)

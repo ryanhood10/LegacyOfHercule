@@ -621,7 +621,7 @@ sequence cg_head_scene
 end
 
 sequence cg_fight7_end
-  script                                 ; stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity)
+  script                                 ; stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity); 18 is thrown clear and lies
         SetEntityAnimation 30, 3
         PlayAudio 60
         FindPlayerEntity
@@ -652,14 +652,26 @@ sequence cg_fight7_end
         CommitCommandBatch
         FadeToWhite 10
         SpawnCharacterEntity 11, 464, 408
+        SetEntityFacing 11, 3
         DespawnEntity 30
         SpawnCharacterEntity 29, 428, 408
         WhiteFadeOut 10
+        BeginCommandBatch
+        SetEntityAnimation 11, 3
+        GlideToPosition 11, 516, 392, 3000
+        CommitCommandBatch
+        SetEntityAnimationNoWait 11, 12
+        SpawnDustCloud 11, 520, 398
         WalkToPosition 0, 432, 440
         SetEntityFacing 0, 1
         PlayAudio 50
         END
-  stockseq @083eb704 1 6    ; Cell spits out 18, "I'm going to blow myself up now!"
+  stockseq @083eb704 1 2    ; "You're not a boy!  You're a monster!", "He spit out Android 18!"
+  script                                 ; stock entry 3 without 18's walk off the screen
+        SetEntityFacing 29, 3
+        SetEntityFacing 29, 0
+        END
+  stockseq @083eb704 4 6    ; "I'll get you for this!!!!", "I'm going to blow myself up now!"
   script                                 ; stock entry 7: everyone gathers; Hercule's actor backs away from the bomb
         FadeToWhite 30
         DespawnEntity 29
@@ -746,6 +758,10 @@ sequence cg_fight7_end
         DespawnEntity 76
         DespawnEntity 30
         DespawnEntity 162
+        CoopCall 22, 2, 11, 0
+        JumpIfFalse A18
+        DespawnEntity 11
+      A18:
         SetEntityPositionInstant 0, 432, 472
         SetEntityFacing 0, 3
         CoopCall 22, 2, 72, 0
