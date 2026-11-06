@@ -765,6 +765,18 @@ move ended); `staging_ch8` (Cooler's charge in every lineup, `c8_charge`); `cell
   (`FindEntityByType n` hides one); a body moving off one shows it. In this environment a Bash heredoc collapses `\\` to `\`: write
   Python that carries backslashes (`\x0b`, a regex `\1`) with the Write tool.
 
+## Super Saiyan notes (headless, 2026-11-06, branch `nb-ssjfix`)
+
+`staging_ch3` "battle": at 19's fight Vegeta's row is 11 (the entry's +8, `0x0203F04C`) and the meter filled, in four lineups, and still 11
+five seconds in (the debut is his own transformation); "cutaway" waits out the stock power-up (about 140 frames) before it looks for 61.
+`ch4_staging` "end": after 18's second kick no 140 and one 137 (alone his actor, with two players player 2) and player 2's row 8; the
+lineup `PHs` pokes player 2's Vegeta gold (`poke8 0x0203F04C 11`, EP up) before the road. `cell_staging` zone 12: Vegeta's row 8 after 7.4.
+`cine.txt`: the charge beside a transformation and the strike's flag 8. **Films** (not committed, `build/film/f.py` on `fl.py` from
+`nb-cs4`, a shot every 6 frames with a press every 60): the transformation beats, the debut in four lineups, the road's end alone and
+with player 2 gold, 7.4's blow and the flight into area 5; F8 beside a ROM built at `4a5e323` (before the pass) in a detached worktree,
+tiled in time by `build/film/pair.py`. A film that sits on a text box (no presses) or warps without waiting (`S.warp(..., frames)`)
+shows another scene: check the map line first.
+
 ## Cinematic helpers (headless, 2026-11-06, branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine")
 
 `src/coop/cine.c` (`CoopCall 37`) is driven two ways: from lscript, and by **test command 50** (`docs/ids.md`): `arg` = the op,
