@@ -1,7 +1,7 @@
 r"""Write tools/headless/staging_ch5.txt, staging_ch6.txt and staging_ch8.txt: chapters 5, 6 and Cooler per lineup (ch5_lookout, ch6_basement, ch8_cooler).
 usage: python tools/headless/staging_ch568_gen.py     (the scripts are committed; rerun this after changing them here)
 Chapter 5: Kami defers, whoever is selectable (the fade makes Piccolo player 1; Hercule only when played), then Kami's boost and
-the fusion (Hercule kept there for the plot: Kami draws out his potential). Chapter 6: the basement and Goku's waking, only who is played: no
+the fusion (Hercule kept there for the plot: Kami draws out his potential; flags 129 and 131 so Kami stands; he is gone after it and Mr. Popo is not). Chapter 6: the basement and Goku's waking, only who is played: no
 Krillin NPC or actor alone as Trunks, no Trunks actor alone as Krillin (Ryan, 2026-11-05). Cooler: the three openings alone (no servant) and with
 two players (the servant's actor, then his twin on the same sprite 166)."""
 from staging_lib import *
@@ -19,10 +19,17 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (KRILLIN, None), (GOHAN, None),
     s.on_map(2, 20)
 for p1, p2 in ((TRUNKS, None), (GOHAN, None), (TRUNKS, GOHAN), (GOHAN, TRUNKS)):
     n = lineup_name(p1, p2)
-    s.begin(f"fusion {n}", p1, p2)
+    s.begin(f"fusion {n}", p1, p2, "+129 +131")     # 129: Kami's record stands on the Lookout (it did not without it: batch 2's finding)
     s.warp(10, 16, 96, 150, 100)
     s.press(56, 80)
     s.shot(f"c5_{n}_kami")
+    s.actors(s73=1, s72=1, s93=1)                   # Kami, Hercule's actor (kept for the plot), Mr. Popo
+    s.out("ents")
+    s.press(16, 80)                                 # the boost, "Our union...", Popo's goodbye: into the fusion
+    for i in range(5):
+        s.out("frames 80")
+        s.shot(f"c5_{n}_fuse{i}")
+    s.actors(s73=0, s72=1, s93=1)                   # Kami has gone into Piccolo; Popo watched from the stair head
     s.out("ents")
     s.end_scene(300)
     s.on_map(6, 99)

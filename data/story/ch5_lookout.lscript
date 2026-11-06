@@ -52,8 +52,9 @@ end
 
 sequence ch5_fusion
   stockseq @083e0dbc 0 35                ; the cicada skin, the news from Gingertown, "So you finally came to your senses?"
-  script
+  script                                 ; Hercule comes in from the rim; Piccolo watches him come
         SpawnCharacterEntity 72, 296, 176
+        SetEntityFacing 0, 3
         WalkToPosition 72, 216, 136
         SetEntityFacing 72, 2
         SetEntityFacing 73, 3
@@ -61,7 +62,18 @@ sequence ch5_fusion
   text 67 "HERCULE: M-me?  Uh, sure thing, Mr. Kami, sir!"
   text 69 "KAMI: You took Piccolo into your home and stood beside him...\x0bthough you had every reason to fear him.\x0bFew have ever shown him such kindness."
   text 69 "Every living being carries a hidden potential.\x0bAllow me to draw out a little of yours...\x0bas the Grand Elder of Namek once did for Gohan and Krillin."
-  script
+  script                                 ; the power comes up through him (a hum, the floor trembles, light) before the flash
+        PlayAudio 43
+        SetEntityAnimation 72, 4
+        BeginCommandBatch
+        ScreenShake 0, 3, 30
+        ScreenShake 0, 6, 30
+        EntityWaitFrames 72, 30
+        FlashScreenColor 72, 255, 255, 255, 8
+        SpawnDustCloud 72, 206, 140
+        SpawnDustCloud 72, 226, 140
+        CommitCommandBatch
+        StopAudio 43
         WhiteFlash 20
         PlayAudio 27
         StackGetCharLevel 5, 5
@@ -70,22 +82,117 @@ sequence ch5_fusion
         SetCharacterLevel
         SetCharHP 5, 5000
         SetCharEP 5, 5000
+        SetEntityAnimation 72, 0
+        SetEntityFacing 72, 2
         WaitFrames 30
   fmt 0 "@^Hercule has achieved Level %d!"
         StackGetCharLevel 5
-  script                                 ; he tries it out
+  script                                 ; he tries it out: a punch each way
+        SetEntityAnimation 72, 6
+        SetEntityFacing 72, 3
         SetEntityAnimation 72, 6
         SetEntityAnimation 72, 0
         SetEntityFacing 72, 2
   text 67 "HERCULE: Whoa...  I feel like I could lift a truck!\x0bHa ha ha!  Not that I couldn't before, of course!"
   text 90 "PICCOLO: Hmph.  Don't let it go to your head."
   script                                 ; and gives Piccolo and Kami the floor
-        WalkToPosition 72, 240, 152
+        WalkToPosition 72, 224, 144
+        SetEntityFacing 72, 2
+        SetEntityFacing 0, 1
+        SetEntityFacing 73, 0
+  stock @083e0a74                        ; "Our union will make you more powerful, Piccolo..."
+  script                                 ; Mr. Popo starts toward Kami; they look at him
+        WalkToPosition 93, 156, 96
+        SetEntityFacing 93, 3
+        SetEntityFacing 0, 2
+  stock @083e0ae8                        ; "MR. POPO: No, Kami!  No!"
+  script                                 ; stock entry 38: Kami turns to him
+        SetEntityFacing 73, 2
+        SetEntityFacing 0, 1
+  stock @083e0b14                        ; "There is nothing to worry about, Popo.  Piccolo has changed. ..."
+  stock @083e0be4                        ; "Goodbye, Kami.  I'll miss you.  Please be careful."
+  script                                 ; Popo goes as far as the stair head and turns back to watch; Hercule gives them room; Piccolo steps up to Kami. A held, quiet look
+        PanCameraToPosition 72, 46, 10   ; the view holds still from here (the camera would follow Piccolo up and off)
+        WalkToPosition 93, 132, 112
+        SetEntityFacing 93, 3
+        WalkToPosition 72, 228, 132
         SetEntityFacing 72, 2
         SetEntityFacing 73, 0
-  stockseq @083e0dbc 36 47               ; "Our union will make you more powerful", Popo's goodbye, the Namek
+        WaitFrames 20
+        WalkToPosition 0, 192, 120
+        SetEntityFacing 0, 1
+        WaitFrames 40
+  script                                 ; the light builds and Kami goes into him (a glide: Kami's sprite has one pose group)
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 4, 60
+        ScreenShake 0, 10, 70
+        EntityWaitFrames 73, 40
+        FlashScreenColor 73, 255, 255, 255, 6
+        EntityWaitFrames 73, 20
+        FlashScreenColor 73, 255, 255, 255, 6
+        EntityWaitFrames 73, 10
+        GlideToPosition 73, 192, 118, 50
+        EntityWaitFrames 93, 88          ; pale green light as he goes in
+        FlashScreenColor 93, 200, 255, 200, 8
+        EntityWaitFrames 93, 10
+        FlashScreenColor 93, 200, 255, 200, 8
+        CommitCommandBatch
+        WhiteFlash 10
+        DespawnEntity 73
+        FadeToWhite 20
+        StackGetCharLevel 1, 1           ; the stock bookkeeping, under the white
+        PushByte 1
+        Add
+        SetCharacterLevel
+        SetEntityPositionInstant 0, 192, 96
+        SetEntityFacing 0, 0
+        PanCameraToPosition 72, 54, 10   ; a little lower: the caption's box will sit under him
+        WhiteFadeOut 40
+        BeginCommandBatch                ; the Namek's power shakes the Lookout: dust in a ring, Hercule thrown on his back, Popo a step away
+        ScreenShake 0, 20, 14
+        SetEntityAnimation 0, 4
+        SpawnDustCloud 93, 172, 100
+        SpawnDustCloud 93, 212, 100
+        SpawnDustCloud 93, 180, 116
+        SpawnDustCloud 93, 204, 116
+        WalkToPosition 93, 122, 112
+        SetEntityFacing 93, 3
+        ScreenShake 93, 20, 96
+        EntityWaitFrames 72, 8
+        SetEntityAnimation 72, 2
+        GlideToPosition 72, 238, 138, 150
+        SetEntityAnimation 72, 3
+        CommitCommandBatch
+        StopAudio 43
+        SetEntityAnimation 0, 0
+        SetEntityFacing 0, 0
+        WaitFrames 50
+        PlayMusic 34
+        PlayAudio 27
+  stock @083e0c80                        ; "@^Piccolo has achieved Level %d! ..."
+  script                                 ; Hercule picks himself up
+        SetEntityAnimation 72, 0
+        SetEntityFacing 72, 2
+  text 94 "No longer am I Kami or Piccolo... "       ; the stock line in the bottom box (it was "@": the middle box sat on him)
+  script                                 ; he turns to the rim and walks two steps
+        SetEntityFacing 0, 3
+        WalkToPosition 0, 218, 96
+  text 94 "I am the Namek who has long since forgotten his name..."
+  script
+        WaitFrames 20
+  text 94 "I must go."
+  script                                 ; he is gone; Hercule runs to the rim, looks after him, looks back at Mr. Popo
+        PlayAudio 26
+        FlyToPosition 0, 340, 20
+        WalkToPosition 72, 222, 104
+        SetEntityFacing 72, 3
+        WaitFrames 30
+        SetEntityFacing 72, 2
+        WaitFrames 20
   script                                 ; stock entry 48: Piccolo and Hercule fly to Gingertown together
         FadeToWhite 120
+        SetActiveEntity 0                ; the camera back on player 1 (the fusion held it still)
         SetCharacterFlag_Dynamic 1, 2
         SetCharacterFlag_Bit1 1
         SetCharacterFlag_Bit5 1

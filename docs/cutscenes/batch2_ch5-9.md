@@ -147,6 +147,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.5 Kami draws out Hercule's potential (touch up, S; build with 5.6)
 
+- **Built 2026-11-06 (`nb-cs2`, with 5.6).** Piccolo turns to watch Hercule come; a hum, a rising tremble, a white pulse and dust at
+  his feet before the stock flash; a punch each way after the caption. No hop (the actor has no jump pose worth it).
+
 - **Where:** `ch5_fusion` entries 36-46 (ours). **Today:** Hercule's actor (72) walks in from the right rim to
   Kami, four lines, `WhiteFlash 20` and the level sound, the caption "@^Hercule has achieved Level %d!", he throws a
   punch (animation 6), his line, Piccolo's "Hmph.  Don't let it go to your head.", he walks aside.
@@ -162,6 +165,22 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Risks:** none beyond 72's groups (full set). **Size S.**
 
 ### 5.6 The fusion (showcase, M)
+
+- **Built 2026-11-06 (`nb-cs2`), script steps only (the cine helpers were not merged yet: CHARGE, FALL / RISE and DASH are
+  hand-rolled here).** The whole scene stays on the Lookout: the blank map 1/6 is not used (the stock `DespawnEntity 0` /
+  `UploadSpritePalette` there only hid the player on the white map; the level and the form are plain party writes). Mr. Popo steps
+  toward Kami for "No, Kami!", goes to the stair head and turns back; Hercule gives them room; Piccolo steps up; a held look; the
+  rumble, a rising shake, two white pulses, pale green light while Kami glides down into him (`GlideToPosition 73, 192, 118, 50`:
+  the last argument is a speed in 1/100 px a frame, measured: 300 crossed 22 px in under 10 frames), the flash that takes Kami, a white;
+  out of it Piccolo stands on Kami's spot in the start pose, a ring of dust, the Lookout shakes, Hercule is thrown on his back, Popo
+  steps away; quiet; the stock caption under him; the three lines in the bottom box (they were `@`); he turns to the rim, walks, flies
+  off; Hercule runs to the rim, looks after him and back at Popo; the stock white and the world map. The camera is held with
+  `PanCameraToPosition 72, 46` (the view follows player 1 otherwise) and handed back with `SetActiveEntity 0` under the last white.
+- **Facts found:** the Lookout top's floor is the blue disc only: about x 92-247, y 82-176 (centre (170, 128)); the stock mark
+  (240, 152) and a walk to (268, 116) both stand on air (no wall stops an actor there). `ScreenShake`, `FlashScreenColor`,
+  `SpawnDustCloud`, `EntityWaitFrames` and `GlideToPosition` are entity commands: in a batch each body's queue runs beside the
+  others', so a shake on one queue, waits and flashes on a second and a glide on a third make one timed beat; `WhiteFlash` and the
+  fades are modal and cannot be batched. `SetEntityAnimation 0, 4` (the start pose) takes about 64 frames.
 
 - **Where:** `ch5_fusion` entries 47-59 (stock 36-48 with our ending), reached from map 283's trigger; it plays on
   the Lookout's top (zone 9 area 4: Kami's record at (192, 96), Mr. Popo's at (144, 96)) and then on the blank
