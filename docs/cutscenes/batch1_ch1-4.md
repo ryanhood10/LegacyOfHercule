@@ -148,6 +148,18 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   (`FindCharacterEntity 0`), keep that exact step; the first frames show the HP bars; the reference film had Piccolo
   as player 1 (Map Test), so Trunks' own animation 24 was not seen: film it from a real prologue start.
 - **Size L** (M without beats 3-4: the androids in view, the volley, the reordered line).
+- **Built 2026-11-06 (`nb-cs1`), the M version with script steps; beats 3-4 (Gohan's charge, the flurry, 18's blow) are marked CINE.**
+  The view sits at (104, 232), 56 px above the stock's: the androids' ground is in it and the players, who wait at the trigger, are not
+  (the stock had Trunks stand in view watching). 17 and 18 walk in from the top, 18 looking away, a held look; eight blasts from both
+  fall as one batch (each a hit: the stock sound, the red flinch) with the shake growing 2, 4, 7; the stock ending; 17 turns away, then
+  18, and they fly off the top; the view comes down for Trunks' walk. **Old Hercule's line stays where Ryan put it** (the research
+  wanted it before the scream: not done). The stock transformation (entry 4) gets a rising shake and old Hercule slides back a step.
+  The hand-over of player 2's old Hercule moved from a json edit into the restated entry 0. The HP bars in the research film's first
+  frames come from the test warp's fade, not the scene. Flags and party after it: identical (one and two players).
+  **With Cine (second commit), beats 3-4:** Gohan's charge (level 1), an exchange of 45 frames with 17 that he holds, they break; 18 is
+  over him and one heavy blow drives him 36 px down into the puddle (17's mark moved to x 288 so that he lands where the stock's lying
+  body appears); he gets up; then the storm. About four seconds more than the first commit, the scene as long as the stock's nine
+  seconds of blasts.
 
 ### 1.5 Krillin's visit: touch up (S)
 
@@ -259,6 +271,26 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   already does). The sword's animation 16 exists only on the Super Saiyan record here (134). Old Hercule's groups:
   check before his "arm up" (a plain walk backwards if in doubt).
 - **Size L.** The Short: beat 3 to beat 8, about 35 seconds.
+- **Built 2026-11-06 (`nb-cs1`), script steps only; the helper beats wait for `cine.c`.** What the research had wrong: the stock
+  "velocity kicks" are not movement: `EntitySetVelocity` is the dust-explosion effect at an offset from the body (`docs/scripts.md` 2.1),
+  so Frieza and King Cold never bounced, they stood in a ring of puffs; knock-backs are `GlideToPosition`. The view is 240 x 160 and a
+  box hides 64 px of it: nobody can be clear of both the top and the bottom box across the 80 px between Trunks and Frieza, so the view
+  sits at (12, 328) (whoever is spoken to is in the clear), drops to y 352 for old Hercule's punch and line (both bodies above the bottom
+  box) and goes to (36, 322) for King Cold (he above the middle box, Trunks below it). Trunks comes in low from the lower left, not from
+  above (a flight down x 120 would pass through Frieza). Beats as built: 1 the swoop, dust, old Hercule runs in; 3 a rising shake under
+  the stock power-up, a flash on the gold, the soldiers give a step, old Hercule slides back; 4 three soldiers struck from beside them
+  (a cut to the spot stands in for the DASH; each is thrown 50 px, dust, gone), back on his mark with his back turned, a blast each for
+  the last two; 5 the last soldier goes for old Hercule, who has crept back up; 6 Frieza fires, Trunks is gone, dust and a shake on empty
+  ground, old Hercule runs clear, Frieza looks left and right, the sword from above, again from below, Trunks slides through with his
+  back to him, "AHHH", the stock explosions, an open hand, a white cut, gone; 8 King Cold strides up and roars, a blast at arm's length
+  slides him back and drops him, he gets up roaring, two steps and a second blast, the stock red flash under a white one. Flags and the
+  party block after the scene are identical to the build before (`staging_ch1` checks the first flag word).
+  **With Cine (second commit):** the Super Saiyan is Cine's charge (level 2: the stance, rings, the growing shake, the burst) under the
+  stock's sprite swap; the three soldiers are an afterimage dash and a heavy strike each (thrown 44 px, smoke where they land), and he
+  dashes back to his mark; the blast into what is left of Frieza and the one under King Cold's chin are the big blast (the ball grows in
+  his palm; King Cold is thrown, lies, gets up roaring); the second is a single blast. Left as cuts on purpose: Trunks leaving the view
+  before Frieza's blast lands and coming down above him (a Cine dash keeps its body inside the view and 30 px off its top); the sword is
+  the stock animation 16 (Cine's strike has no sword pose).
 
 ### 1.8 Goku's arrival and Trunks' warning: touch up (M)
 
@@ -375,6 +407,10 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
 - **Lines kept:** all stock.
 - **Risks:** entry 15 warps without entities to the burning map (5/4): actors placed again by the stock; nothing
   added may straddle it. 19 and 20: no shout or knock-down groups.
+- **Built 2026-11-06 (`nb-cs1`), beats 1 and 3 in part** (two `edits` on the stock entries in `ch3_duels.json`, map 143): entry 15: 20 turns
+  away, a short charge, a volley of six at the building (bursts, the last an explosion) in place of the single blast, then the stock white
+  cut to the burning street; entry 17: Goku's flare (a charge of 24 frames, rings at his feet) before his stock attack pose and "@You
+  monster!!!". Not built: the players shielding their faces, the held shot in the ruins, 19's half step, the fly-off's spacing.
 
 ### 3.2 Space: Vegeta and his clone: SHOWCASE (M)
 
@@ -415,6 +451,16 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
   come at the same entry (`CoopCall 1, -1, 15`) with the clone actor despawned first, as today; beat 8's one-player
   branch must fit in the time the two blind flashes take today (about 120 frames), not add to it. Hide the HP bars until the duel.
 - **Size M.** The Short: beats 4 to 7, about 30 seconds, ending on the gold.
+- **Built 2026-11-06 (`nb-cs1`, with Cine): all eight beats, the lines untouched.** They start at the rock's two edges (220 and 340);
+  an exchange of 45 frames, they break; the clone is behind him: a punch, a kick; his blast throws it (Cine blast 0 + 32); it gets up,
+  a charge, the gold (140 spawned on its own spot, `PushEntityPosition 137`); it is on him, one heavy blow throws him across the rock;
+  40 frames; he is on a knee through the monologue's first box and on his feet for the second (a script entry between the two boxes);
+  a charge of 80 frames at level 2 into the stock transformation. Two players: a clash of 24 frames, he dashes back to (208, 576),
+  the stock's spot for the duel's start (`duel_end.txt` hits from there), the clone goes and the duel starts as before. One player: the
+  clone stays, and in place of the two blind flashes the end sequence plays an exchange of 60 frames that his heavy blow ends (about
+  125 frames against 120), a flash, the clone gone. The HUD is hidden from the first frame to the duel (the stock's second
+  `SetPlayerVisible 1` in entry 0 is gone) and through the one-player fight. Not built: Vegeta's step back at the clone's gold and the
+  clone pushed back at each flash of his charge. Flags and party after it: identical, one and two players.
 
 ### 3.3 The landing: leave
 
@@ -432,6 +478,8 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
 - **Shot list:** 1. stock entry 9: CHARGE on Goku (shake, flashes, the stock animation 9), 19 and 20 step back, the
   watchers' shout poses. 2. "ANDROID 13: Outta date already, huh?" stays with its stroll. Nothing else.
 - **Risks:** the stock swaps sprite 60 for 61 by despawn and spawn: the CHARGE goes on 60 before the swap.
+- **Built 2026-11-06 (`nb-cs1`):** stock entry 9 restated: Cine's charge (level 2) on Goku's 60, the swap to 61 in a flash, the watchers' shout
+  poses (Tien, Gohan, Krillin; guarded). Not built: 19 and 20 stepping back.
 
 ### 3.5 Goku falls, Vegeta arrives: SHOWCASE (L)
 
@@ -482,6 +530,17 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   play the CHARGE without the form. In real play the player walks into this area from its edge; the test warp puts
   him beside Goku: film it once from the area's entrance.
 - **Size L.** The Short: beat 3 to beat 6, about 35 seconds.
+- **Built 2026-11-06 (`nb-cs1`, with Cine): beats 3 (in part), 4 and 6; 1 and 2 left as the stock plays them** (its opening is the
+  liveliest stock choreography of the batch: kept). The scene's trigger is the whole map, so in play the players stand at the area's
+  entry (468, 556), below the view, through Goku's fight (the research film's Vegeta "30 px from Goku" was the test warp). 19 raises
+  his hand over the fallen Goku (his attack 8, Goku flinches red, a flash): the drain. The entrance: Vegeta is beside 19 out of nowhere
+  (Cine dash, the view staying on the fight) and kicks him 60 px (heavy); he steps over Kakarot to the stock mark with his back to the
+  machine; the stock box; 19 gets up and walks back to his mark before "One of you needs to take Kakarot home". Not built: Piccolo and
+  Tien starting down with 20 dashing into their path; player 2 (Hercule) stays at the entry until the fight, as before (he cannot be
+  walked by a script, and a Cine dash is not his way to move). **The debut is its own commit** (Ryan's decision): before the last line
+  a charge (level 2) and he stands gold: **an actor (140) on his spot while player 1's body waits out of view**, so nothing of his
+  state changes (a real transformation in the scene left the form's meter running after it was undone: tried and dropped); a flash at
+  the fight's start puts him back, in base form as the stock starts it. Skipped when he walks in transformed already.
 
 ### 3.6 19's end, 13 leaves, 20 flees: rework (M)
 
@@ -512,6 +571,14 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   sure one 19 is left on the list. Entry 7 warps to map 192 and hands control to Piccolo
   (`SetActiveCharacterNoReset 1`): nothing of ours after it.
 - **Size M.** Could be one commit with 3.5 or its own.
+- **Built 2026-11-06 (`nb-cs1`, with Cine), two commits.** (a) The finishing blow: the HUD goes, 19 reels (his hit-stun), turns and
+  runs 48 px up-screen from wherever the fight left him (a walk to his own position, `PushEntityPosition 12`), Vegeta turns after him,
+  the ball grows in his palm with rings on the ground and flies (Cine blast 3), and the stock explosion chain plays as its impact, EXP
+  and music as stock; everyone on screen looks at 13 as he gets up; dust under his take-off. The research's "five batches of velocity
+  steps" are explosions round a body that stands (`EntitySetVelocity`, `docs/scripts.md` 2.1). 19 has no knock-down pose: when he fell
+  first in the pair he stands frozen until this scene, so the reel works from either case. (b) Vegeta's stock "Silly robot..." moved
+  up to right after the explosion (its own commit: Ryan may drop it). Not built: the shake on 20's blast at the cliff (stock entry 7
+  left alone: it warps and hands control to Piccolo).
 
 ### 3.7 The wrecked robot: leave
 
@@ -595,6 +662,13 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   Stock entry 59 is Piccolo's line ("They can't be headed for West City...") and plays in every lineup; when nobody
   plays him it has no body (an existing gap, the presence rule's business, not this scene's).
 - **Size M.**
+- **Built 2026-11-06 (`nb-cs1`), by Ryan's approved flow: every beat and line kept, weight only.** Not built from the shot list: its
+  beat 2 (17's STRIKE-H before the blast) would be a new beat, and the outside half (Trunks' blasts as a beam) is untouched. Entry 26
+  restated: 17 walks over, a held look, the blast at arm's length, a flash and a shake, Gero slides 28 px and falls (his group 3), the
+  stock explosions over the lying body, gone; 13 starts forward and stops when 17 looks at him; 18 only now looks round and turns back
+  to the pod. Entry 73: the room shakes as 13 powers up, each blast now lands (the hit sound and a dust puff on 17, then on 18; before,
+  the white flash came while they were still flying), the flash, a shake, 18 already looking at the pod again. Entry 76: dust under his
+  take-off, a shake as he goes through the ceiling. `ch4_staging` films it (P, PH) and checks Gero gone and 13, 17, 18 standing.
 
 ### 4.5 The road: the car talk, Vegeta drops in: touch up (S)
 
@@ -666,6 +740,20 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   restate entry 2 whole, leave 3-48 at their indexes. Tien has no group 7; Gohan's actor is 53. Player 1 Krillin
   meets his own NPC (76) in the stock ending: the duplicate rule's case, look at it in the lineup film.
 - **Size L.** The Short: from "Who's next?" to Krillin's shaking, 30 seconds, the batch's best candidate after 1.7.
+- **Built 2026-11-06 (`nb-cs1`, with Cine), about 13 seconds, silent.** As built: a 6-frame white cut puts the stage where the stock
+  ending has it (the view 152, 296; 16 by the roadside; 17 beside 18: **the fight's own twin when there is one**: the stock ending
+  spawned a second 17 beside the twin the fight left standing, now there is one). Vegeta: with two players player 2's own body (Cine's
+  body -1, in whatever form the player left him), alone his gold actor (140) down from the sky; nobody is handed to an actor, because
+  `CoopCall 31, 3` leaves player 2 without a body until control returns and the ending needs him. His charge, an exchange of 50 frames,
+  18 over him, the kick (heavy, he ends on a knee, a red flash), a second kick, he lies. Trunks and Gohan fly in; 18 is beside Trunks
+  before he moves, his swing stops on her (a flash), 17 is over him; Gohan is kicked down. Piccolo: player 1's body gets up (knee, feet)
+  or his actor arrives with Tien; 17 puts him down; Tien dashes for 17's back and 17 is beside him first. 40 frames; a second white cut
+  swaps to the stock's lying bodies (everyone falls within about 20 px of his stock spot), does the stock's flag changes and player 2's
+  rebinding, and stands player 2 by the roadside (Hercule: in view for his line; Piccolo, when player 1 is Hercule: off the stage). Not
+  built: Vegeta's blast that 18 dashes through (two Cine moves cannot overlap), the transformation (alone he arrives gold; a played
+  Vegeta keeps his form). Player 1 as Hercule or Krillin lies by the roadside where the blast left him. The stock bodies: 0 Tien
+  (208, 432), 1 Piccolo (252, 416), 2 Gohan (288, 432), 3 Vegeta (224, 400), 4 Trunks (236, 440) (`FindCharacterEntity n` shows body n,
+  `FindEntityByType n` removes it). Flags, party and player 2's slot after the scene: identical in five lineups.
 
 ### 4.7 The road's aftermath: touch up (M)
 
@@ -693,6 +781,13 @@ flash, the mother charges round the generator shaking the ground, her portrait l
 with the second baby looking back. It is already what this document asks of the others.
 
 ## 6. Priority list for the developer (build order, showcases first)
+
+**State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), 3.1 in part (item 7), and of item 8 the charge of 3.4, the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 4.1, 4.7 and the rest of 3.1 / 4.2 / 4.5 (the HUD is still shown at the generators).**
+
+Measured on the build (A pressed every 100 frames, so each figure is good to about 2 s; `perf` on the two heaviest): 1.7 +14 s, 1.3 +5 s,
+3.5 +7 s (the entrance and the debut), 3.6 +3.5 s, 4.6 +9 s (13 s of fight in place of a 2 s fade), 4.4 +2 s, 3.2 3.5 s shorter. Gohan's death in
+the rain: 12 OBJs at most, no scanline cut, no lagged frame; the road's montage: 20 entities, 11 OBJs, none cut. Every added second is action:
+no scene waits longer before control than its new beats take, and Start skips a helper move in progress.
 
 1. **1.7 Trunks against Frieza and King Cold** (L). No player body in the fight, so one choreography for every
    lineup: the cheapest showcase to test and the scene every fan knows. It is also the helpers' first full use
@@ -732,6 +827,7 @@ fade.
 - **Facts to settle before building:** how the HP bars are hidden in a scene; old Hercule's (158) pose groups;
   which stock body 0-4 on the road is whose; whether Vegeta enters the 19 fight transformed (Ryan's call); the
   order of old Hercule's line at Gohan's death (ours, but ask).
+- **DRAFT lines after the build: none new** (no line was added by the development pass).
 - **DRAFT lines in this batch: none new.** Every shot list keeps the lines as they are today (the drafts already
   listed in `docs/story.md` 0 stay drafts). Two lines move: old Hercule's at Gohan's death (1.3) and Vegeta's stock
   "Silly robot..." (3.6), both to sit next to what they are about.

@@ -55,26 +55,13 @@
         "zone": 1,
         "area": 2
       },
-      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits); Gohan's death: player 2's old Hercule (the companion alone) becomes an actor on his own spot (CoopCall 31) and walks up beside Trunks (Ryan, 2026-11-01: he stopped, then popped)",
+      "_": "present day: old Hercule leaves the party (Krillin becomes player 2 when he visits); Gohan's death is ch1_future_end, whose entry 0 holds the hand-over of player 2's old Hercule (the companion alone) to an actor on his own spot (CoopCall 31) and his walk up beside Trunks (Ryan, 2026-11-01: he stopped, then popped)",
       "triggers": {
         "0": {
           "payload": "seq:ch1_future_end"
         }
       },
       "edits": [
-        {
-          "at": "trigger:0/entry:0",
-          "replace": [
-            [
-              "SetPlayerVisible 0",
-              "SetPlayerVisible 0\nCoopCall 31, 0, 0, 0\nJumpIfFalse H1\nPushVarint 158\nCoopCall 31, 1, 0, 0\nCoopCall 31, 2, 0, 0\nStep SpawnCharacterEntity\nCoopCall 31, 3, 0, 0\nH1:"
-            ],
-            [
-              "WalkToPosition 0, 208, 360",
-              "WalkToPosition 0, 208, 360\nCoopCall 22, 2, 158, 0\nJumpIfFalse H2\nWalkToPosition 158, 240, 376\nSetEntityFacing 158, 2\nH2:"
-            ]
-          ]
-        },
         {
           "at": "trigger:0/entry:9",
           "replace": [

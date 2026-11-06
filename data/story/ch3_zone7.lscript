@@ -18,7 +18,34 @@ sequence ch3_z7_cutaway
         PlayMusic 25
         WaitFrames 60
         PlayAudio 50
-  stockseq @083d37bc 1 14                ; 20: "We will fight here", the tracking device, Super Saiyan, 19, 20
+  stockseq @083d37bc 1 8                 ; 20: "We will fight here", the tracking device, "Super Saiyan?"
+  [9] script                             ; stock 9, the transformation: Goku's power is shown first (the cutscene pass, 2026-11-06: Cine's charge under the stock's sprite swap; the stock played a sound and swapped); the watchers shout
+        SetEntityFacing 12, 2
+        SetEntityFacing 60, 0
+        WaitFrames 60
+        CoopCall 37, 1, 60, 12
+        CoopCall 37, 7, 50, 2
+        CoopCall 37, 0, 0, 0
+        DespawnEntity 60
+        SpawnCharacterEntity 61, 432, 408
+        PlayAudio 55
+        WhiteFlash 6
+        CoopCall 22, 2, 121, 0
+        JumpIfFalse w1
+        SetEntityAnimationNoWait 121, 4
+      w1:
+        CoopCall 22, 2, 53, 0
+        JumpIfFalse w2
+        SetEntityAnimationNoWait 53, 4
+      w2:
+        CoopCall 22, 2, 76, 0
+        JumpIfFalse w3
+        SetEntityAnimationNoWait 76, 4
+      w3:
+        WaitFrames 60
+        SetEntityFacing 61, 3
+        END
+  stockseq @083d37bc 10 14               ; "a most unexpected development", 19, 20
   script                                 ; 13 strolls up to have his say
         WalkToPosition 165, 508, 384
         SetEntityFacing 165, 2
@@ -44,12 +71,65 @@ sequence ch3_z7_battle
       L1:
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
-  stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
+  stockseq @083d40c8 0 23                ; Goku's virus, he falls; 19: "Ah yes...  Perfect!"
+  [25] script                            ; stock 24, and 19's hand over the fallen Goku: the drain (the cutscene pass, 2026-11-06)
+        SetEntityFacing 13, 2
+        SetEntityAnimation 12, 8
+        PlayDamageEffect 61
+        WhiteFlash 3
+        END
+  stockseq @083d40c8 25 27               ; "Let's move in!", 20: "You will stay where you are."
+  [29] script                            ; stock 28, the entrance: a boot from nowhere (the stock flew Vegeta to a mark): he is beside 19 and kicks him 60 px off Goku; he steps over Kakarot to his mark, his back to the machine
+        WaitFrames 20
+        CoopCall 37, 1, 0, 12                 ; the view stays on the fight: he comes into it out of nowhere
+        CoopCall 37, 4, 1, 0
+        CoopCall 37, 5, 3, 60
+        WaitFrames 20
+        WalkToPosition 0, 424, 416
+        WaitFrames 10
+        SetEntityFacing 0, 3
+        SetActiveEntity 0
+        PanCameraToPosition 352, 288, 3
+        END
+  stockseq @083d40c8 29 29               ; "Nobody kills Kakarot while I'm around..."
+  [31] script                            ; stock 30; 19 gets up and walks back to his mark
+        SetEntityFacing 0, 1
+        CoopCall 37, 1, 0, 12
+        CoopCall 37, 10, 1, 0
+        WalkToPosition 12, 480, 408
+        SetEntityFacing 12, 2
+        END
+  stockseq @083d40c8 31 38               ; Yamcha takes Goku home, 19: "I will finish Vegeta now"
   text 169 "!ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
   script                                 ; 13 walks up beside 19, to the spot his boss twin takes (TWIN_OFFSET right of 19), so the swap does not show
         WalkToPosition 165, 504, 408
         SetEntityFacing 165, 2
-  stockseq @083d40c8 39 40               ; 20 flies up to watch; Vegeta: "does a machine experience fear?"
+  [42] script                            ; stock 39 (20 flies up to watch), then the debut (Ryan's decision of 2026-11-06, the anime's moment): his power, and he stands there gold; the watchers shout. Shown, not played: the gold body is an actor (140) on his spot while player 1's own body waits out of view, so his form, energy and meter are what the stock leaves (entry 46 puts him back). Not when he walked in transformed already
+        PlayAudio 26
+        FlyToPosition 13, 456, 96
+        SetEntityFacing 0, 3
+        PushActiveCharIsTransformed
+        JumpIfFalse go
+        Jump done
+      go:
+        WaitFrames 20
+        CoopCall 37, 1, 0, 12
+        CoopCall 37, 7, 50, 2
+        SpawnCharacterEntity 140, 424, 416
+        SetEntityFacing 140, 3
+        SetEntityPositionInstant 0, 424, 716
+        CoopCall 37, 0, 0, 0
+        WhiteFlash 8
+        BeginCommandBatch
+        SetEntityAnimation 53, 4
+        SetEntityAnimation 121, 4
+        SetEntityAnimation 76, 4
+        ScreenShake 12, 6, 24
+        CommitCommandBatch
+        WaitFrames 20
+      done:
+        END
+  [43] stock @083d4076                   ; Vegeta: "So, does a machine like yourself ever experience fear?"
   [44] script                            ; "clown" only when someone plays Hercule (Ryan, 2026-11-05: a party member nobody plays is not in the scene)
         CoopCall 22, 4, 5, 0
         JumpIfFalse a
@@ -59,7 +139,14 @@ sequence ch3_z7_battle
         PushByte 46
         END
   [45] text 1 "!VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
-  [46] script                            ; stock entry 41, plus 13's actor leaving for his boss twin
+  [46] script                            ; stock entry 41, plus 13's actor leaving for his boss twin; the debut's gold actor goes in a flash and player 1 stands on his mark again, in the form the stock starts the fight in
+        CoopCall 22, 2, 140, 0
+        JumpIfFalse keep
+        WhiteFlash 4
+        DespawnEntity 140
+        SetEntityPositionInstant 0, 424, 416
+        SetEntityFacing 0, 3
+      keep:
         SetPlayerVisible 1
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 12, 2
@@ -70,9 +157,30 @@ end
 ; both are down (the record's defeat action runs once, when the last of the pair falls): 19 explodes,
 ; 13 (still on the map, by his own sprite) gets up and flies off
 sequence ch3_z7_defeat
+  script                                 ; the finishing blow (the cutscene pass, 2026-11-06; the anime's Big Bang Attack): 19 reels, turns and runs up-screen, wherever the fight left him; Vegeta raises a palm, the ball grows in it, and the stock explosions are its impact
+        SetPlayerVisible 0
+        SetEntityAnimation 12, 2
+        PushByte 12
+        PushEntityPosition 12
+        PushVarint 65536
+        Div
+        PushEntityPosition 12
+        PushEntityPosition 12
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 48
+        Sub
+        Step WalkToPosition
+        CoopCall 37, 1, 0, 12
+        CoopCall 37, 8, 3, 0
   stock @083d4174                        ; 19 explodes, EXP, the music
-  script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two
+  stock @083d42e0                        ; Vegeta's stock "Silly robot.  You really thought you had a chance against me?..." moved up to here, next to what it is about (it came after 13 had come and gone); the words are the stock's
+  script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two; everyone looks at him
         SetEntityAnimation 165, 0
+        CoopCall 37, 12, 165, 165
         WaitFrames 30
         PushByte 165
         PushEntityPosition 0
@@ -94,12 +202,13 @@ sequence ch3_z7_defeat
   text 1 "#VEGETA: Another tin can?  Stay down and I'll make it quick."
   text 169 "ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
   text 169 "And don't go thinkin' you've got Dr. Gero figured out.\x0bHeh...  Not even we know what the old man's true plan is."
-  script
+  script                                 ; his take-off kicks up dust
+        EntitySetVelocity 165, 0, 8
         PlayAudio 26
         FlyToPosition 165, 640, 96
         DespawnEntity 165
         WaitFrames 30
-  stockseq @083d4834 1 14                ; Vegeta's "Silly robot", 20 flees, Vegeta follows, Piccolo takes over
+  stockseq @083d4834 2 14                ; 20 flees, Vegeta follows, Piccolo takes over
 end
 
 ; ---- zone 2 area 1 (map 7): the three-year skip: after Gohan's and Piccolo's new moves, Hercule's Ki Blast (Ryan, 2026-11-02) ----

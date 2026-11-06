@@ -263,7 +263,32 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot c1_G_land
-mash 70 110
+mash 45 110
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+shot c1_G_faceoff
+mash 8 110
+shot c1_G_fight0
+mash 2 110
+shot c1_G_fight1
+mash 1 110
+shot c1_G_fight2
+mash 2 110
+shot c1_G_fight3
+mash 2 110
+shot c1_G_fight4
+mash 1 110
+shot c1_G_fight5
+mash 2 110
+shot c1_G_fight6
+mash 2 110
+shot c1_G_fight7
+mash 5 110
+shot c1_G_fight8
 deref R55 TBL+0xc0
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R55
@@ -276,6 +301,26 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 shot c1_G_landed
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R134
+deref R49 TBL+0xa8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R49
+deref R74 TBL+0x10c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R74
+echo EXPECT [0-9a-f]+: 00400010$
+peek FLAGS 1
+echo EXPECT map zone 3 area 4\b
+map
+ents
 echo === landing K
 load menu.ss
 p2 off
@@ -296,7 +341,32 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot c1_K_land
-mash 70 110
+mash 45 110
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+shot c1_K_faceoff
+mash 8 110
+shot c1_K_fight0
+mash 2 110
+shot c1_K_fight1
+mash 1 110
+shot c1_K_fight2
+mash 2 110
+shot c1_K_fight3
+mash 2 110
+shot c1_K_fight4
+mash 1 110
+shot c1_K_fight5
+mash 2 110
+shot c1_K_fight6
+mash 2 110
+shot c1_K_fight7
+mash 5 110
+shot c1_K_fight8
 deref R55 TBL+0xc0
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R55
@@ -309,6 +379,105 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 shot c1_K_landed
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R134
+deref R49 TBL+0xa8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R49
+deref R74 TBL+0x10c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R74
+echo EXPECT [0-9a-f]+: 00400010$
+peek FLAGS 1
+echo EXPECT map zone 3 area 4\b
+map
+ents
+echo === landing GK
+load menu.ss
+p2 0
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F000 0
+poke8 0x0203FF84 6
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x403
+poke32 0x0203FD54 0x7800c8
+poke32 0x0203FD08 5
+frames 280
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+shot c1_GK_land
+mash 45 110
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+shot c1_GK_faceoff
+mash 8 110
+shot c1_GK_fight0
+mash 2 110
+shot c1_GK_fight1
+mash 1 110
+shot c1_GK_fight2
+mash 2 110
+shot c1_GK_fight3
+mash 2 110
+shot c1_GK_fight4
+mash 1 110
+shot c1_GK_fight5
+mash 2 110
+shot c1_GK_fight6
+mash 2 110
+shot c1_GK_fight7
+mash 5 110
+shot c1_GK_fight8
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 60 110
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+shot c1_GK_landed
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R134
+deref R49 TBL+0xa8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R49
+deref R74 TBL+0x10c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R74
+echo EXPECT [0-9a-f]+: 00400010$
+peek FLAGS 1
+echo EXPECT map zone 3 area 4\b
+map
+ents
 echo === landing KG
 load menu.ss
 p2 0
@@ -330,7 +499,32 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot c1_KG_land
-mash 70 110
+mash 45 110
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+shot c1_KG_faceoff
+mash 8 110
+shot c1_KG_fight0
+mash 2 110
+shot c1_KG_fight1
+mash 1 110
+shot c1_KG_fight2
+mash 2 110
+shot c1_KG_fight3
+mash 2 110
+shot c1_KG_fight4
+mash 1 110
+shot c1_KG_fight5
+mash 2 110
+shot c1_KG_fight6
+mash 2 110
+shot c1_KG_fight7
+mash 5 110
+shot c1_KG_fight8
 deref R55 TBL+0xc0
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R55
@@ -343,6 +537,26 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 shot c1_KG_landed
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R158
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R134
+deref R49 TBL+0xa8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R49
+deref R74 TBL+0x10c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R74
+echo EXPECT [0-9a-f]+: 00400010$
+peek FLAGS 1
+echo EXPECT map zone 3 area 4\b
+map
+ents
 echo === arrival G
 load menu.ss
 p2 off
@@ -447,6 +661,107 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 echo EXPECT map zone 2 area 1\b
+map
+ents
+echo === death 1p
+load menu.ss
+p2 off
+maptest 1
+frames 30
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x201
+poke32 0x0203FD54 0x1b00110
+poke32 0x0203FD08 5
+frames 330
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+shot c1_death1p_androids
+frames 130
+shot c1_death1p_exchange
+frames 220
+shot c1_death1p_storm
+frames 400
+shot c1_death1p_lies
+frames 300
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+frames 200
+shot c1_death1p_trunks
+mash 7 120
+shot c1_death1p_scream
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 22\b
+map
+ents
+echo === death 2p
+load menu.ss
+p2 0
+maptest 1
+frames 30
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x201
+poke32 0x0203FD54 0x1b00110
+poke32 0x0203FD08 5
+frames 330
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+shot c1_death2p_androids
+frames 130
+shot c1_death2p_exchange
+frames 220
+shot c1_death2p_storm
+frames 400
+shot c1_death2p_lies
+frames 300
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+frames 200
+shot c1_death2p_trunks
+mash 7 120
+shot c1_death2p_scream
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 22\b
 map
 ents
 echo === visit alone

@@ -2,7 +2,7 @@ r"""Write tools/headless/staging_ch2.txt and staging_ch3.txt: chapters 2 and 3's
 usage: python tools/headless/staging_ch23_gen.py     (the scripts are committed; rerun this after changing them here)
 Chapter 2: the mansion deal alone as Gohan / Krillin and with both; the jungle's end alone as Piccolo, alone as Hercule and with both.
 Chapter 3: zone 7's cutaway; 19's battlefield alone as Vegeta, alone as Hercule (made Vegeta), both ways round with two players; the landing
-alone (no Hercule: he only becomes selectable) and with player 2's entity handed over from Hercule's actor. Only who is played is in a scene
+alone (no Hercule: he only becomes selectable) and with player 2's entity handed over from Hercule's actor; space, alone and to the duel. Only who is played is in a scene
 (Ryan, 2026-11-05): Piccolo's actor 103 never, Hercule's sprite 72 only on a player (or his hand-over actor with two players at the landing)."""
 from staging_lib import *
 
@@ -33,23 +33,67 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, P
 s.write("staging_ch2.txt")
 
 s = Script("staging_ch23_gen.py")
+# Amenbo Island (the cutscene pass, 2026-11-06): 20's power and his volley at the city in place of one blast, the white cut to the burning street
+# (zone 5 area 4), Goku's flare before "You monster!!!"; alone as Gohan and with Piccolo and Hercule
+for p1, p2 in ((GOHAN, None), (PICCOLO, HERCULE)):
+    n = lineup_name(p1, p2)
+    s.begin(f"amenbo {n}", p1, p2)
+    s.warp(5, 3, 144, 300, 60)
+    s.press(19, 112)
+    for i in range(4):
+        s.out("key 1 6", "frames 56")
+        s.shot(f"c3_{n}_amenbo{i}a")
+        s.out("frames 56")
+        s.shot(f"c3_{n}_amenbo{i}b")
+    s.out("ents")
+    s.on_map(5, 4)
 s.begin("cutaway", VEGETA, None)
 s.warp(7, 1, 200, 310, 200)
 s.press(16, 100)
+for i in range(3):                  # Goku's power before the gold (the cutscene pass, 2026-11-06): Cine's charge on sprite 60, then 61 stands
+    s.out("key 1 6", "frames 50")
+    s.shot(f"c3_cut_power{i}a")
+    s.out("frames 50")
+    s.shot(f"c3_cut_power{i}b")
+s.actors(s61=1, s60=0)
+s.out("ents")
 s.shot("c3_cut")
 s.end_scene()
 s.on_map(7, 1)
 for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1), (HERCULE, VEGETA, 1)):
     n = lineup_name(p1, p2)
-    s.begin(f"battle {n}", p1, p2, "+76")
-    s.warp(7, 15, 424, 416, 300)
-    s.press(30, 110)
+    # the cutscene pass (2026-11-06): the players stand at the area's own entry point, below the view (the scene's trigger is the whole
+    # map), so Vegeta comes into the fight out of nowhere: shots of 19's hand over Goku, the kick, 19 thrown; the story's lead is poked to
+    # Vegeta (flags 464-467), so speaker 1 shows his portrait as it does in play
+    s.begin(f"battle {n}", p1, p2, "+76", ["poke8 FLAGS+0x3A 3"])
+    s.warp(7, 15, 468, 556, 300)
+    s.press(24, 110)
+    s.shot(f"c3_{n}_drain")
+    s.press(4, 110)
+    s.out("key 1 6", "frames 44")
+    s.shot(f"c3_{n}_kick")
+    s.out("frames 24")
+    s.shot(f"c3_{n}_thrown")
+    s.out("frames 100")
+    s.shot(f"c3_{n}_mark")
+    s.press(1, 110)
     s.actors(s72=s72)              # no Hercule actor for "clown" alone (Ryan, 2026-11-05)
+    s.press(14, 110)
+    for i in range(5):             # the debut: his power, the gold (an actor, 140, on his spot), the line
+        s.press(1, 110)
+        s.shot(f"c3_{n}_debut{i}")
     s.end_scene(200)
     s.shot(f"c3_{n}_fight")
-    s.actors(s72=s72, s165=1)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin
+    s.actors(s72=s72, s165=1, s140=0)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin; the gold actor gone
+    s.out("echo EXPECT 0203f000: 00000602 00000000 00000000", "peek 0x0203F000 3")      # Vegeta plays; the form's meter as the stock leaves it: 0
+    s.out("echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] ", "map")
     s.on_map(7, 15)
-    s.win(200)
+    s.out(f"poke32 {CMD} 7")       # 19's end: he reels and runs, Vegeta's palm, the big blast, the stock explosions
+    for i in range(6):
+        s.out("frames 50")
+        s.shot(f"c3_{n}_end{i}")
+    s.out("frames 200")
+    s.actors(s12=0)
     s.press(5, 100)
     s.actors(s72=s72)
     s.shot(f"c3_{n}_13")
@@ -72,4 +116,28 @@ for p1, p2, s72 in ((VEGETA, None, 0), (VEGETA, TRUNKS, 1)):
     s.shot(f"c3_{n}_landed")
     s.actors(s72=s72)              # alone he walked off; with two players player 2 is him now
     s.on_map(6, 22)
+# space, Vegeta and his clone (the cutscene pass, 2026-11-06: the blows played by the cinematic helpers): alone to the landing (the fight's end shown,
+# no clone left, Vegeta back in base form on sprite 137); with two players to the duel's start (duel_active, coop2 + 0x25C)
+for two in (False, True):
+    n = "2p" if two else "1p"
+    # as in play, nobody else is selectable here (Amenbo's "Meanwhile..." locks them): player 2 has no body until the duel makes the clone his
+    s.begin(f"space {n}", VEGETA, None, "", ["poke8 FLAGS+0x3A 3"] + [f"poke8 {flags_of(i)} 0" for i in (0, 1, 3, 4, 5, 6, 8)] + (["p2 0"] if two else []) + ["frames 30"])
+    s.warp(6, 50, 248, 560, 120)
+    for i, k in enumerate((1, 2, 2, 2, 3, 3, 3)):
+        s.out(f"mash {k} 160", "frames 60")
+        s.shot(f"c3_space{n}_{i}")
+    s.out("ents")
+    if two:
+        s.out("stepnz 0x0203FD5C 60", "frames 60", "echo EXPECT 0203fd5c: 01", "peek8 0x0203FD5C 1")
+        s.shot(f"c3_space{n}_duel")
+        s.out("ents")
+        s.on_map(6, 50)
+    else:
+        for i in range(4):
+            s.out("key 1 6", "frames 60")
+            s.shot(f"c3_space{n}_end{i}")
+        s.end_scene()
+        s.out("frames 60")
+        s.actors(s140=0, s137=1)
+        s.on_map(6, 22)
 s.write("staging_ch3.txt")

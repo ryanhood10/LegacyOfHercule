@@ -33,17 +33,28 @@ for p1, p2, want in ((GOHAN, None, dict(s53=1, s76=0)), (KRILLIN, None, dict(s53
 
 # Frieza's landing and the Goku-arrival site (zone 3 areas 4 and 6): no actor of Gohan (55) or Krillin (76) in any lineup
 LEAD_GOHAN = ["poke8 FLAGS+0x3A 1"]          # flags 464-467: the story's lead is Gohan (slot + 1)
-for p1, p2 in ((GOHAN, None), (KRILLIN, None), (KRILLIN, GOHAN)):
+# The fight is one choreography for every lineup (no player's body is on the ship's map; the cutscene pass of 2026-11-06): shots of the
+# Super Saiyan, the soldiers, old Hercule's punch, Frieza's blast into empty ground, the sword, King Cold's fall. Afterwards: flags 4 and 22
+# and nothing else in the first flag word (as before the pass), old Hercule (158) and Trunks (128 / 134) gone with the scene.
+for p1, p2 in ((GOHAN, None), (KRILLIN, None), (GOHAN, KRILLIN), (KRILLIN, GOHAN)):
     n = lineup_name(p1, p2)
     s.begin(f"landing {n}", p1, p2, "+4 +360", LEAD_GOHAN, maptest=52)
     s.warp(3, 4, 200, 120, 280)
     s.actors(s55=0, s76=0)
     s.shot(f"c1_{n}_land")
-    s.press(70, 110)
+    s.press(45, 110)
+    s.actors(s158=1, s128=1)        # Trunks has landed, old Hercule behind him
+    s.shot(f"c1_{n}_faceoff")
+    for i, k in enumerate((8, 2, 1, 2, 2, 1, 2, 2, 5)):
+        s.press(k, 110)
+        s.shot(f"c1_{n}_fight{i}")
     s.actors(s55=0, s76=0)
     s.press(60, 110)
     s.end_scene(200)
     s.shot(f"c1_{n}_landed")
+    s.actors(s158=0, s128=0, s134=0, s49=0, s74=0)
+    s.out("echo EXPECT [0-9a-f]+: 00400010$", "peek FLAGS 1")
+    s.on_map(3, 4)
 for p1 in (GOHAN, KRILLIN):
     n = lineup_name(p1, None)
     s.begin(f"arrival {n}", p1, None, "+4 +360 +21 +22", LEAD_GOHAN, maptest=54)
@@ -57,6 +68,32 @@ for p1 in (GOHAN, KRILLIN):
     s.actors(s55=0, s76=0)
     s.end_scene(200)
     s.on_map(2, 1)
+
+# Gohan's death (zone 1 area 2; the cutscene pass of 2026-11-06): the androids walk into view (9 and 11 stand while the blasts fall), fly off
+# (none after), old Hercule's actor (158) beside Trunks, the scene runs on into the present (zone 2 area 22). Alone (the companion) and two players.
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.out(f"echo === death {n}", "load menu.ss", "p2 0" if two else "p2 off", "maptest 1", "frames 30", "poke8 0x0203F000 3", "poke8 0x0203F0A0 24", "flags +466")
+    if two:
+        s.out("poke8 0x0203FF84 5")
+    s.out("deref TBL 0x0800959C")
+    s.warp(1, 2, 272, 432, 330)
+    s.actors(s9=1, s11=1, s158=1)
+    s.shot(f"c1_death{n}_androids")
+    s.out("frames 130")
+    s.shot(f"c1_death{n}_exchange")     # Gohan and 17 (the cinematic helpers), then 18's blow
+    s.out("frames 220")
+    s.shot(f"c1_death{n}_storm")
+    s.out("frames 400")
+    s.shot(f"c1_death{n}_lies")
+    s.out("frames 300")
+    s.actors(s9=0, s11=0, s158=1)
+    s.out("frames 200")
+    s.shot(f"c1_death{n}_trunks")
+    s.press(7, 120)
+    s.shot(f"c1_death{n}_scream")
+    s.end_scene(200)
+    s.on_map(2, 22)
 
 only_gohan = [f"poke8 {flags_of(i)} 0" for i in range(1, 9)] + ["frames 30"]
 s.begin("visit alone", GOHAN, None, "+4", only_gohan)

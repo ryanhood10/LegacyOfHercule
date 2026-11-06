@@ -76,6 +76,7 @@ actors(s165=0)
 
 # the lab door (area 46's item 0, Ryan 2026-11-06: the one death): walk up after the cutaway (flag 124 = FLAGS+15 bit 4);
 # 13 stands at Gero's side in the lab, swears revenge after 17's blast and flies off, then the stock scene to area 47
+# (the cutscene pass, 2026-11-06: the same beats with weight; shots 31-41 are Gero's fall, 13's blasts landing and his take-off)
 for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
     begin(f"door_{name}", p1, p2)
     out("poke8 FLAGS+15 0x10")
@@ -84,21 +85,36 @@ for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
     for _ in range(10):
         out(*walk.split("\n"))
     out("frames 300")
-    for i in range(30):                      # to 13's revenge (past "scrap heap")
+    for i in range(44):                      # through 17's blast (Gero thrown, lying, gone: no 14 after it), 13's revenge, his blasts landing, to his take-off
         out("key 1 6", "frames 90")
-        if i in (10, 24):
+        if i in (10, 24, 31, 32, 39, 40, 41):
             out(f"shot st_door_{name}_{i}", "ents")
+        if i == 34:
+            actors(s14=0, s165=1, s9=1, s11=1)
     out(f"stepz {SCENE} 250", "frames 200", "echo EXPECT map zone 8 area 47 ", "map", "ents")
     actors(s165=0)
 
-# the road's end (18 beaten): Hercule backs Krillin only when someone plays him; alone as Piccolo or Krillin no 72 at all
-for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None)):
+# the road's end (18 beaten): after "Who's next?" the fight the stock hid in a black fade (the cutscene pass, 2026-11-06): Vegeta (player 2's
+# body, or alone his gold actor 140), Trunks (128) and Gohan (53), Piccolo (player 1's body or his actor 103) and Tien (121) fall in turn; a
+# white cut; then the stock ending: exactly one 17 (the fight's twin is reused), no actor left, the first flag words as the stock leaves them.
+# Hercule backs Krillin only when someone plays him; alone as Piccolo or Krillin no 72 at all.
+for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None), ("PH", 1, 5), ("HP", 5, 1), ("KH", 6, 5)):
     begin(f"{name}_end", p1, p2)
     warp(49, 200, 700)
-    out(f"stepz {SCENE} 80", "frames 60", "poke32 0x0203FD08 7", "frames 400")
+    out(f"stepz {SCENE} 80", "frames 60", "poke32 0x0203FD08 7", "frames 400", "mash 4 100", "frames 150")
+    actors(s140=int(p2 is None), s11=1, s9=1, s8=1)
+    out(f"shot st_{name}_end_m0", "frames 200")
+    actors(s128=1, s53=1)
+    out(f"shot st_{name}_end_m1", "frames 200", f"shot st_{name}_end_m2", "frames 130")
+    actors(s121=1, s103=1)
+    out(f"shot st_{name}_end_m3", "frames 200", f"shot st_{name}_end_m4", "ents")
+    after2 = None if p2 is None else (1 if p1 == HERCULE else HERCULE)      # player 2 after the rebinding
+    actors(s9=1, s11=1, s8=1, s76=1, s140=0, s128=0, s53=0, s121=0, s103=int(1 in (p1, after2)))
+    if p2 is not None:
+        out(f"echo EXPECT 0203ff84: 0{after2}", "peek8 0x0203FF84 1")
     for i in range(18):
         out(f"key 1 6", "frames 160")
-        actors(s72=int(p1 == HERCULE))
+        actors(s72=int(HERCULE in (p1, after2)))
         out(f"shot st_{name}_end_{i}")
     out(f"stepz {SCENE} 200", "frames 200", "echo EXPECT map zone 6 area 99 ", "map", "ents")
 out("echo ALIVE")
