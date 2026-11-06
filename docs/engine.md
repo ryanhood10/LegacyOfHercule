@@ -143,6 +143,10 @@ so nothing in ROM references it by address.
   from `data/hercule.json`, literals at file `0x8024` and `0x8E8C`) and extend it to ids 0-23: 14-17
   Hercule's four moves, 18 Super Hercule, 19-21 Krillin's Afterimage Rush, Shockwave Punch and
   Destructo Disc, 22 Android 16's Rocket Punch, 23 Super Saiyan 2 Gohan's Burst. `python tools/romdata.py abilities <built rom>` prints it.
+- **Map-visit bits** (decompiled 2026-11-06): `MapVisited_Set` 0x080040EE(party, zone, area) at every map load
+  (0x0800C430) and VM action 128, `MapVisited_Test` 0x080041A6 (VM action 23), the pause map's area draw 0x08017B34: one
+  bit per map id (table 0x086F6D8C, 68 groups of {zone, area, id}, ids 0-296) at stock party + 0xE7 (flags 408-704). The
+  build keeps them in `g_map_visits` (`docs/party-8-slots.md` "The map-visit bank").
 - Map entities are spawned from `MapEntry.mapScripts[]` by handlers `0x0800B711` (town NPC),
   `0x0800D6DF` (script actor), `0x0800E77F` (enemy); behaviour lists ticked by `0x0800D156`.
 

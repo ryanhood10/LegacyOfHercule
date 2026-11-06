@@ -1,0 +1,223 @@
+# The map-visit bits out of the party entries (src/coop/mapvisit.c, docs/party-8-slots.md "The map-visit bank",
+# docs/testing.md "Map visits"): self-checking, python tools/headless/st_expect.py tools/headless/map_visits.txt ROM menu.ss
+# Until 2026-11-06 every map load ORed the map's visit bit into party + 0xE7 + id / 8: slot 7's tail, all of Super Saiyan 2
+# Gohan's entry (slot 8) and story flags 0-32. A. as Ryan met it: he plays Super Saiyan 2 Gohan, the maps load, his entry,
+# slot 7's tail and flags 0-63 stay as they were and the bits land in g_map_visits (its address through the pause map's
+# shadow table: [0x08017E40] + 0x1C = bits - 0xE7). B. his four abilities one after another with L (the old build: his
+# fourth was 2 | 0x40 = 66, past the ability table, and the game jumped to 0xFFFFFFFE). C. a save that an old build left
+# corrupted, through a real save, soft reset and load: party_repair gives him back his entry; the visit bits come back
+# from the slot's record; D. a slot 8 that never joined (flag 195 clear) loads empty.
+echo === A. Super Saiyan 2 Gohan through eight map loads
+p2 off
+maptest 13
+frames 300
+poke16 0x0203F0EC 1314
+poke16 0x0203F0EE 1314
+poke16 0x0203F0F0 210
+poke16 0x0203F0F2 210
+poke8 0x0203F0F4 28
+poke8 0x0203F0F5 0
+poke16 0x0203F0F6 0x5800
+poke16 0x0203F0F8 0x7500
+poke16 0x0203F0FA 0x4A00
+poke32 0x0203F0FC 0x10000
+poke32 0x0203F100 0x7F
+poke32 0x0203F104 0x02170403
+poke8 0x0203F000 8
+echo --- 9/1 (id 262: his fourth ability, bit 6), 8/22 (232: the first), 7/24 (199: EXP bit 31), 7/25 (200: flags bit 0), 13/2 (285: flag 21), 2/27 and 2/33 (8, 15: slot 7's list), 3/11 (40: his HP)
+poke32 0x0203FD0C 0x0109
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x1608
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x1807
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x1907
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x020D
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x1B02
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x2102
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+poke32 0x0203FD0C 0x0B03
+poke32 0x0203FD54 0x00C800C8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 60
+echo EXPECT map zone 3 area 11\b
+map
+echo --- his entry from +4 (HP may have taken hits): EP, row, ability index, stats, EXP, flags, abilities as poked
+echo EXPECT 0203f0f0: 00d200d2 5800001c 4a007500 00010000 0000007f 02170403$
+peek PARTY+0xF0 6
+echo --- slot 7's tail and story flags 0-63 untouched
+echo EXPECT 0203f0e0: 00000000 00000000 00000000$
+peek PARTY+0xE0 3
+echo EXPECT 0203f108: 00000000 00000000$
+peek FLAGS 2
+echo --- the bits in g_map_visits: ids 8 + 15, 40, 199 + 200, 232, 262, 285
+deref T 0x08017E40
+deref V T+0x1C
+echo EXPECT \w+: 81$
+peek8 V+0xE8 1
+echo EXPECT \w+: 01$
+peek8 V+0xEC 1
+echo EXPECT \w+: 80 01$
+peek8 V+0xFF 2
+echo EXPECT \w+: 01$
+peek8 V+0x104 1
+echo EXPECT \w+: 40$
+peek8 V+0x107 1
+echo EXPECT \w+: 20$
+peek8 V+0x10A 1
+echo === B. his four abilities in a row, the L switch between them (index, then EP spent)
+poke32 0x0203FD0C 0x0702
+poke32 0x0203FD54 0x01AE01F4
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD08 13
+frames 30
+poke16 0x0203F0EC 1314
+poke16 0x0203F0F0 210
+poke32 0x0300208C 1
+keys 2
+frames 40
+keys 0
+frames 60
+echo EXPECT 0203f0f0: 00(?!d2)[0-9a-f]{2}$
+peek16 0x0203F0F0 1
+poke16 0x0203F0F0 210
+key 0x200 1
+frames 10
+echo EXPECT 0203f0f5: 01$
+peek8 0x0203F0F5 1
+poke32 0x0300208C 1
+key 2 3
+frames 80
+echo EXPECT 0203f0f0: 00(?!d2)[0-9a-f]{2}$
+peek16 0x0203F0F0 1
+poke16 0x0203F0F0 210
+key 0x200 1
+frames 10
+echo EXPECT 0203f0f5: 02$
+peek8 0x0203F0F5 1
+poke32 0x0300208C 1
+key 2 3
+frames 80
+echo EXPECT 0203f0f0: 00(?!d2)[0-9a-f]{2}$
+peek16 0x0203F0F0 1
+poke16 0x0203F0F0 210
+key 0x200 1
+frames 10
+echo EXPECT 0203f0f5: 03$
+peek8 0x0203F0F5 1
+poke32 0x0300208C 1
+key 2 3
+frames 80
+echo EXPECT 0203f0f0: 00(?!d2)[0-9a-f]{2}$
+peek16 0x0203F0F0 1
+key 0x200 1
+frames 10
+echo EXPECT 0203f0f5: 00$
+peek8 0x0203F0F5 1
+frames 60
+echo EXPECT map zone 2 area 7\b
+map
+echo === C. a save an old build left corrupted (joined: flag 195; bits ORed into EP, row, EXP, flags, abilities), saved, reset, loaded
+load menu.ss
+p2 off
+maptest 7
+frames 300
+poke32 0x0203F0EC 0x05220522
+poke32 0x0203F0F0 0x80d280d2
+poke32 0x0203F0F4 0x580000dd
+poke32 0x0203F0F8 0x4a007500
+poke32 0x0203F0FC 0x80010000
+poke32 0x0203F100 0x0100017f
+poke32 0x0203F104 0x42170c43
+flags +195
+echo --- 3/11 visited before the save, 13/2 never
+poke32 0x0203FD0C 0x0B03
+poke32 0x0203FD54 0x00DE00C8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x0102
+poke32 0x0203FD54 0x0100021C
+poke32 0x0203FD08 5
+frames 200
+mash 6 50
+frames 60
+key 0xF 6
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 400
+echo EXPECT map zone 2 area 1 var 1 player 540,256
+map
+echo --- his entry as the join left it: the top bits of EP and EXP, the row, the flags and the abilities given back
+echo EXPECT 0203f0ec: 05220522 00d200d2 5800001c 4a007500 00010000 0000007f 02170403$
+peek PARTY+0xEC 7
+echo --- the visit bits from the slot's record: 3/11 (id 40) set, 13/2 (id 285) clear
+deref T 0x08017E40
+deref V T+0x1C
+echo EXPECT \w+: 01$
+peek8 V+0xEC 1
+echo EXPECT \w+: 00$
+peek8 V+0x10A 1
+echo === D. a slot 8 that never joined (flag 195 clear) with bits in it: it loads empty
+flags -195
+poke32 0x0203F100 0x0000c003
+poke32 0x0203F104 0x40404040
+key 1 6
+frames 80
+key 1 6
+frames 80
+key 1 6
+frames 80
+key 1 6
+frames 80
+key 1 6
+frames 80
+key 0xF 6
+frames 300
+key 8 6
+frames 200
+key 8 6
+frames 200
+key 8 6
+frames 120
+key 1 6
+frames 120
+key 1 6
+frames 400
+echo EXPECT map zone 2 area 1 var 1 player 540,256
+map
+echo EXPECT 0203f0ec: 00000000 00000000 00000000 00000000 00000000 00000000 00000000$
+peek PARTY+0xEC 7

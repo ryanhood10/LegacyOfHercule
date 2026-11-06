@@ -452,8 +452,9 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F850 | 0x30 | `.party.kr` Krillin state (`krillin.c`) |
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
-| 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
+| 0x0203F000-0x0203FB00 | 0xB00 of 0xB00 | `partyram` is full (2026-11-06: the `.party*` sections use it all; new state goes elsewhere) |
 | 0x0203E900 | 0x84 of 0x100 | `cineram` (`coop.ld`, NOLOAD; 2026-11-06): `.cine`, the cinematic helpers' state (`cine.c` `CineRam`, magic 0xC14E0001: the cast, the point, the hold control state and its vtable copy, the held charge, the tests' counters; offsets at test command 50). **The heap cap ends here** (`tools/patch_rom.py` `WORD_PATCHES`: 0xF83E words), `__coop_ram_start` too |
+| 0x0203E984 | 0x28 | `g_map_visits` (`mapvisit.c`, `.cine.mv` after `.cine` in `cineram`; 2026-11-06): the map-visit bits, 297 maps (id = bit), out of the party entries (`docs/party-8-slots.md` "The map-visit bank"); the pause map reads it through the shadow word at file 0xA0201C |
 | 0x0203EA00 | 0x200 region | `comboram` (team combos, `tny_combo.h`, NOLOAD): `.combo.meter` 0x0203EA00 (0x80, the meter), `.combo.cap` 0x0203EA80 (0x30, the caption), `.combo.run` 0x0203EAB0 (0x88 of 0x140, the runner: test command 33); then `.combo.rg`, `.combo.pf`, `.combo.ag`, `.combo.ch`, `.combo.st` (0xC, the tournament scenes' staging counts for tests, `tny_engine.c`, 2026-11-05: 0x1C0 of 0x200 used); the heap cap ends here since 2026-10-31; offsets at test command 32 |
 | 0x0203EC00 | 0x228 of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, the fight's frames +0x16, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C (72 bytes: seats +0x70, 32 of them; winners +0x90; p1_seat / p2_seat +0xB0; `docs/tournament.md` 26), pop-ups queued / shown +0xEC (the queue: `.tny.eq`), the tests' wait bytes +0xFC / +0xFD, the winners' celebration +0x115 (its frame, 0xFF none) / +0x116 (started for this fight's end; `docs/tournament.md` 28, in the old padding), the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the curtain +0x154, the announcer's walk +0x155 (1 on, 2 off; frames +0x156, target +0x158 / +0x15A), the last ring reload's frames +0x157, the last warp's spot +0x15C / +0x15E, walks off / on done +0x160 / +0x161, test mark x +0x162, walks started +0x164 (2026-11-01, `docs/tournament.md` 24.4 / 24.5), the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr`, `.tny.hp`, `.tny.talk`, `.tny.cap`, `.tny.cp`, `.tny.eq` (0x10, the pop-up queue), `.tny.us` (0x10, the bracket's first seats as last drawn) (`coop.map`): 0x3F8 of `tourneyram`'s 0x400 used, **8 bytes left** (`comboram` has 0x80) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
@@ -467,7 +468,8 @@ All of it, 0x0203E900-0x02040000 (`coop.ld` `__coop_ram_start` / `__coop_ram_end
 (`input.c` `soft_reset`, `docs/coop-design.md` "Session logic"), as a power cycle leaves it.
 
 Save chip (8 KiB EEPROM, `party_save.c`): the header 0x0-0xF, three save slots of `SAVE_STRIDE` (0x10-0x54F with 9
-party slots), **the tournament's global record 0x1E00-0x1E3F** (`tny_engine.c` `TRecord`), the rest free.
+party slots), **the map-visit records 0x1D00-0x1D8F** (`mapvisit.c`: 0x30 per save slot, magic "MSVT" 0x5456534D, checksum,
+the 40 bytes of `g_map_visits`), **the tournament's global record 0x1E00-0x1E3F** (`tny_engine.c` `TRecord`), the rest free.
 
 Useful `coop2` words: `cmd` 0x0203FD08, `cmd_arg` 0x0203FD0C, `a16` 0x0203FD34, `a16_bot` 0x0203FD44,
 `cmd_arg2` 0x0203FD54, `duel_active` / `duel_winner` 0x0203FD5C / 0x0203FD5D.

@@ -78,7 +78,9 @@ def fade_in(zone, area, x, y):
 GOHAN, VEGETA, TRUNKS, PICCOLO, HERCULE = 0, 2, 3, 1, 5
 CELL_Q = "poke32 0x0203F9B0 0xCE11CA3E\npoke8 0x0203F9B5 {q}\npoke8 0x0203F9B6 0\n"   # cg_state: the queued win (docs/testing.md "Cell saga staging")
 SS2 = ("poke16 0x0203F0EC 300\npoke16 0x0203F0EE 300\npoke16 0x0203F0F0 100\npoke16 0x0203F0F2 100\npoke8 0x0203F0F4 28\n"
-       "poke8 0x0203F100 0x7F\n")      # slot 8, Super Saiyan 2 Gohan, as ssj2_join leaves him (the post-game party)
+       "poke8 0x0203F100 0x7F\npoke32 0x0203F104 0x02170403\n")   # slot 8, Super Saiyan 2 Gohan, as ssj2_join leaves him (the
+# post-game party), his abilities 3, 4, 23, 2 too: until 2026-11-06 the list was left to the map-visit bits, which made it 0, 0, 0, 64
+# and crashed the game on its fourth ability (docs/party-8-slots.md "The map-visit bank")
 UP = "keys 0x40\nframes 90\nkeys 0\n"
 
 # key: (made on the debug ROM, Ryan's one action for the film after the question, what to watch)

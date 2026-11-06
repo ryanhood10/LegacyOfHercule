@@ -41,6 +41,7 @@ inspection goes through the GDB stub.
 | Tournament art (Buu's Fury imports) | any new fighter sprite: spawn it as an opponent from a RAM record, fight, hit test, OBJ VRAM with giants |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
+| Map visits | the map-visit bits kept out of the party entries, Super Saiyan 2 Gohan's four abilities after many map loads (the FFFFFFFE crash), an old save's repair and the bits' save record |
 | Art checks: every frame in game | any changed sprite record: all its frames through the game's loader, the entity list checked; Hercule's flight |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
 
@@ -68,6 +69,26 @@ later, every vtable in the ROM. A private runner: `ST_HEADLESS=/root/<name>` (wi
 2026-11-06: 72 (groups 3, 9, 12, 18), 157, 160, 163, 165, 175, 180, 240: ok. `hercule_fly.txt`: Hercule as player 1
 takes a flight circle (zone 3 area 3); the fly state 0x03002130 is checked and his facing held left and right for a few
 frames of the real flight (the circle flies him up the map).
+
+## Map visits (headless, 2026-11-06, branch `nb-crash`; `docs/party-8-slots.md` "The map-visit bank")
+
+```
+python tools/headless/st_expect.py tools/headless/map_visits.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4   # in regfull.sh
+```
+
+Self-checking, 25 checks. A: Super Saiyan 2 Gohan as player 1 (slot 8 poked as `ssj2_join` leaves him, Map Test 13) through
+eight real map loads chosen so each old bit hits a field (9/1 his fourth ability, 8/22 the first, 7/24 EXP bit 31, 7/25
+flags bit 0, 13/2 flag 21, 2/27 and 2/33 slot 7's list, 3/11 his HP): his entry from +4, slot 7's tail and flags 0-63 as
+they were, the bits in `g_map_visits` (found through the pause map's shadow table: `deref T 0x08017E40`, `deref V T+0x1C`,
+the bit of map id n at `V + 0xE7 + n / 8`). B: his four abilities in a row with L between them (index 1, 2, 3, 0; EP spent
+by each). C: a save as an old build left it (joined, bits in EP, the row, EXP, flags and abilities), saved through the town's
+pad (Map Test 7, (540, 256): the tutorial's first save), soft reset, loaded: his entry back to the join's, 3/11's bit back from
+the slot's record and 13/2's clear. D: a slot 8 that never joined (flag 195 clear) with bits in it loads empty. On the build
+before the fix 20 of the 25 fail (and Ryan's crash itself: the summit's lineup S, `staging_arctic.txt`'s poke, three L presses:
+`CRASH ... r15=fffffffe`, r6 = 0x08900400 the table entry of ability 64).
+
+A real save's slots, before and after a fix that touches the load: `chamber_save.py load ROM SAVE --out DIR --base OLD_ROM` (it
+works on a copy) and compare the party blocks.
 
 ## Full regression (headless, `tools/headless/regfull.sh`)
 

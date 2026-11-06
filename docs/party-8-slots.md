@@ -116,6 +116,64 @@ invalid address 696A6870", r14 `0x080027F1`; reproduced on main with `COOP_CMD_A
 would write filler tiles without end. The replacement draws the same strip with the distances clamped
 to 5 and a window of at most 8 tabs around the current member.
 
+**The map-visit bank (missed until 2026-11-06, the cause of "error FFFFFFFE" with Super Saiyan 2 Gohan).** The stock
+game keeps a visited bit per map (297 maps, ids 0-296, table `0x086F6D8C`: 68 groups of `{u8 zone, u8 area, u16 id}`
+entries) at `party + 0xE7 + id / 8`, the stock flag bank's upper half (flags 408-704). Three sites address it with that
+Thumb immediate (`adds rN, #0xE0; ldrb/strb [rN, #7]`): `MapVisited_Set` 0x080040EE (every map load from 0x0800C430; VM
+action 128 at 0x0800AFBC), `MapVisited_Test` 0x080041A6 (VM action 23 at 0x08009646; no stock script uses either action)
+and the pause menu's area map 0x08017B34 (an area is drawn as visited). None was moved with the tail, so with nine slots
+the bits landed on `party + 0xE7 .. + 0x10C`:
+
+| ids | maps | lands on |
+|---|---|---|
+| 0-7 | zone 2 | slot 7's flags, top byte |
+| 8-39 | zones 2-3 | slot 7's ability list |
+| 40-263 | zones 3-9 | all of slot 8 (Super Saiyan 2 Gohan): 40-103 HP / EP, 104-111 the row, 112-119 the ability index, 120-167 str / pow / end, 168-199 EXP, 200-231 flags, 232-263 the ability list |
+| 264-296 | 9/4, zones 11-14 | story flags 0-32 (flag = id - 264) |
+
+(With eight slots, 2026-10-17 .. 10-19, the same range was slot 7 and story flags 0-263.)
+
+**What the overlap did to story flags 0-32 in play (since 2026-10-19).** Flag n was set by entering map id 264 + n: 0 the
+Lookout 9/4; 1-6 zone 11 (Kame House 11/1-6: 3 = 11/1, 1 = 11/2, 2 = 11/3, 4-6 = 11/4-6); 7-19 zone 12 (12/1-4, 6, 10-17:
+7-9 = 12/1-3, 18 = 12/4, 19 = 12/6, 10-17 = 12/10-17); 20-29 zone 13 (Snowy Highlands 13/1-10); 30-32 the Cell Games
+(14/1-3). They are chapter 1-2 flags (zones 1-4), so on a normal run they were already set when those later maps opened; what
+can still go wrong is a flag the story *cleared* coming back, or a still-missed early event being closed:
+flag 10 (12/10) re-arms Gohan's house's phone call (z2 a20 triggers 0 / 1, mode 1: "It's the phone - maybe I should see who
+it is...", Krillin's call about Frieza): **seen headless on the build before the fix, 12/10 then 2/20 replays the call**;
+flag 24 (13/5) re-arms Chi-Chi and Goku's reunion (z2 a20 triggers 4 / 5) and puts back NPCs at z2 a1 and a20 (sprites 33,
+62), 25 (13/6) one at z2 a20, 27 (13/8) the triggers of z2 a5 / a6, 21 (13/2) the eight Goku-arrival NPCs at z3 a4 (all
+cleared by the story in chapters 1-2); 26 (13/7) and 30 (14/1) switch on triggers at z6 a99 (6/7, 19/20; 30 also hides z4
+a3's Goku actor and trigger 1 if not yet seen); 31 (14/2) makes Goku's NPC (z2 a21, z6 a1) give the short line instead of
+his Namek story; 0, 4, 8, 9 change which line an NPC says (z1 a1, z2 a1 / a21, z2 a4); 14-16 (12/14-16) keep three
+enemies at z3 a1 from spawning; the rest close one-time chapter-1 scenes long done. Our own scripts use 4 (tested in
+`ch1_opening`) and 9, 11, 21, 22 (set there). The fix stops new bits; flags an old save already holds are left as they
+are. Ryan's save (2026-11-06): files 1 and 3 (15/15 early, 4/56) have flags 20-32 clear; file 2 (8/50, chapter 4, after
+Kame House) has 1 and 3-6 set, which Kame House's maps would also set, but they are chapter-1 flags its run has set anyway
+(1 is unused, 4 only picks an NPC's line); nothing there re-arms a scene. The overlap also put bits in slot 7: the
+duel clone and Android 16 rewrite it whole when they take it, but Android 16 staying selectable after his chapter (row
+25) took ability-list bits from every zone 2-3 map, the same crash for him.
+ A map load ORs one bit in, so a
+Super Saiyan 2 Gohan who joined at the Cell Games' end collected bits from every later map: 9/1 (the Lookout, id 262)
+made his fourth ability 2 | 0x40 = 66, past the 26-entry ability table into its 0xFF padding, and the HUD's isReady
+for it (called every frame while it is selected, lr 0x08008D25) jumped to 0xFFFFFFFE as soon as L selected it; 7/24
+(id 199) made his EXP negative, which `Character_GetLevel` (a signed compare) walks off its table; 7/25 (id 200) puts
+an unjoined slot 8 "in the party". **Fixed** (`src/coop/mapvisit.c`): `g_map_visits` (40 bytes in `cineram`,
+`.cine.mv`: `partyram` is full) holds the bits; the two functions are entry jumps to `map_visit_set_hook` /
+`map_visit_test_hook` (`PARTY_ENTRY_JUMPS`), and the pause map's pool word 0x08017E40 points at a copy of its module
+table (0x086F806C, file 0xA02000) with one more word at +0x1C = `g_map_visits - 0xE7`, its `ldr r1, [r3, #0xC]` at
+0x08017B2C becoming `ldr r1, [r3, #0x1C]` (`VISIT_MAP_*` in `tools/patch_rom.py`). The bits are saved per save slot in
+an EEPROM record of their own (0x1D00 + slot * 0x30: magic "MSVT", checksum, the 40 bytes; written by the save pad,
+read when a slot is started, wiped by the menu's erase, cleared at a new game), so the save slots keep their layout; a
+save from before the fix starts with no map visited (the pause map shows areas as they are visited again).
+**Loading a save made before the fix** (`party_repair`, from `load_slot_hook`, every saved slot): slot 8 without flag
+195 (the Cell Games' end, set just before `ssj2_join`) is zeroed (every bit in it was the bank's); with it, his row and
+ability list are the join's and his flags keep only the join's bits (28; 3 4 23 2; flags & 0x7F | 1: the bank only added bits, so a "valid" id there is still
+foreign and may play an animation his sprite lacks); Android 16 in slot 7 (row 25) gets his kit back and the flags'
+top byte cleared; every saved entry: an ability id past the table becomes the slot's default (else Ki Blast), an index
+above 3 becomes 0, a row past the rows the slot's default, the top bit of EXP, HP and EP is cleared (no real value has
+it) and EXP is capped at level 50's, HP and EP at their maximum. Story flags are not changed. Test:
+`tools/headless/map_visits.txt` (`docs/testing.md` "Map visits").
+
 **Co-op code**: `PartyState chars[PARTY_SLOTS]`, `player.c` slot loops and `p2_cycle`, `ssj.c`,
 `tools/mgba/peek.lua` / `enemies.lua` read the block through the `g_party_block` symbol.
 
