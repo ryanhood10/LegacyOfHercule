@@ -460,6 +460,12 @@ a step that is moved or removed breaks an insertion further down, so change one 
   blast bursts at his guard (fired at the ground 22 px before him, with his damage flash: a blast that reached the player's body would be a
   real hit); "Why do you protect Vegeta?" now answers what was shown. Two players: Hercule's actor runs for the far edge at the first burst.
   Not built: the afterimage dashes, Gohan's kneel, the knock-back on Trunks (the stock lays him down where he stands).
+  **With the helpers (after the merge of `nb-cine`), replacing the hand-rolled hits above:** Vegeta's charge (op 7, level 1), his afterimage dash
+  to (388, 414) (op 3), a volley of four at each Cell (op 8 kind 1: bursts on the body, the last an explosion; the first queued in a batch so
+  Hercule's actor runs while it plays), Cell's heavy strike (op 5 flags 1, 40 px: Vegeta flies in an arc, lands in smoke, lies, held), Gohan's
+  afterimage dash to Vegeta's side (op 4 on player 1, side 2, 18 px), Cell's blast on his guard (op 8 kind 0 + 16), and Gohan down on a knee (op 10)
+  until "I will!", where he rises (op 10 rise in entry 64). Seen with the real Super Saiyan 2 Gohan (sprite 58): the kneel draws. Not built: the
+  knock-back on Trunks.
 - **Risks:** Vegeta's actor 137 needs a lying group for beat 7 (zone 12 lays "Vegeta's body" on the field in `ch7_cell`:
   use the same sprite and group as there). Char 0 is sprite 58: hurt frames come from 59 (a few frames of the wrong
   hair), acceptable for a flinch and a kneel; check the kneel's frame is drawable. Eight blasts with dust on a field of

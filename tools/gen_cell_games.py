@@ -504,21 +504,17 @@ stockseq(A3, "m325_r11_defeat", 41, 48, "Vegeta, \"part of my design\", Yamcha t
 # blast that hit the player's body would be a real hit). Two players: Hercule's actor runs for the far edge at the first burst.
 b = body(A3, "m325_r11_defeat", 49)
 assert b[:3] == ["WalkToPosition 137, 376, 416", "SetEntityFacing 137, 3", "SetEntityFacing 30, 2"]
-burst = ["BeginCommandBatch", "NPCFireKiBlastAtEntity 137, 30, 100", "NPCFireKiBlastAtEntity 137, 162, 100", "NPCFireKiBlastAtEntity 137, 30, 100",
-         "NPCFireKiBlastAtEntity 137, 162, 100", "CommitCommandBatch"]
-script(["PlayAudio 55", "WhiteFlash 6", "ScreenShake 0, 8, 20", "SetEntityAnimation 137, 4", "StopAudio 55"] + b[:3] + ["SetEntityFacing 162, 2"] +
-       burst[:1] + guard72(["WalkToPosition 72, 592, 500"], "r") + burst[1:] +
-       ["SpawnDustCloud 30, 424, 400", "SpawnDustCloud 162, 466, 392", "ScreenShake 0, 6, 20"] + burst +
-       ["SpawnDustCloud 30, 434, 408", "SpawnDustCloud 162, 474, 400", "SpawnDustCloud 30, 448, 394", "ScreenShake 0, 6, 20", "WaitFrames 44",       # the smoke; both stand as they were
-        "BeginCommandBatch", "NPCFireKiBlastAtEntity 30, 137, 120", "CommitCommandBatch",
-        "WhiteFlash 3", "ScreenShake 0, 8, 10", "PlayDamageEffect 137", "PlaySFX 137, 35",
-        "BeginCommandBatch", "SetEntityAnimation 137, 2", "GlideToPosition 137, 340, 422, 2500", "CommitCommandBatch",
-        "SetEntityAnimationNoWait 137, 3", "SpawnDustCloud 137, 336, 426", "WaitFrames 20",
-        "SetEntityAnimationNoWait 30, 5", "WaitFrames 12",                                                                                           # his hand comes up
-        "WalkToPosition 0, 376, 418", "SetEntityFacing 0, 3",                                                                                        # Gohan, between them
-        "BeginCommandBatch", "NPCFireKiBlast 30, 398, 414, 120", "CommitCommandBatch",
-        "PlayDamageEffect 0", "PlaySFX 0, 34", "SpawnDustCloud 0, 392, 416", "ScreenShake 0, 6, 10", "SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 2",
-        "WaitFrames 20"],
+# with the cinematic helpers (CoopCall 37, docs/cutscenes.md 5; body codes: 137 Vegeta's actor, 30 / 162 the Cells, 0 player 1): the charge,
+# the afterimage dash, two volleys (bursts on each Cell, the last an explosion), Cell's heavy blow (Vegeta flies, lands, lies: held),
+# Gohan's dash to Vegeta's side, Cell's blast on his guard, Gohan down on a knee (a held player frees himself; entry 51 moves him anyway)
+script(["CoopCall 37, 1, 137, 30", "CoopCall 37, 7, 40, 1", "CoopCall 37, 3, 388, 414", "SetEntityFacing 30, 2", "SetEntityFacing 162, 2",
+        "BeginCommandBatch"] + guard72(["WalkToPosition 72, 592, 500"], "r") + ["CoopCall 37, 8, 1, 4", "CommitCommandBatch",
+        "CoopCall 37, 1, 137, 162", "CoopCall 37, 8, 1, 4", "WaitFrames 44",                                 # the smoke; both stand as they were
+        "CoopCall 37, 1, 30, 137", "CoopCall 37, 5, 1, 40", "WaitFrames 16",
+        "SetEntityAnimationNoWait 30, 5", "WaitFrames 12",                                                   # his hand comes up
+        "CoopCall 37, 1, 0, 137", "CoopCall 37, 4, 2, 18",                                                   # Gohan, between them
+        "CoopCall 37, 1, 30, 0", "CoopCall 37, 8, 16, 0",
+        "CoopCall 37, 1, 0, 30", "CoopCall 37, 10, 0, 1", "SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 2", "WaitFrames 20"],
        "stock entry 49: Vegeta's volley at both Cells does nothing; Cell's one blast throws him down; Gohan steps between them and takes the next")
 stock_at(A3, "m325_r11_defeat", 50, "\"Why do you protect Vegeta?  I'll never understand you Saiyans.\"")
 b = body(A3, "m325_r11_defeat", 51)
@@ -529,7 +525,7 @@ b = b[:k + 1] + guard72(["SetEntityPositionInstant 72, 420, 472", "SetEntityFaci
 script(b, "stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side")
 stockseq(A3, "m325_r11_defeat", 52, 63, "\"ultimate perfection\", Goku from the Other World, \"I will!\"")
 b = body(A3, "m325_r11_defeat", 64)
-script(b[:1])
+script(["CoopCall 37, 1, 0, -3", "CoopCall 37, 10, 0, 0"] + b[:1], "\"I will!\": Gohan, on a knee since he took Cell's blast for Vegeta, gets up")
 title(BOTH)
 b = ["DrawBossHealthBarRange 30, 0, 100" if x.startswith("DrawBossHealthBarRange 30,") else x for x in b]   # Ryan: to 0 HP
 script(HANDOVER + b[1:], "fight 8: two Perfect Cells (stat 25 + its pair, both-down), fought to 0: the bars run over the whole HP")

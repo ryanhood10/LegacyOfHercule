@@ -1120,13 +1120,9 @@ sequence cg_fight7_end
   text 40 "SECOND CELL: Twice the perfection!"
   stockseq @083eb704 41 48    ; Vegeta, "part of my design", Yamcha takes Trunks, "Trunks!  My son!...  He will pay!!!!"
   script                                 ; stock entry 49: Vegeta's volley at both Cells does nothing; Cell's one blast throws him down; Gohan steps between them and takes the next
-        PlayAudio 55
-        WhiteFlash 6
-        ScreenShake 0, 8, 20
-        SetEntityAnimation 137, 4
-        StopAudio 55
-        WalkToPosition 137, 376, 416
-        SetEntityFacing 137, 3
+        CoopCall 37, 1, 137, 30
+        CoopCall 37, 7, 40, 1
+        CoopCall 37, 3, 388, 414
         SetEntityFacing 30, 2
         SetEntityFacing 162, 2
         BeginCommandBatch
@@ -1134,50 +1130,22 @@ sequence cg_fight7_end
         JumpIfFalse G72r
         WalkToPosition 72, 592, 500
       G72r:
-        NPCFireKiBlastAtEntity 137, 30, 100
-        NPCFireKiBlastAtEntity 137, 162, 100
-        NPCFireKiBlastAtEntity 137, 30, 100
-        NPCFireKiBlastAtEntity 137, 162, 100
+        CoopCall 37, 8, 1, 4
         CommitCommandBatch
-        SpawnDustCloud 30, 424, 400
-        SpawnDustCloud 162, 466, 392
-        ScreenShake 0, 6, 20
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 137, 30, 100
-        NPCFireKiBlastAtEntity 137, 162, 100
-        NPCFireKiBlastAtEntity 137, 30, 100
-        NPCFireKiBlastAtEntity 137, 162, 100
-        CommitCommandBatch
-        SpawnDustCloud 30, 434, 408
-        SpawnDustCloud 162, 474, 400
-        SpawnDustCloud 30, 448, 394
-        ScreenShake 0, 6, 20
+        CoopCall 37, 1, 137, 162
+        CoopCall 37, 8, 1, 4
         WaitFrames 44
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 30, 137, 120
-        CommitCommandBatch
-        WhiteFlash 3
-        ScreenShake 0, 8, 10
-        PlayDamageEffect 137
-        PlaySFX 137, 35
-        BeginCommandBatch
-        SetEntityAnimation 137, 2
-        GlideToPosition 137, 340, 422, 2500
-        CommitCommandBatch
-        SetEntityAnimationNoWait 137, 3
-        SpawnDustCloud 137, 336, 426
-        WaitFrames 20
+        CoopCall 37, 1, 30, 137
+        CoopCall 37, 5, 1, 40
+        WaitFrames 16
         SetEntityAnimationNoWait 30, 5
         WaitFrames 12
-        WalkToPosition 0, 376, 418
-        SetEntityFacing 0, 3
-        BeginCommandBatch
-        NPCFireKiBlast 30, 398, 414, 120
-        CommitCommandBatch
-        PlayDamageEffect 0
-        PlaySFX 0, 34
-        SpawnDustCloud 0, 392, 416
-        ScreenShake 0, 6, 10
+        CoopCall 37, 1, 0, 137
+        CoopCall 37, 4, 2, 18
+        CoopCall 37, 1, 30, 0
+        CoopCall 37, 8, 16, 0
+        CoopCall 37, 1, 0, 30
+        CoopCall 37, 10, 0, 1
         SetEntityAnimationNoWait 30, 0
         SetEntityFacing 30, 2
         WaitFrames 20
@@ -1209,7 +1177,9 @@ sequence cg_fight7_end
         FadeFromWhite 120
         END
   stockseq @083eb704 52 63    ; "ultimate perfection", Goku from the Other World, "I will!"
-  script
+  script                                 ; "I will!": Gohan, on a knee since he took Cell's blast for Vegeta, gets up
+        CoopCall 37, 1, 0, -3
+        CoopCall 37, 10, 0, 0
         SetEntityFacing 0, 3
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
