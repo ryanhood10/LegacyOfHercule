@@ -1101,6 +1101,11 @@ the lever, then each entered, its find (the item, its flag), the look, out again
 boxes stepped through; out of his room after a win, the training's end) adjusted; `chamber_tiers` unchanged (the lights set flag
 510).
 
+**Full regression** (`regfull.sh build/t`, `PLAY=` a private play ROM, the branch's final build, 2026-11-06): 95 blocks, no FAIL,
+TIMEOUT or CRASH (`chamber_run` 77, `chamber_gate` 106, `chamber_tiers` 36, `chamber_room` 181, `chamber_rooms` 417, `chamber_popo`
+159, `gohan_ssj1` 21 checks). On a `BUU=0` build: `chamber_run_plain` 73, `chamber_rooms_plain` 376, `chamber_room` 181,
+`chamber_popo` 159, clean.
+
 **Test recipes changed**: `door()` sets flag 510 first (test command 48 op 7) unless the opening is wanted; op 0 (the lights) sets
 it too. Read the scene state from RAM (`find CH`, `peek CH+0x30`): test commands wait while a scene runs. The lever's cut-away
 takes 300-600 frames: wait for the light (`stepz D+0x10 10`), and `mashmap` back to the room through the sixth's line. The
