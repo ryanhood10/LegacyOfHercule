@@ -120,7 +120,8 @@ for p1, p2, s72 in ((VEGETA, None, 0), (VEGETA, TRUNKS, 1)):
 # no clone left, Vegeta back in base form on sprite 137); with two players to the duel's start (duel_active, coop2 + 0x25C)
 for two in (False, True):
     n = "2p" if two else "1p"
-    s.begin(f"space {n}", VEGETA, HERCULE if two else None, "", ["poke8 FLAGS+0x3A 3"])
+    # as in play, nobody else is selectable here (Amenbo's "Meanwhile..." locks them): player 2 has no body until the duel makes the clone his
+    s.begin(f"space {n}", VEGETA, None, "", ["poke8 FLAGS+0x3A 3"] + [f"poke8 {flags_of(i)} 0" for i in (0, 1, 3, 4, 5, 6, 8)] + (["p2 0"] if two else []) + ["frames 30"])
     s.warp(6, 50, 248, 560, 120)
     for i, k in enumerate((1, 2, 2, 2, 3, 3, 3)):
         s.out(f"mash {k} 160", "frames 60")

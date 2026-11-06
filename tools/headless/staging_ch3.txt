@@ -544,6 +544,14 @@ maptest 7
 frames 200
 poke8 0x0203F000 2
 poke8 FLAGS+0x3A 3
+poke8 0x203f020 0
+poke8 0x203f03c 0
+poke8 0x203f074 0
+poke8 0x203f090 0
+poke8 0x203f0ac 0
+poke8 0x203f0c8 0
+poke8 0x203f100 0
+frames 30
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3206
 poke32 0x0203FD54 0x23000f8
@@ -599,12 +607,20 @@ map
 ents
 echo === space 2p
 load menu.ss
-p2 0
+p2 off
 maptest 7
 frames 200
 poke8 0x0203F000 2
-poke8 0x0203FF84 5
 poke8 FLAGS+0x3A 3
+poke8 0x203f020 0
+poke8 0x203f03c 0
+poke8 0x203f074 0
+poke8 0x203f090 0
+poke8 0x203f0ac 0
+poke8 0x203f0c8 0
+poke8 0x203f100 0
+p2 0
+frames 30
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3206
 poke32 0x0203FD54 0x23000f8
