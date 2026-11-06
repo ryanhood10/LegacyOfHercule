@@ -12,9 +12,12 @@ Sources (nothing from a ROM is committed; everything is derived at build time in
                       arms-out pose.
 Drawn by code from those frames, as tools/tnysprites.py does for the tournament's fighters: the hit-stun (the idle frame
 leaning back: the side views sheared away from the way he faces, the front and back views flinched two rows shorter at
-the waist), the knock-down (the hit-stun, then lying) and the lying pose (the hit-stun turned on its side,
-tools/lying.py). Groups: 0 idle, 1 walk, 2 / 11 hit-stun, 3 knock-down, 4 / 5 / 6 / 7 / 8 the arms out, 12 lying, 13 / 17 idle,
-20 the tumble (hit-stun then lying); the template's empty groups stay empty.
+the waist, the stock hit-stun's white marks over the head for its first two frames), the knock-down (the hit-stun, then
+lying), the lying pose (the hit-stun turned on its side, tools/lying.py) and, since 2026-11-06, the side views' attacks: a
+palm strike (a bare arm straight out, the gold bracelet, the open hand: 6 at chest height, 7 raised, 8 both hands; the arms-out
+frames are a front view and showed nothing from the side). Groups: 0 idle, 1 walk, 2 / 11 hit-stun, 3 knock-down, 4 / 5 the arms
+out, 6 / 7 / 8 the arms out (front, back) or the palm strikes (sides), 12 lying, 13 / 17 idle, 20 the tumble (hit-stun then
+lying); the template's empty groups stay empty.
 """
 import os
 import struct
@@ -123,6 +126,67 @@ def hurt(fr, d):
     return xo, yo, w, h, out
 
 
+SPARK = 2            # white: the stock hit-stun frames' marks, the stock attacks' swing arcs
+SKIN, GOLD, GOLD2 = 1, 0x25, 0x21
+
+
+def sparks(fr, d):
+    """The stock hit-stun's marks over the head (three short white strokes on the side the blow came from): the front
+    and back views' flinch is two rows, too little to read as a hit without them."""
+    xo, yo, w, h, px = fr
+    out = [row[:] for row in px]
+    top = next(y for y in range(h) if any(px[y]))
+    xs = [x for x in range(w) if px[top + 2][x]]
+    x0 = xs[-1] + 1 if d == 2 else xs[0] - 3        # behind the head in the side views, at its left seen from the front
+    for dy, dx in ((-1, 0), (-2, 1), (0, 2), (-3, 2)):
+        y, x = top + 1 + dy, x0 + dx if d != 3 else x0 + 2 - dx
+        if 0 <= y < h and 0 <= x < w and not out[y][x]:
+            out[y][x] = SPARK
+    return xo, yo, w, h, out
+
+
+def palm(fr, d, kind, arc):
+    """A side view's palm strike, drawn on the idle frame (32 wide): a bare black arm from the shoulder straight out
+    the way he faces, the gold bracelet at the wrist, the open hand upright at its end. kind 0 at chest height, 1
+    raised to head height, 2 both hands together (a thicker arm, a taller hand); `arc` adds the stock attacks' white stroke before the hand.
+    His front and back views keep Buu's Fury's own arms-out frames."""
+    xo, yo, w, h, px = widen(fr, (32 - fr[2]) // 2) if fr[2] < 32 else fr
+    out = [row[:] for row in px]
+    rows = [y for y in range(h) if any(px[y])]
+    top, bottom = rows[0], rows[-1]
+    sh = top + (bottom - top) * 13 // 24                     # the shoulder row (his vest's top)
+    xs = [x for x in range(w) if px[sh][x]]
+    step = -1 if d == 2 else 1
+    x0 = (xs[0] if d == 2 else xs[-1]) + step                # the first column in front of the body
+
+    def arm(row, rise, thick=2, reach=2):
+        """8 px of arm from (row, x0); rise = rows it climbs over its length; then the hand, `reach` rows up and down."""
+        for k in range(8):
+            y = row - (rise * k) // 7
+            x = x0 + step * k
+            for t in range(thick):
+                if 0 <= x < w:
+                    out[y + t][x] = (GOLD if t == 0 else GOLD2) if k == 5 else SKIN
+        hy, hx = row - rise + (thick - 1) // 2, x0 + step * 8
+        for t in range(-reach, reach + 1):                     # the open hand, fingers up
+            for q in (0, 1):
+                if 0 <= hx + step * q < w and not (q == 1 and t == reach):
+                    out[hy + t][hx + step * q] = SKIN
+        if arc:
+            for t in range(-reach - 1, reach + 1):
+                q = 2 if t in (-reach - 1, reach) else 3
+                if 0 <= hx + step * q < w:
+                    out[hy + t][hx + step * q] = SPARK
+
+    if kind == 0:
+        arm(sh, 0)
+    elif kind == 1:
+        arm(sh - 1, 4)
+    else:
+        arm(sh, 0, thick=3, reach=3)
+    return xo, yo, w, h, out
+
+
 def lie(fr, d):
     xo, yo, w, h, px = fr
     nxo, nyo, ow, oh, npx = LY.lie(px, xo, yo, face_left=(d != 3))
@@ -135,18 +199,24 @@ def build(src, template_counts):
     arms = [[src.frame(12, f, d) for f in range(src.count(12) if src.buu else 2)] for d in range(4)]
     stun = [hurt(idle[d][0], d) for d in range(4)]
     down = [lie(stun[d], d) for d in range(4)]
+    hit = [sparks(stun[d], d) for d in range(4)]
+    wide = {d: widen(idle[d][0], (32 - idle[d][0][2]) // 2) if idle[d][0][2] < 32 else idle[d][0] for d in (2, 3)}
+    strike = {d: [[wide[d], palm(idle[d][0], d, kind, True), palm(idle[d][0], d, kind, False), wide[d]]
+                  for kind in range(3)] for d in (2, 3)}
 
     def plan(gi, d, k):
         if gi == 1:
             return walk[d][k % len(walk[d])]
         if gi in (2, 11):
-            return stun[d]
+            return hit[d] if k < 2 else stun[d]      # the marks for the first two frames, as the stock hit-stun
         if gi == 3:
             return stun[d] if k < 2 else down[d]
         if gi == 20:
             return stun[d] if k < 1 else down[d]
         if gi == 12:
             return down[d]
+        if gi in (6, 7, 8) and d >= 2:                # the side views' palm strikes: stand, strike, hold, stand
+            return strike[d][gi - 6][k % 4]
         if gi in (4, 5, 6, 7, 8):
             seq = (0, 0, 1) if gi == 5 else (0, 1, 1, 0)   # the charge holds the first, the throws the second
             return arms[d][seq[k % len(seq)] % len(arms[d])]

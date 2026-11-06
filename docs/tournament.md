@@ -1258,6 +1258,7 @@ Build into a private dir, add each fix's test to `tools/headless/regfull.sh`, ru
 
 **What was built** (`tools/ppportraits.py`, Makefile `PP_PORTRAITS`, ids 169-172 in `tourney_data.c`): each is the
 stock portrait of the body his sprite was made from, repainted the way that sprite was, so face and body agree:
+(Since 2026-11-06 Android 13's 169 is built on Tien's portrait 95, with a cap that says 13: `docs/sprites.md`, `docs/art-audit.md` 5. The paragraph below is the first build.)
 Android 13 (169) is Android 16's 26 with a yellow trucker cap (crown, seam, button, the Red Ribbon dot, a peak with its
 shadow on the forehead), white hair at the temples and the back, the earring gone, his dark-yellow vest, a blue
 background; Cell Jr. (170) is Perfect Cell's 40 with a blue crest and dark-blue spots, blue-white face and body, the

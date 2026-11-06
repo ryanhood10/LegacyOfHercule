@@ -76,7 +76,7 @@ def a13_colours():
     # brightness rank within each source ramp: 0 = lightest
     c["skin"] = [near(x) for x in ((255, 228, 214), (255, 189, 172), (230, 156, 131), (205, 131, 98), (150, 90, 60))]
     c["hair"] = [near(x) for x in ((255, 255, 255), (222, 222, 222), (197, 197, 197), (148, 148, 148))]
-    c["cap"] = [near(x) for x in ((255, 222, 66), (230, 189, 65), (197, 148, 32), (150, 100, 16))]
+    c["cap"] = [near(x) for x in ((255, 222, 90), (255, 189, 41), (222, 156, 49), (156, 106, 41))]   # the portrait's (ppportraits.py)
     c["vest"] = [near(x) for x in ((246, 205, 41), (213, 164, 16), (172, 123, 8), (115, 74, 0))]
     c["jeans"] = [near(x) for x in ((98, 130, 213), (65, 98, 189), (41, 65, 148), (24, 41, 106), (16, 24, 65))]
     c["glove"] = [near(x) for x in ((156, 74, 32), (131, 65, 24), (106, 49, 16), (82, 41, 8))]
@@ -152,16 +152,48 @@ def dress13(px, w, h, col, facing):
     forehead = max((proj(p) for p in face), default=top - 4)
     face_mid = (sum(p[1] for p in face) / len(face)) if face else None
 
-    # cap: hair at or above the forehead line, at most CAP_H deep; anything higher is cut off
-    CAP_H = 3.6
-    cap = {p for p in hair if proj(p) >= forehead - 0.5}
-    cut = {p for p in cap if proj(p) > forehead + CAP_H}
-    cap -= cut
-    for y, x in cut:
+    # the cap (2026-11-06, docs/art-audit.md: the old one was 16's mohawk cut 3.6 px deep and painted in the dull end
+    # of the ramp, a ragged brown tray narrower than the head). Now a dome drawn over the skull in the frame's own
+    # axes (so tilted and lying heads get it too): as wide as the head at the brow, 4.6 px high, a black band and
+    # outline, the portrait's bright yellows, the Red Ribbon dot in front views, a peak in side views.
+    CAP_H = 4.6
+    top_hair = {p for p in hair if proj(p) >= forehead - 0.5}
+    below = [p for p in hair if p not in top_hair]
+    for y, x in top_hair:
         out[y][x] = 0
+    ring = [p for p in list(face) + hair if forehead - 4.0 <= proj(p) <= forehead + 0.5 and abs(lat(p)) <= 8.0]
+    cap, hc, hw = set(), 0.0, 0.0
+    if top_hair and ring:
+        lats = [lat(p) for p in ring]
+        hc, hw = (min(lats) + max(lats)) / 2, min(7.5, (max(lats) - min(lats)) / 2 + 0.6)
+
+        def dl(y, x):
+            return (y - by) * uy + (x - bx) * ux - forehead, (x - bx) * uy - (y - by) * ux - hc
+
+        def in_dome(y, x):
+            d, l = dl(y, x)
+            return -0.5 <= d <= CAP_H and abs(l) <= hw * (1 - (max(d, 0.0) / CAP_H) ** 2.2) ** (1 / 2.2)
+
+        for y in range(h):
+            for x in range(w):
+                if not in_dome(y, x):
+                    continue
+                d, l = dl(y, x)
+                if not (px[y][x] == 0 or px[y][x] in HAIR or (d < 0.5 and (y, x) in face)):
+                    continue                      # a raised fist in front of the cap stays
+                cap.add((y, x))
+                rim = any(not (0 <= ny < h and 0 <= nx < w and in_dome(ny, nx))
+                          for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)))
+                if d < 0.5 or rim:
+                    out[y][x] = BLACK             # the band over the brow, the crown's outline
+                else:
+                    out[y][x] = col["cap"][0 if d >= 2.0 else 1]
+        for y, x in cap:                          # the shaded side: the inner column at the frame's right
+            if out[y][x] != BLACK and x + 1 < w and (y, x + 1) in cap and out[y][x + 1] == BLACK and dl(y, x)[0] < 3.0:
+                out[y][x] = col["cap"][2]
+        face -= cap
     # 16's fringe hangs over his forehead; 13's face is bare under the cap. In views that show more face
     # than hair, hair inside the face's lateral span becomes forehead skin; the rest is white hair.
-    below = [p for p in hair if p not in cap and p not in cut]
     span = None
     if face and facing != 1 and len(face) > len(below) // 2:
         lats = [lat(p) for p in face]
@@ -179,40 +211,31 @@ def dress13(px, w, h, col, facing):
             face.add(p)
         else:
             out[p[0]][p[1]] = col["hair"][r]
-    for p in cap:
-        y, x = p
-        d = proj(p) - forehead
-        exposed = any((0 <= r[0] < h and 0 <= r[1] < w and (out[r[0]][r[1]] == 0 or r in cut))
-                      and (r[0] - by) * uy + (r[1] - bx) * ux > proj(p) for r in neighbours8(y, x)) \
-            or not (0 < y < h - 1 and 0 < x < w - 1)
-        if d < 0.5:
-            out[y][x] = BLACK                     # the band / brim line over the forehead
-        elif exposed:
-            out[y][x] = BLACK                     # crown outline
-        else:
-            out[y][x] = col["cap"][min(3, RANK_HAIR[px[y][x]] + (1 if d < 1.5 else 0))]
-    # the Red Ribbon dot: front views (the face is centred under the cap), just above the band
-    if facing != 1 and face and cap and face_mid is not None:
-        cy = [p for p in cap if 0.5 <= proj(p) - forehead < 1.5 and out[p[0]][p[1]] != BLACK]
+    # the Red Ribbon dot: front views (the face is centred under the cap), on the front panel
+    if facing != 1 and face and cap and face_mid is not None and len(face) >= 12:
         cxs = [p[1] for p in cap]
-        if cy and abs(face_mid - (min(cxs) + max(cxs)) / 2) < 1.5 and len(face) >= 12:
-            p = min(cy, key=lambda q: abs(q[1] - face_mid))
-            out[p[0]][p[1]] = col["red"]
-    # brim: in side views the cap peak juts out over the face side by two pixels
-    if face and cap and face_mid is not None:
+        if abs(face_mid - (min(cxs) + max(cxs)) / 2) < 1.5:
+            panel = [p for p in cap if 1.5 <= dl(*p)[0] < 2.5 and out[p[0]][p[1]] != BLACK]
+            if panel:
+                p = min(panel, key=lambda q: abs(q[1] - face_mid))
+                out[p[0]][p[1]] = col["red"]
+    # the peak: in side views it juts three pixels out over the face, yellow on a black underside
+    if face and cap and face_mid is not None and abs(uy) > 0.8:
         cxs = [p[1] for p in cap]
-        mid = (min(cxs) + max(cxs)) / 2
-        side = face_mid - mid
-        if abs(side) >= 1.5 and abs(uy) > 0.8:
-            band = [p for p in cap if out[p[0]][p[1]] == BLACK and proj(p) - forehead < 0.5]
-            if band:
-                y = band[0][0]
-                edge = max(p[1] for p in band) if side > 0 else min(p[1] for p in band)
-                step = 1 if side > 0 else -1
-                for k in (1, 2):
-                    x = edge + step * k
-                    if 0 <= x < w and out[y][x] == 0:
-                        out[y][x] = BLACK
+        side = face_mid - (min(cxs) + max(cxs)) / 2
+        band = [p for p in cap if dl(*p)[0] < 0.5]
+        if abs(side) >= 1.5 and band:
+            y = min(p[0] for p in band) if uy < 0 else max(p[0] for p in band)
+            row = [p[1] for p in band if p[0] == y]
+            step = 1 if side > 0 else -1
+            edge = max(row) if side > 0 else min(row)
+            for k, c in ((0, col["cap"][2]), (1, col["cap"][1]), (2, col["cap"][1]), (3, BLACK)):
+                x = edge + step * k
+                if 0 <= x < w and (k == 0 or out[y][x] == 0):
+                    out[y][x] = c
+                    y2 = y + (1 if uy < 0 else -1)
+                    if 0 < k < 3 and 0 <= y2 < h and out[y2][x] == 0:
+                        out[y2][x] = BLACK
     for y, x in skin:
         r = RANK_SKIN[px[y][x]]
         out[y][x] = col["skin"][r] if (y, x) in face else col["glove"][min(3, r)]
@@ -228,8 +251,8 @@ def dress13(px, w, h, col, facing):
                     out[y][x] = col["hair"][min(3, r)]
     if facing == 1 and face:
         neck = min((p[0] - by) * uy + (p[1] - bx) * ux for p in face) + 1.5
-        for p in face:
-            if proj(p) > neck:
+        for p in face:                    # (inside the head's width only: a raised arm touching the hair is no hair)
+            if proj(p) > neck and (not cap or abs(lat(p) - hc) <= hw):
                 r = RANK_SKIN.get(px[p[0]][p[1]], RANK_HAIR.get(px[p[0]][p[1]], 1))
                 out[p[0]][p[1]] = col["hair"][min(3, r)]
     for p in arm:
@@ -244,7 +267,7 @@ def dress13(px, w, h, col, facing):
     for y, x in trou:
         out[y][x] = col["jeans"][RANK_TROUSER[px[y][x]]]
     # outline the head (16's head has no outline of its own): transparent pixels next to it -> black
-    head = cap | set(face) | set(below)
+    head = set(face) | set(below)
     for y, x in list(head):
         for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
             if 0 <= ny < h and 0 <= nx < w and out[ny][nx] == 0 and px[ny][nx] == 0:
@@ -298,7 +321,7 @@ def build_a13(sp):
                             flip = bool(attr & HFLIP)
                             work = A.hflip(px) if flip else px
                             face = 2 if d == 3 else d
-                            work, _ = A.swap_head(work, w, h, heads[face], chins[face])
+                            work, _ = A.swap_head(work, w, h, heads[face], chins[face], back=(d == 1))
                             px = A.hflip(work) if flip else work
                         done[blob] = dress13(px, w, h, col, d if not attr & HFLIP else 2)
                     frames.append((xo, yo, w, h, attr, done[blob]))

@@ -255,10 +255,40 @@ def main():
                      f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
         ents.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, ssj_detrans_blob_{fi}}}")
     lines.append(f"static const SpriteDesc ssj_detrans[{len(ents)}] = {{{', '.join(ents)}}};")
+    # the poses herc_record adds to the stock record (tools/herculesprites.py), with the gold afro: the flight seen
+    # from the side (group 12 left / right; the clone had the stock front view there) and the Kamehameha pose (group
+    # 18, empty in the stock record: a transformed Hercule had none)
+    import herculesprites as HS
+    over, made = {}, {}
+
+    def emit(name, frames):
+        """frames: (xo, yo, w, h, attr, display pixels); the blob holds them unflipped, as herculesprites.py's."""
+        ents2 = []
+        for xo, yo, w, h, attr, px in frames:
+            gold = recolour(px, w, h)
+            data = frame_bytes([r[::-1] for r in gold] if attr & HS.HFLIP else gold, w, h)
+            if data not in made:
+                blob = compress(data)
+                assert m.decompress(blob, 8, 1)[:len(data)] == data, "LZ round trip"
+                made[data] = f"ssj_pose_blob_{len(made)}"
+                lines.append(f"static const u8 {made[data]}[{len(blob)}] __attribute__((aligned(4))) = "
+                             f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
+            ents2.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {made[data]}}}")
+        lines.append(f"static const SpriteDesc {name}[{len(ents2)}] = {{{', '.join(ents2)}}};")
+        return name
+
+    gattr = sp.descriptor(sp.groups(sp.record(HS.GOKU))[HS.FLY_GROUP][2], 0)[4] & ~HS.HFLIP
+    fly = HS.fly_side(sp)
+    over[(HS.FLY_GROUP, 2)] = emit("ssj_fly_l", [(-8, -24, 32, 32, gattr, px) for px in fly])
+    over[(HS.FLY_GROUP, 3)] = emit("ssj_fly_r", [(-8, -24, 32, 32, gattr | HS.HFLIP, [r[::-1] for r in px]) for px in fly])
+    assert not any(groups[HS.BEAM_GROUP]), "record 72 has a group 18 now?"
+    for d, frames in enumerate(HS.build(sp)):
+        over[(HS.BEAM_GROUP, d)] = emit(f"ssj_g18_d{d}", frames)
     header = bytearray(header)
     header[2] = ssjhercule.DETRANSFORM_GROUP + 1
     hdr = ", ".join(f"0x{b:02x}" for b in header)
-    grp = ", ".join("{" + ", ".join(names[p] if p else "0" for p in g) + "}" for g in groups)
+    grp = ", ".join("{" + ", ".join(over.get((gi, d)) or (names[p] if p else "0") for d, p in enumerate(g)) + "}"
+                    for gi, g in enumerate(groups))
     grp += ", {ssj_detrans, ssj_detrans, ssj_detrans, ssj_detrans}"
     lines.append(f"const SpriteRecord ssj_record = {{{{{hdr}}}, {{{grp}}}, 0}};")
     # sprite index: stock words 0..156, the new record at 157, then any extra records (158+)
