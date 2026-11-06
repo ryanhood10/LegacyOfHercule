@@ -963,6 +963,16 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### B.5 Broly's end, the planet (showcase with B.3, M)
 
+- **Built 2026-11-06 (`nb-cs2`).** Marks behind a 20-frame fade (Broly (400, 404), the players as at the rim, Paragus' body beside
+  his son, the camera on them); "KAKAROOOOOOT!!" in a bottom box; a charge with green light and dust in two lines across the ground,
+  a second burst that drives him to a knee; Vegeta's line (or player 1's); then player 2 is gone in a blink to the south edge,
+  player 1 flies off the bottom of the view while Broly rises into a last charge, a flash, shakes, and the white takes him standing
+  in it (the white no longer fades back to the basin before the cut). In the ship the white clears, and a second flash and a
+  hard shake open "The ship escapes the exploding planet...".
+- **Cine finding (told to the coordinator):** a **held** charge (`CoopCall 37, 7, 0, 2`) on Broly's body here (sprite 159, the boss
+  after his defeat fired) followed by any blocking script step never returned (the scene hung with him charging); the blocking
+  charge is used instead. Not diagnosed.
+
 - **Where:** `broly_end` entries 0-7. Film `rim_VT`.
 - **Today:** "@^BROLY: KAKAROOOOOOT!!", hit effects and four shakes on him, Vegeta's line (or player 1's), two more
   shakes, a white, the ship's room. **Broly is still on his feet when the screen goes white**, and the planet's end

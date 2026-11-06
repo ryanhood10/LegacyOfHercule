@@ -507,18 +507,40 @@ sequence broly_end
         SetStoryFlag 402
         SetPlayerVisible 0
         WaitFrames 40
-  text 0 "@^BROLY: KAKAROOOOOOT!!"
-  script
+        FadeOut 20                       ; marks behind a short fade (the fight left everyone anywhere): Broly in the middle of the view,
+        CoopCall 37, 0, 0, 0             ; the players below him
+        SetEntityPositionInstant 159, 400, 404
+        SetEntityFacing 159, 2
+        SetEntityPositionInstant 0, 326, 414
+        SetEntityFacing 0, 3
+        CoopCall 9, 1, 290, 402
+        CoopCall 22, 2, 170, 0           ; his father's body beside him
+        JumpIfFalse P1
+        SetEntityPositionInstant 170, 438, 424
+      P1:
+        PanCameraToPosition 240, 326, 10
+        FadeFromWhite 20
+  text 0 "BROLY: KAKAROOOOOOT!!"                        ; a bottom box
+  script                                 ; his own power tears him apart: a charge with green light and dust in lines across the ground
+        CoopCall 37, 1, 159, -3          ; (the cracks), a second burst, and it drives him to a knee
         WhiteFlash 5
+        PlayAudio 31
         BeginCommandBatch
-        ScreenShake 0, 20, 30
-        PlaySFX 159, 31
-        PlayDamageEffect 159
+        CoopCall 37, 7, 50, 2
+        SpawnDustCloud 0, 352, 432
+        SpawnDustCloud 0, 392, 438
+        SpawnDustCloud 0, 432, 432
+        EntityWaitFrames 0, 20
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 10
+        SpawnDustCloud 0, 370, 386
+        SpawnDustCloud 0, 414, 380
+        SpawnDustCloud 0, 452, 390
+        FlashScreenColor 0, 150, 255, 170, 8
         CommitCommandBatch
-        WaitFrames 20
-        WhiteFlash 5
-        ScreenShake 0, 20, 40
-        PlaySFX 159, 20
+        PlayAudio 20
+        CoopCall 37, 15, 40, 2
+        CoopCall 37, 10, 0, 1
         WaitFrames 20
   [3] script
         CoopCall 22, 4, 2, 0
@@ -542,26 +564,34 @@ sequence broly_end
   [6] fmt 250 "%s: His power is tearing the whole planet apart!  Everyone, back to the ship!"
         PushActiveCharNameUpper
         END
-  [7] script  ; back aboard: the ride home (Ryan), the players only
+  [7] script  ; the players turn and go (player 2 in a blink, player 1 flies off the view's south edge) while the ground heaves; Broly
+        CoopCall 37, 15, 80, 1           ; rises into a last charge and the white takes him. Back aboard: the ride home (Ryan), the players only
+        PlayAudio 21
+        CoopCall 37, 1, -1, -3
+        CoopCall 37, 3, 300, 474
+        CoopCall 37, 1, 159, -3
+        PlayAudio 26
         BeginCommandBatch
-        ScreenShake 0, 20, 80
-        PlaySFX 159, 21
+        CoopCall 37, 7, 50, 2
+        FlyToPosition 0, 326, 520
         CommitCommandBatch
-        WaitFrames 20
         WhiteFlash 5
-        ScreenShake 0, 20, 80
-        PlaySFX 159, 31
+        ScreenShake 0, 20, 60
+        PlayAudio 31
         PlayAudioBlocking 10, 20
         FadeToWhite 10
-        WhiteFadeOut 20
-        WaitFrames 60
+        CoopCall 37, 0, 0, 0
+        WaitFrames 40
         WarpToMapWithEntities 15, 9, 1, 96, 192
         CoopCall 9, 1, 128, 196
+        SetActiveEntity 0
         SetEntityFacing 0, 0
         SetPlayerVisible 1
+        WhiteFadeOut 20
         WaitFrames 30
         PlayAudio 26
-        ScreenShake 0, 12, 200
+        WhiteFlash 20                    ; the planet goes behind them
+        ScreenShake 0, 16, 200
         WaitFrames 60
   [8] text 0 "@^The ship escapes the exploding planet and heads home..."
   [9] script
