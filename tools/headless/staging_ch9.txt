@@ -11,6 +11,11 @@ poke32 0x0203FD0C 0x506
 poke32 0x0203FD54 0x12c00e0
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 9 110
+shot c9_G_ws_line
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -35,6 +40,11 @@ poke32 0x0203FD0C 0x506
 poke32 0x0203FD54 0x12c00e0
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 9 110
+shot c9_K_ws_line
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -60,6 +70,11 @@ poke32 0x0203FD0C 0x506
 poke32 0x0203FD54 0x12c00e0
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+mash 9 110
+shot c9_GH_ws_line
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -85,6 +100,11 @@ poke32 0x0203FD0C 0x506
 poke32 0x0203FD54 0x12c00e0
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 9 110
+shot c9_HK_ws_line
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -114,19 +134,37 @@ poke32 FLAGS+0x14 0xFFFFFFFF
 flags +420
 poke32 0x0203FD08 11
 frames 30
+poke8 0x0203F000 6
+poke8 0x0203FF84 7
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3f08
 poke32 0x0203FD54 0x12c00d8
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 240
-mash 12 110
+mashmap 8 48 40
+frames 150
 shot c9_KA_bird
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+frames 270
+shot c9_KA_bird2
+mash 8 110
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -157,19 +195,37 @@ poke32 FLAGS+0x14 0xFFFFFFFF
 flags +420
 poke32 0x0203FD08 11
 frames 30
+poke8 0x0203F000 7
+poke8 0x0203FF84 6
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3f08
 poke32 0x0203FD54 0x12c00d8
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 240
-mash 12 110
+mashmap 8 48 40
+frames 150
 shot c9_AK_bird
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
+frames 270
+shot c9_AK_bird2
+mash 8 110
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -199,19 +255,36 @@ poke32 FLAGS+0x14 0xFFFFFFFF
 flags +420
 poke32 0x0203FD08 11
 frames 30
+poke8 0x0203F000 6
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3f08
 poke32 0x0203FD54 0x12c00d8
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 240
-mash 12 110
+mashmap 8 48 40
+frames 150
 shot c9_K_bird
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+frames 270
+shot c9_K_bird2
+mash 8 110
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -241,19 +314,36 @@ poke32 FLAGS+0x14 0xFFFFFFFF
 flags +420
 poke32 0x0203FD08 11
 frames 30
+poke8 0x0203F000 7
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0x3f08
 poke32 0x0203FD54 0x12c00d8
 poke32 0x0203FD08 5
 frames 200
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 240
-mash 12 110
+mashmap 8 48 40
+frames 150
 shot c9_A_bird
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R8
+frames 270
+shot c9_A_bird2
+mash 8 110
 ents
 stepz 0x03001FDC 150
 frames 30

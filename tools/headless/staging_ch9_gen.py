@@ -29,11 +29,12 @@ for p1, p2, s72 in ((KRILLIN, A16, 1), (A16, KRILLIN, 1), (KRILLIN, None, 0), (A
     s.actors(s76=0, s8=0)          # nobody comes in behind as an actor
     s.end_scene()
     s.win(240)
-    s.press(5 if p2 is not None else 3 if p1 == KRILLIN else 2, 110)   # the lines before the birds
-    s.out("frames 500")
-    s.shot(f"c9_{n}_bird")
+    s.out("mashmap 8 48 40", "frames 150")                         # through the lines to the warp outside; before the first line there (a text box on
+    s.shot(f"c9_{n}_bird")                                          # this full map takes the actors and birds off the list while it is open: docs/scripts.md)
     s.actors(s76=int(KRILLIN in (p1, p2) and p1 != KRILLIN), s8=int(p1 != A16))   # Krillin beside 16 only as player 2's stand-in (player 2 has no entity
-    s.press(8, 110)                                                                 # there); 16 an actor unless player 1 is 16 (alone as Krillin: kept for the plot)
+    s.out("frames 270")                                                             # there); 16 an actor unless player 1 is 16 (alone as Krillin: kept for the plot)
+    s.shot(f"c9_{n}_bird2")
+    s.press(8, 110)
     s.out("ents")
     s.end_scene()
     s.out("frames 60")
