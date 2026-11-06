@@ -94,6 +94,10 @@ for p1, p2, s56 in ((KRILLIN, SS2, 0), (SS2, KRILLIN, 0), (HERCULE, SS2, 0), (GO
     s.press(4, 100)
     s.out("frames 60")
     s.shot(f"ca_{n}_watch")
+    # the players are in the picture (docs/cutscenes/batch3 6.2): player 1 walked up to the view's bottom edge, player 2 beside him
+    s.out("echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372", "map")
+    if p2 is not None:
+        s.out("deref P2E 0x0203FF08", f"echo EXPECT [0-9a-f]+: {350 << 8:08x} {372 << 8:08x}", "peek P2E+0x158 2")
     s.end_scene(120)
     s.shot(f"ca_{n}_fight")
     s.on_map(15, 8)

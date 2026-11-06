@@ -42,6 +42,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_KS_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -104,6 +109,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_SK_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -166,6 +176,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_HS_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -228,6 +243,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_GS_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -289,6 +309,8 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_H_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -350,6 +372,8 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_S_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -411,6 +435,8 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_V_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -473,6 +499,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_HV_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -535,6 +566,11 @@ entrec R121
 mash 4 100
 frames 60
 shot ca_VG_watch
+echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
+map
+deref P2E 0x0203FF08
+echo EXPECT [0-9a-f]+: 00015e00 00017400
+peek P2E+0x158 2
 stepz 0x03001FDC 120
 frames 30
 echo EXPECT 03001fdc: 00000000

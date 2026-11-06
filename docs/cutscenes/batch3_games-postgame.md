@@ -743,6 +743,10 @@ Stock, about 50 s (filmed). **Leave.**
      me.  Even Cell would tremble!" now follows a demonstration.
   10. He turns to the players (facing down). Player 1's line with one step forward (Hercule's: one step back). Player
       2's line. The stock hand-over to the boss record. Control where it is today.
+- **Built so far (`nb-cs3`, 2026-11-06), beat 1 only (the defect):** player 1 walks up to (324, 372) and player 2 is placed at (350, 372)
+  (`CoopCall 9`), both facing the three, and the pan down before the players' lines is gone. Seen: with the stock camera a text box at
+  the bottom covers screen rows 74-136, so the players show whole between boxes and by their feet under one; nothing on this view clears
+  both the three and the players during a box. Test: `staging_arctic.txt` (player 1 at 324, 372 and player 2 at 350, 372 mid-scene, nine lineups).
 - **Draft lines:** none.
 - **Time:** about +12 s on 35. **This scene replays in full after every loss and every reload at the ridge pad** (Ryan
   kept that, 4i). Build with it a short form for a retry in the same session (a RAM bit, not a flag: he stands
