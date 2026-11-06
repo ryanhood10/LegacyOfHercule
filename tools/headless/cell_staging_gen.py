@@ -60,6 +60,7 @@ def zone12(tag, p1, p2, shots):
         out("mash 12 70")
         presses(f"{tag}_b", 8)
     scene_done(f"{tag}_semi")
+    cine_last(10)                                   # 7.2's first blow: Vegeta's dash, the heavy strike, Cell up from his knee (batch 2, 7.2 beat 4)
     expect("map zone 12 area 4", "map")
     out("poke32 0x0203FD08 7", "frames 120")
     if shots:
@@ -89,6 +90,13 @@ def zone12(tag, p1, p2, shots):
     if coop:
         expect("0203ff84: 06", "peek8 0x0203FF84 1")
     p2_stands(coop)
+
+
+def cine_last(op, how=1):
+    """the cinematic helpers' last move was `op`, ended `how` (1 played), and every move started has ended (staging_lib.cine_last)"""
+    out("find CN 0xC14E0001")
+    expect(f"[0-9a-f]{{8}}: {op:02x}[0-9a-f]{{6}} [0-9a-f]{{6}}{how:02x}", "peek CN+0x0C 2")
+    expect(r"[0-9a-f]{8}: ([0-9a-f]{4})\1", "peek CN+0x18 1")
 
 
 def herc(n):

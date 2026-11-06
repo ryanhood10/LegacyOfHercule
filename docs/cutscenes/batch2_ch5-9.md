@@ -108,8 +108,8 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
-| built in part | 7.2 (the power-up; not the first blow), 7.6 (the knee, Cell's turns and exit; not the two misses) |
+| built | 7.2 (the first blow: `nb-cs4`), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built in part | 7.6 (the knee, Cell's turns and exit; not the two misses) |
 | not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
@@ -606,7 +606,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Built in part 2026-11-06 (`nb-cs2`).** Built: after "What is this?" a 100-frame charge on Vegeta (`CoopCall 37, 7, 100, 2`: rings,
   flickers, a growing shake, the burst), the stock change at its peak (skipped when he arrived as a Super Saiyan: the charge
   plays either way), a jolt, and Cell is **pushed** back to the stock mark (216, 272) in his hit-stun instead of walking there.
-- **Not built: the first blow (beat 4).** Built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
+- **The first blow built 2026-11-06 (`nb-cs4`):** after "It's your end!" Vegeta is beside Cell in a blink (`CoopCall 37, 4`) and drives a heavy fist into his body (`CoopCall 37, 5, 5, 32`: Cell thrown 32 px, on a knee in smoke), Cell gets up and walks back to his mark (216, 272), where the boss record and the co-op split start. **The camera drift was found:** this scene never pans, so the game's follow camera is on player 1 the whole time and a dash drags it with him (7.4 had panned). The entry holds the view first (`PanCameraToPosition 71, 224, 4`: where the follow already is alone; with two players a 13 px glide off the pair's midpoint) and the fight's entry (20, stock 083e6608 restated) gives it back with `SetActiveEntity 0`. `cell_staging` checks the rise was the last move (`cine_last(10)`). Earlier note: built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
   made the camera leave its panned spot (one frame far below, then about two seconds of drifting back to centre on him); the
   same dash in 7.4 (no charge or change before it) holds the view. Told to the coordinator; not diagnosed. Beat 1's folded
   arms: no such pose.

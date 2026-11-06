@@ -48,7 +48,14 @@ sequence ch7_semi_perfect
         SetEntityFacing 29, 2
         SetEntityFacing 0, 3
   [13] stock @083e65f4                   ; "It's your end!"
-  [14] script                            ; co-op: the split (next 15), else the fight (20)
+  [14] script                            ; the first blow (batch 2, 7.2 beat 4): Vegeta is beside him in a blink and drives a fist into his
+        PanCameraToPosition 71, 224, 4   ; body; Cell is thrown, gets up and is pushed back to his mark (the boss record and its twin start
+        CoopCall 37, 1, 0, 29            ; from it). The camera is held where it is first: in this scene it follows player 1, and a dash
+        CoopCall 37, 4, 0, 0             ; would drag it (entry 20 gives it back). Then co-op: the split (next 15), else the fight (20)
+        CoopCall 37, 5, 5, 32
+        CoopCall 37, 10, 1, 0
+        WalkToPosition 29, 216, 272
+        SetEntityFacing 29, 2
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 15
@@ -68,7 +75,11 @@ sequence ch7_semi_perfect
   [18] text 4 "VEGETA: Hmph.  Then I'll destroy both halves."
   [19] script                            ; the body that walked goes (a step finds the same one first); the record stands on the other and its twin on this spot
         DespawnEntity 29
-  [20] stock @083e6608                   ; the fight (25-100)
+  [20] script                            ; stock 083e6608, the fight (25-100), with the camera given back to player 1
+        SetActiveEntity 0
+        DespawnCharacterAndRecordPosition 29, 1
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 29, 25, 100
 end
 
 ; Semi-Perfect Cell beaten: the duplicate is taken back in co-op; Cell talks Vegeta into letting him

@@ -52,6 +52,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_V_semi
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -234,6 +239,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_T_semi
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -332,6 +342,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_VT_semi
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -521,6 +536,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_TV_semi
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
