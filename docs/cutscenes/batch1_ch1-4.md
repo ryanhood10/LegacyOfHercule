@@ -530,6 +530,12 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   play the CHARGE without the form. In real play the player walks into this area from its edge; the test warp puts
   him beside Goku: film it once from the area's entrance.
 - **Size L.** The Short: beat 3 to beat 6, about 35 seconds.
+- **Beats 1 and 2 built 2026-11-06 (`nb-cs4`):** the opening is one Cine exchange Goku wins (`CoopCall 37, 6, 60, 0`: 60 frames,
+  they spring apart), then his heavy blow throws 19 28 px (he reels, lies, gets up) and both walk back to their marks before Tien's
+  line (stock entry 0 restated; the stock's own punch at entry 2 stays). The virus: a small jolt under each of Goku's flinches
+  (entries 5 and 7, `CoopCall 37, 15`), and at entry 20 he drops to a knee first (`CoopCall 37, 10, 0, 1`), then the stock collapse
+  out of Super Saiyan (25). `staging_ch3` "battle" shoots the opening (`c3_<n>_open`) and its press count to the drain moved by one;
+  flags and party after the scene equal the build before (alone and with Hercule).
 - **Built 2026-11-06 (`nb-cs1`, with Cine): beats 3 (in part), 4 and 6; 1 and 2 left as the stock plays them** (its opening is the
   liveliest stock choreography of the batch: kept). The scene's trigger is the whole map, so in play the players stand at the area's
   entry (468, 556), below the view, through Goku's fight (the research film's Vegeta "30 px from Goku" was the test warp). 19 raises

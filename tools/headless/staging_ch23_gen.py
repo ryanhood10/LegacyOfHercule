@@ -67,7 +67,9 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     # Vegeta (flags 464-467), so speaker 1 shows his portrait as it does in play
     s.begin(f"battle {n}", p1, p2, "+76", ["poke8 FLAGS+0x3A 3"])
     s.warp(7, 15, 468, 556, 300)
-    s.press(24, 110)
+    s.press(4, 110)                # (3.5 beats 1-2) the opening as an exchange and Goku's heavy blow; later his knee before the collapse
+    s.shot(f"c3_{n}_open")
+    s.press(21, 110)
     s.shot(f"c3_{n}_drain")
     s.press(4, 110)
     s.out("key 1 6", "frames 44")
