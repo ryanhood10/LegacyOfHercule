@@ -95,10 +95,11 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   stock wait, it does not add to it). Sprite 54 has no groups 6-8: the FLURRY's Gohan side uses 5 and 10 only.
 - **Built 2026-11-06 (`nb-cs4`).** Stock entry 0's 60-frame wait is now the lesson: old Hercule (player 2's entity, or the companion
   alone: both are player 2's entity) hands over to an actor on his spot (`CoopCall 31`) and backs off 36 px, a 30-frame exchange
-  Trunks-Gohan, and Gohan's blow puts Trunks on a knee 16 px back (`CoopCall 37, 5, 5, 16`, held); Trunks says "This isn't fair..." on
-  his knee and gets up in stock entry 4's beat. Old Hercule takes two steps further back for "I'll be guarding the rear", steps up
-  and winds up a punch (his group 6) for "A boulder?  Ha!", and at the end walks to where player 2 comes back (12 px left of player
-  1) and makes way, so the respawn does not show. About a second longer before control than the stock's wait. `staging_ch1`
+  Trunks-Gohan, and Gohan's blow puts Trunks on a knee (`CoopCall 37, 5, 5, 16`, held; he ends 35 px right of the stock's spot, where
+  he gets control back) while Gohan steps back to his place; Trunks says "This isn't fair..." on his knee and gets up in stock entry
+  4's beat. Old Hercule takes two steps further back for "I'll be guarding the rear", steps up and winds up a punch (his group 6) for
+  "A boulder?  Ha!", and at the end walks, as Gohan walks off, to where player 2 comes back (12 px left of player 1) and makes way at
+  the last moment, so the respawn does not show. About a second longer before control than the stock's wait. `staging_ch1`
   "training" (alone and two players) shoots the knee and checks one body of old Hercule at the end.
 
 ### 1.2 The knock-out: touch up (S)

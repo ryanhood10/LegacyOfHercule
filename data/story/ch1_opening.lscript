@@ -64,6 +64,8 @@ sequence ch1_training
         CoopCall 37, 6, 30, 0
         CoopCall 37, 1, 54, 0
         CoopCall 37, 5, 5, 16
+        WalkToPosition 54, 180, 664      ; the master steps back to his place
+        SetEntityFacing 54, 3
   stockseq @083b6ec8 1 3                 ; Trunks' doubts (on his knee), Gohan turns to him, his answer
   script                                 ; stock 4: Trunks gets up, looks down, a long beat
         CoopCall 37, 1, 0, 54
@@ -87,14 +89,20 @@ sequence ch1_training
         SetEntityAnimation 158, 6
       H1:
   text 126 "#A boulder?  Ha!  I've chopped bigger rocks than that in my sleep!\x0b...You go first, kid."
-  script                                 ; stock 8: he steps back to where player 2 comes back (12 px left of player 1) and makes way; Gohan walks off,
-        CoopCall 22, 2, 158, 0           ; control back
+  script                                 ; stock 8: Gohan walks off while old Hercule steps back to where player 2 comes back (12 px left of player 1)
+        SetEntityFacing 0, 1             ; and makes way at the last moment; control back
+        CoopCall 22, 2, 158, 0
         JumpIfFalse H1
-        WalkToPosition 158, 223, 664
-        DespawnEntity 158
-      H1:
-        SetEntityFacing 0, 1
+        BeginCommandBatch
         WalkToPosition 54, 144, 568
+        WalkToPosition 158, 223, 664
+        CommitCommandBatch
+        SetEntityFacing 158, 1
+        DespawnEntity 158
+        Jump H2
+      H1:
+        WalkToPosition 54, 144, 568
+      H2:
         SetPlayerVisible 1
 end
 
