@@ -283,7 +283,9 @@ end
 sequence ch4_lab_door
   stockseq @083dae70 0 5                 ; they arrive outside the door; Vegeta, Trunks, Krillin
   [6] stock @083da1f8 -> 67              ; the cut into the lab: Gero walks up
-  stockseq @083dae70 7 25                ; "destroy these intruders", 16's chamber, "scrap heap"
+  stockseq @083dae70 7 15                ; "destroy these intruders", 16's chamber; the cut outside (14), Trunks
+  [16] stock @083da3d8 -> 79             ; the cut back into the lab (it reloads the map: 13 again, entry 79)
+  stockseq @083dae70 17 25               ; "wake our sleeping friend", "scrap heap"
   [26] stock @083da58c -> 68             ; 17's blast: Gero is gone
   stockseq @083dae70 27 65               ; "Now that that's taken care of...", 16 wakes, the Z fighters
   stop
@@ -332,6 +334,9 @@ sequence ch4_lab_door
         WaitFrames 30
   [77] text 29 "ANDROID 18: He's heading north.  Should we bother?"
   [78] text 28 "ANDROID 17: Forget him." -> 27
+  [79] script -> 17                      ; the lab again after the cut outside (a reload drops actors): 13 at Gero's side
+        SpawnCharacterEntity 165, 304, 236
+        SetEntityFacing 165, 2
 end
 
 ; ---- zone 8 area 49: the road. 17, 18 and 16; in co-op Vegeta arrives and fights beside Piccolo ------
