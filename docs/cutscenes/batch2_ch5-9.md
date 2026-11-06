@@ -894,6 +894,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   white flash and the ground heaves; then he is in front of them in a blink (dash to (400, 414), the spot the fight opens from)
   and his fist goes into the ground at their feet (a heavy strike at a point: ring, flash, boom) with dust and the lead thrown
   back a step; Paragus walks to his twin's spot through it. The sequence grew by one entry (the fight is entry 18).
+- **Vegeta's knee (its own commit, for Ryan's review; decided for him while away):** after his step back he drops to one knee
+  for "The Legendary Super Saiyan...  It can't be..." (`CoopCall 37, 10, 0, 1` on `-12`, the player who plays him, and on his actor
+  137: the cast nobody fills plays nothing) and gets up on his own before the roar (after Trunks' shout when Trunks is played).
 - **Marks:** player 1 (326, 414), player 2 (284, 400), Paragus (384, 380), Vegeta's actor when nobody plays him (352, 400).
   Filmed: Vegeta + Trunks, Gohan alone (Vegeta's actor), Piccolo + Vegeta. `staging_broly` (nine lineups) unchanged but for a
   shot of the power-up.

@@ -405,6 +405,10 @@ sequence broly_rim
         WalkToPosition 0, 306, 414
         SetEntityFacing 0, 3
       V2:
+        CoopCall 37, 1, -12, 159         ; (for Ryan's review, its own commit) the film's beat on the game's lines: at Broly's power the
+        CoopCall 37, 10, 0, 1            ; prince goes down on one knee: his player's body when he is played, his actor otherwise (a
+        CoopCall 37, 1, 137, 159         ; cast nobody fills plays nothing)
+        CoopCall 37, 10, 0, 1
   [12] text 4 "VEGETA: The Legendary Super Saiyan...  It can't be..."
   [13] script
         CoopCall 22, 4, 3, 0
@@ -415,7 +419,12 @@ sequence broly_rim
         PushByte 15
         END
   [14] text 5 "TRUNKS: Father, snap out of it!  We have to fight!"
-  [15] script  ; the roar: a flash and the ground heaves before it
+  [15] script  ; Vegeta gets up on his own (after Trunks' shout when Trunks is played). The roar: a flash and the ground heaves before it
+        CoopCall 37, 1, -12, 159
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 1, 137, 159
+        CoopCall 37, 10, 0, 0
+        WaitFrames 10
         WhiteFlash 8
         ScreenShake 0, 24, 40
   [16] text 0 "BROLY: KAKAROOOOT!!"
