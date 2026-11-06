@@ -123,26 +123,31 @@ end
 
 ; zone 6 area 22: Vegeta lands; Hercule was told by Piccolo to wait for him (the duel's loser plays him)
 sequence ch3_landing
-  script                                 ; stock's sound; player 2's entity (whoever the duel left him) waits out the scene, he comes back as Hercule
+  [0] script                             ; stock's sound; player 2's entity (whoever the duel left him) waits out the scene, he comes back as Hercule
         PlayAudio 50
         CoopCall 31, 3, 0, 0
-  stock @083d1974                        ; Vegeta: those Androids must be here by now
-  script
+  [1] stock @083d1974                    ; Vegeta: those Androids must be here by now
+  [2] script                             ; Hercule meets Vegeta only with two players, as player 2's new character (next 3); alone he is not
+        CoopCall 5, 0, 0, 0                   ; in the scene (Ryan, 2026-11-05) and only becomes selectable (11)
+        JumpIfFalse a
         SpawnCharacterEntity 72, 344, 352
         WalkToPosition 72, 272, 320
         SetEntityFacing 72, 2
         SetEntityFacing 0, 3
         PlayAudio 50
-  text 67 "HERCULE: Thank God you've arrived!  We need you in the fight!"
-  text 1 "#VEGETA: And who the hell are you?"
-  text 67 "HERCULE: The name's Hercule!  World Martial Arts Champion!\x0bPiccolo told me to wait here and keep an eye out for you."
-  text 67 "HERCULE: Don't you worry, I came prepared!  See?  Loaded and everything!"
-  text 1 "#VEGETA: A gun.  You brought a gun.  To fight androids."
-  text 67 "HERCULE: ...It's a really good gun."
-  text 1 "#VEGETA: Hmph.  Stay out of my way."
-  script                                 ; two players: Hercule goes to where player 2's entity appears (12 px left of player 1); alone he walks off
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse H1
+        PushByte 3
+        END
+      a:
+        PushByte 11
+        END
+  [3] text 67 "HERCULE: Thank God you've arrived!  We need you in the fight!"
+  [4] text 1 "#VEGETA: And who the hell are you?"
+  [5] text 67 "HERCULE: The name's Hercule!  World Martial Arts Champion!\x0bPiccolo told me to wait here and keep an eye out for you."
+  [6] text 67 "HERCULE: Don't you worry, I came prepared!  See?  Loaded and everything!"
+  [7] text 1 "#VEGETA: A gun.  You brought a gun.  To fight androids."
+  [8] text 67 "HERCULE: ...It's a really good gun."
+  [9] text 1 "#VEGETA: Hmph.  Stay out of my way."
+  [10] script                            ; Hercule goes to where player 2's entity appears (12 px left of player 1)
         PushByte 72
         PushEntityPosition 0
         PushVarint 65536
@@ -173,17 +178,14 @@ sequence ch3_landing
         Mul
         Sub
         Step WalkToPosition
-        Jump H2
-      H1:
-        WalkToPosition 72, 344, 352
-      H2:
         DespawnEntity 72
+  [11] script
         SetCharacterFlag_Bit1 5
         CoopCall 6, 5, 0, 0                ; player 2's entity (kept across the warp) plays Hercule now
         SetStoryFlag 75
         PlayAudio 62
         ReloadMap
-  stock @083d19f2                        ; Journal Updated!
+  [12] stock @083d19f2                   ; Journal Updated!
 end
 
 ; ---- the Lookout (zone 9 area 3) and the Hyperbolic Time Chamber (zone 15 area 2): Vegeta vs Trunks ----

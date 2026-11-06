@@ -1,9 +1,9 @@
 r"""Write tools/headless/staging_ch2.txt and staging_ch3.txt: chapters 2 and 3's added scenes per lineup (ch2_west_city, ch3_zone7, ch3_duels).
 usage: python tools/headless/staging_ch23_gen.py     (the scripts are committed; rerun this after changing them here)
-Chapter 2: the mansion deal alone as Gohan / Krillin and with both; the jungle's end alone as Piccolo (Hercule's actor comes out to take the
-credit), alone as Hercule (Piccolo's actor answers) and with both. Chapter 3: zone 7's cutaway; 19's battlefield alone as Vegeta (Hercule's
-actor for "clown", gone before the fight), alone as Hercule (made Vegeta), both ways round with two players; the landing alone and with
-player 2's entity handed over from Hercule's actor."""
+Chapter 2: the mansion deal alone as Gohan / Krillin and with both; the jungle's end alone as Piccolo, alone as Hercule and with both.
+Chapter 3: zone 7's cutaway; 19's battlefield alone as Vegeta, alone as Hercule (made Vegeta), both ways round with two players; the landing
+alone (no Hercule: he only becomes selectable) and with player 2's entity handed over from Hercule's actor. Only who is played is in a scene
+(Ryan, 2026-11-05): Piccolo's actor 103 never, Hercule's sprite 72 only on a player (or his hand-over actor with two players at the landing)."""
 from staging_lib import *
 
 s = Script("staging_ch23_gen.py")
@@ -25,6 +25,7 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, P
     s.press(9, 90)
     s.out("frames 100")
     s.shot(f"c2_{n}_end")
+    s.actors(s103=int(PICCOLO in (p1, p2)), s72=int(HERCULE in (p1, p2)))
     s.out("ents")
     s.end_scene()
     s.out("frames 30")
@@ -42,12 +43,15 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     n = lineup_name(p1, p2)
     s.begin(f"battle {n}", p1, p2, "+76")
     s.warp(7, 15, 424, 416, 300)
+    s.press(30, 110)
+    s.actors(s72=s72)              # no Hercule actor for "clown" alone (Ryan, 2026-11-05)
     s.end_scene(200)
     s.shot(f"c3_{n}_fight")
     s.actors(s72=s72, s165=1)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin
     s.on_map(7, 15)
     s.win(200)
     s.press(5, 100)
+    s.actors(s72=s72)
     s.shot(f"c3_{n}_13")
     s.out("ents")
     s.end_scene()
@@ -57,7 +61,11 @@ for p1, p2, s72 in ((VEGETA, None, 0), (VEGETA, TRUNKS, 1)):
     n = lineup_name(p1, p2)
     s.begin(f"landing {n}", p1, p2)
     s.warp(6, 22, 240, 312, 100)
+    if p2 is None:
+        s.press(1, 110)
+        s.actors(s72=0)
     s.press(5, 110)
+    s.actors(s72=s72)              # alone Hercule is not in the scene; with two players his actor walks up to hand over to player 2
     s.shot(f"c3_{n}_land")
     s.end_scene()
     s.out("frames 60")

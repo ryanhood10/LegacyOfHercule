@@ -113,6 +113,12 @@ frames 200
 mash 9 90
 frames 100
 shot c2_P_end
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -142,6 +148,12 @@ frames 200
 mash 9 90
 frames 100
 shot c2_H_end
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -172,6 +184,12 @@ frames 200
 mash 9 90
 frames 100
 shot c2_PH_end
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 ents
 stepz 0x03001FDC 150
 frames 30
@@ -202,6 +220,12 @@ frames 200
 mash 9 90
 frames 100
 shot c2_HP_end
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 ents
 stepz 0x03001FDC 150
 frames 30

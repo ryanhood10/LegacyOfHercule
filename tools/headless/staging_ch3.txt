@@ -31,6 +31,10 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x1a001a8
 poke32 0x0203FD08 5
 frames 300
+mash 30 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -48,6 +52,9 @@ ents
 poke32 0x0203FD08 7
 frames 200
 mash 5 100
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 shot c3_V_13
 ents
 stepz 0x03001FDC 150
@@ -70,6 +77,10 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x1a001a8
 poke32 0x0203FD08 5
 frames 300
+mash 30 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -87,6 +98,9 @@ ents
 poke32 0x0203FD08 7
 frames 200
 mash 5 100
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 shot c3_H_13
 ents
 stepz 0x03001FDC 150
@@ -110,6 +124,10 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x1a001a8
 poke32 0x0203FD08 5
 frames 300
+mash 30 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -127,6 +145,9 @@ ents
 poke32 0x0203FD08 7
 frames 200
 mash 5 100
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot c3_VH_13
 ents
 stepz 0x03001FDC 150
@@ -150,6 +171,10 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x1a001a8
 poke32 0x0203FD08 5
 frames 300
+mash 30 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -167,6 +192,9 @@ ents
 poke32 0x0203FD08 7
 frames 200
 mash 5 100
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot c3_HV_13
 ents
 stepz 0x03001FDC 150
@@ -188,7 +216,14 @@ poke32 0x0203FD0C 0x1606
 poke32 0x0203FD54 0x13800f0
 poke32 0x0203FD08 5
 frames 100
+mash 1 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 mash 5 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 shot c3_V_land
 stepz 0x03001FDC 150
 frames 30
@@ -215,6 +250,9 @@ poke32 0x0203FD54 0x13800f0
 poke32 0x0203FD08 5
 frames 100
 mash 5 110
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot c3_VT_land
 stepz 0x03001FDC 150
 frames 30
