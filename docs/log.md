@@ -15,7 +15,10 @@ Newest first. One entry per landed piece or decision; details live in the linked
   CoopCall 16 on 3-6 (the clash's place, a spirit body, the summit seen this session); the cinematic helpers (CoopCall 37) carry the summit's fight, the
   head's dash and Vegeta's charge. New facts for scene writers: `docs/scripts.md` 5b. Tests: `staging_postgame.txt` (new), `cell_staging.txt`,
   `staging_arctic.txt` extended. No new line of dialogue anywhere; the Senzu Bean, a Vegeta variant of the finale's opening line and any change to
-  Dende's Dragon Ball hand-in were decided against and are not built.
+  Dende's Dragon Ball hand-in were decided against and are not built. For Ryan's review, each one commit whose revert drops it alone (switches in
+  `tools/gen_cell_games.py`): `GOKU_SPIRIT` (Goku's spirit in the struggle), `SCREAM_FIRST` (the scream before the white). Found on the way: a text
+  box's eviction destroys held beams (a one-player crash at the struggle's end, fixed: `docs/scripts.md` 5b). Full regression clean on the branch's
+  head (`regfull.sh`, 98 blocks, a private play ROM; run alone: three overlapping runs share one `reg.log`).
 - **The cinematic helpers (`src/coop/cine.c`, `CoopCall 37`; branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine"):** the moves a
   cutscene fight needs, each one call from lscript: the afterimage dash, a light or heavy strike (the knock-back in an arc, the
   landing, lying or on a knee), a melee exchange (beats, clashes, both vanishing and meeting again), a charge (blocking, or held

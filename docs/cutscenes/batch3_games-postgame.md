@@ -945,7 +945,8 @@ a text entry: they follow the box); 5.9 Trunks looks about, a rumble, old Hercul
 the pose from his own record) with dust and a small shake in front of the fist, Trunks' hop, old Hercule looks at his fist for 40 frames before
 "The End.". **Draft lines: none were written.** Decided
 against (2026-11-06) and not built: the Senzu Bean, a Vegeta variant of the finale's opening line, a change to Dende's Dragon Ball hand-in. Marked for
-Ryan's review, each its own commit: Goku's spirit in the struggle; the scream before the white.
+Ryan's review, each a switch in `tools/gen_cell_games.py` turned on by one commit of its own ("FOR REVIEW: ..."; reverting it drops the item alone,
+both off-states filmed): `GOKU_SPIRIT`, Goku's spirit in the struggle; `SCREAM_FIRST`, the scream before the white.
 
 Build order, showcases first. Before them, the two ending fixes of section 0 (5.7's `SetActiveCharacter 5`, then 5.5):
 small, and they are wrong today.
