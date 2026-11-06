@@ -61,7 +61,8 @@ STATES = {
     "f3": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2E08, 190, 740),          # above the lab cutaway: walk down (13 beside Gero)
     "f4": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2C08, 224, 90),           # the eggs: walk up through the north door
     "f5": f"p2 off\npreset {WAIT}\nmaptest 263\nframes 200\npoke8 0x0203F000 1\n" + warp(0x0309, 96, 160),   # the Lookout at the Chamber's door: up + A
-    "f6": chamber(0x40),                                                                          # a run under way, no lights out: explore
+    "f6": f"p2 off\nmaptest 263\nframes 300\nflags {LEGEND} +441\n" + warp(0x0F0F, 300, 200)        # the waiting room, every tier open
+          + "key 1 6\nframes 150\n" * 8,                                                         # (the new tiers' pop-ups read)
     "f7": chamber(0x40 | 0x1F, (240, 1180)),                                                      # five out, at Broly's ship (side rooms after its lever)
     "f8": chamber(0x40 | 0x3F, (1028, 440)),                                                      # six out: the portal ahead, Mr. Popo
     "f9": chamber(0x40, (1616, 600)),                                                             # at Frieza's ship: the throne room after his lever
