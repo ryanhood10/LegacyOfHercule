@@ -606,6 +606,15 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   a charge (level 2) and he stands gold: **an actor (140) on his spot while player 1's body waits out of view**, so nothing of his
   state changes (a real transformation in the scene left the form's meter running after it was undone: tried and dropped); a flash at
   the fight's start puts him back, in base form as the stock starts it. Skipped when he walks in transformed already.
+- **He starts the fight transformed (Ryan, 2026-11-06: "vegeta should START the fight in super sayain if hes going to transform in the
+  scene and then fight"; branch `nb-ssjfix`):** the debut is player 1's own transformation now, the way the stock's space scene makes him
+  one: `SetEntityAnimation 0, 35`, the Transformation ability's own state (its power-up at its pace, the hum, the meter filled, the form
+  change to row 11 / sprite 140 and the Super Saiyan class), with Cine's charge alongside it (`CoopCall 37, 7, 0, 6`) and its burst on the
+  gold. Nothing is half-set: the fight starts with the form's own rules running (the drain of 1 EP every 20 frames, the turn back at 0 EP,
+  B to turn back), exactly as if he had used the ability. The actor and the hidden body are gone. Only Vegeta: the scene's first entry
+  makes Vegeta player 1 in every lineup (alone, alone as Hercule, Vegeta + Hercule, Hercule + Vegeta: the pads trade), so player 2 never
+  plays him here; walking in transformed already skips it. `staging_ch3` "battle" checks his row (11) and the filled meter at the fight in
+  the four lineups, and the row still 11 five seconds into it.
 
 ### 3.6 19's end, 13 leaves, 20 flees: rework (M)
 

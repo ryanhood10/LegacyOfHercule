@@ -161,7 +161,7 @@ sequence ch3_z7_battle
   script                                 ; 13 walks up beside 19, to the spot his boss twin takes (TWIN_OFFSET right of 19), so the swap does not show
         WalkToPosition 165, 504, 408
         SetEntityFacing 165, 2
-  [42] script                            ; stock 39 (20 flies up to watch), then the debut (Ryan's decision of 2026-11-06, the anime's moment): his power, and he stands there gold; the watchers shout. Shown, not played: the gold body is an actor (140) on his spot while player 1's own body waits out of view, so his form, energy and meter are what the stock leaves (entry 46 puts him back). Not when he walked in transformed already
+  [42] script                            ; stock 39 (20 flies up to watch), then the debut (Ryan's decision of 2026-11-06, the anime's moment): he transforms for real, the way the stock's space scene does it (animation 35: the Transformation ability's own power-up, form change, hum and meter), with Cine's charge held alongside it; the watchers shout. He starts the fight a Super Saiyan under the form's own rules (Ryan, 2026-11-06: "vegeta should START the fight in super sayain if hes going to transform in the scene"): the drain, the turn back at 0 EP, B to turn back. Not when he walked in transformed already; only Vegeta (the scene's first entry makes him player 1 in every lineup)
         PlayAudio 26
         FlyToPosition 13, 456, 96
         SetEntityFacing 0, 3
@@ -169,14 +169,17 @@ sequence ch3_z7_battle
         JumpIfFalse go
         Jump done
       go:
+        PushActiveCharIndex
+        PushByte 2
+        CmpEq
+        JumpIfFalse done
         WaitFrames 20
         CoopCall 37, 1, 0, 12
-        CoopCall 37, 7, 50, 2
-        SpawnCharacterEntity 140, 424, 416
-        SetEntityFacing 140, 3
-        SetEntityPositionInstant 0, 424, 716
-        CoopCall 37, 0, 0, 0
+        CoopCall 37, 7, 0, 6
+        SetEntityAnimation 0, 35
+        CoopCall 37, 7, -1, 0
         WhiteFlash 8
+        SetEntityFacing 0, 3
         BeginCommandBatch
         SetEntityAnimation 53, 4
         SetEntityAnimation 121, 4
@@ -196,14 +199,7 @@ sequence ch3_z7_battle
         PushByte 46
         END
   [45] text 1 "!VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
-  [46] script                            ; stock entry 41, plus 13's actor leaving for his boss twin; the debut's gold actor goes in a flash and player 1 stands on his mark again, in the form the stock starts the fight in
-        CoopCall 22, 2, 140, 0
-        JumpIfFalse keep
-        WhiteFlash 4
-        DespawnEntity 140
-        SetEntityPositionInstant 0, 424, 416
-        SetEntityFacing 0, 3
-      keep:
+  [46] script                            ; stock entry 41, plus 13's actor leaving for his boss twin
         SetPlayerVisible 1
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 12, 2
