@@ -1303,7 +1303,7 @@ settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
 
 **Since 2026-11-06 (`nb-cs3`):** `staging_arctic.txt` (from `staging_ch9_gen.py`) also checks both players' spots mid-scene (player 1 at (324, 372),
 player 2's entity at (350, 372)), the boss and no 13 / 17 / 18 once the scene is over, and for two lineups a retry in the same session (a test warp
-back to the arrival: Super 13 stands at once, the scene is over in a few presses). The scene's end is read from `stepz`'s own line (`EXPECT stepz
+back to the arrival: Super 13 stands at once, the scene is over in a few presses). The mark behind it (`cgb` + 0x3F, 0x5A) was watched by hand through a real loss (it stays through "You have died!" and the title) and a warp to the Lookout (dropped within a second). The scene's end is read from `stepz`'s own line (`EXPECT stepz
 03001fdc: zero`): the fight starts as the scene ends and a hit shows the same word for a moment, so a peek after it is not reliable there.
 
 `tools/headless/arctic_summit.txt`: Map Test 261 with flags 191, 195, 480 and 381, a test warp to the summit's arrival

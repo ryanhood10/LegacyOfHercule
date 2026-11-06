@@ -836,7 +836,9 @@ Stock, about 50 s (filmed). **Leave.**
   three each, dust on him, he turns his head and one blast between them throws both to the rim, where they lie through the fight and stand again
   when he is gone (`summit_13_end`); player 1 steps toward him for his line (Hercule: a step back). Not built: beat 8's crouch and roar (the
   boss draws those groups by its own frame code, not by an animation index a script can name), the caption at the bottom (`@` without `^` is a
-  shout box in the middle too). **The short form:** `CoopCall 16, 0, 6` is 1 once the full scene has played since power-on: the players walk in,
+  shout box in the middle too). **The short form:** `CoopCall 16, 0, 6` is 1 once the full scene has played and the players have not left the Arctic since (the mark survives a
+  game over, seen headless: the death screen, the title; a soft reset or a second on any other map drops it; **a reload of a real save at the
+  ridge pad after a loss was not run**, the tests reach the retry by a test warp): the players walk in,
   a white cut to Super 13 standing with Tien and Yamcha down at the rim, his music, "Look at me.  Even Cell would tremble!", the players' lines,
   the fight (about 8 s to control instead of 55).
   **With the helpers (after the merge of `nb-cine`), replacing the hand-rolled hits above:** the opening is a 90-frame exchange between 17 and 13

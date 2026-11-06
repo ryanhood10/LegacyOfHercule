@@ -113,9 +113,11 @@ typedef struct CgBeamRam {
     u8 spirit_id;            // its sprite id
     u8 seen;                 // CoopCall 16 on 5 / 6: CG_SEEN once the summit's scene has played in full since power-on (a retry plays its short form)
 } CgBeamRam;
-#define CG_SEEN 0x5A         // partyram is not cleared at boot: one value in 256 counts
+#define CG_SEEN 0x5A         // the mark; up to CG_SEEN + CG_SEEN_HOLD - 1 while it counts polls spent off the Arctic (cg_choice_input)
+#define CG_SEEN_HOLD 60
 _Static_assert(sizeof(CgBeamRam) == 0x40, "CgBeamRam: .party.bv holds 0x40");
 static CgBeamRam cgb __attribute__((section(".party.bv")));
+static int cg_seen(void) { return cgb.seen >= CG_SEEN && cgb.seen < CG_SEEN + CG_SEEN_HOLD; }
 #define cg_beam_vt cgb.vt
 static const u8 cg_clear_remap[256];         // every colour transparent (the Rumble's blink, tny_engine.c)
 
@@ -173,7 +175,7 @@ static void cg_beams_sweep(void) {
 
 int cg_beam(int id, int on, int c) {
     if (on == 5) { cgb.seen = c ? CG_SEEN : 0; return 0; }   // the summit's scene (arctic_summit.lscript): seen in full / forget
-    if (on == 6) return cgb.seen == CG_SEEN;                 // -> 1 on a retry in the same session (pushed by vmcall.c)
+    if (on == 6) return cg_seen();                           // -> 1 on a retry in the same session (pushed by vmcall.c)
     if (on == 3) {                           // the clash goes to x = c px at id px a frame (0 = 1; 99 = at once)
         cgb.clash_to = (s16)c;
         cgb.step = (u8)(id == 99 ? 0 : id);
@@ -241,6 +243,16 @@ int cg_choice_take(void) {
 }
 
 void cg_choice_input(u16 *p1, u16 *p2) {
+    // The summit's short form (CoopCall 16 on 5 / 6) is for a retry from the ridge pad: a game over leaves EWRAM alone (seen: "You have
+    // died!" on zone 1 area 7, the title, the load), a soft reset clears it. A second on any map but the Arctic's (zone 15 areas 1,
+    // 5-8), the death screen's and the title (no map) drops the mark, so another save or a new game in this session sees the scene in
+    // full; shorter than that is a map load's half-written zone / area (seen: it dropped the mark on the way to the death screen).
+    if (cg_seen()) {
+        const u8 *m = (const u8 *)g_MapState;
+        int off = m && (m[0] || m[1]) && !(m[0] == 1 && m[1] == 7) && !(m[0] == 15 && (m[1] == 1 || (m[1] >= 5 && m[1] <= 8)));
+        if (!off) cgb.seen = CG_SEEN;
+        else if (++cgb.seen >= CG_SEEN + CG_SEEN_HOLD) cgb.seen = 0;
+    }
     if (cg_state.magic == CG_MAGIC && in_arena()) {
         if (cg_state.owner[0] || cg_state.owner[1]) { cg_beams_sweep(); cg_scene_step(); }   // while a beam is held
         if (cgb.spirit && cgb.spirit <= 3) cg_spirit_show(cgb.spirit == 2 || (cgb.spirit == 1 && ((g_FrameCounter >> 1) & 1)));   // the spirit flickers
@@ -276,6 +288,5 @@ void cg_set_solo(int mode) {
     if (mode < 0 || mode > 2) mode = 0;
     cg_state.magic = CG_MAGIC;
     cg_state.solo = (u8)mode;
-    if (mode) cgb.seen = 0;                  // the Games: a later visit to the summit is a first one again
     if (mode && coop.p2) EntityList_Remove(g_SceneTable[1], coop.p2, 0);   // its destroy clears coop.p2
 }
