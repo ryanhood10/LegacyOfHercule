@@ -149,6 +149,8 @@ def dress13(px, w, h, table, death=False):
     belt_y = cy(reds[0]) if reds and len(reds[0]) >= 12 else None
     pants_px = []
     hair_px = set()
+    warm = [c2 for c2 in comps(px, w, h, B_WARM) if any(px[y][x] in B_YELLOW for y, x in c2)]
+    legs = max((c2 for c2 in warm if cy(c2) >= skin_y), key=len, default=[(0, 0)])
     for comp in comps(px, w, h, B_WARM):
         if not any(px[y][x] in B_YELLOW for y, x in comp):
             continue                                        # white light, sparks: unchanged
@@ -158,7 +160,10 @@ def dress13(px, w, h, table, death=False):
             hair_px.update(comp)
         elif death and belt_y is not None and c < belt_y:
             continue                                        # light bursting out of the torso
-        elif len(comp) >= 30:
+        elif len(comp) >= 30 and (len(comp) * 2 >= len(legs) or c >= cy(legs) - 2):
+            # (a gold cuff of 30+ pixels on a forearm hanging by the hip was painted as trousers, a red-brown patch
+            # on the walking arm: the trousers are the largest such piece, any at least half its size, and any no
+            # higher than its middle; a cuff is smaller and hangs above it)
             # trousers: the pixels with no transparent 4-neighbour and their 8-neighbours; the rest of
             # the component is a swing arc or streak touching them (white)
             opaque = lambda y, x: 0 <= y < h and 0 <= x < w and px[y][x] != 0   # noqa: E731
@@ -190,7 +195,14 @@ def dress13(px, w, h, table, death=False):
             out[y][x] = 14
     pants_y = cy(pants_px) if pants_px else None
     for k, comp in enumerate(reds):
-        if belt_y is not None and len(comp) >= 8 and abs(cy(comp) - belt_y) <= 6:   # the sash, front and back
+        # the sash, front and back; in the side views its knot sits at the hip 8 rows over the tails' middle (it
+        # stayed red there: a red patch on a body with no red), so up to 12 rows above
+        # (not in the death frames, and never red within 8 px of his hair: in a crouch his open mouth is that near
+        # the sash)
+        dy = cy(comp) - belt_y if belt_y is not None else 99
+        knot = (not death and -12 <= dy < -6 and
+                not any((y + a, x + b) in hair_px for y, x in comp[::3] for a in range(-8, 9) for b in range(-8, 9)))
+        if belt_y is not None and len(comp) >= 8 and (abs(dy) <= 6 or knot):
             for y, x in comp:
                 out[y][x] = belt[px[y][x]]
         elif pants_y is not None and cy(comp) > pants_y:

@@ -29,7 +29,7 @@ python tools/headless/st_expect.py tools/headless/ssj_hercule.txt "$ROM" "$OUT/m
 echo "## softreset" >> "$LOG"
 python tools/headless/st_expect.py tools/headless/softreset.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 # Resting heals, player 2's pickups, West City's arrival, the tournament in co-op, player 2's agency (docs/testing.md "Resting heals", "Player 2's pickups", "West City's arrival", "Tournament in co-op", "Player 2's agency"): self-checking
-for t in regen pickup wc_arrival corn_maze ssj_lock hercule_kit tny_coop p2_agency p2_cases p2_scenes balance p2_levelup tny_pools tny_xp eggbot tny_sizes ch4_eggs ch4_staging tny_bracket tny_n32 cell_staging gohan_ssj1; do
+for t in regen pickup wc_arrival corn_maze ssj_lock hercule_kit tny_coop p2_agency p2_cases p2_scenes balance p2_levelup tny_pools tny_xp eggbot tny_sizes ch4_eggs ch4_staging tny_bracket tny_n32 cell_staging gohan_ssj1 hercule_fly; do
   echo "## $t" >> "$LOG"
   python tools/headless/st_expect.py tools/headless/$t.txt "$ROM" "$OUT/menu.ss" --out "$OUT" --cols 4 2>&1   | grep -E "^==|^map zone|^0[0-9a-f]{7}:|FAIL|rror|TIMEOUT|CRASH" >> "$LOG"
 done

@@ -139,7 +139,7 @@ $(BUILD)/obj/%.o: src/coop/%.c src/coop/rom.h src/coop/coop.h src/coop/android16
 -include $(patsubst src/coop/%.c,$(BUILD)/obj/%.d,$(SRCS))
 
 # Super Saiyan Hercule sprite + relocated sprite index / display rows, generated from the ROM (never committed)
-$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/ssjhercule.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
+$(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/ssjhercule.py tools/herculesprites.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py tools/tnyplayables.py src/coop/tourney.h src/coop/tourney_data.c $(ROM) $(BUILD)/.spriteflags
 	$(PYTHON) tools/spriteclone.py $(ROM) $@ $(CLONE_FLAGS)
 
 # re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
