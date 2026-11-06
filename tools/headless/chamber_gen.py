@@ -42,10 +42,27 @@ class S:
     def warp(self, za, x, y, frames=150):
         self.out(f"poke32 {ARG} {za:#x}", f"poke32 {ARG2} {x | y << 16:#x}", f"poke32 {CMD} 5", f"frames {frames}")
 
-    def door(self):
-        """from the chamber room through the door: a real load of the open area (its spot records)"""
+    def door(self, opening=False):
+        """from the chamber room through the door: a real load of the open area (its spot records). The opening of a run plays
+        only when flag 510 is clear (test command 48 op 7 sets it here unless `opening`; op 0, the lights, sets it too)"""
+        self.out(f"poke32 {ARG} 7", f"poke32 {ARG2} {0 if opening else 1}", f"poke32 {CMD} 48", "frames 2")
         self.warp(0x0309, 96, 160)
         self.out("keys 0x40", "frames 20", "keys 0", "key 1 6", "waitmap 15 18 600", "frames 260")
+
+    def chs(self, regex):
+        """chamber.c ChState +0x30: the open area's scene | bits << 8 | the portal's frames << 16 | the scene's wait << 24 (read from
+        RAM: test commands wait while a scene runs)"""
+        self.out("find CH 0x4348414D")
+        self.expect(rf"\w+: {regex}", "peek CH+0x30 1")
+
+    def camera(self, regex):
+        """the view's top-left (the camera object's +0x1C / +0x20, docs: rom.h CAMERA_CELL)"""
+        self.out("deref CAM 0x081DA974")
+        self.expect(rf"\w+: {regex}", "peek CAM+0x1C 2")
+
+    def quiet(self):
+        """the void's refill frozen and every standing body gone (a test of the door or the scene, not of a fight)"""
+        self.out(f"poke32 {ARG} 3", f"poke32 {ARG2} 1", f"poke32 {CMD} 48", "frames 2", f"poke32 {CMD} 13", "frames 30")
 
     def lights(self, mask):
         self.out(f"poke32 {ARG} 0", f"poke32 {ARG2} {mask:#x}", f"poke32 {CMD} 48", "frames 2")
@@ -99,6 +116,20 @@ def gate():
         s.deco(6)
         s.expect(r"\w+: 00000001", "peek D+0x10 1")
     s.out("shot g_lights")
+    s.echo("the wall the gate stands in: walking up at x 600 stops below it, nothing walks round the gate")
+    s.lights(0)
+    s.warp(OPEN, 600, 470)
+    s.place(600, 470, p2=False)
+    s.out("keys 0x40", "frames 90", "keys 0")
+    s.expect(r"map zone 15 area 18 var 1 player 6\d\d,(39\d|4[0-6]\d)", "map")
+    s.out("shot g_wall")
+    s.echo("five lights out: the portal closed (decorations 25 / 26 hidden)")
+    s.lights(0x1F)
+    s.warp(OPEN, 1028, 430)
+    s.out("frames 30")
+    for i in (25, 26):
+        s.deco(i)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
     s.echo("the beams shut the way: walking up into them stops below the gate")
     s.lights(0)
     s.warp(OPEN, 1028, 430)
@@ -112,9 +143,14 @@ def gate():
     for i in range(9):
         s.deco(i)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
+    s.echo("the portal between the pillars is open: its two frames (decorations 25 / 26) shown in turn")
+    for k in range(2):
+        s.out("frames 5", f"deref PA {0x03001128 + 4 * 25:#x}", f"deref PB {0x03001128 + 4 * 26:#x}", "peek PA+0x10 1", "peek PB+0x10 1",
+              "frames 6")
+    s.chs(r"[0-9a-f]{4}0[4-7c-f][0-9a-f]{2}")
     s.place(1028, 430, p2=False)
-    s.out("keys 0x40", "frames 50", "keys 0")       # past the beams' line, short of the hidden room's door (popo_gen.py goes in)
-    s.expect(r"map zone 15 area 18 var 1 player 10\d\d,3[4-8]\d", "map")
+    s.out("keys 0x40", "frames 30", "keys 0")       # past the beams' line, short of the portal (popo_gen.py goes in)
+    s.expect(r"map zone 15 area 18 var 1 player 10\d\d,(3[5-9]\d|4[0-2]\d)", "map")
     s.out("shot g_open")
     s.lights(0)
 
@@ -148,23 +184,45 @@ def gate():
     s.out("keys 0x90", "frames 90", "keys 0")
     s.expect(r"map zone 15 area 18 var 1 player 20[0-3]\d,20[0-3]\d", "map")
 
-    s.echo("--- the save pad at the quarters: a save with lights out, a soft reset, a load")
+    s.echo("--- no save pad inside the chamber any more (Ryan, 2026-11-05): A on its old spot opens nothing")
     s.lights(0x05)
     s.warp(OPEN, 1224, 1228)
-    s.echo("(no body near the pad: the refill frozen, the standing ones gone; a hit on the way in kept the menu shut once)")
-    s.out(f"poke32 {ARG} 3", f"poke32 {ARG2} 1", f"poke32 {CMD} 48", "frames 2", f"poke32 {CMD} 13", "frames 30")
+    s.quiet()
     s.place(1224, 1228)
-    s.out("frames 30", "mash 6 50", "frames 60", "key 1 4", "frames 80", "key 1 4", "frames 80", "key 1 4", "frames 80", "key 1 4", "frames 60", "shot g_saved")
-    s.echo("saved on zone 15 area 18")
-    s.expect(r"\w+: 0f 12", "peek8 PARTY+2 2")
-    s.out("key 0xF 6", "frames 400", "key 8 6", "frames 200", "key 8 6", "frames 200", "key 8 6", "frames 200", "key 1 6", "frames 100", "key 1 6",
-          "frames 100", "stepnz 0x0203FA49 10", "find PS 0x91A7E250", "frames 60", "key 2 6", "frames 100", "key 1 6", "frames 300", "shot g_loaded")
+    s.out("frames 30", "key 1 6", "frames 60", "shot g_nopad")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+
+    s.echo("--- the door home asks first (Ryan: a player may leave mid-run by accident)")
+    s.out("flags +514 +520")
+    door_ask(s, "g_ask_lose", "29")
+    s.echo("B (once its text is out): no; a step back from the door, still inside, the lights kept (0 and 2 out, the run's 510)")
+    s.out("frames 120", "key 2 6", "frames 90", "shot g_no")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.expect(r"map zone 15 area 18 var 1 player \d+,12[5-9]\d", "map")
+    s.expect(r"\w+: 45$", "peek8 FLAGS+0x3F 1")
+    s.echo("an A held when the question comes does not answer it: A down as the scene starts and held, the box waits (CoopCall 18 ignores a held A)")
+    s.place(1012, 1262, p2=False)
+    s.out("keys 0x40", f"waitnz {SCENE} 200", "keys 0x41", "frames 200", "shot g_held")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
     s.expect(r"map zone 15 area 18 ", "map")
-    s.echo("the load: lights 0 and 2 out, the rest on, its spots standing (the bodies of tier 2)")
-    for i in range(6):
-        s.deco(i)
-        s.expect(rf"\w+: 0000000{0 if (0x05 >> i) & 1 else 1}", "peek D+0x10 1")
-    s.out("ents")
+    s.out("keys 0", "frames 20")
+    s.echo("A now: yes; the run's progress reset (the six lights on, flag 510 clear), the first win and the time round kept, the Lookout")
+    s.out("key 1 6", "waitmap 9 3 400", "frames 120", "shot g_left")
+    s.expect(r"map zone 9 area 3 var 1 player 9\d,1[67]\d", "map")
+    s.echo("flags 504-510 clear (the lights; the run: the next way in is a new run, its opening in chamber_run.txt)")
+    s.expect(r"\w+: 00$", "peek8 FLAGS+0x3F 1")
+    s.expect(f"\\w+: {flag_on(514)}", "peek8 FLAGS+0x40 1")
+    s.expect(f"\\w+: {flag_on(520)}", "peek8 FLAGS+0x41 1")
+
+    s.out("frames 200")
+    s.echo("--- no lights out: the plain question, B, still inside")
+    s.lights(0)
+    s.warp(OPEN, 1016, 1272)
+    s.quiet()
+    door_ask(s, "g_ask_plain", "31")
+    s.out("frames 120", "key 2 6", "frames 90")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.expect(r"map zone 15 area 18 ", "map")
 
     s.echo("=== a new game clears flags 504-535 (party_new_game), not 496-503's neighbour 536+: set at the title after a soft reset")
     s.out("load menu.ss", "p2 off", "maptest 7", "frames 300", "key 0xF 6", "frames 400", "key 8 6", "frames 200", "key 8 6", "frames 200",
@@ -172,6 +230,19 @@ def gate():
           "key 1 6", "frames 200", "key 0x80 6", "frames 60", "key 1 6", "frames 600")
     s.expect(r"0203f146: 00 00 00 00 00 01", "peek8 FLAGS+62 6")
     s.write("chamber_gate.txt")
+
+
+def flag_off(n):
+    bit = 1 << (n % 8)
+    return "(" + "|".join(f"{v:02x}" for v in range(256) if not v & bit) + ")$"
+
+
+def door_ask(s, shot, entry):
+    """either player walking up into the quarters' door: the scene (test command 48 op 8: kind 2, running) and its question"""
+    s.place(1012, 1262, p2=False)
+    s.out("keys 0x40", "frames 40", "keys 0", "frames 50", f"shot {shot}")
+    s.chs(r"[0-9a-f]{6}42")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
 
 
 # ---- chamber_tiers ---------------------------------------------------------------------------------------------------
@@ -229,6 +300,89 @@ def tiers():
     s.write("chamber_tiers.txt")
 
 
+# ---- the lever (docs/time-chamber.md 13): the cut-away from the room's entrance along the carpet to the gate, the prize's box --
+SENZU, STR3, PWR3, END3 = 0x0203F17F, 0x0203F182, 0x0203F185, 0x0203F188   # item counters 0, 3, 6, 9 (popo_gen.py)
+
+
+def flag_on(n):
+    bit = 1 << (n % 8)
+    return "(" + "|".join(f"{v:02x}" for v in range(256) if v & bit) + ")$"
+
+
+def view(c):
+    """the cut-away's view top-left for a centre (chamber.c view_of)"""
+    return max(0, min(2048 - 240, c[0] - 120)), max(0, min(2048 - 160, c[1] - 80))
+
+
+def cutaway(s, tag, light, entrance, sixth):
+    """after the lever's press: the open area (no records) on the room's entrance, the pan along the carpet to the gate, the light
+    out there; the sixth: the beams fall, the portal opens and Popo's line holds on it"""
+    s.out("waitmap 15 18 300", "frames 34")
+    s.echo("the cut-away starts on this room's entrance on the open map, the light still on")
+    s.expect(r"map zone 15 area 18 ", "map")
+    vx, vy = view(entrance)
+    s.camera(f"{vx:08x} {vy:08x}")
+    s.deco(light)
+    s.expect(r"\w+: 00000001", "peek D+0x10 1")
+    s.out(f"shot {tag}_cut0", "frames 80", f"shot {tag}_cut1")
+    s.echo("the camera arrives at the gate (908, 280) along the carpet, then the light goes out")
+    s.out(f"stepz D+0x10 10")
+    s.camera("0000038[a-e] 0000011[6-a]")
+    s.out(f"shot {tag}_gate1")
+    if sixth:
+        s.echo("the sixth: the beams go down one by one, the portal opens (decorations 25 / 26 in turn), Popo's line")
+        s.out("frames 30")
+        s.deco(6)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.out("frames 60")
+        s.deco(8)
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.out(f"waitnz {0x03001128 + 4 * 25:#x} 1", "frames 150", f"shot {tag}_portal")
+        s.out(f"deref PA {0x03001128 + 4 * 25:#x}", f"deref PB {0x03001128 + 4 * 26:#x}", "peek PA+0x10 1", "peek PB+0x10 1")
+        s.expect(r"\w+: 0000000[01]", "peek PA+0x10 1")
+        s.chs(r"[0-9a-f]{4}0[4-7c-f][0-9a-f]{2}")      # the portal's bit (4) in the bits byte
+        s.out("frames 60", f"shot {tag}_portal_line")
+
+
+def prize(s, tag, light, first, gift):
+    """back in the room: the door opens; the prize (the first win: a +3 capsule by light % 3) in a box of its own, then Gohan's"""
+    s.out(f"mashmap 15 {19 + light} 40")
+    s.out("frames 80")
+    item = (3, 6, 9)[light % 3] if first else 0
+    s.echo(f"the prize's box: item {item} (chamber.c ChState +0x27, the last prize), a box up")
+    s.out("find CH 0x4348414D")
+    s.expect(rf"\w+: 0{item:x}$", "peek8 CH+0x27 1")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+    s.out(f"shot {tag}_prize", "key 1 6", "frames 60", f"shot {tag}_after_prize")
+    if gift:
+        s.out(f"shot {tag}_gift")
+    s.out(f"stepz {SCENE} 10", "frames 30")
+
+
+def side_rooms(s, tag, R, two):
+    """after the lever the side doorways are open: into each side room, its find once (the item, its flag), the look the second
+    time, out again"""
+    for k, w in enumerate(R["ways"]):
+        n = w["area"] - 27
+        s.echo(f"the side room 15/{w['area']}: open now; its find (flag {531 + n})")
+        s.place(*w["near"], p2=two)
+        s.out("frames 4", f"keys {w['dir']:#x}", f"waitmap 15 {w['area']} 200", "keys 0", "frames 60")
+        s.expect(rf"map zone 15 area {w['area']} ", "map")
+        s.out(f"shot {tag}_side{k}", f"poke8 {w['item']:#x} 0")
+        s.place(*w["find"], p2=False)
+        s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "frames 2", "key 1 6", "frames 40")
+        s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+        s.out(f"shot {tag}_find{k}", f"stepz {SCENE} 10", "frames 30")
+        s.expect(rf"\w+: {flag_on(531 + n)}", f"peek8 FLAGS+{(531 + n) // 8:#x} 1")
+        s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
+        s.echo("twice: the look, nothing more")
+        s.out("key 1 6", "frames 40", f"stepz {SCENE} 10", "frames 30")
+        s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
+        s.place(*w["near_out"], p2=two)
+        s.out("frames 4", f"keys {w['out']:#x}", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
+        s.expect(rf"map zone 15 area {R['area']} var 1 player {w['back']}", "map")
+
+
 # ---- chamber_room ---------------------------------------------------------------------------------------------------
 def to_dojo(s):
     s.door()
@@ -272,20 +426,19 @@ def room():
             s.out("frames 200", f"poke16 {entry(who) + 4:#x} 400")
             s.expect(r"\w+: (?!%02x)" % base_row, f"peek8 {entry(who) + 8:#x} 1")
         to_dojo(s)
-        s.echo("the boss stands at the far end; the partner only with two players; the plaque and the beam hidden")
+        s.echo("the boss stands at the far end; the partner only with two players; the plaque ON (lit), the beam hidden")
         s.actor(186, 1)
         s.actor(189, 1 if p2 is not None else 0)
         s.deco(0)
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
         s.deco(1)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.echo("the plaque clicks before the fight, pressed twice (both stop words of ch_lever are 0)")
         s.place(136, 96, p2=p2 is not None)
         s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "frames 30", "key 1 4", "frames 120")
         s.expect(r"map zone 15 area 19 ", "map")
-        s.expect(r"\w+: 00$|\w+: 0[0-9a-f]$", f"peek8 FLAGS+0x3F 1") if False else None
         s.deco(0)
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
         s.place(140, 215, p2=p2 is not None)
         s.out("frames 4")
         intro(s, 4)
@@ -335,40 +488,14 @@ def room():
         else:
             s.place(136, 96, p2=p2 is not None)
             s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4")
-        s.out("waitmap 15 18 300")
-        s.echo("the cut-away: the open area's map, no records, the gate, the light still on")
-        s.out("frames 120")
-        s.expect(r"map zone 15 area 18 ", "map")
-        s.deco(0)
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
-        s.out(f"shot {tag}_gate0", "frames 70", f"shot {tag}_gate1")
-        s.echo("the light is out, in the cut-away; the flag follows it")
-        s.deco(0)
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
-        if mask == 0x3E:
-            s.out("frames 62")
-            s.echo("the sixth: the beams go down one by one")
-            s.deco(6)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.deco(7)
-            s.expect(r"\w+: 00000001", "peek D+0x10 1")
-            s.out(f"shot {tag}_beam0", "frames 26")
-            s.deco(7)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.out("frames 26", f"shot {tag}_beam2")
-            s.deco(8)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.out("frames 170")
-        s.out("frames 130")
-        s.out(f"stepz {SCENE} 8" if not gift else "frames 200", "frames 100")
-        if gift:
-            s.out(f"shot {tag}_gift", "mash 2 90", "frames 60")
+        cutaway(s, tag, 0, (1616, 1704), mask == 0x3E)
+        prize(s, tag, 0, first=True, gift=gift)
         s.expect(r"map zone 15 area 19 ", "map")
         s.out("ents", f"shot {tag}_back")
-        s.echo("back in the room: flag 504, the plaque on, the door open")
+        s.echo("back in the room: flag 504, the plaque OFF, the door open")
         s.expect(r"\w+: [0-9a-f][1-9a-f]$|\w+: [0-9a-f][13579bdf]$", "peek8 FLAGS+0x3F 1")
         s.deco(0)
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.deco(1)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
         if gift:
@@ -381,12 +508,12 @@ def room():
         s.expect(r"map zone 15 area 18 var 1 player 16\d\d,17\d\d", "map")
         s.out(f"shot {tag}_out", "frames 300", "ents")
         s.full()
-        s.echo("a return to the room: empty, the plaque on, no fight, the door open")
+        s.echo("a return to the room: empty, the plaque OFF, no fight, the door open")
         s.place(*DOJO_DOOR)
         s.out("frames 4", "keys 0x40", "waitmap 15 19 200", "keys 0", "frames 60")
         s.actor(186, 0)
         s.deco(0)
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.place(140, 215, p2=p2 is not None)
         s.out("frames 4", "keys 0x40", "frames 60", "keys 0", "frames 30")
         s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
@@ -426,18 +553,24 @@ CAPSULE = dict(intro=(160, 286), walk=UP, plaque=(204, 180), seal=(160, 290), ou
 ROOMS = {
     # area, light, the door on the open map (inside its rect), the way back's position (regex), the lead / partner / crew
     # sprites, ratings (alone, pair lead, pair partner, pair pct), where the intro is walked into, the plaque, the seal
-    "pirate": dict(area=20, light=1, door=(1808, 1140), back=r"18\d\d,11\d\d", lead=50, partner=None, crew=142,
+    "pirate": dict(area=20, light=1, door=(1808, 1140), entrance=(1808, 1096), back=r"18\d\d,11\d\d", lead=50, partner=None, crew=142,
                    rate=(360, 360, None, 180), intro=(360, 128), walk=LEFT, plaque=(44, 92), seal=(340, 128), out=RIGHT,
                    seal_re=r"3[0-5]\d,1[0-4]\d"),
-    "frieza": dict(area=21, light=2, door=(1616, 560), back=r"16\d\d,5\d\d", lead=48, partner=185,
+    "frieza": dict(area=21, light=2, door=(1616, 560), entrance=(1616, 520),
+                   ways=[dict(near=(200, 112), dir=0x40, area=29, find=(204, 128), item=PWR3, near_out=(200, 320), out=0x80,
+                              back=r"\d+,1[0-3]\d")], back=r"16\d\d,5\d\d", lead=48, partner=185,
                    rate=(360, 360, 340, 70), intro=(200, 326), walk=UP, plaque=(92, 124), seal=(200, 330), out=DOWN,
                    seal_re=r"\d+,3[0-3]\d"),
-    "namek": dict(area=22, light=3, door=(432, 560), back=r"4\d\d,5\d\d", lead=222, partner=166,
+    "namek": dict(area=22, light=3, door=(432, 560), entrance=(432, 520), back=r"4\d\d,5\d\d", lead=222, partner=166,
                   rate=(380, 370, 350, 70), **CAPSULE),
-    "lab": dict(area=23, light=4, door=(432, 1744), back=r"4\d\d,17\d\d", lead=11, partner=9,
+    "lab": dict(area=23, light=4, door=(432, 1744), entrance=(432, 1704), back=r"4\d\d,17\d\d", lead=11, partner=9,
                 rate=(360, 360, 370, 70), intro=(216, 326), walk=UP, plaque=(76, 176), seal=(216, 330), out=DOWN,
                 seal_re=r"\d+,3[0-3]\d"),
-    "saiyan": dict(area=24, light=5, door=(240, 1136), back=r"2\d\d,11\d\d", lead=159, partner=170,
+    "saiyan": dict(area=24, light=5, door=(240, 1136), entrance=(240, 1096),
+                   ways=[dict(near=(40, 160), dir=0x20, area=27, find=(100, 96), item=END3, near_out=(200, 108), out=0x10,
+                              back=r"\d+,1[4-7]\d"),
+                         dict(near=(200, 160), dir=0x10, area=28, find=(132, 96), item=SENZU, near_out=(36, 108), out=0x20,
+                              back=r"\d+,1[4-7]\d")], back=r"2\d\d,11\d\d", lead=159, partner=170,
                    rate=(390, 380, 330, 70), intro=(120, 212), walk=UP, plaque=(172, 126), seal=(120, 220), out=DOWN,
                    seal_re=r"\d+,2[12]\d", rage=True),
 }
@@ -483,14 +616,14 @@ def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the
         s.out("frames 4", "keys 0x40", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
         s.expect(rf"map zone 15 area {R['area']} ", "map")
         s.out(f"shot {tag}_in")
-        s.echo("the lead stands; the partner only with two players; the crew; the plaque and the beam hidden")
+        s.echo("the lead stands; the partner only with two players; the crew; the plaque ON (lit), the beam hidden")
         s.actor(R["lead"], 1)
         if R["partner"]:
             s.actor(R["partner"], 1 if two else 0)
         if R.get("crew"):
             s.actor(R["crew"], 3)
         s.deco(0)
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
         s.deco(1)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.echo("the plaque clicks before the fight, pressed twice (a trigger resumes at its stop word's index: both are 0)")
@@ -498,7 +631,13 @@ def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the
         s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "frames 30", "key 1 4", "frames 120")
         s.expect(rf"map zone 15 area {R['area']} ", "map")
         s.deco(0)
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        if R.get("ways") and table is ROOMS:
+            s.echo("the side rooms' doorways are shut before the lever")
+            for w in R["ways"]:
+                s.place(*w["near"], p2=False)
+                s.out(f"keys {w['dir']:#x}", "frames 40", "keys 0", "frames 4")
+                s.expect(rf"map zone 15 area {R['area']} ", "map")
         s.echo("walking in: the intro")
         s.place(*R["intro"], p2=two)
         s.out("frames 4", f"keys {R['walk']:#x}", "frames 60", "keys 0", "frames 110")
@@ -592,37 +731,16 @@ def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the
         else:
             s.place(*R["plaque"], p2=two)
             s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4")
-        s.out("waitmap 15 18 300")
-        s.echo("the cut-away: the open area, the room's light still on")
-        s.out("frames 120")
-        s.expect(r"map zone 15 area 18 ", "map")
-        s.deco(R["light"])
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
-        s.out(f"shot {tag}_gate0", "frames 70", f"shot {tag}_gate1")
-        s.echo("its light is out")
-        s.deco(R["light"])
-        s.expect(r"\w+: 00000000", "peek D+0x10 1")
-        if mask | (1 << R["light"]) == 0x3F:
-            s.out("frames 62")
-            s.echo("the sixth: the beams go down one by one")
-            s.deco(6)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.deco(7)
-            s.expect(r"\w+: 00000001", "peek D+0x10 1")
-            s.out(f"shot {tag}_beam0", "frames 26")
-            s.deco(7)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.out("frames 26", f"shot {tag}_beam2")
-            s.deco(8)
-            s.expect(r"\w+: 00000000", "peek D+0x10 1")
-            s.out("frames 170")
-        s.out("frames 130", "frames 200", "frames 100", f"shot {tag}_gift", "mash 2 90", "frames 60")
+        cutaway(s, tag, R["light"], R["entrance"], mask | (1 << R["light"]) == 0x3F)
+        prize(s, tag, R["light"], first=True, gift=True)
         s.expect(rf"map zone 15 area {R['area']} ", "map")
         s.out("ents", f"shot {tag}_back")
-        s.echo(f"back in the room: flag {504 + R['light']}, the plaque on, the door open")
+        s.echo(f"back in the room: flag {504 + R['light']}, the plaque OFF, the door open")
         s.expect(flag_re(R["light"]), "peek8 FLAGS+0x3F 1")
         s.deco(0)
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
+        if R.get("ways") and table is ROOMS:
+            side_rooms(s, tag, R, two)
         s.deco(1)
         s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.echo("Gohan's Super Saiyan at the first lever: his row 2")
@@ -633,14 +751,14 @@ def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the
         s.expect(rf"map zone 15 area 18 var 1 player {R['back']}", "map")
         s.out(f"shot {tag}_out", "frames 200", "ents")
         s.full()
-        s.echo("a return: the room empty, the plaque on, no scene")
+        s.echo("a return: the room empty, the plaque OFF, no scene")
         s.place(*R["door"], p2=two)
         s.out("frames 4", "keys 0x40", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
         s.actor(R["lead"], 0)
         if R.get("crew"):
             s.actor(R["crew"], 0)
         s.deco(0)
-        s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.expect(r"\w+: 00000000", "peek D+0x10 1")
         s.place(*R["intro"], p2=two)
         s.out("frames 4", f"keys {R['walk']:#x}", "frames 60", "keys 0", "frames 30")
         s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
@@ -658,6 +776,109 @@ def rooms(table=ROOMS, name="chamber_rooms.txt", head="the five rooms beyond the
     case("saiyan_one_ss", "saiyan", GOKU, None, transform="p1", base_row=0x0F, by_punch=True)
     case("saiyan_two", "saiyan", GOHAN, PICCOLO)
     case("six_lab", "lab", KRILLIN, VEGETA, mask=0x2F)
+    s.write(name)
+
+
+# ---- chamber_run: the run's scenes (docs/time-chamber.md 13, Ryan's first play) ----------------------------------------------
+MONTAGE = [(19, 186, 189), (20, 50, None), (21, 48, 185), (22, 222, 166), (24, 159, 170), (23, 11, 9)]   # the rooms' views, in order
+MONTAGE_PLAIN = [(19, 186, 189), (20, 50, None), (21, 48, 185), (22, 166, None), (24, 170, None), (23, 11, 9)]   # BUU=0's rows
+
+
+def run_scenes(montage=MONTAGE, name="chamber_run.txt"):
+    s = S(["The open area's scenes (docs/time-chamber.md 13): the opening of a run in one and two players (the pans to the six entrances, the",
+           "rooms' views with their bosses and lit plaques, the gate in its wall), its skip by Start and by B (in the open area and inside a",
+           "room's view), the training's end after Popo (no enemies, its line, the way out with no question)."])
+
+    def opening(tag, p1, p2):
+        two = p2 is not None
+        s.tag = tag
+        s.begin(tag, p1, p2)
+        s.full()
+        s.door(opening=True)
+        s.echo("a new run: the opening starts once player 1 is free (kind 1, running), flag 510 set, the void's bodies gone")
+        s.out(f"waitnz {SCENE} 300", "frames 40")
+        s.chs(r"[0-9a-f]{6}41")
+        s.expect(f"\\w+: {flag_on(510)}", "peek8 FLAGS+0x3F 1")
+        s.out(f"findent EN {ENEMY_VT}")
+        s.expect("findent EN = 00000000", f"findent EN {ENEMY_VT}")
+        s.out(f"shot {tag}_start")
+        for k in range(8):
+            s.out("frames 50", f"shot {tag}_tour{k}", "frames 10", "key 1 6")
+        for area, lead, partner in montage:
+            s.echo(f"the view of room 15/{area}: its boss stands (alone, or with his partner for two players), the plaque lit")
+            s.out(f"mashmap 15 {area} 40", "frames 40", f"shot {tag}_room{area}")
+            s.expect(rf"map zone 15 area {area} ", "map")
+            s.actor(lead, 1)
+            if partner:
+                s.actor(partner, 1 if two else 0)
+            s.deco(0)
+            s.expect(r"\w+: 00000001", "peek D+0x10 1")
+        s.echo("back on the open area: the pan from the quarters to the gate, its lines, the end")
+        s.out("mashmap 15 18 40", "frames 60", f"shot {tag}_back")
+        s.out("frames 90", f"shot {tag}_gate", f"stepz {SCENE} 20", "frames 60", f"shot {tag}_end")
+        s.chs(r"[0-9a-f]{6}00")
+        s.expect(r"map zone 15 area 18 var 1 player 10[0-2]\d,12[6-8]\d", "map")
+        s.camera(r"00000(37f|38[0-9a-f]) 000004(9[0-9a-f]|a[0-9a-f])")
+        if two:
+            s.echo("player 2 stands again beside player 1")
+            s.out("deref P2 0x0203FF08")
+            s.expect(r"\w+: 000(3[c-f]|4[0-3])[0-9a-f]{3} 000(4[a-f]|5[0-3])[0-9a-f]{3}", "peek P2+0x158 2")
+        s.echo("the void fills again after the scene")
+        s.out("frames 400")
+        s.out(f"poke32 {ARG} 1", f"poke32 {CMD} 48", "frames 2")
+        s.expect(r"0203fd0c: [0-9a-f]{4}00(0[1-9a-f]|1[0-9a-f])", f"peek {ARG} 1")
+        s.out("ents")
+
+    opening("open_one", GOKU, None)
+    opening("open_two", GOHAN, PICCOLO)
+
+    s.tag = "skip_start"
+    s.begin("the opening skipped by Start during the first pan", HERCULE, None)
+    s.door(opening=True)
+    s.out(f"waitnz {SCENE} 300", "frames 40", "key 1 6", "frames 40", "key 8 6", "frames 150", "shot skip_start")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.chs(r"[0-9a-f]{6}00")
+    s.expect(r"map zone 15 area 18 var 1 player 10[0-2]\d,12[6-8]\d", "map")
+    s.expect(f"\\w+: {flag_on(510)}", "peek8 FLAGS+0x3F 1")
+
+    s.tag = "skip_b"
+    s.begin("the opening skipped by player 2's B inside a room's view (Frieza's ship)", VEGETA, TRUNKS)
+    s.door(opening=True)
+    s.out(f"waitnz {SCENE} 300", "mashmap 15 21 40", "frames 20", "p2 2", "frames 6", "p2 0", "waitmap 15 18 300", "frames 200", "shot skip_b")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.chs(r"[0-9a-f]{6}00")
+    s.expect(r"map zone 15 area 18 var 1 player 10[0-2]\d,12[6-8]\d", "map")
+    s.echo("a run under way: out and back in, no opening")
+    s.out("frames 60")
+    s.warp(OPEN, 1016, 1272)
+    s.out("frames 120")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+
+    s.tag = "done"
+    s.begin("the training complete (Popo beaten this time round): out of his room, no enemies, the line, the way home with no question",
+            PICCOLO, HERCULE)
+    s.lights(0x3F)
+    s.out("flags +530 +521")
+    s.warp(0x190F, 244, 300)
+    s.out("frames 60")
+    s.place(244, 368)
+    s.out("frames 2", "keys 0x80", "waitmap 15 18 200", "keys 0", f"waitnz {SCENE} 300", "frames 40", "shot done_line")
+    s.chs(r"[0-9a-f]{6}43")
+    s.out("frames 60", "shot done_pan", f"stepz {SCENE} 20", "frames 60", "shot done_end")
+    s.chs(r"[0-9a-f]{4}0[2367abef]00")             # done seen (bit 1), no scene
+    s.echo("no enemy stands, none comes")
+    s.out("frames 400", f"poke32 {ARG} 1", f"poke32 {CMD} 48", "frames 2")
+    s.expect(r"0203fd0c: [0-9a-f]{4}0000", f"peek {ARG} 1")
+    s.expect("findent EN = 00000000", f"findent EN {ENEMY_VT}")
+    s.echo("the door home: out at once, no question; the run's lights and flag 530 reset, the time round kept")
+    s.warp(OPEN, 1012, 1262)
+    s.out("frames 30")
+    s.place(1012, 1262)
+    s.out("keys 0x40", "waitmap 9 3 300", "keys 0", "frames 120", "shot done_out")
+    s.expect(r"map zone 9 area 3 ", "map")
+    s.expect(r"\w+: 00$", "peek8 FLAGS+0x3F 1")
+    s.expect(f"\\w+: {flag_off(530)}", f"peek8 FLAGS+{530 // 8:#x} 1")
+    s.expect(f"\\w+: {flag_on(521)}", f"peek8 FLAGS+{521 // 8:#x} 1")
     s.write(name)
 
 
@@ -706,7 +927,8 @@ def gohan():
         s.out(f"poke32 {CMD} 7", "frames 100", f"stepz {SCENE} 8", "frames 60")
         s.state(r"[0-9a-f]{6}06$")
         s.place(136, 96, p2=p2 is not None)
-        s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "waitmap 15 18 300", "frames 500", "shot %s_caption" % tag, "mash 2 90", "frames 60")
+        s.out("frames 4", "keys 0x40", "frames 6", "keys 0", "key 1 4", "waitmap 15 18 300", "waitmap 15 19 900", "frames 80",
+              "shot %s_prize" % tag, "key 1 6", "frames 70", "shot %s_caption" % tag, f"stepz {SCENE} 10", "frames 60")
         s.expect(r"map zone 15 area 19 ", "map")
         s.echo("Gohan's row 2, flag 468")
         s.expect(r"\w+: 02", f"peek8 {entry(GOHAN) + 8:#x} 1")
@@ -725,6 +947,8 @@ def gohan():
 
 
 if __name__ == "__main__":
+    run_scenes()
+    run_scenes(MONTAGE_PLAIN, "chamber_run_plain.txt")
     gohan()
     gate()
     tiers()
