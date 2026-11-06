@@ -686,9 +686,11 @@ deref R158 TBL+0x25c
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R158
 shot c1_death1p_androids
-frames 200
+frames 130
+shot c1_death1p_exchange
+frames 220
 shot c1_death1p_storm
-frames 300
+frames 400
 shot c1_death1p_lies
 frames 300
 deref R9 TBL+0x8
@@ -735,9 +737,11 @@ deref R158 TBL+0x25c
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R158
 shot c1_death2p_androids
-frames 200
+frames 130
+shot c1_death2p_exchange
+frames 220
 shot c1_death2p_storm
-frames 300
+frames 400
 shot c1_death2p_lies
 frames 300
 deref R9 TBL+0x8

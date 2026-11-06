@@ -57,7 +57,8 @@ end
 ; one storm from both of them with the ground shaking harder; the stock ending; 17 turns away first and both fly off (the stock despawned
 ; them where they stood). Old Hercule's line is Ryan's and stays where it is; the scream's power-up shakes the ground and old Hercule is
 ; pushed back a step. Entry 0 holds the hand-over of player 2's old Hercule to an actor (CoopCall 31) that a json edit used to add.
-; CINE (when cine.c is in): Gohan's charge, his dash at 17, the flurry, 18's blow in his back before the storm.
+; With the cinematic helpers (second commit): before the storm Gohan powers up and goes for 17, an exchange of 45 frames, they break; 18 is
+; over him and one blow drives him back into the puddle (the marks are set so he lands where the stock's lying body appears); he gets up.
 sequence ch1_future_end
   [0] script                             ; stock 0 re-staged
         SetPlayerVisible 0
@@ -73,15 +74,24 @@ sequence ch1_future_end
         WaitFrames 40
         WhiteFlash 3
         SpawnCharacterEntity 11, 200, 204
-        SpawnCharacterEntity 9, 244, 204
+        SpawnCharacterEntity 9, 288, 204
         BeginCommandBatch
-        WalkToPosition 9, 244, 292
+        WalkToPosition 9, 288, 292
         WalkToPosition 11, 200, 280
         SetEntityFacing 11, 2                 ; 18 looks away
         CommitCommandBatch
         WaitFrames 40                         ; a held look
-        SetEntityFacing 11, 0
-        WaitFrames 10
+        CoopCall 37, 1, 54, 9
+        CoopCall 37, 7, 30, 1                 ; Gohan's power, and he goes for 17: an exchange he holds
+        CoopCall 37, 6, 45, 0
+        CoopCall 37, 1, 11, 54
+        CoopCall 37, 4, 3, 0                  ; 18 is over him: one blow drives him back into the water
+        CoopCall 37, 5, 1, 36
+        WaitFrames 24
+        CoopCall 37, 10, 1, 0                 ; he gets up
+        CoopCall 37, 0, 0, 0
+        SetEntityFacing 54, 1
+        WaitFrames 16
         BeginCommandBatch                     ; the storm: eight blasts from both sides, each a hit
         NPCFireKiBlastAtEntity 9, 54, 120
         EntityWaitFrames 9, 34

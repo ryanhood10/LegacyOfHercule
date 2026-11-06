@@ -80,9 +80,11 @@ for two in (False, True):
     s.warp(1, 2, 272, 432, 330)
     s.actors(s9=1, s11=1, s158=1)
     s.shot(f"c1_death{n}_androids")
-    s.out("frames 200")
+    s.out("frames 130")
+    s.shot(f"c1_death{n}_exchange")     # Gohan and 17 (the cinematic helpers), then 18's blow
+    s.out("frames 220")
     s.shot(f"c1_death{n}_storm")
-    s.out("frames 300")
+    s.out("frames 400")
     s.shot(f"c1_death{n}_lies")
     s.out("frames 300")
     s.actors(s9=0, s11=0, s158=1)

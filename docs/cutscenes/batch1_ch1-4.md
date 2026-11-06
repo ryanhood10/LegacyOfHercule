@@ -156,6 +156,10 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   wanted it before the scream: not done). The stock transformation (entry 4) gets a rising shake and old Hercule slides back a step.
   The hand-over of player 2's old Hercule moved from a json edit into the restated entry 0. The HP bars in the research film's first
   frames come from the test warp's fade, not the scene. Flags and party after it: identical (one and two players).
+  **With Cine (second commit), beats 3-4:** Gohan's charge (level 1), an exchange of 45 frames with 17 that he holds, they break; 18 is
+  over him and one heavy blow drives him 36 px down into the puddle (17's mark moved to x 288 so that he lands where the stock's lying
+  body appears); he gets up; then the storm. About four seconds more than the first commit, the scene as long as the stock's nine
+  seconds of blasts.
 
 ### 1.5 Krillin's visit: touch up (S)
 
