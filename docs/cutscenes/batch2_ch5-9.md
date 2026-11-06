@@ -763,6 +763,10 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   boxes are at the bottom where Vegeta stands: pan a little lower than the stock
   `PanCameraToPosition 136, 192` so both sit above the box, or use `!`. The beam variant needs group 18 on 140 (present) and a C-driven beam on the player
   (`CoopCall 16` is the model). **Size L** (area 5 M, area 6 M; the variant S more).
+- **Cell's landing without a jump (Ryan, 2026-11-06: "imperfect cell flies away and starts walking to a spot and he has a weird
+  jump/teleport after landing"; branch `nb-ssjfix`):** `WarpToMapWithEntities` fades area 5 in with the map's own Cell actor on its record
+  spot (144, 240), and the script then put him at (168, 300) for his walk up: seen as a jump once the screen was lit. The placement is gone:
+  he stands where the fade shows him and walks on from there to (164, 244). Filmed alone (`fly_V`).
 - **Vegeta falls out of his form (Ryan, 2026-11-06, F6: "even in f6 vegeta gets killed and his body is super saiyan"; branch
   `nb-ssjfix`):** Cell's blow (`CoopCall 37, 5, 9, 28`: heavy, flag 8) knocks player 1 out of his Super Saiyan form at the impact (a white
   flash, the form's own turn-back: row 8, the hum stopped), so he flies and lies as Vegeta, as the stock's body (137) lies after the fade.

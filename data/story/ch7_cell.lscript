@@ -135,9 +135,8 @@ sequence ch7_semi_perfect_end
         FlyToPosition
         CommitCommandBatch
         FadeOut 180
-        WarpToMapWithEntities 12, 5, 1, 144, 408
-        SetEntityPositionInstant 29, 168, 300    ; Cell comes up into the clearing from below, past where Vegeta lands
-        FlyToPosition 0, 204, 272
+        WarpToMapWithEntities 12, 5, 1, 144, 408 ; Cell is on the clearing as the fade lifts (the map's actor, 144, 240: he has landed) and
+        FlyToPosition 0, 204, 272                ; walks on from there (Ryan, 2026-11-06: he was put at 168, 300 after the fade, a jump)
         SetEntityFacing 0, 1
         PanCameraToPosition 40, 120, 3
         WalkToPosition 29, 164, 244
