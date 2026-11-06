@@ -309,13 +309,14 @@ for seed in (47, 53, 61):
     out(f"shot r{seed}_fight", "map")
 
 out("echo === The team loses in the first round: the rest of the bracket plays to a champion, nobody's prize")
-# the lost fight lasts 120 frames: `stepz` looks for it every 100 (with 60 it was caught only while hit-stops reset test command
-# 40's count, which they no longer do: docs/testing.md "Tournament scenes")
+# the lost fight lasts 120 frames: `stepz` on NOFIGHT looked for it every 100 (with 60 it was caught only while hit-stops reset
+# test command 40's count, which they no longer do: docs/testing.md "Tournament scenes"), and once missed the presses went on
+# into a new tournament (2026-11-05: a longer pre-fight talk moved the looks off the fight); A until the team is out instead
 to_size_menu(4, LEGEND, 23, "l", decide=(120, 1))
 down(2)
 p1(1)
 picks()
-out("frames 60", f"stepz {NOFIGHT} 200", "frames 200")
+out("frames 60", f"stepnz {OUT} 200", "frames 200")
 out("poke16 UI+0x82 0", "stepnz UI+0x82 300", "frames 200", "shot l01_results", "frames 200", "shot l02_results")
 out("waitnz UI+0x88 4000", "shot l03_champion", "key 1 4", "frames 100", "shot l04_champion_screen", f"stepz {BUSY} 300", "frames 30")
 waiting_room()
