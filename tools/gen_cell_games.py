@@ -334,7 +334,7 @@ junior_end("cg_j3_end", "m325_r9_defeat", 132, 3, 2, 13, 39, P2, "J4: Trunks, pl
 CAM_TALK, CAM_RAGE = "456, 336", "456, 280"   # the view's top-left corners (Gohan stands at 576, 376)
 # For Ryan's review (decided 2026-11-06, each switched on by one commit of its own, so reverting that commit drops it):
 SCREAM_FIRST = False      # 16's head: the scream is read during the first tremor, before the white (stock order: pose, white, scream)
-GOKU_SPIRIT = False       # the beam struggle: haloed Goku flickers at Gohan's shoulder while a line of his is open (the stock has only his voice)
+GOKU_SPIRIT = True       # the beam struggle: haloed Goku flickers at Gohan's shoulder while a line of his is open (the stock has only his voice)
 emit("sequence cg_head_scene")
 b = body(A3, "m325_r10_defeat", 0)
 k = b.index("SetActiveCharacter 0")
