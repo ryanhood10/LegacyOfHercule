@@ -1,5 +1,9 @@
 # Sprite inventory (tools/sprites.py; Buu's Fury: tools/buu_sprites.py, tools/buu2log2.py, last section)
 
+**The audit of everything below, and which body has which cutscene pose: `docs/art-audit.md` (2026-11-06).** Sheets of a
+built ROM's records (stock and generated alike): `tools/artsheet.py`; every frame in the running game:
+`tools/headless/art_poses.py`.
+
 `python tools\sprites.py roms\log2.gba build\sprites` writes `build/sprites/atlas.png` (every sprite
 id, first frame facing down/up/left/right), `build/sprites/<id>.png` (every pose group x 4
 directions) and `build/sprites/report.md` (groups, frames, sizes). Sprites are 8-bit OBJ tiles,
@@ -99,6 +103,12 @@ tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercul
   icon pair with the picture (rows 2-8, columns 13-28) remapped by `ICON_READY` / `ICON_COOLING`.
 
 A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
+
+**The poses `herc_record` adds, in gold (2026-11-06, `docs/art-audit.md`).** The clone is made from the stock record 72, so
+it had neither the Kamehameha pose (group 18: a transformed Hercule sent into a beam scene had no group there, the
+heap-damage trap) nor the flight's side view. `spriteclone.py` now takes both from `herculesprites.py` (`build`,
+`fly_side`), recolours them with its own `recolour` (the afro gold) and puts them in `ssj_record`: group 12's left /
+right arrays and all of group 18 (7 frames a facing, as the base form's). The group count stays 22.
 
 ## Buu's Fury (roms/buu.gba, USA BG3E): format, tools, ids (2026-10-17)
 
@@ -263,6 +273,18 @@ own stock frames are already broader than 17's at the game's 16x32 / 32x32 sizes
 groups taken from 17 keep 17's silhouette below the head (a wider torso would need hand-drawn
 frames). Frames are LZ-compressed with `buu2log2.compress`.
 
+**The art pass (2026-11-06, `docs/art-audit.md`):** the four groups taken from 17 were a step duller than 16's own frames
+(his trousers went onto the dark end of the armour ramp: the punch 6 was lime and yellow, the kicks 7 / 8 olive) and
+olive specks floated round the head: 17's black hair has grey strands and glints (palette 9-15, the vest's greys) that
+are not part of the black component `swap_head` removes, so they were recoloured with the vest. Now the trousers map
+`215: 42, 80: 41, 79: 41, 78: 46, 214: 54` (as bright as sprite 8's legs); grey pieces of at most 10 pixels at head
+height that touch only what is removed anyway go with the hair (a cuff touches its hand and stays; the vest is bigger);
+skin left above the hair's top row (a hand raised over the head, cut from its arm) goes; pieces of at most 5 pixels
+(14 when wholly at head height) that touch nothing and are not white go. In back views the head was anchored on the
+middle of 17's hair or on a raised hand's skin taken for a face, and in the spin kick it floated beside the body: a
+back view (`back=True`, facing up) puts the head over 17's orange scarf (the neck), its chin at most one row under the
+scarf's top. Sprites 160 and 175 change; Android 13 (165, 240) shares `swap_head` and loses its brown specks too.
+
 ### Rocket, fist, bomb and explosion frames (same generator)
 
 The ROM's projectile class (`0x08013BC0` base, 0x58-byte objects, vtable slots 3 cull / 4 OAM /
@@ -378,7 +400,7 @@ of the face's line along that axis; the waist sits at 70 % of the body's length 
 
 | part (16-space colours) | Android 13 |
 |---|---|
-| hair (16's orange mohawk) at or above the forehead line, at most 3.6 px deep | trucker cap: yellow crown, black outline, black band over the forehead, red dot in front views, a 2 px black peak over the face in side views; mohawk above the cap cut off |
+| hair (16's orange mohawk) at or above the forehead line | cleared; the trucker cap is drawn over the skull (below): a yellow dome as wide as the head, black band and outline, red dot in front views, a 3 px yellow peak on a black underside in side views |
 | hair below the cap | white hair (sides and back); in front views hair inside the face's span (16's fringe) becomes forehead skin, two columns of white hair stay at each side for five rows |
 | face skin | pale skin (one step lighter than 16's) |
 | other skin (hands) | brown gloves |
@@ -387,7 +409,18 @@ of the face's line along that axis; the waist sits at 70 % of the body's length 
 | armour below the waist; 17's blue trousers | blue jeans |
 | back views (facing up) | the face pixels become hair: white hair under the cap |
 
-The head gets a black outline (transparent pixels next to cap, face or hair), which 16's head lacks.
+**The cap (2026-11-06, Ryan: "improve his trucker hat"; `docs/art-audit.md`).** It was 16's mohawk cut 3.6 px deep and
+painted from the dull end of its ramp: a ragged brown tray narrower than the head, missing on tilted and lying heads.
+`dress13` now draws it: in the frame's own axes (up = body centroid to hair centroid, so a tilted or lying head gets it
+too) a dome from the forehead line up 4.6 px, as wide as the head at the brow (`hw * (1 - (d / 4.6) ^ 2.2) ^ (1 / 2.2)`),
+over transparent and hair pixels only (a fist raised in front of it stays), the band row and the rim black, the inside
+the portrait's yellows (LoG2 36 / 38 / 120: `a13_colours` `cap`), the column inside the right rim a shade darker, the
+Red Ribbon dot on the row two above the band in front and side views, and in upright side views a peak: three yellow
+pixels past the band toward the face with black under them. A "13" does not fit a 12 px head; the portrait (169) has
+it beside the same dot. In back views only skin inside the head's width becomes hair (an arm raised beside the head was
+painted white with it: the white boxes in the back-view kicks).
+
+The head gets a black outline (transparent pixels next to face or hair), which 16's head lacks.
 The record keeps 17's header and group layout (13 groups: 0-3, 5-8 and 12 filled), so Android 19's AI
 set 29 and the melee set 21 find every group they play, and group 3 (stand, stagger, fall, lie) is
 there for the both-down rule. 82 frames, all LZ-compressed (`buu2log2.compress`).
@@ -487,6 +520,22 @@ group 18, Hercule's base frames; four facings x (charge, thrust, hold). Engine p
 (`docs/testing.md` "Hercule's beam pose"): the stock struggle with Hercule as player 1 (the clash and
 the Kamehameha, beam from his palms), the same run as Gohan side by side, right / down / up facings
 by holding the facing byte while the beam fires, and player 2 (row 21) in the pose in all four facings.
+
+## Hercule's flight from the side (group 12 of sprite 72, `tools/herculesprites.py` `fly_side`, 2026-11-06)
+
+`FlyToPosition` (script step 54, the flight circles, any scene that flies player 1 or an actor) plays **group 12**
+(`docs/engine.md`). The stock record 72 draws Hercule's flight from the front and the back only (head, shoulders and
+fists toward the viewer with two glints over the afro; from behind the afro and the soles of his boots glinting: 4
+frames, the glints yellow, orange, a dot, gone) and its left / right arrays are the front view again: flying sideways
+he slid along as a face looking out of the screen. `herc_record` now keeps the stock front and back arrays (ROM
+addresses) and gets a side view built from his own frames, laid out as Goku's (60: 32 x 32 at (-8, -24), the body on
+rows 17-23, right = the left blob h-flipped): his lying frame (the knock-down's last, group 3 frame 3: on his front,
+fists out ahead) raised 8 rows to Goku's flying height, its head (afro and the face turned into the ground: the black
+of rows 14-27 x columns 6-21, the skin under it) replaced by his standing side head (idle, rows 0-13) looking where he
+flies, and the stock frames' glints (same colours and phases) trailing over his boots. 4 frames, 1 body blob + glints.
+Old Hercule (158, the Buu's Fury import) and the tournament's lying table are untouched (`tny_lie` gives 72 its
+knock-down's last frame, not group 12). Checks: `tools/headless/hercule_fly.txt` (a flight circle's real flight with
+Hercule as player 1, his facing held left and right for a few frames of it) and `art_poses.py --ids 72 --groups 12`.
 
 ## Haloed Goku (ids 176, 177; display rows 26, 27; `tools/halosprites.py`, 2026-10-19)
 
@@ -592,6 +641,15 @@ the orbs and both portraits).
 | boots | silver and gem pixels below the trousers' centroid; red below them (soles) | black boots |
 | light, sparks, fire, mouth | anything else (and in the death frames, yellow patches above the belt: light bursting out) | nearest LoG2 colour; Broly's brown swing arcs (210 / 211) light grey |
 
+**The art pass (2026-11-06, `docs/art-audit.md`):** two leftovers of Broly's colours showed in 43 frames. In the side
+views the sash's knot sits at the hip 8 rows above the middle of its tails (the largest red piece, which sets the belt
+line), outside the 6 rows the rule allowed: a bright red patch on a body with no red; a red piece up to 12 rows above
+the line is the sash too, unless it lies within 8 px of his hair (in a crouch his open mouth is that near the sash) or
+the frame is a death frame. And a gold arm cuff of 30 or more pixels on a forearm hanging by the hip was taken for
+trousers (red-brown stripes on the walking arm, the punch, the ki pose): the trousers are now the largest warm piece
+below the skin's centroid, any piece at least half its size and any no higher than two rows above its middle; a
+smaller piece hanging above it is a cuff (blue skin).
+
 **Groups.** Hercule's 21-group template layout (as `buu2log2`'s Broly 159), so the melee boss AI set 21
 finds idle 0, walk 1, hit-stun 2, charge 5 and attacks 6-8, plus the poses `src/coop/super13.c` plays itself
 (`S13_G_*` in `super13.h`); 27 groups:
@@ -658,6 +716,16 @@ and the lying pose (the hit-stun turned, `tools/lying.py`). Groups: 0 idle, 1 wa
 arms out (5, the charge, holds the first frame), 12 lying, 13 / 17 idle, 20 hit-stun then lying; 9, 10, 14-16, 18, 19 empty as
 in Hercule's. 39 frame blobs, 11.4 KB compressed (29, 7.5 KB from 93), in the second ROM blob (`.rodata.art`). Preview
 `$(BUILD)/popo_preview.png` (every group x 4 facings, the hurt box in red). His portrait is the stock 82.
+
+**The art pass (2026-11-06, `docs/art-audit.md`).** Buu's Fury's arms-out frames are a front view: from the side his three
+attacks showed a standing Popo (two pixels of arm moved). The side views of groups 6-8 are now palm strikes drawn on his
+idle frame in a 32 x 32 box (`popoart.py` `palm`): stand, strike with the stock attacks' white stroke before the hand,
+hold, stand; a bare black arm 8 px straight out from the vest's top, the gold bracelet at the wrist, the open hand
+upright (6 at chest height, 7 raised four rows to head height, 8 both hands: a three-row arm and a taller hand). Front
+and back views keep the arms-out frames. The hit-stun (2, 11) gets the stock hit-stun's white marks over the head for its
+first two frames (`sparks`): seen from the front his flinch is two rows and did not read as a hit. He still has **no
+flight pose**: his group 12 is the lying frame the fight's fall uses, so `FlyToPosition` slides him along lying down;
+walk him, or let him appear in a flash (he teleports).
 
 ## Making a new enemy model (generic)
 
@@ -729,6 +797,17 @@ and Evil Buu, each a stock portrait of the body his sprite came from repainted a
 Cell's 40, Piccolo's 94; Buu's Fury's Super Buu 127 for Evil Buu, who has none there). A recolour is an index map
 applied inside the 3 px frame, the background found by a flood from the top edge through its colours, so a body colour
 that is also a background colour (Piccolo's purple gi) keeps its own map.
+**169 again (2026-11-06, Ryan: "even android 13's photo when he speaks is recycled from 16 and looks too much like 16 ...
+improve his trucker hat on his head and have it say '13' on it"):** neither ROM has an Android 13 or Super 13 face (all
+155 entries of Buu's Fury's module 0x086F393C, ids 8-162, and LoG2's 8-114 were drawn as atlases and looked at: Buu's
+Fury has Broly 16 and Bojack's crew 104-109, no 13), so it stays a repaint, on another face: **Tien's portrait 95**, a
+bald three-quarter head with a heavy brow and a smirk (13's look in the film; 16's is a calm front face with a mohawk
+to hide). `ppportraits.py` `a13`: the skull above the cap's band cleared, a crown (a superellipse cut by the tilted
+band) with a foam front panel and a two-tone mesh back past the seam, a button, a black two-pixel **"13"** (8 px high,
+legible at 1x in the dialogue box) and the Red Ribbon dot his sprite's cap wears, the peak a flat ellipse down over the
+brow with its shadow on the skin; long white hair from under the cap down both sides to points on the shoulders; the
+whites' greys pale blue; Tien's green strap and its mirror on the other shoulder a sleeveless yellow vest; the
+androids' red background (17's 28, 18's 29). The cap's yellows (36 / 38 / 120 / 21) are the sprite's (`bossmodels.py`).
 **173** (2026-11-05, the same tool, recipe `dino`): the mother dinosaur of the generator's eggs (`ch4_eggs.lscript`). LoG2
 has King Triceratops' own dialogue portrait, **96** (the bestiary 0x086F8E40 entry 112, Triceratops King, sprite 127,
 portrait 96; his stock lines in Triceratops Jungle use 96, and 97 when he gives up, the same face in tears), so it is

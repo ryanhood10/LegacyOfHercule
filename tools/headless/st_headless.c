@@ -21,6 +21,9 @@
 //   stepz ADDR MAX         press A on both pads every 100 frames until the byte at ADDR is 0 (a pending win)
 //   mash N [F]             press A N times, F frames apart (50);  mashent NAME VTABLE MAX  ... until such an entity exists
 //   ents                   list the scene entities;  findent NAME VTABLE  NAME = first entity with that vtable
+//   pose SPRITE GROUP FACING FRAME [N]   hold every entity showing sprite id SPRITE in that group, facing and frame
+//                          for N frames (3), re-poked each frame (+0x4C a group built in coop2.boss_rec, +0x10, +0x12 the timer)
+//   entmove SPRITE DX DY   every entity showing sprite id SPRITE stands DX, DY pixels from player 1 (negative: -48)
 //   entrec RECORD          count the entities on that sprite record (+0x48; an actor's sprite id -> record:
 //                          the table at *0x0800959C, entry id - 7)
 //   map                    print the current map (zone, area, variation) and player 1's position
@@ -486,6 +489,41 @@ int main(int argc, char **argv) {
                 unsigned e = r32(0x03001128 + 4 * i);
                 printf("  ent %2u %08x vt %08x x %d y %d w180 %08x hp %d\n", i, e, r32(e), (int)r32(e + 0x158) >> 8,
                        (int)r32(e + 0x15C) >> 8, r32(e + 0x180), (int)r32(e + 0x188));
+            }
+        }
+        else if (!strcmp(c, "pose")) {      // pose SPRITE GROUP FACING FRAME [N]: every entity showing that sprite id
+            // (>= 7: the record table at *0x0800959C) is held in that group, facing and frame for N frames (3): the
+            // art checks' way to see a record's every frame through the game's own loader (tools/headless/art_poses.py)
+            unsigned sid = num(tok[1]), g = num(tok[2]), d = num(tok[3]) & 3, f = num(tok[4]);
+            unsigned hold = n > 5 ? num(tok[5]) : 3, rec = r32(r32(0x0800959C) + 4 * (sid - 7)), hit = 0;
+            unsigned grp = rec + 0x4C + 0x10 * g;
+            if (rec < 0x08000000 || g >= r8(rec + 2) || !r32(grp) || !r32(grp + 4) || !r32(grp + 8) || !r32(grp + 12))
+                printf("pose %u g%u: no such group\n", sid, g);
+            else {
+                for (unsigned k = 0; k < hold; k++) {
+                    unsigned cnt = r32(0x03001124);
+                    hit = 0;
+                    for (unsigned i = 0; i < cnt && i < 64; i++) {
+                        unsigned e = r32(0x03001128 + 4 * i);
+                        if (!e || r32(e + 0x48) != rec) continue;
+                        // a standing body's state shows frame 0 while its timer (+0x12) is 0: a group of our own
+                        // in coop2.boss_rec (0x0203FD6C, a test's scratch) whose frame 0 is the wanted frame
+                        for (unsigned q = 0; q < 4; q++) w32(0x0203FD6C + 4 * q, r32(grp + 4 * q) + 12 * f);
+                        w32(e + 0x4C, 0x0203FD6C); w8(e + 0x10, d); w16(e + 0x14, 0); w16(e + 0x12, 0);
+                        hit++;
+                    }
+                    run_frames(1);
+                }
+                printf("pose %u g%u d%u f%u: %u bodies\n", sid, g, d, f, hit);
+            }
+        }
+        else if (!strcmp(c, "entmove")) {   // entmove SPRITE DX DY: every entity showing that sprite id stands DX, DY
+            unsigned rec = r32(r32(0x0800959C) + 4 * (num(tok[1]) - 7)), cnt = r32(0x03001124), p1 = r32(0x03001128);
+            for (unsigned i = 1; i < cnt && i < 64; i++) {   // pixels from player 1 (the list's first entity)
+                unsigned e = r32(0x03001128 + 4 * i);
+                if (!e || r32(e + 0x48) != rec) continue;
+                w32(e + 0x158, r32(p1 + 0x158) + ((int)num(tok[2]) << 8));
+                w32(e + 0x15C, r32(p1 + 0x15C) + ((int)num(tok[3]) << 8));
             }
         }
         else if (!strcmp(c, "entrec")) {    // entrec RECORD: how many entities use that sprite record (+0x48)
