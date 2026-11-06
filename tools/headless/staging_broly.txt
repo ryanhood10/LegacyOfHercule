@@ -13,6 +13,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_VT_rim
 stepz 0x03001FDC 150
 frames 30
@@ -53,7 +65,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R137
+mash 7 100
 shot cb_VT_home
 ents
 stepz 0x03001FDC 150
@@ -78,6 +106,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_TV_rim
 stepz 0x03001FDC 150
 frames 30
@@ -118,7 +158,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R137
+mash 7 100
 shot cb_TV_home
 ents
 stepz 0x03001FDC 150
@@ -142,6 +198,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_V_rim
 stepz 0x03001FDC 150
 frames 30
@@ -181,7 +249,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R137
+mash 7 100
 shot cb_V_home
 ents
 stepz 0x03001FDC 150
@@ -205,6 +289,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_T_rim
 stepz 0x03001FDC 150
 frames 30
@@ -244,7 +340,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+mash 7 100
 shot cb_T_home
 ents
 stepz 0x03001FDC 150
@@ -268,6 +380,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_G_rim
 stepz 0x03001FDC 150
 frames 30
@@ -307,7 +431,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+mash 7 100
 shot cb_G_home
 ents
 stepz 0x03001FDC 150
@@ -331,6 +471,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_K_rim
 stepz 0x03001FDC 150
 frames 30
@@ -370,7 +522,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+mash 7 100
 shot cb_K_home
 ents
 stepz 0x03001FDC 150
@@ -394,6 +562,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_P_rim
 stepz 0x03001FDC 150
 frames 30
@@ -433,7 +613,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+mash 7 100
 shot cb_P_home
 ents
 stepz 0x03001FDC 150
@@ -458,6 +654,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_GK_rim
 stepz 0x03001FDC 150
 frames 30
@@ -498,7 +706,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+mash 7 100
 shot cb_GK_home
 ents
 stepz 0x03001FDC 150
@@ -523,6 +747,18 @@ poke32 0x0203FD54 0x1cc0138
 poke32 0x0203FD08 5
 frames 150
 mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
 shot cb_PV_rim
 stepz 0x03001FDC 150
 frames 30
@@ -563,7 +799,23 @@ poke32 0x0203FD0C 0x90f
 poke32 0x0203FD54 0x4c0078
 poke32 0x0203FD08 5
 frames 60
-mash 10 100
+mash 3 100
+deref R132 TBL+0x1f4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R132
+deref R56 TBL+0xc4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R56
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R103
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R137
+mash 7 100
 shot cb_PV_home
 ents
 stepz 0x03001FDC 150

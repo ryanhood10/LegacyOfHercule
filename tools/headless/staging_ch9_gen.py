@@ -1,9 +1,10 @@
 r"""Write tools/headless/staging_ch9.txt, staging_broly.txt and staging_arctic.txt: the side chapters per lineup (ch9_gero, broly, arctic_summit).
 usage: python tools/headless/staging_ch9_gen.py     (the scripts are committed; rerun this after changing them here)
-Gero: the workshop's end (whoever nobody plays of Krillin and 16 leaves by the door), the bunker's end (the birds on foot, no flying pose on
-their sprites; Hercule on the map at the end, alone he walks out, with two players player 2 is him). Broly: the rim (all walk in, Paragus to
+Gero: the workshop's end (nobody left by the table), the bunker's end (the birds on foot, no flying pose on their sprites; alone no Krillin
+beside 16 and no Hercule at home; with two players player 2 is Hercule). Only who is played is in a scene (Ryan, 2026-11-05). Broly: the rim (all walk in, Paragus to
 his twin's spot), the retry (flag 403: straight to the fight), Vegeta's line at the end, the debrief, for any of the trip's five in either
-hand. The Arctic: the watchers by lineup (player 2 as Super Saiyan 2 Gohan has no Gohan watcher beside him)."""
+hand: only who is played (the others' actors never: 132, 56, 103, 76; Vegeta's 137 only at the rim when nobody plays him). The Arctic:
+no party watcher in any lineup (Tien and Yamcha stay)."""
 from staging_lib import *
 
 GERO = ["poke32 FLAGS+0x00 0xFFFFFFFF", "poke32 FLAGS+0x04 0xFFFFFFFF", "poke32 FLAGS+0x08 0xFFFFFFFF", "poke32 FLAGS+0x0C 0xFFFFFFFF",
@@ -13,6 +14,9 @@ for p1, p2, s76 in ((GOHAN, None, 0), (KRILLIN, None, 0), (GOHAN, HERCULE, 0), (
     n = lineup_name(p1, p2)
     s.begin(f"workshop {n}", p1, p2, "+151 +155 +156 +157")
     s.warp(6, 5, 224, 300, 200)
+    s.actors(s76=int(p2 is not None and KRILLIN not in (p1, p2)))   # Krillin walks in only with two players (he is player 1 after it)
+    s.press(9, 110)
+    s.shot(f"c9_{n}_ws_line")
     s.end_scene()
     s.out("frames 30")
     s.shot(f"c9_{n}_ws")
@@ -20,12 +24,16 @@ for p1, p2, s76 in ((GOHAN, None, 0), (KRILLIN, None, 0), (GOHAN, HERCULE, 0), (
     s.on_map(6, 5)
 for p1, p2, s72 in ((KRILLIN, A16, 1), (A16, KRILLIN, 1), (KRILLIN, None, 0), (A16, None, 0)):
     n = lineup_name(p1, p2)
-    s.begin(f"bunker {n}", p1, p2, "+151 +155 +156 +157", GERO)
+    s.begin(f"bunker {n}", p1, p2, "+151 +155 +156 +157", GERO + [f"poke8 0x0203F000 {p1}"] + ([] if p2 is None else [f"poke8 0x0203FF84 {p2}"]))   # test command 11 makes Krillin player 1: the lineup again
     s.warp(8, 63, 216, 300, 200)
+    s.actors(s76=0, s8=0)          # nobody comes in behind as an actor
     s.end_scene()
     s.win(240)
-    s.press(12, 110)
+    s.press(5 if p2 is not None else 3 if p1 == KRILLIN else 2, 110)   # the lines before the birds
+    s.out("frames 500")
     s.shot(f"c9_{n}_bird")
+    s.actors(s76=int(KRILLIN in (p1, p2) and p1 != KRILLIN), s8=int(p1 != A16))   # Krillin beside 16 only as player 2's stand-in (player 2 has no entity
+    s.press(8, 110)                                                                 # there); 16 an actor unless player 1 is 16 (alone as Krillin: kept for the plot)
     s.out("ents")
     s.end_scene()
     s.out("frames 60")
@@ -41,6 +49,7 @@ for p1, p2 in ((VEGETA, TRUNKS), (TRUNKS, VEGETA), (VEGETA, None), (TRUNKS, None
     s.begin(f"rim {n}", p1, p2, TRIP)
     s.warp(15, 3, 312, 460, 150)
     s.press(3, 100)
+    s.actors(s132="[01]" if TRUNKS in (p1, p2) else 0, s56="[01]" if GOHAN in (p1, p2) else 0, s103="[01]" if PICCOLO in (p1, p2) else 0, s76=0)
     s.shot(f"cb_{n}_rim")
     s.end_scene()
     s.shot(f"cb_{n}_fight")
@@ -54,7 +63,9 @@ for p1, p2 in ((VEGETA, TRUNKS), (TRUNKS, VEGETA), (VEGETA, None), (TRUNKS, None
     s.on_map(15, 9)
     s.begin(f"home {n}", p1, p2, TRIP + " +402")
     s.warp(15, 9, 120, 76, 60)
-    s.press(10, 100)
+    s.press(3, 100)
+    s.actors(s132="[01]" if TRUNKS in (p1, p2) else 0, s56="[01]" if GOHAN in (p1, p2) else 0, s103="[01]" if PICCOLO in (p1, p2) else 0, s76=0, s137="[01]" if VEGETA in (p1, p2) else 0)
+    s.press(7, 100)
     s.shot(f"cb_{n}_home")
     s.out("ents")
     s.end_scene()
@@ -75,7 +86,7 @@ for p1, p2, s56 in ((KRILLIN, SS2, 0), (SS2, KRILLIN, 0), (HERCULE, SS2, 0), (GO
     n = lineup_name(p1, p2)
     s.begin(f"summit {n}", p1, p2, ARC, SS, maptest=261)
     s.warp(15, 8, 336, 430, 200)
-    s.actors(s56=s56)              # Gohan's watcher, never beside a played Gohan or Super Saiyan 2 Gohan
+    s.actors(s56="[01]" if GOHAN in (p1, p2) else 0, s72="[01]" if HERCULE in (p1, p2) else 0, s137="[01]" if VEGETA in (p1, p2) else 0, s103=0, s76=0, s132=0, s121=1)   # no party watcher; Tien stays
     s.press(4, 100)
     s.out("frames 60")
     s.shot(f"ca_{n}_watch")
