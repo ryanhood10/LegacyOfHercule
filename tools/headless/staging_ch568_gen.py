@@ -83,6 +83,32 @@ for p1, p2, s76 in ((TRUNKS, None, 0), (KRILLIN, None, 0), (TRUNKS, KRILLIN, 0),
     s.actors(s76=s76)
     s.end_scene()
     s.on_map(11, 1)
+# The Time Chamber duel (ch3_duels.lscript's chamber part): alone the spar is played between Vegeta and Trunks' actor (134), who is on the
+# floor for "Now get up." (Vegeta spoke to an empty room) and gone before the Lookout; with two players the actor makes way and the duel starts.
+s.begin("chamber T", TRUNKS, None, "+136 +140 +141 +142 +143")
+s.warp(9, 3, 128, 230, 100)
+s.press(34, 60)
+s.out("frames 400")
+s.shot("c6_T_spar0")
+s.actors(s134=1)
+s.press(5, 100)
+s.out("ents", "frames 300")
+s.shot("c6_T_spar1")
+s.actors(s134=1)
+s.end_scene()
+s.actors(s134=0)
+s.out("echo EXPECT 0203f000: 01", "peek8 0x0203F000 1")
+s.on_map(9, 3)
+s.begin("chamber TK", TRUNKS, KRILLIN, "+136 +140 +141 +142 +143")
+s.warp(9, 3, 128, 230, 100)
+s.press(34, 60)
+s.out("frames 400")
+s.press(5, 100)
+s.out("frames 200")
+s.shot("c6_TK_duel")
+s.actors(s134="[01]")                               # player 2's Trunks shows 134 himself
+s.out("echo EXPECT 0203fd5c: 01", "peek8 0x0203FD5C 1", "ents")     # the duel runs
+s.on_map(15, 2)
 # Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo, 17 gives him room, 16 leaves first. The fade makes Piccolo
 # player 1 whoever walks in. Then the flight pad: Tien comes out to watch, and Krillin's actor (76) only when nobody plays him.
 for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):

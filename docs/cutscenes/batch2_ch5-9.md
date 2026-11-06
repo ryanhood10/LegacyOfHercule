@@ -365,6 +365,18 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.4 The Time Chamber duel, Vegeta and Trunks (rework, M)
 
+- **Built 2026-11-06 (`nb-cs2`, cine helpers), smaller than the shot list.** In `data/story/ch3_duels.lscript` only the chamber part
+  changed: the tail of `ch6_lookout` (from the fade into the chamber) and `ch6_chamber_end` up to its fade out. Vegeta stands with
+  his back to his son; Trunks looks about the white room; his line; **Vegeta's answer is a power-up** (a 40-frame charge) and then
+  he turns: "Settled in?  Don't be ridiculous. ..."; Trunks' line, his own power-up, a held look. **Two players:** the actor makes
+  way and the duel starts as before. **One player (the repair):** the actor stays and the spar is played: an exchange of about
+  two seconds (`CoopCall 37, 6, 110, 0`), they break, Trunks is behind his father in a blink, Vegeta catches it, Trunks answers,
+  and one heavy blow throws Trunks 64 px; he lies there for "Now get up." and gets up after it. After a real duel the loser's
+  body (the player who plays that character, `-12` / `-13`) is on a knee for the winner's line and rises after it.
+- **Not built:** the base-form walk-in and the change into Super Saiyans inside the scene (the duel's rules want both
+  transformations set before `CoopCall 1`: left as the stock order), the opening clash before control with two players, marks
+  behind a fade at the duel's end (the two stand where the last blow left them, often on top of each other).
+
 - **Where:** `ch6_lookout` entries 18-22 and `ch6_chamber_end` (`data/story/ch3_duels.lscript`), zone 15 area 2.
   Films `tc_T2` (two players, the duel ended by a real blow), `tc_T` (alone).
 - **Today:** fade in: both already Super Saiyans, standing 64 px apart on the white floor. Three lines. Two

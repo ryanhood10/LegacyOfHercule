@@ -457,6 +457,70 @@ peek 0x03001FDC 1
 echo EXPECT map zone 11 area 1\b
 map
 ents
+echo === chamber T
+load menu.ss
+p2 off
+preset +136 +140 +141 +142 +143
+maptest 7
+frames 200
+poke8 0x0203F000 3
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x309
+poke32 0x0203FD54 0xe60080
+poke32 0x0203FD08 5
+frames 100
+mash 34 60
+frames 400
+shot c6_T_spar0
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R134
+mash 5 100
+ents
+frames 300
+shot c6_T_spar1
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R134
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R134
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT map zone 9 area 3\b
+map
+ents
+echo === chamber TK
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203FF84 6
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x309
+poke32 0x0203FD54 0xe60080
+poke32 0x0203FD08 5
+frames 100
+mash 34 60
+frames 400
+mash 5 100
+frames 200
+shot c6_TK_duel
+deref R134 TBL+0x1fc
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R134
+echo EXPECT 0203fd5c: 01
+peek8 0x0203FD5C 1
+ents
+echo EXPECT map zone 15 area 2\b
+map
+ents
 echo === kame P
 load menu.ss
 p2 off
