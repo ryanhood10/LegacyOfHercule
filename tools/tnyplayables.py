@@ -283,7 +283,8 @@ def lying_group(sp, g, src):
 # sprite -> ("own", group, frame): the sprite's own record (frame -1 = the last); ("body", stem): that player body's
 # group 12 (below); ("lie", source sprite): a lying group built here from the source's hit-stun. The stock playables'
 # group 12 is a dazed sit (Hercule, Gohan, Trunks) or a half-risen lean (Gohan, Super Saiyan 2 Gohan's from 59): they
-# lie in their knock-down's last frame; the Cells' 12 are risen leans too. Checked by eye on tools/tnysheet.py --lying.
+# lie in their knock-down's last frame (built as a one-frame group of its own: a held pose shows its group's first frame,
+# docs/tournament.md 28); the Cells' 12 are risen leans too. Checked by eye on tools/tnysheet.py --lying.
 LIE = {72: ("own", 3, -1), 57: ("own", 3, -1), 135: ("own", 3, -1), 58: ("own", 3, -1), 29: ("own", 3, -1),
        30: ("own", 3, -1), 48: ("body", "frieza"), 49: ("body", "mecha"), 50: ("body", "tao"), 34: ("body", "cooler"),
        31: ("lie", 31)}
@@ -348,8 +349,24 @@ class Writer:
         """tny_lie[]: {sprite, group, frame, group pointer or 0} (tourney.h TnyLie) for the engine's end poses."""
         ent = []
         for sid, how in LIE.items():
-            if how[0] == "own":
+            if how[0] == "own" and how[2] == 0:
                 ent.append(f"{{{sid}, {how[1]}, {how[2]}, 0}}")
+            elif how[0] == "own":
+                # a held pose shows its group's FIRST frame (the body's state recomputes the frame index from its timer:
+                # docs/tournament.md 28), so the lying frame gets a one-frame group of its own: that frame's descriptor in
+                # each facing (the ROM's own blobs) and a zero descriptor; frame -1 = the last
+                grp = sp.groups(sp.record(sid))[how[1]]
+                counts = sp.frame_counts([grp])
+                arrs = []
+                for d, arr in enumerate(grp):
+                    fi = counts[arr] - 1 if how[2] < 0 else min(how[2], counts[arr] - 1)
+                    xo, yo, w, h, attr, blob = sp.descriptor(arr, fi)
+                    name = f"tp_lieown{sid}_d{d}"
+                    self.lines.append(f"static const TpDesc {name}[2] TNY_ART = {{{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, "
+                                      f"(const void *)0x{blob:08x}u}}, {{0, 0, 0, 0, 0, 0}}}};")
+                    arrs.append(name)
+                self.lines.append(f"static const void *const tp_lieown{sid}[4] TNY_ART = {{{', '.join(arrs)}}};")
+                ent.append(f"{{{sid}, {how[1]}, 0, tp_lieown{sid}}}")
             elif how[0] == "body":
                 ent.append(f"{{{sid}, 12, 0, (const void *const *)tnyp_{how[1]}_record.groups[12]}}")
             else:
