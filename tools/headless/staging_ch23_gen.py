@@ -54,11 +54,12 @@ for p1, p2 in ((GOHAN, None), (PICCOLO, HERCULE)):
 s.begin("cutaway", VEGETA, None)
 s.warp(7, 1, 200, 310, 200)
 s.press(16, 100)
-for i in range(3):                  # Goku's power before the gold (the cutscene pass, 2026-11-06): Cine's charge on sprite 60, then 61 stands
+for i in range(3):                  # Goku's power before the gold: his stock power-up (animation 9 on sprite 60) with Cine's charge held alongside (nb-ssjfix), then 61 stands
     s.out("key 1 6", "frames 50")
     s.shot(f"c3_cut_power{i}a")
     s.out("frames 50")
     s.shot(f"c3_cut_power{i}b")
+s.out("frames 160")                 # (the stock power-up runs its own length, about 140 frames)
 s.actors(s61=1, s60=0)
 s.out("ents")
 s.shot("c3_cut")
@@ -85,14 +86,17 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     s.press(1, 110)
     s.actors(s72=s72)              # no Hercule actor for "clown" alone (Ryan, 2026-11-05)
     s.press(14, 110)
-    for i in range(5):             # the debut: his power, the gold (an actor, 140, on his spot), the line
+    for i in range(5):             # the debut: he transforms for real (animation 35, the stock's power-up with Cine's charge alongside), the line
         s.press(1, 110)
         s.shot(f"c3_{n}_debut{i}")
     s.end_scene(200)
     s.shot(f"c3_{n}_fight")
-    s.actors(s72=s72, s165=1, s140=0)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin; the gold actor gone
-    s.out("echo EXPECT 0203f000: 00000602 00000000 00000000", "peek 0x0203F000 3")      # Vegeta plays; the form's meter as the stock leaves it: 0
+    s.actors(s72=s72, s165=1, s140=1)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin; 140 is Vegeta himself
+    s.out("echo EXPECT 0203f000: 00000602", "peek 0x0203F000 1")      # Vegeta plays
+    # he starts the fight a Super Saiyan (Ryan, 2026-11-06): his row is 11 (sprite 140, the form's flag; the entry's +8), the meter was filled by the transformation
+    s.out("echo EXPECT 0203f04c: 0b", "peek8 0x0203F04C 1", "echo EXPECT 0203f008: 00000[1-5][0-9a-f]{2}", "peek 0x0203F008 1")
     s.out("echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] ", "map")
+    s.out("frames 300", "echo EXPECT 0203f04c: 0b", "peek8 0x0203F04C 1")   # still a Super Saiyan 5 s into the fight (the drain: 1 EP every 20 frames)
     s.on_map(7, 15)
     s.out(f"poke32 {CMD} 7")       # 19's end: he reels and runs, Vegeta's palm, the big blast, the stock explosions
     for i in range(6):

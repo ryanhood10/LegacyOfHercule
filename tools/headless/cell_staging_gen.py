@@ -73,6 +73,7 @@ def zone12(tag, p1, p2, shots):
         presses(f"{tag}_d", 16)
     scene_done(f"{tag}_perfect")
     expect("0203f000: 03", "peek8 0x0203F000 1")     # Trunks player 1
+    expect("0203f04c: 08", "peek8 0x0203F04C 1")     # Vegeta (a Super Saiyan since 7.2) was knocked out of his form by Cell's blow (7.4, nb-ssjfix)
     if coop:
         expect("0203ff84: 06", "peek8 0x0203FF84 1")  # Krillin player 2 on Vegeta's pad
     p2_stands(coop)

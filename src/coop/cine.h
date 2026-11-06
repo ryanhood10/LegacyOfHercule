@@ -18,12 +18,14 @@ enum {
     CINE_DASH_TO = 3,      // A vanishes and reappears at (b, c) px
     CINE_DASH_BY = 4,      // ... beside B: b = side (0 his own side, 1 left, 2 right, 3 above, 4 below, 5 behind B,
                            //     6 in front of B; + 16 no afterimage), c = px between their centres (0 = touching)
-    CINE_STRIKE = 5,       // A hits B: b bits: 1 heavy (B is knocked back, lands, lies), 2 a kick, 4 B ends kneeling;
+    CINE_STRIKE = 5,       // A hits B: b bits: 1 heavy (B is knocked back, lands, lies), 2 a kick, 4 B ends kneeling, 8 the
+                           //     blow knocks B out of his Super Saiyan form (a player's own turn-back, an actor's base sprite);
                            //     c = the knock-back in px (0 = 56)
     CINE_EXCHANGE = 6,     // A and B trade a flurry for b frames (0 = 120); c = 0 they break apart, 1 A lands the last
                            //     blow (heavy), 2 B does
     CINE_CHARGE = 7,       // A powers up for b frames (blocking); b = 0 holds it alongside the script until b = -1
-                           //     ends it; c = level 0-2
+                           //     ends it; c = level 0-2; held, c + 4: beside the body's own animation (a transformation's
+                           //     stock power-up plays under it): no pose, no hold, no sound of its own, a silent burst
     CINE_BLAST = 8,        // A fires at B: b = 0 one ki blast, 1 a volley, 2 a beam (a big blast without group 18),
                            //     3 a big blast; + 16 B blocks, + 32 B is thrown; c = shots of a volley (0 = 5) /
                            //     frames a beam is held (0 = 60)

@@ -4,6 +4,23 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **Ryan's Super Saiyan notes on the cutscene pass (branch `nb-ssjfix`; one commit a scene).** (1) The transformations play the body's
+  own stock power-up again at its own pace, with the cutscene pass's effects alongside instead of in place of it: Cine's held charge has
+  a mode beside the body's animation (`CoopCall 37, 7, 0, level + 4`: rings, smoke, flickers, a growing rumble, no pose, no hold, no
+  sound of its own, a silent burst); 3.4 Goku (`SetEntityAnimation 60, 9`), 1.7 Trunks (128, 9), 3.2 the clone (137, 9) and Vegeta
+  (animation 35), 7.2 Vegeta (35); the stock sounds kept. (F8) Gohan's Super Saiyan 2 is the stock's own steps and timing again (the
+  pass had rebuilt it; the scream back after the white), with lightning flickers, the ground breaking in pulses, dust rings and Cell
+  pushed back laid on its 60 frames and a half-second crackle after. (2) 3.5: Vegeta's debut is his own transformation
+  (`SetEntityAnimation 0, 35`, the Transformation ability's state), so he starts the fight against 19 a Super Saiyan under the form's
+  rules (drain, turn back at 0 EP, B); the scene makes Vegeta player 1 in every lineup. (3) A fighter knocked down out of his form falls
+  in base form: Cine's strike flag 8 (`ssj.c` `ssj_turn_back`: a transformed player's own turn-back, an actor of a gold sprite on the
+  base sprite's record) at the road's end (F4: 18's second kick) and under Perfect Cell's blow (F6, 7.4); no other knock-down in the
+  pass's scenes is of a Super Saiyan the next cut shows in base form (the list in the batch notes). The player death and downed code is
+  unchanged. And 7.4's Cell no longer jumps after the fade into the clearing (he walks on from the map's own spot). Tests: `cine.txt` (647
+  checks: the mode, flag 8 on a player and an actor), `staging_ch3` (the debut's row and meter in four lineups), `ch4_staging` (the fall
+  in seven lineups, one with player 2's Vegeta gold), `cell_staging` (Vegeta's row after 7.4). Films beside the build before the pass
+  for F8. Full regression clean on the branch (`regfull.sh`, 98 blocks, a private play ROM).
+
 - **Cutscenes, the leftovers of batches 1 and 2 (branch `nb-cs4`; each scene's "Built" note in `docs/cutscenes/batch1_ch1-4.md`
   and `batch2_ch5-9.md`; one commit a scene).** Batch 2, the beats that waited for the cinematic helpers: Cooler powers up before his
   fight (W.3), Vegeta's first blow on Semi-Perfect Cell (7.2), Trunks' two misses before Cell's lesson (7.6), player 2 at Kame House

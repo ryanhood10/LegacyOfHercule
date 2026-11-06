@@ -44,7 +44,12 @@ sequence ch3_space
         CoopCall 37, 1, 137, 0
         CoopCall 37, 10, 0, 0                 ; it gets up
         WaitFrames 20
-        CoopCall 37, 7, 50, 1                 ; its power, and the gold
+        CoopCall 37, 7, 0, 5                  ; its power, and the gold: the transformation's own power-up (its animation 9 at its pace,
+        PlayAudio 55                          ; the hum, the burst sound) with Cine's charge held alongside it (Ryan, 2026-11-06)
+        SetEntityAnimation 137, 9
+        CoopCall 37, 7, -1, 0
+        StopAudio 55
+        PlayAudio 23
         PushVarint 140
         PushEntityPosition 137
         PushVarint 65536
@@ -78,10 +83,11 @@ sequence ch3_space
         SetCharacterFlag_Bit5 2
         SetCharacterFlag_Dynamic 2, 1
         CoopCall 37, 1, 0, 140
-        CoopCall 37, 7, 80, 2                 ; the long power-up, then the stock transformation
-        SetEntityAnimation 0, 35
+        CoopCall 37, 7, 0, 6                  ; the stock transformation (animation 35: his power-up at its pace, the hum, the gold, the form)
+        SetEntityAnimation 0, 35              ; with Cine's charge held alongside it (Ryan, 2026-11-06: the transformation itself, not a charge
+        CoopCall 37, 7, -1, 0                 ; and then the transformation), the burst's light on the gold
         SetCharacterTransformation 2, 140
-        WhiteFlash 20
+        WhiteFlash 12
   stock @083d1fe8                        ; Vegeta: I'm finally a Super Saiyan!
   stock @083d1fac                        ; You are now playing as Vegeta.
   text 1 "#Only one of us leaves alive, shadow?  So be it!"

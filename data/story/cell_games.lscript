@@ -755,54 +755,55 @@ sequence cg_head_scene
         SpawnDustCloud 0, 564, 382
         SpawnDustCloud 0, 588, 382
   stockseq @083ea400 23 25    ; "You loved life!...  I just let you die!", "I won't watch this ANYMORE!!!!!!"
-  script                                 ; stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)
+  script                                 ; stock entry 26, Super Saiyan 2, the stock's own steps and timing (his power-up pose, the white, the swap), with lightning, the ground breaking and Cell pushed back layered on it
         PlayMusic 20
         PlayAudio 55
         SetEntityAnimationNoWait 0, 9
-        ScreenShake 0, 4, 40
-        SpawnDustCloud 0, 554, 380
-        SpawnDustCloud 0, 598, 380
-        SpawnDustCloud 0, 576, 358
-        SpawnDustCloud 0, 576, 398
-        WaitFrames 40
-  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!", moved here from after the transformation
-  script                                 ; stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still
-        WhiteFlash 6
-        SetEntityAnimationNoWait 0, 9
-        ScreenShake 0, 10, 40
-        SpawnDustCloud 0, 536, 380
-        SpawnDustCloud 0, 616, 380
-        SpawnDustCloud 0, 576, 340
-        SpawnDustCloud 0, 576, 416
         SetEntityFacing 30, 3
-        WaitFrames 16
-        WalkToPosition 30, 506, 428
-        SetEntityFacing 30, 3
+        PlayAudio 43
+        CoopCall 37, 15, 10, 1
+        SpawnDustCloud 0, 546, 382
+        SpawnDustCloud 0, 606, 382
         WaitFrames 14
-        StopAudio 55
-        SetEntityFacing 0, 0
-        WaitFrames 24
-        FadeToWhite 20
+        CoopCall 37, 15, 12, 2
+        SpawnDustCloud 0, 532, 382
+        SpawnDustCloud 0, 620, 382
+        SpawnDustCloud 0, 576, 408
+        WaitFrames 8
+        CoopCall 37, 15, 4, 1
+        WaitFrames 6
+        SetEntityAnimationNoWait 30, 2
+        CoopCall 37, 15, 14, 3
+        SpawnDustCloud 0, 518, 382
+        SpawnDustCloud 0, 634, 382
+        SpawnDustCloud 0, 576, 415
+        GlideToPosition 30, 510, 428, 120
+        SetEntityAnimationNoWait 30, 2
+        WaitFrames 2
+        CoopCall 37, 15, 4, 1
+        WaitFrames 8
+        CoopCall 37, 15, 6, 2
+        WaitFrames 10
+        FadeToWhite 10
         PushActiveCharMaxEP
         TypeOp 15
         PushActiveCharMaxHP
         TypeOp 13
         PlayAudio 23
         PlayAudio 20
+        StopAudio 55
+        StopAudio 43
         SetCharacterTransformation 0, 58
-        SetEntityFacing 0, 2
-        ScreenShake 0, 20, 60
-        WaitFrames 24
-        WhiteFadeOut 30
-        WaitFrames 36
-        WhiteFlash 3
-        WaitFrames 12
-        WhiteFlash 3
-        SpawnDustCloud 0, 590, 378
+        WhiteFadeOut 10
+        CoopCall 37, 15, 8, 1
+        WaitFrames 9
+        CoopCall 37, 15, 5, 2
+        SpawnDustCloud 0, 594, 382
         WaitFrames 7
-        WhiteFlash 3
-        WaitFrames 19
-        WaitFrames 30
+        CoopCall 37, 15, 6, 1
+        SpawnDustCloud 0, 558, 382
+        WaitFrames 12
+  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!"
   script                                 ; stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box
         PlayAudio 27
         PanCameraToPosition 456, 336, 2
@@ -827,7 +828,7 @@ sequence cg_head_scene
         SetEntityFacing 72, 2
         END
       HS9:
-        PushByte 39
+        PushByte 38
         END
   text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   fmt 0 "%s"

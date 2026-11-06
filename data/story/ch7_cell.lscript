@@ -32,13 +32,15 @@ sequence ch7_semi_perfect
         SetEntityFacing 0, 3
   [10] stockseq @083e6620 8 9            ; "a power not seen for thousands of years", "What is this?"
   [12] script                            ; stock entry 10 (its index moved). The power-up is the scene (it was the bare change and Cell walking
-        CoopCall 37, 1, 0, 29            ; back two steps): a long charge with rings and dust, the change at its peak unless he came as a Super
-        CoopCall 37, 7, 100, 2           ; Saiyan already, and Cell is pushed back to his mark in the hit-stun, not walking
-        PushActiveCharIsTransformed
-        JumpIfFalse L1
+        CoopCall 37, 1, 0, 29            ; back two steps): the stock change (animation 35, his power-up at its pace) with Cine's charge held
+        PushActiveCharIsTransformed      ; alongside it (Ryan, 2026-11-06: the transformation with the effects, not a charge before it); a
+        JumpIfFalse L1                   ; long charge with rings and dust when he came as a Super Saiyan already; Cell is pushed back to
+        CoopCall 37, 7, 100, 2           ; his mark in the hit-stun, not walking
         Jump L2
       L1:
+        CoopCall 37, 7, 0, 6
         SetEntityAnimation 0, 35
+        CoopCall 37, 7, -1, 0
       L2:
         CoopCall 37, 15, 24, 0
         SetEntityAnimationNoWait 29, 2
@@ -133,9 +135,8 @@ sequence ch7_semi_perfect_end
         FlyToPosition
         CommitCommandBatch
         FadeOut 180
-        WarpToMapWithEntities 12, 5, 1, 144, 408
-        SetEntityPositionInstant 29, 168, 300    ; Cell comes up into the clearing from below, past where Vegeta lands
-        FlyToPosition 0, 204, 272
+        WarpToMapWithEntities 12, 5, 1, 144, 408 ; Cell is on the clearing as the fade lifts (the map's actor, 144, 240: he has landed) and
+        FlyToPosition 0, 204, 272                ; walks on from there (Ryan, 2026-11-06: he was put at 168, 300 after the fade, a jump)
         SetEntityFacing 0, 1
         PanCameraToPosition 40, 120, 3
         WalkToPosition 29, 164, 244
@@ -280,7 +281,7 @@ sequence ch7_semi_perfect_end
   [27] script                            ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
         CoopCall 37, 1, 30, 0            ; for the pad that played Vegeta (the pads trade players). The blow (it was Cell's arm moving
         CoopCall 37, 4, 0, 0             ; and Vegeta lying at his feet): Cell is beside him and one strike throws him to where the stock
-        CoopCall 37, 5, 1, 28            ; lays his body, (296, 262)
+        CoopCall 37, 5, 9, 28            ; lays his body, (296, 262); the blow knocks him out of his form (flag 8: he falls as Vegeta, as the next cut lays him)
         WaitFrames 40
         FadeOut 120
         CoopCall 37, 0, 0, 0             ; the held body is player 1's: let go before he becomes Trunks

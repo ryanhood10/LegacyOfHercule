@@ -133,6 +133,9 @@ runs them, as player 1 or player 2:
   `data/hercule.json` (`"icons": 12` is the stock Transformation icon, 17's too; two `"sym:"` names for new art).
 - **When he gets it** is unchanged: `hercule_awaken` (CoopCall 4) late in the story.
 
+- **In a scene** (2026-11-06, `nb-ssjfix`): `ssj_turn_back` (a Cine strike's flag 8) turns any transformed player back the same way, his
+  too; nothing in his rules changed.
+
 Test: `tools/headless/ssj_hercule.txt` (`docs/testing.md` "Super Saiyan Hercule"), in `regfull.sh`.
 
 ## 4. Keep Goku after Cell

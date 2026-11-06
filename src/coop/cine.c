@@ -124,6 +124,9 @@ typedef struct CineRam {
     u32 tick;               // +0x4C g_FrameCounter at the director's last frame
     CtrlObj hold;           // +0x50 the hold control state
     u32 hold_vt[12];        // +0x54
+    u8 aura_own, _p2[3];    // +0x84 the held charge plays beside the body's own animation (level + 4): no pose, no hold, no hum
+    void *own_fx[4];        // +0x88 its smoke puffs and rings
+    u32 own_key[4];         // +0x98
 } CineRam;
 _Static_assert(sizeof(CineRam) <= 0x100, "cineram is 0x100 bytes (coop.ld)");
 static CineRam ram __attribute__((section(".cine"), used));
@@ -972,6 +975,19 @@ static void contact(Run *r, Act *att, Act *def, s32 *x, s32 *y) {
 // knee. Returns 1 while it plays.
 #define ST_SWING_L  3       // frames from the swing's start to the impact, light / heavy (the wind-up)
 #define ST_SWING_H  7
+// Flag 8: the blow knocks B out of his form (Ryan, 2026-11-06: a Super Saiyan put down "should turn normal as he falls"): a
+// transformed player turns back as the form's own turn-back ends (ssj.c), an actor of a Super Saiyan sprite takes the base
+// sprite; a white flash on it, and he falls in base form.
+int ssj_turn_back(Entity *e);
+static void power_down(Run *r, Act *a) {
+    Entity *e = a->e;
+    int how = ssj_turn_back(e);
+    if (!how) return;
+    if (how == 1) hold(e);                          // (the turn-back stood him idle: he is the op's again)
+    a->shown = 0;
+    flash(r, 200, 10);
+    shake(r, 8, 40);
+}
 static int strike(Run *r, Act *att, Act *def, int k, int flags, int back) {
     int heavy = flags & 1, hit = r->p[4] + (heavy ? ST_SWING_H : ST_SWING_L);
     if (k == 0) {
@@ -1009,6 +1025,7 @@ static int strike(Run *r, Act *att, Act *def, int k, int flags, int back) {
         act_centre(att, &ax, &ay);
         act_face(def, ax, ay);
         fx(r, FX_STAR, 4, x, y, heavy ? 0x3000 : 0x5000);
+        if (flags & 8) power_down(r, def);       // (skipped too: only its light and shake are left out)
         def->flash = heavy ? 6 : 4;
         pose(def, P_HURT, 0, 0, 0);
         snd(r, SFX_HIT + r->hits % 3);
@@ -1554,10 +1571,45 @@ static void op_pose(Run *r) {
 #undef B
 
 // ---- the held charge and the flash (cine_tick: every input poll, in scenes' modals and text boxes too) ------------------
+// The charge beside the body's own animation (level + 4: a transformation's stock power-up, `SetEntityAnimation X, 9` on
+// an actor or 35 on a player, plays under it): the blocking charge's effects on a 160-frame ramp (the stock power-up's
+// length), white flickers coming faster, a rumble growing, smoke at his feet by turns, yellow rings on the ground (level 1
+// at the start, level 2 every 30 frames); no pose, no hold and no sound of its own (the script and the game's state play
+// the stock's), and the burst at -1 is the light and the shake only.
+#define OWN_RAMP 160
+static u32 fx_key(void *o);
+static void own_fx_add(const void *tab, s32 x, s32 y, int speed) {
+    for (int i = 0; i < 4; i++) {
+        if (ram.own_fx[i] && in_list(ram.own_fx[i])) continue;
+        ram.own_fx[i] = fx_make(tab, 4, x, y, speed);
+        if (ram.own_fx[i]) ram.own_key[i] = fx_key(ram.own_fx[i]) + 1;
+        return;
+    }
+}
+static void own_tick(Entity *e, int t) {
+    int lvl = ram.aura_lvl, k = t < OWN_RAMP ? t : OWN_RAMP;
+    int period = 12 - 8 * k / OWN_RAMP;
+    set_tint(e, (t % period) < 2 ? ram.aura_white : 0);
+    if ((t & 7) == 0) camera_shake_safe(10, 12 + (25 + 25 * lvl) * k / OWN_RAMP);
+    s32 cx, cy;
+    centre(e, &cx, &cy);
+    if (t % 18 == 6) own_fx_add(FX_SMOKE, cx + ((t / 18) & 1 ? 15 : -15), cy + 8, -0x5000);
+    if (lvl >= 2 && t % 30 == 20) own_fx_add(FX_RINGS, cx, cy + 8, -0x4000);
+    for (int i = 0; i < 4; i++) {                   // animated here when nothing else does (a text box)
+        void *o = ram.own_fx[i];
+        if (!o) continue;
+        if (!in_list(o)) { ram.own_fx[i] = 0; continue; }
+        if (fx_key(o) == ram.own_key[i]) {
+            ((void (*)(void *))vslot(o, 2))(o);
+            if (!in_list(o)) { ram.own_fx[i] = 0; continue; }
+        }
+        ram.own_key[i] = fx_key(o);
+    }
+}
 static void aura_end(int burst) {
     if (!ram.aura_on) return;
     ram.aura_on = 0;
-    Sfx_Stop(g_AudioMixer + 0x5C4, SFX_TABLE + SFX_POWER * 12);
+    if (!ram.aura_own) Sfx_Stop(g_AudioMixer + 0x5C4, SFX_TABLE + SFX_POWER * 12);
     Entity *e = body_of(ram.aura_who);
     EntityList *l = g_EntityList;
     for (int i = 0; i < l->count; i++) {            // nobody keeps the white table
@@ -1568,16 +1620,22 @@ static void aura_end(int burst) {
         if (ram.aura_fx[i] && in_list(ram.aura_fx[i])) EntityList_Remove(g_EntityList, ram.aura_fx[i], 0);
         ram.aura_fx[i] = 0;
     }
+    for (int i = 0; i < 4; i++) {
+        if (ram.own_fx[i] && in_list(ram.own_fx[i])) EntityList_Remove(g_EntityList, ram.own_fx[i], 0);
+        ram.own_fx[i] = 0;
+    }
     if (ram.aura_white) { Arena_Free(ram.aura_white); ram.aura_white = 0; }
     if (e && held(e) && !ram.run) release(e);
-    if (burst && e) { flash(0, 130, 9); camera_shake_safe(12, 60); sfx(SFX_BURST); }
+    if (burst && e) { flash(0, 130, 9); camera_shake_safe(12, 60); if (!ram.aura_own) sfx(SFX_BURST); }
+    ram.aura_own = 0;
 }
 static u32 fx_key(void *o) { return E32(o, 0x30) + (E32(o, 0x34) << 16) + E32(o, 0x3C); }
 static void aura_tick(void) {
     Entity *e = body_of(ram.aura_who);
-    if (!e || !held(e) || !ram.aura_white) { aura_end(0); return; }
+    if (!e || (!ram.aura_own && !held(e)) || !ram.aura_white) { aura_end(0); return; }
     if (ram.run) return;                            // an op plays (it owns the bodies' poses)
     u16 t = ++ram.aura_t;
+    if (ram.aura_own) { own_tick(e, t); return; }
     int period = ram.aura_lvl >= 2 ? 5 : ram.aura_lvl ? 7 : 10;
     set_tint(e, (t % period) < 2 ? ram.aura_white : 0);
     pose_kind(e, P_CHARGE, (t >> 3) & 1);
@@ -1602,20 +1660,28 @@ static void aura_tick(void) {
         }
     }
 }
-static void aura_start(int lvl) {
+static void aura_start(int lvl, int own) {
     Entity *e = body_of(ram.cast[0]);
     aura_end(0);
     if (!e || ram.run) { ram.quiet++; return; }
     ram.aura_white = Arena_Alloc(256);
     if (!ram.aura_white) { ram.quiet++; return; }
     white_build(ram.aura_white);
-    hold(e);
-    pose_kind(e, P_CHARGE, 0);
+    ram.aura_own = (u8)own;
+    if (!own) {
+        hold(e);
+        pose_kind(e, P_CHARGE, 0);
+    }
     ram.aura_who = ram.cast[0];
     ram.aura_lvl = (u8)lvl;
     ram.aura_t = 0;
     ram.aura_on = 1;
-    sfx(SFX_POWER);
+    if (!own) sfx(SFX_POWER);
+    else if (lvl >= 1) {
+        s32 cx, cy;
+        centre(e, &cx, &cy);
+        own_fx_add(FX_RINGS, cx, cy + 8, -0x3000);
+    }
 }
 
 void cine_tick(void) {
@@ -1711,7 +1777,12 @@ int cine_call(s32 op, s32 b, s32 c, s32 *push) {
     }
     case CINE_CHARGE:
         if (b < 0) { aura_end(1); return 0; }
-        if (b == 0) { aura_start(c < 0 ? 0 : c > 2 ? 2 : c); return 0; }
+        if (b == 0) {                               // level + 4: beside the body's own animation
+            int own = c >= 4;
+            if (own) c -= 4;
+            aura_start(c < 0 ? 0 : c > 2 ? 2 : c, own);
+            return 0;
+        }
         break;
     default: break;
     }
@@ -1740,7 +1811,7 @@ int cine_call(s32 op, s32 b, s32 c, s32 *push) {
         break;
     case CINE_STRIKE:
         if (!cast(r, 0)) break;
-        r->p[0] = b & 7; r->p[1] = c;
+        r->p[0] = b & 15; r->p[1] = c;
         r->step = op_strike;
         ok = 1;
         break;

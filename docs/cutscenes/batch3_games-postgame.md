@@ -330,6 +330,15 @@ a step that is moved or removed breaks an insertion further down, so change one 
      the scream during 7a-b and leave only the caption after the reveal, so he is silent once transformed, as in the
      anime. It reorders two stock entries; no word changes.)
      **Built as the optional order (decided 2026-11-06; its own commit):** the scream is read during the first tremor; once transformed he is silent.
+     **Taken back (Ryan, 2026-11-06, F8: "you ruined gohans super sayain rage transformation. it was so much better before ... keep the
+     original animation and add to it, dont remove it!"):** the stock order again (pose, white, scream) and the stock's own steps and
+     timing restored exactly (branch `nb-ssjfix`): the hum, his power-up pose (animation 9, NoWait plus 60 frames), the 10-frame white, the
+     refill, the sounds 23 and 20, the swap to 58, the white lifting. Laid on those 60 frames, and not the charge every other power-up has:
+     white lightning flickers at uneven gaps with shakes that grow (Cine's jolt, op 15), the rumble (43), dust thrown up at his feet in
+     three widening rings (beside and below him, never over him), and Cell, who had walked off, wheeling round into his hurt pose and
+     pushed back a step; after the white, the new form crackles (three flickers, two puffs) for half a second before "AHHHH". The scene
+     before it (the carry, Cell's dash and stomp, the music stopping, the lowered view) is the pass's and stays. Filmed beside the
+     build from before the pass (`4a5e323`): the original pose and gold are fully visible, the scream comes 24 frames later.
   9. Cell: `cine: charge-up` (a flash, `ScreenShake 0, 8, 20`), then "You wretched child!!!  NOW TASTE MY TRUE
      POWER!!!!!!": power shown, then spoken.
   10. **Two players:** Hercule's walk back as today, but he stumbles at the last tremor (hurt pose 2, 10 frames) before

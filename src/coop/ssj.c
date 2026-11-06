@@ -139,6 +139,31 @@ void ssj_death_enter(void *state, Entity *e) {
     if (coop.p2) hum_settle();                     // the class's stop took the first hum it found: the other's stays
 }
 
+// A body knocked down out of his form in a scene (cine.c, a strike's flag 8): a player on a transformed row turns back as
+// the turn-back's end does (apply: 1); an actor showing a transformed row's sprite takes the sprite of the row it turns back
+// to (140 -> 137, 61 -> 60, 134 -> 128, 59 -> 56, ...: 2), so the base body falls and lies as the next cut shows him.
+// 0: neither (an untransformed player, any other body).
+#define DISPLAY_ROW_COUNT 80        // the patched row limit (docs/ids.md "Display rows")
+int ssj_turn_back(Entity *e) {
+    if (!e) return 0;
+    if (e == g_PlayerObject || is_p2_entity(e)) {
+        int slot = slot_of_entity(e);
+        if (slot < 0 || slot >= PARTY_SLOTS || !(row_of(slot)[0] & 1)) return 0;
+        apply(e, 0);
+        return 1;
+    }
+    for (int r = 0; r < DISPLAY_ROW_COUNT; r++) {
+        const u8 *row = DISPLAY_DATA + r * 0x14;
+        if (!(row[0] & 1) || Character_GetSpriteRecord(row[1]) != e->sprite_record) continue;
+        const u8 *base = DISPLAY_DATA + row[5] * 0x14;
+        if (base[0] & 1) return 0;
+        e->sprite_record = Character_GetSpriteRecord(base[1]);
+        *(u32 *)((u8 *)e + 0x20) = 0;              // the cached frame: the next one is read from the new record
+        return 2;
+    }
+    return 0;
+}
+
 // the Super Saiyans' class update (vtable 0x08024C58 slot 1, stock 0x08017306): not while turning back; the
 // entity's +0x184 accumulator gains 0xCCD a frame and each overflow takes 1 EP from its own slot; at 0 EP
 // (alive) it turns back

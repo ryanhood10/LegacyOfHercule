@@ -195,6 +195,11 @@ The stock rules, read from the ROM (thumb disassembly); what the build changes i
   stop it in slot 3 (`0x0801FC22`, the first it finds): 16 channels of 0x40 bytes at the mixer's +0x5C4, +0x10 bit 0 on, +0x28 the
   sound. A save pad's screen hands back the channels it found. `ssj.c` `hum_settle` keeps one for two players.
 
+**In scenes** (`nb-ssjfix`, 2026-11-06): a scene transforms player 1 the stock's way, `SetEntityAnimation 0, 35` (the ability's own
+state: nothing half-set; 3.2, 3.5, 7.2); a Cine strike with flag 8 knocks a fighter out of his form at the impact: `ssj.c`
+`ssj_turn_back` runs the turn-back's end (`apply(e, 0)`) for a transformed player, or puts an actor of a transformed row's sprite on
+the record of the row it turns back to.
+
 **The build** (`src/coop/ssj.c`, 2026-11-01): `0x08014D58` and the class update served only the active slot, so a
 player 2 who transformed changed player 1's row and drained player 1's EP. The transform's slot 5 (vtables
 `0x08025D9C`, `0x08025CE0`), the turn-back's slot 5 (`0x080256AC`) and the Super Saiyan class's update

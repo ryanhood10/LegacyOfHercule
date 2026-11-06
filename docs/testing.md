@@ -765,6 +765,18 @@ move ended); `staging_ch8` (Cooler's charge in every lineup, `c8_charge`); `cell
   (`FindEntityByType n` hides one); a body moving off one shows it. In this environment a Bash heredoc collapses `\\` to `\`: write
   Python that carries backslashes (`\x0b`, a regex `\1`) with the Write tool.
 
+## Super Saiyan notes (headless, 2026-11-06, branch `nb-ssjfix`)
+
+`staging_ch3` "battle": at 19's fight Vegeta's row is 11 (the entry's +8, `0x0203F04C`) and the meter filled, in four lineups, and still 11
+five seconds in (the debut is his own transformation); "cutaway" waits out the stock power-up (about 140 frames) before it looks for 61.
+`ch4_staging` "end": after 18's second kick no 140 and one 137 (alone his actor, with two players player 2) and player 2's row 8; the
+lineup `PHs` pokes player 2's Vegeta gold (`poke8 0x0203F04C 11`, EP up) before the road. `cell_staging` zone 12: Vegeta's row 8 after 7.4.
+`cine.txt`: the charge beside a transformation and the strike's flag 8. **Films** (not committed, `build/film/f.py` on `fl.py` from
+`nb-cs4`, a shot every 6 frames with a press every 60): the transformation beats, the debut in four lineups, the road's end alone and
+with player 2 gold, 7.4's blow and the flight into area 5; F8 beside a ROM built at `4a5e323` (before the pass) in a detached worktree,
+tiled in time by `build/film/pair.py`. A film that sits on a text box (no presses) or warps without waiting (`S.warp(..., frames)`)
+shows another scene: check the map line first.
+
 ## Cinematic helpers (headless, 2026-11-06, branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine")
 
 `src/coop/cine.c` (`CoopCall 37`) is driven two ways: from lscript, and by **test command 50** (`docs/ids.md`): `arg` = the op,
@@ -778,13 +790,14 @@ python tools/headless/staging_run.py tools/headless/cine.txt ROM build/<dir>/hl/
 python tools/headless/st_test.py tools/headless/cine_demo.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl/cine --cols 8
 ```
 
-- **`cine.txt`** (in `regfull.sh`; 632 checks, about three minutes): on New Planet Vegeta's basin (zone 15 area 3), every
+- **`cine.txt`** (in `regfull.sh`; 647 checks, about three minutes): on New Planet Vegeta's basin (zone 15 area 3), every
   blocking op for seven pairs of sprites (Vegeta 137 and Android 17 both ways, Cooler's 64 x 64 body 34, King Cold 74 with
   five groups and no hit-stun, Piccolo's one-group NPC 73 with a bird 63), then a missing B, a missing A, an id past the
   sprite index, the point as the target, player 1 and player 2 as either party (two players, and one: player 2's moves play
   nothing), a party-slot code, the players on each other, a transformed player 1 (Goku on his Super Saiyan row), Start
   skipping an exchange, a struggle and a beam, the looks (player 1's facing byte), the camera's follow, a pan, a jolt, the
-  held charge, and the demo scene in both modes. After each op: the last op and how it ended (`CineRam` +0xF / +0x10), ops
+  held charge (and the charge beside a transformation, level + 4: nobody held, no hum of its own), a blow with flag 8 (the transformed
+  player 1 back on his base row, a 140 actor on 137), and the demo scene in both modes. After each op: the last op and how it ended (`CineRam` +0xF / +0x10), ops
   started = ended (+0x18); after each block: nobody held (op 17), no hum left (test command 46), OBJ VRAM's largest free
   block back to its mark (`arg` 103 / 104), the `ents` lists' vtables sane (`staging_run.py`): a body animated on a group
   it lacks would corrupt the heap and show there. A player knocked down outside a scene is back in his idle state

@@ -99,6 +99,7 @@ frames 50
 shot c3_cut_power2a
 frames 50
 shot c3_cut_power2b
+frames 160
 deref R61 TBL+0xd8
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R61
@@ -166,12 +167,19 @@ deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
 deref R140 TBL+0x214
-echo EXPECT entrec [0-9a-f]+: 0$
+echo EXPECT entrec [0-9a-f]+: 1$
 entrec R140
-echo EXPECT 0203f000: 00000602 00000000 00000000
-peek 0x0203F000 3
+echo EXPECT 0203f000: 00000602
+peek 0x0203F000 1
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
+echo EXPECT 0203f008: 00000[1-5][0-9a-f]{2}
+peek 0x0203F008 1
 echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
 map
+frames 300
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -258,12 +266,19 @@ deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
 deref R140 TBL+0x214
-echo EXPECT entrec [0-9a-f]+: 0$
+echo EXPECT entrec [0-9a-f]+: 1$
 entrec R140
-echo EXPECT 0203f000: 00000602 00000000 00000000
-peek 0x0203F000 3
+echo EXPECT 0203f000: 00000602
+peek 0x0203F000 1
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
+echo EXPECT 0203f008: 00000[1-5][0-9a-f]{2}
+peek 0x0203F008 1
 echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
 map
+frames 300
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -351,12 +366,19 @@ deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
 deref R140 TBL+0x214
-echo EXPECT entrec [0-9a-f]+: 0$
+echo EXPECT entrec [0-9a-f]+: 1$
 entrec R140
-echo EXPECT 0203f000: 00000602 00000000 00000000
-peek 0x0203F000 3
+echo EXPECT 0203f000: 00000602
+peek 0x0203F000 1
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
+echo EXPECT 0203f008: 00000[1-5][0-9a-f]{2}
+peek 0x0203F008 1
 echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
 map
+frames 300
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -444,12 +466,19 @@ deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
 deref R140 TBL+0x214
-echo EXPECT entrec [0-9a-f]+: 0$
+echo EXPECT entrec [0-9a-f]+: 1$
 entrec R140
-echo EXPECT 0203f000: 00000602 00000000 00000000
-peek 0x0203F000 3
+echo EXPECT 0203f000: 00000602
+peek 0x0203F000 1
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
+echo EXPECT 0203f008: 00000[1-5][0-9a-f]{2}
+peek 0x0203F008 1
 echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
 map
+frames 300
+echo EXPECT 0203f04c: 0b
+peek8 0x0203F04C 1
 echo EXPECT map zone 7 area 15\b
 map
 ents

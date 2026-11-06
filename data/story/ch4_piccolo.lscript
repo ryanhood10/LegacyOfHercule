@@ -582,7 +582,16 @@ sequence ch4_road_end
         CoopCall 37, 5, 7, 20                 ; the kick on his arm: he is on a knee
         FlashScreenColor 11, 255, 0, 0, 8
         WaitFrames 26
-        CoopCall 37, 5, 2, 0                  ; a second, without hurry
+        CoopCall 37, 5, 10, 0                 ; a second, without hurry: it knocks him out of his form (strike flag 8, nb-ssjfix: the gold actor
+        PushByte 37                           ; takes the base sprite, player 2 turns back) in a flash, and he falls and lies as Vegeta, as the
+        PushByte 1                            ; next cut shows him. The cast again: alone his actor is found by the base sprite now (137)
+        PushByte 11
+        PushVarint 137
+        CoopCall 31, 0, 0, 0
+        PushVarint 138
+        Mul
+        Sub
+        Step 59
         CoopCall 37, 10, 1, 2                 ; he lies
         WaitFrames 12
         END
@@ -664,6 +673,10 @@ sequence ch4_road_end
         JumpIfFalse d1
         DespawnEntity 140
       d1:
+        CoopCall 22, 2, 137, 0                ; (alone his actor is on the base sprite since 18's second kick)
+        JumpIfFalse d3
+        DespawnEntity 137
+      d3:
         CoopCall 22, 2, 103, 0
         JumpIfFalse d2
         DespawnEntity 103

@@ -333,7 +333,8 @@ junior_end("cg_j3_end", "m325_r9_defeat", 132, 3, 2, 13, 39, P2, "J4: Trunks, pl
 
 CAM_TALK, CAM_RAGE = "456, 336", "456, 280"   # the view's top-left corners (Gohan stands at 576, 376)
 # For Ryan's review (decided 2026-11-06, each switched on by one commit of its own, so reverting that commit drops it):
-SCREAM_FIRST = True      # 16's head: the scream is read during the first tremor, before the white (stock order: pose, white, scream)
+SCREAM_FIRST = False     # 16's head: the stock order, pose, white, scream (Ryan, 2026-11-06, F8: he prefers the original; True read the scream
+                         # during a first tremor, before the white)
 GOKU_SPIRIT = True       # the beam struggle: haloed Goku flickers at Gohan's shoulder while a line of his is open (the stock has only his voice)
 emit("sequence cg_head_scene")
 b = body(A3, "m325_r10_defeat", 0)
@@ -390,23 +391,32 @@ stockseq(A3, "m325_r10_defeat", 23, 25, "\"You loved life!...  I just let you di
 b = body(A3, "m325_r10_defeat", 26)
 assert b == ["PlayMusic 20", "PlayAudio 55", "SetEntityAnimation 0, 9", "FadeToWhite 10", "PushActiveCharMaxEP", "TypeOp 15", "PushActiveCharMaxHP", "TypeOp 13",
              "PlayAudio 23", "PlayAudio 20", "StopAudio 55", "SetCharacterTransformation 0, 58", "WhiteFadeOut 10", "END"]
-SS2_RISE = (["PlayMusic 20", "PlayAudio 55", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 4, 40"] + dust_ring(22) + ["WaitFrames 40"])       # the first tremor
-SS2_BURST = (["WhiteFlash 6", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 10, 40"] + dust_ring(40) +                                        # the second, harder:
-             ["SetEntityFacing 30, 3", "WaitFrames 16", "WalkToPosition 30, 506, 428", "SetEntityFacing 30, 3", "WaitFrames 14",                  # Cell turns round and gives ground
-              "StopAudio 55", "SetEntityFacing 0, 0", "WaitFrames 24",                                                                           # a held silence, his head down
-              "FadeToWhite 20", "PushActiveCharMaxEP", "TypeOp 15", "PushActiveCharMaxHP", "TypeOp 13", "PlayAudio 23", "PlayAudio 20",
-              "SetCharacterTransformation 0, 58", "SetEntityFacing 0, 2", "ScreenShake 0, 20, 60", "WaitFrames 24", "WhiteFadeOut 30", "WaitFrames 36",
-              "WhiteFlash 3", "WaitFrames 12", "WhiteFlash 3", f"SpawnDustCloud 0, {GX + 14}, {GY + 2}", "WaitFrames 7", "WhiteFlash 3", "WaitFrames 19",  # light flickers on him
-              "WaitFrames 30"])
-# The scream comes before the white (decided 2026-11-06; one commit, so it can be dropped): stock entry 27 is read during the first tremor,
-# the aura's sound under it, and once transformed he says nothing: the caption follows the flicker. The stock order was pose, white, scream.
+# The transformation is the stock's own, step for step and frame for frame (Ryan, 2026-11-06, F8: "keep the original animation and add to
+# it, dont remove it!"; the cutscene pass had replaced it with two tremors, Cell walking off, a held silence and a longer white, and moved
+# the scream before it): the music, the hum, his power-up pose (animation 9; NoWait plus the stock's 60 frames: the blocking step never
+# ended in co-op tests), the 10-frame white, the refill, the sounds 23 and 20, the swap to 58, the white lifting, then "AHHHH". What is
+# added rides on those 60 frames and on half a second after the white, and is not the charge every other power-up has: lightning (short
+# white flickers of the screen at uneven gaps, Cine's jolt: CoopCall 37 op 15), the ground breaking under him (the rumble, 43, and the
+# jolts' shakes in pulses that grow), dust thrown up at his feet in rings that widen (beside and below him, never over him), and Cell,
+# his back turned, wheeling round into his hurt pose and pushed back a step. After the white the new form crackles before the scream.
+def jolt(frames, flash):
+    return f"CoopCall 37, 15, {frames}, {flash}"
+def ground(r):      # dust at his feet: beside and below him, clear of his body
+    return [f"SpawnDustCloud 0, {GX - r}, {GY + 6}", f"SpawnDustCloud 0, {GX + r}, {GY + 6}"] + ([f"SpawnDustCloud 0, {GX}, {GY + r // 2 + 10}"] if r > 32 else [])
+SS2_LAYER = (["SetEntityFacing 30, 3", "PlayAudio 43", jolt(10, 1)] + ground(30) + ["WaitFrames 14",          # 0: the first crack; Cell turns
+             jolt(12, 2)] + ground(44) + ["WaitFrames 8", jolt(4, 1), "WaitFrames 6",                       # 14: harder; a flicker
+             "SetEntityAnimationNoWait 30, 2", jolt(14, 3)] + ground(58) + ["GlideToPosition 30, 510, 428, 120", "SetEntityAnimationNoWait 30, 2",   # 28: the biggest; Cell is pushed back
+             "WaitFrames 2", jolt(4, 1), "WaitFrames 8", jolt(6, 2), "WaitFrames 10"])                      # 42-60: two more flickers, then the stock's white
+b26 = body(A3, "m325_r10_defeat", 26)[:-1]
+assert b26[2] == "SetEntityAnimation 0, 9"
+SS2 = (b26[:2] + ["SetEntityAnimationNoWait 0, 9"] + SS2_LAYER                     # (the layer is the stock's WaitFrames 60: about 60 frames)
+       + sum((["StopAudio 55", "StopAudio 43"] if x == "StopAudio 55" else [x] for x in b26[3:]), [])
+       + [jolt(8, 1), "WaitFrames 9", jolt(5, 2), f"SpawnDustCloud 0, {GX + 18}, {GY + 6}", "WaitFrames 7", jolt(6, 1),
+          f"SpawnDustCloud 0, {GX - 18}, {GY + 6}", "WaitFrames 12"])
 if SCREAM_FIRST:
-    script(SS2_RISE, "stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)")
-    stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\", moved here from after the transformation")
-    script(SS2_BURST, "stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still")
-else:
-    script(SS2_RISE + SS2_BURST, "stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)")
-    stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\"")
+    raise SystemExit("SCREAM_FIRST: the pass's order was taken back (F8); rebuild it from git history if wanted")
+script(SS2, "stock entry 26, Super Saiyan 2, the stock's own steps and timing (his power-up pose, the white, the swap), with lightning, the ground breaking and Cell pushed back layered on it")
+stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\"")
 script(body(A3, "m325_r10_defeat", 28)[:-1] + [f"PanCameraToPosition {CAM_TALK}, 2"], "stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box")
 stock_at(A3, "m325_r10_defeat", 29, "\"Gohan has entered Super Saiyan Rage!\"")
 script(["CoopCall 37, 1, 30, 0", "CoopCall 37, 7, 28, 1"], "Cell powers up (the helpers' charge), then speaks")

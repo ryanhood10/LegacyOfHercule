@@ -632,6 +632,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Built in part 2026-11-06 (`nb-cs2`).** Built: after "What is this?" a 100-frame charge on Vegeta (`CoopCall 37, 7, 100, 2`: rings,
   flickers, a growing shake, the burst), the stock change at its peak (skipped when he arrived as a Super Saiyan: the charge
   plays either way), a jolt, and Cell is **pushed** back to the stock mark (216, 272) in his hit-stun instead of walking there.
+- **The transformation itself (Ryan, 2026-11-06: "add that back in alongside the explosions"; branch `nb-ssjfix`):** when he is not a Super
+  Saiyan yet the stock change (animation 35, his power-up at its own pace) plays with the charge's effects alongside it (`CoopCall 37, 7, 0,
+  6`), not after a 100-frame charge; arriving transformed he still gets the 100-frame charge.
 - **The first blow built 2026-11-06 (`nb-cs4`):** after "It's your end!" Vegeta is beside Cell in a blink (`CoopCall 37, 4`) and drives a heavy fist into his body (`CoopCall 37, 5, 5, 32`: Cell thrown 32 px, on a knee in smoke), Cell gets up and walks back to his mark (216, 272), where the boss record and the co-op split start. **The camera drift was found:** this scene never pans, so the game's follow camera is on player 1 the whole time and a dash drags it with him (7.4 had panned). The entry holds the view first (`PanCameraToPosition 71, 224, 4`: where the follow already is alone; with two players a 13 px glide off the pair's midpoint) and the fight's entry (20, stock 083e6608 restated) gives it back with `SetActiveEntity 0`. `cell_staging` checks the rise was the last move (`cine_last(10)`). Earlier note: built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
   made the camera leave its panned spot (one frame far below, then about two seconds of drifting back to centre on him); the
   same dash in 7.4 (no charge or change before it) holds the view. Told to the coordinator; not diagnosed. Beat 1's folded
@@ -760,8 +763,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   boxes are at the bottom where Vegeta stands: pan a little lower than the stock
   `PanCameraToPosition 136, 192` so both sit above the box, or use `!`. The beam variant needs group 18 on 140 (present) and a C-driven beam on the player
   (`CoopCall 16` is the model). **Size L** (area 5 M, area 6 M; the variant S more).
-
-### 7.5 Trunks' vow, Krillin flies in, Trunks powers up (touch up, S)
+- **Cell's landing without a jump (Ryan, 2026-11-06: "imperfect cell flies away and starts walking to a spot and he has a weird
+  jump/teleport after landing"; branch `nb-ssjfix`):** `WarpToMapWithEntities` fades area 5 in with the map's own Cell actor on its record
+  spot (144, 240), and the script then put him at (168, 300) for his walk up: seen as a jump once the screen was lit. The placement is gone:
+  he stands where the fade shows him and walks on from there to (164, 244). Filmed alone (`fly_V`).
+- **Vegeta falls out of his form (Ryan, 2026-11-06, F6: "even in f6 vegeta gets killed and his body is super saiyan"; branch
+  `nb-ssjfix`):** Cell's blow (`CoopCall 37, 5, 9, 28`: heavy, flag 8) knocks player 1 out of his Super Saiyan form at the impact (a white
+  flash, the form's own turn-back: row 8, the hum stopped), so he flies and lies as Vegeta, as the stock's body (137) lies after the fade.
+  `cell_staging` checks his row (8) after the scene in the four zone 12 lineups., Krillin flies in, Trunks powers up (touch up, S)
 
 - **Where:** `ch7_semi_perfect_end` entries 27-37. Films `z12_VT` (sheet 4), `z12b_V`.
 - **Today:** Trunks flies in under Vegeta's body, his vow, Krillin flies in to his side, three lines (alone:

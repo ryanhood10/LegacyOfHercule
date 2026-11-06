@@ -593,17 +593,20 @@ sequence ch1_frieza_landing
         END
   [31] text 73 "!KRILLIN: And who's that old guy with the afro?\x0bHis power level is...  um...  barely there."
   stockseq @083be798 28 32    ; King Cold's "comedian", "a real Super Saiyan", Frieza laughs
-  [37] script                            ; stock 33, the Super Saiyan: the ground shakes harder and harder under the power-up, a white flash on the gold; the soldiers give a step, old Hercule backs off
+  [37] script                            ; stock 33, the Super Saiyan: the stock's own power-up (his animation 9 at its pace, the hum 55, the burst sound 23, the swap to 134) with Cine's charge held alongside it (rings, flickers, the ground shaking harder and harder; Ryan, 2026-11-06: "add that back in alongside the explosions"), a white flash on the gold; the soldiers give a step, old Hercule backs off
         SetEntityFacing 128, 0
         WaitFrames 40
-        BeginCommandBatch
         CoopCall 37, 1, 128, 49
-        CoopCall 37, 7, 60, 2                 ; his power: the stance, the rings on the ground, the shake growing, the burst
+        CoopCall 37, 7, 0, 6
+        PlayAudio 55
+        BeginCommandBatch
+        SetEntityAnimation 128, 9
         GlideToPosition 158, 76, 482, 60
         CommitCommandBatch
+        CoopCall 37, 7, -1, 0
+        PlayAudio 23
         DespawnEntity 128
         SpawnCharacterEntity 134, 120, 448
-        PlayAudio 55
         WhiteFlash 6
         BeginCommandBatch
         ScreenShake 74, 6, 24

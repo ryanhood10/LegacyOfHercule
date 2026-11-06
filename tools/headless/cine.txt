@@ -2914,6 +2914,76 @@ echo EXPECT [0-9a-f]{8}: 00000001
 peek 0x203fd0c 1
 ents
 shot cine_ssj
+echo == a blow that knocks him out of his form (strike flag 8): player 1 turns back, an actor takes the base sprite
+poke32 0x203fd0c 0x1
+poke32 0x203fd54 0x9
+poke32 0x203fd08 50
+frames 3
+poke32 0x203fd0c 0x5
+poke32 0x203fd54 0x280009
+poke32 0x203fd08 50
+frames 110
+echo EXPECT [0-9a-f]{8}: 05[0-9a-f]{4}00 [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
+echo EXPECT [0-9a-f]{8}: 13
+peek8 PARTY+0x84 1
+frames 40
+poke32 0x203fd0c 0x11
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 4
+echo EXPECT [0-9a-f]{8}: 00000000
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x0
+poke32 0x203fd54 0x0
+poke32 0x203fd08 46
+frames 3
+echo EXPECT [0-9a-f]{8}: 00000000
+peek 0x203fd0c 1
+frames 70
+poke32 0x203fd0c 0x68
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 3
+echo EXPECT [0-9a-f]{8}: 00000001
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x66
+poke32 0x203fd54 0x1ece008c
+poke32 0x203fd08 50
+frames 3
+poke32 0x203fd0c 0x1
+poke32 0x203fd54 0x8c0009
+poke32 0x203fd08 50
+frames 3
+poke32 0x203fd0c 0x5
+poke32 0x203fd54 0x280009
+poke32 0x203fd08 50
+frames 110
+echo EXPECT [0-9a-f]{8}: 05[0-9a-f]{4}00 [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R137
+poke32 0x203fd0c 0x0
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 4
+poke32 0x203fd0c 0x11
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 4
+echo EXPECT [0-9a-f]{8}: 00000000
+peek 0x203fd0c 1
+ents
+shot cine_ssj_down
 echo == Start skips an op: the timeline at once, the bodies where they would have ended
 load cine2.ss
 p2 0
@@ -3121,6 +3191,30 @@ poke32 0x203fd08 50
 frames 4
 echo EXPECT [0-9a-f]{8}: 00000001
 peek 0x203fd0c 1
+poke32 0x203fd0c 0x7
+poke32 0x203fd54 0x60000
+poke32 0x203fd08 50
+frames 90
+echo EXPECT [0-9a-f]{8}: [0-9a-f]{4}01[0-9a-f]{2}
+peek CN+0x10 1
+poke32 0x203fd0c 0x11
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 4
+echo EXPECT [0-9a-f]{8}: 00000001
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x0
+poke32 0x203fd54 0x0
+poke32 0x203fd08 46
+frames 3
+echo EXPECT [0-9a-f]{8}: 00000000
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x7
+poke32 0x203fd54 0xffff
+poke32 0x203fd08 50
+frames 20
+echo EXPECT [0-9a-f]{8}: [0-9a-f]{4}00[0-9a-f]{2}
+peek CN+0x10 1
 poke32 0x203fd0c 0x7
 poke32 0x203fd54 0x10000
 poke32 0x203fd08 50
