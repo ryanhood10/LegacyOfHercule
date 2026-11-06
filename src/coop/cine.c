@@ -368,7 +368,8 @@ static void hold_nop(CtrlObj *s, Entity *e) { (void)s; (void)e; }
 static void hold_update(CtrlObj *s, Entity *e) {
     (void)s;
     if (e != g_PlayerObject && e != coop.p2) return;
-    if (ram.run || (ram.aura_on && scene_running())) { E16(e, 0x12) = 0; return; }
+    // (an op queued in a batch has played a frame within the second, or its block is lost: then it holds nobody)
+    if ((ram.run && (u32)(g_FrameCounter - ram.tick) < 60) || (ram.aura_on && scene_running())) { E16(e, 0x12) = 0; return; }
     if (++E16(e, 0x12) < HOLD_FREE) return;
     set_tint(e, 0);
     Entity_SetAnimation(e, 0);
@@ -785,7 +786,11 @@ static void cam_frame(Run *r) {
     s32 x, y;
     if (!r->act[0].e) return;
     act_centre(&r->act[0], &x, &y);
-    if (r->has_b) { x = (x + r->tx) / 2; y = (y + r->ty) / 2; }
+    if (r->act[1].e) {                              // the middle of the two, where they are now
+        s32 bx, by;
+        act_centre(&r->act[1], &bx, &by);
+        x = (x + bx) / 2; y = (y + by) / 2;
+    } else if (r->has_b) { x = (x + r->tx) / 2; y = (y + r->ty) / 2; }
     camera_aim(x, y);
 }
 static void director(Run *r) {
