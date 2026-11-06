@@ -263,6 +263,24 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.8 Cell's Kamehameha, the arm, Cell's story, the escape (showcase, L)
 
+- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 (the meeting, the town blown away) is not built.** Player 2 has a mark (324, 250)
+  and looks at Cell. Cell is in a charge with blue light before "Kaaaaaaaaa..." (`CoopCall 37, 7, 40, 0`). The beam is cine's
+  (`CoopCall 37, 8, 2, 60`: the stock batch of twelve contact-waits is gone): it holds on Piccolo with bursts and shakes and
+  pushes him back a few pixels (not the 40 px of the shot list: the op moves him a pixel at a time and stops at the hits);
+  player 2 throws himself down first and gets up when the talk starts. The arm (stock pose 22), a jolt, and Cell walks over to
+  stand beside him (his marks are relative to player 1: `PushEntityPosition 0`). **The story is paced:** Cell walks off as the
+  questions start, stops and turns to the camera for "Very well, my name is Cell.", is back at Piccolo's side after "You're
+  wrong!", walks away and looks at the sky for "I suppose I can answer this last one.", comes back for the last of it. The
+  regrowth (stock 26) lands on a white jolt with the ki sound and Cell slides back; Piccolo powers up (30 frames) and is face to
+  face with him in a blink for "Maybe I'll take yours."; a held look; Krillin and Trunks fly in and everyone turns to them. Vegeta
+  lands at (200, 214), left of where Piccolo now stands (the stock spot was on top of him). Every line kept; the sequence has
+  five more script entries (entry 0's targets 1 / 3 are before them).
+- **Cell's escape as a blinding light (its own commit, for Ryan's review; decided for him while away):** the burst sound, a fast
+  white, everyone in the start pose, Cell gone under it, his flight heard trailing off as it clears. No word added. The stock
+  flew him out between Trunks and Krillin.
+- Tested in `staging_ch5` ("gingertown": alone, with Hercule, as Hercule with Piccolo): Cell stands for the beam, nobody of the
+  scene is left after it, Trunks is player 1 and Krillin player 2's.
+
 - **Where:** `ch5_gingertown_end`, map 287 record 0's defeat sequence (entries 3-61 are stock `083e24a0`). Film
   `gin_PH` (sheets 1-2).
 - **Today:** (two players: a flash takes the second Cell back) a fade, Cell and Piccolo on marks facing each

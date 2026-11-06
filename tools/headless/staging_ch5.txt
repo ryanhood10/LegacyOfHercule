@@ -405,4 +405,169 @@ peek 0x03001FDC 1
 echo EXPECT map zone 6 area 99\b
 map
 ents
+echo === gingertown P
+load menu.ss
+p2 off
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_P_beam0
+frames 50
+shot c5_P_beam1
+frames 50
+shot c5_P_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_P_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+echo === gingertown PH
+load menu.ss
+p2 0
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_PH_beam0
+frames 50
+shot c5_PH_beam1
+frames 50
+shot c5_PH_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_PH_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 06
+peek8 0x0203FF84 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+echo === gingertown HP
+load menu.ss
+p2 0
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 5
+poke8 0x0203FF84 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_HP_beam0
+frames 50
+shot c5_HP_beam1
+frames 50
+shot c5_HP_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_HP_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 06
+peek8 0x0203FF84 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
 echo ALIVE

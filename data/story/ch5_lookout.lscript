@@ -245,8 +245,201 @@ sequence ch5_gingertown_end
         SetEntityAnimation 28, 0         ; the one left may be the body that fell first (lying)
         WaitFrames 30
   text 1 "#PICCOLO: It took its other half back into itself..."
-  stockseq @083e24a0 0 56                ; the Kamehameha, the arm trick, Cell's story, Krillin and Trunks, Vegeta
-  script                                 ; stock entry 57: Trunks and Krillin are the pair for the lab
+  [3] script                             ; stock entry 0 with player 2 on a mark too (he stood mid-screen with his back to the camera all scene)
+        PlayAudio 60
+        FindPlayerEntity
+        AddEXP 12000
+        SetPlayerVisible 0
+        FadeOut 60
+        PanCameraToPosition 128, 168, 10
+        SetEntityPositionInstant 28, 208, 224
+        SetEntityPositionInstant 0, 312, 224
+        SetEntityFacing 0, 2
+        SetEntityFacing 28, 3
+        CoopCall 9, 1, 324, 250
+        CoopCall 37, 0, 0, 0
+        FadeFromWhite 60
+        WalkToPosition 0, 280, 224
+        CoopCall 37, 12, 28, 28
+        PlayAudio 50
+  stockseq @083e24a0 1 2                 ; "Now who are you?", "I came here of my own accord."
+  [6] script                             ; Cell is in the wind-up from the first syllable (he stood idle while the box typed it): the charge, blue light
+        CoopCall 37, 1, 28, 0
+        BeginCommandBatch
+        CoopCall 37, 7, 40, 0
+        EntityWaitFrames 0, 14
+        FlashScreenColor 0, 120, 170, 255, 8
+        EntityWaitFrames 0, 8
+        FlashScreenColor 0, 120, 170, 255, 8
+        CommitCommandBatch
+  stockseq @083e24a0 3 6                 ; "Kaaaaaaaaa... Meeeeeeee...", Piccolo starts, "It can't be!", "HAAAAAAAAAAAAAAAAAAAA!!!"
+  [11] script                            ; stock entry 7: the beam. It drives Piccolo back along its line while the hits land (he flashed where he
+        CoopCall 37, 1, -1, -3           ; stood); player 2 throws himself down out of its way. The arm is gone (the stock pose 22), dust; Cell
+        CoopCall 37, 10, 0, 2            ; walks over to stand above him
+        CoopCall 37, 1, 28, 0
+        CoopCall 37, 8, 2, 60
+        SetEntityAnimation 28, 0
+        SetEntityFacing 0, 0
+        SetEntityAnimation 0, 2
+        PlayDamageEffect 0
+        SetEntityAnimationNoWait 0, 22
+        CoopCall 37, 15, 12, 0
+        WaitFrames 30
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 60
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 34
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 8 10                ; "I got you now.", "I have no choice but to surrender.", "You finally realize the futility..."
+  [15] script                            ; stock entry 11 (Piccolo faces him); Cell begins to pace: the interrogation is staged (it was a minute of
+        SetEntityFacing 0, 2             ; text with nobody moving); player 2 picks himself up
+        SetEntityAnimation 0, 0
+        CoopCall 37, 1, -1, -3
+        CoopCall 37, 10, 0, 0
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 58
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 12 14               ; "What do you mean?", "...Perfection!", "Tell me, who are you?"
+  [19] script                            ; he stops and turns to the camera
+        SetEntityFacing 28, 0
+        WaitFrames 12
+  stockseq @083e24a0 15 16               ; "Very well, my name is Cell. ...", "You're wrong!  We destroyed Dr. Gero's lab..."
+  [22] script                            ; that stings: he is back at Piccolo's side
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 34
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 17 18               ; "Luckily, the computer was hidden...", "Wait!  One more question..."
+  [25] script                            ; he turns his back on Piccolo, walks off a few steps and looks at the sky
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 70
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 1
+  stockseq @083e24a0 19 20               ; "I suppose I can answer this last one. ...", "But what for?"
+  [28] script                            ; and comes back for the last of it
+        SetEntityFacing 28, 3
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 40
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 21 23               ; "...I need Androids 17 and 18...", the arm pose again, "Yes, I'm ready.  You've said more than enough!"
+  [32] script                            ; stock entry 24: the regrowth on a flash, the ground jolts, and Cell recoils
+        WaitFrames 40
+        PlayAudio 13
+        CoopCall 37, 15, 14, 2
+        SetEntityAnimation 0, 26
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 52
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 150
+        Step GlideToPosition
+        WaitFrames 30
+  stockseq @083e24a0 25 26               ; "You tricked me!!!", "That's right. ... Don't think I won't pay you back for taking my arm."
+  [35] script                            ; stock entry 27: he powers up and is face to face with Cell in a blink
+        SetEntityFacing 0, 2
+        CoopCall 37, 1, 0, 28
+        CoopCall 37, 7, 30, 1
+        CoopCall 37, 4, 0, 18
+        WaitFrames 10
+  stock @083e1e66                        ; "Maybe I'll take yours."
+  [37] script                            ; a held look; then stock entry 29: Krillin and Trunks fly in, and everyone looks
+        WaitFrames 30
+        SpawnCharacterEntity 76, 256, 376
+        SpawnCharacterEntity 128, 280, 376
+        FlyToPosition 128, 280, 296
+        FlyToPosition 76, 240, 304
+        CoopCall 37, 12, 128, 128
+  stockseq @083e24a0 30 41               ; the talk with Krillin and Trunks; "You all must feel honored. ... I'll absorb you later!"
+  [50] script                            ; stock entry 42: Cell flies off; Vegeta flies in (to a spot left of where Piccolo stands now)
+        PlayAudio 26
+        FlyToPosition 28, 344, 380
+        DespawnEntity 28
+        WaitFrames 60
+        SpawnCharacterEntity 137, 104, 176
+        FlyToPosition 137, 200, 214
+        WaitFrames 30
+        SetEntityFollow 137, 0
+  stockseq @083e24a0 43 56               ; Vegeta, Tien, "You can call me... Piccolo.", the plan
+  [65] script                            ; stock entry 57: Trunks and Krillin are the pair for the lab
         FadeOut 90                       ; basement (ch6_basement); Hercule flies on with Piccolo
         PlayMusic 5
         DespawnEntity 128

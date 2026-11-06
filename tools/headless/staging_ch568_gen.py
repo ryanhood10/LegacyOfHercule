@@ -33,6 +33,30 @@ for p1, p2 in ((TRUNKS, None), (GOHAN, None), (TRUNKS, GOHAN), (GOHAN, TRUNKS)):
     s.out("ents")
     s.end_scene(300)
     s.on_map(6, 99)
+# Gingertown's end (ch5_gingertown_end): Cell's Kamehameha, the arm, his story with Cell pacing, the escape, Vegeta and Tien; then Trunks is
+# player 1 and Krillin player 2's. Alone, with Hercule, and as Hercule with Piccolo (the fade makes Piccolo player 1).
+for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (HERCULE, PICCOLO)):
+    n = lineup_name(p1, p2)
+    s.begin(f"gingertown {n}", p1, p2, "+129 +131 +132")
+    s.warp(10, 17, 280, 300, 100)
+    s.end_scene()
+    s.on_map(10, 20)
+    s.win(120)
+    s.press(8, 60)
+    for i in range(3):
+        s.out("frames 50")
+        s.shot(f"c5_{n}_beam{i}")
+    s.actors(s28=1)
+    s.out("ents")
+    s.press(40, 60)
+    s.shot(f"c5_{n}_story")
+    s.out("ents")
+    s.end_scene(250)
+    s.actors(s28=0, s137=0, s121=0)
+    s.out("echo EXPECT 0203f000: 03", "peek8 0x0203F000 1")      # Trunks player 1
+    if p2 is not None:
+        s.out("echo EXPECT 0203ff84: 06", "peek8 0x0203FF84 1")  # Krillin player 2's
+    s.on_map(10, 20)
 s.write("staging_ch5.txt")
 
 s = Script("staging_ch568_gen.py")
