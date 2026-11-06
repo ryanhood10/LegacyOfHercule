@@ -329,6 +329,7 @@ a step that is moved or removed breaks an insertion further down, so change one 
   8. "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!" and "@^Gohan has entered Super Saiyan Rage!" as stock. (Optional, Ryan decides: play
      the scream during 7a-b and leave only the caption after the reveal, so he is silent once transformed, as in the
      anime. It reorders two stock entries; no word changes.)
+     **Built as the optional order (decided 2026-11-06; its own commit):** the scream is read during the first tremor; once transformed he is silent.
   9. Cell: `cine: charge-up` (a flash, `ScreenShake 0, 8, 20`), then "You wretched child!!!  NOW TASTE MY TRUE
      POWER!!!!!!": power shown, then spoken.
   10. **Two players:** Hercule's walk back as today, but he stumbles at the last tremor (hurt pose 2, 10 frames) before

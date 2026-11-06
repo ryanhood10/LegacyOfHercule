@@ -395,8 +395,11 @@ SS2_BURST = (["WhiteFlash 6", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 1
               "SetCharacterTransformation 0, 58", "SetEntityFacing 0, 2", "ScreenShake 0, 20, 60", "WaitFrames 24", "WhiteFadeOut 30", "WaitFrames 36",
               "WhiteFlash 3", "WaitFrames 12", "WhiteFlash 3", f"SpawnDustCloud 0, {GX + 14}, {GY + 2}", "WaitFrames 7", "WhiteFlash 3", "WaitFrames 19",  # light flickers on him
               "WaitFrames 30"])
-script(SS2_RISE + SS2_BURST, "stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)")
-stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\"")
+# The scream comes before the white (decided 2026-11-06; one commit, so it can be dropped): stock entry 27 is read during the first tremor,
+# the aura's sound under it, and once transformed he says nothing: the caption follows the flicker. The stock order was pose, white, scream.
+script(SS2_RISE, "stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)")
+stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\", moved here from after the transformation")
+script(SS2_BURST, "stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still")
 script(body(A3, "m325_r10_defeat", 28)[:-1] + [f"PanCameraToPosition {CAM_TALK}, 2"], "stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box")
 stock_at(A3, "m325_r10_defeat", 29, "\"Gohan has entered Super Saiyan Rage!\"")
 script(["SetEntityAnimationNoWait 30, 5", "PlayAudio 55", "WhiteFlash 4", "ScreenShake 0, 8, 20", "WaitFrames 24", "StopAudio 55"], "Cell powers up, then speaks")
