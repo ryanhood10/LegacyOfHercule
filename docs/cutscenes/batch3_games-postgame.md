@@ -837,6 +837,14 @@ Stock, about 50 s (filmed). **Leave.**
   shout box in the middle too). **The short form:** `CoopCall 16, 0, 6` is 1 once the full scene has played since power-on: the players walk in,
   a white cut to Super 13 standing with Tien and Yamcha down at the rim, his music, "Look at me.  Even Cell would tremble!", the players' lines,
   the fight (about 8 s to control instead of 55).
+  **With the helpers (after the merge of `nb-cine`), replacing the hand-rolled hits above:** the opening is a 90-frame exchange between 17 and 13
+  that 13 ends with the heavy blow (op 6, end 2), queued in the batch that runs the others in, so the fight is under way as the view arrives;
+  18's blast is op 8; 13's power-up before his first line op 7; 17 rises (op 10) for his line and the looks are op 11 / 12; the two go in with
+  afterimage dashes to either side of him (op 4) and a blow each (op 5), 13 throws 17 down (heavy, 44 px) and puts 18 on a knee (flags 5); he is
+  over 17 in a dash (op 4 + 16) for the absorption; 18's volley of five is op 8 kind 1 and he is at her side in a dash; the three surges are
+  charges of level 0, 1, 2 (30, 36, 46 frames) with the snow rings; Tien and Yamcha fire a volley of four each at Super 13 and his answer is a big
+  blast that throws Tien (op 8, 3 + 32), both then glide to the rim and lie. All on sprites 165, 9, 11, 121, 156 and 180 as an actor: no op
+  misbehaved. About 50 s to control.
 - **Draft lines:** none.
 - **Time:** about +12 s on 35. **This scene replays in full after every loss and every reload at the ridge pad** (Ryan
   kept that, 4i). Build with it a short form for a retry in the same session (a RAM bit, not a flag: he stands

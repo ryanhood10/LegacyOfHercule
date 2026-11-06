@@ -70,7 +70,8 @@ sequence summit_scene
         END
       FULL:
         CoopCall 16, 0, 5, 1
-        ; the others run in from the rim to the view's edges (Ryan, 2026-11-05: no stagnant characters; only actors move, by their own sprites)
+        ; a fight already under way (the cinematic helpers, CoopCall 37: docs/cutscenes.md 5): 17 and 13 trade a flurry, queued in the batch so
+        ; that the others run in from the rim to the view's edges while it plays (Ryan, 2026-11-05: no stagnant characters)
         BeginCommandBatch
         CoopCall 22, 2, 103, 0
         JumpIfFalse a103
@@ -98,6 +99,8 @@ sequence summit_scene
       a132:
         WalkToPosition 121, 456, 300
         WalkToPosition 156, 440, 328
+        CoopCall 37, 1, 9, 165
+        CoopCall 37, 6, 90, 2
         CommitCommandBatch
         CoopCall 22, 2, 103, 0
         JumpIfFalse af103
@@ -125,108 +128,61 @@ sequence summit_scene
       af132:
         SetEntityFacing 121, 2
         SetEntityFacing 156, 2
-        ; a fight already under way: 17's two blows land and do nothing (no flash on 13), 13's one answer throws him back; 18's blast, and
-        ; 13 walks out of its dust
-        WalkToPosition 9, 322, 306
-        SetEntityFacing 165, 2
-        SetEntityAnimation 9, 6
-        PlaySFX 165, 34
-        SetEntityAnimation 9, 7
-        PlaySFX 165, 35
-        SetEntityAnimation 165, 6
-        PlayDamageEffect 9
-        PlaySFX 9, 36
-        BeginCommandBatch
-        SetEntityAnimation 9, 3
-        GlideToPosition 9, 288, 322, 2500
-        CommitCommandBatch
-        SpawnDustCloud 9, 284, 326
-        SetEntityFacing 9, 3
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 11, 165, 100
-        CommitCommandBatch
-        SpawnDustCloud 165, 344, 296
-        SpawnDustCloud 165, 354, 304
-        WaitFrames 24
-        WalkToPosition 165, 348, 312
+        ; (the flurry above, CoopCall 37 op 6: 13 ends it with the blow that throws 17 down) 18's blast bursts on him; he powers up before he speaks
+        CoopCall 37, 1, 11, 165
+        CoopCall 37, 8, 0, 0
+        WaitFrames 10
         SetEntityFacing 165, 0
-        SetEntityAnimation 165, 5              ; he cracks his knuckles
+        CoopCall 37, 1, 165, -3
+        CoopCall 37, 7, 30, 0
+        CoopCall 37, 11, 165, -3               ; they all look at him
   text 169 "ANDROID 13: Ha!  The Dragon Balls brought your brother back...\x0band you came along too.  Just for me!"
-  script                                 ; 17 comes forward again
-        WalkToPosition 9, 306, 318
-        SetEntityFacing 9, 3
+  script                                 ; 17 gets up; they look at him, he looks at his sister
+        CoopCall 37, 1, 9, 11
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 11, 9, 11
   text 28 "ANDROID 17: Sis, get out of here!"
   script                                 ; 18 steps up: both sides of him
         WalkToPosition 11, 390, 314
         SetEntityFacing 11, 2
+        CoopCall 37, 11, 11, 165
   text 29 "ANDROID 18: Not a chance.  We finish him together!"
   script                                 ; they go in together; 13 throws 17 down, knocks 18 back, and absorbs 17
-        ; they go in together; 13 takes both blows, throws 17 down and knocks 18 back
-        BeginCommandBatch
-        WalkToPosition 9, 326, 310
-        WalkToPosition 11, 372, 308
-        CommitCommandBatch
-        BeginCommandBatch
-        SetEntityAnimation 9, 6
-        SetEntityAnimation 11, 6
-        CommitCommandBatch
-        PlaySFX 165, 34
-        PlaySFX 165, 35
-        SetEntityFacing 165, 2
-        SetEntityAnimation 165, 6
-        WhiteFlash 3
-        ScreenShake 0, 8, 10
-        PlayDamageEffect 9
-        PlaySFX 9, 36
-        BeginCommandBatch
-        SetEntityAnimation 9, 3
-        GlideToPosition 9, 290, 324, 3000
-        CommitCommandBatch
-        SetEntityAnimationNoWait 9, 12         ; down (his fight set's knock-down)
-        SpawnDustCloud 9, 288, 328
-        SetEntityFacing 165, 3
-        SetEntityAnimation 165, 7
-        PlayDamageEffect 11
-        PlaySFX 11, 35
-        BeginCommandBatch
-        SetEntityAnimation 11, 3
-        GlideToPosition 11, 414, 318, 2500
-        CommitCommandBatch
-        SetEntityFacing 11, 2
-        SpawnDustCloud 11, 418, 322
-        ; 13 absorbs 17: he stands over him, a pulse, 17 is dragged the last steps into him
-        WalkToPosition 165, 314, 320
-        SetEntityFacing 165, 2
-        WaitFrames 12
+        ; they go in together: each vanishes and is at his side with a blow; 13 throws 17 down and sends 18 back onto a knee
+        CoopCall 37, 1, 9, 165
+        CoopCall 37, 4, 1, 4
+        CoopCall 37, 1, 11, 165
+        CoopCall 37, 4, 2, 4
+        CoopCall 37, 5, 2, 0
+        CoopCall 37, 1, 9, 165
+        CoopCall 37, 5, 0, 0
+        CoopCall 37, 1, 165, 9
+        CoopCall 37, 5, 1, 44
+        CoopCall 37, 1, 165, 11
+        CoopCall 37, 5, 5, 40
+        ; 13 absorbs 17: he is over him at once, a pulse, and 17 is gone
+        CoopCall 37, 1, 165, 9
+        CoopCall 37, 4, 16, 10
+        WaitFrames 14
         WhiteFlash 6
         PlayAudio 61
-        GlideToPosition 9, 310, 322, 700
         DespawnEntity 9
         ScreenShake 0, 10, 30
         SetEntityAnimation 165, 2              ; it doubles him over for a moment
         WaitFrames 10
-        SetEntityFacing 165, 3
-        WaitFrames 24
+        CoopCall 37, 12, 11, -3                ; he turns to her; so does everyone
+        WaitFrames 20
   text 169 "ANDROID 13: This is for the Doc.\x0bYour power is mine!"
   script                                 ; 18's volley as he walks through it; he absorbs her; the transformation's three surges
-        ; 18 does not wait her turn: she fires as he walks at her through it, backs off still firing; he reaches her
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 11, 165, 100
-        NPCFireKiBlastAtEntity 11, 165, 100
-        NPCFireKiBlastAtEntity 11, 165, 100
-        WalkToPosition 165, 370, 318
-        CommitCommandBatch
-        SpawnDustCloud 165, 366, 314
-        WalkToPosition 11, 438, 318
-        SetEntityFacing 11, 2
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 11, 165, 100
-        NPCFireKiBlastAtEntity 11, 165, 100
-        WalkToPosition 165, 416, 318
-        CommitCommandBatch
+        ; 18 does not wait her turn: on her feet, a volley of five into him; he comes out of the last burst at her side
+        CoopCall 37, 1, 11, 165
+        CoopCall 37, 8, 1, 5
+        WaitFrames 16
+        CoopCall 37, 1, 165, 11
+        CoopCall 37, 4, 0, 10
+        WaitFrames 14
         WhiteFlash 6
         PlayAudio 61
-        GlideToPosition 11, 422, 318, 700
         DespawnEntity 11
         ScreenShake 0, 10, 30
         SetEntityAnimation 165, 2
@@ -239,18 +195,16 @@ sequence summit_scene
       Ks:
         PanCameraToPosition 228, 230, 2        ; 13 at the centre of the view
         WaitFrames 20
-        ; the change (Ryan: more epic): three surges, each blowing the snow out further; the second pushes Tien, Yamcha and the players back
-        PlayAudio 55
-        WhiteFlash 10
-        ScreenShake 0, 6, 20
+        ; the change (Ryan: more epic): three surges, each a charge of the helpers' (his pose, the flicker, a growing shake, the burst) that blows
+        ; the snow out further; the second pushes Tien, Yamcha and the players back
+        CoopCall 37, 1, 165, -3
+        CoopCall 37, 7, 30, 0
         SpawnDustCloud 165, 326, 302
         SpawnDustCloud 165, 370, 302
         SpawnDustCloud 165, 348, 284
         SpawnDustCloud 165, 348, 316
-        WaitFrames 36
-        PlayAudio 55
-        WhiteFlash 20
-        ScreenShake 0, 12, 30
+        WaitFrames 20
+        CoopCall 37, 7, 36, 1
         SpawnDustCloud 165, 308, 302
         SpawnDustCloud 165, 388, 302
         SpawnDustCloud 165, 348, 266
@@ -262,10 +216,8 @@ sequence summit_scene
         CommitCommandBatch
         SetEntityFacing 0, 1
         CoopCall 9, 1, 350, 378
-        WaitFrames 20
-        PlayAudio 55
-        WhiteFlash 30
-        ScreenShake 0, 18, 40
+        WaitFrames 16
+        CoopCall 37, 7, 46, 2
         SpawnDustCloud 165, 290, 302
         SpawnDustCloud 165, 406, 302
         SpawnDustCloud 165, 348, 248
@@ -343,29 +295,17 @@ sequence summit_scene
         WaitFrames 40
   text 122 "SUPER 13: Now...  I am complete!"
   script                                 ; Tien and Yamcha's blasts do nothing; his one blast throws them to the rim
-        ; proof, between story actors only: Tien and Yamcha fire everything; he has not moved; one blast between them puts both down at the rim,
-        ; where they lie through the fight
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 121, 180, 100
-        NPCFireKiBlastAtEntity 156, 180, 100
-        NPCFireKiBlastAtEntity 121, 180, 100
-        NPCFireKiBlastAtEntity 156, 180, 100
-        NPCFireKiBlastAtEntity 121, 180, 100
-        NPCFireKiBlastAtEntity 156, 180, 100
-        CommitCommandBatch
-        SpawnDustCloud 180, 352, 284
-        SpawnDustCloud 180, 366, 296
-        SpawnDustCloud 180, 356, 306
+        ; proof, between story actors only: Tien and Yamcha fire everything (a volley each, the helpers'); he has not moved; his one big blast
+        ; throws Tien, Yamcha goes down with him, and both end at the rim, where they lie through the fight
+        CoopCall 37, 1, 121, 180
+        CoopCall 37, 8, 1, 4
+        CoopCall 37, 1, 156, 180
+        CoopCall 37, 8, 1, 4
         WaitFrames 36
         SetEntityFacing 180, 3
-        WaitFrames 24
-        BeginCommandBatch
-        NPCFireKiBlast 180, 462, 318, 100
-        CommitCommandBatch
-        WhiteFlash 4
-        PlayAudio 20
-        ScreenShake 0, 10, 16
-        SpawnDustCloud 121, 462, 318
+        WaitFrames 20
+        CoopCall 37, 1, 180, 121
+        CoopCall 37, 8, 35, 0
         BeginCommandBatch
         GlideToPosition 121, 530, 380, 2500
         GlideToPosition 156, 530, 430, 2500
