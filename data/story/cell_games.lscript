@@ -725,10 +725,11 @@ sequence cg_head_scene
         WalkToPosition 30, 606, 418
         SetEntityFacing 30, 1
   stockseq @083ea400 15 17    ; "This sentimental downpour is killing me!", "Just let it go."
-  script                                 ; stock entry 18: Cell steps onto the head and crushes it (the stock blast's sound and dust); the music stops; he turns away
+  script                                 ; stock entry 18: Cell is on the head in an afterimage dash (CoopCall 37 op 3) and crushes it (the stock blast's sound and dust); the music stops; he turns away
         SetEntityFacing 0, 3
         WaitFrames 30
-        WalkToPosition 30, 614, 398
+        CoopCall 37, 1, 30, -3
+        CoopCall 37, 3, 614, 398
         SetEntityFacing 30, 1
         SetEntityAnimation 30, 6
         WhiteFlash 4
@@ -806,13 +807,9 @@ sequence cg_head_scene
         PlayAudio 27
         PanCameraToPosition 456, 336, 2
   stock @083ea388    ; "Gohan has entered Super Saiyan Rage!"
-  script                                 ; Cell powers up, then speaks
-        SetEntityAnimationNoWait 30, 5
-        PlayAudio 55
-        WhiteFlash 4
-        ScreenShake 0, 8, 20
-        WaitFrames 24
-        StopAudio 55
+  script                                 ; Cell powers up (the helpers' charge), then speaks
+        CoopCall 37, 1, 30, 0
+        CoopCall 37, 7, 28, 1
   stock @083ea3b4    ; "You wretched child!!!  NOW TASTE MY TRUE POWER!!!!!!"
   script                                 ; player 2 is Hercule again
         SetEntityAnimationNoWait 30, 0

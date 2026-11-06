@@ -373,10 +373,10 @@ stockseq(A3, "m325_r10_defeat", 15, 17, "\"This sentimental downpour is killing 
 b = body(A3, "m325_r10_defeat", 18)
 assert b == ["SetEntityFacing 0, 3", "WaitFrames 40", "BeginCommandBatch", "NPCFireKiBlast 30, 616, 384, 100", "SpawnDustCloud 30, 616, 384", "CommitCommandBatch",
              "FindEntityByType 1", "PlayAudio 20", "END"]
-script(["SetEntityFacing 0, 3", "WaitFrames 30", f"WalkToPosition 30, {HDX - 2}, {HDY + 14}", "SetEntityFacing 30, 1", "SetEntityAnimation 30, 6",
+script(["SetEntityFacing 0, 3", "WaitFrames 30", "CoopCall 37, 1, 30, -3", f"CoopCall 37, 3, {HDX - 2}, {HDY + 14}", "SetEntityFacing 30, 1", "SetEntityAnimation 30, 6",
         "WhiteFlash 4", "PlayAudio 20", "ScreenShake 0, 8, 12", f"SpawnDustCloud 30, {HDX}, {HDY}", "FindEntityByType 1", "StopMusic",
         "WaitFrames 40", "SetEntityFacing 30, 2", "WaitFrames 10"],
-       "stock entry 18: Cell steps onto the head and crushes it (the stock blast's sound and dust); the music stops; he turns away")
+       "stock entry 18: Cell is on the head in an afterimage dash (CoopCall 37 op 3) and crushes it (the stock blast's sound and dust); the music stops; he turns away")
 stock_at(A3, "m325_r10_defeat", 19, "\"Yet another fighter you could have saved, Gohan.\"")
 script(["WalkToPosition 30, 524, 424", "SetEntityFacing 30, 2", "ScreenShake 0, 4, 20", "SetEntityAnimation 0, 4"],
        "stock entry 20 (Gohan's start): Cell walks off past him first, his back turned")
@@ -402,7 +402,7 @@ stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\", moved 
 script(SS2_BURST, "stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still")
 script(body(A3, "m325_r10_defeat", 28)[:-1] + [f"PanCameraToPosition {CAM_TALK}, 2"], "stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box")
 stock_at(A3, "m325_r10_defeat", 29, "\"Gohan has entered Super Saiyan Rage!\"")
-script(["SetEntityAnimationNoWait 30, 5", "PlayAudio 55", "WhiteFlash 4", "ScreenShake 0, 8, 20", "WaitFrames 24", "StopAudio 55"], "Cell powers up, then speaks")
+script(["CoopCall 37, 1, 30, 0", "CoopCall 37, 7, 28, 1"], "Cell powers up (the helpers' charge), then speaks")
 stock_at(A3, "m325_r10_defeat", 30, "\"You wretched child!!!  NOW TASTE MY TRUE POWER!!!!!!\"")
 script(["SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 3", "CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
 duo_only(["SpawnCharacterEntity 72, 648, 330", f"WalkToPosition 72, {GX + 40}, {GY - 26}", "ScreenShake 0, 6, 14", "SetEntityAnimation 72, 2",

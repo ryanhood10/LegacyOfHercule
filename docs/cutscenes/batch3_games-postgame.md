@@ -347,6 +347,9 @@ a step that is moved or removed breaks an insertion further down, so change one 
   life!..." through the transformation and "AHHH". `FindCharacterEntity 0 / 1` and `FindEntityByType 0 / 1` are how the map shows and removes
   the head (by the rocks / beside Gohan): its spot (616, 384) is the map's and was kept. A dust ring needs about 22 px of radius to read as one.
   Filmed alone and with two players (`C:/Users/ryan/AppData/Local/Temp/claude/.../scratchpad/cs3/`); `cell_staging.txt` passes through it.
+  **With the helpers (after the merge of `nb-cine`):** Cell is on the head in an afterimage dash (`CoopCall 37` op 3 on sprite 30, the map's enemy
+  record standing as a scene body: it works) before his blow, and his power-up before "NOW TASTE MY TRUE POWER!!!!!!" is the helpers' charge (op 7,
+  level 1). Gohan's own change stays hand-built: his stock power-up pose and the white are the scene's, and a charge's burst would be a second flash.
 - **Draft lines:** none.
 - **Risks:** (a) Gohan may be Super Saiyan 1 (row 5, sprite 59) when this scene makes him player 1 again, if the player
   transformed in fight 3: the hair would go gold to gold. Put him on his base row before the fade lifts (the ring scene's
