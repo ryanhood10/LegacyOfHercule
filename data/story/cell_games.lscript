@@ -755,7 +755,7 @@ sequence cg_head_scene
         SpawnDustCloud 0, 564, 382
         SpawnDustCloud 0, 588, 382
   stockseq @083ea400 23 25    ; "You loved life!...  I just let you die!", "I won't watch this ANYMORE!!!!!!"
-  script                                 ; stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)
+  script                                 ; stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)
         PlayMusic 20
         PlayAudio 55
         SetEntityAnimationNoWait 0, 9
@@ -765,6 +765,8 @@ sequence cg_head_scene
         SpawnDustCloud 0, 576, 358
         SpawnDustCloud 0, 576, 398
         WaitFrames 40
+  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!", moved here from after the transformation
+  script                                 ; stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still
         WhiteFlash 6
         SetEntityAnimationNoWait 0, 9
         ScreenShake 0, 10, 40
@@ -801,7 +803,6 @@ sequence cg_head_scene
         WhiteFlash 3
         WaitFrames 19
         WaitFrames 30
-  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!"
   script                                 ; stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box
         PlayAudio 27
         PanCameraToPosition 456, 336, 2
@@ -826,7 +827,7 @@ sequence cg_head_scene
         SetEntityFacing 72, 2
         END
       HS9:
-        PushByte 38
+        PushByte 39
         END
   text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   fmt 0 "%s"
