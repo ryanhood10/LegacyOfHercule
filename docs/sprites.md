@@ -637,6 +637,15 @@ the orbs and both portraits).
 | boots | silver and gem pixels below the trousers' centroid; red below them (soles) | black boots |
 | light, sparks, fire, mouth | anything else (and in the death frames, yellow patches above the belt: light bursting out) | nearest LoG2 colour; Broly's brown swing arcs (210 / 211) light grey |
 
+**The art pass (2026-11-06, `docs/art-audit.md`):** two leftovers of Broly's colours showed in 43 frames. In the side
+views the sash's knot sits at the hip 8 rows above the middle of its tails (the largest red piece, which sets the belt
+line), outside the 6 rows the rule allowed: a bright red patch on a body with no red; a red piece up to 12 rows above
+the line is the sash too, unless it lies within 8 px of his hair (in a crouch his open mouth is that near the sash) or
+the frame is a death frame. And a gold arm cuff of 30 or more pixels on a forearm hanging by the hip was taken for
+trousers (red-brown stripes on the walking arm, the punch, the ki pose): the trousers are now the largest warm piece
+below the skin's centroid, any piece at least half its size and any no higher than two rows above its middle; a
+smaller piece hanging above it is a cuff (blue skin).
+
 **Groups.** Hercule's 21-group template layout (as `buu2log2`'s Broly 159), so the melee boss AI set 21
 finds idle 0, walk 1, hit-stun 2, charge 5 and attacks 6-8, plus the poses `src/coop/super13.c` plays itself
 (`S13_G_*` in `super13.h`); 27 groups:
