@@ -292,7 +292,8 @@ sequence summit_scene
         WhiteFadeOut 60
         PlayMusic 30                     ; a boss track (Broly's fight's), on through the talk into the fight
         ScreenShake 0, 30, 90
-        WaitFrames 40
+        CoopCall 37, 1, 180, -3          ; as the white lifts he is drawing it all in (the helpers' charge: his crouching power-up), and bursts upright
+        CoopCall 37, 7, 40, 2
   text 122 "SUPER 13: Now...  I am complete!"
   script                                 ; Tien and Yamcha's blasts do nothing; his one blast throws them to the rim
         ; proof, between story actors only: Tien and Yamcha fire everything (a volley each, the helpers'); he has not moved; his one big blast

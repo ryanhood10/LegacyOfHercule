@@ -848,7 +848,8 @@ Stock, about 50 s (filmed). **Leave.**
   over 17 in a dash (op 4 + 16) for the absorption; 18's volley of five is op 8 kind 1 and he is at her side in a dash; the three surges are
   charges of level 0, 1, 2 (30, 36, 46 frames) with the snow rings; Tien and Yamcha fire a volley of four each at Super 13 and his answer is a big
   blast that throws Tien (op 8, 3 + 32), both then glide to the rim and lie. All on sprites 165, 9, 11, 121, 156 and 180 as an actor: no op
-  misbehaved. About 50 s to control.
+  misbehaved. About 50 s to control. **Beat 8 (the reveal):** as the white lifts Super 13 is in the helpers' charge (op 7, level 2, 40 frames: his
+  power-up pose from his own record, the flicker, the growing shake) and bursts upright before "Now...  I am complete!".
 - **Draft lines:** none.
 - **Time:** about +12 s on 35. **This scene replays in full after every loss and every reload at the ridge pad** (Ryan
   kept that, 4i). Build with it a short form for a retry in the same session (a RAM bit, not a flag: he stands
