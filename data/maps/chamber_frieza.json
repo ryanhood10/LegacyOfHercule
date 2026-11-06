@@ -1,5 +1,5 @@
 {
- "_": "A Time Chamber room (docs/time-chamber.md 12): Frieza's ship, Buu's Fury's crystal room inside Babidi's ship (zone 8 area 19, variation 0x0822EAA0 there) imported whole, its right opening closed, its top doorway closed until the lever is thrown (then the throne room, 15/29), the bottom corridor the door; a purple plaque (8/37's) on the back wall left of the top doorway (BG1, empty there). Frieza (Mecha Frieza at 40 %), with two players King Cold: they come down the sides of the crystal. Without roms/buu.gba chamber_frieza_plain.json stands here.",
+ "_": "A Time Chamber room (docs/time-chamber.md 12, 13.6): Frieza's ship, entered into his throne room: Buu's Fury's 8/27 inside Babidi's ship (the pillars, the round pad, the dome at the back: his hover pod) whole, its bottom wall cleared and 8/19's corridor stamped there (the door from the open area), 8/19's top doorway stamped into the back wall right of the pod (the way on to the crystal room, 15/29, blocked until the lever: chamber.c ways), a purple plaque (8/37's) on the back wall left of the pod (BG1, empty there). Frieza (Mecha Frieza at 40 %), with two players King Cold, at the far end by the pod. Without roms/buu.gba chamber_frieza_plain.json stands here (one room, no doorway).",
  "name": "chamber_frieza",
  "zone": 15,
  "area": 21,
@@ -11,7 +11,7 @@
  ],
  "priorities": [
   2,
-  2,
+  3,
   3,
   3
  ],
@@ -25,7 +25,7 @@
    "src": {
     "map": {
      "rom": "buu",
-     "variation": "0x0822EAA0"
+     "variation": "0x0822BB50"
     },
     "rect": [
      0,
@@ -46,6 +46,110 @@
     2,
     3
    ]
+  },
+  {
+   "op": "clear",
+   "bg": 0,
+   "rect": [
+    22,
+    38,
+    6,
+    8
+   ]
+  },
+  {
+   "op": "clear",
+   "bg": 1,
+   "rect": [
+    22,
+    38,
+    6,
+    8
+   ]
+  },
+  {
+   "op": "clear",
+   "bg": 2,
+   "rect": [
+    22,
+    38,
+    6,
+    8
+   ]
+  },
+  {
+   "op": "clear",
+   "bg": 3,
+   "rect": [
+    22,
+    38,
+    6,
+    8
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    22,
+    38
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0822EAA0"
+    },
+    "rect": [
+     22,
+     38,
+     6,
+     8
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "_": "the crystal room's bottom corridor: the door"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    30,
+    4
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0822EAA0"
+    },
+    "rect": [
+     22,
+     4,
+     6,
+     9
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "_": "the crystal room's top doorway: the way on (15/29)"
   },
   {
    "op": "stamp",
@@ -79,22 +183,22 @@
   {
    "op": "block",
    "rect": [
-    23,
+    31,
     7,
     4,
     6
    ],
-   "_": "the top doorway"
+   "_": "the way on, until the lever"
   },
   {
    "op": "block",
    "rect": [
-    42,
-    24,
-    5,
-    4
+    10,
+    11,
+    3,
+    2
    ],
-   "_": "the right opening"
+   "_": "the plaque's foot"
   }
  ],
  "objects": {
@@ -128,8 +232,8 @@
    {
     "part": 1,
     "frame": 0,
-    "x": 160,
-    "y": 311,
+    "x": 168,
+    "y": 300,
     "shape": "64x32",
     "visible": 0
    }
@@ -139,16 +243,16 @@
   {
    "kind": "actor",
    "sprite": 48,
-   "x": 104,
-   "y": 240,
+   "x": 168,
+   "y": 132,
    "facing": 0,
    "condition": "script:ch_boss_cond"
   },
   {
    "kind": "actor",
    "sprite": 185,
-   "x": 296,
-   "y": 232,
+   "x": 248,
+   "y": 132,
    "facing": 0,
    "condition": "script:ch_partner_cond"
   }
@@ -158,9 +262,9 @@
    "type": "dialogue",
    "rect": [
     64,
-    296,
+    268,
     336,
-    316
+    288
    ],
    "payload": "seq:ch_room_intro",
    "activation": "enter",
@@ -183,7 +287,7 @@
    "type": "door",
    "rect": [
     184,
-    344,
+    330,
     216,
     368
    ],
@@ -202,9 +306,9 @@
   {
    "type": "door",
    "rect": [
-    184,
+    248,
     56,
-    216,
+    280,
     80
    ],
    "dir": "up",
@@ -215,16 +319,16 @@
    ],
    "at": [
     200,
-    300
+    330
    ],
    "facing": 1,
-   "_": "the throne room (the top doorway, blocked until the lever)"
+   "_": "the crystal room (blocked until the lever)"
   }
  ],
  "onload": "script:ch_room_onload",
  "spawn": [
   200,
-  326
+  320
  ],
  "name_id": 221,
  "music": 39,

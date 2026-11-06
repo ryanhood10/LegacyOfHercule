@@ -9,8 +9,9 @@
 #define CH_ROOMS        6
 #define CH_SPOT_STAT    155     // a spot record's stat (chamber_open.json): the current tier picks the real one
 #define CH_FLAG_RUN     510     // a run is under way: its opening scene has played (cleared when the players leave)
-#define CH_FLAG_FIND0   531     // 531-533: the side rooms' finds taken (the Saiyan ship's bedroom, its store room, Frieza's throne room)
-#define CH_FIND_AREA0   27      // zone 15 areas 27-29: those side rooms (docs/time-chamber.md 13)
+#define CH_FLAG_FIND0   531     // 531-535: the side rooms' finds taken (areas 27-31 in order: docs/time-chamber.md 13.6)
+#define CH_FIND_AREA0   27      // zone 15 areas 27-31: the Saiyan ship's bedroom, its store room, Frieza's crystal room, his control
+#define CH_FINDS        5       // room, the Saiyan ship's lounge
 
 int  chamber_lights(void);                                     // how many of the six levers are thrown
 // A spot record (enemy_spawn_hook): the real record in *out (one behaviour, at most 0x20 bytes) and the kill's EXP

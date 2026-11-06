@@ -1,0 +1,218 @@
+{
+ "_": "A Time Chamber side room (docs/time-chamber.md 13.6): the Saiyan ship's lounge, north of its round room (15/24), open once that room's lever is thrown. Composed from the round room's own neighbours in Buu's Fury: 6/7's walls and floor (BG1 and BG3, without its cold box on BG2), its left opening closed by its right rim mirrored, the round room's (6/6) bottom doorway stamped into the bottom rim (the way back down), and 6/6's round table in the middle. Explore only: two stone jars, and on the table a +3 Strength Capsule, once ever (ch_find, flag 535).",
+ "name": "chamber_saiyan_lounge",
+ "zone": 15,
+ "area": 31,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  240,
+  176
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08253DE4"
+    },
+    "rect": [
+     0,
+     0,
+     30,
+     20
+    ]
+   },
+   "layers": [
+    1,
+    3
+   ],
+   "to_layers": [
+    1,
+    3
+   ]
+  },
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    6
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08253DE4"
+    },
+    "rect": [
+     27,
+     6,
+     3,
+     12
+    ]
+   },
+   "layers": [
+    1,
+    3
+   ],
+   "to_layers": [
+    1,
+    3
+   ],
+   "flip": "h",
+   "_": "the left opening shut: the right rim mirrored"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    12,
+    17
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082546A0"
+    },
+    "rect": [
+     12,
+     26,
+     6,
+     4
+    ]
+   },
+   "layers": [
+    1,
+    3
+   ],
+   "to_layers": [
+    1,
+    3
+   ],
+   "_": "the round room's bottom doorway: the way back down"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    12,
+    9
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x082546A0"
+    },
+    "rect": [
+     15,
+     15,
+     6,
+     6
+    ]
+   },
+   "layers": [
+    2
+   ],
+   "to_layers": [
+    2
+   ],
+   "_": "the round room's table"
+  }
+ ],
+ "collision": [
+  {
+   "op": "walk",
+   "rect": [
+    13,
+    18,
+    4,
+    4
+   ],
+   "_": "the way down"
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     14,
+     2
+    ]
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 40,
+    "y": 72,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 176,
+    "y": 72,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    96,
+    112,
+    144,
+    132
+   ],
+   "payload": "seq:ch_find",
+   "activation": "facing",
+   "_": "below the table, facing it"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    104,
+    160,
+    136,
+    176
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    24,
+    1
+   ],
+   "at": [
+    120,
+    80
+   ],
+   "facing": 0
+  }
+ ],
+ "spawn": [
+  120,
+  150
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

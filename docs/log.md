@@ -6,6 +6,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 - **One death for Gero (Ryan):** the first lab cutaway is back to the stock beat (Gero wakes 17 and 18, the controller) with 13 beside him; 13's revenge moved into the stock 16 scene at the lab door, after 17's blast ("scrap heap"): `ch4_lab_door`, run by area 46's item 0 (`tools/mapedit.py` gained `"items": {"N": {"script": REF}}`). `ch4_staging.txt` door blocks, one player and two.
 
+## 2026-11-06
+
+- **The Time Chamber, Ryan's second round (`docs/time-chamber.md` 13.6; branch `nb-chamber2`):** mid-run the door home asks twice
+  ("Leave the Time Chamber?", then his "Are you sure? You will lose all progress."; the six and Popo are one run); Broly's ship's
+  top doorway leads to a lounge (15/31); Frieza's ship is entered into his throne room (the fight), the crystal room is the second
+  room and a control room lies north of it (15/29, 15/30); a find in each. Flags 534-535, areas 30-31.
+
 ## 2026-11-05
 
 - **The mother dinosaur speaks in a speaker box (branch `nb-dino-portrait`; Ryan: "she needs a real player text-box like you do for our players ... recycle the Tricertop King's image"):** portrait 173, King Triceratops' stock dialogue portrait (96) with the hide pink over the frill and orange on the face, the colours of her sprite (`tools/ppportraits.py` recipe `dino`, from the ROM at build time); her ten lines in `ch4_eggs.lscript` are `text 173 "@MOTHER DINOSAUR: ..."` boxes, the words unchanged. The caption "One baby stays behind just long enough to kick dirt at you." is gone (Ryan: "that isnt funny"); the walk-off is as it was, the second baby looking back for a 60-frame wait where the box stood, then running after them. `ch4_eggs.txt` now shoots every page of her lines and the walk-off (28 checks); full regression clean.
