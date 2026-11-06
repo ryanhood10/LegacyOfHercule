@@ -1,0 +1,159 @@
+{
+ "_": "A Time Chamber side room (docs/time-chamber.md 13.6): Frieza's crystal room, the second room of his ship (until 13.6 the fight room): Buu's Fury's 8/19 whole, its right opening shut, its bottom corridor down to the throne room's way on (15/21), its top doorway on to the control room (15/30). Explore only: two stone jars, and at the crystal's foot a +3 Power Capsule, once ever (ch_find, flag 533).",
+ "name": "chamber_frieza_crystal",
+ "zone": 15,
+ "area": 29,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  400,
+  400
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0822EAA0"
+    },
+    "rect": [
+     0,
+     0,
+     50,
+     50
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "collision": [
+  {
+   "op": "block",
+   "rect": [
+    42,
+    24,
+    5,
+    4
+   ],
+   "_": "the right opening"
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     14,
+     2
+    ]
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 72,
+    "y": 272,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 296,
+    "y": 272,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    176,
+    284,
+    224,
+    304
+   ],
+   "payload": "seq:ch_find",
+   "activation": "facing",
+   "_": "below the crystal's dais, facing it"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    184,
+    344,
+    216,
+    368
+   ],
+   "dir": "down",
+   "to": [
+    15,
+    21,
+    1
+   ],
+   "at": [
+    264,
+    112
+   ],
+   "facing": 0
+  },
+  {
+   "type": "door",
+   "rect": [
+    184,
+    56,
+    216,
+    80
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    30,
+    1
+   ],
+   "at": [
+    112,
+    196
+   ],
+   "facing": 1
+  }
+ ],
+ "spawn": [
+  200,
+  330
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

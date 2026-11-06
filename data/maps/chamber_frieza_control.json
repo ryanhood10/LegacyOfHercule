@@ -1,13 +1,13 @@
 {
- "_": "A Time Chamber side room (docs/time-chamber.md 13): Frieza's throne room, behind his ship's crystal room (15/21): Buu's Fury's 8/27 (variation 0x0822BB50 inside Babidi's ship: the pillars, the round pad, the dome at the back, Frieza's hover pod here) whole, a doorway cut into its bottom wall from 8/19's corridor (stamp), back down to the crystal room's top doorway, open once its lever is thrown. Explore only: two stone jars, and in the pod a +3 Power Capsule, once ever (ch_find, flag 533).",
- "name": "chamber_frieza_throne",
+ "_": "A Time Chamber side room (docs/time-chamber.md 13.6): Frieza's control room, north of the crystal room (15/29), no other door: Buu's Fury's 8/34 inside Babidi's ship (its bottom corridor the way back down), its right opening shut by 8/20's right wall, 8/20's console in the middle. Explore only: two stone jars, and at the console a Senzu Bean, once ever (ch_find, flag 534).",
+ "name": "chamber_frieza_control",
  "zone": 15,
- "area": 29,
+ "area": 30,
  "requires": "buu",
  "tileset": "fresh",
  "layout": [
-  400,
-  400
+  240,
+  240
  ],
  "priorities": [
   2,
@@ -25,13 +25,13 @@
    "src": {
     "map": {
      "rom": "buu",
-     "variation": "0x0822BB50"
+     "variation": "0x0822A798"
     },
     "rect": [
      0,
      0,
-     50,
-     50
+     30,
+     30
     ]
    },
    "layers": [
@@ -45,64 +45,24 @@
     1,
     2,
     3
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 0,
-   "rect": [
-    22,
-    38,
-    6,
-    8
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 1,
-   "rect": [
-    22,
-    38,
-    6,
-    8
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 2,
-   "rect": [
-    22,
-    38,
-    6,
-    8
-   ]
-  },
-  {
-   "op": "clear",
-   "bg": 3,
-   "rect": [
-    22,
-    38,
-    6,
-    8
    ]
   },
   {
    "op": "stamp",
    "at": [
-    22,
-    38
+    25,
+    8
    ],
    "src": {
     "map": {
      "rom": "buu",
-     "variation": "0x0822EAA0"
+     "variation": "0x0822E1F0"
     },
     "rect": [
-     22,
-     38,
-     6,
-     8
+     25,
+     8,
+     5,
+     14
     ]
    },
    "layers": [
@@ -117,7 +77,39 @@
     2,
     3
    ],
-   "_": "the crystal room's bottom corridor: the doorway down"
+   "_": "the right opening shut: 8/20's right wall"
+  },
+  {
+   "op": "stamp",
+   "at": [
+    11,
+    12
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x0822E1F0"
+    },
+    "rect": [
+     11,
+     12,
+     6,
+     7
+    ]
+   },
+   "layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "_": "the console"
   }
  ],
  "objects": {
@@ -133,8 +125,8 @@
    {
     "part": 0,
     "frame": 0,
-    "x": 72,
-    "y": 272,
+    "x": 40,
+    "y": 168,
     "shape": "32x32",
     "hits": 3,
     "drop": "script:ch_jar_drop"
@@ -142,8 +134,8 @@
    {
     "part": 0,
     "frame": 0,
-    "x": 296,
-    "y": 272,
+    "x": 168,
+    "y": 168,
     "shape": "32x32",
     "hits": 3,
     "drop": "script:ch_jar_drop"
@@ -154,29 +146,29 @@
   {
    "type": "dialogue",
    "rect": [
-    176,
-    108,
-    232,
-    136
+    96,
+    150,
+    136,
+    176
    ],
    "payload": "seq:ch_find",
    "activation": "facing",
-   "_": "below the pod, facing it"
+   "_": "below the console, facing it"
   }
  ],
  "exits": [
   {
    "type": "door",
    "rect": [
-    184,
-    330,
+    96,
     216,
-    368
+    128,
+    240
    ],
    "dir": "down",
    "to": [
     15,
-    21,
+    29,
     1
    ],
    "at": [
@@ -187,8 +179,8 @@
   }
  ],
  "spawn": [
-  200,
-  300
+  112,
+  196
  ],
  "name_id": 221,
  "music": 39,

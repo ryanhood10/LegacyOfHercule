@@ -1,6 +1,6 @@
 ; The Hyperbolic Time Chamber as a game mode (docs/time-chamber.md; state of the build and how to add a room: section 12; Ryan's
 ; first play and what changed for it: section 13). Shared by the open area (data/maps/chamber_open.json), every room's map
-; (data/maps/chamber_dojo.json is the pattern) and the side rooms (chamber_saiyan_bed / _store, chamber_frieza_throne); the rows
+; (data/maps/chamber_dojo.json is the pattern) and the side rooms (chamber_saiyan_bed / _store / _lounge, chamber_frieza_crystal / _control); the rows
 ; and the rooms' lines are in src/coop/chamber.c. CoopCall 35's op numbers are chamber.c's enum.
 ; Every line here is Claude's draft (DRAFT), not dictated.
 
@@ -69,7 +69,7 @@ end
 
 ; ---- the open area's scenes (docs/time-chamber.md 13, Ryan's first play) ---------------------------------------------
 ; One sequence for the open area's three scenes; chamber.c starts it (coop2's action object) once player 1 is free and entry 0
-; asks where: the opening of a run (1), the question at the door home (28), the training's end (36), the portal (42). The opening is skipped
+; asks where: the opening of a run (1), the questions at the door home (28), the training's end (36), the portal (42). The opening is skipped
 ; with Start or B (chamber.c sets the skip; every entry's end and every 24 frames of a pan ask CH_GOING / CH_GO): out of the
 ; rooms' views through RestoreMap (22), else to the end (26). Absolute indexes (chamber.c's E_*): keep the `[n]` checks.
 ; Lines: DRAFT, Mr. Popo's voice (portrait 82, his third-person way of talking); he is not seen here.
@@ -399,23 +399,23 @@ sequence ch_open_scenes
         WhiteFadeOut 16
         CoopCall 35, 33, 0, 0
   [27] stop 0x0
-  [28] script                            ; the door home: the players face it; -> 29 lights out, 31 none, 34 the training is done
+  [28] script                            ; the door home: the players face it; -> 29 the question, 34 out at once (the training done)
         CoopCall 35, 34, 0, 0
         WaitFrames 12
         CoopCall 35, 35, 0, 0
         END
   [29] script
         CoopCall 18, 1, 0, 0
-  [30] text 0 "@^Are you sure you want to leave?\x0aYou'll lose all progress.\x0a(A: Yes  B: No)" -> 33
-  [31] script
+  [30] text 0 "@^Leave the Time Chamber?\x0a(A: Yes  B: No)" -> 33
+  [31] script                            ; mid-run, after a yes: Ryan's own question (a held A from the first does not answer it)
         CoopCall 18, 1, 0, 0
-  [32] text 0 "@^Leave the Time Chamber?\x0a(A: Yes  B: No)" -> 33
-  [33] script                            ; yes: out; no: a step back from the door
+  [32] text 0 "@^Are you sure?\x0aYou will lose all progress.\x0a(A: Yes  B: No)" -> 33
+  [33] script                            ; yes: the second question (mid-run) or out; no: a step back from the door
         CoopCall 18, 0, 0, 0
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 34
+        CoopCall 35, 35, 1, 0
         END
       L1:
         BeginCommandBatch
@@ -719,28 +719,41 @@ end
 
 ; ---- the side rooms (Broly's ship: the bedroom 15/27, the store room 15/28; Frieza's throne room 15/29) -------------------
 ; Explore only: two jars, and one thing to find (A facing it, either player); the find is taken once ever (flags 531-533).
-; Entries: 1 + 2n room n's find, 2 + 2n its look once taken (chamber.c CH_FIND); the find's item and its box follow it
+; Entries: 1 + 2n room n's find (areas 27-31 in order), 2 + 2n its look once taken (chamber.c CH_FIND); a find's text leads to
+; 11 + 2n, the item (flag 531 + n), and 12 + 2n, its box
 sequence ch_find
   [0] script
         CoopCall 35, 51, 0, 0
         END
-  [1] text 0 "@^A bed, neatly made. Something is under the pillow..." -> 7
-  [2] text 0 "@^A bed, neatly made. Nothing else here." -> 13
-  [3] text 0 "@^The cold box is stocked with rations...\x0band something green at the back." -> 9
-  [4] text 0 "@^Rations, and nothing else." -> 13
-  [5] text 0 "@^Frieza's hover pod. Something is wedged in the seat..." -> 11
-  [6] text 0 "@^Frieza's hover pod. It hums quietly." -> 13
-  [7] script                             ; the find is taken (flag 531 + n): the item
-        CoopCall 35, 52, 0, 0
-        Step PickUpItem
-  [8] text 0 "@^You received a +3 Endurance Capsule!" -> 13
-  [9] script
-        CoopCall 35, 52, 0, 0
-        Step PickUpItem
-  [10] text 0 "@^You received a Senzu Bean!" -> 13
+  [1] text 0 "@^A bed, neatly made. Something is under the pillow..." -> 11
+  [2] text 0 "@^A bed, neatly made. Nothing else here." -> 21
+  [3] text 0 "@^The cold box is stocked with rations...\x0band something green at the back." -> 13
+  [4] text 0 "@^Rations, and nothing else." -> 21
+  [5] text 0 "@^The crystal hums. Something glints at its foot..." -> 15
+  [6] text 0 "@^The crystal hums quietly." -> 21
+  [7] text 0 "@^The ship's controls. A pouch is wedged under the panel..." -> 17
+  [8] text 0 "@^The ship's controls blink. Nothing else here." -> 21
+  [9] text 0 "@^Bowls and cups on the table, and a capsule among them..." -> 19
+  [10] text 0 "@^The table is bare now." -> 21
   [11] script
         CoopCall 35, 52, 0, 0
         Step PickUpItem
-  [12] text 0 "@^You received a +3 Power Capsule!" -> 13
-  [13] stop 0x0
+  [12] text 0 "@^You received a +3 Endurance Capsule!" -> 21
+  [13] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [14] text 0 "@^You received a Senzu Bean!" -> 21
+  [15] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [16] text 0 "@^You received a +3 Power Capsule!" -> 21
+  [17] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [18] text 0 "@^You received a Senzu Bean!" -> 21
+  [19] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [20] text 0 "@^You received a +3 Strength Capsule!" -> 21
+  [21] stop 0x0
 end

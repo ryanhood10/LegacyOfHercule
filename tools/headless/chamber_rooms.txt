@@ -1117,7 +1117,7 @@ echo EXPECT \w+: 00000001
 peek D+0x10 1
 echo the side rooms' doorways are shut before the lever
 deref P1 0x03001FA8
-poke32 P1+0x158 0xc800
+poke32 P1+0x158 0x10800
 poke32 P1+0x15C 0x7000
 keys 0x40
 frames 40
@@ -1191,12 +1191,12 @@ peek B0+0x188 1
 echo the seal holds: a player stops before the door
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14a00
+poke32 P1+0x15C 0x12800
 keys 0x80
 frames 30
 keys 0
 frames 4
-echo EXPECT map zone 15 area 21 var 1 player \d+,3[0-3]\d
+echo EXPECT map zone 15 area 21 var 1 player \d+,(29\d|3[01]\d)
 map
 poke16 0x203f00c 999
 poke16 0x203f00e 999
@@ -1399,7 +1399,7 @@ echo EXPECT \w+: 00000000
 peek D+0x10 1
 echo the side room 15/29: open now; its find (flag 533)
 deref P1 0x03001FA8
-poke32 P1+0x158 0xc800
+poke32 P1+0x158 0x10800
 poke32 P1+0x15C 0x7000
 frames 4
 keys 0x40
@@ -1408,11 +1408,11 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 29 
 map
-shot frieza_one_ss_side0
+shot frieza_one_ss_0_side
 poke8 0x203f185 0
 deref P1 0x03001FA8
-poke32 P1+0x158 0xcc00
-poke32 P1+0x15C 0x8000
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0x12c00
 frames 4
 keys 0x40
 frames 4
@@ -1422,7 +1422,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot frieza_one_ss_find0
+shot frieza_one_ss_0_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (20|21|22|23|24|25|26|27|28|29|2a|2b|2c|2d|2e|2f|30|31|32|33|34|35|36|37|38|39|3a|3b|3c|3d|3e|3f|60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|a0|a1|a2|a3|a4|a5|a6|a7|a8|a9|aa|ab|ac|ad|ae|af|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -1436,15 +1436,64 @@ stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: 01$
 peek8 0x203f185 1
+echo the side room 15/30: open now; its find (flag 534)
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14000
+poke32 P1+0x15C 0x7000
+frames 4
+keys 0x40
+waitmap 15 30 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 30 
+map
+shot frieza_one_ss_0n_side
+poke8 0x203f17f 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7400
+poke32 P1+0x15C 0xac00
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 40
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+shot frieza_one_ss_0n_find
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: (40|41|42|43|44|45|46|47|48|49|4a|4b|4c|4d|4e|4f|50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f|60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|c0|c1|c2|c3|c4|c5|c6|c7|c8|c9|ca|cb|cc|cd|ce|cf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 01$
+peek8 0x203f17f 1
+echo twice: the look, nothing more
+key 1 6
+frames 40
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: 01$
+peek8 0x203f17f 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7000
+poke32 P1+0x15C 0xd400
+frames 4
+keys 0x80
+waitmap 15 29 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 29 var 1 player \d+,1[0-2]\d
+map
+deref P1 0x03001FA8
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0x14a00
 frames 4
 keys 0x80
 waitmap 15 21 200
 keys 0
 frames 60
-echo EXPECT map zone 15 area 21 var 1 player \d+,1[0-3]\d
+echo EXPECT map zone 15 area 21 var 1 player 2[4-8]\d,1[0-2]\d
 map
 deref D 0x300112c
 echo EXPECT \w+: 00000000
@@ -1455,7 +1504,7 @@ peek8 0x203f014 1
 echo out of the door to the open area, below this room's entrance
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14a00
+poke32 P1+0x15C 0x12800
 frames 2
 keys 0x80
 waitmap 15 18 200
@@ -1627,7 +1676,7 @@ echo EXPECT \w+: 00000001
 peek D+0x10 1
 echo the side rooms' doorways are shut before the lever
 deref P1 0x03001FA8
-poke32 P1+0x158 0xc800
+poke32 P1+0x158 0x10800
 poke32 P1+0x15C 0x7000
 keys 0x40
 frames 40
@@ -1707,12 +1756,12 @@ peek B1+0x188 1
 echo the seal holds: a player stops before the door
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14a00
+poke32 P1+0x15C 0x12800
 keys 0x80
 frames 30
 keys 0
 frames 4
-echo EXPECT map zone 15 area 21 var 1 player \d+,3[0-3]\d
+echo EXPECT map zone 15 area 21 var 1 player \d+,(29\d|3[01]\d)
 map
 poke16 0x203f00c 999
 poke16 0x203f00e 999
@@ -1884,10 +1933,10 @@ echo EXPECT \w+: 00000000
 peek D+0x10 1
 echo the side room 15/29: open now; its find (flag 533)
 deref P1 0x03001FA8
-poke32 P1+0x158 0xc800
+poke32 P1+0x158 0x10800
 poke32 P1+0x15C 0x7000
 deref P2 0x0203FF08
-poke32 P2+0x158 0xb800
+poke32 P2+0x158 0xf800
 poke32 P2+0x15C 0x7000
 frames 4
 keys 0x40
@@ -1896,11 +1945,11 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 29 
 map
-shot frieza_two_side0
+shot frieza_two_0_side
 poke8 0x203f185 0
 deref P1 0x03001FA8
-poke32 P1+0x158 0xcc00
-poke32 P1+0x15C 0x8000
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0x12c00
 frames 4
 keys 0x40
 frames 4
@@ -1910,7 +1959,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot frieza_two_find0
+shot frieza_two_0_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (20|21|22|23|24|25|26|27|28|29|2a|2b|2c|2d|2e|2f|30|31|32|33|34|35|36|37|38|39|3a|3b|3c|3d|3e|3f|60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|a0|a1|a2|a3|a4|a5|a6|a7|a8|a9|aa|ab|ac|ad|ae|af|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -1924,18 +1973,73 @@ stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: 01$
 peek8 0x203f185 1
+echo the side room 15/30: open now; its find (flag 534)
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14000
+poke32 P1+0x15C 0x7000
 deref P2 0x0203FF08
 poke32 P2+0x158 0xb800
-poke32 P2+0x15C 0x14000
+poke32 P2+0x15C 0x7000
+frames 4
+keys 0x40
+waitmap 15 30 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 30 
+map
+shot frieza_two_0n_side
+poke8 0x203f17f 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7400
+poke32 P1+0x15C 0xac00
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 40
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+shot frieza_two_0n_find
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: (40|41|42|43|44|45|46|47|48|49|4a|4b|4c|4d|4e|4f|50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f|60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|c0|c1|c2|c3|c4|c5|c6|c7|c8|c9|ca|cb|cc|cd|ce|cf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 01$
+peek8 0x203f17f 1
+echo twice: the look, nothing more
+key 1 6
+frames 40
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: 01$
+peek8 0x203f17f 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7000
+poke32 P1+0x15C 0xd400
+deref P2 0x0203FF08
+poke32 P2+0x158 0x6000
+poke32 P2+0x15C 0xd400
+frames 4
+keys 0x80
+waitmap 15 29 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 29 var 1 player \d+,1[0-2]\d
+map
+deref P1 0x03001FA8
+poke32 P1+0x158 0xc800
+poke32 P1+0x15C 0x14a00
+deref P2 0x0203FF08
+poke32 P2+0x158 0xb800
+poke32 P2+0x15C 0x14a00
 frames 4
 keys 0x80
 waitmap 15 21 200
 keys 0
 frames 60
-echo EXPECT map zone 15 area 21 var 1 player \d+,1[0-3]\d
+echo EXPECT map zone 15 area 21 var 1 player 2[4-8]\d,1[0-2]\d
 map
 deref D 0x300112c
 echo EXPECT \w+: 00000000
@@ -1946,10 +2050,10 @@ peek8 0x203f014 1
 echo out of the door to the open area, below this room's entrance
 deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
-poke32 P1+0x15C 0x14a00
+poke32 P1+0x15C 0x12800
 deref P2 0x0203FF08
 poke32 P2+0x158 0xb800
-poke32 P2+0x15C 0x14a00
+poke32 P2+0x15C 0x12800
 frames 2
 keys 0x80
 waitmap 15 18 200
@@ -3851,6 +3955,15 @@ keys 0
 frames 4
 echo EXPECT map zone 15 area 24 
 map
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x5000
+keys 0x40
+frames 40
+keys 0
+frames 4
+echo EXPECT map zone 15 area 24 
+map
 echo walking in: the intro
 deref P1 0x03001FA8
 poke32 P1+0x158 0x7800
@@ -4104,7 +4217,7 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 27 
 map
-shot saiyan_one_ss_side0
+shot saiyan_one_ss_0_side
 poke8 0x203f188 0
 deref P1 0x03001FA8
 poke32 P1+0x158 0x6400
@@ -4118,7 +4231,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot saiyan_one_ss_find0
+shot saiyan_one_ss_0_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (08|09|0a|0b|0c|0d|0e|0f|18|19|1a|1b|1c|1d|1e|1f|28|29|2a|2b|2c|2d|2e|2f|38|39|3a|3b|3c|3d|3e|3f|48|49|4a|4b|4c|4d|4e|4f|58|59|5a|5b|5c|5d|5e|5f|68|69|6a|6b|6c|6d|6e|6f|78|79|7a|7b|7c|7d|7e|7f|88|89|8a|8b|8c|8d|8e|8f|98|99|9a|9b|9c|9d|9e|9f|a8|a9|aa|ab|ac|ad|ae|af|b8|b9|ba|bb|bc|bd|be|bf|c8|c9|ca|cb|cc|cd|ce|cf|d8|d9|da|db|dc|dd|de|df|e8|e9|ea|eb|ec|ed|ee|ef|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -4153,7 +4266,7 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 28 
 map
-shot saiyan_one_ss_side1
+shot saiyan_one_ss_1_side
 poke8 0x203f17f 0
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8400
@@ -4167,7 +4280,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot saiyan_one_ss_find1
+shot saiyan_one_ss_1_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (10|11|12|13|14|15|16|17|18|19|1a|1b|1c|1d|1e|1f|30|31|32|33|34|35|36|37|38|39|3a|3b|3c|3d|3e|3f|50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|90|91|92|93|94|95|96|97|98|99|9a|9b|9c|9d|9e|9f|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -4190,6 +4303,55 @@ waitmap 15 24 200
 keys 0
 frames 60
 echo EXPECT map zone 15 area 24 var 1 player \d+,1[4-7]\d
+map
+echo the side room 15/31: open now; its find (flag 535)
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x5000
+frames 4
+keys 0x40
+waitmap 15 31 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 31 
+map
+shot saiyan_one_ss_2_side
+poke8 0x203f182 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x8000
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 40
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+shot saiyan_one_ss_2_find
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: (80|81|82|83|84|85|86|87|88|89|8a|8b|8c|8d|8e|8f|90|91|92|93|94|95|96|97|98|99|9a|9b|9c|9d|9e|9f|a0|a1|a2|a3|a4|a5|a6|a7|a8|a9|aa|ab|ac|ad|ae|af|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|c0|c1|c2|c3|c4|c5|c6|c7|c8|c9|ca|cb|cc|cd|ce|cf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 01$
+peek8 0x203f182 1
+echo twice: the look, nothing more
+key 1 6
+frames 40
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: 01$
+peek8 0x203f182 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x9600
+frames 4
+keys 0x80
+waitmap 15 24 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 24 var 1 player \d+,([4-9]\d|1[01]\d)
 map
 deref D 0x300112c
 echo EXPECT \w+: 00000000
@@ -4384,6 +4546,15 @@ deref P1 0x03001FA8
 poke32 P1+0x158 0xc800
 poke32 P1+0x15C 0xa000
 keys 0x10
+frames 40
+keys 0
+frames 4
+echo EXPECT map zone 15 area 24 
+map
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x5000
+keys 0x40
 frames 40
 keys 0
 frames 4
@@ -4669,7 +4840,7 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 27 
 map
-shot saiyan_two_side0
+shot saiyan_two_0_side
 poke8 0x203f188 0
 deref P1 0x03001FA8
 poke32 P1+0x158 0x6400
@@ -4683,7 +4854,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot saiyan_two_find0
+shot saiyan_two_0_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (08|09|0a|0b|0c|0d|0e|0f|18|19|1a|1b|1c|1d|1e|1f|28|29|2a|2b|2c|2d|2e|2f|38|39|3a|3b|3c|3d|3e|3f|48|49|4a|4b|4c|4d|4e|4f|58|59|5a|5b|5c|5d|5e|5f|68|69|6a|6b|6c|6d|6e|6f|78|79|7a|7b|7c|7d|7e|7f|88|89|8a|8b|8c|8d|8e|8f|98|99|9a|9b|9c|9d|9e|9f|a8|a9|aa|ab|ac|ad|ae|af|b8|b9|ba|bb|bc|bd|be|bf|c8|c9|ca|cb|cc|cd|ce|cf|d8|d9|da|db|dc|dd|de|df|e8|e9|ea|eb|ec|ed|ee|ef|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -4724,7 +4895,7 @@ keys 0
 frames 60
 echo EXPECT map zone 15 area 28 
 map
-shot saiyan_two_side1
+shot saiyan_two_1_side
 poke8 0x203f17f 0
 deref P1 0x03001FA8
 poke32 P1+0x158 0x8400
@@ -4738,7 +4909,7 @@ key 1 6
 frames 40
 echo EXPECT 03001fdc: 0000000[1-9a-f]
 peek 0x03001FDC 1
-shot saiyan_two_find1
+shot saiyan_two_1_find
 stepz 0x03001FDC 10
 frames 30
 echo EXPECT \w+: (10|11|12|13|14|15|16|17|18|19|1a|1b|1c|1d|1e|1f|30|31|32|33|34|35|36|37|38|39|3a|3b|3c|3d|3e|3f|50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e|7f|90|91|92|93|94|95|96|97|98|99|9a|9b|9c|9d|9e|9f|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
@@ -4764,6 +4935,61 @@ waitmap 15 24 200
 keys 0
 frames 60
 echo EXPECT map zone 15 area 24 var 1 player \d+,1[4-7]\d
+map
+echo the side room 15/31: open now; its find (flag 535)
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x5000
+deref P2 0x0203FF08
+poke32 P2+0x158 0x6800
+poke32 P2+0x15C 0x5000
+frames 4
+keys 0x40
+waitmap 15 31 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 31 
+map
+shot saiyan_two_2_side
+poke8 0x203f182 0
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x8000
+frames 4
+keys 0x40
+frames 4
+keys 0
+frames 2
+key 1 6
+frames 40
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+shot saiyan_two_2_find
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: (80|81|82|83|84|85|86|87|88|89|8a|8b|8c|8d|8e|8f|90|91|92|93|94|95|96|97|98|99|9a|9b|9c|9d|9e|9f|a0|a1|a2|a3|a4|a5|a6|a7|a8|a9|aa|ab|ac|ad|ae|af|b0|b1|b2|b3|b4|b5|b6|b7|b8|b9|ba|bb|bc|bd|be|bf|c0|c1|c2|c3|c4|c5|c6|c7|c8|c9|ca|cb|cc|cd|ce|cf|d0|d1|d2|d3|d4|d5|d6|d7|d8|d9|da|db|dc|dd|de|df|e0|e1|e2|e3|e4|e5|e6|e7|e8|e9|ea|eb|ec|ed|ee|ef|f0|f1|f2|f3|f4|f5|f6|f7|f8|f9|fa|fb|fc|fd|fe|ff)$
+peek8 FLAGS+0x42 1
+echo EXPECT \w+: 01$
+peek8 0x203f182 1
+echo twice: the look, nothing more
+key 1 6
+frames 40
+stepz 0x03001FDC 10
+frames 30
+echo EXPECT \w+: 01$
+peek8 0x203f182 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0x7800
+poke32 P1+0x15C 0x9600
+deref P2 0x0203FF08
+poke32 P2+0x158 0x6800
+poke32 P2+0x15C 0x9600
+frames 4
+keys 0x80
+waitmap 15 24 200
+keys 0
+frames 60
+echo EXPECT map zone 15 area 24 var 1 player \d+,([4-9]\d|1[01]\d)
 map
 deref D 0x300112c
 echo EXPECT \w+: 00000000

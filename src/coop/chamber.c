@@ -105,7 +105,7 @@ typedef struct ChRoom {
     // (docs/time-chamber.md 13, Ryan's first play)
     s16 stand[2][2];            // where the lead and the partner stand at the far end (the map's actor records): the opening
     s16 shot[2][2];             // the opening's two views of the room (top-left): from the lit plaque to the boss
-    s16 ways[2][4];             // side rooms' doorways, blocked until the lever is thrown (x1, y1, x2, y2; 0 = none)
+    s16 ways[3][4];             // side rooms' doorways, blocked until the lever is thrown (x1, y1, x2, y2; 0 = none)
 } ChRoom;
 #define RF_CREW 0x01            // a crew of regular enemies first (the airship's Warlord's Henchmen), then the lead
 #define RF_RAGE 0x02            // the partner falling first enrages the lead (the Broly chapter's rule: full HP, a power-up)
@@ -255,18 +255,20 @@ static const ChRoom rooms[] = {
         .plain = &pirate_plain,
         .stand = { { 80, 136 }, { 80, 136 } }, .shot = { { 0, 0 }, { 0, 60 } },
     },
-    {   // Frieza's ship (data/maps/chamber_frieza.json, Buu's Fury's 8/19, the crystal room): Frieza alone turns Mecha at 40 %
-        // (his kit); with two players Frieza and King Cold come round the crystal
+    {   // Frieza's ship (data/maps/chamber_frieza.json): entered into his throne room (Buu's Fury's 8/27: the pillars, the pad, his
+        // hover pod; Ryan's second round, docs/time-chamber.md 13.6): Frieza alone turns Mecha at 40 % (his kit); with two players
+        // Frieza and King Cold come down from beside the pod. The doorway right of the pod leads on to the crystal room (15/29)
+        // and from there to the control room (15/30)
         .area = 21, .light = 2, .look = LOOK_UP,
         .alone = { TF_FRIEZA, 360, 100, FRIEZA_WON },
         .pair = { { TF_FRIEZA, 360, PAIR_HP, FRIEZA_WON }, { TF_KING_COLD, 340, PAIR_HP, 0 } },
-        .mark = { { 104, 296 }, { 296, 296 } },
-        .seal = { 184, 336, 216, 344 },
-        .line = 320,
+        .mark = { { 176, 200 }, { 232, 200 } },
+        .seal = { 184, 312, 216, 320 },
+        .line = 300,
         .open = FRIEZA_OPEN, .open_by = frieza_by, .partner_line = COLD_LINE,
         .plain = &frieza_plain,
-        .stand = { { 104, 240 }, { 296, 232 } }, .shot = { { 0, 16 }, { 80, 150 } },
-        .ways = { { 184, 56, 216, 104 } },          // the top doorway: the throne room (15/29)
+        .stand = { { 168, 132 }, { 248, 132 } }, .shot = { { 24, 8 }, { 88, 72 } },
+        .ways = { { 248, 56, 280, 104 } },          // the doorway right of the pod: the crystal room (15/29)
     },
     {   // the Namek ship (data/maps/chamber_namek.json, Capsule Ship 3 in green): Buu-saga Piccolo, the Namekian Warrior
         .area = 22, .light = 3, CAPSULE_PLACE,
@@ -296,7 +298,8 @@ static const ChRoom rooms[] = {
         .open = BROLY_OPEN, .open_by = broly_by, .partner_line = PARAGUS_LINE, .rage_line = BROLY_RAGE,
         .plain = &saiyan_plain,
         .stand = { { 56, 136 }, { 200, 150 } }, .shot = { { 0, 0 }, { 0, 60 } },
-        .ways = { { 0, 136, 32, 184 }, { 208, 136, 240, 184 } },   // the side openings: the bedroom (15/27), the store room (15/28)
+        .ways = { { 0, 136, 32, 184 }, { 208, 136, 240, 184 },     // the side openings: the bedroom (15/27), the store room (15/28)
+                  { 104, 24, 136, 72 } },                          // the top doorway: the lounge (15/31)
     },
 };
 #define ROOM_COUNT (int)(sizeof rooms / sizeof rooms[0])
@@ -355,6 +358,7 @@ enum { SC_NONE, SC_OPENING, SC_EXIT, SC_DONE, SC_PORTAL };   // the open area's 
 #define B_DONE_SEEN 0x02   // "Training complete!" shown this visit
 #define B_PORTAL    0x04   // the portal is open (its two frames shown in turn)
 #define B_PHASE     0x08
+#define B_ASKED     0x10   // the door's second question was asked this time
 static ChState ch __attribute__((section(".combo.ch")));
 
 static void state_check(void) {
@@ -897,8 +901,8 @@ _Static_assert(CH_FIGHT == 13 && CH_OPEN == 20 && CH_STEP_Y == 22 && CH_OPEN_LOA
 // ch_open_scenes' entries (data/story/chamber.lscript; keep the `[n]` checks there)
 #define E_OPENING      1
 #define E_EXIT         28
-#define E_EXIT_LOSE    29
-#define E_EXIT_PLAIN   31
+#define E_EXIT_ASK     29            // "Leave the Time Chamber?"
+#define E_EXIT_SURE    31            // mid-run, after a yes: "Are you sure? You will lose all progress." (Ryan's words)
 #define E_EXIT_NOW     34
 #define E_DONE         36
 #define E_PORTAL       42
@@ -954,7 +958,7 @@ static void stand_actor(int sprite, s32 x, s32 y) {
 }
 
 static void ways(const ChRoom *r, int open) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         const s16 *w = r->ways[i];
         if (!w[2]) continue;
         step4(open ? STEP_WALK_RECT : STEP_BLOCK_RECT, w[0], w[1], w[2], w[3]);
@@ -964,7 +968,7 @@ static void ways(const ChRoom *r, int open) {
 static int find_room(void) {
     const u8 *m = map_here();
     int n = m && m[0] == CH_ZONE ? m[1] - CH_FIND_AREA0 : -1;
-    return n >= 0 && n < 3 ? n : -1;
+    return n >= 0 && n < CH_FINDS ? n : -1;
 }
 
 static void reset_run(void) {
@@ -1124,7 +1128,12 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
         if (p2) p2->facing = LOOK_UP;
         return 0;
     }
-    case CH_EXIT_ROUTE: *push = training_done() ? E_EXIT_NOW : chamber_lights() ? E_EXIT_LOSE : E_EXIT_PLAIN; return 1;
+    case CH_EXIT_ROUTE:     // a = 0: the door's first route; a = 1: after a yes. Mid-run (a light out, Popo not beaten) it asks twice
+        if (training_done()) *push = E_EXIT_NOW;
+        else if (!a) { ch.bits &= (u8)~B_ASKED; *push = E_EXIT_ASK; }
+        else if (chamber_lights() && !(ch.bits & B_ASKED)) { ch.bits |= B_ASKED; *push = E_EXIT_SURE; }
+        else *push = E_EXIT_NOW;
+        return 1;
     case CH_STEP_BACK: {
         Entity *p1 = g_PlayerObject, *p2 = p2_here();
         if (p1) walk_to(p1, p1->x >> 8, (p1->y >> 8) + 24);
@@ -1175,7 +1184,8 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
         return 1;
     }
     case CH_FIND_ITEM: {
-        static const u8 item[3] = { ITEM_END3, ITEM_SENZU, ITEM_PWR3 };   // the bed, the cold box, Frieza's pod
+        // the bed, the cold box, the crystal's foot, the control console, the lounge's table (areas 27-31, flags 531-535)
+        static const u8 item[CH_FINDS] = { ITEM_END3, ITEM_SENZU, ITEM_PWR3, ITEM_SENZU, ITEM_STR3 };
         int n = find_room();
         if (n < 0) { *push = ITEM_SENZU; return 1; }
         flag_set_hook(g_Party, CH_FLAG_FIND0 + n);

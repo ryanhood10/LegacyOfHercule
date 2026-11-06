@@ -192,10 +192,10 @@ def gate():
     s.out("frames 30", "key 1 6", "frames 60", "shot g_nopad")
     s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
 
-    s.echo("--- the door home asks first (Ryan: a player may leave mid-run by accident)")
+    s.echo("--- the door home asks first (Ryan: a player may leave mid-run by accident); mid-run it asks twice")
     s.out("flags +514 +520")
     door_ask(s, "g_ask_lose", "29")
-    s.echo("B (once its text is out): no; a step back from the door, still inside, the lights kept (0 and 2 out, the run's 510)")
+    s.echo("B on the first (once its text is out): no; a step back from the door, still inside, the lights kept (0 and 2 out, the run's 510)")
     s.out("frames 120", "key 2 6", "frames 90", "shot g_no")
     s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
     s.expect(r"map zone 15 area 18 var 1 player \d+,12[5-9]\d", "map")
@@ -206,7 +206,20 @@ def gate():
     s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
     s.expect(r"map zone 15 area 18 ", "map")
     s.out("keys 0", "frames 20")
-    s.echo("A now: yes; the run's progress reset (the six lights on, flag 510 clear), the first win and the time round kept, the Lookout")
+    s.echo("A now: yes to the first; mid-run the second comes, 'Are you sure? You will lose all progress.'; the A still held does not answer it")
+    s.out("keys 1", "frames 160", "shot g_sure")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+    s.expect(r"map zone 15 area 18 ", "map")
+    s.chs(r"[0-9a-f]{4}1[0-9a-f]42")                # the second asked (bit 0x10), the door's scene running
+    s.echo("B on the second: no; still inside, the lights kept")
+    s.out("keys 0", "frames 10", "key 2 6", "frames 90", "shot g_no2")
+    s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
+    s.expect(r"map zone 15 area 18 var 1 player \d+,12[5-9]\d", "map")
+    s.expect(r"\w+: 45$", "peek8 FLAGS+0x3F 1")
+    s.echo("both yes: the run's progress reset (the six lights on, flag 510 clear), the first win and the time round kept, the Lookout")
+    door_ask(s, "g_ask_lose2", "29")
+    s.out("frames 120", "key 1 6", "frames 160", "shot g_sure2")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
     s.out("key 1 6", "waitmap 9 3 400", "frames 120", "shot g_left")
     s.expect(r"map zone 9 area 3 var 1 player 9\d,1[67]\d", "map")
     s.echo("flags 504-510 clear (the lights; the run: the next way in is a new run, its opening in chamber_run.txt)")
@@ -215,14 +228,17 @@ def gate():
     s.expect(f"\\w+: {flag_on(520)}", "peek8 FLAGS+0x41 1")
 
     s.out("frames 200")
-    s.echo("--- no lights out: the plain question, B, still inside")
+    s.echo("--- nothing done yet (no light out): one question; B stays, A leaves at once")
     s.lights(0)
     s.warp(OPEN, 1016, 1272)
     s.quiet()
-    door_ask(s, "g_ask_plain", "31")
+    door_ask(s, "g_ask_plain", "29")
     s.out("frames 120", "key 2 6", "frames 90")
     s.expect(f"{SCENE[2:].lower()}: 00000000", f"peek {SCENE} 1")
     s.expect(r"map zone 15 area 18 ", "map")
+    door_ask(s, "g_ask_plain2", "29")
+    s.out("frames 120", "key 1 6", "waitmap 9 3 400", "frames 60")
+    s.expect(r"map zone 9 area 3 ", "map")
 
     s.echo("=== a new game clears flags 504-535 (party_new_game), not 496-503's neighbour 536+: set at the title after a soft reset")
     s.out("load menu.ss", "p2 off", "maptest 7", "frames 300", "key 0xF 6", "frames 400", "key 8 6", "frames 200", "key 8 6", "frames 200",
@@ -361,26 +377,32 @@ def prize(s, tag, light, first, gift):
 
 def side_rooms(s, tag, R, two):
     """after the lever the side doorways are open: into each side room, its find once (the item, its flag), the look the second
-    time, out again"""
+    time (a room beyond it too: Frieza's control room), out again"""
     for k, w in enumerate(R["ways"]):
-        n = w["area"] - 27
-        s.echo(f"the side room 15/{w['area']}: open now; its find (flag {531 + n})")
-        s.place(*w["near"], p2=two)
-        s.out("frames 4", f"keys {w['dir']:#x}", f"waitmap 15 {w['area']} 200", "keys 0", "frames 60")
-        s.expect(rf"map zone 15 area {w['area']} ", "map")
-        s.out(f"shot {tag}_side{k}", f"poke8 {w['item']:#x} 0")
-        s.place(*w["find"], p2=False)
-        s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "frames 2", "key 1 6", "frames 40")
-        s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
-        s.out(f"shot {tag}_find{k}", f"stepz {SCENE} 10", "frames 30")
-        s.expect(rf"\w+: {flag_on(531 + n)}", f"peek8 FLAGS+{(531 + n) // 8:#x} 1")
-        s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
-        s.echo("twice: the look, nothing more")
-        s.out("key 1 6", "frames 40", f"stepz {SCENE} 10", "frames 30")
-        s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
-        s.place(*w["near_out"], p2=two)
-        s.out("frames 4", f"keys {w['out']:#x}", f"waitmap 15 {R['area']} 200", "keys 0", "frames 60")
-        s.expect(rf"map zone 15 area {R['area']} var 1 player {w['back']}", "map")
+        side_room(s, f"{tag}_{k}", R["area"], w, two)
+
+
+def side_room(s, tag, home, w, two):
+    n = w["area"] - 27
+    s.echo(f"the side room 15/{w['area']}: open now; its find (flag {531 + n})")
+    s.place(*w["near"], p2=two)
+    s.out("frames 4", f"keys {w['dir']:#x}", f"waitmap 15 {w['area']} 200", "keys 0", "frames 60")
+    s.expect(rf"map zone 15 area {w['area']} ", "map")
+    s.out(f"shot {tag}_side", f"poke8 {w['item']:#x} 0")
+    s.place(*w["find"], p2=False)
+    s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "frames 2", "key 1 6", "frames 40")
+    s.expect(f"{SCENE[2:].lower()}: 0000000[1-9a-f]", f"peek {SCENE} 1")
+    s.out(f"shot {tag}_find", f"stepz {SCENE} 10", "frames 30")
+    s.expect(rf"\w+: {flag_on(531 + n)}", f"peek8 FLAGS+{(531 + n) // 8:#x} 1")
+    s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
+    s.echo("twice: the look, nothing more")
+    s.out("key 1 6", "frames 40", f"stepz {SCENE} 10", "frames 30")
+    s.expect(r"\w+: 01$", f"peek8 {w['item']:#x} 1")
+    if "next" in w:
+        side_room(s, tag + "n", w["area"], w["next"], two)
+    s.place(*w["near_out"], p2=two)
+    s.out("frames 4", f"keys {w['out']:#x}", f"waitmap 15 {home} 200", "keys 0", "frames 60")
+    s.expect(rf"map zone 15 area {home} var 1 player {w['back']}", "map")
 
 
 # ---- chamber_room ---------------------------------------------------------------------------------------------------
@@ -557,10 +579,13 @@ ROOMS = {
                    rate=(360, 360, None, 180), intro=(360, 128), walk=LEFT, plaque=(44, 92), seal=(340, 128), out=RIGHT,
                    seal_re=r"3[0-5]\d,1[0-4]\d"),
     "frieza": dict(area=21, light=2, door=(1616, 560), entrance=(1616, 520),
-                   ways=[dict(near=(200, 112), dir=0x40, area=29, find=(204, 128), item=PWR3, near_out=(200, 320), out=0x80,
-                              back=r"\d+,1[0-3]\d")], back=r"16\d\d,5\d\d", lead=48, partner=185,
-                   rate=(360, 360, 340, 70), intro=(200, 326), walk=UP, plaque=(92, 124), seal=(200, 330), out=DOWN,
-                   seal_re=r"\d+,3[0-3]\d"),
+                   ways=[dict(near=(264, 112), dir=0x40, area=29, find=(200, 300), item=PWR3, near_out=(200, 330), out=0x80,
+                              back=r"2[4-8]\d,1[0-2]\d",
+                              next=dict(near=(200, 112), dir=0x40, area=30, find=(116, 172), item=SENZU, near_out=(112, 212),
+                                        out=0x80, back=r"\d+,1[0-2]\d"))],
+                   back=r"16\d\d,5\d\d", lead=48, partner=185,
+                   rate=(360, 360, 340, 70), intro=(200, 326), walk=UP, plaque=(92, 124), seal=(200, 296), out=DOWN,
+                   seal_re=r"\d+,(29\d|3[01]\d)"),
     "namek": dict(area=22, light=3, door=(432, 560), entrance=(432, 520), back=r"4\d\d,5\d\d", lead=222, partner=166,
                   rate=(380, 370, 350, 70), **CAPSULE),
     "lab": dict(area=23, light=4, door=(432, 1744), entrance=(432, 1704), back=r"4\d\d,17\d\d", lead=11, partner=9,
@@ -570,7 +595,9 @@ ROOMS = {
                    ways=[dict(near=(40, 160), dir=0x20, area=27, find=(100, 96), item=END3, near_out=(200, 108), out=0x10,
                               back=r"\d+,1[4-7]\d"),
                          dict(near=(200, 160), dir=0x10, area=28, find=(132, 96), item=SENZU, near_out=(36, 108), out=0x20,
-                              back=r"\d+,1[4-7]\d")], back=r"2\d\d,11\d\d", lead=159, partner=170,
+                              back=r"\d+,1[4-7]\d"),
+                         dict(near=(120, 80), dir=0x40, area=31, find=(120, 128), item=STR3, near_out=(120, 150), out=0x80,
+                              back=r"\d+,([4-9]\d|1[01]\d)")], back=r"2\d\d,11\d\d", lead=159, partner=170,
                    rate=(390, 380, 330, 70), intro=(120, 212), walk=UP, plaque=(172, 126), seal=(120, 220), out=DOWN,
                    seal_re=r"\d+,2[12]\d", rage=True),
 }
