@@ -695,6 +695,20 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   restate entry 2 whole, leave 3-48 at their indexes. Tien has no group 7; Gohan's actor is 53. Player 1 Krillin
   meets his own NPC (76) in the stock ending: the duplicate rule's case, look at it in the lineup film.
 - **Size L.** The Short: from "Who's next?" to Krillin's shaking, 30 seconds, the batch's best candidate after 1.7.
+- **Built 2026-11-06 (`nb-cs1`, with Cine), about 13 seconds, silent.** As built: a 6-frame white cut puts the stage where the stock
+  ending has it (the view 152, 296; 16 by the roadside; 17 beside 18: **the fight's own twin when there is one**: the stock ending
+  spawned a second 17 beside the twin the fight left standing, now there is one). Vegeta: with two players player 2's own body (Cine's
+  body -1, in whatever form the player left him), alone his gold actor (140) down from the sky; nobody is handed to an actor, because
+  `CoopCall 31, 3` leaves player 2 without a body until control returns and the ending needs him. His charge, an exchange of 50 frames,
+  18 over him, the kick (heavy, he ends on a knee, a red flash), a second kick, he lies. Trunks and Gohan fly in; 18 is beside Trunks
+  before he moves, his swing stops on her (a flash), 17 is over him; Gohan is kicked down. Piccolo: player 1's body gets up (knee, feet)
+  or his actor arrives with Tien; 17 puts him down; Tien dashes for 17's back and 17 is beside him first. 40 frames; a second white cut
+  swaps to the stock's lying bodies (everyone falls within about 20 px of his stock spot), does the stock's flag changes and player 2's
+  rebinding, and stands player 2 by the roadside (Hercule: in view for his line; Piccolo, when player 1 is Hercule: off the stage). Not
+  built: Vegeta's blast that 18 dashes through (two Cine moves cannot overlap), the transformation (alone he arrives gold; a played
+  Vegeta keeps his form). Player 1 as Hercule or Krillin lies by the roadside where the blast left him. The stock bodies: 0 Tien
+  (208, 432), 1 Piccolo (252, 416), 2 Gohan (288, 432), 3 Vegeta (224, 400), 4 Trunks (236, 440) (`FindCharacterEntity n` shows body n,
+  `FindEntityByType n` removes it). Flags, party and player 2's slot after the scene: identical in five lineups.
 
 ### 4.7 The road's aftermath: touch up (M)
 

@@ -450,12 +450,152 @@ sequence ch4_road
   [31] stock @083d8b38                   ; the fight: 18 (and 17, her twin)
 end
 
-; 18 (or the pair) beaten: she gets up and blasts Piccolo; player 2 is Hercule again for the stock ending
+; 18 (or the pair) beaten: she gets up and blasts player 1; "Who's next?"; then the fight the stock hid in a two-second black fade (the
+; cutscene pass, 2026-11-06, docs/cutscenes/batch1_ch1-4.md 4.6): silent, about fifteen seconds. A white cut puts the stage where the
+; stock ending has it (the view at 152, 296; 18 at 224, 344; 16 by the roadside; 17 beside her: the fight's own twin when there is one,
+; so the ending no longer has two of him). Vegeta answers: player 2's body with two players (Cine's body -1), alone his actor, gold
+; (140), down from the sky. His power, an exchange with 18 that she walks through, her kick on his arm puts him on a knee, a second one
+; drops him. Trunks and Gohan fly in: Trunks' sword stops on her arm, 17 is behind him; Gohan is kicked aside. Piccolo gets up (player
+; 1's own body when he plays Piccolo, else Piccolo's actor arrives with Tien: the stock ending has him lying there in every lineup) and
+; 17 puts him down; Tien is caught from behind. A second white cut swaps the fallen for the stock's own lying bodies (they fall near
+; those spots), rebinds player 2 as the stock fade did and places him by the roadside, and the stock ending goes on: flags, party and
+; who lies where are the stock's. No line is added.
 sequence ch4_road_end
   stockseq @083d98ac 0 1                 ; 18 falls, gets up, the blast, "Nice try!  Who's next?"
-  script                                 ; stock entry 2, with player 2 back to Hercule during the fade
+  [2] script                             ; the stage, in a white cut
         PlayMusic 37
-        FadeOut 120
+        FadeToWhite 6
+        PanCameraToPosition 152, 296, 10
+        SetEntityPositionInstant 11, 278, 344
+        SetEntityFacing 11, 0
+        CoopCall 22, 2, 9, 0
+        JumpIfFalse s1
+        SetEntityPositionInstant 9, 296, 348
+        SetEntityAnimation 9, 0
+        Jump s2
+      s1:
+        SpawnCharacterEntity 9, 296, 348
+      s2:
+        SetEntityFacing 9, 2
+        SpawnCharacterEntity 8, 344, 368
+        SetEntityFacing 8, 2
+        PushActiveCharIndex                   ; player 1 lies where the blast left him: Piccolo on the spot the stock ending gives him, anyone else by the roadside
+        PushByte 1
+        CmpEq
+        JumpIfFalse s3
+        SetEntityPositionInstant 0, 252, 402
+        Jump s4
+      s3:
+        SetEntityPositionInstant 0, 176, 408
+      s4:
+        CoopCall 31, 0, 0, 0                  ; Vegeta: player 2's body below 18, or his actor above the view
+        JumpIfFalse s5
+        CoopCall 9, 1, 220, 404
+        Jump s6
+      s5:
+        SpawnCharacterEntity 140, 220, 240
+      s6:
+        WhiteFadeOut 8
+        END
+  [3] script                             ; Vegeta answers
+        CoopCall 31, 0, 0, 0
+        JumpIfFalse a0
+        Jump a1
+      a0:
+        PlayAudio 26
+        FlyToPosition 140, 220, 404
+        SetEntityFacing 140, 1
+      a1:
+        WaitFrames 12
+        PushByte 37                           ; the cast: Vegeta (player 2: -1; alone his actor: 140) on 18
+        PushByte 1
+        PushVarint 140
+        CoopCall 31, 0, 0, 0
+        PushVarint 141
+        Mul
+        Sub
+        PushByte 11
+        Step 59
+        CoopCall 37, 7, 30, 1                 ; his power
+        CoopCall 37, 6, 50, 0                 ; the exchange; they break apart
+        WaitFrames 14
+        PushByte 37                           ; 18 on Vegeta
+        PushByte 1
+        PushByte 11
+        PushVarint 140
+        CoopCall 31, 0, 0, 0
+        PushVarint 141
+        Mul
+        Sub
+        Step 59
+        CoopCall 37, 4, 3, 0                  ; she is on him, from above
+        CoopCall 37, 5, 7, 20                 ; the kick on his arm: he is on a knee
+        FlashScreenColor 11, 255, 0, 0, 8
+        WaitFrames 26
+        CoopCall 37, 5, 2, 0                  ; a second, without hurry
+        CoopCall 37, 10, 1, 2                 ; he lies
+        WaitFrames 12
+        END
+  [4] script                             ; Trunks and Gohan
+        SpawnCharacterEntity 128, 160, 480
+        SpawnCharacterEntity 53, 312, 484
+        PlayAudio 26
+        BeginCommandBatch
+        FlyToPosition 128, 240, 440
+        FlyToPosition 53, 288, 404
+        CommitCommandBatch
+        SetEntityFacing 128, 1
+        CoopCall 37, 1, 11, 128
+        CoopCall 37, 4, 2, 0                  ; 18 is beside Trunks before he has moved
+        SetEntityFacing 128, 3
+        SetEntityAnimation 128, 6             ; the sword: it stops on her arm
+        WhiteFlash 3
+        WaitFrames 12
+        CoopCall 37, 1, 9, 128
+        CoopCall 37, 4, 3, 0                  ; 17 is over him
+        CoopCall 37, 5, 1, 10
+        CoopCall 37, 1, 11, 53                ; Gohan, without a look
+        CoopCall 37, 4, 3, 0
+        CoopCall 37, 5, 3, 28
+        WaitFrames 10
+        END
+  [5] script                             ; Piccolo: player 1's own body, or his actor with Tien
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse act
+        SpawnCharacterEntity 121, 340, 484
+        PlayAudio 26
+        FlyToPosition 121, 300, 420
+        CoopCall 37, 1, 0, 9
+        CoopCall 37, 10, 0, 1                 ; he gets up: a knee, then his feet
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 1, 9, 0
+        CoopCall 37, 4, 3, 0
+        CoopCall 37, 5, 1, 14                 ; 17 puts him back down
+        Jump tien
+      act:
+        SpawnCharacterEntity 103, 320, 484
+        SpawnCharacterEntity 121, 348, 476
+        PlayAudio 26
+        BeginCommandBatch
+        FlyToPosition 103, 252, 402
+        FlyToPosition 121, 312, 420
+        CommitCommandBatch
+        CoopCall 37, 1, 9, 103
+        CoopCall 37, 4, 3, 0
+        CoopCall 37, 5, 1, 14
+      tien:
+        CoopCall 37, 1, 121, 9
+        CoopCall 37, 3, 188, 432              ; Tien goes for his back
+        CoopCall 37, 1, 9, 121
+        CoopCall 37, 4, 1, 0                  ; and 17 is already beside him
+        CoopCall 37, 5, 1, 20
+        WaitFrames 40
+        END
+  [6] script                             ; the second white cut: the stock's lying bodies, player 2 rebound (stock entry 2 from here on)
+        FadeToWhite 6
+        CoopCall 37, 0, 0, 0
         ClearCharacterFlag_Bit1 2
         SetCharacterFlag_Bit1 0
         SetCharacterFlag_Bit1 5
@@ -463,13 +603,24 @@ sequence ch4_road_end
         PushByte 5
         CmpEq
         JumpIfFalse pl2
-        CoopCall 6, 1, 0, 0                ; player 1 is Hercule: player 2 is Piccolo again
+        CoopCall 6, 1, 0, 0                   ; player 1 is Hercule: player 2 is Piccolo again, off the stage where player 1 waits
+        CoopCall 9, 1, 40, 372
         Jump pl3
       pl2:
-        CoopCall 6, 5, 0, 0
+        CoopCall 6, 5, 0, 0                   ; player 2 is Hercule again, by the roadside
+        CoopCall 9, 1, 172, 376
       pl3:
-        PanCameraToPosition 152, 296, 10
-        WaitFrames 60
+        CoopCall 22, 2, 140, 0
+        JumpIfFalse d1
+        DespawnEntity 140
+      d1:
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse d2
+        DespawnEntity 103
+      d2:
+        DespawnEntity 128
+        DespawnEntity 53
+        DespawnEntity 121
         SetEntityPositionInstant 0, 0, 0
         SetEntityAnimation 0, 0
         PushActiveCharIndex
@@ -482,9 +633,9 @@ sequence ch4_road_end
       L1:
         SetEntityPositionInstant 11, 224, 344
         SetEntityFacing 11, 0
-        SpawnCharacterEntity 8, 344, 368
         SetEntityFacing 8, 3
-        SpawnCharacterEntity 9, 256, 288
+        SetEntityPositionInstant 9, 256, 312
+        SetEntityFacing 9, 0
         SpawnCharacterEntity 76, 88, 432
         FindCharacterEntity 0
         FindCharacterEntity 1
@@ -492,7 +643,7 @@ sequence ch4_road_end
         FindCharacterEntity 3
         FindCharacterEntity 4
         SetEntityFacing 76, 3
-        FadeFromWhite 90
+        WhiteFadeOut 10
         WalkToPosition 9, 256, 336
         WaitFrames 60
         WalkToPosition 9, 208, 368
@@ -501,26 +652,26 @@ sequence ch4_road_end
         WaitFrames 60
         SetEntityAnimation 76, 4
   stockseq @083d98ac 3 11                ; 17: "We want Goku", the birds, Krillin's plea
-  [12] script                            ; Hercule backs Krillin only when someone plays him (Ryan, 2026-11-05): player 1 is off the stage here, so player 1
-        PushActiveCharIndex                   ; Hercule walks back on (next 13); player 2's Hercule says it where he stands; nobody: 15
+  [16] script                            ; Hercule backs Krillin only when someone plays him (Ryan, 2026-11-05): player 1 is off the stage here, so player 1
+        PushActiveCharIndex                   ; Hercule walks back on (next 17); player 2's Hercule says it where he stands; nobody: 19
         PushByte 5
         CmpEq
         JumpIfFalse p2
         SetEntityPositionInstant 0, 60, 372
         WalkToPosition 0, 128, 372
         SetEntityFacing 0, 3
-        PushByte 13
+        PushByte 17
         END
       p2:
         CoopCall 22, 4, 5, 0
         JumpIfFalse no
-        PushByte 13
+        PushByte 17
         END
       no:
-        PushByte 15
+        PushByte 19
         END
-  [13] text 67 "#HERCULE: Y-yeah!  What the little guy said!\x0bLeave Goku alone, or...  or you'll have to deal with me!"
-  [14] script                            ; ...and thinks better of it
+  [17] text 67 "#HERCULE: Y-yeah!  What the little guy said!\x0bLeave Goku alone, or...  or you'll have to deal with me!"
+  [18] script                            ; ...and thinks better of it
         PushActiveCharIndex
         PushByte 5
         CmpEq
@@ -528,5 +679,5 @@ sequence ch4_road_end
         WalkToPosition 0, 16, 372
       a:
         END
-  [15] stockseq @083d98ac 12 48          ; 17's game, the kiss, Vegeta storms off, Piccolo leaves alone
+  [19] stockseq @083d98ac 12 48          ; 17's game, the kiss, Vegeta storms off, Piccolo leaves alone
 end

@@ -2362,6 +2362,73 @@ stepz 0x03001FDC 80
 frames 60
 poke32 0x0203FD08 7
 frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_P_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_P_end_m1
+frames 200
+shot st_P_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_P_end_m3
+frames 200
+shot st_P_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
 key 1 6
 frames 160
 deref TBL 0x0800959C
@@ -2510,6 +2577,73 @@ stepz 0x03001FDC 80
 frames 60
 poke32 0x0203FD08 7
 frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_K_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_K_end_m1
+frames 200
+shot st_K_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_K_end_m3
+frames 200
+shot st_K_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
 key 1 6
 frames 160
 deref TBL 0x0800959C
@@ -2658,6 +2792,73 @@ stepz 0x03001FDC 80
 frames 60
 poke32 0x0203FD08 7
 frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_H_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_H_end_m1
+frames 200
+shot st_H_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_H_end_m3
+frames 200
+shot st_H_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
 key 1 6
 frames 160
 deref TBL 0x0800959C
@@ -2784,6 +2985,660 @@ deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
 shot st_H_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
+echo === PH_end
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_PH_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_PH_end_m1
+frames 200
+shot st_PH_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_PH_end_m3
+frames 200
+shot st_PH_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84 1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_PH_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
+echo === HP_end
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke8 0x0203F000 5
+poke8 0x0203FF84 1
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_HP_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_HP_end_m1
+frames 200
+shot st_HP_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_HP_end_m3
+frames 200
+shot st_HP_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+echo EXPECT 0203ff84: 01
+peek8 0x0203FF84 1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_HP_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
+echo === KH_end
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke8 0x0203F000 6
+poke8 0x0203FF84 5
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+mash 4 100
+frames 150
+deref TBL 0x0800959C
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+shot st_KH_end_m0
+frames 200
+deref TBL 0x0800959C
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R53
+shot st_KH_end_m1
+frames 200
+shot st_KH_end_m2
+frames 130
+deref TBL 0x0800959C
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+shot st_KH_end_m3
+frames 200
+shot st_KH_end_m4
+ents
+deref TBL 0x0800959C
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R8 TBL+0x4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R8
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R76
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+deref R128 TBL+0x1e4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R128
+deref R53 TBL+0xb8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R53
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84 1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_KH_end_17
 stepz 0x03001FDC 200
 frames 200
 echo EXPECT map zone 6 area 99 
