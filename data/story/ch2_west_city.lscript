@@ -48,82 +48,23 @@ end
 ; map 105 (zone 4 area 58) record 0 defeat: King Triceratops gives up, Hercule takes the credit
 sequence ch2_triceratops_end
   stockseq @083c9bf8 0 3                 ; "OK OK!  I give up!", the Triceratops of honor
-  script                                 ; whoever nobody plays comes out from where he sat the fight out (alone: Hercule; alone as Hercule: Piccolo)
-        CoopCall 22, 1, 5, 0
-        JumpIfFalse H1
-        PushByte 72
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 90
-        Add
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 60
-        Add
-        Step SpawnCharacterEntity
-        PushByte 72
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 28
-        Add
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 8
-        Add
-        Step WalkToPosition
-        SetEntityFacing 72, 2
-        SetEntityFacing 0, 3
-      H1:
-        CoopCall 22, 1, 1, 0
-        JumpIfFalse P1
-        PushByte 103
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 90
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 60
-        Add
-        Step SpawnCharacterEntity
-        PushByte 103
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 28
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 8
-        Add
-        Step WalkToPosition
-        SetEntityFacing 103, 3
-        SetEntityFacing 0, 2
-      P1:
-  text 67 "HERCULE: Ha ha ha!\x0bAnother peace treaty, brought to you by the World Martial Arts Champion!"
-  text 3 "!PICCOLO: You hid behind a rock the whole fight."
-  stockseq @083c9bf8 4                   ; flag 60, back to the farmers
+  [4] script                             ; only who is played (Ryan, 2026-11-05: a party member nobody plays is not in the scene):
+        CoopCall 22, 4, 5, 0                  ; Hercule takes the credit when someone plays him (next 5), else the stock end (8)
+        JumpIfFalse a
+        PushByte 5
+        END
+      a:
+        PushByte 8
+        END
+  [5] text 67 "HERCULE: Ha ha ha!\x0bAnother peace treaty, brought to you by the World Martial Arts Champion!"
+  [6] script                             ; Piccolo answers him when someone plays Piccolo too (next 7), else 8
+        CoopCall 22, 4, 1, 0
+        JumpIfFalse a
+        PushByte 7
+        END
+      a:
+        PushByte 8
+        END
+  [7] text 3 "!PICCOLO: You hid behind a rock the whole fight."
+  [8] stockseq @083c9bf8 4                   ; flag 60, back to the farmers
 end
