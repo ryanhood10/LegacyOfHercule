@@ -704,6 +704,16 @@ arms out (5, the charge, holds the first frame), 12 lying, 13 / 17 idle, 20 hit-
 in Hercule's. 39 frame blobs, 11.4 KB compressed (29, 7.5 KB from 93), in the second ROM blob (`.rodata.art`). Preview
 `$(BUILD)/popo_preview.png` (every group x 4 facings, the hurt box in red). His portrait is the stock 82.
 
+**The art pass (2026-11-06, `docs/art-audit.md`).** Buu's Fury's arms-out frames are a front view: from the side his three
+attacks showed a standing Popo (two pixels of arm moved). The side views of groups 6-8 are now palm strikes drawn on his
+idle frame in a 32 x 32 box (`popoart.py` `palm`): stand, strike with the stock attacks' white stroke before the hand,
+hold, stand; a bare black arm 8 px straight out from the vest's top, the gold bracelet at the wrist, the open hand
+upright (6 at chest height, 7 raised four rows to head height, 8 both hands: a three-row arm and a taller hand). Front
+and back views keep the arms-out frames. The hit-stun (2, 11) gets the stock hit-stun's white marks over the head for its
+first two frames (`sparks`): seen from the front his flinch is two rows and did not read as a hit. He still has **no
+flight pose**: his group 12 is the lying frame the fight's fall uses, so `FlyToPosition` slides him along lying down;
+walk him, or let him appear in a flash (he teleports).
+
 ## Making a new enemy model (generic)
 
 What an enemy record needs depends on the AI set its stat names, because AI modules and enemy control
