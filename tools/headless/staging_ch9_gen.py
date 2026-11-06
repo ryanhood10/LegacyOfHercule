@@ -27,6 +27,9 @@ for p1, p2, s72 in ((KRILLIN, A16, 1), (A16, KRILLIN, 1), (KRILLIN, None, 0), (A
     s.begin(f"bunker {n}", p1, p2, "+151 +155 +156 +157", GERO + [f"poke8 0x0203F000 {p1}"] + ([] if p2 is None else [f"poke8 0x0203FF84 {p2}"]))   # test command 11 makes Krillin player 1: the lineup again
     s.warp(8, 63, 216, 300, 200)
     s.actors(s76=0, s8=0)          # nobody comes in behind as an actor
+    # the bunker's androids may land a hit soon after the intro: a pick-up box can open within the check's 30 frames,
+    # earlier or later with any change to the frame's timing (docs/testing.md); step through it before the check
+    s.out("stepz 0x03001FDC 150", "frames 60")
     s.end_scene()
     s.win(240)
     s.out("mashmap 8 48 40", "frames 150")                         # through the lines to the warp outside; before the first line there (a text box on
