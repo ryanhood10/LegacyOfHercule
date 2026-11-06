@@ -797,7 +797,7 @@ finale whoever plays** (an actor unless player 1 plays a Gohan: the goodbyes are
 Hercule is mid-brag when his stomach growls; Piccolo senses the Arctic before the blast and 18 looks back once at Krillin. The summit: the players
 stand in the picture; 17 and 18 fight, 13 throws them down and absorbs them where they fall; each surge blows the snow out; Tien and Yamcha's blasts
 do nothing and his one blast lays them out at the rim for the fight; **a retry in the same session plays a short form** (he stands transformed, his
-last line, the players' lines: the full scene still plays after a reload from a save, as Ryan kept it).
+last line, the players' lines), which is 4i's own default ("in full the first time and in short after a reload at the summit save pad") as far as RAM can tell: after a loss and the reload that follows it; after the console was off, or a soft reset, the full scene plays again (Ryan kept that).
 
 **Pre-play check (Ryan, 2026-10-20):** no healing between the Cell Games fights (the arena's breakable rubble
 drops HP / EP pickups, as in the stock game); the journal lists our chapters; Super 13 gets a boss track; Broly
