@@ -5,7 +5,7 @@
     {
       "map": {"zone": 11, "area": 1},
       "_": "Kame House: the androids' arrival scene",
-      "triggers": {"3": {"payload": "seq:a16_kame_house"}}
+      "triggers": {"3": {"payload": "seq:a16_kame_house"}, "4": {"payload": "script:a16_kame_flight"}}
     },
     {
       "map": {"zone": 11, "area": 4},

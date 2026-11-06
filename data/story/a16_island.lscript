@@ -28,6 +28,7 @@ sequence a16_kame_house
         SetActiveCharacter 1
         FadeFromWhite 20
       F9:
+        SetPlayerVisible 0              ; the HUD's bars stayed up over the first lines (the stock hides them one entry later)
         PlayAudio 50
         END
   [1] stock @083e2864                   ; 17: can Goku come out and play?
@@ -36,16 +37,86 @@ sequence a16_kame_house
   [4] stock @083e295e                   ; 17: not here?
   [5] stock @083e296c                   ; Piccolo walks up
   [6] text 3 "!PICCOLO: That's right.  Goku's not here."
-  [7] text 26 "ANDROID 16: Not here...?\x0bI was built for one purpose: to destroy Goku.\x0bWhere is he?  Tell me where Goku is!"
-  [8] text 28 "Whoa, take it easy, 16.  I've never seen you like this."
-  [9] text 3 "!You want Goku?  Then let's make a deal.\x0bBeat me on that island over there...\x0b...and I'll tell you where he is."
-  [10] stock @083e2ac6                  ; camera pans to the island
-  [11] stock @083e2ae4                  ; Piccolo: you and me
-  [12] stock @083e2af4                  ; camera back
-  [13] text 26 "ANDROID 16: Agreed.\x0bWhen you lose, you will tell me where to find Goku."
-  [14] text 28 "Ha!  This I've got to see.  Come on, 18."
-  [15] text 3 "!(Heh.  He doesn't need to know I have no intention of telling him.)"
-  [16] stock @083e2b38                  ; all three fly to the island, flag 145, reload
+  [7] script                            ; 16's anger is shown before it is spoken: two heavy steps toward Piccolo, the ground answers
+        WalkToPosition 8, 592, 448
+        SetEntityFacing 8, 3
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 10, 24
+        SpawnDustCloud 8, 584, 452
+        SpawnDustCloud 8, 600, 452
+        SetEntityFacing 9, 2
+        CommitCommandBatch
+        StopAudio 43
+  [8] text 26 "ANDROID 16: Not here...?\x0bI was built for one purpose: to destroy Goku.\x0bWhere is he?  Tell me where Goku is!"
+  [9] script                            ; 17 gives him room (18 does not move: she is bored)
+        WalkToPosition 9, 644, 502
+        SetEntityFacing 9, 2
+  [10] text 28 "Whoa, take it easy, 16.  I've never seen you like this."
+  [11] script                           ; Piccolo steps toward 16 with his offer
+        WalkToPosition 0, 630, 438
+        SetEntityFacing 0, 2
+  [12] text 3 "!You want Goku?  Then let's make a deal.\x0bBeat me on that island over there...\x0b...and I'll tell you where he is."
+  [13] stock @083e2ac6                  ; camera pans to the island
+  [14] stock @083e2ae4                  ; Piccolo: you and me
+  [15] script                           ; stock 083e2af4 (camera back); 16 looks at the island, then at Piccolo
+        PanCameraToPosition 496, 368, 3
+        SetEntityFacing 8, 2
+        WaitFrames 30
+        SetEntityFacing 8, 3
+  [16] text 26 "ANDROID 16: Agreed.\x0bWhen you lose, you will tell me where to find Goku."
+  [17] script                           ; 16 goes first (he is the eager one; the stock sent him last)
+        PlayAudio 26
+        FlyToPosition 8, 500, 544
+        DespawnEntity 8
+        SetEntityFacing 9, 2
+        SetEntityFacing 11, 2
+  [18] text 28 "Ha!  This I've got to see.  Come on, 18."
+  [19] text 3 "!(Heh.  He doesn't need to know I have no intention of telling him.)"
+  [20] script                           ; stock 083e2b38 without 16: 17 and 18 fly after him together; flag 145, reload
+        PlayAudio 26
+        BeginCommandBatch
+        FlyToPosition 9, 568, 544
+        DespawnEntity 9
+        FlyToPosition 11, 528, 536
+        DespawnEntity 11
+        CommitCommandBatch
+        SetActiveEntity 0
+        SetStoryFlag 145
+        ReloadMap
+        SetPlayerVisible 1
+end
+
+; map 293 trigger 4 (A on the flight pad after the scene): the stock flight, where Krillin and Tien come out to watch. A played
+; Krillin is already beside Piccolo: his actor (76) stays away then (it stood as a second Krillin)
+script a16_kame_flight
+        PlayMusic 19
+        PlayAudio 26
+        FlyToPosition 0, 96, 800
+        SetPlayerVisible 0
+        FindEntityByType 5
+        PanCameraToPosition 256, 512, 3
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse K1
+        SpawnCharacterEntity 121, 488, 504
+        FlyToPosition 121, 456, 568
+        WalkToPosition 121, 392, 608
+        Jump K2
+      K1:
+        BeginCommandBatch
+        SpawnCharacterEntity 76, 448, 496
+        SpawnCharacterEntity 121, 488, 504
+        FlyToPosition 121, 456, 568
+        WalkToPosition 121, 392, 608
+        FlyToPosition 76, 416, 544
+        WalkToPosition 76, 376, 568
+        CommitCommandBatch
+        SetEntityAnimation 76, 4
+      K2:
+        PushMulti 11, 4, 1, 520, 32
+        Negate
+        WarpToMapWithEntities
+        FlyToPosition 0, 352, 224
 end
 
 ; map 296 trigger 0: on the island, before the fight

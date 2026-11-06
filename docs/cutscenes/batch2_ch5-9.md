@@ -385,6 +385,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.5 Kame House: the androids land, Piccolo's deal (touch up, S)
 
+- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (player 2's own move waits for the cine helpers' player-2 bodies).** The HUD is hidden
+  from the first line. 16 walks up to (592, 448), the ground shakes and dust rises at his feet before "Not here...?"; 17 turns to him
+  and steps away for "Whoa, take it easy, 16."; Piccolo steps toward 16 with the offer; after the island's pan 16 looks at the
+  island, then at Piccolo, "Agreed."; **16 flies off first**, then 17's line, Piccolo's aside, and 17 and 18 leave together.
+- **Fixed (the research's finding):** the flight pad's stock script (trigger 4) stood Krillin's actor beside Tien whoever played
+  him; it is `a16_kame_flight` now and leaves the actor out when Krillin is played (`CoopCall 22, 4, 6`). Tested in `staging_ch6`
+  ("kame": Tien alone with a played Krillin, both otherwise).
+
 - **Where:** `a16_kame_house`, map 293 (zone 11 area 1) trigger 3. Films `kh_PH`, `kh_K`.
 - **Today:** 17's "Hi!  Can Goku come out and play?" from off screen; the three fly in below the house; 16 scans
   (three turns, stock); the lines; Piccolo walks down; the camera pans to the far beach and back for "You and

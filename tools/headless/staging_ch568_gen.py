@@ -59,6 +59,26 @@ for p1, p2, s76 in ((TRUNKS, None, 0), (KRILLIN, None, 0), (TRUNKS, KRILLIN, 0),
     s.actors(s76=s76)
     s.end_scene()
     s.on_map(11, 1)
+# Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo, 17 gives him room, 16 leaves first. The fade makes Piccolo
+# player 1 whoever walks in. Then the flight pad: Tien comes out to watch, and Krillin's actor (76) only when nobody plays him.
+for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
+    n = lineup_name(p1, p2)
+    s.begin(f"kame {n}", p1, p2, "+136 +140 +141 +142 +143 +144")
+    s.warp(11, 1, 640, 432, 100)
+    s.press(7, 100)
+    s.shot(f"c6_{n}_kame0")
+    s.actors(s8=1, s9=1, s11=1)
+    s.out("ents")
+    s.press(6, 100)
+    s.shot(f"c6_{n}_kame1")
+    s.end_scene()
+    s.out("echo EXPECT 0203f000: 01", "peek8 0x0203F000 1")
+    s.on_map(11, 1)
+    s.warp(11, 1, 384, 564, 120)
+    s.out("key 1 6", "frames 330")
+    s.shot(f"c6_{n}_flight")
+    s.actors(s76=0 if p2 == KRILLIN else 1, s121=1)
+    s.out("ents", "mashmap 11 4 20")
 # The island (a16_island): 16's first stage ends at 75 %: the break scene on marks in the clearing (16 the boss 160, 17 and 18 on their
 # cliff, the players beside 16, the camera on all of them), then area 5. An idle player dies fast against 16: win at once.
 for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
