@@ -511,6 +511,22 @@ group 18, Hercule's base frames; four facings x (charge, thrust, hold). Engine p
 the Kamehameha, beam from his palms), the same run as Gohan side by side, right / down / up facings
 by holding the facing byte while the beam fires, and player 2 (row 21) in the pose in all four facings.
 
+## Hercule's flight from the side (group 12 of sprite 72, `tools/herculesprites.py` `fly_side`, 2026-11-06)
+
+`FlyToPosition` (script step 54, the flight circles, any scene that flies player 1 or an actor) plays **group 12**
+(`docs/engine.md`). The stock record 72 draws Hercule's flight from the front and the back only (head, shoulders and
+fists toward the viewer with two glints over the afro; from behind the afro and the soles of his boots glinting: 4
+frames, the glints yellow, orange, a dot, gone) and its left / right arrays are the front view again: flying sideways
+he slid along as a face looking out of the screen. `herc_record` now keeps the stock front and back arrays (ROM
+addresses) and gets a side view built from his own frames, laid out as Goku's (60: 32 x 32 at (-8, -24), the body on
+rows 17-23, right = the left blob h-flipped): his lying frame (the knock-down's last, group 3 frame 3: on his front,
+fists out ahead) raised 8 rows to Goku's flying height, its head (afro and the face turned into the ground: the black
+of rows 14-27 x columns 6-21, the skin under it) replaced by his standing side head (idle, rows 0-13) looking where he
+flies, and the stock frames' glints (same colours and phases) trailing over his boots. 4 frames, 1 body blob + glints.
+Old Hercule (158, the Buu's Fury import) and the tournament's lying table are untouched (`tny_lie` gives 72 its
+knock-down's last frame, not group 12). Checks: `tools/headless/hercule_fly.txt` (a flight circle's real flight with
+Hercule as player 1, his facing held left and right for a few frames of it) and `art_poses.py --ids 72 --groups 12`.
+
 ## Haloed Goku (ids 176, 177; display rows 26, 27; `tools/halosprites.py`, 2026-10-19)
 
 After the Cell Games Goku stays playable but dead, so he wears a halo (`docs/story.md` 4h "After the

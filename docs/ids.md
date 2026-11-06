@@ -168,7 +168,7 @@ sprite 72) for Roshi's gym.
 | id | what | source | Makefile variable |
 |---|---|---|---|
 | 58 | Super Saiyan 2 Gohan, **repointed**: `ssj2_record` = the stock record 58 (ROM groups) with hurt 11, lying 12 and tumble 20 from record 59 (party slot 8, row 28; the Cell Games' stock row 4 too) | `tools/ssj2sprites.py` | `EXTRA_SPRITES` `58=ssj2_record` |
-| 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
+| 72 | Hercule, **repointed**: `herc_record` = the stock record 72 (ROM groups) plus the Kamehameha pose in group 18 (Cell Games beam struggle), the power-up in group 9 and, since 2026-11-06, the flight seen from the side in group 12's left / right arrays (the stock ones were the front view) | `tools/herculesprites.py` | `EXTRA_SPRITES` `72=herc_record` |
 | 157 | Super Saiyan Hercule (22 groups: group 21 the turn back, `tools/ssjhercule.py`) | `tools/spriteclone.py` | `SSJ_SPRITE` |
 | 158 | Hercule from Buu's Fury (old Hercule's body) | `tools/buu2log2.py` | `BUU_SPRITES` |
 | 159 | Legendary Super Saiyan Broly (from Buu's Fury) | `tools/buu2log2.py` | `BUU_SPRITES` (hardcoded in `bosses.h`) |

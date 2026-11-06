@@ -1,0 +1,43 @@
+# Hercule's flight from the side (group 12 of sprite 72, tools/herculesprites.py fly_side; docs/sprites.md "Hercule's
+# flight"). A flight circle's FlyToPosition (zone 3 area 3, Map Test 51, as p2_agency.txt's) with Hercule as player 1:
+# the fly state 0x03002130 plays group 12 while he crosses the map. The shots show him over the route; the peeks his
+# state; the circle flies him up the map, so his facing is held left and right for a few frames of the same flight.
+# Every frame of the group in all four facings: tools/headless/art_poses.py --ids 72 --groups 12.
+#   python tools/headless/st_test.py tools/headless/hercule_fly.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+p2 off
+maptest 51
+frames 300
+poke8 0x0203F000 5
+poke32 0x0203FD0C 0x0303
+poke32 0x0203FD54 0x00580080
+poke32 0x0203FD08 5
+frames 300
+findent PL 0x08025604
+map
+key 1 6
+frames 16
+echo EXPECT \w+: 03002130
+peek PL+0x18 1
+peek8 PL+0x10 1
+shot hfly_1
+echo == the flight's own state with his facing held left, then right (the circle flies him up)
+poke8 PL+0x10 2
+frames 2
+poke8 PL+0x10 2
+frames 1
+echo EXPECT \w+: 03002130
+peek PL+0x18 1
+shot hfly_2
+poke8 PL+0x10 2
+frames 9
+poke8 PL+0x10 2
+frames 1
+shot hfly_3
+poke8 PL+0x10 3
+frames 2
+poke8 PL+0x10 3
+frames 1
+shot hfly_4
+ents
+frames 400
+map
