@@ -89,9 +89,10 @@ shot cg09_won
 poke32 0x0203F9B0 0xCE11CA3E
 save cg_pre8.ss
 poke32 0x0203F9B0 0xCE11CA3E
+# fight 7's end (the bomb, Goku's goodbye, Cell's return) is the Games' longest scene: about 145 presses 100 frames apart since 2026-11-06
 poke8 0x0203F9B5 26
 poke8 0x0203F9B6 0
-stepz 0x0203F9B5 140
+stepz 0x0203F9B5 190
 echo == fight 8: two Cells -> expect 00 (Gohan alone)
 peek8 0x0203F9B7 1
 map

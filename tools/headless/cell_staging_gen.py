@@ -25,9 +25,9 @@ def expect(rx, *line):
     out(f"echo EXPECT {rx}", *line)
 
 
-def scene_done(tag):
+def scene_done(tag, mx=150):
     # twice: an EXP level-up's box clears the flag for a moment between two scripts of one scene
-    out(f"stepz {SC} 150", "frames 120", f"stepz {SC} 150", "frames 120", f"shot cs_{tag}", "ents")
+    out(f"stepz {SC} {mx}", "frames 120", f"stepz {SC} 150", "frames 120", f"shot cs_{tag}", "ents")
     expect("03001fdc: 00000000", f"peek {SC} 1")
 
 
@@ -143,7 +143,7 @@ def games(tag, p2):
     # Android 18 lies where Cell spat her out until the two Cells' fade (she walked off by herself; 3.7): there after the bomb's lines, gone at fight 8
     out("deref TBL 0x0800959C", f"deref R11 TBL+{(11 - 7) * 4:#x}", "mash 14 100", f"shot cs_{tag}_18")
     expect("entrec [0-9a-f]+: 1$", "entrec R11")
-    scene_done(f"{tag}_f8")      # fight 8
+    scene_done(f"{tag}_f8", 200)      # fight 8 (fight 7's end is the Games' longest scene: about 145 presses since 2026-11-06)
     expect("entrec [0-9a-f]+: 0$", "entrec R11")
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")

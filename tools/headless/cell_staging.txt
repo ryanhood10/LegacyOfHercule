@@ -742,7 +742,7 @@ mash 14 100
 shot cs_alone_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
-stepz 0x03001FDC 150
+stepz 0x03001FDC 200
 frames 120
 stepz 0x03001FDC 150
 frames 120
@@ -947,7 +947,7 @@ mash 14 100
 shot cs_H_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
-stepz 0x03001FDC 150
+stepz 0x03001FDC 200
 frames 120
 stepz 0x03001FDC 150
 frames 120
@@ -1154,7 +1154,7 @@ mash 14 100
 shot cs_K_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
-stepz 0x03001FDC 150
+stepz 0x03001FDC 200
 frames 120
 stepz 0x03001FDC 150
 frames 120
@@ -1361,7 +1361,7 @@ mash 14 100
 shot cs_Ve_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
-stepz 0x03001FDC 150
+stepz 0x03001FDC 200
 frames 120
 stepz 0x03001FDC 150
 frames 120

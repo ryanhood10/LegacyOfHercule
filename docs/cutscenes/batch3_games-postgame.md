@@ -402,6 +402,13 @@ a step that is moved or removed breaks an insertion further down, so change one 
   set's knock-down, group 12, which holds its last frame) and lies there until the two Cells' fade despawns her; the stock walk off the screen
   is gone, so "She needs our help!  She's still alive!" is said of a body. Test: `cell_staging.txt` (sprite 11 stands after the bomb's lines,
   gone at fight 8).
+- **Built (`nb-cs3`, 2026-11-06), beats 2, 3, 5-8:** three pulses before the swap; from the swap a low shake is re-issued at every script entry
+  (`TICK`, strength 2, 300 frames) with a flash at entries 9, 13, 17; Goku looks back at the group once, turns to Cell, and the two flicker out
+  three times (off the view and back by `SetEntityPositionInstant`) and are gone: no white, the shake is cut (`ScreenShake 0, 1, 1`) and the
+  music stops; 70 frames of field, a faint flash and tremor, then the stock walks; "DADDY!!!" has a shake and a dust ring, and the farewell's
+  music starts again after it; Krillin walks to 18's side on "Android 18!" (he looked about for her), Vegeta starts toward them. Not built:
+  Cell's stagger, Gohan's kneel (no helper), Goku's ki pose (his actor's groups were not checked), no sound at the vanish (no id could be
+  auditioned headless), Hercule peeking out. `cell_games.txt` gives this scene 190 presses (it needs about 145 at 100 frames apart; the limit was 140).
 - **Risks:** 18's sprite 11 is a fight set with 13 groups: **group 3 is her hurt pose, 12 the knock-down** (checked on film; `GlideToPosition`
   puts a body back on its idle pose when it arrives, so the knock-down is played after the glide). The swollen Cell 27 is a large body with nine actors and a player: OBJ
   VRAM is already at its busiest here; add no bodies, and measure with the runner's `vram` after adding dust. The stock

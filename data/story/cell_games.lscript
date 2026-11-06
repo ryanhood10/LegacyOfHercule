@@ -898,11 +898,23 @@ sequence cg_fight7_end
         SetEntityFacing 29, 0
         END
   stockseq @083eb704 4 6    ; "I'll get you for this!!!!", "I'm going to blow myself up now!"
-  script                                 ; stock entry 7: everyone gathers; Hercule's actor backs away from the bomb
+  script                                 ; stock entry 7: Cell swells in three pulses; everyone gathers; Hercule's actor backs away from the bomb; the ground trembles from here on
+        PlayAudio 55
+        WhiteFlash 4
+        ScreenShake 0, 4, 14
+        WaitFrames 24
+        WhiteFlash 5
+        ScreenShake 0, 8, 16
+        WaitFrames 20
+        WhiteFlash 6
+        ScreenShake 0, 14, 20
+        WaitFrames 16
+        StopAudio 55
         FadeToWhite 30
         DespawnEntity 29
         SpawnCharacterEntity 27, 428, 408
         WhiteFadeOut 30
+        ScreenShake 0, 2, 300
         WaitFrames 60
         WalkToPosition 0, 432, 464
         SetEntityFacing 0, 1
@@ -934,8 +946,135 @@ sequence cg_fight7_end
         SetEntityFollow 156, 27
         CommitCommandBatch
         SetEntityAnimation 121, 4
-        END
-  stockseq @083eb704 8 38    ; Goku's Instant Transmission, "He's back!!!!"
+        ScreenShake 0, 2, 300
+  stock @083ea702    ; "TIEN: What do we do?  Someone come up with a plan!"
+  script                                 ; stock entry 9: Piccolo's start; the tremor goes on
+        ScreenShake 0, 2, 300
+        WhiteFlash 3
+        SetEntityAnimation 103, 4
+  stock @083ea744
+  script                                 ; stock entry 11: Goku looks down; the tremor goes on
+        ScreenShake 0, 2, 300
+        SetEntityFacing 60, 0
+        WaitFrames 60
+  stock @083ea79c
+  script                                 ; stock entry 13: they all turn to Goku; the tremor goes on
+        ScreenShake 0, 2, 300
+        WhiteFlash 3
+        BeginCommandBatch
+        SetEntityFollow 121, 60
+        SetEntityFollow 0, 60
+        SetEntityFollow 137, 60
+        SetEntityFollow 132, 60
+        SetEntityFollow 76, 60
+        SetEntityFollow 103, 60
+        SetEntityFollow 156, 60
+        CommitCommandBatch
+        WaitFrames 100
+  stock @083ea820
+  script                                 ; stock entry 15: Goku walks to Cell; the tremor goes on
+        ScreenShake 0, 2, 300
+        PlayMusic 24
+        WaitFrames 60
+        SetEntityFacing 60, 1
+        WaitFrames 30
+        BeginCommandBatch
+        SetEntityFollow 121, 60
+        SetEntityFollow 0, 60
+        SetEntityFollow 137, 60
+        SetEntityFollow 156, 60
+        SetEntityFollow 132, 60
+        SetEntityFollow 76, 60
+        SetEntityFollow 103, 60
+        WalkToPosition 60, 440, 416
+        CommitCommandBatch
+        SetEntityFacing 60, 1
+        WaitFrames 60
+        SetEntityFacing 60, 0
+        WaitFrames 40
+  stock @083ea8ec
+  script                                 ; stock entry 17; the tremor goes on
+        ScreenShake 0, 2, 300
+        WhiteFlash 3
+        WaitFrames 40
+  stock @083ea93c
+  script                                 ; stock entry 19: Goku turns to Cell; the tremor goes on
+        ScreenShake 0, 2, 300
+        SetEntityFacing 60, 1
+        WaitFrames 30
+  stockseq @083eb704 20 21    ; "Take care of your mother for me...  Goodbye my son.", "Goku...  No!!!!"
+  script                                 ; stock entry 22: Goku looks back once, turns to Cell, and they are gone: no white, the shaking and the music stop; a silence, a far-off flash
+        ScreenShake 0, 2, 300
+        SetEntityFacing 60, 0
+        WaitFrames 24
+        SetEntityFacing 60, 1
+        WaitFrames 16
+        SetEntityPositionInstant 60, 0, 0
+        SetEntityPositionInstant 27, 0, 0
+        WaitFrames 2
+        SetEntityPositionInstant 27, 428, 408
+        SetEntityPositionInstant 60, 440, 416
+        SetEntityFacing 60, 1
+        WaitFrames 3
+        SetEntityPositionInstant 60, 0, 0
+        SetEntityPositionInstant 27, 0, 0
+        WaitFrames 2
+        SetEntityPositionInstant 27, 428, 408
+        SetEntityPositionInstant 60, 440, 416
+        SetEntityFacing 60, 1
+        WaitFrames 4
+        SetEntityPositionInstant 60, 0, 0
+        SetEntityPositionInstant 27, 0, 0
+        WaitFrames 2
+        SetEntityPositionInstant 27, 428, 408
+        SetEntityPositionInstant 60, 440, 416
+        SetEntityFacing 60, 1
+        WaitFrames 3
+        DespawnEntity 60
+        DespawnEntity 27
+        ScreenShake 0, 1, 1
+        StopMusic
+        WaitFrames 70
+        WhiteFlash 3
+        ScreenShake 0, 2, 20
+        WaitFrames 50
+        BeginCommandBatch
+        WalkToPosition 132, 400, 424
+        WalkToPosition 103, 488, 408
+        SetEntityAnimation 103, 4
+        CommitCommandBatch
+  stock @083ea9f6    ; "He's gone!!!!!"
+  script                                 ; stock entry 24: his cry shakes the ground
+        ScreenShake 0, 6, 30
+        SpawnDustCloud 0, 408, 468
+        SpawnDustCloud 0, 456, 468
+        SpawnDustCloud 0, 432, 444
+        SpawnDustCloud 0, 432, 488
+        SetEntityAnimation 0, 4
+  stock @083eaa14    ; "DADDY!!!!!!!!!!!"
+  script                                 ; stock entry 26; the farewell's music again
+        PlayMusic 24
+        BeginCommandBatch
+        SetEntityAnimation 76, 4
+        SetEntityAnimation 121, 4
+        SetEntityAnimation 156, 4
+        SetEntityAnimation 132, 4
+        SetEntityAnimation 0, 4
+        CommitCommandBatch
+        SetEntityFollow 76, 0
+  stockseq @083eb704 27 31    ; Krillin and Gohan, "Android 18!  I almost forgot about her.  She needs our help!  She's still alive!"
+  script                                 ; stock entry 32: Krillin goes to 18, where she lies (he looked about for her); Vegeta starts toward them
+        SetEntityFollow 137, 76
+        WalkToPosition 76, 524, 440
+        WaitFrames 8
+        WalkToPosition 76, 522, 416
+        SetEntityFacing 76, 1
+        WaitFrames 30
+        SetEntityFacing 76, 2
+        SetEntityAnimation 137, 4
+        WalkToPosition 137, 374, 424
+        SetEntityFacing 137, 3
+  stockseq @083eb704 33 38    ; "Leave that Android alone right now!", the sound, "He's back!!!!"
   script                                 ; stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest
         SpawnCharacterEntity 30, 428, 328
         SpawnCharacterEntity 162, 468, 328

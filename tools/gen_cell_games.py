@@ -434,8 +434,52 @@ k = b.index("FlyToPosition 121, 368, 456")
 b = b[:k] + guard72(["WalkToPosition 72, 536, 484"], "a") + b[k:]
 k = b.index("SetEntityFollow 121, 27")
 b = b[:k] + guard72(["SetEntityFollow 72, 27"], "b") + b[k:]
-script(b, "stock entry 7: everyone gathers; Hercule's actor backs away from the bomb")
-stockseq(A3, "m325_r11_defeat", 8, 38, "Goku's Instant Transmission, \"He's back!!!!\"")
+# The bomb and Goku's goodbye (docs/cutscenes/batch3 3.7). Every line as it was. The stock bomb never ticked (nine fighters round a still
+# picture), Goku left in a 5-frame white with no gesture, and the field went on as before. Now: Cell swells in three pulses; from the swap
+# the ground trembles under every line until Goku goes (TICK, re-issued at each script entry: a shake does not outlast its frames) with a
+# flash on Cell now and then; Goku turns to Cell, and the two flicker out with no white: the tremor and the music stop on that frame; a
+# silence, a far-off flash; "DADDY!!!" shakes the ground; Krillin goes to 18, who lies where she was thrown.
+TICK = ["ScreenShake 0, 2, 300"]
+PULSE = ["WhiteFlash 3"]
+k = b.index("FadeToWhite 30")
+b = (b[:k] + ["PlayAudio 55", "WhiteFlash 4", "ScreenShake 0, 4, 14", "WaitFrames 24", "WhiteFlash 5", "ScreenShake 0, 8, 16", "WaitFrames 20",
+              "WhiteFlash 6", "ScreenShake 0, 14, 20", "WaitFrames 16", "StopAudio 55"] + b[k:])
+k = b.index("WaitFrames 60", k)
+b = b[:k] + TICK + b[k:]
+script(b[:-1] + TICK, "stock entry 7: Cell swells in three pulses; everyone gathers; Hercule's actor backs away from the bomb; the ground trembles from here on")
+stock_at(A3, "m325_r11_defeat", 8, "\"TIEN: What do we do?  Someone come up with a plan!\"")
+for n, extra, what in ((9, PULSE, "Piccolo's start"), (11, [], "Goku looks down"), (13, PULSE, "they all turn to Goku"), (15, [], "Goku walks to Cell"),
+                       (17, PULSE, ""), (19, [], "Goku turns to Cell")):
+    bb = body(A3, "m325_r11_defeat", n)
+    script(TICK + extra + bb[:-1], f"stock entry {n}{': ' + what if what else ''}; the tremor goes on")
+    lo, hi = n + 1, (n + 1 if n != 19 else 21)
+    if lo == hi:
+        stock_at(A3, "m325_r11_defeat", lo)
+    else:
+        stockseq(A3, "m325_r11_defeat", lo, hi, "\"Take care of your mother for me...  Goodbye my son.\", \"Goku...  No!!!!\"")
+b = body(A3, "m325_r11_defeat", 22)
+assert b[:4] == ["FadeToWhite 5", "DespawnEntity 60", "DespawnEntity 27", "WhiteFadeOut 5"]
+GONE = []
+for gap in (3, 4, 3):            # the two flicker out together (taken off the view and put back: a script cannot hide a body)
+    GONE += ["SetEntityPositionInstant 60, 0, 0", "SetEntityPositionInstant 27, 0, 0", "WaitFrames 2",
+             "SetEntityPositionInstant 27, 428, 408", "SetEntityPositionInstant 60, 440, 416", "SetEntityFacing 60, 1", f"WaitFrames {gap}"]
+script(TICK + ["SetEntityFacing 60, 0", "WaitFrames 24", "SetEntityFacing 60, 1", "WaitFrames 16"] + GONE +
+       ["DespawnEntity 60", "DespawnEntity 27", "ScreenShake 0, 1, 1", "StopMusic", "WaitFrames 70",       # the tremor and the music stop with them; an empty field
+        "WhiteFlash 3", "ScreenShake 0, 2, 20", "WaitFrames 50"] + b[4:-1],                                # far away
+       "stock entry 22: Goku looks back once, turns to Cell, and they are gone: no white, the shaking and the music stop; a silence, a far-off flash")
+stock_at(A3, "m325_r11_defeat", 23, "\"He's gone!!!!!\"")
+bb = body(A3, "m325_r11_defeat", 24)
+script(["ScreenShake 0, 6, 30", "SpawnDustCloud 0, 408, 468", "SpawnDustCloud 0, 456, 468", "SpawnDustCloud 0, 432, 444", "SpawnDustCloud 0, 432, 488"] + bb[:-1],
+       "stock entry 24: his cry shakes the ground")
+stock_at(A3, "m325_r11_defeat", 25, "\"DADDY!!!!!!!!!!!\"")
+script(["PlayMusic 24"] + body(A3, "m325_r11_defeat", 26)[:-1], "stock entry 26; the farewell's music again")
+stockseq(A3, "m325_r11_defeat", 27, 31, "Krillin and Gohan, \"Android 18!  I almost forgot about her.  She needs our help!  She's still alive!\"")
+bb = body(A3, "m325_r11_defeat", 32)
+assert bb[0] == "SetEntityFollow 137, 76" and bb[-2] == "SetEntityAnimation 137, 4"
+script(["SetEntityFollow 137, 76", "WalkToPosition 76, 524, 440", "WaitFrames 8", "WalkToPosition 76, 522, 416", "SetEntityFacing 76, 1", "WaitFrames 30",
+        "SetEntityFacing 76, 2", "SetEntityAnimation 137, 4", "WalkToPosition 137, 374, 424", "SetEntityFacing 137, 3"],
+       "stock entry 32: Krillin goes to 18, where she lies (he looked about for her); Vegeta starts toward them")
+stockseq(A3, "m325_r11_defeat", 33, 38, "\"Leave that Android alone right now!\", the sound, \"He's back!!!!\"")
 b = body(A3, "m325_r11_defeat", 39)
 k = b.index("SpawnCharacterEntity 30, 428, 328")
 b = b[:k + 1] + ["SpawnCharacterEntity 162, 468, 328", "WalkToPosition 162, 468, 400"] + b[k + 1:]
