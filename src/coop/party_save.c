@@ -64,6 +64,11 @@ void party_new_game(PartyState *p);    // party.c: the Time Chamber's flags
 int flag_test_hook(PartyState *p, u32 id);   // party.c
 void flag_set_hook(PartyState *p, u32 id);
 const CharacterEntry *party_default_entries(void);   // party.c: the N-entry default table
+void party_repair(PartyState *p);      // mapvisit.c
+void map_visits_clear(void);
+void map_visits_load(int slot);
+void map_visits_save(int slot);
+void map_visits_erase(int slot);
 
 // Saves of the eight-slot builds: the same block with eight entries (0x19C bytes), slots of 0x1A0 at
 // 0x10 + slot * 0x1A0. A slot that fails the checksum at this layout is read at that one and moved over:
@@ -119,6 +124,7 @@ void load_slot_hook(PartyState *dst, int slot) {
         flag_set_hook(&s->party, KRILLIN_LIFT_FLAG);
     }
     if (s->party.flags & 1) hercule_lock(&s->party);   // ssj.c: an older save's Hercule
+    if (s->party.flags & 1) party_repair(&s->party);   // mapvisit.c: what the map-visit bits did to a save made before 2026-11-06
     if (dst != &s->party) memcpy(dst, &s->party, sizeof(PartyState));
 }
 
@@ -133,6 +139,7 @@ void save_game_hook(PartyState *p, const s32 *xy) {
     p->save_y = (s16)xy[1];
     p->flags |= 1;
     write_slot_hook(p, g_SelectedSaveSlot);
+    map_visits_save(g_SelectedSaveSlot);   // mapvisit.c: the slot's map-visit record
 }
 
 // ---- save menu ---------------------------------------------------------------------------------
@@ -241,6 +248,7 @@ void save_menu_erase_hook(void *handle, int slot) {
     (void)handle;
     party_init_hook(&store.slot[slot].party);
     write_slot(&store.slot[slot], slot);
+    map_visits_erase(slot);
     build_view(slot);
 }
 
@@ -260,6 +268,7 @@ int save_menu_start_hook(u8 *menu) {
     *(u32 *)(mapstate + 4) = 0;
     if (store.slot[sel].party.flags & 1) {
         memcpy(party, &store.slot[sel].party, sizeof(PartyState));
+        map_visits_load(sel);
         Party_DetransformOthers(party);
         const u8 *loc = Party_LocationEntry(party);
         u32 *fade = Arena_Alloc(4);
@@ -274,6 +283,7 @@ int save_menu_start_hook(u8 *menu) {
     } else {
         party_init_hook(party);
         party_new_game(party);
+        map_visits_clear();
         int v = MapEntry_Variation(NEW_GAME_ENTRY, 0);
         const u8 *sub = MapEntry_Sub(NEW_GAME_ENTRY, v);
         u32 *fade = Arena_Alloc(4);

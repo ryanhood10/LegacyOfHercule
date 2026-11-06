@@ -17,7 +17,7 @@ EXTERN(walk_update diag_update input_poll_hook hud_draw_hook hud_update_hook hud
        krillin_shock_use krillin_disc_ready krillin_disc_use kr_disc_icon_0 kr_disc_icon_1 kr_state krillin_record
        a16_rocket_ready a16_rocket_use a16p_record ssj2_burst_ready ssj2_burst_use ssj2_record tny_steal_ready tny_steal_use
        trigger_scan_hook trigger_takes_a_hook agency_item_msg vm_fly_hook vm_warp_hook
-       masenko_update_hook bigbang_update_hook burning_update_hook kame_update_hook sbc_update_hook spiritbomb_update_hook status_tabs_hook)
+       map_visit_set_hook map_visit_test_hook g_map_visits masenko_update_hook bigbang_update_hook burning_update_hook kame_update_hook sbc_update_hook spiritbomb_update_hook status_tabs_hook)
 
 MEMORY
 {
@@ -106,6 +106,7 @@ SECTIONS
 
     .cineram (NOLOAD) : {
         KEEP(*(.cine))       /* cine.c: the cast, the hold state, the held charge, the tests' counters (<= 0x100) */
+        KEEP(*(.cine.mv))    /* mapvisit.c: the map-visit bits (0x28, after cine.c's 0x84; partyram is full) */
     } > cineram
 
     .bss (NOLOAD) : {

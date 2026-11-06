@@ -281,6 +281,9 @@ party member; regular Gohan (slot 0) stays selectable. `PARTY_SLOTS=9` (`docs/pa
   Masenko / Big Bang / Burning Attack charged until player 1 let go of B; `wrap.c` now runs them with
   player 2's input, and player 2's Select switch waits until player 2 stands or walks (switching in a
   charge crashed). `docs/coop-design.md` "Player 2's beam abilities".
+- **The FFFFFFFE crash (fixed 2026-11-06):** until then every map load ORed a map-visit bit into his entry (slot 8 sat
+  where the stock map-visit bits are); his fourth ability became 66 after the Lookout and selecting it crashed. Saves
+  made before load repaired (`docs/party-8-slots.md` "The map-visit bank").
 - **Test build** `SSJ2_TEST=1`: player 2's pad holding L + R: Select = join, Start = he becomes player 1,
   Up = player 2 plays him, Down = his EXP one short of the next level.
 

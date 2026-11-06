@@ -187,6 +187,10 @@ PARTY_ENTRY_JUMPS = [
     (0x080096E8, "vm_counter_sub_hook"),    # VM opcode: counters[idx] -= value
     (0x0800F3F0, "item_use_hook"),          # item use check / counter increment
     (0x0800B00C, "vm_seen_hook"),           # VM opcode: mark a sprite's bestiary entry seen
+    # the map-visit bits (src/coop/mapvisit.c): the stock bank at party + 0xE7 (flags 408+) was never moved and, with
+    # nine slots, landed on slot 7's tail, slot 8 and story flags 0-32; these two and VISIT_MAP_* below use g_map_visits
+    (0x080040EE, "map_visit_set_hook"),     # MapVisited_Set(party, zone, area): every map load, VM action 128
+    (0x080041A6, "map_visit_test_hook"),    # MapVisited_Test(party, zone, area): VM action 23
     # save path (src/coop/party_save.c): new EEPROM layout, slot store outside the menu object
     (0x08004030, "save_game_hook"),         # SaveGame(party, xy): the save pad
     (0x08003F9C, "load_slot_hook"),         # LoadSlot(dst, slot)
@@ -233,6 +237,14 @@ PARTY_SHADOWS = [
 ]
 PARTY_SHADOW_AT = romdata.PARTY_TABLE_AT + 0x1000   # shadow tables, 0x200 bytes each
 PARTY_SHADOW_SIZE = 0x200
+# The pause menu's area map (0x08017B2C..0x08017B36) reads the visit bit as [[pool 0x08017E40] + 0xC] + id / 8 + 0xE7.
+# Its pool word moves to a copy of the module table (0x086F806C; the function reads its words +8 .. +0x14 only) with
+# one more word at +0x1C = g_map_visits.bits - 0xE7, and the load "ldr r1,[r3,#0xC]" becomes "ldr r1,[r3,#0x1C]".
+VISIT_MAP_POOL = 0x17E40
+VISIT_MAP_TABLE = 0x086F806C
+VISIT_MAP_LOAD = (0x17B2C, 0x68D9, 0x69D9)
+VISIT_MAP_SHADOW_AT = PARTY_SHADOW_AT + 0x1000
+VISIT_BITS_OFFSET = 0                               # g_map_visits is the bits
 
 
 def build_party_table(rom, n):
@@ -283,6 +295,23 @@ def apply_party_patches(rom, syms, n):
             print(f"shadow table {table:08x} -> {ROM_BASE + at:08x} (word +{word:#x} = {new:08x}, {target or 'party + shift'})")
         struct.pack_into("<I", rom, pool, ROM_BASE + shadows[key])
         print(f"shadow pool word {ROM_BASE + pool:08x} -> {ROM_BASE + shadows[key]:08x}")
+
+
+def apply_visit_patches(rom, syms):
+    cur = struct.unpack_from("<I", rom, VISIT_MAP_POOL)[0]
+    if cur != VISIT_MAP_TABLE:
+        sys.exit(f"visit map pool word at {VISIT_MAP_POOL:#x}: expected {VISIT_MAP_TABLE:08x}, found {cur:08x}")
+    off, old, new = VISIT_MAP_LOAD
+    if struct.unpack_from("<H", rom, off)[0] != old:
+        sys.exit(f"visit map load at {off:#x}: expected {old:04x}")
+    at = VISIT_MAP_SHADOW_AT
+    if any(b != 0xFF for b in rom[at:at + 0x20]):
+        sys.exit(f"visit map shadow at {at:#x} overlaps used ROM")
+    rom[at:at + 0x1C] = rom[VISIT_MAP_TABLE - ROM_BASE:VISIT_MAP_TABLE - ROM_BASE + 0x1C]
+    struct.pack_into("<I", rom, at + 0x1C, (syms["g_map_visits"] + VISIT_BITS_OFFSET - 0xE7) & 0xFFFFFFFF)
+    struct.pack_into("<I", rom, VISIT_MAP_POOL, ROM_BASE + at)
+    struct.pack_into("<H", rom, off, new)
+    print(f"visits pause map reads g_map_visits: pool {ROM_BASE + VISIT_MAP_POOL:08x} -> {ROM_BASE + at:08x}, load at {ROM_BASE + off:08x}")
 
 
 def apply_party_count_patches(rom, n):
@@ -476,6 +505,7 @@ def main():
     apply_party_patches(rom, syms, party_slots)
     for path in data_patches:
         apply_data_patch(rom, path, syms)
+    apply_visit_patches(rom, syms)          # after the data patches: its shadow's room is checked against what they wrote
     apply_party_count_patches(rom, party_slots)
     for path in maps:
         apply_maps(rom, path)

@@ -33,6 +33,22 @@ Newest first. One entry per landed piece or decision; details live in the linked
   pose's two-handed push from the front and back), base and gold-haired; old Hercule (158) fires the Gun in his own drawing. Built
   from the ROMs at build time (`herculesprites.py` / `spriteclone.py --buu`, `buu2log2.py --map 158 22:...`). `docs/sprites.md`
   "Hercule's shooting poses"; test `hercule_shoot.txt` (153 checks, in `regfull.sh`).
+- **Ryan's "error FFFFFFFE" with Super Saiyan 2 Gohan (branch `nb-crash`; `docs/party-8-slots.md` "The map-visit bank").** Not
+  Broly, the heap cap, `cine.c` or the art pass: the stock map-visit bits (one per map, written at every map load at
+  `party + 0xE7 + id / 8`) were never moved when the party grew to nine slots, so every map load ORed a bit into slot 7's
+  tail, Super Saiyan 2 Gohan's entry (slot 8) or story flags 0-32. A byte of 64 in his ability list (the Lookout, 9/1) put
+  his fourth ability past the ability table: selecting it with L jumped to 0xFFFFFFFE (reproduced headless: the summit's
+  lineup S, three L presses, `CRASH ... r15=fffffffe`, r6 = the table entry of ability 64). Fixed in `src/coop/mapvisit.c`:
+  the bits have their own bank (`g_map_visits`, `cineram`) and EEPROM record per save slot (0x1D00); the set / test
+  functions are C, the pause map reads the bank through a shadow table (`tools/patch_rom.py`); a save made before loads
+  repaired (`party_repair`: slot 8 zeroed until the Cell Games' end, then his row, flags and kit as the join left them;
+  ability ids past the table, index, row, the top bits of EXP / HP / EP for everyone; story flags untouched). Android 16
+  (slot 7 after his chapter) had the same exposure from zone 2-3 maps. Test `map_visits.txt` (in `regfull.sh`; 20 of its 25
+  checks fail on the build before). The showcase's F9 state now pokes his abilities too (`dropins_showcase.py`); the
+  staging generators' Super Saiyan 2 Gohan pokes (`staging_ch9_gen.py`, `postgame_staging_gen.py`) still leave his list
+  0 0 0 0 (they never press B). Flags 0-32 that late maps could set, and what that does: `docs/party-8-slots.md`.
+  Full regression clean (99 blocks, `PLAY=` a private play ROM; `chamber_save` on Ryan's save: every slot loads, slot 8's
+  bank bytes zeroed in all three files, none of which had him joined).
 - **Cutscenes, the leftovers of batches 1 and 2 (branch `nb-cs4`; each scene's "Built" note in `docs/cutscenes/batch1_ch1-4.md`
   and `batch2_ch5-9.md`; one commit a scene).** Batch 2, the beats that waited for the cinematic helpers: Cooler powers up before his
   fight (W.3), Vegeta's first blow on Semi-Perfect Cell (7.2), Trunks' two misses before Cell's lesson (7.6), player 2 at Kame House
