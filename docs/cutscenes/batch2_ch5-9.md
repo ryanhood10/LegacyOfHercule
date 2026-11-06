@@ -423,7 +423,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.5 Kame House: the androids land, Piccolo's deal (touch up, S)
 
-- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (player 2's own move waits for the cine helpers' player-2 bodies).** The HUD is hidden
+- **Built 2026-11-06 (`nb-cs2`); beat 3 built 2026-11-06 (`nb-cs4`):** at the stomp player 2's Hercule drops to a knee and cowers where he stands (`CoopCall 37, 10, 0, 1` on `-15`; he gets up as Piccolo steps forward with the offer), his Krillin is at Piccolo's left in a blink, between him and 16, facing 16 (`CoopCall 37, 4, 1, 24` on `-16`); then everyone turns to 16 for his line (`CoopCall 37, 11`). The fade makes Piccolo player 1, so `-15` / `-16` can only be player 2. `staging_ch6` "kame" checks the rise played with Hercule (and found nobody otherwise). Not built: Hercule hopping *behind* Piccolo (a player's body can only be dashed or posed by Cine, not walked). Earlier note: The HUD is hidden
   from the first line. 16 walks up to (592, 448), the ground shakes and dust rises at his feet before "Not here...?"; 17 turns to him
   and steps away for "Whoa, take it easy, 16."; Piccolo steps toward 16 with the offer; after the island's pan 16 looks at the
   island, then at Piccolo, "Agreed."; **16 flies off first**, then 17's line, Piccolo's aside, and 17 and 18 leave together.

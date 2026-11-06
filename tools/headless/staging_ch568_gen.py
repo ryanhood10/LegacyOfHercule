@@ -109,7 +109,8 @@ s.shot("c6_TK_duel")
 s.actors(s134="[01]")                               # player 2's Trunks shows 134 himself
 s.out("echo EXPECT 0203fd5c: 01", "peek8 0x0203FD5C 1", "ents")     # the duel runs
 s.on_map(15, 2)
-# Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo, 17 gives him room, 16 leaves first. The fade makes Piccolo
+# Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo (player 2's Hercule cowers on a knee, his Krillin is at Piccolo's side
+# in a blink), 17 gives him room, 16 leaves first. The fade makes Piccolo
 # player 1 whoever walks in. Then the flight pad: Tien comes out to watch, and Krillin's actor (76) only when nobody plays him.
 for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
     n = lineup_name(p1, p2)
@@ -122,6 +123,7 @@ for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, K
     s.press(6, 100)
     s.shot(f"c6_{n}_kame1")
     s.end_scene()
+    s.cine_last(10, 1 if p2 == HERCULE else 5)      # player 2's Hercule cowered at the stomp and got up (nobody to raise otherwise); Krillin dashed up
     s.out("echo EXPECT 0203f000: 01", "peek8 0x0203F000 1")
     s.on_map(11, 1)
     s.warp(11, 1, 384, 564, 120)

@@ -48,12 +48,25 @@ sequence a16_kame_house
         SetEntityFacing 9, 2
         CommitCommandBatch
         StopAudio 43
+        CoopCall 37, 16, -15, 0         ; player 2 (batch 2, 6.5 beat 3; the fade made Piccolo player 1): Hercule drops to a knee and
+        JumpIfFalse P1                  ; cowers at the stomp; Krillin is level with Piccolo in a blink, on guard
+        CoopCall 37, 1, -15, 8
+        CoopCall 37, 10, 0, 1
+      P1:
+        CoopCall 37, 16, -16, 0
+        JumpIfFalse P2
+        CoopCall 37, 1, -16, 0
+        CoopCall 37, 4, 1, 24
+      P2:
+        CoopCall 37, 11, 8, 0
   [8] text 26 "ANDROID 16: Not here...?\x0bI was built for one purpose: to destroy Goku.\x0bWhere is he?  Tell me where Goku is!"
   [9] script                            ; 17 gives him room (18 does not move: she is bored)
         WalkToPosition 9, 644, 502
         SetEntityFacing 9, 2
   [10] text 28 "Whoa, take it easy, 16.  I've never seen you like this."
-  [11] script                           ; Piccolo steps toward 16 with his offer
+  [11] script                           ; Piccolo steps toward 16 with his offer (a cowering Hercule gets up behind him)
+        CoopCall 37, 1, -15, 0
+        CoopCall 37, 10, 0, 0
         WalkToPosition 0, 630, 438
         SetEntityFacing 0, 2
   [12] text 3 "!You want Goku?  Then let's make a deal.\x0bBeat me on that island over there...\x0b...and I'll tell you where he is."

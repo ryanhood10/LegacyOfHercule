@@ -551,6 +551,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}05
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT 0203f000: 01
 peek8 0x0203F000 1
 echo EXPECT map zone 11 area 1\b
@@ -601,6 +606,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}05
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT 0203f000: 01
 peek8 0x0203F000 1
 echo EXPECT map zone 11 area 1\b
@@ -652,6 +662,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT 0203f000: 01
 peek8 0x0203F000 1
 echo EXPECT map zone 11 area 1\b
@@ -703,6 +718,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 0a[0-9a-f]{6} [0-9a-f]{6}05
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT 0203f000: 01
 peek8 0x0203F000 1
 echo EXPECT map zone 11 area 1\b
