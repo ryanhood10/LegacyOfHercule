@@ -46,6 +46,17 @@ mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
+mash 14 110
+mash 1 110
+shot c3_V_debut0
+mash 1 110
+shot c3_V_debut1
+mash 1 110
+shot c3_V_debut2
+mash 1 110
+shot c3_V_debut3
+mash 1 110
+shot c3_V_debut4
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -57,6 +68,13 @@ entrec R72
 deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+echo EXPECT 0203f000: 00000602 00000000 00000000
+peek 0x0203F000 3
+echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
+map
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -103,6 +121,17 @@ mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
+mash 14 110
+mash 1 110
+shot c3_H_debut0
+mash 1 110
+shot c3_H_debut1
+mash 1 110
+shot c3_H_debut2
+mash 1 110
+shot c3_H_debut3
+mash 1 110
+shot c3_H_debut4
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -114,6 +143,13 @@ entrec R72
 deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+echo EXPECT 0203f000: 00000602 00000000 00000000
+peek 0x0203F000 3
+echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
+map
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -161,6 +197,17 @@ mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
+mash 14 110
+mash 1 110
+shot c3_VH_debut0
+mash 1 110
+shot c3_VH_debut1
+mash 1 110
+shot c3_VH_debut2
+mash 1 110
+shot c3_VH_debut3
+mash 1 110
+shot c3_VH_debut4
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -172,6 +219,13 @@ entrec R72
 deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+echo EXPECT 0203f000: 00000602 00000000 00000000
+peek 0x0203F000 3
+echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
+map
 echo EXPECT map zone 7 area 15\b
 map
 ents
@@ -219,6 +273,17 @@ mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
+mash 14 110
+mash 1 110
+shot c3_HV_debut0
+mash 1 110
+shot c3_HV_debut1
+mash 1 110
+shot c3_HV_debut2
+mash 1 110
+shot c3_HV_debut3
+mash 1 110
+shot c3_HV_debut4
 stepz 0x03001FDC 200
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -230,6 +295,13 @@ entrec R72
 deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R165
+deref R140 TBL+0x214
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R140
+echo EXPECT 0203f000: 00000602 00000000 00000000
+peek 0x0203F000 3
+echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] 
+map
 echo EXPECT map zone 7 area 15\b
 map
 ents

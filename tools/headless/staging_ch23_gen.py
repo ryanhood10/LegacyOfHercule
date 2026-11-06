@@ -57,9 +57,15 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     s.shot(f"c3_{n}_mark")
     s.press(2, 110)
     s.actors(s72=s72)              # no Hercule actor for "clown" alone (Ryan, 2026-11-05)
+    s.press(14, 110)
+    for i in range(5):             # the debut: his power, the gold (an actor, 140, on his spot), the line
+        s.press(1, 110)
+        s.shot(f"c3_{n}_debut{i}")
     s.end_scene(200)
     s.shot(f"c3_{n}_fight")
-    s.actors(s72=s72, s165=1)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin
+    s.actors(s72=s72, s165=1, s140=0)     # Hercule's actor gone before the fight (player 2 only); 13's actor replaced by his twin; the gold actor gone
+    s.out("echo EXPECT 0203f000: 00000602 00000000 00000000", "peek 0x0203F000 3")      # Vegeta plays; the form's meter as the stock leaves it: 0
+    s.out("echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] ", "map")
     s.on_map(7, 15)
     s.win(200)
     s.press(5, 100)
