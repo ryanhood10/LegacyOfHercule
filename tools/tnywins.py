@@ -17,8 +17,7 @@ Gohan (57) and Krillin (161, sprite 76's shout): their cheer is group 4's frame 
 Their own descriptors for that frame in each facing, copied (12 bytes each, pointing at the ROM's own frame blobs).
 
 Out (C): `tny_win_a16`, `tny_win_gohan`, `tny_win_krillin` (four descriptor-array pointers each: a group the engine's
-pose table points at, tny_engine.c `tny_wins`); every array is its frame and a zero descriptor (the engine's frame count
-stops there). `--preview PNG` draws 16's frame x 6.
+pose table points at, tny_engine.c `tny_wins`); every array is its frame repeated PAD times and a zero descriptor. `--preview PNG` draws 16's frame x 6.
 
 usage: python tools/tnywins.py roms/log2.gba OUT.c [--preview PNG]
 """
@@ -115,7 +114,12 @@ def frame(body, arm):
     return px
 
 
-# (symbol, stock sprite, group, frame): a stock frame as its own one-frame group, per facing
+# Every built array repeats its frame PAD times (then a zero descriptor): a body's control state picks the frame index
+# from its own timer (0 while the poses reset it), and whatever index it picks must find a drawable frame of the same
+# size: a zero descriptor read as a frame would decode from address 0 into the frame buffer. 8 is the most frames any
+# record's group has (the engine's frames_of stops there).
+PAD = 8
+# (symbol, stock sprite, group, frame): a stock frame as its own group, per facing
 CHEERS = [("tny_win_gohan", 57, 4, 3), ("tny_win_krillin", 76, 4, 3)]
 
 
@@ -141,15 +145,15 @@ def write_c(path, frames, cheers):
         data = compress(tiles(px, W, H))
         body = ", ".join(f"0x{b:02x}" for b in data)
         lines.append(f"static const u8 win_a16_{i}[{len(data)}] TNY_ART __attribute__((aligned(4))) = {{{body}}};")
-        ents.append(f"{{-8, -24, {W}, {H}, 0x{ATTR_32:08x}u, win_a16_{i}}}")
+        ents += [f"{{-8, -24, {W}, {H}, 0x{ATTR_32:08x}u, win_a16_{i}}}"] * PAD
     ents.append("{0, 0, 0, 0, 0, 0}")
     lines.append(f"static const WinDesc win_a16_d[{len(ents)}] TNY_ART = {{{', '.join(ents)}}};")
     lines.append("const WinDesc *const tny_win_a16[4] TNY_ART = { win_a16_d, win_a16_d, win_a16_d, win_a16_d };")
     for name, descs in cheers.items():
         arrs = []
         for d, (xo, yo, w, h, attr, blob) in enumerate(descs):
-            lines.append(f"static const WinDesc {name}_{d}[2] TNY_ART = {{{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, "
-                         f"(const void *)0x{blob:08x}u}}, {{0, 0, 0, 0, 0, 0}}}};")
+            one = f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, (const void *)0x{blob:08x}u}}"
+            lines.append(f"static const WinDesc {name}_{d}[{PAD + 1}] TNY_ART = {{{', '.join([one] * PAD)}, {{0, 0, 0, 0, 0, 0}}}};")
             arrs.append(f"{name}_{d}")
         lines.append(f"const WinDesc *const {name}[4] TNY_ART = {{ {', '.join(arrs)} }};")
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)

@@ -1092,8 +1092,8 @@ frames 10
 echo sprite 160: in the build, frames ok (bit 31 clear), a group (not 0xff)
 echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Android 16: the drawn raised fist (0x3f), one frame
-echo EXPECT 0203fd0c: 3f 00 01 01
+echo Android 16: the drawn raised fist (0x3f), its frame 8 times
+echo EXPECT 0203fd0c: 3f 00 08 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x1d
@@ -1319,8 +1319,8 @@ frames 10
 echo sprite 57: in the build, frames ok (bit 31 clear), a group (not 0xff)
 echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f)
-echo EXPECT 0203fd0c: 3f 00 01 01
+echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f, the frame 8 times)
+echo EXPECT 0203fd0c: 3f 00 08 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xa1
@@ -1329,8 +1329,8 @@ frames 10
 echo sprite 161: in the build, frames ok (bit 31 clear), a group (not 0xff)
 echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f)
-echo EXPECT 0203fd0c: 3f 00 01 01
+echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f, the frame 8 times)
+echo EXPECT 0203fd0c: 3f 00 08 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x67
@@ -1367,8 +1367,8 @@ frames 10
 echo sprite 175: in the build, frames ok (bit 31 clear), a group (not 0xff)
 echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Android 16: the drawn raised fist (0x3f), one frame
-echo EXPECT 0203fd0c: 3f 00 01 01
+echo Android 16: the drawn raised fist (0x3f), its frame 8 times
+echo EXPECT 0203fd0c: 3f 00 08 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x3a

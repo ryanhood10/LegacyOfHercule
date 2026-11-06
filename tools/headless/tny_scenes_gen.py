@@ -264,11 +264,11 @@ for sid in BODIES:
     out(f"echo sprite {sid}: in the build, frames ok (bit 31 clear), a group (not 0xff)")
     expect(r"0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01", "peek8 0x0203FD0C 4")
     if sid in (160, 175):
-        out("echo Android 16: the drawn raised fist (0x3f), one frame")
-        expect(r"0203fd0c: 3f 00 01 01", "peek8 0x0203FD0C 4")
+        out("echo Android 16: the drawn raised fist (0x3f), its frame 8 times")
+        expect(r"0203fd0c: 3f 00 08 01", "peek8 0x0203FD0C 4")
     if sid in (57, 161):
-        out("echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f)")
-        expect(r"0203fd0c: 3f 00 01 01", "peek8 0x0203FD0C 4")
+        out("echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f, the frame 8 times)")
+        expect(r"0203fd0c: 3f 00 08 01", "peek8 0x0203FD0C 4")
 for b in range(0, len(BODIES), 4):
     batch = BODIES[b:b + 4]
     for sid in batch:

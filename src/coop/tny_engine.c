@@ -1179,18 +1179,19 @@ const u32 *tny_lie_pose(const Entity *e, int *frame) {
 // A held pose shows the FIRST frame of the group it is given: the engine writes the frame (+0x14), but every body's
 // control state recomputes it from its timer (+0x12, which the poses reset) before the draw, and that gives 0 (found
 // headless, docs/tournament.md 28: +0x14 read 0 on actors, opponents and players alike). So a pose is a group, and a pose
-// that is no group's first frame gets a group of its own (tools/tnywins.py: one frame per facing).
+// that is no group's first frame gets a group of its own (tools/tnywins.py: its frame per facing, repeated 8 times so that
+// whatever index a state picks finds it). The pose is never switched while held: alternating it with the idle (tried)
+// crashed a real 2 v 2 in tny_n32 (an entity freed under the list a fight later), so the celebration is the pose and hops.
 // Each body's victory pose: the row of `tny_wins` for its record (its group, or WF_BUILT a group from tnywins.py, `art`,
 // weak: absent in a build without it), else the old order (group 4, the fidget 14, the charge 5: only groups the record
-// has, grp_of). WF_STILL: the pose is held through the hops (no alternation with the idle; Pui Pui's and Janemba's are an
-// attack's first frame). A row whose group the body lacks is skipped, so no body is ever shown in a group it does not have
+// has, grp_of). WF_STILL marks a pose taken from an attack's first frame (Pui Pui's, Janemba's). A row whose group the body lacks is skipped, so no body is ever shown in a group it does not have
 // (docs/sprites.md: a missing group overwrites the heap). The bodies were looked at group by group (docs/sprites.md "Win
 // poses"): the stock playables' shout is a cheer whose first frame has the arms up (Goku, Yamcha, Tien ...) or down
 // (Gohan, Krillin: their frame 3 is drawn as a group of its own); Android 16's group 4 is the startled look round.
 extern const void *const tny_win_a16[4] __attribute__((weak));
 extern const void *const tny_win_gohan[4] __attribute__((weak));
 extern const void *const tny_win_krillin[4] __attribute__((weak));
-#define WF_STILL       1                     // hold the pose through the hops (no alternation with the idle)
+#define WF_STILL       1                     // the pose is an attack's first frame (a mark for the sheets: tnysheet.py)
 #define WF_BUILT       2                     // the group from tnywins.py (`art`), not one of the record's
 #define WIN_BUILT      0x3F                  // pose_g's group for a built pose (no record has 63 groups)
 static const struct { u16 sprite; u8 group, flags; const void *const *art; } tny_wins[] = {
@@ -1205,7 +1206,6 @@ static const struct { u16 sprite; u8 group, flags; const void *const *art; } tny
 #define CEL_OFF        0xFF                  // eng.cel_t: no celebration runs
 #define CEL_START      40                    // the end's pause (90 frames) at which the winners start
 #define CEL_HOP        16                    // frames a hop (two of them, 6 px: the trophy's)
-#define CEL_SWAP       6                     // while they hop: the pose and the idle in turn, this many frames each
 #define CEL_STAGGER    6                     // each next winner hops this much later (as the trophy's)
 #define CEL_LEN        (2 * CEL_HOP + 3 * CEL_STAGGER)
 static int win_row(const Entity *e) {
@@ -1238,7 +1238,6 @@ static int win_pose(const Entity *e, int *frame) {
     for (int i = 0; i < 3; i++) if (grp_of(e, cheer[i])) return cheer[i];
     return -1;
 }
-static int win_still(const Entity *e) { int r = win_row(e); return r >= 0 && (tny_wins[r].flags & WF_STILL); }
 
 static int pose_at(const Entity *e);
 // Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd). The loser lies
@@ -1271,23 +1270,13 @@ static void pose_hold(Entity *e, int win) {
     eng.pose_g[k] = (u8)(g == POSE_LIE_TABLE ? g : g | (win ? PG_WIN : 0));
     eng.pose_f[k] = (u8)f;
 }
-// While the winners hop (the celebration, or the trophy's hops) a standing victory pose and the body's idle (group 0, which
-// every body has) take turns, CEL_SWAP frames each: the cheer pumped; then the pose holds (WF_STILL bodies hold it all along)
-static const u32 *pose_now(const Entity *e, int k, const u32 *grp) {
-    u8 g = eng.pose_g[k];
-    if (g == POSE_LIE_TABLE || (g & (PG_WIN | PG_TALK)) != PG_WIN) return grp;
-    int t = eng.cel_t != CEL_OFF ? eng.cel_t : eng.phase == P_PRIZE ? (int)eng.timer : 9999;
-    if (t >= 2 * CEL_HOP || !((t / CEL_SWAP) & 1) || win_still(e)) return grp;
-    const u32 *idle = grp_of(e, 0);
-    return idle ? idle : grp;
-}
 static void poses_apply(int still) {
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
         const u32 *grp = !e || !in_list(e) ? 0
                        : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : pose_grp(e, eng.pose_g[k]);
         if (!grp) continue;
-        E32(e, 0x4C) = (u32)pose_now(e, k, grp);
+        E32(e, 0x4C) = (u32)grp;
         E16(e, 0x14) = eng.pose_f[k];
         E16(e, 0x12) = 0;
     }
@@ -1477,9 +1466,10 @@ static void trophy_hop(void) {
 }
 
 // The winners' celebration at a fight's end (docs/tournament.md 28): CEL_START frames into the end's pause (the last body
-// has fallen, the announcer walks back on) the winners strike their victory pose (win_pose), play its frames while they
-// hop twice (6 px, CEL_HOP frames a hop, each next winner CEL_STAGGER later: the trophy's hop) and land on the frame they
-// hold through the result line. The players when they won (both on a 2 v 2 floor), else the opponents still standing.
+// has fallen, the announcer walks back on) the winners strike their victory pose (win_pose) and hop twice in it (6 px,
+// CEL_HOP frames a hop, each next winner CEL_STAGGER later: the trophy's hop), then hold it through the result line. The
+// players when they won (both on a 2 v 2 floor), else the opponents still standing; not while a player still lies downed
+// (then the end's line starts it, after getting him up, as the poses always did).
 // It costs nothing: the fight is decided, the pause was there, and a line opening lands them at once (cel_land).
 static int cel_h(int t) { return t > 0 && t < 2 * CEL_HOP ? (t % CEL_HOP) * (CEL_HOP - t % CEL_HOP) / 10 : 0; }
 static int cel_is(int k) {                  // pose k is a celebrating winner's (a standing victory pose, not a line's)
@@ -2736,7 +2726,9 @@ void tny_engine_frame(void) {
         break;
     case P_MATCH_END:
         if (eng.timer < 90) eng.timer++;
-        if (eng.timer == CEL_START && eng.pres == 0 && !scene_running()) cel_start();   // the winners celebrate
+        // the winners celebrate (not while a player still lies downed: the end's line gets him up first, as before)
+        if (eng.timer == CEL_START && eng.pres == 0 && !scene_running() && !revive_is_down(g_PlayerObject) &&
+            !revive_is_down(floor_p2())) cel_start();
         break;
     case P_INTRO: case P_TROPHY:
         if (eng.timer < 0xFFFF) eng.timer++;         // the dark frames before the curtain opens
