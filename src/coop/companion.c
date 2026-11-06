@@ -124,7 +124,9 @@ int companion_is(const Entity *e) { return e && e == coop.p2 && companion_active
 //   op 1, a = party slot: 1 when that character is in the party and neither player plays him (spawn his actor);
 //         player 2 plays him while a second player is in (not alone), whether or not his entity stands yet;
 //   op 2, a = sprite id: 1 when an actor (not a player) of that sprite stands on the map (move it);
-//   op 3: the lead's name in capitals (a %s argument: "%s: Hey dad!").
+//   op 3: the name in capitals of whoever speaker 1 shows (the lead in the scene, else player 1; a %s argument: "%s: Hey dad!");
+//   op 4, a = party slot: 1 when player 1 plays him, or player 2 does while a second player is in: he is in the scene
+//         (Ryan, 2026-11-05: a party member nobody plays is not in the scene; docs/howto.md "Stage a scene" rule 2).
 extern const char *const ui_strings[];   // relocated UI strings (krillin.c): UI_CAPS + slot = a name in capitals
 s32 companion_call(int op, int a) {
     if (op == 1) {
@@ -141,8 +143,9 @@ s32 companion_call(int op, int a) {
         }
         return 0;
     }
-    if (op == 3) {
-        int lead = lead_slot();
+    if (op == 4) return a >= 0 && a < PARTY_SLOTS && (a == g_Party->active_slot || (coop.p2_slot == a && !alone()));
+    if (op == 3) {   // the name speaker 1 shows: the lead's while he is in the scene, else player 1's (Ryan, 2026-11-05)
+        int lead = other_lead();
         return (s32)ui_strings[UI_CAPS + (lead >= 0 ? lead : g_Party->active_slot)];
     }
     return 0;
