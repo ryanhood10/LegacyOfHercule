@@ -9,7 +9,8 @@ or a word's initial; a tag several fighters match goes to the one no other tag o
 
 Out (C): tny_talk_voice[TF_COUNT] (four lines, 0 = none), tny_talk_pairs[] (meeting yourself first, then the rival
 exchanges), tny_talk_teams[], tny_talk_tvt[]. Each line is the game's text with the speaker's name in capitals:
-"!GOKU: Hey!  You look strong!" (the box at the top, two spaces after a sentence as the stock lines have them).
+"!GOKU: Hey!  You look strong!" (the box at the top, two spaces after a sentence as the stock lines have them; in the
+ring tny_talk.c skips the "!" when the top box would hide the speaker: docs/tournament.md 27).
 
 usage: python tools/tnytalk.py docs/tournament-dialogue.md src/coop/tourney_data.c OUT.c
 """

@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-05
 
+- **The tournament's scenes staged (`docs/tournament.md` 27; branch `nb-tny-polish`; Ryan: "characters look at whoever is talking ... you dont have to go too deep, just make a few simple rules"):** every line on the ring is staged as it opens, at no cost in frames: the others turn to the speaker, he turns to whom he addresses and holds his taunt (the shout's last frame, a group his body has), his box moves to the bottom when the top one would hide him; the announcer raises his microphone and turns to whom he names (the winner, the champions, the challenger's entrance); the champions hop twice as the trophy line opens. A fight's talk reaches each line through one ROM entry (CoopCall 24, which pushes the line's slot): no new slot, no new frame. Papaya Island's welcome: the announcer moved into view beside the flight sign, the players turn to him, his microphone (CoopCall 30 ops 7 / 8). No line changed. Test `tny_scenes` (every lineup, in regfull); full regression clean (93 blocks), `perf_budget` as before.
 - **The Time Chamber, phases 4 and 5 (`docs/time-chamber.md` 12.6; branch `nb-chamber-rooms`):** the five rooms beyond the dojo,
   each complete as the dojo is. The pirate airship (Buu's Fury's deck): three Warlord's Henchmen first (twins with two players,
   the stronger ones from three lights out), then General Tao steps up (`RF_CREW`). Frieza's ship (Buu's crystal room): Frieza

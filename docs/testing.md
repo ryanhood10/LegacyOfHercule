@@ -20,6 +20,7 @@ inspection goes through the GDB stub.
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
 | Tournament perfecting pass (tny) | the Rumble announcer's captions, his walks off and on, the turn change's reload, walking speed per playable |
 | Tournament bracket | 8, 16 and 8-team brackets filmed, the page's slide, the skip, BG2's map back, frame stalls on a screen |
+| Tournament scenes | the ring's lines staged (who faces whom, the speaker's pose, the box clear of him, the announcer's microphone, the champions' hop) in every lineup, and the plaza's welcome |
 | Tournament of 32 | 16 teams: the menu's locks, the draw, the blocks and the final four filmed, whole tournaments by pad presses |
 | Tournament in co-op | every tournament with player 2 in, the director and picks by pad presses, to the record and the prize |
 | Team combos: the runner | a team combo started directly (test command 33), filmed: the frozen fight, damage, the knock-down, control back |
@@ -1238,6 +1239,17 @@ python tools/headless/st_expect.py tools/headless/tny_bracket.txt build/<dir>/lo
 ```
 
 **Does the screen stand still?** `UiState.anim_frames` (UI+0x82) counts the bracket's steps: `frames 1` and `peek16 UI+0x82 1` in a loop across a screen, and any frame where it does not move is a frame the screen stood still (one frame at a page's empty middle and at a landing is what it does now). For where the time goes, the hardware timer: `*(u16 *)0x0400010E = 0x83` starts timer 3 at 16,384 Hz (274 ticks a frame), read 0x0400010C around a piece of code into RAM past `UiState` and peek it. Temporary code, not committed.
+
+## Tournament scenes (headless, 2026-11-05, branch `nb-tny-polish`)
+
+`tools/headless/tny_scenes.txt` (from `tny_scenes_gen.py`; self-checking, the `ents` lists checked by `staging_run.py`, in `regfull.sh`; about a minute; `docs/tournament.md` 27). Each block loads `menu.ss` again (it must be in the `--out` folder; `maptest` only works from the debug menu). A 1P Rookie 1 v 1 on seed 42 (Spopovich against the debug party's Piccolo) line by line: on Spopovich's line the announcer faces right, Spopovich left, Piccolo right, one pose held (`eng` +0x152) with the flags 0xC0 on group 4 / 14 / 5 (+0x12C); on Piccolo's the announcer left; on the call everyone squared up, the announcer facing down with his microphone (0xC4). B the 2 v 2 (Mecha Frieza and King Cold): King Cold looks up at his partner, player 2 up at Piccolo. Then whole tournaments by test command 40 (a fight decided after 30 frames): the 1 v 1, the 2 v 2, the co-op 1 v 1 to the duel final (player 2 wins), the Rumble alone and in teams, both players on Piccolo, Yamu and Yamcha, Legend 1 v 1, a loss with Start on the first line (one line staged, then the call); each ends in the waiting room with no pose held and the counts in `.combo.st` (`find ST 0x47415453`, +4 lines, the announcer's lines, the highest hop: 6 on a win, 0 on a loss, boxes moved to the bottom). Last the plaza's welcome, one and two players: the players face right, to the announcer beside the sign. Shots `a*` to `j*` in `tny_scenes.png`. Its line-by-line checks follow the seeded draw: a change to the pool, the seed's use or the dialogue tables can move them (rerun the generator, look at the shots).
+
+**A timing-sensitive neighbour (found 2026-11-05):** `staging_ch9`'s bunker blocks (KA, AK) expect no scene 30 frames after the bunker's intro, while the androids already fight; a few more cycles in every frame (the trophy hop's check in the frame tick, before it moved under `eng.npose`) moved the first hit enough for a pick-up box to open there. The same padding elsewhere did not. If those two blocks fail after an unrelated change, look at their `ka` shots before looking for a bug.
+
+```
+python tools/headless/tny_scenes_gen.py
+python tools/headless/staging_run.py tools/headless/tny_scenes.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+```
 
 ## Tournament of 32 (headless, 2026-11-05, branch `nb-bracket32`)
 
