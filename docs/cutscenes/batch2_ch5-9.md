@@ -886,6 +886,18 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### B.3 The rim: the betrayal, Broly (showcase, M)
 
+- **Built 2026-11-06 (`nb-cs2`, cine helpers).** The basin is empty while Paragus speaks (Broly waits out of view at (520, 404)).
+  On "Broly!" Paragus turns east, the ground shudders twice, dust at the players' feet, everyone looks east and the camera pans
+  56 px to him: his back to them, a 90-frame charge (`CoopCall 37, 7, 90, 2`: the ki pose, white flickers, rings, the burst) with
+  pale green light, the lead pushed back 8 px; silence; he turns his head, then round; "BROLY: ...Ka...  ka...  rot..." in a bottom
+  box (speaker 0 without `@^`), nothing over him. The lines of who is played as before. Before "BROLY: KAKAROOOOT!!" (bottom box) a
+  white flash and the ground heaves; then he is in front of them in a blink (dash to (400, 414), the spot the fight opens from)
+  and his fist goes into the ground at their feet (a heavy strike at a point: ring, flash, boom) with dust and the lead thrown
+  back a step; Paragus walks to his twin's spot through it. The sequence grew by one entry (the fight is entry 18).
+- **Marks:** player 1 (326, 414), player 2 (284, 400), Paragus (384, 380), Vegeta's actor when nobody plays him (352, 400).
+  Filmed: Vegeta + Trunks, Gohan alone (Vegeta's actor), Piccolo + Vegeta. `staging_broly` (nine lineups) unchanged but for a
+  shot of the power-up.
+
 - **Where:** `broly_rim`, zone 15 area 3 (through `data/maps/broly_arena.json`), once (flag 403; the retry goes
   straight to the fight). Films `rim_VT`, `rim_G`.
 - **Today:** the players walk to their marks; **Broly strolls in** from the top right to his spot while Paragus
