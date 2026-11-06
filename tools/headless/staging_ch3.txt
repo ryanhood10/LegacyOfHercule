@@ -34,7 +34,7 @@ poke32 0x0203FD08 5
 frames 300
 mash 24 110
 shot c3_V_drain
-mash 3 110
+mash 4 110
 key 1 6
 frames 44
 shot c3_V_kick
@@ -42,7 +42,7 @@ frames 24
 shot c3_V_thrown
 frames 100
 shot c3_V_mark
-mash 2 110
+mash 1 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
@@ -124,7 +124,7 @@ poke32 0x0203FD08 5
 frames 300
 mash 24 110
 shot c3_H_drain
-mash 3 110
+mash 4 110
 key 1 6
 frames 44
 shot c3_H_kick
@@ -132,7 +132,7 @@ frames 24
 shot c3_H_thrown
 frames 100
 shot c3_H_mark
-mash 2 110
+mash 1 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
@@ -215,7 +215,7 @@ poke32 0x0203FD08 5
 frames 300
 mash 24 110
 shot c3_VH_drain
-mash 3 110
+mash 4 110
 key 1 6
 frames 44
 shot c3_VH_kick
@@ -223,7 +223,7 @@ frames 24
 shot c3_VH_thrown
 frames 100
 shot c3_VH_mark
-mash 2 110
+mash 1 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
@@ -306,7 +306,7 @@ poke32 0x0203FD08 5
 frames 300
 mash 24 110
 shot c3_HV_drain
-mash 3 110
+mash 4 110
 key 1 6
 frames 44
 shot c3_HV_kick
@@ -314,7 +314,7 @@ frames 24
 shot c3_HV_thrown
 frames 100
 shot c3_HV_mark
-mash 2 110
+mash 1 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
