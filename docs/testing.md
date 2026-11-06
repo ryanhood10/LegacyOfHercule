@@ -734,9 +734,13 @@ python tools/headless/st_test.py tools/headless/cine_demo.txt ROM build/<dir>/hl
 - **Skips in a test:** player 1's Start outside a scene also opens the pause menu once the op is over, so `cine.txt` skips
   with player 2's pad (`p2 8`); in a real scene player 1's Start skips (checked on the demo: four moves skipped, the same
   end positions, the scene's end reached).
-- **A skipped move's cost:** the rest of its timeline runs in one frame without poses or effects (a 300-frame exchange:
-  no lagged frame); before the poses were cached a skip froze the game for some 40 frames, which is why `act_frame`
-  writes a pose only when it changes.
+- **Frame cost** (the `perf` command of the probe's runner, two players on the basin, 2026-11-06): idle 35 % of a frame
+  on average; an exchange 48 % (its busiest frame 78 %), a beam struggle 46 % (90 %: the frame both beams fire), a volley
+  45 % (74 %), a charge held alongside 49 % (63 %); no lagged frame in any. A skip runs the rest of the timeline in one
+  frame without poses or effects: a 300-frame exchange skipped 30 frames in cost four lagged frames (before the poses were
+  written only on a change it froze the game for some 40, which is why `act_frame` caches them).
+- **`regfull.sh` and `ST_HEADLESS`:** a private runner copy made from `/root/st_headless` has no `perf` command, so the
+  `perf_budget` block fails under it; run that block by itself without `ST_HEADLESS` (it builds `/root/st_perf`).
 
 ## Time Chamber (headless, 2026-11-05, branch `nb-chamber`; `docs/time-chamber.md` 12)
 
