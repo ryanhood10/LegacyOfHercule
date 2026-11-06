@@ -469,15 +469,32 @@ end
 
 ; Paragus fell while Broly stands (bosses.c BOSS_RAGE; queued by enemies.c)
 sequence broly_rage
-  script
+  script                                 ; he stops and looks at his father's body (the players look at him)
         WhiteFlash 5
-        ScreenShake 0, 20, 40
+        ScreenShake 0, 20, 20
         PlayAudio 50
-  text 0 "@^BROLY: Pa...  ra...  gus...?"
-  text 0 "@^BROLY: RRRAAAAAAAAAGH!!"
+        CoopCall 37, 14, 159, 8          ; the camera goes to him (the fight may have left him far from the players)
+        CoopCall 37, 11, 159, 170
+        WaitFrames 20
+  text 0 "BROLY: Pa...  ra...  gus...?"                 ; bottom boxes (the centred captions sat on him)
+  script                                 ; a held look, then the power doubles: a charge harder than at the rim, green light
+        WaitFrames 30
+        CoopCall 37, 1, 159, -3
+        BeginCommandBatch
+        CoopCall 37, 7, 70, 2
+        EntityWaitFrames 0, 20
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 16
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 12
+        FlashScreenColor 0, 150, 255, 170, 8
+        CommitCommandBatch
+  text 0 "BROLY: RRRAAAAAAAAAGH!!"
   script
-        WhiteFlash 5
-        ScreenShake 0, 20, 60
+        CoopCall 37, 15, 40, 2
+        CoopCall 37, 0, 0, 0
+        CoopCall 37, 14, 0, 8            ; and back to player 1
+        SetActiveEntity 0
   text 0 "@^Broly's power explodes!  He is stronger and faster than ever!"
 end
 

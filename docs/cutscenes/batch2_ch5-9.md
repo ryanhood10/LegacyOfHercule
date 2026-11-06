@@ -943,6 +943,11 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### B.4 Broly's rage (showcase with B.3, S)
 
+- **Built 2026-11-06 (`nb-cs2`).** The camera goes to Broly (`CoopCall 37, 14, 159, 8`: the fight may have left him off screen: the
+  old captions then played over nothing), he looks at his father's body and the players look at him (op 11), "Pa...  ra...  gus...?" in
+  a bottom box, a held look, a 70-frame charge with green light, "RRRAAAAAAAAAGH!!", a jolt, the camera back, the caption. About
+  3.5 s of moves. The fight goes on after it (the staging test wins it afterwards).
+
 - **Where:** `broly_rage` (queued by `enemies.c` when Paragus falls first). Film `rim_VT` (test command 9).
 - **Today:** a flash and a shake; two captions over him; a flash and a shake; "@^Broly's power explodes!  He is
   stronger and faster than ever!" tells what happened.
