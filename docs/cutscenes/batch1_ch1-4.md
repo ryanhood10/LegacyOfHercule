@@ -315,6 +315,9 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   his palm; King Cold is thrown, lies, gets up roaring); the second is a single blast. Left as cuts on purpose: Trunks leaving the view
   before Frieza's blast lands and coming down above him (a Cine dash keeps its body inside the view and 30 px off its top); the sword is
   the stock animation 16 (Cine's strike has no sword pose).
+  **The transformation itself back (Ryan, 2026-11-06: "add that back in alongside the explosions"; branch `nb-ssjfix`):** the stock's own
+  power-up again (the hum 55, `SetEntityAnimation 128, 9` at its own pace, about 140 frames, the burst sound 23, the swap to 134) with
+  Cine's charge held alongside (`CoopCall 37, 7, 0, 6`), old Hercule backing off in the same batch, the burst on the swap.
 
 ### 1.8 Goku's arrival and Trunks' warning: touch up (M)
 
