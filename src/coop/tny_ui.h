@@ -90,7 +90,7 @@ struct Ui {
     u8 ok;                      // the display and canvas are ready
     u16 qmark_tile;             // OBJ tiles of the "?" mark (0xFFFF none)
     u8 idle;                    // the screen waits for a button this frame (on_step sets it; tests read it)
-    u8 shrink;                  // giants' 64 x 64 faces at half size (OBJ affine; the bracket, the Rumble board)
+    u8 shrink;                  // giants' faces (a 64 px side: 64 x 64, 32 x 64, 64 x 32) at half size (OBJ affine; the bracket, the Rumble board)
     u16 bg1_x;                  // the bitmap's horizontal scroll, written in the vblank (the bracket's page slide)
 };
 

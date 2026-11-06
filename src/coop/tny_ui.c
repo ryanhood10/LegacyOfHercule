@@ -376,16 +376,18 @@ void ui_crop_draw(Ui *u, u16 tile, int x, int y) {
 }
 
 // Giants' faces at half size on the screens whose faces move (the bracket, the Rumble board; polish, 2026-10-25): a
-// face's OAM entry (attr2's tile = the Portrait entity's OBJ tile, +0x0C) that is 64 x 64 becomes an affine sprite on
-// matrix 31 (entries 124-127's attr3: PA = PD = 0x200, a 1/2 scale) without double size: a 32 x 32 body in the
-// middle of its 64 x 64 box, the same centre. Faces face down (never flipped), so the flip bits it replaces are 0.
+// face's OAM entry (attr2's tile = the Portrait entity's OBJ tile, +0x0C) that is 64 px on a side (64 x 64, and since
+// 2026-11-05 also 32 x 64 and 64 x 32: Super Buu, Evil Buu and Pui Pui stand in 32 x 64 frames, 57 px tall, and covered
+// their neighbours, docs/tournament.md 28) becomes an affine sprite on matrix 31 (entries 124-127's attr3: PA = PD =
+// 0x200, a 1/2 scale) without double size: the body at half size in the middle of its box, the same centre. Faces face
+// down (never flipped), so the flip bits it replaces are 0.
 #define UI_PORTRAIT_VT 0x08025C30u
 static void shrink_giants(EntityList *l) {
     int used = 0;
     for (int k = 0; k < 124; k++) {
         u32 w0 = UI_OAM_SHADOW[k * 2], w1 = UI_OAM_SHADOW[k * 2 + 1];
         if ((w0 & 0x300) == 0x200) continue;                      // hidden
-        if ((w0 & 0xC000) != 0 || (w0 >> 30) != 3) continue;     // square, size 3: 64 x 64
+        if ((w0 & 0xC000) == 0xC000 || (w0 >> 30) != 3) continue;   // size 3, any shape: 64 x 64, 64 x 32, 32 x 64
         for (int i = 0; i < l->count; i++) {
             const Entity *e = l->items[i];
             if ((u32)e->vtable != UI_PORTRAIT_VT || (*(const u16 *)((const u8 *)e + 0x0C) & 0x3FF) != (w1 & 0x3FF)) continue;
