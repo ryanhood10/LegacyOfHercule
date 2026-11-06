@@ -1,5 +1,5 @@
 {
- "_": "A Time Chamber room (docs/time-chamber.md 12): Frieza's ship, Buu's Fury's crystal room inside Babidi's ship (zone 8 area 19, variation 0x0822EAA0 there) imported whole, its top doorway and right opening closed, the bottom corridor the door; a purple plaque (8/37's) on the back wall left of the top doorway (BG1, empty there). Frieza (Mecha Frieza at 40 %), with two players King Cold: they come down the sides of the crystal. Without roms/buu.gba chamber_frieza_plain.json stands here.",
+ "_": "A Time Chamber room (docs/time-chamber.md 12): Frieza's ship, Buu's Fury's crystal room inside Babidi's ship (zone 8 area 19, variation 0x0822EAA0 there) imported whole, its right opening closed, its top doorway closed until the lever is thrown (then the throne room, 15/29), the bottom corridor the door; a purple plaque (8/37's) on the back wall left of the top doorway (BG1, empty there). Frieza (Mecha Frieza at 40 %), with two players King Cold: they come down the sides of the crystal. Without roms/buu.gba chamber_frieza_plain.json stands here.",
  "name": "chamber_frieza",
  "zone": 15,
  "area": 21,
@@ -198,6 +198,27 @@
     580
    ],
    "facing": 0
+  },
+  {
+   "type": "door",
+   "rect": [
+    184,
+    56,
+    216,
+    80
+   ],
+   "dir": "up",
+   "to": [
+    15,
+    29,
+    1
+   ],
+   "at": [
+    200,
+    300
+   ],
+   "facing": 1,
+   "_": "the throne room (the top doorway, blocked until the lever)"
   }
  ],
  "onload": "script:ch_room_onload",

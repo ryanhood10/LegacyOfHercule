@@ -1,5 +1,5 @@
 {
- "_": "The Time Chamber's open area (docs/time-chamber.md, section 12 the state of the build): the largest map the collision bitmap takes, white void floor, the living quarters (the Lookout's facade, as time_chamber.json), the gate (decorations 0-8), six entrances (tools/chamberart.py: drawn by code, mirrored; each door leads to its room, 15/19-24), jars, spot records (stat 155: chamber.c gives each the tier's enemy).",
+ "_": "The Time Chamber's open area (docs/time-chamber.md, sections 12 and 13): the largest map the collision bitmap takes, white void floor, the living quarters (the Lookout's facade, as time_chamber.json) with the door home (a dark doorway and an EXIT sign; leaving asks first: chamber.c), the gate (decorations 0-8) set in a wall across the map with a portal between its pillars (decorations 25-26, open with all six lights out), six entrances (tools/chamberart.py; each door leads to its room, 15/19-24), a red carpet joining the quarters, the doors and the gate (tools/chamberpath.py), jars, spot records (stat 155: chamber.c gives each the tier's enemy). No save pad.",
  "name": "chamber_open",
  "zone": 15,
  "area": 18,
@@ -240,26 +240,6 @@
    "mask": "both"
   },
   {
-   "op": "stamp",
-   "at": [
-    150,
-    150
-   ],
-   "src": {
-    "map": [
-     13,
-     7
-    ],
-    "rect": [
-     7,
-     13,
-     8,
-     8
-    ]
-   },
-   "collision": false
-  },
-  {
    "op": "png",
    "bg": 2,
    "draw": "chamberart",
@@ -440,6 +420,72 @@
    "mask": "both"
   },
   {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberpath",
+   "arg": "carpet",
+   "at": [
+    0,
+    0
+   ],
+   "_": "the red carpet from the quarters to the six doors and the gate (tools/chamberpath.py SEGMENTS)"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberpath",
+   "arg": "wall",
+   "at": [
+    0,
+    37
+   ],
+   "_": "the wall the gate stands in, the sealed portal between the pillars"
+  },
+  {
+   "op": "block",
+   "rect": [
+    0,
+    0,
+    256,
+    50
+   ],
+   "mask": "both",
+   "_": "the wall and everything north of it"
+  },
+  {
+   "op": "png",
+   "bg": 1,
+   "draw": "chamberpath",
+   "arg": "door",
+   "at": [
+    125,
+    152
+   ],
+   "_": "the quarters' door home"
+  },
+  {
+   "op": "png",
+   "bg": 2,
+   "draw": "chamberpath",
+   "arg": "sign",
+   "at": [
+    134,
+    151
+   ],
+   "_": "the EXIT sign"
+  },
+  {
+   "op": "block",
+   "rect": [
+    134,
+    151,
+    5,
+    3
+   ],
+   "mask": "both",
+   "_": "the sign's board and posts"
+  },
+  {
    "op": "border",
    "width": 1,
    "mask": "both"
@@ -461,6 +507,10 @@
      14,
      2
     ]
+   },
+   {
+    "draw": "chamberpath",
+    "arg": "portal"
    }
   ],
   "list": [
@@ -670,6 +720,23 @@
     "shape": "32x32",
     "hits": 3,
     "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 2,
+    "frame": 0,
+    "x": 1012,
+    "y": 324,
+    "shape": "32x64",
+    "visible": 0
+   },
+   {
+    "part": 2,
+    "frame": 0,
+    "x": 1012,
+    "y": 324,
+    "shape": "32x64",
+    "visible": 0,
+    "flip": "hv"
    }
   ]
  },
@@ -683,7 +750,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -694,7 +762,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -705,7 +774,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -716,7 +786,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -727,7 +798,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -738,7 +810,8 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   },
   {
    "kind": "enemy",
@@ -749,61 +822,25 @@
    "behaviours": [
     "0x083EE430"
    ],
-   "action": "script:ch_enemy_drop"
+   "action": "script:ch_enemy_drop",
+   "condition": "noflag:530"
   }
  ],
  "triggers": [
   {
-   "type": "savepad",
-   "rect": [
-    1200,
-    1208,
-    1249,
-    1249
-   ]
-  }
- ],
- "exits": [
-  {
-   "_": "the way between the gate's pillars to the hidden room (15/25, Mr. Popo: popo.c): inside the rect that stays blocked until all six lights are out (ch_open_onload)",
-   "type": "door",
+   "type": "script",
    "rect": [
     1008,
     320,
     1048,
-    336
-   ],
-   "dir": "up",
-   "to": [
-    15,
-    25,
-    1
-   ],
-   "at": [
-    244,
     340
    ],
-   "facing": 1
-  },
-  {
-   "type": "door",
-   "rect": [
-    976,
-    1224,
-    1048,
-    1256
-   ],
-   "dir": "up",
-   "to": [
-    9,
-    3,
-    1
-   ],
-   "at": [
-    96,
-    168
-   ]
-  },
+   "payload": "script:ch_portal",
+   "activation": "enter",
+   "_": "the portal (open with all six lights out: the rect is blocked until then): chamber.c queues the warp (a flash, its sound, the hidden room) as a scene after the trigger scan"
+  }
+ ],
+ "exits": [
   {
    "type": "door",
    "rect": [

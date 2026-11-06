@@ -1,0 +1,125 @@
+{
+ "_": "A Time Chamber side room (docs/time-chamber.md 13): the Saiyan ship's bedroom, Buu's Fury's 6/8 (variation 0x08253924, the round room's left-hand room there) imported whole but its BG0 effect; its opening on the right back to the Saiyan ship (15/24), open once that room's lever is thrown. Explore only: two stone jars, and under the pillow a +3 Endurance Capsule, once ever (ch_find, flag 531).",
+ "name": "chamber_saiyan_bed",
+ "zone": 15,
+ "area": 27,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  240,
+  160
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08253924"
+    },
+    "rect": [
+     0,
+     0,
+     30,
+     20
+    ]
+   },
+   "layers": [
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     14,
+     2
+    ]
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 120,
+    "y": 64,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 168,
+    "y": 64,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    88,
+    64,
+    112,
+    128
+   ],
+   "payload": "seq:ch_find",
+   "activation": "press",
+   "_": "beside the bed"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    208,
+    96,
+    240,
+    124
+   ],
+   "dir": "right",
+   "to": [
+    15,
+    24,
+    1
+   ],
+   "at": [
+    40,
+    160
+   ],
+   "facing": 3
+  }
+ ],
+ "spawn": [
+  196,
+  108
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

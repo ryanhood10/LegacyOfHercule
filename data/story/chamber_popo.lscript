@@ -116,7 +116,7 @@ end
 
 ; ---- his HP at 0: he does not fall (the arms out, popo.c P_YIELD), then a flash and he stands at the far end; he stays -----
 sequence ch_popo_end
-  [0] script                             ; -> 1 the first win ever, 3 a later one
+  [0] script                             ; -> 1 the first win ever, 10 a later one (popo.c POPO_WIN)
         WhiteFlash 10
         PlayAudio 26
         CoopCall 36, 13, 0, 0
@@ -126,19 +126,26 @@ sequence ch_popo_end
         CoopCall 36, 14, 0, 0
         END
   [1] text 82 "MR. POPO: Enough.  Popo has seen enough.\x0bYou are strong now.  Popo has something for you." -> 2
-  [2] script                             ; the first reward: a Senzu bean and a +3 capsule of each
-        PickUpItem 0
-        PickUpItem 3
-        PickUpItem 6
-        PickUpItem 9
+  [2] script                             ; the first reward: a Senzu bean and a +3 capsule of each, each with its box
         CoopCall 36, 15, 0, 0
-        PushByte 5
-        END
-  [3] text 82 "MR. POPO: Again you win.  Popo is happy.\x0bTake this." -> 4
-  [4] script
         PickUpItem 0
-  [5] text 82 "MR. POPO: Popo will stay here.\x0bTalk to Popo when you want more."
-  [6] script                             ; beaten this time round (flag 530); the door opens; the view back on player 1
+  [3] text 0 "@^You received a Senzu Bean!"
+  [4] script
+        PickUpItem 3
+  [5] text 0 "@^You received a +3 Strength Capsule!"
+  [6] script
+        PickUpItem 6
+  [7] text 0 "@^You received a +3 Power Capsule!"
+  [8] script
+        PickUpItem 9
+  [9] text 0 "@^You received a +3 Endurance Capsule!" -> 13
+  [10] text 82 "MR. POPO: Again you win.  Popo is happy.\x0bTake this." -> 11
+  [11] script
+        PickUpItem 0
+  [12] text 0 "@^You received a Senzu Bean!" -> 13
+  [13] text 82 "MR. POPO: Popo will stay here.\x0bTalk to Popo when you want more."
+  [14] text 82 "MR. POPO: Outside, the chamber is quiet now.\x0bThe training is complete. The way home is open."
+  [15] script                            ; beaten this time round (flag 530); the door opens; the view back on player 1
         CoopCall 36, 23, 0, 0
         CoopCall 36, 17, 0, 0
         PlayAudio 47
@@ -148,7 +155,7 @@ sequence ch_popo_end
         Step PanCameraToPosition
         WaitFrames 30
         SetActiveEntity 0
-  [7] stop 0x0
+  [16] stop 0x0
 end
 
 ; ---- talking to him after a win (the map's "facing" trigger in front of him: either player's A) ---------------------------

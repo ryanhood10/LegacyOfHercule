@@ -1,44 +1,270 @@
 {
-  "_": "The Time Chamber's hidden room behind the gate (docs/time-chamber.md 5 and 12.7): a plain white room, the gate's two pillars again on either side of the door at the bottom (the way back to the open area, 15/18 below the gate), four stone jars in the corners with the big drop (ch_popo_jar: 30 % food and 30 % energy, 3 hits), Mr. Popo's actor at the far end with his back turned (sprite 163, POPO_SPRITE, tools/popoart.py); in front of him a talk trigger (A facing him, either player: ch_popo_talk, the fight again or the loop once he is beaten this time round). Decorations: 0 the gate's beam across the door (hidden; shown while the fight seals it), 1-4 the jars. The scenes and the fight are src/coop/popo.c and data/story/chamber_popo.lscript.",
+  "_": "The Time Chamber's hidden room behind the gate (docs/time-chamber.md 5 and 12.7): another part of the chamber, its white tinged with violet, the gate's two pillars again at the bottom with the portal (tools/chamberpath.py) between them, the way back (the way back to the open area, 15/18 below the gate), four stone jars in the corners with the big drop (ch_popo_jar: 30 % food and 30 % energy, 3 hits), Mr. Popo's actor at the far end with his back turned (sprite 163, POPO_SPRITE, tools/popoart.py); in front of him a talk trigger (A facing him, either player: ch_popo_talk, the fight again or the loop once he is beaten this time round). Decorations: 0 the gate's beam across the door (hidden; shown while the fight seals it), 1-4 the jars. The scenes and the fight are src/coop/popo.c and data/story/chamber_popo.lscript.",
   "name": "chamber_popo",
-  "zone": 15, "area": 25,
-  "base": [9, 1],
-  "tileset": "fresh",
-  "layout": [480, 400],
-  "priorities": [1, 2, 3, 3],
-  "ops": [
-    {"op": "texture", "bg": 3, "rect": [0, 0, 60, 50], "color": [252, 252, 252], "variants": 8, "seed": 25,
-     "speckle": [{"color": [232, 236, 246], "density": 0.035}, {"color": [214, 222, 238], "density": 0.008}]},
-    {"op": "walk", "rect": [0, 0, 60, 50], "mask": "both"},
-    {"op": "stamp", "at": [25, 41], "src": {"map": [8, 16], "rect": [20, 8, 3, 9]}, "layers": [2], "collision": false},
-    {"op": "stamp", "at": [33, 41], "src": {"map": [8, 16], "rect": [20, 8, 3, 9]}, "layers": [2], "flip": "h", "collision": false},
-    {"op": "block", "rect": [25, 41, 3, 9], "mask": "both"},
-    {"op": "block", "rect": [33, 41, 3, 9], "mask": "both"},
-    {"op": "border", "width": 1, "mask": "both"}
+  "zone": 15,
+  "area": 25,
+  "base": [
+    9,
+    1
   ],
-  "sources": ["data/story/chamber_popo.lscript"],
+  "tileset": "fresh",
+  "layout": [
+    480,
+    400
+  ],
+  "priorities": [
+    1,
+    2,
+    3,
+    3
+  ],
+  "ops": [
+    {
+      "op": "texture",
+      "bg": 3,
+      "rect": [
+        0,
+        0,
+        60,
+        50
+      ],
+      "color": [
+        246,
+        246,
+        255
+      ],
+      "variants": 8,
+      "seed": 25,
+      "speckle": [
+        {
+          "color": [
+            222,
+            222,
+            255
+          ],
+          "density": 0.04
+        },
+        {
+          "color": [
+            189,
+            189,
+            255
+          ],
+          "density": 0.01
+        }
+      ]
+    },
+    {
+      "op": "walk",
+      "rect": [
+        0,
+        0,
+        60,
+        50
+      ],
+      "mask": "both"
+    },
+    {
+      "op": "stamp",
+      "at": [
+        25,
+        41
+      ],
+      "src": {
+        "map": [
+          8,
+          16
+        ],
+        "rect": [
+          20,
+          8,
+          3,
+          9
+        ]
+      },
+      "layers": [
+        2
+      ],
+      "collision": false
+    },
+    {
+      "op": "stamp",
+      "at": [
+        33,
+        41
+      ],
+      "src": {
+        "map": [
+          8,
+          16
+        ],
+        "rect": [
+          20,
+          8,
+          3,
+          9
+        ]
+      },
+      "layers": [
+        2
+      ],
+      "flip": "h",
+      "collision": false
+    },
+    {
+      "op": "block",
+      "rect": [
+        25,
+        41,
+        3,
+        9
+      ],
+      "mask": "both"
+    },
+    {
+      "op": "block",
+      "rect": [
+        33,
+        41,
+        3,
+        9
+      ],
+      "mask": "both"
+    },
+    {
+      "op": "png",
+      "bg": 2,
+      "draw": "chamberpath",
+      "arg": "portal_open",
+      "at": [
+        28,
+        41
+      ],
+      "_": "the portal back between the gate's pillars"
+    },
+    {
+      "op": "border",
+      "width": 1,
+      "mask": "both"
+    }
+  ],
+  "sources": [
+    "data/story/chamber_popo.lscript"
+  ],
   "objects": {
-    "parts": [{"map": [8, 16], "from": 128, "bytes": 2048}, {"map": [14, 2]}],
+    "parts": [
+      {
+        "map": [
+          8,
+          16
+        ],
+        "from": 128,
+        "bytes": 2048
+      },
+      {
+        "map": [
+          14,
+          2
+        ]
+      }
+    ],
     "list": [
-      {"part": 0, "frame": 0, "x": 212, "y": 352, "shape": "64x32", "visible": 0},
-      {"part": 1, "frame": 0, "x": 24, "y": 24, "shape": "32x32", "hits": 3, "drop": "script:ch_popo_jar"},
-      {"part": 1, "frame": 0, "x": 424, "y": 24, "shape": "32x32", "hits": 3, "drop": "script:ch_popo_jar"},
-      {"part": 1, "frame": 0, "x": 24, "y": 296, "shape": "32x32", "hits": 3, "drop": "script:ch_popo_jar"},
-      {"part": 1, "frame": 0, "x": 424, "y": 296, "shape": "32x32", "hits": 3, "drop": "script:ch_popo_jar"}
+      {
+        "part": 0,
+        "frame": 0,
+        "x": 212,
+        "y": 352,
+        "shape": "64x32",
+        "visible": 0
+      },
+      {
+        "part": 1,
+        "frame": 0,
+        "x": 24,
+        "y": 24,
+        "shape": "32x32",
+        "hits": 3,
+        "drop": "script:ch_popo_jar"
+      },
+      {
+        "part": 1,
+        "frame": 0,
+        "x": 424,
+        "y": 24,
+        "shape": "32x32",
+        "hits": 3,
+        "drop": "script:ch_popo_jar"
+      },
+      {
+        "part": 1,
+        "frame": 0,
+        "x": 24,
+        "y": 296,
+        "shape": "32x32",
+        "hits": 3,
+        "drop": "script:ch_popo_jar"
+      },
+      {
+        "part": 1,
+        "frame": 0,
+        "x": 424,
+        "y": 296,
+        "shape": "32x32",
+        "hits": 3,
+        "drop": "script:ch_popo_jar"
+      }
     ]
   },
   "records": [
-    {"kind": "actor", "sprite": 163, "x": 244, "y": 72, "facing": 1}
+    {
+      "kind": "actor",
+      "sprite": 163,
+      "x": 244,
+      "y": 72,
+      "facing": 1
+    }
   ],
   "triggers": [
-    {"type": "dialogue", "rect": [220, 52, 268, 108], "payload": "seq:ch_popo_talk", "activation": "facing"}
+    {
+      "type": "dialogue",
+      "rect": [
+        220,
+        52,
+        268,
+        108
+      ],
+      "payload": "seq:ch_popo_talk",
+      "activation": "facing"
+    }
   ],
   "exits": [
-    {"type": "door", "rect": [224, 376, 264, 392], "dir": "down", "to": [15, 18, 1], "at": [1028, 420], "facing": 0}
+    {
+      "type": "door",
+      "rect": [
+        224,
+        376,
+        264,
+        392
+      ],
+      "dir": "down",
+      "to": [
+        15,
+        18,
+        1
+      ],
+      "at": [
+        1028,
+        420
+      ],
+      "facing": 0
+    }
   ],
   "onload": "script:ch_popo_onload",
   "onleave": "script:ch_popo_onleave",
-  "spawn": [244, 340],
+  "spawn": [
+    244,
+    340
+  ],
   "name_id": 221,
   "music": 39,
   "flags": 1

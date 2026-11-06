@@ -102,6 +102,10 @@ typedef struct ChRoom {
     const char *crew_line;      // RF_CREW: the lead's line when the crew is down, as he steps up
     const char *rage_line;      // RF_RAGE: the lead's line when his partner falls first
     const struct ChRoom *plain; // the row a build without Buu's Fury's art uses (BUU=0: its fallback map, other fighters)
+    // (docs/time-chamber.md 13, Ryan's first play)
+    s16 stand[2][2];            // where the lead and the partner stand at the far end (the map's actor records): the opening
+    s16 shot[2][2];             // the opening's two views of the room (top-left): from the lit plaque to the boss
+    s16 ways[2][4];             // side rooms' doorways, blocked until the lever is thrown (x1, y1, x2, y2; 0 = none)
 } ChRoom;
 #define RF_CREW 0x01            // a crew of regular enemies first (the airship's Warlord's Henchmen), then the lead
 #define RF_RAGE 0x02            // the partner falling first enrages the lead (the Broly chapter's rule: full HP, a power-up)
@@ -203,7 +207,8 @@ static const char *const paragus_by[CH_LINE_SLOTS] = {
 
 // A build without roms/buu.gba (BUU=0) has no Buu-saga Piccolo, no Broly and none of Buu's Fury's interiors: these rows stand
 // on the fallback maps (data/maps/chamber_*_plain.json, "unless": "buu": LoG2's Capsule Ship 3 recoloured).
-#define CAPSULE_PLACE .look = LOOK_UP, .mark = { { 120, 200 }, { 200, 200 } }, .seal = { 144, 296, 176, 304 }, .line = 290
+#define CAPSULE_PLACE .look = LOOK_UP, .mark = { { 120, 200 }, { 200, 200 } }, .seal = { 144, 296, 176, 304 }, .line = 290, \
+                      .stand = { { 120, 176 }, { 200, 176 } }, .shot = { { 40, 60 }, { 40, 100 } }
 static const ChRoom pirate_plain = {
     .area = 20, .light = 1, .flags = RF_CREW, CAPSULE_PLACE,
     .alone = { TF_TAO, 360, 100, TAO_WON }, .pair = { { TF_TAO, 360, LONE_HP, TAO_WON }, { NONE, 0, 0, 0 } },
@@ -237,6 +242,7 @@ static const ChRoom rooms[] = {
         .open = "ROSHI: Hoho! So Popo set me up in here, did he?\x0b" "Come on, then. Let's see what you've learned.",
         .open_by = roshi_by,
         .partner_line = "CHIAOTZU: I'll help, Master Roshi.\x0b" "Tien says I have to get more practice.",
+        .stand = { { 124, 100 }, { 164, 100 } }, .shot = { { 20, 0 }, { 20, 40 } },
     },
     {   // the pirate airship (data/maps/chamber_pirate.json, Buu's Fury's deck 12/1): the Warlord's Henchmen, then Tao. The
         // players come in by the gangway on the right; a lone Tao against two (his crew has twins)
@@ -247,6 +253,7 @@ static const ChRoom rooms[] = {
         .line = 344,
         .open = TAO_OPEN, .open_by = tao_by, .crew_sprite = 142, .crew_line = TAO_CREW,
         .plain = &pirate_plain,
+        .stand = { { 80, 136 }, { 80, 136 } }, .shot = { { 0, 0 }, { 0, 60 } },
     },
     {   // Frieza's ship (data/maps/chamber_frieza.json, Buu's Fury's 8/19, the crystal room): Frieza alone turns Mecha at 40 %
         // (his kit); with two players Frieza and King Cold come round the crystal
@@ -258,6 +265,8 @@ static const ChRoom rooms[] = {
         .line = 320,
         .open = FRIEZA_OPEN, .open_by = frieza_by, .partner_line = COLD_LINE,
         .plain = &frieza_plain,
+        .stand = { { 104, 240 }, { 296, 232 } }, .shot = { { 0, 16 }, { 80, 150 } },
+        .ways = { { 184, 56, 216, 104 } },          // the top doorway: the throne room (15/29)
     },
     {   // the Namek ship (data/maps/chamber_namek.json, Capsule Ship 3 in green): Buu-saga Piccolo, the Namekian Warrior
         .area = 22, .light = 3, CAPSULE_PLACE,
@@ -274,6 +283,7 @@ static const ChRoom rooms[] = {
         .seal = { 200, 336, 232, 344 },
         .line = 320,
         .open = A18_OPEN, .open_by = a18_by, .partner_line = A17_LINE,
+        .stand = { { 128, 200 }, { 240, 200 } }, .shot = { { 30, 60 }, { 40, 110 } },
     },
     {   // the Saiyan ship (data/maps/chamber_saiyan.json, the Broly chapter's round room): Broly (his rage at 50 %, his kit);
         // with two players Paragus too, and Paragus falling first enrages Broly (RF_RAGE)
@@ -285,6 +295,8 @@ static const ChRoom rooms[] = {
         .line = 216,
         .open = BROLY_OPEN, .open_by = broly_by, .partner_line = PARAGUS_LINE, .rage_line = BROLY_RAGE,
         .plain = &saiyan_plain,
+        .stand = { { 56, 136 }, { 200, 150 } }, .shot = { { 0, 0 }, { 0, 60 } },
+        .ways = { { 0, 136, 32, 184 }, { 208, 136, 240, 184 } },   // the side openings: the bedroom (15/27), the store room (15/28)
     },
 };
 #define ROOM_COUNT (int)(sizeof rooms / sizeof rooms[0])
@@ -326,9 +338,23 @@ typedef struct ChState {
     u8 cut;                // the room whose lever's cut-away runs (rooms[] index)
     u8 crew;               // RF_CREW: 1 once the crew stood up (the lead fights after them)
     u8 raged;              // RF_RAGE: 1 once the lead raged
+    u8 prize;              // the item the last lever paid (its box: CH_PRIZE_TEXT)
     const void *const *crew_parts;   // RF_CREW: the scene's parts when the crew is down (ch_crew_parts, CH_INTRO's b)
+    const void *open_seq;  // the open area's scenes (ch_open_scenes: the opening, the way out, the training's end)
+    u8 scene;              // SC_* | SC_RUNNING | SC_SKIP: the open area's scene queued or running
+    u8 bits;               // B_*
+    u8 anim;               // the portal's frames
+    u8 wait2;              // frames before a queued scene starts (player 1 free)
 } ChState;
-_Static_assert(sizeof(ChState) <= 0x30, "docs/ids.md: .combo.ch at most 0x30 bytes");
+_Static_assert(sizeof(ChState) <= 0x34, "docs/ids.md: .combo.ch at most 0x34 bytes");
+enum { SC_NONE, SC_OPENING, SC_EXIT, SC_DONE, SC_PORTAL };   // the open area's scenes (ch_open_scenes' routes)
+#define SC_KIND     0x0F
+#define SC_RUNNING  0x40
+#define SC_SKIP     0x80
+#define B_EXIT_HELD 0x01   // a player stood in the door's strip: no question until both have left it
+#define B_DONE_SEEN 0x02   // "Training complete!" shown this visit
+#define B_PORTAL    0x04   // the portal is open (its two frames shown in turn)
+#define B_PHASE     0x08
 static ChState ch __attribute__((section(".combo.ch")));
 
 static void state_check(void) {
@@ -440,10 +466,15 @@ static void spawn_near(Entity *p1, s32 cx, s32 cy) {
     }
 }
 
+static void exit_watch(void);
+static int training_done(void) { return flag_test_hook(g_Party, CH_FLAG_ROUND_WON); }
+
 static void open_tick(void) {
-    if (ch.frozen || scene_running() || !p1_controllable()) return;
+    if (scene_running() || !p1_controllable()) return;
     Entity *p1 = g_PlayerObject;
     if (!p1 || !in_list(p1)) return;
+    exit_watch();
+    if (ch.frozen || training_done()) return;      // Popo beaten this time round: the training is complete, nobody comes
     if (ch.wait > 0) ch.wait--;
     if (ch.tick++ < CH_TICK) return;
     ch.tick = 0;
@@ -698,11 +729,112 @@ static void room_tick(const ChRoom *r) {
     }
 }
 
+// ---- the open area's scenes (docs/time-chamber.md 13): the opening of a run, the question at the door home, the training's end
+// One sequence (data/story/chamber.lscript ch_open_scenes, handed over by the open area's on-load); its entry 0 asks
+// CH_SCENE_ROUTE where to start. A queued scene starts once player 1 is free (as Popo's do), through coop2's action object.
+#define SCENE_WAIT     20            // frames of player 1 free before a queued scene starts
+#define DOOR_X1        976           // the quarters' door: a player here pressing Up is leaving
+#define DOOR_X2        1048
+#define DOOR_Y2        1250          // (the door's wall stops a player at about y 1234)
+#define PORTAL_DECO    25            // the open map's decorations 25 / 26: the portal's swirl and its half-turned copy
+#define PORTAL_FRAMES  10
+#define CMD_BATCH      ((u32 *)0x030020F8)
+ROM_FN(void *, Cmd_Walk, (void *mem, const s32 *xy), 0x08026621);
+ROM_FN(void, Cmd_Queue, (u32 *batch, void *cmd, Entity *e), 0x0800E04D);
+
+static Entity *p2_here(void) { return coop.p2 && in_list(coop.p2) ? coop.p2 : 0; }
+static void queue_scene(int kind) { ch.scene = (u8)kind; ch.wait2 = 0; }
+
+static void walk_to(Entity *e, s32 x, s32 y) {      // inside the script's command batch
+    if (!e || !in_list(e) || *(u32 *)((u8 *)e + 0x150)) return;
+    s32 xy[2] = { x, y };
+    void *c = Cmd_Walk(0, xy);
+    if (c) Cmd_Queue(CMD_BATCH, c, e);
+}
+
+static int at_door(const Entity *e, const InputSystem *in) {
+    if (!e) return 0;
+    s32 x = e->x >> 8, y = e->y >> 8;
+    return x >= DOOR_X1 && x < DOOR_X2 && y < DOOR_Y2 && y > DOOR_Y2 - 48 && (in->current & KEY_UP);
+}
+static int near_door(const Entity *e) {
+    if (!e) return 0;
+    s32 x = e->x >> 8, y = e->y >> 8;
+    return x >= DOOR_X1 - 8 && x < DOOR_X2 + 8 && y < DOOR_Y2 + 4 && y > DOOR_Y2 - 48;
+}
+
+// Either player walking up into the quarters' door: the question (or, the training complete, the way out at once). Asked
+// again only once both have stepped away from the door.
+static void exit_watch(void) {
+    Entity *p1 = g_PlayerObject, *p2 = p2_here();
+    if (ch.scene) return;
+    if (ch.bits & B_EXIT_HELD) {
+        if (!near_door(p1) && !near_door(p2)) ch.bits &= (u8)~B_EXIT_HELD;
+        return;
+    }
+    if (at_door(p1, g_InputSystem) || (p2 && !coop_solo() && at_door(p2, &coop.input2))) {
+        ch.bits |= B_EXIT_HELD;
+        queue_scene(SC_EXIT);
+    }
+}
+
+static void bodies_clear(void) {                    // the void's regular enemies leave (a scene over the whole map)
+    EntityList *l = g_EntityList;
+    for (int i = l->count - 1; i >= 0; i--) {
+        Entity *e = l->items[i];
+        if (!is_any_enemy(e)) continue;
+        EntityList_Broadcast(g_SceneTable[1], 0xF, e);
+        EntityList_Remove(g_SceneTable[1], e, 0);
+    }
+    ch.wait = CH_REFILL_WAIT;
+}
+
+static void portal_tick(void) {
+    if (!(ch.bits & B_PORTAL) || ++ch.anim < PORTAL_FRAMES) return;
+    ch.anim = 0;
+    ch.bits ^= B_PHASE;
+    int b = (ch.bits & B_PHASE) != 0;
+    step1(b ? STEP_FLAG_HIDE : STEP_FLAG_SHOW, PORTAL_DECO);
+    step1(b ? STEP_FLAG_SHOW : STEP_FLAG_HIDE, PORTAL_DECO + 1);
+}
+
+// input.c, every poll: during the opening Start or B (either pad) asks for the skip; from then on the pads press A every other
+// frame and nothing else, so a box on screen closes and the scene runs to its end (CH_GO / CH_GOING route it there)
+void chamber_input(u16 *p1, u16 *p2) {
+    if (ch.magic != CH_MAGIC || (ch.scene & (SC_RUNNING | SC_KIND)) != (SC_RUNNING | SC_OPENING)) return;
+    if ((*p1 | *p2) & (KEY_START | KEY_B)) ch.scene |= SC_SKIP;
+    if (!(ch.scene & SC_SKIP)) return;
+    *p1 = (g_FrameCounter & 2) ? KEY_A : 0;
+    *p2 = 0;
+}
+
+static void scene_tick(void) {
+    int kind = ch.scene & SC_KIND;
+    if (!kind) return;
+    if (ch.scene & SC_RUNNING) {                    // the scene's last entry clears it (CH_SCENE_END); a failsafe if it never
+        if (scene_running()) ch.wait2 = 0;          // got there: two seconds with no scene, and the door is watched again
+        else if (++ch.wait2 > 120) ch.scene = 0;
+        return;
+    }
+    if (scene_running() || !p1_controllable() || !ch.open_seq) { ch.wait2 = 0; return; }
+    if (++ch.wait2 < ((ch.scene & SC_KIND) == SC_PORTAL ? 2 : SCENE_WAIT)) return;
+    ch.scene |= SC_RUNNING;
+    ch.wait2 = 0;
+    coop_run_sequence(coop2.call_action, ch.open_seq);
+}
+
 void chamber_tick(void) {
     state_check();
     const u8 *m = map_here();
-    if (!m || m[0] != CH_ZONE) { ch.state = R_IDLE; return; }
-    if (m[1] == CH_OPEN_AREA) { open_tick(); return; }      // a lever's cut-away too: a scene, open_tick does nothing
+    if (!m || m[0] != CH_ZONE) { ch.state = R_IDLE; ch.scene = 0; ch.bits &= (u8)~B_PORTAL; return; }
+    if (m[1] == CH_OPEN_AREA) {                     // a lever's cut-away too: a scene, open_tick does nothing
+        portal_tick();
+        scene_tick();
+        open_tick();
+        return;
+    }
+    ch.bits &= (u8)~B_PORTAL;
+    if (!(ch.scene & SC_RUNNING)) ch.scene = 0;     // the opening's views of the rooms keep it
     if (m[1] == POPO_AREA) { ch.state = R_IDLE; popo_tick(); return; }   // the hidden room (popo.c)
     const ChRoom *r = room_here();
     if (!r) { ch.state = R_IDLE; return; }
@@ -729,8 +861,118 @@ enum {
     CH_SET_FLAG,        // the lever's flag
     CH_OPEN,            // the door opens (back in the room)
     CH_STEP_X, CH_STEP_Y,   // -> where the lead steps up to after his crew (RF_CREW, ch_crew_parts)
+    // docs/time-chamber.md 13 (Ryan's first play)
+    CH_OPEN_LOAD,       // 23 the open area's on-load: a = seq:ch_open_scenes; the opening (a new run) or the training's end queued
+    CH_SCENE_ROUTE,     // 24 -> ch_open_scenes' entry for the queued scene
+    CH_OPEN_STAGE,      // 25 the opening starts: the run is under way (flag 510), the void's bodies leave, the players stand
+    CH_LOOK,            // 26 the players face a
+    CH_GO,              // 27 -> a, or b once the player skipped the opening (Start or B)
+    CH_SHOW,            // 28 the opening's view of room a: its lead (and partner with two players) stand at the far end
+    CH_SHOT_X, CH_SHOT_Y,   // 29 / 30 -> room a's view b (0 the plaque, 1 the boss), top-left
+    CH_AREA,            // 31 -> room a's map area
+    CH_GOING,           // 32 -> 1 while the opening is not skipped
+    CH_SCENE_END,       // 33 the open area's scene is over
+    CH_EXIT_STAGE,      // 34 the players face the door
+    CH_EXIT_ROUTE,      // 35 -> the way out: the question (progress to lose, or none), or out at once (the training complete)
+    CH_STEP_BACK,       // 36 (in a command batch) the players step back from the door
+    CH_RESET_RUN,       // 37 leaving: the six lights on again, the run over (flags 504-510, 530)
+    CH_DONE_STAGE,      // 38 the training's end: seen this visit; the players face down
+    CH_PORTAL,          // 39 a = 1: the portal opens now (the sixth lever's cut-away, the on-load with six out)
+    CH_CUT_X, CH_CUT_Y, // 40 / 41 -> the lever's cut-away starts at its room's entrance (the view's top-left)
+    CH_LEG,             // 42 -> 1 when leg a of the way to the gate exists
+    CH_LEG_X, CH_LEG_Y, // 43 / 44 -> leg a's end (the view's top-left)
+    CH_LEG_WAIT,        // 45 -> leg a's frames
+    CH_WAYS,            // 46 the room's side doorways open (a room's on-load once its lever is thrown)
+    CH_PRIZE_OWED,      // 47 -> 1 when the lever pays a prize (popo.c's rule: the first win, or any win once round)
+    CH_PRIZE_ITEM,      // 48 -> its item (and it is paid)
+    CH_PRIZE_TEXT,      // 49 -> ch_lever's entry of its box
+    CH_GOHAN,           // 50 -> ch_lever's entry: Gohan's Super Saiyan now (Gohan in the party, before the Games), else the end
+    CH_FIND,            // 51 -> ch_find's entry: the side room's find (its first time) or the look
+    CH_FIND_ITEM,       // 52 -> the side room's item (the find is taken: flag 531 + n)
+    CH_PORTAL_GO,       // 53 the portal's trigger: with all six out, the warp into the hidden room is queued (a scene of its own)
 };
-_Static_assert(CH_FIGHT == 13 && CH_OPEN == 20 && CH_STEP_Y == 22, "the op numbers data/story/chamber.lscript uses");
+_Static_assert(CH_FIGHT == 13 && CH_OPEN == 20 && CH_STEP_Y == 22 && CH_OPEN_LOAD == 23 && CH_PORTAL == 39 && CH_PORTAL_GO == 53,
+               "the op numbers data/story/chamber.lscript uses");
+
+// ch_open_scenes' entries (data/story/chamber.lscript; keep the `[n]` checks there)
+#define E_OPENING      1
+#define E_EXIT         28
+#define E_EXIT_LOSE    29
+#define E_EXIT_PLAIN   31
+#define E_EXIT_NOW     34
+#define E_DONE         36
+#define E_PORTAL       42
+// ch_lever's entries
+#define E_PRIZE_SENZU  14            // 14-17: the Senzu, the Strength, Power, Endurance capsules' boxes
+#define E_GOHAN        19
+#define E_LEVER_END    21
+// ch_find's
+#define E_FIND0        1             // 1 + 2n: room n's find; 2 + 2n: its look once taken
+#define ITEM_SENZU     0
+#define ITEM_STR3      3
+#define ITEM_PWR3      6
+#define ITEM_END3      9
+
+// The way from each room's entrance along the red carpet to the gate (centres, px; tools/chamberpath.py SEGMENTS):
+// rooms[] order (light 0-5). The cut-away starts on the entrance and pans leg by leg (Ryan: "i literally couldnt find the
+// gate or where to go after i beat 18").
+#define GATE_X 1028
+#define GATE_Y 360
+#define CUT_SPEED 8                  // px a frame (PanCameraToPosition's speed)
+static const s16 way[CH_ROOMS][8][2] = {
+    { { 1616, 1704 }, { 1616, 1792 }, { 1016, 1792 }, { 1016, 1304 }, { 1160, 1304 }, { 1160, 1000 }, { 1028, 1000 }, { GATE_X, GATE_Y } },
+    { { 1808, 1096 }, { 1808, 1304 }, { 1616, 1304 }, { 1616, 616 }, { 1028, 616 }, { GATE_X, GATE_Y } },
+    { { 1616, 520 }, { 1616, 616 }, { 1028, 616 }, { GATE_X, GATE_Y } },
+    { { 432, 520 }, { 432, 616 }, { 1028, 616 }, { GATE_X, GATE_Y } },
+    { { 432, 1704 }, { 432, 1792 }, { 1016, 1792 }, { 1016, 1304 }, { 880, 1304 }, { 880, 1000 }, { 1028, 1000 }, { GATE_X, GATE_Y } },
+    { { 240, 1096 }, { 240, 1304 }, { 432, 1304 }, { 432, 616 }, { 1028, 616 }, { GATE_X, GATE_Y } },
+};
+static s32 view_of(s32 c, int y) {
+    s32 v = c - (y ? 80 : 120), max = y ? CH_MAP_H - 160 : CH_MAP_W - 240;
+    return v < 0 ? 0 : v > max ? max : v;
+}
+static int way_len(int room) { int n = 0; while (n < 8 && way[room][n][0]) n++; return n; }
+
+static const ChRoom *room_k(int k) {             // the opening's rooms: rooms[] order, the build's own row
+    if (k < 0 || k >= ROOM_COUNT) k = 0;
+    return rooms[k].plain && !have_buu() ? rooms[k].plain : &rooms[k];
+}
+
+static void stand_actor(int sprite, s32 x, s32 y) {
+    static const u32 face_wait[2] = { 0x0800CB0Fu, 0x7D00 };    // NpcBehavior_FaceAndWait: face down
+    ActorRecord *rec = Arena_Alloc(sizeof(ActorRecord));      // the map's heap: it goes with the map
+    if (!rec || !Character_GetSpriteRecord(sprite)) return;
+    memset(rec, 0, sizeof *rec);
+    rec->handler = (void *)0x0800D6DFu;
+    rec->x = (s16)x;
+    rec->y = (s16)y;
+    rec->sprite_id = sprite;
+    rec->behaviour_count = 1;
+    rec->behaviours[0] = face_wait;
+    Entity *n = MapScript_CreateCharacter(rec);
+    if (n) { EntityList_Add(g_SceneTable[1], n); n->facing = 0; }
+}
+
+static void ways(const ChRoom *r, int open) {
+    for (int i = 0; i < 2; i++) {
+        const s16 *w = r->ways[i];
+        if (!w[2]) continue;
+        step4(open ? STEP_WALK_RECT : STEP_BLOCK_RECT, w[0], w[1], w[2], w[3]);
+    }
+}
+
+static int find_room(void) {
+    const u8 *m = map_here();
+    int n = m && m[0] == CH_ZONE ? m[1] - CH_FIND_AREA0 : -1;
+    return n >= 0 && n < 3 ? n : -1;
+}
+
+static void reset_run(void) {
+    for (int i = 0; i < CH_ROOMS; i++) flag_clear_hook(g_Party, CH_FLAG_LEVER0 + i);
+    flag_clear_hook(g_Party, CH_FLAG_RUN);
+    flag_clear_hook(g_Party, CH_FLAG_ROUND_WON);
+    ch.bits &= (u8)~B_DONE_SEEN;
+}
 
 // The room whose lever runs: the map says while in the room; in the cut-away the map is the open area, so CH_LEVER notes it
 static const ChRoom *cut_room(void) { return &rooms[ch.cut < ROOM_COUNT ? ch.cut : 0]; }
@@ -747,6 +989,7 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
         ch.crew_parts = 0;
         *push = r && lever_thrown(r);
         return 1;
+    case CH_WAYS: if (r) ways(r, 1); return 0;
     case CH_BOSS_COND:
         *push = r && !lever_thrown(r);
         return 1;
@@ -825,8 +1068,120 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
         if (r) {
             step4(STEP_WALK_RECT, r->seal[0], r->seal[1], r->seal[2], r->seal[3]);
             step1(STEP_FLAG_HIDE, DECO_DOOR_BEAM);
+            ways(r, 1);                             // the side rooms (Broly's ship, Frieza's throne room)
         }
         return 0;
+    // ---- docs/time-chamber.md 13 ----
+    case CH_OPEN_LOAD: {
+        ch.open_seq = (const void *)a;
+        ch.bits &= (u8)~(B_PORTAL | B_EXIT_HELD);
+        if (ch.scene & SC_RUNNING) return 0;        // the opening's way back from its views of the rooms
+        ch.scene = 0;
+        if (!flag_test_hook(g_Party, CH_FLAG_RUN)) queue_scene(SC_OPENING);
+        else if (training_done() && !(ch.bits & B_DONE_SEEN)) queue_scene(SC_DONE);
+        Entity *p1 = g_PlayerObject;               // arriving by the door (the Lookout's) stands in its strip: no question
+        if (p1 && near_door(p1)) ch.bits |= B_EXIT_HELD;
+        return 0;
+    }
+    case CH_SCENE_ROUTE: {
+        int k = ch.scene & SC_KIND;
+        *push = k == SC_EXIT ? E_EXIT : k == SC_DONE ? E_DONE : k == SC_PORTAL ? E_PORTAL : E_OPENING;
+        return 1;
+    }
+    case CH_OPEN_STAGE:
+        flag_set_hook(g_Party, CH_FLAG_RUN);
+        bodies_clear();
+        __attribute__((fallthrough));               // the players face down, towards the camera
+    case CH_LOOK: {
+        Entity *p2 = p2_here();
+        int f = op == CH_OPEN_STAGE ? 0 : a;
+        if (g_PlayerObject) g_PlayerObject->facing = (u8)f;
+        if (p2) p2->facing = (u8)f;
+        return 0;
+    }
+    case CH_GO: *push = (ch.scene & SC_SKIP) ? b : a; return 1;
+    case CH_GOING: *push = !(ch.scene & SC_SKIP); return 1;
+    case CH_SHOW: {
+        const ChRoom *k = room_k(a);
+        const ChBoss *lead = lead_of(k), *part = partner_of(k);
+        stand_actor(tny_fighters[lead->fighter].sprite, k->stand[0][0], k->stand[0][1]);
+        if (part) stand_actor(tny_fighters[part->fighter].sprite, k->stand[1][0], k->stand[1][1]);
+        return 0;
+    }
+    case CH_SHOT_X: {                               // the boss's view: alone, centred on him (Frieza stands far left)
+        const ChRoom *k = room_k(a);
+        s32 x = k->shot[b & 1][0];
+        if ((b & 1) && !partner_of(k)) { x = k->stand[0][0] - 120; if (x < 0) x = 0; }
+        *push = x;
+        return 1;
+    }
+    case CH_SHOT_Y: *push = room_k(a)->shot[b & 1][1]; return 1;
+    case CH_AREA: *push = room_k(a)->area; return 1;
+    case CH_SCENE_END: ch.scene = 0; return 0;
+    case CH_EXIT_STAGE: {
+        Entity *p2 = p2_here();
+        if (g_PlayerObject) g_PlayerObject->facing = LOOK_UP;
+        if (p2) p2->facing = LOOK_UP;
+        return 0;
+    }
+    case CH_EXIT_ROUTE: *push = training_done() ? E_EXIT_NOW : chamber_lights() ? E_EXIT_LOSE : E_EXIT_PLAIN; return 1;
+    case CH_STEP_BACK: {
+        Entity *p1 = g_PlayerObject, *p2 = p2_here();
+        if (p1) walk_to(p1, p1->x >> 8, (p1->y >> 8) + 24);
+        if (p2) walk_to(p2, p2->x >> 8, (p2->y >> 8) + 24);
+        return 0;
+    }
+    case CH_RESET_RUN: reset_run(); return 0;
+    case CH_DONE_STAGE: {
+        Entity *p2 = p2_here();
+        ch.bits |= B_DONE_SEEN;
+        if (g_PlayerObject) g_PlayerObject->facing = 0;
+        if (p2) p2->facing = 0;
+        return 0;
+    }
+    case CH_PORTAL_GO: if (chamber_lights() == CH_ROOMS && !(ch.scene & SC_RUNNING)) queue_scene(SC_PORTAL); return 0;
+    case CH_PORTAL:
+        if (a && !(ch.bits & B_PORTAL)) { ch.bits |= B_PORTAL; ch.bits &= (u8)~B_PHASE; ch.anim = PORTAL_FRAMES; }
+        return 0;
+    case CH_CUT_X: *push = view_of(way[cut_room()->light][0][0], 0); return 1;
+    case CH_CUT_Y: *push = view_of(way[cut_room()->light][0][1], 1); return 1;
+    case CH_LEG: *push = a >= 0 && a + 1 < way_len(cut_room()->light); return 1;
+    case CH_LEG_X: case CH_LEG_Y: case CH_LEG_WAIT: {
+        int n = way_len(cut_room()->light), i = a < 0 ? 0 : a + 1 >= n ? n - 1 : a + 1;
+        const s16 *to = way[cut_room()->light][i], *from = way[cut_room()->light][i ? i - 1 : 0];
+        if (op == CH_LEG_X) *push = view_of(to[0], 0);
+        else if (op == CH_LEG_Y) *push = view_of(to[1], 1);
+        else {
+            s32 dx = view_of(to[0], 0) - view_of(from[0], 0), dy = view_of(to[1], 1) - view_of(from[1], 1);
+            if (dx < 0) dx = -dx;
+            if (dy < 0) dy = -dy;
+            *push = (dx > dy ? dx : dy) / CUT_SPEED + 4;
+        }
+        return 1;
+    }
+    case CH_PRIZE_OWED: { s32 v = 0; popo_call(19, 0, 0, &v); *push = v; return 1; }      // popo.c POPO_ROOM_OWED
+    case CH_PRIZE_ITEM: { s32 v = 0; popo_call(20, 0, 0, &v); ch.prize = (u8)v; *push = v; return 1; }   // POPO_ROOM_PRIZE
+    case CH_PRIZE_TEXT:
+        *push = ch.prize == ITEM_STR3 ? E_PRIZE_SENZU + 1 : ch.prize == ITEM_PWR3 ? E_PRIZE_SENZU + 2
+              : ch.prize == ITEM_END3 ? E_PRIZE_SENZU + 3 : E_PRIZE_SENZU;
+        return 1;
+    case CH_GOHAN:      // Gohan's Super Saiyan (decision 6): at a lever before the Cell Games, only while Gohan is in the party
+        *push = !flag_test_hook(g_Party, 468) && !flag_test_hook(g_Party, 193) && (g_Party->chars[0].flags & 1)
+              ? E_GOHAN : E_LEVER_END;
+        return 1;
+    case CH_FIND: {
+        int n = find_room();
+        *push = n < 0 ? 0 : E_FIND0 + 2 * n + (flag_test_hook(g_Party, CH_FLAG_FIND0 + n) ? 1 : 0);
+        return 1;
+    }
+    case CH_FIND_ITEM: {
+        static const u8 item[3] = { ITEM_END3, ITEM_SENZU, ITEM_PWR3 };   // the bed, the cold box, Frieza's pod
+        int n = find_room();
+        if (n < 0) { *push = ITEM_SENZU; return 1; }
+        flag_set_hook(g_Party, CH_FLAG_FIND0 + n);
+        *push = item[n];
+        return 1;
+    }
     case CH_JAR: drop_item(Rand_Range(100), 1); return 0;
     case CH_DROP: if (Rand_Range(100) < 25) drop_item(Rand_Range(100), 0); return 0;
     default:
@@ -838,11 +1193,19 @@ int chamber_call(s32 op, s32 a, s32 b, s32 *push) {
 void chamber_test(u32 arg, u32 arg2) {
     state_check();
     switch (arg) {
-    case 0:                                         // arg2 bits 0-5: which levers are thrown
+    case 0:                                         // arg2 bits 0-5: which levers are thrown; the run is under way
         for (int i = 0; i < CH_ROOMS; i++) {
             if ((arg2 >> i) & 1) flag_set_hook(g_Party, CH_FLAG_LEVER0 + i);
             else flag_clear_hook(g_Party, CH_FLAG_LEVER0 + i);
         }
+        flag_set_hook(g_Party, CH_FLAG_RUN);
+        break;
+    case 7:                                         // flag 510 (a run under way: no opening at the next load) := arg2
+        if (arg2) flag_set_hook(g_Party, CH_FLAG_RUN);
+        else flag_clear_hook(g_Party, CH_FLAG_RUN);
+        break;
+    case 8:                                         // cmd_arg := the open area's scene | bits << 8 | the last prize << 16
+        coop2.cmd_arg = (u32)ch.scene | (u32)ch.bits << 8 | (u32)ch.prize << 16;
         break;
     case 1: coop2.cmd_arg = (u32)ch.standing | (u32)ch.obj_low << 16; break;
     case 2: ch.target = (u8)arg2; break;            // records standing
