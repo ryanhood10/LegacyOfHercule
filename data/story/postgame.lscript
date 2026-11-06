@@ -142,9 +142,10 @@ sequence pg_dende
       L1:
         PushByte 86
         END
-  script                                 ; stock entry 0 of the talk show without the walk to its door
+  script                                 ; stock entry 0 of the talk show without the walk to its door; Hercule is the guest (player 1 from here to the title screen)
         SetPlayerVisible 0
         FadeOut 180
+        SetActiveCharacter 5
         PushMulti 4, 20, 1, 16
         Negate
         WarpToMapNoEntities 88

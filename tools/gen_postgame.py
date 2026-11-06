@@ -171,7 +171,12 @@ for pass_no in (1, 2):
     label("ending")
     b = body(SHOW, 0)
     b = [x for x in b if not x.startswith("WalkToPosition 0,")]   # the stock walk is to the studio's door in West City
-    script(b, "stock entry 0 of the talk show without the walk to its door")
+    # The stock game only let Hercule through the studio's door; ours comes from Dende's question with anyone, and the show walked and
+    # posed player 1's body under "HERCULE: OH YEAH!!!!!". Hercule is player 1 behind the fade that is there (nothing to put back: the
+    # scene ends in the credits, the epilogue and the title screen, and nothing saves on the way)
+    k = b.index("PushMulti 4, 20, 1, 16")
+    b = b[:k] + ["SetActiveCharacter 5"] + b[k:]
+    script(b, "stock entry 0 of the talk show without the walk to its door; Hercule is the guest (player 1 from here to the title screen)")
     stockseq(SHOW, 1, 28, "\"Late Night with Rob Howard\", Hercule's \"parlor tricks\", the crowd, the credits (flag 196)")
     b = body(EPI, 0)
     k = b.index("LoadMapWithEntities 1, 2, 1, 384, 552")

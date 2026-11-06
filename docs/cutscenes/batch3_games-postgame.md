@@ -23,6 +23,8 @@ These are not staging taste; they are wrong pictures. All three are in the endin
    beside Piccolo's portrait (`build/research3/pg/zoom_ts.png`). Fix (S): make Hercule player 1 behind the fade that is
    already there (`SetActiveCharacter 5` before `WarpToMapNoEntities`, the way the wishes make Gohan player 1). Nothing
    needs restoring: the scene ends in the credits and the title screen.
+   **Fixed (`nb-cs3`, 2026-11-06):** built as proposed (`gen_postgame.py`, the talk show's entry 0); nothing saves between the question
+   and the title screen (`PlayCredits`, flag 196, `ReturnToTitleScreen`). Test: `staging_postgame.txt` `ts_*` (four lineups: one Hercule, player 1 = slot 5).
 2. **The finale doubles player 1 and leaves Gohan's lines without a body.** The finale warps to the Lookout's edge
    (zone 9 area 7) with the stock actors standing (Piccolo 103, Krillin 76, Vegeta 137, Trunks 132, Tien, Yamcha, Dende,
    Popo) and player 1 as he is. Filmed as Piccolo: two Piccolos, and "Finally...  some time to relax." (player 1,
