@@ -12,6 +12,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `PLAYING.md` | the players' guide: build, connecting player 2, controls, difficulty, co-op rules, the story in short | before playing |
 | `CLAUDE.md` | rules, current phase, build and test commands, key addresses, where to start per task | every session |
 | `docs/ids.md` | registry: every flag, stat, sprite, row, portrait, ability, CoopCall, test command, zone-15 area and RAM region the mod uses, and what is free | before taking any new number |
+| `docs/review-2026-11-06-cutscenes.md` | the cutscene and art pass for Ryan: what changed per chapter, the five review items, the best Shorts, what is not built | the next session with him |
 | `docs/review-2026-11-05.md` | the overnight polish for Ryan: what changed, decisions waiting, draft lines, what could not be checked | start of the next session with him |
 | `docs/cutscenes.md` | the cutscene guidelines (Ryan, 2026-11-06): improve not replace, what is DBZ and what is cheesy, dynamic by who plays, the toolkit with **the "Cine" table (`CoopCall 37`: every cinematic move, its arguments, what plays, a copy-paste example, what each body lacks)**, how research and development split; per-batch research in `docs/cutscenes/` | before touching any scene |
 | `docs/howto.md` | recipes: add a chapter, CoopCall, boss, sprite, portrait, playable character, map; test; run parallel sessions; find things fast | doing a common job |
