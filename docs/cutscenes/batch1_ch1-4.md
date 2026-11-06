@@ -776,6 +776,8 @@ with the second baby looking back. It is already what this document asks of the 
 
 ## 6. Priority list for the developer (build order, showcases first)
 
+**State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), and of item 8 the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 3.1, 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 3.4, 4.1, 4.7 and the rest of 4.2 / 4.5 (the HUD is still shown at the generators).**
+
 1. **1.7 Trunks against Frieza and King Cold** (L). No player body in the fight, so one choreography for every
    lineup: the cheapest showcase to test and the scene every fan knows. It is also the helpers' first full use
    (DASH, STRIKE-H, BLAST-1, CHARGE).
@@ -814,6 +816,7 @@ fade.
 - **Facts to settle before building:** how the HP bars are hidden in a scene; old Hercule's (158) pose groups;
   which stock body 0-4 on the road is whose; whether Vegeta enters the 19 fight transformed (Ryan's call); the
   order of old Hercule's line at Gohan's death (ours, but ask).
+- **DRAFT lines after the build: none new** (no line was added by the development pass).
 - **DRAFT lines in this batch: none new.** Every shot list keeps the lines as they are today (the drafts already
   listed in `docs/story.md` 0 stay drafts). Two lines move: old Hercule's at Gohan's death (1.3) and Vegeta's stock
   "Silly robot..." (3.6), both to sit next to what they are about.
