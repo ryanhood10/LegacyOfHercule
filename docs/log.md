@@ -11,12 +11,12 @@ Newest first. One entry per landed piece or decision; details live in the linked
   Piccolo's volley and fall, Cell behind 17 in a blink, Goku takes player 2 too); then Gingertown's meeting (5.7: player 2 at Piccolo's
   side, Cell's back turned, his pacing, the power-up before the blast, one Cell becoming two). Batch 1: Goku's opening exchange and
   his knee (3.5 beats 1-2), and the touch-ups 1.1 (the lesson shown, old Hercule backing off), 1.2 (the chop's weight), 1.5 (the rumble
-  before Krillin), 1.6 (silence before the spirit; player 2 in the clearing), 1.8 (the landing only), 2.2 (the mansion deal in view),
+  before Krillin), 1.6 (silence before the spirit; player 2 in the clearing), 1.8 (Vegeta walks into view; the landing), 2.2 (the mansion deal in view),
   2.3 (King Triceratops' stamp), 4.1 (Gero's palm, 13's punch, the HUD hidden), 4.7 (the aftermath's beats). Two old "not understood"
   defects found: 7.2's camera drift is the follow camera (the scene never pans), 7.6's second lying Vegeta is the map's own decoration
   1 under Cell's spot. Two json edits of stock entries moved into restated entries (a json edit stops applying once the entry is ours:
   Gingertown's player-1 hand-over had silently gone, found by the staging test as a crash with Hercule as player 1). Not built: the rises
-  in 4.7, 1.8's other beats, the end beats of 1.6 and 2.3 (each note says why). No line added, changed or moved. Tests extended:
+  in 4.7, 1.8's last two beats, the end beats of 1.6 and 2.3 (each note says why). No line added, changed or moved. Tests extended:
   `staging_ch1` (training, knock-out, spirit, visit), `staging_ch2` (deal, jungle), `staging_ch3` (battle), `staging_ch5`
   (gingertown), `staging_ch6` (kame, island half), `staging_ch8` (Cooler), `cell_staging`, `ch4_staging` (the aftermath);
   `staging_lib.cine_last` checks a Cine move played. Flags, party and player 2's slot after each changed scene equal the build before.

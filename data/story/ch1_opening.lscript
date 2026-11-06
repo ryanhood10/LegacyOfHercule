@@ -890,7 +890,17 @@ sequence ch1_trunks_talk
       a:
         PushByte 95
         END
-  [4] stockseq @083bfddc 4 17            ; Trunks can't say, Vegeta, the Super Saiyan question, "Goku should be arriving any second now."
+  [4] stockseq @083bfddc 4 4             ; Trunks: "Sorry, I can't say."
+  [5] script                             ; stock 5 (batch 1, 1.8 beat 1): Vegeta walks into view to face Trunks (the stock had him follow
+        SetEntityPositionInstant 137, 104, 484 ; Trunks from the group's spot, off the stage, so his lines came from nowhere); below him,
+        WalkToPosition 137, 216, 484     ; clear of the top boxes
+        SetEntityFacing 137, 1
+  [6] stockseq @083bfddc 6 9             ; "Why not?  I'll tell you...", "I wish I could say.", the Super Saiyan question, "Yes, I was."
+  [10] script                            ; stock 10: he squares up closer and shouts
+        WalkToPosition 137, 216, 474
+        SetEntityFacing 137, 1
+        SetEntityAnimation 137, 4
+  [11] stockseq @083bfddc 11 17          ; "That's a lie!" ... "Goku should be arriving any second now."
   [18] script                            ; stock 18, the landing (batch 1, 1.8): between the stock's two rumbles everyone looks up at the sky over
         SetEntityFacing 128, 1           ; the crater and a white flash marks the impact; when the camera reaches the crater dust is still
         WaitFrames 100                   ; settling on the pod; then the stock climb-out

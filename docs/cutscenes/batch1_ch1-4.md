@@ -350,10 +350,13 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Built 2026-11-06 (`nb-cs4`), beat 2 only (the landing):** stock entry 18 restated in place (`[18] script`): between the stock's
   two rumbles (`PlayAudioBlocking` is the rumble and a camera shake) everyone on screen looks up toward the sky over the crater
   (`CoopCall 37, 12` at the point (488, 160)) and a white flash marks the impact; when the camera reaches the crater two dust clouds
-  are still settling on the open pod; the rest of the entry is the stock's, step for step. **Not built: beats 1, 3, 4.** The headless
-  route into this talk (Map Test of area 6) parks the group's actors at (672, 728), off the stage, so Vegeta's walk-in, the group's
-  step toward Goku and the private talk's moves cannot be filmed in their real places; they want a film from the real flight in
-  (the landing site, area 4) first. `staging_ch1` "arrival" passes as before (the scene ends on map 2/1).
+  are still settling on the open pod; the rest of the entry is the stock's, step for step. **Beat 1 too:** Vegeta walks into view
+  from the left to stand below Trunks, facing him, for "Why not?  I'll tell you..." (stock entries 5 and 10 restated in place; the
+  stock had him follow Trunks from the group's spot, off the stage, so his lines came from nowhere), and squares up 10 px closer with
+  his shout for "That's a lie!"; below Trunks because the talk's boxes are at the top. **Not built: beats 3, 4.** The headless route
+  into this talk (Map Test of area 6) parks the group's other actors at (672, 728), off the stage, so the group's step toward Goku and
+  the private talk's moves cannot be judged in their real places; they want a film from the real flight in (the landing site, area 4)
+  first. `staging_ch1` "arrival" passes as before (the scene ends on map 2/1).
 
 ### 1.4, 1.9 Leave
 
@@ -847,7 +850,7 @@ with the second baby looking back. It is already what this document asks of the 
 
 **State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), 3.1 in part (item 7), and of item 8 the charge of 3.4, the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 4.1, 4.7 and the rest of 3.1 / 4.2 / 4.5 (the HUD is still shown at the generators).**
 
-**State (2026-11-06, branch `nb-cs4`):** built 3.5 beats 1-2, 1.1, 1.2, 1.5, 1.6 (beats 1-3), 1.8 (beat 2, the landing), 2.2, 2.3 (beats 1-2 and the end's shake), 4.1 (the rest: the HUD, Gero's palm, 13's punch), 4.7 (beats 2-4); 1.3's beats 3-4 were already played by Cine (`nb-cs1`'s second commit). Not built: 1.8 beats 1, 3, 4 (no faithful film route yet), 4.7's rises, 2.4, the rest of 3.1 / 4.5 (each note says why).
+**State (2026-11-06, branch `nb-cs4`):** built 3.5 beats 1-2, 1.1, 1.2, 1.5, 1.6 (beats 1-3), 1.8 (beats 1-2: Vegeta's walk-in, the landing), 2.2, 2.3 (beats 1-2 and the end's shake), 4.1 (the rest: the HUD, Gero's palm, 13's punch), 4.7 (beats 2-4); 1.3's beats 3-4 were already played by Cine (`nb-cs1`'s second commit). Not built: 1.8 beats 3, 4 (no faithful film route yet), 4.7's rises, 2.4, the rest of 3.1 / 4.5 (each note says why).
 
 Measured on the build (A pressed every 100 frames, so each figure is good to about 2 s; `perf` on the two heaviest): 1.7 +14 s, 1.3 +5 s,
 3.5 +7 s (the entrance and the debut), 3.6 +3.5 s, 4.6 +9 s (13 s of fight in place of a 2 s fade), 4.4 +2 s, 3.2 3.5 s shorter. Gohan's death in
