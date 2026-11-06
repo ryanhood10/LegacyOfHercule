@@ -142,6 +142,10 @@ a step that is moved or removed breaks an insertion further down, so change one 
   (`SetEntityFacing 0, 1`). 3. `cine: blast single` straight down at the ring's centre (the stock `NPCFireKiBlast 30,
   456, 464, 140`). 4. Impact: `WhiteFlash 8`, `ScreenShake 0, 20, 40`, four `SpawnDustCloud` across the tiles, the stock
   sounds 20 / 21. 5. Only then `FadeToWhite 30` (was 10) into the stock warp. About +2 s.
+- **Built (`nb-cs3`, 2026-11-06):** behind the stock flash Cell stands at (456, 440) and Goku at (456, 504) with the view on the ring's middle (the
+  stock placed nobody here either); after his line Cell flies up to (456, 404) (**sprite 30 has the flight group: seen**), holds his charge pose
+  with the aura's sound and a tremor for 34 frames, fires the stock blast at the ring's middle; a flash, the biggest shake, five dust clouds across
+  the tiles, the stock sounds, and a 30-frame white (was 10). About +1.5 s.
 - **Risks:** whether Perfect Cell's sprite 30 has a flight group is not recorded (`docs/sprites.md` lists groups 0-3, 5-8,
   12, 18 from the Super 13 fallback note); if not, he stays on the floor and fires at his feet. Goku's position is
   wherever the fight ended: Cell may be anywhere on the ring, so aim the dust clouds by the ring's own coordinates.

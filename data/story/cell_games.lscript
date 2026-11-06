@@ -255,7 +255,53 @@ sequence cg_ring
 end
 
 sequence cg_fight1_end
-  stockseq @083e8f50 0 3    ; Cell destroys the ring, "the whole desert is our ring"
+  script                                 ; stock entry 0, and Cell and Goku stand on the ring's middle, the view on them
+        PlayAudio 60
+        WhiteFlash 20
+        SetEntityPositionInstant 30, 456, 440
+        SetEntityFacing 30, 0
+        SetEntityPositionInstant 0, 456, 504
+        SetEntityFacing 0, 1
+        PanCameraToPosition 336, 364, 30
+        WaitFrames 40
+        PlayAudio 50
+        END
+  stock @083e8e20    ; "I'm tired of being confined to this little ring."
+  script                                 ; stock entry 2: Cell rises and gathers power, the blast breaks the ring (a flash, the shake, dust across the tiles), a slower white; the desert
+        PlayAudio 26
+        FlyToPosition 30, 456, 404
+        SetEntityFacing 30, 0
+        SetEntityAnimationNoWait 30, 5
+        PlayAudio 55
+        ScreenShake 0, 4, 34
+        WaitFrames 34
+        StopAudio 55
+        BeginCommandBatch
+        NPCFireKiBlast 30, 456, 464, 140
+        SpawnDustCloud 30, 456, 464
+        CommitCommandBatch
+        PlayAudio 20
+        WhiteFlash 8
+        ScreenShake 0, 20, 44
+        SpawnDustCloud 30, 424, 448
+        SpawnDustCloud 30, 488, 452
+        WaitFrames 8
+        PlayAudio 21
+        SpawnDustCloud 30, 440, 484
+        SpawnDustCloud 30, 474, 478
+        WaitFrames 14
+        SpawnDustCloud 30, 456, 432
+        WaitFrames 10
+        FadeToWhite 30
+        WarpToMapNoEntities 14, 3, 1, 368, 440
+        DisableLayer 0
+        SetEntityFacing 0, 3
+        SetEntityFacing 30, 2
+        PanCameraToPosition 328, 304, 10
+        WaitFrames 60
+        WhiteFadeOut 30
+        END
+  stock @083e8edc    ; "Now the whole desert is our ring."
   script                                 ; player 2's pad takes Goku
         CoopCall 15, 2, 0, 0
   fmt 0 "%s"

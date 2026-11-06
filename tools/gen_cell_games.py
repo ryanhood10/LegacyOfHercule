@@ -180,7 +180,26 @@ script(body(A2, "m324_t0", 27), "stock entry 27: fight 1")
 emit("end")
 emit("")
 emit("sequence cg_fight1_end")
-stockseq(A2, "m324_r1_defeat", 0, 3, "Cell destroys the ring, \"the whole desert is our ring\"")
+# Cell destroys the ring (docs/cutscenes/batch3 3.2): the stock blast was on screen for a third of a second before the white, the ring was
+# never seen breaking, and nobody was placed (the fight ends anywhere on the ring: Cell could be off the view for his own line). Behind
+# the stock flash the two stand on the ring's middle, the view on them; Cell rises above the tiles (his flight group, 12), gathers power
+# (his charge pose, the ground trembling, Goku looking up), the blast lands with a flash and the biggest shake, dust goes up across the
+# tiles, and the white takes 30 frames, not 10.
+b = body(A2, "m324_r1_defeat", 0)
+assert b[:2] == ["PlayAudio 60", "WhiteFlash 20"]
+script(b[:2] + ["SetEntityPositionInstant 30, 456, 440", "SetEntityFacing 30, 0", "SetEntityPositionInstant 0, 456, 504", "SetEntityFacing 0, 1",
+                "PanCameraToPosition 336, 364, 30"] + b[2:], "stock entry 0, and Cell and Goku stand on the ring's middle, the view on them")
+stock_at(A2, "m324_r1_defeat", 1, "\"I'm tired of being confined to this little ring.\"")
+b = body(A2, "m324_r1_defeat", 2)
+k = b.index("BeginCommandBatch")
+kc = b.index("CommitCommandBatch")
+assert b[kc + 1:kc + 6] == ["PlayAudio 20", "WaitFrames 10", "PlayAudio 21", "WaitFrames 10", "FadeToWhite 10"]
+script(b[:k] + ["PlayAudio 26", "FlyToPosition 30, 456, 404", "SetEntityFacing 30, 0", "SetEntityAnimationNoWait 30, 5", "PlayAudio 55", "ScreenShake 0, 4, 34",
+                "WaitFrames 34", "StopAudio 55"] + b[k:kc + 1] +
+       ["PlayAudio 20", "WhiteFlash 8", "ScreenShake 0, 20, 44", "SpawnDustCloud 30, 424, 448", "SpawnDustCloud 30, 488, 452", "WaitFrames 8", "PlayAudio 21",
+        "SpawnDustCloud 30, 440, 484", "SpawnDustCloud 30, 474, 478", "WaitFrames 14", "SpawnDustCloud 30, 456, 432", "WaitFrames 10", "FadeToWhite 30"] + b[kc + 6:],
+       "stock entry 2: Cell rises and gathers power, the blast breaks the ring (a flash, the shake, dust across the tiles), a slower white; the desert")
+stock_at(A2, "m324_r1_defeat", 3, "\"Now the whole desert is our ring.\"")
 script(["CoopCall 15, 2, 0, 0"], "player 2's pad takes Goku")
 title(P2)
 script(body(A2, "m324_r1_defeat", 4), "stock entry 4: fight 2")
