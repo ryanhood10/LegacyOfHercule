@@ -3,7 +3,7 @@ usage: python tools/headless/staging_ch568_gen.py     (the scripts are committed
 Chapter 5: Kami defers, whoever is selectable (the fade makes Piccolo player 1; Hercule only when played), then Kami's boost and
 the fusion (Hercule kept there for the plot: Kami draws out his potential; flags 129 and 131 so Kami stands; he is gone after it and Mr. Popo is not). Chapter 6: the basement and Goku's waking, only who is played: no
 Krillin NPC or actor alone as Trunks, no Trunks actor alone as Krillin (Ryan, 2026-11-05). Cooler: the three openings alone (no servant) and with
-two players (the servant's actor, then his twin on the same sprite 166)."""
+two players (the servant's actor, then his twin on the same sprite 166); player 1 walks up to (200, 298) under Cooler in each, and Cooler's end is seen (the camera pans to him)."""
 from staging_lib import *
 
 s = Script("staging_ch568_gen.py")
@@ -81,6 +81,9 @@ for p1, p2, s166 in ((GOHAN, None, 0), (GOKU, None, 0), (TRUNKS, None, 0), (GOHA
     n = lineup_name(p1, p2)
     s.begin(f"cooler {n}", p1, p2, "+60")
     s.warp(6, 61, 200, 400, 260)
+    s.press(1, 100)
+    s.shot(f"c8_{n}_open")                           # the players in the view, 34 px under Cooler
+    s.out("echo EXPECT map zone 6 area 61 var 1 player 200,298", "map")    # player 1 walked up to his mark
     s.end_scene()
     s.shot(f"c8_{n}_fight")
     s.actors(s166=s166)

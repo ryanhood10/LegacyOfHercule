@@ -713,6 +713,18 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### W.3 Cooler's fight: the opening and his end (rework, S)
 
+- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (Cooler's CHARGE waits for the cine helpers).** The HUD is hidden for the opening
+  (`SetPlayerVisible 0`, back at the fight's entry). Player 1 walks up to (200, 298), 34 px under Cooler, player 2 is placed beside him
+  (`CoopCall 9`), the camera at (100, 214): Cooler above a bottom box and the players just clear of it; a top box (the player's
+  lines) covers Cooler and leaves the players. Cooler starts with his back turned and turns round as they arrive. The three
+  openings and the servant's walk are unchanged. **His end:** record 1's defeat is now `ch8_cooler_death`, the stock script
+  with a pan to wherever he fell first (`PushEntityPosition 34`), so the jolts and explosions are seen; the stock pan to the door and
+  `SetActiveEntity 0` hand the camera back.
+- **Not done (found, left):** with two players the body of whichever of the two fell first stays lying on the map after the
+  explosion, as before this change (the both-down rule's downed body is never removed here; the same in the build before this
+  branch). Beat 5's "the servant's body goes in the last flash" needs `enemies.c`, not the script: the fallen one may be Cooler
+  himself with the servant dying in his place.
+
 - **Where:** `ch8_cooler`, map 172 (zone 6 area 61) trigger 0; the defeat is the stock script of record 1. Films
   `co2_PH`, `co2_G`.
 - **Today:** the camera pans up to Cooler on his stone circle and **the players are left below the view** for the
