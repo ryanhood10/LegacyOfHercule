@@ -474,6 +474,8 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
 - **Shot list:** 1. stock entry 9: CHARGE on Goku (shake, flashes, the stock animation 9), 19 and 20 step back, the
   watchers' shout poses. 2. "ANDROID 13: Outta date already, huh?" stays with its stroll. Nothing else.
 - **Risks:** the stock swaps sprite 60 for 61 by despawn and spawn: the CHARGE goes on 60 before the swap.
+- **Built 2026-11-06 (`nb-cs1`):** stock entry 9 restated: Cine's charge (level 2) on Goku's 60, the swap to 61 in a flash, the watchers' shout
+  poses (Tien, Gohan, Krillin; guarded). Not built: 19 and 20 stepping back.
 
 ### 3.5 Goku falls, Vegeta arrives: SHOWCASE (L)
 

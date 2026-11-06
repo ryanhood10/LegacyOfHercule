@@ -11,6 +11,28 @@ poke32 0x0203FD54 0x13600c8
 poke32 0x0203FD08 5
 frames 200
 mash 16 100
+key 1 6
+frames 50
+shot c3_cut_power0a
+frames 50
+shot c3_cut_power0b
+key 1 6
+frames 50
+shot c3_cut_power1a
+frames 50
+shot c3_cut_power1b
+key 1 6
+frames 50
+shot c3_cut_power2a
+frames 50
+shot c3_cut_power2b
+deref R61 TBL+0xd8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R61
+deref R60 TBL+0xd4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R60
+ents
 shot c3_cut
 stepz 0x03001FDC 150
 frames 30
