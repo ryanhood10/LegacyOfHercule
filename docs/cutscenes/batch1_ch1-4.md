@@ -511,6 +511,11 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
   125 frames against 120), a flash, the clone gone. The HUD is hidden from the first frame to the duel (the stock's second
   `SetPlayerVisible 1` in entry 0 is gone) and through the one-player fight. Not built: Vegeta's step back at the clone's gold and the
   clone pushed back at each flash of his charge. Flags and party after it: identical, one and two players.
+  **The transformations themselves (Ryan, 2026-11-06: "add that back in alongside the explosions"; branch `nb-ssjfix`):** the clone's gold is
+  the stock power-up of its own record (`SetEntityAnimation 137, 9`: the step finds the clone's actor, not player 1, as the despawn after it
+  does; filmed), the hum and the burst sound, with Cine's charge held alongside (level 1); Vegeta's is the stock transformation alone
+  (`SetEntityAnimation 0, 35`) with the charge's effects alongside it (level 2), not an 80-frame charge before it; the burst's light on the
+  gold and a shorter white (12 frames) over the swap.
 
 ### 3.3 The landing: leave
 
