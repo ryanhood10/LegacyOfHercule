@@ -2085,6 +2085,57 @@ key 1 6
 frames 90
 key 1 6
 frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_P_31
+ents
+key 1 6
+frames 90
+shot st_door_P_32
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+deref TBL 0x0800959C
+deref R14 TBL+0x1c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R14
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_P_39
+ents
+key 1 6
+frames 90
+shot st_door_P_40
+ents
+key 1 6
+frames 90
+shot st_door_P_41
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
 stepz 0x03001FDC 250
 frames 200
 echo EXPECT map zone 8 area 47 
@@ -2230,6 +2281,57 @@ key 1 6
 frames 90
 key 1 6
 frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_PH_31
+ents
+key 1 6
+frames 90
+shot st_door_PH_32
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+deref TBL 0x0800959C
+deref R14 TBL+0x1c
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R14
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_PH_39
+ents
+key 1 6
+frames 90
+shot st_door_PH_40
+ents
+key 1 6
+frames 90
+shot st_door_PH_41
+ents
 key 1 6
 frames 90
 key 1 6

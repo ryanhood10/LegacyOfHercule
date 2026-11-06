@@ -76,6 +76,7 @@ actors(s165=0)
 
 # the lab door (area 46's item 0, Ryan 2026-11-06: the one death): walk up after the cutaway (flag 124 = FLAGS+15 bit 4);
 # 13 stands at Gero's side in the lab, swears revenge after 17's blast and flies off, then the stock scene to area 47
+# (the cutscene pass, 2026-11-06: the same beats with weight; shots 31-41 are Gero's fall, 13's blasts landing and his take-off)
 for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
     begin(f"door_{name}", p1, p2)
     out("poke8 FLAGS+15 0x10")
@@ -84,10 +85,12 @@ for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
     for _ in range(10):
         out(*walk.split("\n"))
     out("frames 300")
-    for i in range(30):                      # to 13's revenge (past "scrap heap")
+    for i in range(44):                      # through 17's blast (Gero thrown, lying, gone: no 14 after it), 13's revenge, his blasts landing, to his take-off
         out("key 1 6", "frames 90")
-        if i in (10, 24):
+        if i in (10, 24, 31, 32, 39, 40, 41):
             out(f"shot st_door_{name}_{i}", "ents")
+        if i == 34:
+            actors(s14=0, s165=1, s9=1, s11=1)
     out(f"stepz {SCENE} 250", "frames 200", "echo EXPECT map zone 8 area 47 ", "map", "ents")
     actors(s165=0)
 

@@ -609,6 +609,13 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   Stock entry 59 is Piccolo's line ("They can't be headed for West City...") and plays in every lineup; when nobody
   plays him it has no body (an existing gap, the presence rule's business, not this scene's).
 - **Size M.**
+- **Built 2026-11-06 (`nb-cs1`), by Ryan's approved flow: every beat and line kept, weight only.** Not built from the shot list: its
+  beat 2 (17's STRIKE-H before the blast) would be a new beat, and the outside half (Trunks' blasts as a beam) is untouched. Entry 26
+  restated: 17 walks over, a held look, the blast at arm's length, a flash and a shake, Gero slides 28 px and falls (his group 3), the
+  stock explosions over the lying body, gone; 13 starts forward and stops when 17 looks at him; 18 only now looks round and turns back
+  to the pod. Entry 73: the room shakes as 13 powers up, each blast now lands (the hit sound and a dust puff on 17, then on 18; before,
+  the white flash came while they were still flying), the flash, a shake, 18 already looking at the pod again. Entry 76: dust under his
+  take-off, a shake as he goes through the ceiling. `ch4_staging` films it (P, PH) and checks Gero gone and 13, 17, 18 standing.
 
 ### 4.5 The road: the car talk, Vegeta drops in: touch up (S)
 

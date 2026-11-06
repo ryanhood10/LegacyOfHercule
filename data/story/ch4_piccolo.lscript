@@ -286,7 +286,44 @@ sequence ch4_lab_door
   stockseq @083dae70 7 15                ; "destroy these intruders", 16's chamber; the cut outside (14), Trunks
   [16] stock @083da3d8 -> 79             ; the cut back into the lab (it reloads the map: 13 again, entry 79)
   stockseq @083dae70 17 25               ; "wake our sleeping friend", "scrap heap"
-  [26] stock @083da58c -> 68             ; 17's blast: Gero is gone
+  [26] script -> 68                      ; stock 26 with weight (2026-11-06): 17 walks over, a held look, the blast at arm's length throws Gero across the floor, he lies, the stock explosions take him; 18 only now looks round, and back to the pod; 13 starts forward and stops
+        WalkToPosition 9, 240, 240
+        SetEntityFacing 9, 2
+        WaitFrames 24
+        BeginCommandBatch
+        EntityWaitTouchPlayer 14
+        PlayDamageEffect 14
+        EntityStopMovement 14
+        NPCFireKiBlastAtEntity 9, 14, 120
+        CommitCommandBatch
+        WhiteFlash 5
+        BeginCommandBatch
+        GlideToPosition 14, 180, 242, 1000
+        SetEntityAnimation 14, 3
+        ScreenShake 9, 8, 16
+        CommitCommandBatch
+        PlayAudioBlocking 10, 5
+        BeginCommandBatch
+        EntitySetVelocity 14, -10, -10
+        EntitySetVelocity 14, -8, 10
+        EntitySetVelocity 14, -4, 16
+        WalkToPosition 165, 294, 236
+        CommitCommandBatch
+        BeginCommandBatch
+        EntitySetVelocity 14, 12, -6
+        DespawnEntity 14
+        ScreenShake 9, 4, 12
+        CommitCommandBatch
+        SetEntityFacing 9, 3                  ; 17 looks at 13: he stops
+        WaitFrames 30
+        CoopCall 22, 2, 11, 0
+        JumpIfFalse a
+        SetEntityFacing 11, 3                 ; 18 looks round at the spot...
+        WaitFrames 34
+        SetEntityFacing 11, 1                 ; ...and back to the pod
+      a:
+        WaitFrames 30
+        END
   stockseq @083dae70 27 65               ; "Now that that's taken care of...", 16 wakes, the Z fighters
   stop
   [67] script -> 7                       ; 13 at Gero's side as the lab comes in (DRAFT staging)
@@ -311,27 +348,43 @@ sequence ch4_lab_door
         END
   [71] text 169 "ANDROID 13: You...  You killed him!\x0bHe gave you life, and you killed him!  That man was my father!"
   [72] text 169 "I'll get you for this, ya hear me?\x0bI swear it!  The both of you!"
-  [73] script                            ; Ryan, 2026-11-05: his revenge, the blasts, and he flies off to the arctic
+  [73] script                            ; Ryan, 2026-11-05: his revenge, the blasts, and he flies off to the arctic. Weight (2026-11-06): the room shakes as he powers up, each blast lands (dust on the one it hits) before the flash, and when it clears neither has moved: 18 is already looking at the pod again
+        ScreenShake 165, 3, 30
+        BeginCommandBatch
         CoopCall 22, 2, 9, 0
         JumpIfFalse a
-        NPCFireKiBlastAtEntity 165, 9, 30
-        WaitFrames 12
+        NPCFireKiBlastAtEntity 165, 9, 90
+        EntityWaitTouchPlayer 9
+        PlaySFX 9, 36
+        EntitySetVelocity 9, 0, 0
       a:
         CoopCall 22, 2, 11, 0
         JumpIfFalse b
-        NPCFireKiBlastAtEntity 165, 11, 30
+        EntityWaitFrames 165, 8
+        NPCFireKiBlastAtEntity 165, 11, 90
+        EntityWaitTouchPlayer 11
+        PlaySFX 11, 35
+        EntitySetVelocity 11, 0, 0
       b:
-        WaitFrames 30
+        CommitCommandBatch
         WhiteFlash 12
         PlayAudio 21
+        ScreenShake 165, 6, 16
+        CoopCall 22, 2, 11, 0
+        JumpIfFalse c
+        SetEntityFacing 11, 1
+      c:
         WaitFrames 40
         END
   [74] text 28 "ANDROID 17: ...Was that it?"
   [75] text 169 "ANDROID 13: Laugh it up.\x0bNext time I see you two, I'll be stronger than the both of you put together."
-  [76] script
+  [76] script                            ; his take-off kicks up dust; the ceiling shakes where he goes through
+        EntitySetVelocity 165, 0, 8
+        PlayAudio 26
         FlyToPosition 165, 304, 40
         DespawnEntity 165
-        WaitFrames 30
+        ScreenShake 9, 5, 14
+        WaitFrames 16
   [77] text 29 "ANDROID 18: He's heading north.  Should we bother?"
   [78] text 28 "ANDROID 17: Forget him." -> 27
   [79] script -> 17                      ; the lab again after the cut outside (a reload drops actors): 13 at Gero's side
