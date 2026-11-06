@@ -395,6 +395,36 @@ static S13 *state_of(Entity *e) {
 
 int is_s13(const Entity *e) { return e && s13.magic == S13_MAGIC && s13.boss == e; }
 
+// ---- the world map waits while he fights (Ryan, 2026-11-06: "the world map shouldnt be accessible during the fight here
+// ... i accidentally used the world map": the summit's flight sign stands at the fight's edge and A is the punch) ----------
+// The trigger boxes (docs/engine.md "Trigger boxes"; agency.c): {vtable, s16 x1, y1, x2, y2 (outside), activation, ...};
+// a script box keeps its script at +0x10. A world-map flight spot is a script box whose script starts with the flight
+// music (PushByte 43; Step 49 PlayMusic), as every stock flight spot's and mapbuild's "flight" do. From his spawn to the
+// end of his explosion each one's x edges are mirrored below 0 (x -> -x - 1: an empty rect left of the map, no RAM
+// needed to undo it), so neither player's A fires it, and an A press there swings as anywhere (the stock attack holds
+// back a swing only for a box that would take the press); then they are mirrored back. A map load makes the boxes anew
+// from the map's data, so leaving the map mid-fight leaves nothing behind.
+#define TRIGGER_LIST     ((s32 *)0x03001FE0)   // {count, boxes...}
+#define BOX_SCRIPT       0x08023BC0u           // the script box class (create 0x0800C2C3)
+typedef struct FlightBox { u32 vtable; s16 x1, y1, x2, y2; u32 act; const u8 *script; } FlightBox;
+
+static int is_flight(const FlightBox *b) {
+    const u8 *s = b->script;
+    return b->vtable == BOX_SCRIPT && (u32)s >= 0x08000000u && (u32)s < 0x0A000000u
+        && s[0] == 0x00 && s[1] == 0x2B && s[2] == 0x02 && s[3] == 0x31;
+}
+
+static void flight_hold(int hold) {
+    s32 *list = TRIGGER_LIST;
+    int n = list[0] < 0x20 ? list[0] : 0x20;
+    for (int i = 1; i <= n; i++) {
+        FlightBox *b = (FlightBox *)list[i];
+        if (!b || !is_flight(b) || (b->x1 < 0) == hold) continue;   // held already / not held
+        b->x1 = (s16)(-b->x1 - 1);
+        b->x2 = (s16)(-b->x2 - 1);
+    }
+}
+
 static void set_frames(S13 *a, int group, int frame) {
     Entity *e = a->e;
     a->group = (u8)group;
@@ -656,11 +686,13 @@ static void dying(S13 *a) {
     a->gone = 1;
     s13.state = 3;
     s13.gone_frame = g_FrameCounter;
+    flight_hold(0);
 }
 
 static void s13_update(Entity *e) {
     S13 *a = state_of(e);
     s13.boss = e;
+    if ((s13.state == 1 || s13.state == 2) && !tny_ring_active()) flight_hold(1);
     if (e->hp <= 0) {              // beaten: the explosion; the record's action runs the story
         if (!a->down) {
             a->down = 1;
@@ -755,7 +787,7 @@ static void s13_destroy(Entity *e, int free_it, u32 x, u32 y) {
     S13 *a = state_of(e);
     for (int i = 0; i < S13_LIVE; i++) if (a->live[i]) { a->live[i]->boss = 0; a->live[i] = 0; }
     for (int i = 0; i < 2; i++) a->held[i] = 0;
-    if (s13.boss == e) { s13.boss = 0; if (s13.state < 3) s13.state = 0; }
+    if (s13.boss == e) { s13.boss = 0; if (s13.state < 3) s13.state = 0; }   // (a held flight spot: see flight_hold; his destroy comes with a map load, which makes the boxes anew)
     e->vtable = (u32 *)ENEMY_VTABLE;
     Enemy_Destroy(e, free_it, x, y);
 }

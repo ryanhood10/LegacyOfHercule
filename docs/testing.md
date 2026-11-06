@@ -43,6 +43,7 @@ inspection goes through the GDB stub.
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
 | Art checks: every frame in game | any changed sprite record: all its frames through the game's loader, the entity list checked; Hercule's flight |
 | Hercule's shooting poses | the Gun's and the Ki Blast's poses in every facing, both players, both forms, old Hercule (`hercule_shoot.txt`) |
+| The summit's flight spot during the fight | no world map while Super 13 fights, both players and alone; the flight back after his explosion and after the fight (`summit_flight.txt`) |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
 
 Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
@@ -1367,6 +1368,20 @@ back to the arrival: Super 13 stands at once, the scene is over in a few presses
 (15/8, (336, 464)), both pads walk up into the scene's rect, A through the scene, then the boss stat is queued the way
 the Cell Games test does it (`cg_state + 5`, stat + 1 = 146 for Super 13's 145; stepz) and FLAGS+47 bit 6 (382)
 is checked. `PanCameraToPosition` names the view's top-left corner, not its centre.
+
+## The summit's flight spot during the fight (headless, 2026-11-06, branch `nb-hgun`)
+
+`tools/headless/summit_flight.txt` (self-checking, in `regfull.sh`, 23 checks): A, the story fight on the summit after its
+scene (`stepz 0x03001FDC`): player 1 and then player 2 stand on the flight spot and press A: still on 15 / 8, Super 13
+fighting (`S13 + 0x15` = 1, the block found by its magic 0x53313333), player 1's A a swing (control state not the idle
+0x03001F64); the win queued as `arctic_summit.txt` does, the end scene to the Lookout, 382 set. B, on the arctic landing
+(15 / 1) with Super 13 by test command 17: A on the sign does nothing; his HP poked to 0, the explosion, state 3: A on
+the sign flies to the world map. C, the summit with 382 set: A flies. D, part A alone (`p2 off`). The same part A on a
+build without the fix flies to the world map at the first A (the test sees Ryan's bug).
+
+```
+python tools/headless/st_expect.py tools/headless/summit_flight.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+```
 
 ## Revive and difficulty (headless, 2026-10-20)
 

@@ -325,6 +325,21 @@ The Android 13 post-game's way up the mountain, reachable only once flag 381 is 
 | summit 15 / 8 | path down (320, 552)-(352, 592), Down | ridge (144, 112) |
 | landing, summit | flight spots (89, 217)-(168, 296) and (201, 401)-(268, 476) round their signs, press A | world map (1100, 800), the arctic landing |
 
+- **No flight while Super 13 fights** (Ryan's play, 2026-11-06: "the world map shouldnt be accessible during the fight
+  here ... i accidentally used the world map": the summit's sign stands at the fight's edge, and A is the punch).
+  `super13.c` `flight_hold`: from his spawn (the scene's end) to the end of his explosion, every world-map flight box of
+  the map (a script box, 0x08023BC0, whose script starts `PushByte 43; PlayMusic`: every stock flight spot and
+  `mapbuild`'s "flight") has its x edges mirrored below 0 (x -> -x - 1, an empty rect; mirrored back after, no RAM), so
+  neither player's A fires it and a swing there is a swing. The path down (a walk-off to the ridge) stays open: it
+  leads to the climbs, not the world map, and a return is the scene's short retry. Test `tools/headless/summit_flight.txt`.
+- **The other boss fights, checked for the same hole (2026-11-06):** the maps with a world-map flight spot (3/1, 4/3,
+  6/1, 7/1, 7/19, 8/1, 8/48, 9/1, 10/1, 11/1, 12/1, 12/6, 13/1, 14/1, 15/1, 15/8, 15/11) against every boss record and
+  scripted boss: only two stock maps hold a boss beside a flight spot, and the stock game already keeps them apart by
+  the box's condition, tested at the map's load: Gero on 7/19 (the flight needs flag 86, his fight's trigger needs it
+  clear; 86 is set by his defeat) and Cell against Trunks on 12/6 (the flight needs 151, set by that fight's defeat
+  dialogue). Our fights (16, 19 + 13, the eggs, the road, Cooler, Broly, the Cell Games, the Chamber, the tournament)
+  are on maps without one. Only the summit had the hole.
+
 - **Save pad:** the ridge, rect (184, 176)-(233, 217) (Save / Switch Characters; a save there loads back on
   the ridge and the Select Game screen names it "The Arctic").
 - **Enemies** (stock Snowy Highlands records copied with `"like"`: behaviours and item drop; co-op

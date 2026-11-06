@@ -4,6 +4,11 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **No world map during the Super 13 fight (branch `nb-hgun`, Ryan's play: "the world map shouldnt be accessible during the
+  fight here ... i accidentally used the world map").** `super13.c` `flight_hold` empties the map's world-map flight boxes
+  from his spawn to the end of his explosion (A at the summit's sign is a swing now), then restores them. Every other
+  boss fight was checked: the two stock bosses beside a flight spot (Gero on 7/19, Cell against Trunks on 12/6) are kept
+  apart from it by the stock conditions; ours have none. `docs/maps.md` 9; test `summit_flight.txt` (in `regfull.sh`).
 - **Hercule's shooting poses (branch `nb-hgun`, Ryan's play: "when he shoots his gun, he just shoots up the peace sign, and same with
   his ki blasts").** Both moves run the ki blast's state, which shows group 5: on 72 / 157 the peace sign (the Flash's pose). Now
   `hercule.c` `shoot_pose` shows group 22 for the Gun (Buu's Fury's Hercule aiming and firing his pistol: Buu's Fury reused LoG2's

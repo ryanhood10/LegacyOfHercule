@@ -1,0 +1,214 @@
+# The world map's flight spots wait while Super 13 fights (Ryan, 2026-11-06: "the world map shouldnt be accessible during the
+# fight here ... i accidentally used the world map"; src/coop/super13.c flight_hold: from his spawn to the end of his explosion
+# every flight box of the map has its x edges mirrored below 0, an empty rect). Self-checking, in regfull.sh:
+#   python tools/headless/st_expect.py tools/headless/summit_flight.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4
+# A: the summit's story fight. The arrival and the scene as staging_arctic.txt; mid-fight player 1 (Piccolo) and player 2
+#    (Hercule) each stand on the flight spot (rect (201, 401)-(268, 476) round the sign) and press A: still on the summit
+#    (15 / 8), Super 13 still fighting (S13 + 0x15 = 1), and player 1's A a swing (his control state not the idle one,
+#    0x03001F64: a box that would take the press holds the swing back). The fight won (the boss win queued as the Cell
+#    Games test does it), the end scene takes everyone to the Lookout (9 / 1), 382 set.
+# B: the same hold and its release on one map: the arctic landing (15 / 1, flight rect (89, 217)-(168, 296)), Super 13 by
+#    test command 17 beside player 1: A on the sign does nothing; his HP to 0, the explosion, state 3: A on the sign flies
+#    to the world map (6 / 99).
+# C: the summit after the fight (382 set: no fight there): A on the sign flies, as before.
+# D: part A alone (no player 2: the stock trigger scan, not agency.c's): A on the sign mid-fight, still on the summit.
+p2 0
+preset +195 +191 +480 +381
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01D00150
+poke32 0x0203FD08 5
+frames 240
+echo EXPECT map zone 15 area 8
+map
+echo == the scene (walked into from (336, 430), as staging_arctic.txt), A through it to its end: the fight starts
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01AE0150
+poke32 0x0203FD08 5
+frames 200
+mash 4 100
+frames 60
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 120
+frames 60
+shot sf_00_fight
+find S13 0x53313333
+echo == the fight runs: Super 13's state 1
+echo EXPECT \w+: 01
+peek8 S13+0x15
+findent PL 0x08025604
+deref P2 0x0203FF08
+echo == player 1 on the sign, A three times: a punch, no flight
+poke32 PL+0x158 0xEA00
+poke32 PL+0x15C 0x1B800
+poke32 P2+0x158 0x11800
+poke32 P2+0x15C 0x1B800
+frames 20
+echo EXPECT map zone 15 area 8 var 1 player 23[0-9],4[34][0-9]
+map
+shot sf_01_on_sign
+key 1 1
+echo --- player 1's control state right after A: a swing (the attack state, not idle 03001f64)
+echo EXPECT \w+: (?!03001f64)
+peek PL+0x18
+shot sf_02_punch
+frames 40
+key 1 1
+frames 40
+key 1 1
+frames 120
+echo EXPECT map zone 15 area 8
+map
+echo EXPECT \w+: 01
+peek8 S13+0x15
+shot sf_03_still_here
+echo == player 2 on the sign, A three times
+poke32 PL+0x158 0x11800
+poke32 PL+0x15C 0x1B800
+poke32 P2+0x158 0xEA00
+poke32 P2+0x15C 0x1B800
+frames 20
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 2
+p2 0
+frames 40
+p2 1
+frames 2
+p2 0
+frames 120
+echo EXPECT map zone 15 area 8
+map
+echo EXPECT \w+: 01
+peek8 S13+0x15
+shot sf_04_p2_still_here
+echo == the fight won (the boss win queued as the Cell Games test does it), the end scene: to the Lookout
+poke32 0x0203F9B0 0xCE11CA3E
+poke8 0x0203F9B5 146
+poke8 0x0203F9B6 0
+stepz 0x0203F9B5 60
+shot sf_05_won
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 100
+p2 1
+key 1 6
+p2 0
+frames 300
+echo EXPECT map zone 9 area 1
+map
+echo == 382 set: FLAGS+47 bit 6
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
+echo === B: the arctic landing, Super 13 by test command 17: the flight spot waits, then works once he has exploded
+load menu.ss
+p2 0
+preset +195 +191 +480 +381
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x010F
+poke32 0x0203FD54 0x01000080
+poke32 0x0203FD08 5
+frames 240
+echo EXPECT map zone 15 area 1 var 1 player 128,256
+map
+poke32 0x0203FD08 17
+frames 60
+find S13 0x53313333
+echo EXPECT \w+: 01
+peek8 S13+0x15
+findent PL 0x08025604
+poke32 PL+0x158 0x8000
+poke32 PL+0x15C 0x10000
+frames 4
+shot sf_10_landing_fight
+key 1 1
+frames 120
+echo EXPECT map zone 15 area 1
+map
+echo --- his HP to 0: the explosion
+deref B S13+4
+poke32 B+0x188 0
+frames 400
+echo EXPECT \w+: 03
+peek8 S13+0x15
+poke32 PL+0x158 0x8000
+poke32 PL+0x15C 0x10000
+frames 4
+shot sf_11_landing_after
+key 1 1
+waitmap 6 99 600
+echo EXPECT map zone 6 area 99
+map
+echo === C: the summit after the fight (382 set: no fight there), on the sign: A flies to the world map, as before
+load menu.ss
+p2 0
+preset +195 +191 +480 +381 +382
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01B800EA
+poke32 0x0203FD08 5
+frames 240
+echo EXPECT map zone 15 area 8 var 1 player 23[0-9],4[34][0-9]
+map
+shot sf_06_back
+key 1 6
+waitmap 6 99 600
+echo EXPECT map zone 6 area 99
+map
+shot sf_07_world_map
+echo === D: one player (no player 2): the summit's fight, A on the sign does nothing
+load menu.ss
+p2 off
+preset +195 +191 +480 +381
+maptest 261
+frames 200
+poke32 0x0203FD0C 0x080F
+poke32 0x0203FD54 0x01AE0150
+poke32 0x0203FD08 5
+frames 200
+mash 4 100
+frames 60
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 120
+frames 60
+find S13 0x53313333
+echo EXPECT \w+: 01
+peek8 S13+0x15
+findent PL 0x08025604
+poke32 PL+0x158 0xEA00
+poke32 PL+0x15C 0x1B800
+frames 4
+key 1 1
+echo EXPECT \w+: (?!03001f64)
+peek PL+0x18
+frames 40
+key 1 1
+frames 120
+echo EXPECT map zone 15 area 8
+map
+echo EXPECT \w+: 01
+peek8 S13+0x15
+shot sf_20_alone
