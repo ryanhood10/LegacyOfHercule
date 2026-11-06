@@ -106,6 +106,10 @@ pass (section 3).
 Every one was looked at before and after at 1x and 4x (group x facing x frame sheets of the built ROM) and then frame by
 frame in the running game. Details per sprite: `docs/sprites.md`.
 
+**Tests at the end (2026-11-06):** `bash tools/headless/regfull.sh build/t` with a private play ROM: exit 0, no TIMEOUT /
+CRASH / FAIL line (`hercule_fly` added to its self-checking list); `BUU=0` builds and `chamber_room` passes on it (0
+failures), and `art_poses.py` passes there for 72, 157, 160, 163 (LoG2's own Popo), 165 and 180 (Perfect Cell's groups).
+
 ## 4. Left, and why
 
 - **Stock actors 8 (Android 16) and 76 (Krillin): the empty groups.** The cheapest cutscene win left: a repointed record
