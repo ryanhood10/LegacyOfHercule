@@ -5,7 +5,7 @@ usage: python tools/headless/cine_gen.py
 cine.txt (self-checking, through staging_run.py: EXPECT lines, the `ents` lists' vtables; in regfull.sh): every blocking
 op for several pairs of sprites (a player-layout body, an enemy set, a 64 x 64 body, one with five groups, one with a
 single group, a bird), with a missing body, an id past the sprite index, the point as the target, player 1 and player 2
-as either party, a party-slot code, a transformed player 1, a skip with Start, the looks, the camera, the held charge,
+as either party, a party-slot code, a transformed player 1 (and a blow that knocks him and an actor out of the form), a skip with Start, the looks, the camera, the held charge,
 and the demo scene in both modes. After each op: it ended the way expected, every op started has ended, and at the end
 of a block nobody is left held, no hum plays, OBJ VRAM's largest free block is what it was.
 cine_demo.txt: the demo scene filmed (a shot every 6 frames):
@@ -281,6 +281,24 @@ def main():
     s.clean(hums=1)                                 # (his form's own hum plays on: one, as before the charge)
     s.w("ents")
     s.w("shot cine_ssj")
+    s.w("echo == a blow that knocks him out of his form (strike flag 8): player 1 turns back, an actor takes the base sprite")
+    s.cine(CAST, 9, P1)
+    s.op(STRIKE, 1 + 8, 40, 110)
+    s.expect(r"[0-9a-f]{8}: 13", "peek8 PARTY+0x84 1")       # Goku's base row 19
+    s.w("frames 40")
+    s.clean()                                       # his form's hum went with it
+    s.actor(140, -50, 30)                           # Vegeta's Super Saiyan actor: on the base sprite 137 after the blow
+    s.cine(CAST, 9, 140)
+    s.op(STRIKE, 1 + 8, 40, 110)
+    s.w("deref TBL 0x0800959C")
+    s.w(f"deref R140 TBL+{(140 - 7) * 4:#x}")
+    s.w(f"deref R137 TBL+{(137 - 7) * 4:#x}")
+    s.expect(r"entrec [0-9a-f]+: 0$", "entrec R140")
+    s.expect(r"entrec [0-9a-f]+: 1$", "entrec R137")
+    s.cine(END, 0, 0, 4)
+    s.answer(HELD, 0, 0)
+    s.w("ents")
+    s.w("shot cine_ssj_down")
 
     s.w("echo == Start skips an op: the timeline at once, the bodies where they would have ended")
     s.w("load cine2.ss")

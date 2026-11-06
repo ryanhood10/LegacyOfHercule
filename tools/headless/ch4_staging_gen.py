@@ -98,18 +98,26 @@ for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
 # body, or alone his gold actor 140), Trunks (128) and Gohan (53), Piccolo (player 1's body or his actor 103) and Tien (121) fall in turn; a
 # white cut; then the stock ending: exactly one 17 (the fight's twin is reused), no actor left, the first flag words as the stock leaves them.
 # Hercule backs Krillin only when someone plays him; alone as Piccolo or Krillin no 72 at all.
-for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None), ("PH", 1, 5), ("HP", 5, 1), ("KH", 6, 5)):
+# Vegeta falls out of his form (Ryan, 2026-11-06, F4: "he should turn normal as he falls", nb-ssjfix): 18's second kick has Cine's flag 8, so
+# alone his gold actor is on the base sprite 137 from then on (no 140 after it), and a player 2 who plays him transformed ("PHs": his row
+# poked to 11 before the road, so the arrival binds him gold) is on row 8 again, base, as he lies.
+for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None), ("PH", 1, 5), ("HP", 5, 1), ("KH", 6, 5), ("PHs", 1, 5)):
+    ssj = name.endswith("s")
     begin(f"{name}_end", p1, p2)
+    if ssj:
+        out("poke8 0x0203F04C 11", "poke16 0x0203F048 0x8d")
     warp(49, 200, 700)
     out(f"stepz {SCENE} 80", "frames 60", "poke32 0x0203FD08 7", "frames 400", "mash 4 100", "frames 150")
-    actors(s140=int(p2 is None), s11=1, s9=1, s8=1)
+    actors(s140=int(p2 is None or ssj), s11=1, s9=1, s8=1)
     out(f"shot st_{name}_end_m0", "frames 200")
-    actors(s128=1, s53=1)
+    actors(s128=1, s53=1, s140=0, s137=1)          # Vegeta lies on the base sprite (alone his actor; with two players player 2)
+    if p2 is not None:
+        out("echo EXPECT 0203f04c: 08", "peek8 0x0203F04C 1")      # his row: base
     out(f"shot st_{name}_end_m1", "frames 200", f"shot st_{name}_end_m2", "frames 130")
     actors(s121=1, s103=1)
     out(f"shot st_{name}_end_m3", "frames 200", f"shot st_{name}_end_m4", "ents")
     after2 = None if p2 is None else (1 if p1 == HERCULE else HERCULE)      # player 2 after the rebinding
-    actors(s9=1, s11=1, s8=1, s76=1, s140=0, s128=0, s53=0, s121=0, s103=int(1 in (p1, after2)))
+    actors(s9=1, s11=1, s8=1, s76=1, s140=0, s137=0, s128=0, s53=0, s121=0, s103=int(1 in (p1, after2)))
     if p2 is not None:
         out(f"echo EXPECT 0203ff84: 0{after2}", "peek8 0x0203FF84 1")
     for i in range(40):             # (batch 1, 4.7) on into the aftermath: the kiss, Vegeta's power under his scream, Piccolo's "ALONE"

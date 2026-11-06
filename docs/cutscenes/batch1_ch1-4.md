@@ -833,8 +833,14 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   Vegeta keeps his form). Player 1 as Hercule or Krillin lies by the roadside where the blast left him. The stock bodies: 0 Tien
   (208, 432), 1 Piccolo (252, 416), 2 Gohan (288, 432), 3 Vegeta (224, 400), 4 Trunks (236, 440) (`FindCharacterEntity n` shows body n,
   `FindEntityByType n` removes it). Flags, party and player 2's slot after the scene: identical in five lineups.
-
-### 4.7 The road's aftermath: touch up (M)
+- **Vegeta falls out of his form (Ryan, 2026-11-06, F4: "when vegeta gets 'downed' you still have him as super saiyan, he should turn
+  normal as he falls. in the next cut you have him normal passed out on the ground"; branch `nb-ssjfix`):** 18's second kick is a Cine
+  strike with flag 8 (`CoopCall 37, 5, 10, 0`): at the impact a white flash, and alone his gold actor takes the base sprite's record
+  (137) in place, with two players a transformed player 2 turns back as the form's own turn-back ends (row 8); the cast is set again
+  (the actor is found by 137 now) and he falls and lies as Vegeta, as the stock's lying body of the next cut shows him. The second cut
+  despawns the 137 actor. His power before the exchange is not a transformation (alone he comes down gold already; a played Vegeta
+  keeps his form), so it stays a charge. `ch4_staging` "end": no 140 and one 137 after his fall in every lineup, player 2's row 8 in the
+  two-player ones, and a lineup `PHs` with player 2's Vegeta gold from the start.: touch up (M)
 
 - **Where:** the same sequence, stock entries 3-48 with Hercule's backing line.
 - **Today** (sheets `rePH_1`, `rePH_2`): 17's talk, 16 and the birds, Krillin's plea, "HERCULE: Y-yeah!  What the

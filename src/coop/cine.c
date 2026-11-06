@@ -975,6 +975,19 @@ static void contact(Run *r, Act *att, Act *def, s32 *x, s32 *y) {
 // knee. Returns 1 while it plays.
 #define ST_SWING_L  3       // frames from the swing's start to the impact, light / heavy (the wind-up)
 #define ST_SWING_H  7
+// Flag 8: the blow knocks B out of his form (Ryan, 2026-11-06: a Super Saiyan put down "should turn normal as he falls"): a
+// transformed player turns back as the form's own turn-back ends (ssj.c), an actor of a Super Saiyan sprite takes the base
+// sprite; a white flash on it, and he falls in base form.
+int ssj_turn_back(Entity *e);
+static void power_down(Run *r, Act *a) {
+    Entity *e = a->e;
+    int how = ssj_turn_back(e);
+    if (!how) return;
+    if (how == 1) hold(e);                          // (the turn-back stood him idle: he is the op's again)
+    a->shown = 0;
+    flash(r, 200, 10);
+    shake(r, 8, 40);
+}
 static int strike(Run *r, Act *att, Act *def, int k, int flags, int back) {
     int heavy = flags & 1, hit = r->p[4] + (heavy ? ST_SWING_H : ST_SWING_L);
     if (k == 0) {
@@ -1012,6 +1025,7 @@ static int strike(Run *r, Act *att, Act *def, int k, int flags, int back) {
         act_centre(att, &ax, &ay);
         act_face(def, ax, ay);
         fx(r, FX_STAR, 4, x, y, heavy ? 0x3000 : 0x5000);
+        if (flags & 8) power_down(r, def);       // (skipped too: only its light and shake are left out)
         def->flash = heavy ? 6 : 4;
         pose(def, P_HURT, 0, 0, 0);
         snd(r, SFX_HIT + r->hits % 3);
@@ -1797,7 +1811,7 @@ int cine_call(s32 op, s32 b, s32 c, s32 *push) {
         break;
     case CINE_STRIKE:
         if (!cast(r, 0)) break;
-        r->p[0] = b & 7; r->p[1] = c;
+        r->p[0] = b & 15; r->p[1] = c;
         r->step = op_strike;
         ok = 1;
         break;

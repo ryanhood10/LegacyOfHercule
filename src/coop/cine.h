@@ -18,7 +18,8 @@ enum {
     CINE_DASH_TO = 3,      // A vanishes and reappears at (b, c) px
     CINE_DASH_BY = 4,      // ... beside B: b = side (0 his own side, 1 left, 2 right, 3 above, 4 below, 5 behind B,
                            //     6 in front of B; + 16 no afterimage), c = px between their centres (0 = touching)
-    CINE_STRIKE = 5,       // A hits B: b bits: 1 heavy (B is knocked back, lands, lies), 2 a kick, 4 B ends kneeling;
+    CINE_STRIKE = 5,       // A hits B: b bits: 1 heavy (B is knocked back, lands, lies), 2 a kick, 4 B ends kneeling, 8 the
+                           //     blow knocks B out of his Super Saiyan form (a player's own turn-back, an actor's base sprite);
                            //     c = the knock-back in px (0 = 56)
     CINE_EXCHANGE = 6,     // A and B trade a flurry for b frames (0 = 120); c = 0 they break apart, 1 A lands the last
                            //     blow (heavy), 2 B does
