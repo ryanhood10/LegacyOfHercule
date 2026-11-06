@@ -187,6 +187,10 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   door and looks back. Nothing else.
 - **Risks:** the stock "sit" puts Gohan inside the desk's collision (already handled at the end): stand him only by
   the same `SetEntityPositionInstant`.
+- **Built 2026-11-06 (`nb-cs4`).** After "I guess I'll just do my math": a low rumble, the room trembles (`ScreenShake 0, 3, 40` in a
+  batch, so it blocks with the sound), Gohan is up beside the desk (the same `SetEntityPositionInstant 0, 136, 104` as the end) and
+  looks up; then the door and Krillin as before. Before "I'll come with you" Krillin takes a step toward the door and looks back.
+  `staging_ch1` "visit alone" shoots the rumble (`c1_G_rumble`); both visit blocks pass as before.
 
 ### 1.6 The forest spirit and its end: touch up (M)
 

@@ -314,8 +314,16 @@ end
 sequence ch1_krillin_visit
   stock @083bb624                        ; Gohan sits down at his desk
   stock @083bb662                        ; "I guess I'll just do my math for a while..."
-  script
-        WaitFrames 40
+  script                                 ; (batch 1, 1.5) the power is felt before it is spoken: a low rumble, the room trembles, Gohan gets up
+        WaitFrames 20                    ; from the desk and looks up; Krillin comes in on that
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 3, 40
+        CommitCommandBatch
+        SetEntityPositionInstant 0, 136, 104
+        SetEntityFacing 0, 1
+        WaitFrames 24
+        StopAudio 43
         PlayAudio 10
         SpawnCharacterEntity 76, 216, 148
         WalkToPosition 76, 160, 120
@@ -330,6 +338,9 @@ sequence ch1_krillin_visit
   stock @083b9e30
   stock @083b9ec0                        ; Gohan: first I need my Saiyan Battle Armor, hidden in a cave
   stock @083b9f2c
+  script                                 ; Krillin takes a step toward the door and looks back
+        WalkToPosition 76, 160, 120
+        SetEntityFacing 76, 2
   text 73 "KRILLIN: I'll come with you.  With Frieza around, two of us are safer than one."
   text 1 "#Thanks, Krillin!  The cave is in the forest, just past our house."
   script

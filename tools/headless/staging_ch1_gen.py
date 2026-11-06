@@ -98,7 +98,10 @@ for two in (False, True):
 only_gohan = [f"poke8 {flags_of(i)} 0" for i in range(1, 9)] + ["frames 30"]
 s.begin("visit alone", GOHAN, None, "+4", only_gohan)
 s.warp(2, 22, 136, 170, 150)
-s.press(10, 90)
+s.press(1, 90)                  # (batch 1, 1.5) the room trembles, Gohan gets up from the desk and looks up; Krillin comes in on that
+s.out("frames 80")
+s.shot("c1_G_rumble")
+s.press(9, 90)
 s.shot("c1_G_visit")
 s.end_scene()
 s.actors(s76=0)

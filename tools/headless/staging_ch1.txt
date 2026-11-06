@@ -785,7 +785,10 @@ poke32 0x0203FD0C 0x1602
 poke32 0x0203FD54 0xaa0088
 poke32 0x0203FD08 5
 frames 150
-mash 10 90
+mash 1 90
+frames 80
+shot c1_G_rumble
+mash 9 90
 shot c1_G_visit
 stepz 0x03001FDC 150
 frames 30
