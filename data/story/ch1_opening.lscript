@@ -448,18 +448,15 @@ sequence ch1_frieza_landing
   [37] script                            ; stock 33, the Super Saiyan: the ground shakes harder and harder under the power-up, a white flash on the gold; the soldiers give a step, old Hercule backs off
         SetEntityFacing 128, 0
         WaitFrames 40
-        PlayAudio 55
         BeginCommandBatch
-        ScreenShake 74, 2, 24
-        ScreenShake 74, 5, 24
-        ScreenShake 74, 9, 30
-        SetEntityAnimation 128, 9
+        CoopCall 37, 1, 128, 49
+        CoopCall 37, 7, 60, 2                 ; his power: the stance, the rings on the ground, the shake growing, the burst
         GlideToPosition 158, 76, 482, 60
         CommitCommandBatch
-        PlayAudio 23
-        WhiteFlash 6
         DespawnEntity 128
         SpawnCharacterEntity 134, 120, 448
+        PlayAudio 55
+        WhiteFlash 6
         BeginCommandBatch
         ScreenShake 74, 6, 24
         GlideToPosition 68, 96, 418, 60
@@ -475,49 +472,26 @@ sequence ch1_frieza_landing
         WaitFrames 15
         SetEntityFacing 70, 0
         WaitFrames 10
-        SetEntityFacing 134, 2                 ; CINE: dash beside 68, heavy strike
-        SetEntityPositionInstant 134, 112, 420
-        BeginCommandBatch
-        SetEntityAnimation 134, 6
-        EntityWaitFrames 68, 6
-        PlaySFX 68, 34
-        PlayDamageEffect 68
-        SetEntityAnimationNoWait 68, 2
-        GlideToPosition 68, 44, 426, 1200
+        CoopCall 37, 1, 134, 68               ; he is beside the first before it can aim: thrown off the column
+        CoopCall 37, 4, 2, 0
+        CoopCall 37, 5, 1, 44
         EntitySetVelocity 68, 0, 0
-        ScreenShake 74, 4, 8
-        CommitCommandBatch
         DespawnEntity 68
-        SetEntityFacing 134, 3                 ; CINE: dash beside 70, heavy strike
-        SetEntityPositionInstant 134, 128, 398
-        BeginCommandBatch
-        SetEntityFacing 70, 2
-        SetEntityAnimation 134, 7
-        EntityWaitFrames 70, 6
-        PlaySFX 70, 36
-        PlayDamageEffect 70
-        SetEntityAnimationNoWait 70, 2
-        GlideToPosition 70, 196, 388, 1200
+        CoopCall 37, 1, 134, 70               ; the second, a kick
+        CoopCall 37, 4, 1, 0
+        CoopCall 37, 5, 3, 44
         EntitySetVelocity 70, 0, 0
-        ScreenShake 74, 4, 8
-        CommitCommandBatch
         DespawnEntity 70
-        SetEntityFacing 134, 3                 ; CINE: dash beside 71, heavy strike
-        SetEntityPositionInstant 134, 128, 420
-        BeginCommandBatch
-        SetEntityFacing 71, 2
-        SetEntityAnimation 134, 6
-        EntityWaitFrames 71, 6
-        PlaySFX 71, 35
-        PlayDamageEffect 71
-        SetEntityAnimationNoWait 71, 2
-        GlideToPosition 71, 196, 426, 1200
+        CoopCall 37, 1, 134, 71               ; the third
+        CoopCall 37, 4, 1, 0
+        CoopCall 37, 5, 1, 44
         EntitySetVelocity 71, 0, 0
-        ScreenShake 74, 4, 8
-        CommitCommandBatch
         DespawnEntity 71
-        SetEntityFacing 134, 0                 ; CINE: dash back to his mark, his back to the last two: a blast each, over his shoulder
-        SetEntityPositionInstant 134, 120, 444
+        CoopCall 37, 2, 120, 444              ; back on his mark, his back to the last two: a blast each, over his shoulder
+        CoopCall 37, 1, 134, -2
+        CoopCall 37, 3, 120, 444
+        CoopCall 37, 0, 0, 0
+        SetEntityFacing 134, 0
         WaitFrames 12
         BeginCommandBatch
         SetEntityFacing 67, 3
@@ -567,7 +541,7 @@ sequence ch1_frieza_landing
         BeginCommandBatch
         SetEntityAnimation 49, 5
         NPCFireKiBlast 49, 120, 444, 100
-        EntityWaitFrames 134, 7                ; CINE: he is gone before it lands (dash out)
+        EntityWaitFrames 134, 7                ; he is gone before it lands (a cut: a Cine dash keeps its body in the view)
         CommitCommandBatch
         SetEntityPositionInstant 134, 272, 16
         BeginCommandBatch
@@ -582,7 +556,7 @@ sequence ch1_frieza_landing
         WaitFrames 14
         SetEntityFacing 49, 3
         WaitFrames 14
-        SetEntityFacing 134, 0                 ; CINE: dash in above him
+        SetEntityFacing 134, 0                 ; he is above him (a cut: the spot is too near the view's top for a Cine dash)
         SetEntityPositionInstant 134, 120, 350
         BeginCommandBatch
         SetEntityAnimation 134, 16
@@ -591,7 +565,7 @@ sequence ch1_frieza_landing
         PlayDamageEffect 49
         CommitCommandBatch
         WhiteFlash 4
-        SetEntityFacing 134, 1                 ; CINE: dash through to his other side
+        SetEntityFacing 134, 1                 ; and through to his other side
         SetEntityPositionInstant 134, 120, 388
         BeginCommandBatch
         SetEntityAnimation 134, 16
@@ -613,12 +587,10 @@ sequence ch1_frieza_landing
         EntitySetVelocity 49, -8, 8
         PlayAudio 20
         EntitySetVelocity 49, 8, -8
-        SetEntityFacing 134, 1
-        BeginCommandBatch
         EntitySetVelocity 49, 4, 6
-        NPCFireKiBlastAtEntity 134, 49, 100
-        EntityWaitFrames 134, 10
-        CommitCommandBatch
+        CoopCall 37, 1, 134, 49
+        CoopCall 37, 8, 3, 0                  ; an open hand: the ball grows in it and flies
+        CoopCall 37, 0, 0, 0
         FadeToWhite 3
         DespawnEntity 49
         PlayAudio 20
@@ -649,30 +621,19 @@ sequence ch1_frieza_landing
         SetEntityAnimation 74, 4
         ScreenShake 158, 2, 50
         CommitCommandBatch
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 134, 74, 100
-        EntityWaitTouchPlayer 74
-        PlaySFX 74, 36
-        PlayDamageEffect 74
-        GlideToPosition 74, 152, 388, 900
-        SetEntityAnimation 74, 3
-        EntitySetVelocity 74, 0, 0
-        ScreenShake 158, 12, 30
-        CommitCommandBatch
-        PlayAudio 20
+        CoopCall 37, 1, 134, 74
+        CoopCall 37, 8, 35, 0                 ; the ball grows in his palm under King Cold's chin: thrown on his back
         WaitFrames 50
-        SetEntityAnimation 74, 4               ; he lifts his head
+        CoopCall 37, 10, 1, 0                 ; he gets up
+        SetEntityAnimation 74, 4               ; roaring
         WalkToPosition 134, 152, 432
-        BeginCommandBatch
-        NPCFireKiBlastAtEntity 134, 74, 100
-        EntityWaitTouchPlayer 74
+        CoopCall 37, 8, 0, 0                  ; and a second
+        CoopCall 37, 0, 0, 0
         PlaySFX 74, 36
-        PlayDamageEffect 74
         SetEntityAnimation 74, 3
         EntitySetVelocity 74, 8, -8
         EntitySetVelocity 74, -12, 16
         EntitySetVelocity 74, 20, -4
-        CommitCommandBatch
         FlashScreenColor 74, 255, 0, 0, 10
         WhiteFlash 6
         DespawnEntity 74

@@ -281,6 +281,12 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   back to him, "AHHH", the stock explosions, an open hand, a white cut, gone; 8 King Cold strides up and roars, a blast at arm's length
   slides him back and drops him, he gets up roaring, two steps and a second blast, the stock red flash under a white one. Flags and the
   party block after the scene are identical to the build before (`staging_ch1` checks the first flag word).
+  **With Cine (second commit):** the Super Saiyan is Cine's charge (level 2: the stance, rings, the growing shake, the burst) under the
+  stock's sprite swap; the three soldiers are an afterimage dash and a heavy strike each (thrown 44 px, smoke where they land), and he
+  dashes back to his mark; the blast into what is left of Frieza and the one under King Cold's chin are the big blast (the ball grows in
+  his palm; King Cold is thrown, lies, gets up roaring); the second is a single blast. Left as cuts on purpose: Trunks leaving the view
+  before Frieza's blast lands and coming down above him (a Cine dash keeps its body inside the view and 30 px off its top); the sword is
+  the stock animation 16 (Cine's strike has no sword pose).
 
 ### 1.8 Goku's arrival and Trunks' warning: touch up (M)
 
