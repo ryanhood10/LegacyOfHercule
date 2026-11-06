@@ -120,8 +120,10 @@ ENTRY_JUMPS = [
 # bytes, coop.ld): (0x0203EC00 - 0x02000808) / 4 = 0xF8FE words.
 # Since 2026-10-31 it ends at 0x0203EA00, below the team combos' `comboram` (0x200 bytes): (0x0203EA00 - 0x02000808) / 4
 # = 0xF87E words.
+# Since 2026-11-06 it ends at 0x0203E900, below the cinematic helpers' `cineram` (0x100 bytes, src/coop/cine.c):
+# (0x0203E900 - 0x02000808) / 4 = 0xF83E words.
 WORD_PATCHES = [
-    (0x01F20C, 0x0000FDFE, 0x0000F87E),
+    (0x01F20C, 0x0000FDFE, 0x0000F83E),
 ]
 
 # The 27 pointer words that hold the party block's address (g_PartyState, 0x03000E90): the static
