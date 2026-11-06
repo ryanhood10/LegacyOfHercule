@@ -9,7 +9,8 @@ usage: buu2log2.py roms/log2.gba roms/buu.gba build/gen/buu_sprites_data.c 158=1
   --template   LoG2 record whose group layout (count, frames per group, header) the output copies
                (default 72 = Hercule: the game's animation tables index frames per group, so a
                converted record keeps the template's frame counts, cycling the Buu frames)
-  --map        per-id override of the LoG2 group -> Buu animation table (see GROUP_MAP)
+  --map        per-id override of the LoG2 group -> Buu animation table (see GROUP_MAP); a frame list for a group
+               past the template's count adds that group (old Hercule's Gun: `--map 158 22:3.1+3.2+3.2`)
   --spec       a file of more pairs, one per line: `<id>=<buu record> [g:a,g:a,...] [@<template>]`
                (the group map override and a per-id template; `#` starts a comment); a group's value may also be
                `lie` (the lying pose, see GROUP_MAP) or a frame list `a.f+a.f+...` (Buu anim a frame f, in order,
@@ -447,11 +448,18 @@ class Converter:
         rec = self.bu.record(bu_id)
         anims = [self.bu.anim(a) if a else [] for a in rec["anims"]]
         header = bytearray(self.t_header)
-        header[2] = len(self.t_counts)
+        # a frame-list group past the template's last (old Hercule's Gun, 22: `--map 158 22:3.1+3.2+3.2`) extends the
+        # record, its frame count the list's length; the groups between stay empty
+        counts = list(self.t_counts)
+        for gi, src in group_map.items():
+            if gi >= len(self.t_counts) and isinstance(src, str):
+                counts += [0] * (gi + 1 - len(counts))
+                counts[gi] = len(src.split("+"))
+        header[2] = len(counts)
         for k in range(4):                        # the Buu record's collision boxes
             header[0x0C + 16 * k:0x1C + 16 * k] = struct.pack("<iiii", *rec["boxes"][k])
         groups = []
-        for gi, count in enumerate(self.t_counts):
+        for gi, count in enumerate(counts):
             if count == 0:
                 groups.append(None)
                 continue

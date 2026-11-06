@@ -807,6 +807,12 @@ of the time. Specials cannot be interrupted, and a stun opens 60 frames of poise
 players cannot lock him. Every blast is a type-0 hit message (players only); orbs in flight when he dies
 fizzle without damage. Test command 18 forces a special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar).
 
+### The world map waits while he fights (2026-11-06)
+
+From his spawn to the end of his explosion `flight_hold` empties every world-map flight box of the map (x mirrored below
+0) and then restores it: Ryan flew off mid-fight by pressing A beside the summit's sign. `docs/maps.md` 9 (the arctic's
+exits), `tools/headless/summit_flight.txt`.
+
 ### Engine facts found for this
 
 - **Hurt box**: `Entity_GetBox` (`0x080079B8`) = position + `record + 0xC + facing * 0x10` ({x1, y1, x2, y2});

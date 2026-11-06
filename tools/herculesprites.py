@@ -2,7 +2,7 @@
 (docs/sprites.md "Hercule's beam pose"). Emits C source compiled into the co-op ROM; nothing from the ROM
 is committed.
 
-usage: herculesprites.py roms/log2.gba build/gen/hercule_sprites_data.c [--preview-dir build/x]
+usage: herculesprites.py roms/log2.gba build/gen/hercule_sprites_data.c [--buu roms/buu.gba|none] [--preview-dir build/x]
 
 The engine's beam pose is group 18: the NPCFireKamehameha opcode (script step 137) puts the entity in
 control state 30 (vtable 0x08025038), which plays group 18 frame 0 for 8 frames (the charge) and then
@@ -24,6 +24,9 @@ cutscenes) are unchanged; the Makefile repoints id 72 at it in the relocated spr
     of sight for the fire);
   * the hold frame (2-6) is the thrust frame with the afro bristling (a ragged black fringe on its top
     and back edge), as Goku's hair rises in his.
+Groups 22 and 23 are the Gun's and the Ki Blast's poses (hercule.c points the ki blast's state at them): the Gun from
+Buu's Fury's Hercule (record 128 anim 3, the same drawing as 72; --buu, else group 5's peace sign), the Ki Blast a push
+built from his own frames (see "the Gun" below; docs/sprites.md "Hercule's shooting poses"); the record has 24 groups.
 Group 9 (the Super Saiyan transform's power-up, tools/ssjhercule.py) and ability 18's HUD icons
 (herc_ssj_icon_0 / _1) are emitted here too (docs/sprites.md "Super Saiyan Hercule: the transformation").
 Frames are LZ-compressed with buu2log2.compress; the frame boxes and offsets are Goku's (16x32 front /
@@ -105,9 +108,13 @@ def display(sp, sid, gi, d, fi):
     return xo, yo, w, h, attr, (A.hflip(px) if attr & HFLIP else [r[:] for r in px])
 
 
-def arm_colour(c, col, rule):
-    """Goku's arm pixel -> Hercule's colour (None: not an arm pixel)."""
+def arm_colour(c, col, rule, extra=None):
+    """Goku's arm pixel -> Hercule's colour (None: not an arm pixel). `extra`: more Goku colours,
+    {colour: (as hand, as sleeve)} (the ki pose's arms use his darker skin outline and the bright band)."""
     kind, wrist = rule
+    if extra and c in extra:
+        hand = kind is None or (col < wrist if kind == "lt" else col > wrist)
+        return extra[c][0 if hand else 1]
     if c in G_BLUE:
         return TO_SLEEVE[c]
     if c not in G_SKIN:
@@ -158,10 +165,10 @@ def face_row(px):
     return len(px) // 3
 
 
-def compose(sp, d, spec, image):
+def compose(sp, d, spec, image, group=BEAM_GROUP):
     gi, fi = spec["base"]
     xo, yo, w, h, _, base = display(sp, HERCULE, gi, d, fi)
-    gxo, gyo, gw, gh, _, goku = display(sp, GOKU, BEAM_GROUP, d, image)
+    gxo, gyo, gw, gh, _, goku = display(sp, GOKU, group, d, image)
     assert (gw, gh) == (w, h), (d, w, h, gw, gh)
     px = [r[:] for r in base]
     for r0, r1, c0, c1, colours in spec["erase"]:
@@ -173,11 +180,17 @@ def compose(sp, d, spec, image):
     for (r0, r1, c0, c1), (dy, dx), rule in spec["arms"][image]:
         for y in range(r0, r1 + 1):
             for x in range(c0, c1 + 1):
-                c = arm_colour(goku[y][x], x, rule)
+                c = arm_colour(goku[y][x], x, rule, spec.get("extra"))
                 ty, tx = y + dy, x + dx
                 if c is not None and 0 <= ty < h and 0 <= tx < w:
                     px[ty][tx] = c
                     touched.add(ty)
+    for r0, r1, c0, c1, colours in spec.get("erase_after", {}).get(image, []):
+        for y in range(r0, r1 + 1):
+            for x in range(c0, c1 + 1):
+                if colours is None or px[y][x] in colours:
+                    px[y][x] = 0
+                    touched.add(y)
     if image in spec.get("patch", {}):
         r0, art = spec["patch"][image]
         for y, line in enumerate(art):
@@ -269,8 +282,118 @@ def fly_side(sp):
     return frames
 
 
+# ---- the Gun (group 22) and the Ki Blast's push (group 23) ----------------------------------------------
+# Both abilities run the ki blast's control state (animation 34, hercule.c): its enter points the entity at group 5
+# (record + 0x9C, the peace sign on 72 / 157) and its update shows frame 0 for 8 frames, frame 1 from the shot (the
+# blast leaves 8 frames in) and, for each extra shot of a held fire, frames 1 and 2 in turn. hercule.c then points the
+# entity at group 22 (the Gun) or 23 (the Ki Blast) when the record has it. Frames: 0 the wind-up, 1 the shot, 2 the
+# next shot.
+GUN_GROUP, KI_GROUP = 22, 23
+GROUP_COUNT = 24                 # herc_record / ssj_record's group count (21 stays empty in herc_record)
+BUU_HERCULE, BUU_GUN_ANIM = 128, 3   # Buu's Fury Hercule (record 128, the same drawing as 72's); anim 3 = the gun:
+#                                  frame 0 the hand at the holster, 1 aimed, 2 fired (the gun kicks up, the flash)
+FLASH_NEXT = {0x24: 0x25, 0x25: 0x26, 0x26: 0x27, 0x77: 0x24}   # the muzzle flash one step hotter: the next shot
+SHADOW = 1
+
+
+def add_shadow(px):
+    """LoG2's ground shadow under the feet (Buu's Fury draws none; every frame of 72 has one): a black band from 3 px
+    outside the feet, over the boots' last rows and one row under them, only on transparent pixels."""
+    h, w = len(px), len(px[0])
+    bot = max(y for y in range(h) if any(px[y]))
+    cols = [x for y in range(max(0, bot - 2), bot + 1) for x in range(w) if px[y][x]]
+    left, right = min(cols) - 3, max(cols) + 3
+    out = [r[:] for r in px]
+    for y, inset in ((bot - 2, 3), (bot - 1, 1), (bot, 0), (bot + 1, 1)):
+        if 0 <= y < h:
+            for x in range(max(0, left + inset), min(w, right - inset + 1)):
+                if not out[y][x]:
+                    out[y][x] = SHADOW
+    return out
+
+
+def gun_frames(sp, buu_rom, shadow=True):
+    """Group 22 per facing (down, up, left, right): 3 frames (xo, yo, w, h, attr, display pixels) from Buu's Fury's
+    Hercule gun anim in LoG2's palette: 0 aimed, 1 fired, 2 fired with the flash one step hotter. Right is the left
+    blob h-flipped, as LoG2's. `shadow`: add LoG2's ground shadow (72 and 157; old Hercule's 158 has none)."""
+    import buu_sprites as B
+    from buu2log2 import nearest_table
+    bu = B.BuuSprites(buu_rom)
+    rec = bu.record(BUU_HERCULE)
+    anim = bu.anim(rec["anims"][BUU_GUN_ANIM])
+    assert len(anim) == 3, "Buu's Fury Hercule's gun anim changed?"
+    table = nearest_table(bu.pal, sp.pal)
+    dirs = []
+    for d in range(3):
+        imgs = []
+        for f in (1, 2):
+            box, parts = bu.descriptor(anim[f][d])
+            assert len(parts) == 1 and not parts[0][4] & 0x30000000, "a one-part, unflipped frame"
+            x, y, w, h, attr, _ = parts[0]
+            (_, _, _, _), raw = bu.frame_pixels(anim[f][d], rec["remap"])
+            px = [[table[c][0] if c else 0 for c in r] for r in raw]
+            imgs.append((x, y, w, h, attr, add_shadow(px) if shadow else px))
+        hot = [[FLASH_NEXT.get(c, c) for c in r] for r in imgs[1][5]]
+        dirs.append([imgs[0], imgs[1], imgs[1][:5] + (hot,)])
+    dirs.append([(x, y, w, h, attr | HFLIP, A.hflip(px)) for x, y, w, h, attr, px in dirs[2]])
+    return dirs
+
+
+# The Ki Blast: a push. Seen from the side, Goku's ki-blast pose (his group 5: the state that plays it) re-posed on
+# Hercule's body the way the beam pose is (compose): frame 0 the wind-up is his own guard (the lunge, the back fist
+# chambered), frames 1 / 2 the front arm thrust out with the palm open (Goku's frame 2 arm in Hercule's colours: the
+# hand his skin, from the wrist band up his brown gi sleeve; Goku's skin outline 0x15 and bright band 0x4F are not in the
+# beam pose's maps). From the front and the back a one-handed thrust is an arm foreshortened toward the viewer, which in
+# Hercule's colours reads as a tan block (the beam pose's finding); there his beam pose's own two-handed push is used,
+# the charge for the wind-up and the thrust (without the hold's bristling afro) for the shot.
+KI_EXTRA = {0x15: (0x17, 0x71), 0x4F: (0x6F, 0x6F)}
+KI_SIDE = {
+    "base": (7, 0),
+    "erase": [(15, 21, 13, 17, H_SKIN)],                              # the front fist at the waist
+    "arms": {2: [((12, 19, 0, 15), (-1, 4), ("lt", 7))]},
+    "extra": KI_EXTRA,
+}
+
+
+def ki_frames(sp):
+    """Group 23 per facing: 3 frames (xo, yo, w, h, attr, display pixels)."""
+    out = {}
+    for d, spec in ((0, FRONT), (1, BACK)):
+        box, charge = compose(sp, d, spec, 0)
+        _, thrust = compose(sp, d, spec, 1)
+        out[d] = (box, [charge, thrust, thrust])
+    xo, yo, w, h, _, guard = display(sp, HERCULE, *KI_SIDE["base"][:1], 2, KI_SIDE["base"][1])
+    _, push = compose(sp, 2, KI_SIDE, 2, group=5)
+    out[2] = ((xo, yo, w, h), [guard, push, push])
+    g = sp.groups(sp.record(GOKU))[BEAM_GROUP]
+    dirs = []
+    for d in range(4):
+        (xo, yo, w, h), imgs = out[2 if d == 3 else d]
+        attr = sp.descriptor(g[d], 0)[4]        # Goku's attributes (shape/size; h-flip on the right)
+        dirs.append([(xo, yo, w, h, attr, A.hflip(px) if attr & HFLIP else px) for px in imgs])
+    return dirs
+
+
+def write_frames(lines, blobs, name, frames, counter):
+    """Emit a descriptor array; frames are (xo, yo, w, h, attr, display pixels), blobs stored unflipped and shared."""
+    ents, nbytes = [], 0
+    for xo, yo, w, h, attr, px in frames:
+        data = A.tiles(A.hflip(px) if attr & HFLIP else px, w, h)
+        if data not in blobs:
+            blob = compress(data)
+            assert m.decompress(blob, 8, 1)[:len(data)] == data, "LZ round trip"
+            blobs[data] = f"{counter}{len(blobs)}"
+            nbytes += len(blob)
+            lines.append(f"static const u8 {blobs[data]}[{len(blob)}] __attribute__((aligned(4))) = "
+                         f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
+        ents.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {blobs[data]}}}")
+    lines.append(f"static const HcDesc {name}[{len(ents)}] = {{{', '.join(ents)}}};")
+    return nbytes
+
+
 # ---- output -----------------------------------------------------------------------------------------
-def write_c(path, sp, group18):
+def write_c(path, sp, group18, gun=None):
+    """gun: gun_frames() (None without Buu's Fury: group 22 is then group 5's arrays, the peace sign as before)."""
     rom = sp.rom
     rec = sp.record(HERCULE)
     header = rom[rec - S.ROM_BASE:rec - S.ROM_BASE + 0x4C]
@@ -348,8 +471,24 @@ def write_c(path, sp, group18):
             grp.append("{" + ", ".join(f"(const HcDesc *)0x{q:08x}u" for q in g[:2]) + ", herc_g12_l, herc_g12_r}")
         else:
             grp.append("{" + ", ".join(f"(const HcDesc *)0x{p:08x}u" for p in g) + "}")
+    # groups 21 (empty: the turn back is the transformed record's), 22 the Gun, 23 the Ki Blast's push
+    grp.append("{0, 0, 0, 0}")
+    if gun:
+        names = [f"herc_gun_d{d}" for d in range(4)]
+        for nm, frames in zip(names, gun):
+            nbytes += write_frames(lines, blobs, nm, frames, "herc_blob_g")
+        grp.append("{" + ", ".join(names) + "}")
+    else:
+        grp.append("{" + ", ".join(f"(const HcDesc *)0x{p:08x}u" for p in stock[5]) + "}")
+    names = [f"herc_ki_d{d}" for d in range(4)]
+    for nm, frames in zip(names, ki_frames(sp)):
+        nbytes += write_frames(lines, blobs, nm, frames, "herc_blob_k")
+    grp.append("{" + ", ".join(names) + "}")
+    assert len(grp) == GROUP_COUNT
+    header = bytearray(header)
+    header[2] = GROUP_COUNT
     hdr = ", ".join(f"0x{b:02x}" for b in header)
-    lines.append(f"typedef struct {{ u8 header[0x4C]; const HcDesc *groups[{len(stock)}][4]; u32 end; }} HcRecord;")
+    lines.append(f"typedef struct {{ u8 header[0x4C]; const HcDesc *groups[{GROUP_COUNT}][4]; u32 end; }} HcRecord;")
     lines.append(f"const HcRecord herc_record = {{{{{hdr}}}, {{{', '.join(grp)}}}, 0}};")
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     open(path, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
@@ -388,18 +527,51 @@ def preview(path, sp, group18):
         pass
 
 
+def shoot_preview(path, sp, gun):
+    """Groups 5 (the peace sign, what both moves showed before), 22 (the Gun) and 23 (the Ki Blast), four facings x
+    three frames each, on a ground cross at the entity's position; also a _x4 copy."""
+    rows = [("5", [[display(sp, HERCULE, 5, d, fi) for fi in range(3)] for d in range(4)])]
+    if gun:
+        rows.append(("22", gun))
+    rows.append(("23", ki_frames(sp)))
+    cell = 40
+    cv = S.Canvas(24 + 4 * (3 * cell + 6), len(rows) * (cell + 4) + 4, (70, 90, 70))
+    for ri, (name, dirs) in enumerate(rows):
+        y0 = 2 + ri * (cell + 4)
+        cv.text(1, y0 + 2, name, (255, 255, 0))
+        for d, frames in enumerate(dirs):
+            for fi, (xo, yo, w, h, attr, px) in enumerate(frames[:3]):
+                ox, oy = 24 + d * (3 * cell + 6) + fi * cell + 12, y0 + 30
+                cv.put(ox, oy, (140, 160, 140))
+                for y, line in enumerate(px):
+                    for x, v in enumerate(line):
+                        if v:
+                            cv.put(ox + xo + x, oy + yo + y, sp.pal[v])
+    cv.save(path)
+    try:
+        from PIL import Image
+        im = Image.open(path)
+        im.resize((im.width * 4, im.height * 4), Image.NEAREST).save(path.replace(".png", "_x4.png"))
+    except ImportError:
+        pass
+
+
 def main():
     rom = open(sys.argv[1], "rb").read()
     out_c = sys.argv[2]
     pdir = sys.argv[sys.argv.index("--preview-dir") + 1] if "--preview-dir" in sys.argv else None
+    buu = sys.argv[sys.argv.index("--buu") + 1] if "--buu" in sys.argv else "none"
     sp = S.Sprites(rom)
     g18 = build(sp)
-    n, nbytes = write_c(out_c, sp, g18)
+    gun = gun_frames(sp, open(buu, "rb").read()) if buu != "none" else None
+    n, nbytes = write_c(out_c, sp, g18, gun)
     if pdir:
         os.makedirs(pdir, exist_ok=True)
         preview(os.path.join(pdir, "hercule_beam_preview.png"), sp, g18)
         SSJ.preview(os.path.join(pdir, "ssj_hercule_transform_preview.png"), rom)
-    print(f"wrote {out_c}: herc_record (sprite 72 + groups 18 and 9, 12's sides), {n} frames, {nbytes} bytes; "
+        shoot_preview(os.path.join(pdir, "hercule_shoot_preview.png"), sp, gun)
+    print(f"wrote {out_c}: herc_record (sprite 72 + groups 18 and 9, 12's sides, 22 the Gun{'' if gun else ' = 5'}, "
+          f"23 the Ki Blast), {n} frames, {nbytes} bytes; "
           "herc_ssj_icon_0/1")
 
 

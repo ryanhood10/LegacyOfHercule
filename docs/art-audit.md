@@ -28,9 +28,9 @@ body has no lying group the knock-down (3) ends lying and can be played through,
 
 | body (sprite) | attack | hurt | knock-down / lying | kneel | fly (12) | charge / power-up | beam (18) | shout / victory | do not play |
 |---|---|---|---|---|---|---|---|---|---|
-| Hercule 72 | 6, 7, 8 | 2, 11 | 3 (ends lying) | 3's frame 1 (not holdable) | **12, all four facings** (sides new) | 9 (arms up, then the gold aura: his Super Saiyan power-up), 5 the wave | 18 | 4 shout, 5 wave | 10, 14-16, 19 |
-| Super Saiyan Hercule 157 | 6, 7, 8 | 2, 11 | 3 | - | **12** (sides new) | 5; 21 the turn back | **18 (new)** | 4 | 9, 10, 14-16, 19 |
-| old Hercule 158 | 6, 7, 8 | 2, 11 | 3; 12 is a lying pose in every facing | - | - (12 lies) | 5 | - | 4 | 9, 10, 14-16, 18, 19 |
+| Hercule 72 | 6, 7, 8; **22 the Gun, 23 the Ki Blast's push** (C only: `hercule.c` `shoot_pose`) | 2, 11 | 3 (ends lying) | 3's frame 1 (not holdable) | **12, all four facings** (sides new) | 9 (arms up, then the gold aura: his Super Saiyan power-up), 5 the wave | 18 | 4 shout, 5 wave | 10, 14-16, 19, 21 |
+| Super Saiyan Hercule 157 | 6, 7, 8; **22, 23** as 72's | 2, 11 | 3 | - | **12** (sides new) | 5; 21 the turn back | **18 (new)** | 4 | 9, 10, 14-16, 19 |
+| old Hercule 158 | 6, 7, 8; **22 the Gun** | 2, 11 | 3; 12 is a lying pose in every facing | - | - (12 lies) | 5 (Buu's gun anim: reach, aim, fire) | - | 4 | 9, 10, 14-16, 18, 19, 21 |
 | Android 13 165 (count 13) | 6, 7, 8 | 2 | 3 (ends lying); 12's side views | - | 12 | 5 | - | - | **4, 9, 10, 11, anything from 13 up** |
 | Android 13, player body 240 | 6, 7, 8 | 2, 11 | 3, 12 | - | 12 | 5 | - | 4 (= his charge) | 9, 10, 14-16, 18, 19 |
 | Super Android 13 180 | 6, 7, 8; 21 the ki throw, 22 the bomber | 2, 11 | 3 (recoil only: he never lies) | **23** (crouching power-up) | **- (12 is his death light)** | 23, 24 the roar, 25 the nova | - (21) | 4, 24 | 9, 10, 14-16, 18, 19; 12 outside his death |
@@ -102,6 +102,7 @@ pass (section 3).
 | `e105ff0` | Mr. Popo (163): side palm strikes, hit marks | `--ids 163`: 196 frames; `chamber_popo.txt` |
 | `f5ebdce` | Super Android 13 (180): the side sash, the forearm cuff (43 frames) | `--ids 180`: 320 frames |
 | `1fd72ec` | the Time Chamber's EXIT sign (`chamberpath.py`) | seen in game beside the door home; the chamber tests |
+| `nb-hgun` (2026-11-06, after Ryan's play) | Hercule's shooting poses: the Gun (group 22: Buu's Fury's Hercule drawing his pistol, all four facings, LoG2's shadow) and the Ki Blast (group 23: a push) on 72, 157 and the Gun on 158, in place of the peace sign (`docs/sprites.md` "Hercule's shooting poses") | `hercule_shoot.txt` (153 checks: both moves, four facings, players 1 and 2, base and Super Saiyan, old Hercule); `art_poses.py --ids 72,157,158` |
 
 Every one was looked at before and after at 1x and 4x (group x facing x frame sheets of the built ROM) and then frame by
 frame in the running game. Details per sprite: `docs/sprites.md`.
