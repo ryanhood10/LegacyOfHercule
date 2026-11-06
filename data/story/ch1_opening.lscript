@@ -559,7 +559,11 @@ sequence ch1_frieza_landing
         FlyToPosition 128, 120, 448
         SetEntityFacing 128, 1
         SpawnDustCloud 128, 120, 456
-        PanCameraToPosition 12, 328, 2
+        BeginCommandBatch                     ; Frieza and his father take a step toward the intruder (the frame: Ryan)
+        WalkToPosition 74, 168, 384
+        WalkToPosition 49, 120, 384
+        CommitCommandBatch
+        PanCameraToPosition 12, 314, 2
         SpawnCharacterEntity 158, 96, 510
         WalkToPosition 158, 96, 470
         SetEntityFacing 158, 1
@@ -665,7 +669,7 @@ sequence ch1_frieza_landing
         WalkToPosition 158, 84, 438
         SetEntityFacing 158, 1
         CommitCommandBatch
-        PanCameraToPosition 12, 352, 2
+        PanCameraToPosition 12, 330, 2
         WaitFrames 20
         SetEntityAnimation 158, 6
         PlaySFX 66, 34
@@ -679,7 +683,7 @@ sequence ch1_frieza_landing
   text 126 "OLD HERCULE: Ha!  Did you see that, Trunks?\x0bOne punch!  That's the power of the World Champion!"
   text 98 "TRUNKS: ...Stay behind me, Hercule."
   [44] script                            ; stock 37, second half: Frieza fires first and hits empty ground; he looks for him; the sword comes from above, and again from the other side (the stock: a wait, a walk-up, one slash)
-        PanCameraToPosition 12, 328, 2
+        PanCameraToPosition 12, 314, 2
         SetEntityFacing 134, 1
         WaitFrames 20
         BeginCommandBatch
@@ -701,7 +705,7 @@ sequence ch1_frieza_landing
         SetEntityFacing 49, 3
         WaitFrames 14
         SetEntityFacing 134, 0                 ; he is above him (a cut: the spot is too near the view's top for a Cine dash)
-        SetEntityPositionInstant 134, 120, 350
+        SetEntityPositionInstant 134, 120, 366
         BeginCommandBatch
         SetEntityAnimation 134, 16
         EntityWaitFrames 49, 8
@@ -710,7 +714,7 @@ sequence ch1_frieza_landing
         CommitCommandBatch
         WhiteFlash 4
         SetEntityFacing 134, 1                 ; and through to his other side
-        SetEntityPositionInstant 134, 120, 388
+        SetEntityPositionInstant 134, 120, 404
         BeginCommandBatch
         SetEntityAnimation 134, 16
         EntityWaitFrames 49, 8
@@ -719,7 +723,7 @@ sequence ch1_frieza_landing
         FlashScreenColor 49, 255, 0, 0, 10
         CommitCommandBatch
         SetEntityFacing 134, 0                 ; through him, his back to what is left
-        GlideToPosition 134, 120, 412, 700
+        GlideToPosition 134, 120, 428, 700
         END
   [45] stock @083be36e                   ; "!AHHHHHHHHH!!!!"
   [46] script                            ; stock 39: Frieza comes apart; an open hand, and the pieces are gone in the blast (the stock despawned him mid-bounce)
@@ -740,7 +744,7 @@ sequence ch1_frieza_landing
         PlayAudio 20
         WhiteFadeOut 6
         BeginCommandBatch
-        SpawnDustCloud 134, 132, 372
+        SpawnDustCloud 134, 132, 388
         ScreenShake 74, 10, 30
         SpawnDustCloud 158, 112, 360
         CommitCommandBatch
@@ -755,7 +759,7 @@ sequence ch1_frieza_landing
         WalkToPosition 134, 152, 456
         SetEntityFacing 134, 1
         CommitCommandBatch
-        PanCameraToPosition 36, 322, 2
+        PanCameraToPosition 36, 314, 2
         WaitFrames 60
         END
   stockseq @083be798 42 46    ; King Cold's offer, "Not a chance.", "Very well..."
