@@ -545,6 +545,14 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   sure one 19 is left on the list. Entry 7 warps to map 192 and hands control to Piccolo
   (`SetActiveCharacterNoReset 1`): nothing of ours after it.
 - **Size M.** Could be one commit with 3.5 or its own.
+- **Built 2026-11-06 (`nb-cs1`, with Cine), two commits.** (a) The finishing blow: the HUD goes, 19 reels (his hit-stun), turns and
+  runs 48 px up-screen from wherever the fight left him (a walk to his own position, `PushEntityPosition 12`), Vegeta turns after him,
+  the ball grows in his palm with rings on the ground and flies (Cine blast 3), and the stock explosion chain plays as its impact, EXP
+  and music as stock; everyone on screen looks at 13 as he gets up; dust under his take-off. The research's "five batches of velocity
+  steps" are explosions round a body that stands (`EntitySetVelocity`, `docs/scripts.md` 2.1). 19 has no knock-down pose: when he fell
+  first in the pair he stands frozen until this scene, so the reel works from either case. (b) Vegeta's stock "Silly robot..." moved
+  up to right after the explosion (its own commit: Ryan may drop it). Not built: the shake on 20's blast at the cliff (stock entry 7
+  left alone: it warps and hands control to Piccolo).
 
 ### 3.7 The wrecked robot: leave
 

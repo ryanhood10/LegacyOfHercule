@@ -130,9 +130,29 @@ end
 ; both are down (the record's defeat action runs once, when the last of the pair falls): 19 explodes,
 ; 13 (still on the map, by his own sprite) gets up and flies off
 sequence ch3_z7_defeat
+  script                                 ; the finishing blow (the cutscene pass, 2026-11-06; the anime's Big Bang Attack): 19 reels, turns and runs up-screen, wherever the fight left him; Vegeta raises a palm, the ball grows in it, and the stock explosions are its impact
+        SetPlayerVisible 0
+        SetEntityAnimation 12, 2
+        PushByte 12
+        PushEntityPosition 12
+        PushVarint 65536
+        Div
+        PushEntityPosition 12
+        PushEntityPosition 12
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 48
+        Sub
+        Step WalkToPosition
+        CoopCall 37, 1, 0, 12
+        CoopCall 37, 8, 3, 0
   stock @083d4174                        ; 19 explodes, EXP, the music
-  script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two
+  script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two; everyone looks at him
         SetEntityAnimation 165, 0
+        CoopCall 37, 12, 165, 165
         WaitFrames 30
         PushByte 165
         PushEntityPosition 0
@@ -154,7 +174,8 @@ sequence ch3_z7_defeat
   text 1 "#VEGETA: Another tin can?  Stay down and I'll make it quick."
   text 169 "ANDROID 13: Not today.  You remember this face.\x0bI'm comin' back for you, and for Goku too."
   text 169 "And don't go thinkin' you've got Dr. Gero figured out.\x0bHeh...  Not even we know what the old man's true plan is."
-  script
+  script                                 ; his take-off kicks up dust
+        EntitySetVelocity 165, 0, 8
         PlayAudio 26
         FlyToPosition 165, 640, 96
         DespawnEntity 165

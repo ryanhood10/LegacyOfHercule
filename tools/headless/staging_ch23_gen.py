@@ -67,7 +67,12 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     s.out("echo EXPECT 0203f000: 00000602 00000000 00000000", "peek 0x0203F000 3")      # Vegeta plays; the form's meter as the stock leaves it: 0
     s.out("echo EXPECT map zone 7 area 15 var 1 player 4[0-9][0-9],4[0-9][0-9] ", "map")
     s.on_map(7, 15)
-    s.win(200)
+    s.out(f"poke32 {CMD} 7")       # 19's end: he reels and runs, Vegeta's palm, the big blast, the stock explosions
+    for i in range(6):
+        s.out("frames 50")
+        s.shot(f"c3_{n}_end{i}")
+    s.out("frames 200")
+    s.actors(s12=0)
     s.press(5, 100)
     s.actors(s72=s72)
     s.shot(f"c3_{n}_13")

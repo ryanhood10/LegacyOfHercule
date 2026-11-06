@@ -79,7 +79,22 @@ echo EXPECT map zone 7 area 15\b
 map
 ents
 poke32 0x0203FD08 7
+frames 50
+shot c3_V_end0
+frames 50
+shot c3_V_end1
+frames 50
+shot c3_V_end2
+frames 50
+shot c3_V_end3
+frames 50
+shot c3_V_end4
+frames 50
+shot c3_V_end5
 frames 200
+deref R12 TBL+0x14
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R12
 mash 5 100
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -154,7 +169,22 @@ echo EXPECT map zone 7 area 15\b
 map
 ents
 poke32 0x0203FD08 7
+frames 50
+shot c3_H_end0
+frames 50
+shot c3_H_end1
+frames 50
+shot c3_H_end2
+frames 50
+shot c3_H_end3
+frames 50
+shot c3_H_end4
+frames 50
+shot c3_H_end5
 frames 200
+deref R12 TBL+0x14
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R12
 mash 5 100
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -230,7 +260,22 @@ echo EXPECT map zone 7 area 15\b
 map
 ents
 poke32 0x0203FD08 7
+frames 50
+shot c3_VH_end0
+frames 50
+shot c3_VH_end1
+frames 50
+shot c3_VH_end2
+frames 50
+shot c3_VH_end3
+frames 50
+shot c3_VH_end4
+frames 50
+shot c3_VH_end5
 frames 200
+deref R12 TBL+0x14
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R12
 mash 5 100
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
@@ -306,7 +351,22 @@ echo EXPECT map zone 7 area 15\b
 map
 ents
 poke32 0x0203FD08 7
+frames 50
+shot c3_HV_end0
+frames 50
+shot c3_HV_end1
+frames 50
+shot c3_HV_end2
+frames 50
+shot c3_HV_end3
+frames 50
+shot c3_HV_end4
+frames 50
+shot c3_HV_end5
 frames 200
+deref R12 TBL+0x14
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R12
 mash 5 100
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
