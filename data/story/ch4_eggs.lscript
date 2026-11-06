@@ -1,7 +1,7 @@
 ; The generator's eggs, zone 8 area 50 (Ryan, 2026-11-04: instead of carrying them to safety, the first one smashes and the mother turns on you, a mini boss; at half her health the two eggs left hatch, and her two babies fight beside her).
 ; Flags: stock 117, 118, 119 an egg gone (its decoration hidden at the load, its tube breakable: the item's condition, tested at a load only, so her end warps to the same room, a white blink), our 476 the fight begun, 478 the eggs hatched, 477 she is down.
 ; Records: 0 the mother standing, 1 the fight to half her health, 2 the rest of it, 3-5 a baby at each egg (spawned by TriggerMapEvent only).
-; She ends the fight: babies still standing go with her, by the warp; a room left and entered again brings her back without them, so nothing can be left unfinished. Lines are Claude's drafts.
+; She ends the fight: babies still standing go with her, by the warp; a room left and entered again brings her back without them, so nothing can be left unfinished. Lines are Claude's drafts; hers show her portrait, 173 (King Triceratops' recoloured, tools/ppportraits.py).
 
 ; an egg's A, as the map loads: while it is whole and the fight has not begun (the sequences check again: a trigger's condition is a load's)
 script z8_egg_open1
@@ -62,8 +62,8 @@ sequence z8_egg1
         SetEntityFacing 245, 2
         SetEntityFacing 0, 3
         WaitFrames 12
-  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] text 173 "@MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 173 "@MOTHER DINOSAUR: I'll stomp you flat for that!"
   [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
@@ -100,8 +100,8 @@ sequence z8_egg2
         SetEntityFacing 245, 2
         SetEntityFacing 0, 3
         WaitFrames 12
-  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] text 173 "@MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 173 "@MOTHER DINOSAUR: I'll stomp you flat for that!"
   [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
@@ -138,8 +138,8 @@ sequence z8_egg3
         SetEntityFacing 245, 2
         SetEntityFacing 0, 3
         WaitFrames 12
-  [6] text 0 "@^MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
-  [7] text 0 "@^MOTHER DINOSAUR: I'll stomp you flat for that!"
+  [6] text 173 "@MOTHER DINOSAUR: MY EGG!\x0bYou clumsy little monkey!"
+  [7] text 173 "@MOTHER DINOSAUR: I'll stomp you flat for that!"
   [8] script -> 9
         SetStoryFlag 476
         WhiteFlash 20
@@ -155,8 +155,8 @@ sequence z8_dino_hatch
   script
         PlayAudio 60
         WaitFrames 30
-  text 0 "@^MOTHER DINOSAUR: Hah...  hah...\x0bYou hit harder than you look."
-  text 0 "@^MOTHER DINOSAUR: But you forgot about my other two."
+  text 173 "@MOTHER DINOSAUR: Hah...  hah...\x0bYou hit harder than you look."
+  text 173 "@MOTHER DINOSAUR: But you forgot about my other two."
   script                                 ; the eggs that are left begin to rattle
         ScreenShake 0, 4, 40
   text 0 "@^Behind her, the eggs that are left begin to rattle."
@@ -186,12 +186,12 @@ sequence z8_dino_hatch
         DespawnCharacterAndRecordPosition 245, 2
         DrawBossHealthBarRange 245, 0, 50
   text 0 "@^CRACK!  CRACK!\x0bTwo tiny, furious dinosaurs burst out of their shells!"
-  text 0 "@^MOTHER DINOSAUR: That's my babies!\x0bGet 'em!"
+  text 173 "@MOTHER DINOSAUR: That's my babies!\x0bGet 'em!"
   script
         SetActiveEntity 0
 end
 
-; the second half's record falls: the warp opens the tubes and clears any baby still standing, then she and two actors of them walk out (Ryan, 2026-11-05: not a line over a fade).
+; the second half's record falls: the warp opens the tubes and clears any baby still standing, then she and two actors of them walk out (Ryan, 2026-11-05: not a line over a fade); the second runs off late, without a caption (2026-11-05).
 ; Two babies show one sprite: a sprite-addressed step finds the first, so the first leaves, and only then is the second addressed.
 sequence z8_dino_defeat
   script
@@ -199,7 +199,7 @@ sequence z8_dino_defeat
         WaitFrames 40
         AddEXP 1500
         WaitFrames 30
-  text 0 "@^MOTHER DINOSAUR: Enough...  ENOUGH!\x0bCome, children.  We're leaving."
+  text 173 "@MOTHER DINOSAUR: Enough...  ENOUGH!\x0bCome, children.  We're leaving."
   script
         SetStoryFlag 477
         FadeToWhite 10
@@ -215,9 +215,7 @@ sequence z8_dino_defeat
         DespawnEntity 245
         DespawnEntity 246
         SetEntityFacing 246, 2
-        WaitFrames 20
-  text 0 "@^One baby stays behind just long enough to kick dirt at you."
-  script
+        WaitFrames 60                    ; the second baby looks back a moment (where a caption was), then runs after them
         WalkToPosition 246, 480, 366
         DespawnEntity 246
   fmt 1 "@%s: ...I'm just gonna go break that generator now."

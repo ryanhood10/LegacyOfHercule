@@ -1020,6 +1020,10 @@ grep -E "^hit|0202....: " build/art-buu/hl/artbuu.out | paste - -      # the hit
   each beside its source, the sprite-face recipe and two stock portraits. In the game: `tny_talk.txt` t8 (Android 13,
   Cell Jr.) and t9 (the Namekian Warrior, Evil Buu): each box shows the speaker's face. Yakon's lying pose:
   `tny_polish.txt` section 12 (`p12_yakon_down`, his frame group = record + 0x10C) and `tnysheet.py --lying --ids 198`.
+- **Portrait 173** (the mother dinosaur, 2026-11-05): `--check` as above with `173=dino` in the pairs ("5 portraits
+  load"); in the game: `ch4_eggs.txt`'s two-player pass shoots every page of her lines (`eg2p_mother1` .. `eg2p_babiesb`,
+  her box with the portrait) and the walk-off every 30 frames (`eg2p_out0` .. `eg2p_out14`: the second baby looks back,
+  runs off late, then the player's line).
 - Previews of every conversion (Buu colours left, ours right, the hurt box in red on group 0):
   `build/art-buu/tny/buu_preview_<id>.png`; portraits: `build/art-buu/tny_portraits.png`.
 ## Tournament fighters (art-new, headless, 2026-10-25)

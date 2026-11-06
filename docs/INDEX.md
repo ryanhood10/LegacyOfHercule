@@ -111,7 +111,7 @@ the relocated `ui_strings` and `portrait_module` tables, from `tools/krillinspri
 `tools/tnyplayables.py`), `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 `build/gen/tny_buu_sprites_data.c` (the tournament's Buu's Fury fighters 195-222 and the announcer 230, second ROM blob,
 from `tools/buu2log2.py` and `data/tny_buu.txt`; previews in `$(BUILD)/tny/`), `build/gen/tny_portraits_data.c` (their
-dialogue portraits 140-168, `tools/tnyportraits.py`), `build/gen/pp_portraits_data.c` (portraits 169-172,
+dialogue portraits 140-168, `tools/tnyportraits.py`), `build/gen/pp_portraits_data.c` (portraits 169-173,
 `tools/ppportraits.py`),
 `build/hercule.patch.json` (from `tools/romdata.py build data/hercule.json`).
 `build/gen/tny_sprites_data.c` (the tournament's King Cold, Roshi, Chi-Chi, Videl, Chiaotzu and Videl's portrait, from
@@ -169,7 +169,7 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `tnysheet.py` | contact sheets of every tournament body from a built ROM: the engine's lying pose (`--lying`, reads `tny_lie`), the victory pose (`--cheer`), groups' last frames (`--last`) or every frame (`--groups`) (`docs/testing.md` "Tournament bodies") |
 | `lying.py` | a lying-down frame made from an upright one (turned, sparks dropped, on its back or face down, on the ground line), for `tnyplayables.py`, `tnysprites.py`, `buu2log2.py` |
 | `vanart.py` | the ZZTV news van on Papaya Island's street, drawn by code (a `png` op with `"draw": "vanart"` and its `art_footprint`) |
-| `ppportraits.py` | dialogue portraits 169-172 (Android 13, Cell Jr., the Namekian Warrior, Evil Buu): stock portraits of the bodies their sprites came from, repainted -> `build/gen/pp_portraits_data.c` (`pp_portrait_<id>`); `--compare` sheet beside the stock faces, `--check` against a built ROM |
+| `ppportraits.py` | dialogue portraits 169-173 (Android 13, Cell Jr., the Namekian Warrior, Evil Buu; 173 the mother dinosaur, King Triceratops' 96 in her colours): stock portraits of the bodies their sprites came from, repainted -> `build/gen/pp_portraits_data.c` (`pp_portrait_<id>`); `--compare` sheet beside the stock faces, `--check` against a built ROM |
 | `tnyportraits.py` | the tournament's dialogue portraits (ids 140-168) from Buu's Fury's portrait module, the `oldherculeportrait.build` way -> `build/gen/tny_portraits_data.c` (`tny_portrait_<id>`, second ROM blob), preview `tny_portraits.png` |
 | `tnysprites.py` | the tournament's five new fighters (art-new): King Cold 185 (Cooler's set recoloured, Cold's head, a cape), Master Roshi 186 (Krillin's body, Roshi's head and beard, a shell), Chi-Chi 187 and Videl 188 (Android 18's set re-headed and re-dressed), Chiaotzu 189 (kid Gohan's set re-headed), one player-layout record each that also runs on AI set 21, a test enemy record after each, Videl's portrait 127 -> `build/gen/tny_sprites_data.c` (`TNY_ART`), previews `tny_preview_<name>.png` (`docs/sprites.md` "Tournament fighters (art-new)") |
 | `buu2log2.py` | converts Buu's Fury records to LoG2 format (palette remap, LZ encoder, previews, colour report) -> `build/gen/buu_sprites_data.c` |

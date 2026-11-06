@@ -107,8 +107,8 @@ TNY_BUU_SPEC := data/tny_buu.txt
 TNY_BUU_IDS := 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 230
 TNY_PORTRAITS ?= 140=10 141=16 142=126 143=160 144=119 145=116 146=83 147=113 148=24 149=92 150=85 151=127                  152=130 153=129 154=81 155=65 156=139 157=68 158=71 159=73 160=151 161=142 162=57 163=59 164=61                  165=148 166=42 167=47 168=112
 # the perfecting pass's portraits for the fighters that had none (tools/ppportraits.py, docs/tournament.md 24.2):
-# "<portrait id>=<recipe>", ids 169-172 (docs/ids.md); Evil Buu's needs roms/buu.gba (LoG2's Hercule without it)
-PP_PORTRAITS ?= 169=a13 170=celljr 171=namek 172=evilbuu
+# "<portrait id>=<recipe>", ids 169-172, and 173 the mother dinosaur (data/story/ch4_eggs.lscript; docs/ids.md); Evil Buu's needs roms/buu.gba (LoG2's Hercule without it)
+PP_PORTRAITS ?= 169=a13 170=celljr 171=namek 172=evilbuu 173=dino
 OBJS += $(BUILD)/obj/pp_portraits_data.o
 EXTRA_SPRITES += $(KING_COLD_SPRITE)=tny_cold_record $(ROSHI_SPRITE)=tny_roshi_record $(CHICHI_SPRITE)=tny_chichi_record $(VIDEL_SPRITE)=tny_videl_record $(CHIAOTZU_SPRITE)=tny_chiaotzu_record
 # Mr. Popo, the Time Chamber's hidden room (tools/popoart.py, TNY_ART: Buu's Fury r.183, LoG2's sprite 93 without roms/buu.gba;
@@ -174,7 +174,7 @@ $(BUILD)/obj/tny_portraits_data.o: $(BUILD)/gen/tny_portraits_data.c src/coop/ro
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
-$(BUILD)/gen/pp_portraits_data.c: tools/ppportraits.py tools/oldherculeportrait.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/gen/pp_portraits_data.c: tools/ppportraits.py tools/dinosprites.py tools/oldherculeportrait.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	@mkdir -p $(BUILD)/gen
 	$(PYTHON) tools/ppportraits.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) $(PP_PORTRAITS)
 
