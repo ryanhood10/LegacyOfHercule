@@ -74,6 +74,23 @@ for i in range(10):
 out(f"stepz {SCENE} 150", "frames 60", "echo EXPECT map zone 8 area 46 ", "map", "ents")
 actors(s165=0)
 
+# the lab door (area 46's item 0, Ryan 2026-11-06: the one death): walk up after the cutaway (flag 124 = FLAGS+15 bit 4);
+# 13 stands at Gero's side in the lab, swears revenge after 17's blast and flies off, then the stock scene to area 47
+for name, p1, p2 in (("P", 1, None), ("PH", 1, 5)):
+    begin(f"door_{name}", p1, p2)
+    out("poke8 FLAGS+15 0x10")
+    warp(46, 190, 600)
+    walk = "keys 0x40\n" + ("p2 0x40\n" if p2 is not None else "") + "frames 40\nkeys 0\n" + ("p2 0\n" if p2 is not None else "") + "frames 20"
+    for _ in range(10):
+        out(*walk.split("\n"))
+    out("frames 300")
+    for i in range(30):                      # to 13's revenge (past "scrap heap")
+        out("key 1 6", "frames 90")
+        if i in (10, 24):
+            out(f"shot st_door_{name}_{i}", "ents")
+    out(f"stepz {SCENE} 250", "frames 200", "echo EXPECT map zone 8 area 47 ", "map", "ents")
+    actors(s165=0)
+
 # the road's end (18 beaten): Hercule backs Krillin only when someone plays him; alone as Piccolo or Krillin no 72 at all
 for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None)):
     begin(f"{name}_end", p1, p2)

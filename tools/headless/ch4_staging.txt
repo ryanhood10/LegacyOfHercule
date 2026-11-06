@@ -1966,6 +1966,283 @@ deref TBL 0x0800959C
 deref R165 TBL+0x278
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R165
+echo === door_P
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke8 FLAGS+15 0x10
+poke32 0x0203FD0C 0x2e08
+poke32 0x0203FD54 0x25800be
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+keys 0x40
+frames 40
+keys 0
+frames 20
+frames 300
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_P_10
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_P_24
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+stepz 0x03001FDC 250
+frames 200
+echo EXPECT map zone 8 area 47 
+map
+ents
+deref TBL 0x0800959C
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+echo === door_PH
+load menu.ss
+p2 0
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke8 FLAGS+15 0x10
+poke32 0x0203FD0C 0x2e08
+poke32 0x0203FD54 0x25800be
+poke32 0x0203FD08 5
+frames 300
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+keys 0x40
+p2 0x40
+frames 40
+keys 0
+p2 0
+frames 20
+frames 300
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_PH_10
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+shot st_door_PH_24
+ents
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+key 1 6
+frames 90
+stepz 0x03001FDC 250
+frames 200
+echo EXPECT map zone 8 area 47 
+map
+ents
+deref TBL 0x0800959C
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
 echo === P_end
 load menu.ss
 p2 off

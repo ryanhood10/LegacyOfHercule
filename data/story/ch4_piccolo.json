@@ -34,8 +34,9 @@
     },
     {
       "map": {"zone": 8, "area": 46},
-      "_": "the lab cutaway (loads map 8/60): 13 watches and leaves",
-      "triggers": {"0": {"payload": "seq:ch4_lab"}}
+      "_": "the lab cutaway (loads map 8/60): Gero wakes 17 and 18, 13 beside him watching; the lab door (item 0, broken by walking up to it) runs the stock 16 scene, where 17 kills Gero: 13's revenge goes there (Ryan, 2026-11-06: one death, not two)",
+      "triggers": {"0": {"payload": "seq:ch4_lab"}},
+      "items": {"0": {"script": "seq:ch4_lab_door"}}
     },
     {
       "map": {"zone": 8, "area": 49},

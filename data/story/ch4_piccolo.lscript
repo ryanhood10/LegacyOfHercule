@@ -266,40 +266,72 @@ sequence ch4_lab
         WalkToPosition 165, 300, 184
         SetEntityFacing 165, 2
   stockseq @083d9f5c 25 27               ; "You destroyed it!", "not going to put us to sleep again"
-  script                                 ; 17 finishes him, and 13 has seen it
-        WalkToPosition 9, 250, 216
-        SetEntityAnimation 9, 6
-        PlayAudio 21
-        WhiteFlash 20
-        DespawnEntity 14
-        WaitFrames 50
-        PlayAudio 50
-  text 169 "ANDROID 13: DOC!"
-  script
-        WalkToPosition 165, 284, 204
-        SetEntityFacing 165, 2
-        SetEntityFacing 9, 3
-        SetEntityFacing 11, 3
+  script                                 ; 13 has seen what they are; he stays by Gero (he dies in the next scene, at the door)
         WaitFrames 20
-  text 169 "ANDROID 13: You...  You killed him!\x0bHe gave you life, and you killed him!  That man was my father!"
-  text 169 "I'll get you for this, ya hear me?\x0bI swear it!  The both of you!"
-  script                                 ; Ryan, 2026-11-05: his revenge, the blasts, and he flies off to the arctic
+        SetEntityFacing 165, 2
+        WaitFrames 20
+  stock @083d9f44                        ; back to area 46, flag 124
+end
+
+; ---- zone 8 area 46, the lab door (item 0, broken by walking up to it): the stock 16 scene ---------------------------
+; Vegeta, Trunks and Krillin arrive, the cut into the lab, Gero orders 17 and 18 at them, they open 16's chamber, and 17
+; kills Gero ("scrap heap", entry 26). Ryan, 2026-11-06: the death is here, and only here, so 13's revenge comes here:
+; he stands beside Gero from the cut in (entry 67), and after 17's blast he swears revenge, blasts them and flies north
+; (68-78), then 17's "Now that that's taken care of..." (27). Stock indexes are kept: the added entries sit after the end.
+; Lines are drafts. Sprites here: 9 Android 17, 11 Android 18, 14 Dr. Gero (despawned by entry 26), 165 Android 13.
+
+sequence ch4_lab_door
+  stockseq @083dae70 0 5                 ; they arrive outside the door; Vegeta, Trunks, Krillin
+  [6] stock @083da1f8 -> 67              ; the cut into the lab: Gero walks up
+  stockseq @083dae70 7 25                ; "destroy these intruders", 16's chamber, "scrap heap"
+  [26] stock @083da58c -> 68             ; 17's blast: Gero is gone
+  stockseq @083dae70 27 65               ; "Now that that's taken care of...", 16 wakes, the Z fighters
+  stop
+  [67] script -> 7                       ; 13 at Gero's side as the lab comes in (DRAFT staging)
+        SpawnCharacterEntity 165, 304, 236
+        SetEntityFacing 165, 2
+  [68] script                            ; he saw it
+        PlayAudio 50
+        WaitFrames 20
+        SetEntityFacing 165, 2
+  [69] text 169 "ANDROID 13: DOC!"
+  [70] script
+        WalkToPosition 165, 284, 236
+        CoopCall 22, 2, 9, 0
+        JumpIfFalse a
+        SetEntityFacing 9, 3
+      a:
+        CoopCall 22, 2, 11, 0
+        JumpIfFalse b
+        SetEntityFacing 11, 3
+      b:
+        WaitFrames 20
+        END
+  [71] text 169 "ANDROID 13: You...  You killed him!\x0bHe gave you life, and you killed him!  That man was my father!"
+  [72] text 169 "I'll get you for this, ya hear me?\x0bI swear it!  The both of you!"
+  [73] script                            ; Ryan, 2026-11-05: his revenge, the blasts, and he flies off to the arctic
+        CoopCall 22, 2, 9, 0
+        JumpIfFalse a
         NPCFireKiBlastAtEntity 165, 9, 30
         WaitFrames 12
+      a:
+        CoopCall 22, 2, 11, 0
+        JumpIfFalse b
         NPCFireKiBlastAtEntity 165, 11, 30
+      b:
         WaitFrames 30
         WhiteFlash 12
         PlayAudio 21
         WaitFrames 40
-  text 28 "ANDROID 17: ...Was that it?"
-  text 169 "ANDROID 13: Laugh it up.\x0bNext time I see you two, I'll be stronger than the both of you put together."
-  script
-        FlyToPosition 165, 330, 40
+        END
+  [74] text 28 "ANDROID 17: ...Was that it?"
+  [75] text 169 "ANDROID 13: Laugh it up.\x0bNext time I see you two, I'll be stronger than the both of you put together."
+  [76] script
+        FlyToPosition 165, 304, 40
         DespawnEntity 165
         WaitFrames 30
-  text 29 "ANDROID 18: He's heading north.  Should we bother?"
-  text 28 "ANDROID 17: Forget him.\x0bWe have Goku to find."
-  stock @083d9f44                        ; back to area 46, flag 124
+  [77] text 29 "ANDROID 18: He's heading north.  Should we bother?"
+  [78] text 28 "ANDROID 17: Forget him." -> 27
 end
 
 ; ---- zone 8 area 49: the road. 17, 18 and 16; in co-op Vegeta arrives and fights beside Piccolo ------

@@ -19,6 +19,7 @@ A spec (docs/scripts.md has the reference and examples):
                        {"kind": "exit", "rect": [..], "exit": [DIR, ZONE, AREA, VAR, X, Y], "condition": COND}],
       "records": {"1": {"stat": 109, "sprite": 160, "action": "seq:NAME"},
                   "3": {"sprite": 9}, "5": "disable"},
+      "items": {"0": {"script": "seq:NAME"}},     what a broken item (a door, a rock) runs
       "add_records": [{"kind": "actor", "sprite": 76, "x": 400, "y": 300, "facing": 2, "condition": COND},
                       {"like": 4, "sprite": 72, "talk": "seq:NAME"}],
       "edits": [{"at": "trigger:3/entry:15", "replace": [["SetStoryFlag 145", "SetStoryFlag 146"]]}],
@@ -208,6 +209,8 @@ class MapEditor:
             self.edit_record(me, int(r), ch, tag)
         for r in m.get("add_records", []):
             self.add_record(me, r, tag)
+        for i, ch in m.get("items", {}).items():
+            self.edit_item(me, int(i), ch, tag)
         if m.get("add_decorations"):
             self.add_decorations(me, m["add_decorations"], tag)
         for e in m.get("edits", []):
@@ -347,6 +350,20 @@ class MapEditor:
                 self.write(rec + lay[k], struct.pack("<I", self.action_obj(v, tag)), f"{tag} {label} action {v}")
             else:
                 self.write(rec + lay[k], struct.pack("<I", num(v)), f"{tag} {label} {k} {v}")
+
+    def edit_item(self, me, i, ch, tag):
+        """An item (MapEntry +0x18 pointers, count +5; 16 bytes: condition, decoration, hits, mask, 0, handler, script at
+        +12, docs/maps.md): "script" repoints what it runs when broken (a sequence or a script, like a trigger's payload;
+        Gero's lab door at zone 8 area 46 runs the 16 scene)."""
+        count = self.rom[off(me) + 5]
+        if not 0 <= i < count:
+            raise AsmError(f"item {i}: the map has {count}")
+        item = self.w32(self.w32(me + 0x18) + 4 * i)
+        for k, v in ch.items():
+            if k == "script":
+                self.write(item + 12, struct.pack("<I", self.ref(v)), f"{tag} item {i} script {v}")
+            elif k != "_":
+                raise AsmError(f"item {i}: unknown field {k!r}")
 
     def edit_record(self, me, r, ch, tag):
         rec = self.record(me, r)

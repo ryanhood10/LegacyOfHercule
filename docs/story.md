@@ -233,6 +233,8 @@ robot escorts, and **Android 13 backs Gero up** as his partner (stat 112, both-d
 when the pair is beaten. Hercule offers to "negotiate". Inside the lab (zone 8 area 60) the stock
 scene plays: Gero wakes 17 and 18 and dies at their hands; 13 watches, then **swears revenge for his
 father (Ryan, 2026-11-05), blasts 17 and 18 and flies north: that is where he goes until the post-game**
+(2026-11-06: this happens in the stock scene at the lab door, where 17 kills Gero; the first cutaway only shows Gero waking
+them, with 13 beside him: one death, not two)
 (the summit: "This is for the Doc"). 17 and 18 shrug it off. Hercule and Piccolo stand as actors when nobody
 plays them (`docs/howto.md` "Stage a scene").
 
