@@ -347,6 +347,13 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   would be runnin' into guys like that on this trip!\x0bThat Frieza fella isn't coming back, is he?" word for word.
 - **Risks:** the sequence's indexes are absolute (every stock script returns them): add only inside existing script
   entries or after the end, as `ch1_trunks_talk` already does. Sprite 62: never an attack or hurt animation.
+- **Built 2026-11-06 (`nb-cs4`), beat 2 only (the landing):** stock entry 18 restated in place (`[18] script`): between the stock's
+  two rumbles (`PlayAudioBlocking` is the rumble and a camera shake) everyone on screen looks up toward the sky over the crater
+  (`CoopCall 37, 12` at the point (488, 160)) and a white flash marks the impact; when the camera reaches the crater two dust clouds
+  are still settling on the open pod; the rest of the entry is the stock's, step for step. **Not built: beats 1, 3, 4.** The headless
+  route into this talk (Map Test of area 6) parks the group's actors at (672, 728), off the stage, so Vegeta's walk-in, the group's
+  step toward Goku and the private talk's moves cannot be filmed in their real places; they want a film from the real flight in
+  (the landing site, area 4) first. `staging_ch1` "arrival" passes as before (the scene ends on map 2/1).
 
 ### 1.4, 1.9 Leave
 

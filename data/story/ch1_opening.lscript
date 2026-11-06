@@ -890,7 +890,64 @@ sequence ch1_trunks_talk
       a:
         PushByte 95
         END
-  [4] stockseq @083bfddc 4 18            ; Trunks can't say, Vegeta, the Super Saiyan question, Goku lands
+  [4] stockseq @083bfddc 4 17            ; Trunks can't say, Vegeta, the Super Saiyan question, "Goku should be arriving any second now."
+  [18] script                            ; stock 18, the landing (batch 1, 1.8): between the stock's two rumbles everyone looks up at the sky over
+        SetEntityFacing 128, 1           ; the crater and a white flash marks the impact; when the camera reaches the crater dust is still
+        WaitFrames 100                   ; settling on the pod; then the stock climb-out
+        PlayMusic 5
+        PlayAudioBlocking 10, 100
+        CoopCall 37, 2, 488, 160
+        CoopCall 37, 12, -2, -3
+        WhiteFlash 6
+        PlayAudioBlocking 80, 60
+        SetEntityFacing 137, 1
+        WaitFrames 60
+        BeginCommandBatch
+        WalkToPosition 128, 352, 440
+        SetEntityFacing 128, 1
+        WalkToPosition 0, 376, 456
+        SetEntityFacing 76, 1
+        SetEntityFacing 121, 1
+        SetEntityFacing 0, 1
+        SetEntityFacing 23, 1
+        SetEntityFacing 156, 1
+        CommitCommandBatch
+        WaitFrames 15
+        SetEntityFacing 103, 1
+        SetEntityFacing 107, 1
+        SetEntityFacing 32, 1
+        PanCameraToPosition 384, 104, 1
+        SpawnDustCloud 62, 476, 192
+        WaitFrames 20
+        SpawnDustCloud 62, 500, 188
+        WaitFrames 40
+        SetEntityFacing 62, 2
+        WaitFrames 30
+        SetEntityFacing 62, 1
+        WaitFrames 45
+        SetEntityFacing 62, 2
+        WaitFrames 20
+        SetEntityFacing 62, 0
+        SetActiveEntity 62
+        WalkToPosition 62, 472, 192
+        WalkToPosition 62, 432, 224
+        WaitFrames 30
+        PlayAudio 26
+        FlyToPosition 62, 392, 432
+        SetEntityFollow 32, 62
+        SetEntityFacing 23, 2
+        SetEntityFacing 121, 2
+        SetEntityFacing 103, 2
+        SetEntityFacing 128, 3
+        SetEntityFacing 137, 3
+        SetEntityFacing 156, 2
+        SetEntityFacing 107, 2
+        BeginCommandBatch
+        SetEntityAnimation 0, 4
+        SetEntityAnimation 76, 4
+        SetEntityAnimation 121, 4
+        SetEntityAnimation 156, 4
+        CommitCommandBatch
   [19] script                            ; Gohan played: "Hey dad!" (96), else 20
         CoopCall 22, 4, 0, 0
         JumpIfFalse a
