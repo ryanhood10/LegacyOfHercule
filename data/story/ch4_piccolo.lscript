@@ -17,7 +17,8 @@
 ; Lines marked (draft) are Claude's, for Ryan to read.
 
 sequence ch4_gero_first
-  [0] script                             ; stock entry 0, with 13 walking down beside Gero and player 1 walking up
+  [0] script                             ; stock entry 0, with 13 walking down beside Gero and player 1 walking up (the HUD hidden for the
+        SetPlayerVisible 0               ; scene: batch 1, 4.1)
         PlayAudio 50
         SetStoryFlag 90
         SpawnCharacterEntity 165, 216, 168
@@ -43,6 +44,7 @@ sequence ch4_gero_first
   [5] script                             ; stock entry 2: Gero (and 13, his boss twin) fight
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 14, 1
+        SetPlayerVisible 1
         DrawBossHealthBarRange 14, 75, 100
         ClearCollisionRect 72, 0, 208, 24
         ClearCollisionRect 240, 568, 376, 592
@@ -55,7 +57,8 @@ end
 ; "scrap ya" for Hercule alone (drafts).
 
 sequence ch4_gero_door_a27
-  [0] script
+  [0] script                             ; the HUD's bars go for the scene (batch 1, 4.1), back at either fight
+        SetPlayerVisible 0
         PlayAudio 50
         SetStoryFlag 89
         StackTestStoryFlag 88
@@ -65,6 +68,7 @@ sequence ch4_gero_door_a27
       L1:
         WalkToPosition 0, 456, 192
         SetEntityFacing 0, 2
+        SetEntityAnimationNoWait 14, 5    ; (batch 1, 4.1) Gero raises his palm at them
         END
   [1] stock @083d6274                    ; Gero: I won't let you get into my lab!
   [2] script                             ; Hercule played: his offer (next 3), else 13 drops in (7)
@@ -109,6 +113,8 @@ sequence ch4_gero_door_a27
         EntitySetVelocity 165, 0, 8
         ScreenShake 0, 6, 12
         CommitCommandBatch
+        SetEntityAnimation 165, 6         ; a punch at the air: his knuckles cracked before his offer
+        SetEntityFacing 165, 3
         CoopCall 22, 4, 5, 0
         JumpIfFalse c
         CoopCall 5, 0, 0, 0
@@ -127,7 +133,12 @@ sequence ch4_gero_door_a27
   [11] text 67 "HERCULE: Run?  Now that's the first smart thing anyone's said all day!"
   [12] script
         DespawnEntity 165
-  [13] stock @083d62dc                   ; the fight, stage 50-75
+  [13] script                            ; stock: the fight, stage 50-75, with the HUD back
+        DespawnCharacterAndRecordPosition 14, 3
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 14, 50, 75
+        ClearCollisionRect 520, 152, 544, 264
+        ClearCollisionRect 0, 112, 24, 240
   stop
   [15] stock @083d6304                   ; Gero: the last generator
   [16] script                            ; 13 drops in again
@@ -142,11 +153,18 @@ sequence ch4_gero_door_a27
   [17] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
   [18] script
         DespawnEntity 165
-  [19] stock @083d6360                   ; the fight, stage 25-50
+  [19] script                            ; stock: the fight, stage 25-50, with the HUD back
+        DespawnCharacterAndRecordPosition 14, 3
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 14, 25, 50
+        ClearCollisionRect 520, 152, 544, 264
+        ClearCollisionRect 0, 112, 24, 240
+
 end
 
 sequence ch4_gero_door_a40
-  [0] script
+  [0] script                             ; the HUD's bars go for the scene (batch 1, 4.1), back at either fight
+        SetPlayerVisible 0
         PlayAudio 50
         SetStoryFlag 88
         StackTestStoryFlag 89
@@ -156,6 +174,7 @@ sequence ch4_gero_door_a40
       L1:
         WalkToPosition 0, 96, 288
         SetEntityFacing 0, 3
+        SetEntityAnimationNoWait 14, 5    ; (batch 1, 4.1) Gero raises his palm at them
         END
   [1] stock @083d76e0                    ; Gero: I won't let you get into my lab!
   [2] script                             ; Hercule played: his offer (next 3), else 13 drops in (7)
@@ -200,6 +219,8 @@ sequence ch4_gero_door_a40
         EntitySetVelocity 165, 0, 8
         ScreenShake 0, 6, 12
         CommitCommandBatch
+        SetEntityAnimation 165, 6         ; a punch at the air: his knuckles cracked before his offer
+        SetEntityFacing 165, 2
         CoopCall 22, 4, 5, 0
         JumpIfFalse c
         CoopCall 5, 0, 0, 0
@@ -218,7 +239,12 @@ sequence ch4_gero_door_a40
   [11] text 67 "HERCULE: Run?  Now that's the first smart thing anyone's said all day!"
   [12] script
         DespawnEntity 165
-  [13] stock @083d7748                   ; the fight, stage 50-75
+  [13] script                            ; stock: the fight, stage 50-75, with the HUD back
+        DespawnCharacterAndRecordPosition 14, 1
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 14, 50, 75
+        ClearCollisionRect 0, 248, 24, 368
+        ClearCollisionRect 344, 184, 368, 304
   stop
   [15] stock @083d7770                   ; Gero: the last generator
   [16] script                            ; 13 drops in again
@@ -233,7 +259,13 @@ sequence ch4_gero_door_a40
   [17] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
   [18] script
         DespawnEntity 165
-  [19] stock @083d77cc                   ; the fight, stage 25-50
+  [19] script                            ; stock: the fight, stage 25-50, with the HUD back
+        DespawnCharacterAndRecordPosition 14, 1
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 14, 25, 50
+        ClearCollisionRect 0, 248, 24, 368
+        ClearCollisionRect 344, 184, 368, 304
+
 end
 
 ; ---- zone 8 area 46: the cutaway into the lab (map 8/60): Gero wakes 17 and 18; 13 watches ----------

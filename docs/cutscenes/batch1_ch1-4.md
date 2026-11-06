@@ -648,6 +648,11 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   defeat: Gero's flight off gets a dust cloud; 13 follows after a beat (as built).
 - **Risks:** the actor Gero here is the record's sprite 14 (the boss set): group 5 is there; never group 4. Player 2
   may show any sprite: only player 1 (char 0), Gero and 13 are addressed, as today.
+- **Built 2026-11-06 (`nb-cs4`), the rest of 4.1 / 4.2:** the HUD's bars are hidden for Gero's first stage and both generator scenes
+  and come back at each fight (the doors' two stock fight entries restated with `SetPlayerVisible 1`); at the generators Gero raises
+  his palm at the players for "I won't let you get into my lab!" (his ki pose, group 5, without waiting on it) and 13, landed, throws
+  one punch at the air before his offer (group 6). 13's landings were built by `nb-cs1`. `ch4_staging` (554 checks, every lineup)
+  passes as before; its shots `st_<n>_a27_*` / `a40_*` show the pose and the hidden bars.
 
 ### 4.3 The lab cutaway: leave (one beat, S)
 
