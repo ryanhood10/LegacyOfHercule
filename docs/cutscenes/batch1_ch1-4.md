@@ -259,6 +259,20 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   already does). The sword's animation 16 exists only on the Super Saiyan record here (134). Old Hercule's groups:
   check before his "arm up" (a plain walk backwards if in doubt).
 - **Size L.** The Short: beat 3 to beat 8, about 35 seconds.
+- **Built 2026-11-06 (`nb-cs1`), script steps only; the helper beats wait for `cine.c`.** What the research had wrong: the stock
+  "velocity kicks" are not movement: `EntitySetVelocity` is the dust-explosion effect at an offset from the body (`docs/scripts.md` 2.1),
+  so Frieza and King Cold never bounced, they stood in a ring of puffs; knock-backs are `GlideToPosition`. The view is 240 x 160 and a
+  box hides 64 px of it: nobody can be clear of both the top and the bottom box across the 80 px between Trunks and Frieza, so the view
+  sits at (12, 328) (whoever is spoken to is in the clear), drops to y 352 for old Hercule's punch and line (both bodies above the bottom
+  box) and goes to (36, 322) for King Cold (he above the middle box, Trunks below it). Trunks comes in low from the lower left, not from
+  above (a flight down x 120 would pass through Frieza). Beats as built: 1 the swoop, dust, old Hercule runs in; 3 a rising shake under
+  the stock power-up, a flash on the gold, the soldiers give a step, old Hercule slides back; 4 three soldiers struck from beside them
+  (a cut to the spot stands in for the DASH; each is thrown 50 px, dust, gone), back on his mark with his back turned, a blast each for
+  the last two; 5 the last soldier goes for old Hercule, who has crept back up; 6 Frieza fires, Trunks is gone, dust and a shake on empty
+  ground, old Hercule runs clear, Frieza looks left and right, the sword from above, again from below, Trunks slides through with his
+  back to him, "AHHH", the stock explosions, an open hand, a white cut, gone; 8 King Cold strides up and roars, a blast at arm's length
+  slides him back and drops him, he gets up roaring, two steps and a second blast, the stock red flash under a white one. Flags and the
+  party block after the scene are identical to the build before (`staging_ch1` checks the first flag word).
 
 ### 1.8 Goku's arrival and Trunks' warning: touch up (M)
 

@@ -283,16 +283,20 @@ sequence ch1_frieza_landing
         PlayAudio 50
         END
   stockseq @083be798 1 14    ; Frieza and King Cold, the soldiers march out
-  script                                 ; stock 15: Trunks appears, old Hercule with him
+  script                                 ; stock 15: Trunks swoops in low from the lower left and lands (the stock popped him in inside a white fade); old Hercule runs up behind him; the view comes down 24 px so the two stand clear of the screen's edge
         PlayMusic 38
         WaitFrames 80
-        FadeToWhite 10
-        SpawnCharacterEntity 128, 120, 448
+        WhiteFlash 10
+        SpawnCharacterEntity 128, 8, 500
+        PlayAudio 26
+        FlyToPosition 128, 120, 448
         SetEntityFacing 128, 1
-        SpawnCharacterEntity 158, 92, 440
+        SpawnDustCloud 128, 120, 456
+        PanCameraToPosition 12, 328, 2
+        SpawnCharacterEntity 158, 96, 510
+        WalkToPosition 158, 96, 470
         SetEntityFacing 158, 1
-        WhiteFadeOut 10
-        WaitFrames 60
+        WaitFrames 20
         END
   stockseq @083be798 16 16    ; "Not so fast!  You must be Frieza!"
   text 126 "OLD HERCULE: Yeah!  What he said!"
@@ -317,41 +321,84 @@ sequence ch1_frieza_landing
         PushByte 32
         END
   [31] text 73 "!KRILLIN: And who's that old guy with the afro?\x0bHis power level is...  um...  barely there."
-  stockseq @083be798 28 36    ; the Super Saiyan
-  script                                 ; stock 37, first half: Trunks cuts down five soldiers; old Hercule knocks out the sixth
+  stockseq @083be798 28 32    ; King Cold's "comedian", "a real Super Saiyan", Frieza laughs
+  [37] script                            ; stock 33, the Super Saiyan: the ground shakes harder and harder under the power-up, a white flash on the gold; the soldiers give a step, old Hercule backs off
+        SetEntityFacing 128, 0
+        WaitFrames 40
+        PlayAudio 55
+        BeginCommandBatch
+        ScreenShake 74, 2, 24
+        ScreenShake 74, 5, 24
+        ScreenShake 74, 9, 30
+        SetEntityAnimation 128, 9
+        GlideToPosition 158, 76, 482, 60
+        CommitCommandBatch
+        PlayAudio 23
+        WhiteFlash 6
+        DespawnEntity 128
+        SpawnCharacterEntity 134, 120, 448
+        BeginCommandBatch
+        ScreenShake 74, 6, 24
+        GlideToPosition 68, 96, 418, 60
+        GlideToPosition 71, 144, 418, 60
+        GlideToPosition 67, 96, 396, 60
+        GlideToPosition 70, 144, 396, 60
+        CommitCommandBatch
+        WaitFrames 30
+        END
+  stockseq @083be798 34 36    ; "It's impossible!!!", the soldiers look at each other, "So this is a Super Saiyan..."
+  [41] script                            ; stock 37, first half: Trunks is on three soldiers before they can aim and shoots two without turning his head (the stock walked him from one to the next); old Hercule knocks out the sixth
         SetEntityFacing 67, 0
         WaitFrames 15
         SetEntityFacing 70, 0
-        WalkToPosition 134, 104, 432
+        WaitFrames 10
+        SetEntityFacing 134, 2                 ; CINE: dash beside 68, heavy strike
+        SetEntityPositionInstant 134, 112, 420
+        BeginCommandBatch
+        SetEntityAnimation 134, 6
+        EntityWaitFrames 68, 6
+        PlaySFX 68, 34
+        PlayDamageEffect 68
+        SetEntityAnimationNoWait 68, 2
+        GlideToPosition 68, 44, 426, 1200
+        EntitySetVelocity 68, 0, 0
+        ScreenShake 74, 4, 8
+        CommitCommandBatch
+        DespawnEntity 68
+        SetEntityFacing 134, 3                 ; CINE: dash beside 70, heavy strike
+        SetEntityPositionInstant 134, 128, 398
+        BeginCommandBatch
+        SetEntityFacing 70, 2
+        SetEntityAnimation 134, 7
+        EntityWaitFrames 70, 6
+        PlaySFX 70, 36
+        PlayDamageEffect 70
+        SetEntityAnimationNoWait 70, 2
+        GlideToPosition 70, 196, 388, 1200
+        EntitySetVelocity 70, 0, 0
+        ScreenShake 74, 4, 8
+        CommitCommandBatch
+        DespawnEntity 70
+        SetEntityFacing 134, 3                 ; CINE: dash beside 71, heavy strike
+        SetEntityPositionInstant 134, 128, 420
         BeginCommandBatch
         SetEntityFacing 71, 2
         SetEntityAnimation 134, 6
-        EntityWaitTouchPlayer 68
-        PlaySFX 68, 34
-        EntitySetVelocity 68, 0, 0
-        PlayDamageEffect 68
-        SetEntityAnimation 68, 2
-        DespawnEntity 68
-        CommitCommandBatch
-        BeginCommandBatch
-        WalkToPosition 134, 120, 424
-        SetEntityFacing 134, 1
-        WalkToPosition 71, 136, 424
-        SetEntityAnimation 134, 7
-        EntityWaitTouchPlayer 71
+        EntityWaitFrames 71, 6
         PlaySFX 71, 35
-        EntitySetVelocity 71, 0, 0
         PlayDamageEffect 71
-        SetEntityAnimation 71, 2
+        SetEntityAnimationNoWait 71, 2
+        GlideToPosition 71, 196, 426, 1200
+        EntitySetVelocity 71, 0, 0
+        ScreenShake 74, 4, 8
+        CommitCommandBatch
         DespawnEntity 71
-        WalkToPosition 70, 136, 416
-        SetEntityAnimation 134, 6
-        EntityWaitTouchPlayer 70
-        PlaySFX 70, 36
-        EntitySetVelocity 70, 0, 0
-        PlayDamageEffect 70
-        SetEntityAnimation 70, 2
-        DespawnEntity 70
+        SetEntityFacing 134, 0                 ; CINE: dash back to his mark, his back to the last two: a blast each, over his shoulder
+        SetEntityPositionInstant 134, 120, 444
+        WaitFrames 12
+        BeginCommandBatch
+        SetEntityFacing 67, 3
+        SetEntityFacing 69, 2
         NPCFireKiBlastAtEntity 134, 67, 100
         EntityWaitTouchPlayer 67
         PlaySFX 67, 36
@@ -361,7 +408,6 @@ sequence ch1_frieza_landing
         DespawnEntity 67
         CommitCommandBatch
         BeginCommandBatch
-        WalkToPosition 69, 136, 392
         NPCFireKiBlastAtEntity 134, 69, 100
         EntityWaitTouchPlayer 69
         PlaySFX 69, 35
@@ -370,9 +416,15 @@ sequence ch1_frieza_landing
         SetEntityAnimation 69, 2
         DespawnEntity 69
         CommitCommandBatch
-        SetEntityFacing 158, 1
-        WalkToPosition 66, 96, 432
+        SetEntityFacing 134, 0
+        WaitFrames 40                          ; he stands still, his back to Frieza
+        BeginCommandBatch                      ; the last soldier goes for the old man, who has crept back up
+        WalkToPosition 66, 84, 408
         SetEntityFacing 66, 0
+        WalkToPosition 158, 84, 438
+        SetEntityFacing 158, 1
+        CommitCommandBatch
+        PanCameraToPosition 12, 352, 2
         WaitFrames 20
         SetEntityAnimation 158, 6
         PlaySFX 66, 34
@@ -382,22 +434,135 @@ sequence ch1_frieza_landing
         WaitFrames 30
         DespawnEntity 66
         SetEntityAnimation 158, 0
+        SetEntityFacing 158, 3
   text 126 "OLD HERCULE: Ha!  Did you see that, Trunks?\x0bOne punch!  That's the power of the World Champion!"
   text 98 "TRUNKS: ...Stay behind me, Hercule."
-  script                                 ; stock 37, second half: Frieza
-        WaitFrames 120
-        WalkToPosition 134, 120, 384
+  [44] script                            ; stock 37, second half: Frieza fires first and hits empty ground; he looks for him; the sword comes from above, and again from the other side (the stock: a wait, a walk-up, one slash)
+        PanCameraToPosition 12, 328, 2
+        SetEntityFacing 134, 1
+        WaitFrames 20
+        BeginCommandBatch
+        SetEntityAnimation 49, 5
+        NPCFireKiBlast 49, 120, 444, 100
+        EntityWaitFrames 134, 7                ; CINE: he is gone before it lands (dash out)
+        CommitCommandBatch
+        SetEntityPositionInstant 134, 272, 16
+        BeginCommandBatch
+        SpawnDustCloud 49, 120, 444
+        ScreenShake 74, 6, 20
+        WalkToPosition 158, 52, 470            ; old Hercule throws himself clear of it
+        CommitCommandBatch
+        SetEntityFacing 158, 3
+        SetEntityAnimation 49, 0
+        WaitFrames 20
+        SetEntityFacing 49, 2
+        WaitFrames 14
+        SetEntityFacing 49, 3
+        WaitFrames 14
+        SetEntityFacing 134, 0                 ; CINE: dash in above him
+        SetEntityPositionInstant 134, 120, 350
         BeginCommandBatch
         SetEntityAnimation 134, 16
-        EntityWaitTouchPlayer 49
+        EntityWaitFrames 49, 8
+        PlaySFX 49, 59
+        PlayDamageEffect 49
+        CommitCommandBatch
+        WhiteFlash 4
+        SetEntityFacing 134, 1                 ; CINE: dash through to his other side
+        SetEntityPositionInstant 134, 120, 388
+        BeginCommandBatch
+        SetEntityAnimation 134, 16
+        EntityWaitFrames 49, 8
         PlaySFX 49, 59
         PlayDamageEffect 49
         FlashScreenColor 49, 255, 0, 0, 10
         CommitCommandBatch
-        WalkToPosition 134, 160, 424
-        SetEntityFacing 134, 1
+        SetEntityFacing 134, 0                 ; through him, his back to what is left
+        GlideToPosition 134, 120, 412, 700
         END
-  stockseq @083be798 38 47    ; Frieza falls, King Cold's offer, King Cold falls
+  [45] stock @083be36e                   ; "!AHHHHHHHHH!!!!"
+  [46] script                            ; stock 39: Frieza comes apart; an open hand, and the pieces are gone in the blast (the stock despawned him mid-bounce)
+        WaitFrames 30
+        SetEntityFacing 74, 2
+        SetEntityAnimation 49, 3
+        EntitySetVelocity 49, 0, 0
+        PlayAudio 31
+        EntitySetVelocity 49, -8, 8
+        PlayAudio 20
+        EntitySetVelocity 49, 8, -8
+        SetEntityFacing 134, 1
+        BeginCommandBatch
+        EntitySetVelocity 49, 4, 6
+        NPCFireKiBlastAtEntity 134, 49, 100
+        EntityWaitFrames 134, 10
+        CommitCommandBatch
+        FadeToWhite 3
+        DespawnEntity 49
+        PlayAudio 20
+        WhiteFadeOut 6
+        BeginCommandBatch
+        SpawnDustCloud 134, 132, 372
+        ScreenShake 74, 10, 30
+        SpawnDustCloud 158, 112, 360
+        CommitCommandBatch
+        WaitFrames 30
+        SetEntityFacing 74, 0
+        SetEntityAnimation 74, 4
+        WaitFrames 30
+        END
+  [47] stock @083be3de                   ; "!Frieza!!!"
+  [48] script                            ; stock 41: the view goes to King Cold; Trunks turns to him, unhurried
+        BeginCommandBatch
+        WalkToPosition 134, 152, 456
+        SetEntityFacing 134, 1
+        CommitCommandBatch
+        PanCameraToPosition 36, 322, 2
+        WaitFrames 60
+        END
+  stockseq @083be798 42 46    ; King Cold's offer, "Not a chance.", "Very well..."
+  [54] script                            ; stock 47: King Cold strides at him and rears up; Trunks does not give a step: one blast at arm's length throws him on his back, a second finishes him (the stock: one blast and a bounce); the stock power-down
+        BeginCommandBatch
+        WalkToPosition 74, 152, 424
+        SetEntityAnimation 74, 4
+        ScreenShake 158, 2, 50
+        CommitCommandBatch
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 134, 74, 100
+        EntityWaitTouchPlayer 74
+        PlaySFX 74, 36
+        PlayDamageEffect 74
+        GlideToPosition 74, 152, 388, 900
+        SetEntityAnimation 74, 3
+        EntitySetVelocity 74, 0, 0
+        ScreenShake 158, 12, 30
+        CommitCommandBatch
+        PlayAudio 20
+        WaitFrames 50
+        SetEntityAnimation 74, 4               ; he lifts his head
+        WalkToPosition 134, 152, 432
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 134, 74, 100
+        EntityWaitTouchPlayer 74
+        PlaySFX 74, 36
+        PlayDamageEffect 74
+        SetEntityAnimation 74, 3
+        EntitySetVelocity 74, 8, -8
+        EntitySetVelocity 74, -12, 16
+        EntitySetVelocity 74, 20, -4
+        CommitCommandBatch
+        FlashScreenColor 74, 255, 0, 0, 10
+        WhiteFlash 6
+        DespawnEntity 74
+        WaitFrames 90
+        SetEntityFacing 134, 0
+        WaitFrames 120
+        SetEntityAnimation 134, 21
+        DespawnEntity 134
+        SpawnCharacterEntity 128, 152, 432
+        StopAudio 55
+        WalkToPosition 158, 120, 448           ; old Hercule comes back out from where he hid
+        SetEntityFacing 158, 3
+        END
   script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule runs up
         SetStoryFlag 21
         WarpToMapWithEntities 3, 4, 1, 192, 88
