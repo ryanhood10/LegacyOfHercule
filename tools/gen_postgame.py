@@ -253,12 +253,21 @@ for pass_no in (1, 2):
     k = b.index("LoadMapWithEntities 1, 2, 1, 384, 552")
     b = b[:k + 1] + ["DespawnEntity 9", "DespawnEntity 11"] + b[k + 1:]
     b = [x for x in b if not x.startswith("SetEntityFacing 9,")]
-    b = b[:-1] + ["SpawnCharacterEntity 158, 640, 520", "WalkToPosition 158, 560, 504", "SetEntityFacing 158, 2"] + b[-1:]
-    script(b, "the epilogue's staging (stock entry 0): Trunks back in his time; no Androids; old Hercule walks up")
+    # The epilogue (docs/cutscenes/batch3 5.9; his four lines as Ryan wrote them): it was four boxes between two standing bodies. Trunks arrives
+    # braced and looks about for the Androids; a rumble, and old Hercule strolls in from where it came; he throws the Megaton Punch at the air
+    # (the cinematic helpers' strike, which takes the pose from his own record: a build without roms/buu.gba shows the stock Hercule) and
+    # the ground answers a little more than a punch should; Trunks starts; old Hercule looks at his fist. The one hint Ryan allows (4i).
+    b = b[:-1] + ["SetEntityFacing 132, 2", "WaitFrames 24", "SetEntityFacing 132, 3", "WaitFrames 24", "SetEntityFacing 132, 1"] + b[-1:]
+    script(b, "the epilogue's staging (stock entry 0): Trunks back in his time, looking about; no Androids")
     text(101, "TRUNKS: I'm back.\\x0bNow I'm ready to take the Androids down!")
+    script(["PlayAudio 20", "ScreenShake 0, 4, 20", "WaitFrames 10", "SetEntityFacing 132, 3", "SpawnCharacterEntity 158, 640, 520", "WalkToPosition 158, 560, 504",
+            "SetEntityFacing 158, 2"], "a rumble; Trunks spins toward it; old Hercule walks up from there")
     text(126, "OLD HERCULE: Hey, Trunks!  You're too late!\\x0bI already beat them with my Megaton Punch while you were gone!")
+    script(["CoopCall 37, 1, 158, -3", "CoopCall 37, 5, 0, 0", "SpawnDustCloud 158, 538, 506", "PlayAudio 20", "ScreenShake 0, 3, 10", "SetEntityFacing 158, 2",
+            "SetEntityAnimation 132, 4"], "he throws it at the air; the ground answers; Trunks starts")
     text(101, "TRUNKS: You...  what?!")
     text(126, "OLD HERCULE: I don't know what it is...\\x0bbut lately I feel stronger than I've ever been!")
+    script(["SetEntityFacing 158, 0", "WaitFrames 40"], "he looks at his fist")
     text(0, "@^The End.\\x0bThanks for playing!")
     script(["ReturnToTitleScreen"])
     emit("end")

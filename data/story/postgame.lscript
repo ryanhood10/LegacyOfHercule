@@ -409,7 +409,7 @@ sequence pg_dende
         PanCameraToPosition 0, 24, 1
         END
   stockseq @083c4e98 1 28    ; "Late Night with Rob Howard", Hercule's "parlor tricks", the crowd, the credits (flag 196)
-  script                                 ; the epilogue's staging (stock entry 0): Trunks back in his time; no Androids; old Hercule walks up
+  script                                 ; the epilogue's staging (stock entry 0): Trunks back in his time, looking about; no Androids
         PlayMusic 42
         LoadMapWithEntities 6, 23, 1, 0, 192
         SetActiveEntity 132
@@ -435,14 +435,35 @@ sequence pg_dende
         WaitFrames 60
         WaitFrames 30
         PlayMusic 38
+        SetEntityFacing 132, 2
+        WaitFrames 24
+        SetEntityFacing 132, 3
+        WaitFrames 24
+        SetEntityFacing 132, 1
+        END
+  text 101 "TRUNKS: I'm back.\x0bNow I'm ready to take the Androids down!"
+  script                                 ; a rumble; Trunks spins toward it; old Hercule walks up from there
+        PlayAudio 20
+        ScreenShake 0, 4, 20
+        WaitFrames 10
+        SetEntityFacing 132, 3
         SpawnCharacterEntity 158, 640, 520
         WalkToPosition 158, 560, 504
         SetEntityFacing 158, 2
-        END
-  text 101 "TRUNKS: I'm back.\x0bNow I'm ready to take the Androids down!"
   text 126 "OLD HERCULE: Hey, Trunks!  You're too late!\x0bI already beat them with my Megaton Punch while you were gone!"
+  script                                 ; he throws it at the air; the ground answers; Trunks starts
+        CoopCall 37, 1, 158, -3
+        CoopCall 37, 5, 0, 0
+        SpawnDustCloud 158, 538, 506
+        PlayAudio 20
+        ScreenShake 0, 3, 10
+        SetEntityFacing 158, 2
+        SetEntityAnimation 132, 4
   text 101 "TRUNKS: You...  what?!"
   text 126 "OLD HERCULE: I don't know what it is...\x0bbut lately I feel stronger than I've ever been!"
+  script                                 ; he looks at his fist
+        SetEntityFacing 158, 0
+        WaitFrames 40
   text 0 "@^The End.\x0bThanks for playing!"
   script
         ReturnToTitleScreen
