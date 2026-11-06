@@ -764,9 +764,20 @@ poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 00
 peek8 0x0203F9B7 1
-frames 1500
+frames 300
 shot cs_alone_struggle
-mash 42 100
+deref TBL 0x0800959C
+deref R176 TBL+0x2a4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R176
+echo EXPECT 0203fad8: 01b8 01b8
+peek16 0x0203FAD8 2
+mash 7 100
+shot cs_alone_push
+ents
+echo EXPECT 0203fad8: 01[cd][0-9a-f] 01(c8|d4)
+peek16 0x0203FAD8 2
+mash 35 100
 shot cs_alone_after1
 ents
 mash 14 100
@@ -781,6 +792,10 @@ echo EXPECT map zone 6 area 99
 map
 echo EXPECT [0-9a-f]+: 1a
 peek8 0x0203F084 1
+echo EXPECT 0203fad8: 0180 0180
+peek16 0x0203FAD8 2
+echo EXPECT 0203fadd: 00
+peek8 0x0203FADD 1
 echo === H
 load menu.ss
 p2 0
@@ -971,9 +986,20 @@ poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
-frames 1500
+frames 300
 shot cs_H_struggle
-mash 42 100
+deref TBL 0x0800959C
+deref R176 TBL+0x2a4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R176
+echo EXPECT 0203fad8: 01b8 01b8
+peek16 0x0203FAD8 2
+mash 7 100
+shot cs_H_push
+ents
+echo EXPECT 0203fad8: 01[cd][0-9a-f] 01(c8|d4)
+peek16 0x0203FAD8 2
+mash 35 100
 shot cs_H_after1
 ents
 mash 14 100
@@ -988,6 +1014,10 @@ echo EXPECT map zone 6 area 99
 map
 echo EXPECT [0-9a-f]+: 1a
 peek8 0x0203F084 1
+echo EXPECT 0203fad8: 0180 0180
+peek16 0x0203FAD8 2
+echo EXPECT 0203fadd: 00
+peek8 0x0203FADD 1
 echo === K
 load menu.ss
 p2 0
@@ -1178,9 +1208,20 @@ poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
-frames 1500
+frames 300
 shot cs_K_struggle
-mash 42 100
+deref TBL 0x0800959C
+deref R176 TBL+0x2a4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R176
+echo EXPECT 0203fad8: 01b8 01b8
+peek16 0x0203FAD8 2
+mash 7 100
+shot cs_K_push
+ents
+echo EXPECT 0203fad8: 01[cd][0-9a-f] 01(c8|d4)
+peek16 0x0203FAD8 2
+mash 35 100
 shot cs_K_after1
 ents
 mash 14 100
@@ -1195,6 +1236,10 @@ echo EXPECT map zone 6 area 99
 map
 echo EXPECT [0-9a-f]+: 1a
 peek8 0x0203F084 1
+echo EXPECT 0203fad8: 0180 0180
+peek16 0x0203FAD8 2
+echo EXPECT 0203fadd: 00
+peek8 0x0203FADD 1
 echo === Ve
 load menu.ss
 p2 0
@@ -1385,9 +1430,20 @@ poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
-frames 1500
+frames 300
 shot cs_Ve_struggle
-mash 42 100
+deref TBL 0x0800959C
+deref R176 TBL+0x2a4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R176
+echo EXPECT 0203fad8: 01b8 01b8
+peek16 0x0203FAD8 2
+mash 7 100
+shot cs_Ve_push
+ents
+echo EXPECT 0203fad8: 01[cd][0-9a-f] 01(c8|d4)
+peek16 0x0203FAD8 2
+mash 35 100
 shot cs_Ve_after1
 ents
 mash 14 100
@@ -1402,4 +1458,8 @@ echo EXPECT map zone 6 area 99
 map
 echo EXPECT [0-9a-f]+: 1a
 peek8 0x0203F084 1
+echo EXPECT 0203fad8: 0180 0180
+peek16 0x0203FAD8 2
+echo EXPECT 0203fadd: 00
+peek8 0x0203FADD 1
 echo ALIVE

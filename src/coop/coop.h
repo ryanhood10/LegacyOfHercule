@@ -45,7 +45,7 @@ const char *cg_card(int kind);     // cellgames.c: CoopCall 14 op 3, a title car
 void cg_choice_arm(void);            // cellgames.c: CoopCall 18 op 1
 int cg_choice_take(void);            // cellgames.c: CoopCall 18 op 0 -> 1 yes / 2 no
 void cg_choice_input(u16 *p1, u16 *p2);   // input.c, every poll while a question is armed
-void cg_beam(int id, int on);       // cellgames.c: CoopCall 16, a held Kamehameha the script does not wait for (on 0 ends it)
+int cg_beam(int id, int on, int c);  // cellgames.c: CoopCall 16, a held Kamehameha the script does not wait for (on 0 ends it; 3 the clash's place, 4 a spirit)
 void cg_note_win(int stat, int standing, const s16 xy[2][2]);   // cellgames.c: the test win's record (.party.pp, magic "JRWN")
 u8 *cg_test_slot(void);       // cellgames.c: [0] = stat to win + 1 (COOP_CMD_WIN_STAT), [1] = frames it has been ready,
                               // [2] = at the last win: player 1's slot | solo << 4 | 0x80 when player 2's entity stood  // cellgames.c: CoopCall 15 / COOP_CMD_SOLO

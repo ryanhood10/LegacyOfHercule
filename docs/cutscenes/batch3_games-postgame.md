@@ -527,6 +527,23 @@ a step that is moved or removed breaks an insertion further down, so change one 
   11. `FadeFromWhite`: the field, Gohan back in his base form (the stock `SetCharacterTransformation 0, 56`), and he
       falls (`cine: fall`). Hercule is still in his beam pose a second too long, looks at his hands, lowers them
       (`CoopCall 16, 72, 0`, as today). The stock fade.
+- **Built (`nb-cs3`, 2026-11-06), every beat, with C in the Games' own file (`cellgames.c`, CoopCall 16 on 3 / 4) and no helper:**
+  the picture in 2 s; the held beams are out as the white lifts and no longer fade (their tick count wraps: the refires at every step are gone);
+  **the clash moves**: the script sends the point where the two held beams meet along the line (440 the middle, 456 and 468 toward Gohan, 462
+  the creep, 384 at the Cells) and it walks there 1-2 px a frame; the map's starburst (BG1) is on only while the clash sits in the middle and the
+  beam's strip (BG0) stays, so what moves is the two beam heads; **Goku's spirit** (sprite 176 in the beam pose at (503, 376), behind Gohan's
+  shoulder) flickers two frames in four while each of his three lines is open and stands whole for "Now's your chance!" (**for Ryan to review**);
+  Hercule's beam drops while he looks round for the voice and flares at "The champ...  never...  backs down!!!", which pushes the clash back to
+  the middle and no further; Vegeta flies down, the view takes him and the Cells, the Big Bang lands (flash, shake, dust) and the first Cell
+  turns to him; "VEGETA!" is read over that picture (the view dropped so the shout's box clears the Cells); the clash runs into the Cells, the
+  second Cell's beam breaks, Gohan's stock wave and Hercule's uncapped beam take both for the stock twelve beats of hurt, then white with the
+  last shake, the two despawned under it; the field: Gohan in his base form goes down (pose 3), Hercule holds his beam pose a second, looks at
+  his hands and at Gohan. No explosions.
+  **Research corrections:** a moving cap alone needed no helper (the cap was a constant); the starburst cannot move (a background layer), so it
+  is shown only at the middle; a body spawned for each line was evicted by the text box (OBJ VRAM: `docs/scripts.md` 5b), so the spirit is made
+  once into a block Vegeta's off-view actor gives up and then only hidden and shown; the spirit's flicker runs from the input poll, since a box
+  may take the beams (and their update) away. Tests: `cell_staging.txt` (the spirit's record, the clash's x at the start, after Cell's push and
+  at the end, no spirit left behind), `cell_games.txt`.
 - **Draft lines:** none. For Ryan: beat 3 puts an image (Goku's spirit) where the stock has a voice.
 - **No-reveal check:** Hercule's beam was Ryan's own design (4h: "Hercule's beam pushes through with Gohan's"); beats 3
   and 6 make him waver, then hold. Nobody on the field looks at him afterwards, and scene 3.12 is his lie. Nothing here

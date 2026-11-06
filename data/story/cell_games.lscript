@@ -1228,7 +1228,7 @@ sequence cg_fight7_end
 end
 
 sequence cg_beam_struggle
-  script                                 ; stock entry 0: Gohan and Hercule against the two Cells (the second pair hold real beams; the stock clash beam is a map decoration)
+  script                                 ; stock entry 0: Gohan and Hercule against the two Cells, the held beams out as the white lifts; Goku's spirit for his line
         CoopCall 15, 1, 0, 0
         PlayAudio 60
         FindPlayerEntity
@@ -1250,22 +1250,39 @@ sequence cg_beam_struggle
         SetEntityFacing 72, 2
         SpawnCharacterEntity 162, 324, 416
         SetEntityFacing 162, 3
-        PlayAudio 43
-        WhiteFadeOut 600
-        END
-  text 64 "GOKU: Dig deeper, Gohan!  You too, Hercule!"
-  text 67 "HERCULE: Wh-who said that?!"
-  script                                 ; stock entry 2: Hercule and the second Cell fire their beams after the fade, held through the struggle (CoopCall 16)
+        CoopCall 16, 99, 3, 440
         CoopCall 16, 72, 3000, 0
         CoopCall 16, 162, 3000, 0
-        WaitFrames 120
-        END
-  text 40 "CELL: These are your last minutes!  Make them count!"
-  script                                 ; stock entry 4: Krillin and Tien now blast the second Cell (the held beams are refired at each step: a beam object fades on its own)
+        DespawnEntity 137
+        SpawnCharacterEntity 176, 503, 376
+        SetEntityFacing 176, 2
+        SetEntityAnimationNoWait 176, 30
+        CoopCall 16, 176, 4, 3
+        SpawnCharacterEntity 137, 112, 272
+        SetEntityFacing 137, 3
+        PlayAudio 43
+        WhiteFadeOut 120
+        WaitFrames 30
+        CoopCall 16, 176, 4, 1
+  text 64 "GOKU: Dig deeper, Gohan!  You too, Hercule!"
+  script                                 ; Hercule's beam falters: he looks round for the voice
+        CoopCall 16, 176, 4, 3
         CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
+        SetEntityFacing 72, 3
+        WaitFrames 16
+        SetEntityFacing 72, 1
+        WaitFrames 12
+  text 67 "HERCULE: Wh-who said that?!"
+  script                                 ; stock entry 2 (its wait): back to his beam
+        SetEntityFacing 72, 2
         CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
+        WaitFrames 50
+  text 40 "CELL: These are your last minutes!  Make them count!"
+  script                                 ; stock entry 4: Cell pushes, the clash moves toward Gohan (the middle's starburst goes); Krillin and Tien now blast the second Cell
+        WhiteFlash 4
+        DisableLayer 1
+        CoopCall 16, 1, 3, 456
+        ScreenShake 0, 6, 20
         WaitFrames 60
         PanCameraToPosition 176, 280, 3
         WaitFrames 60
@@ -1308,11 +1325,8 @@ sequence cg_beam_struggle
         CommitCommandBatch
         END
   stock @083eba2a    ; "Would you stop interfering?!"
-  script                                 ; stock entry 6
-        CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
-        CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
+  script                                 ; stock entry 6: the four go down; back on the clash, closer to Gohan still
+        CoopCall 16, 1, 3, 468
         BeginCommandBatch
         FlashScreenColor 30, 0, 0, 0, 20
         PlaySFX 0, 20
@@ -1327,15 +1341,22 @@ sequence cg_beam_struggle
         WaitFrames 60
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
-        END
+        ScreenShake 0, 4, 16
+        CoopCall 16, 176, 4, 1
   text 64 "Gohan, raise it higher!  Hercule, hold on!  He needs you!"
+  script
+        CoopCall 16, 176, 4, 3
   text 67 "HERCULE: The champ...  never...  backs down!!!"
-  script                                 ; stock entry 8: the blasts again
+  script                                 ; stock entry 8: Hercule's beam flares and the clash is pushed back to the middle, no further; the blasts again
         CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
         CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
-        WaitFrames 120
+        WhiteFlash 2
+        CoopCall 16, 1, 3, 440
+        ScreenShake 0, 5, 24
+        WaitFrames 36
+        WhiteFlash 2
+        EnableLayer 1
+        WaitFrames 60
         PanCameraToPosition 176, 280, 3
         WaitFrames 60
         SetEntityAnimation 103, 0
@@ -1384,11 +1405,9 @@ sequence cg_beam_struggle
         CommitCommandBatch
         END
   stock @083ebc58    ; "They just keep lining up to die!"
-  script                                 ; stock entry 10
-        CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
-        CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
+  script                                 ; stock entry 10; the clash creeps toward Gohan again
+        DisableLayer 1
+        CoopCall 16, 1, 3, 462
         BeginCommandBatch
         FlashScreenColor 30, 0, 0, 0, 20
         PlaySFX 0, 20
@@ -1403,26 +1422,17 @@ sequence cg_beam_struggle
         END
   stock @083ebcc6    ; Vegeta's "ARGHHH!!!"
   script                                 ; stock entry 12
-        CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
-        CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
         WaitFrames 60
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
-        END
+        CoopCall 16, 176, 4, 1
   text 64 "Release it, both of you!  Remember all the pain he's caused!\x0bNOW MAKE THAT YOUR POWER!"
   script                                 ; stock entry 14
-        CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
-        CoopCall 16, 72, 1, 0
-        CoopCall 16, 162, 1, 0
+        CoopCall 16, 176, 4, 3
         WaitFrames 60
         END
   stock @083ebd68    ; "SAY GOODBYE!!!"
-  script                                 ; stock entry 16: the held beams end; Vegeta's Big Bang
-        CoopCall 16, 72, 0, 0
-        CoopCall 16, 162, 0, 0
+  script                                 ; stock entry 16 without its white: Vegeta flies down, the view takes him and the Cells, the Big Bang lands; Cell's head turns
         PlayMusic 35
         PanCameraToPosition 64, 200, 3
         WaitFrames 40
@@ -1431,41 +1441,44 @@ sequence cg_beam_struggle
         FlyToPosition 137, 208, 376
         SetEntityFacing 137, 3
         WaitFrames 40
+        PanCameraToPosition 176, 312, 4
+        WaitFrames 10
         BeginCommandBatch
         NPCFireBigBangAtEntity 137, 30, 100
         PlayDamageEffect 30
         PlaySFX 137, 20
         CommitCommandBatch
-        FadeToWhite 20
-        GetActiveEntityContext
-        DespawnEntity 121
-        DespawnEntity 156
-        DespawnEntity 76
-        DespawnEntity 103
-        DespawnEntity 137
-        SetEntityPositionInstant 30, 0, 0
-        SetEntityPositionInstant 0, 0, 0
-        UploadSpritePalette
-        END
+        WhiteFlash 6
+        ScreenShake 0, 12, 20
+        SpawnDustCloud 30, 352, 420
+        SetEntityFacing 30, 2
+        WaitFrames 20
+        PanCameraToPosition 176, 264, 3
   stockseq @083ec758 17 17    ; "VEGETA!"
+  script                                 ; back on the clash; Goku's spirit, whole
+        SetEntityFacing 30, 3
+        SetEntityAnimationNoWait 30, 30
+        PanCameraToPosition 320, 312, 4
+        CoopCall 16, 176, 4, 2
   text 64 "Now's your chance!"
-  script                                 ; stock entry 19: two Kamehamehas, both Cells destroyed (the second explodes too), Hercule stays
-        FadeToWhite 1
-        PanCameraToPosition 320, 312, 3
+  script                                 ; stock entry 19: the clash runs into the Cells, the beams take them both and the screen goes white (no explosions); Gohan falls, Hercule lowers his hands late; the stock fade and the aftermath's walk-in
+        CoopCall 16, 176, 4, 0
+        DespawnEntity 176
+        CoopCall 16, 2, 3, 384
+        ScreenShake 0, 6, 20
+        WaitFrames 20
+        ScreenShake 0, 12, 24
+        WaitFrames 22
+        CoopCall 16, 162, 0, 0
+        CoopCall 16, 72, 0, 0
         DisableLayer 0
         DisableLayer 1
-        SetEntityPositionInstant 0, 496, 392
-        SetEntityFacing 0, 2
-        SetEntityPositionInstant 30, 351, 411
-        SetEntityFacing 30, 3
-        SetEntityAnimationNoWait 30, 0
-        SetEntityPositionInstant 72, 524, 392
-        SetEntityFacing 72, 2
-        SetEntityPositionInstant 162, 323, 411
-        SetEntityFacing 162, 3
-        SetEntityAnimationNoWait 0, 0
         StopAudio 43
-        WhiteFadeOut 80
+        SetEntityAnimationNoWait 30, 2
+        SetEntityAnimationNoWait 162, 2
+        WhiteFlash 4
+        ScreenShake 0, 16, 60
+        SetEntityAnimationNoWait 0, 0
         BeginCommandBatch
         NPCFireKamehameha 0, 140
         CoopCall 16, 72, 2, 0
@@ -1484,156 +1497,32 @@ sequence cg_beam_struggle
         EntityWaitFrames 30, 5
         LoopOrJump L1
         CommitCommandBatch
-        WhiteFlash 5
-        BeginCommandBatch
-        ScreenShake 0, 20, 30
         PlaySFX 30, 31
-        PlayDamageEffect 30
-        PushMulti 30, 10, 10
-        Negate
-        EntitySetVelocity
-        PlaySFX 30, 20
-        PushMulti 30, 8
-        Negate
-        EntitySetVelocity 10
-        PlaySFX 30, 21
-        PushMulti 30, 4
-        Negate
-        EntitySetVelocity 16
-        PlayDamageEffect 162
-        PushMulti 162, 10, 10
-        Negate
-        EntitySetVelocity
-        PushMulti 162, 8
-        Negate
-        EntitySetVelocity 10
-        PushMulti 162, 4
-        Negate
-        EntitySetVelocity 16
-        CommitCommandBatch
-        WaitFrames 20
-        BeginCommandBatch
-        ScreenShake 0, 20, 30
-        PlaySFX 30, 31
-        PlayDamageEffect 30
-        SetEntityAnimation 30, 2
-        PushMulti 30, 16, 16
-        Negate
-        EntitySetVelocity
-        PlaySFX 30, 21
-        PushMulti 30, 20, 8
-        Negate
-        EntitySetVelocity
-        PlaySFX 30, 20
-        PushMulti 30, 12
-        Negate
-        PushByte 4
-        Negate
-        EntitySetVelocity
-        PlayDamageEffect 162
-        SetEntityAnimation 162, 2
-        PushMulti 162, 16, 16
-        Negate
-        EntitySetVelocity
-        PushMulti 162, 20, 8
-        Negate
-        EntitySetVelocity
-        PushMulti 162, 12
-        Negate
-        PushByte 4
-        Negate
-        EntitySetVelocity
-        CommitCommandBatch
-        WaitFrames 20
-        BeginCommandBatch
-        ScreenShake 0, 20, 40
-        PlaySFX 30, 31
-        PlayDamageEffect 30
-        SetEntityAnimation 30, 2
-        PushMulti 30, 10
-        Negate
-        PushByte 16
-        Negate
-        EntitySetVelocity
-        PlaySFX 30, 20
-        EntitySetVelocity 30, 10, 16
-        PlaySFX 30, 21
-        PushMulti 30, 16
-        Negate
-        EntitySetVelocity 8
-        PlayDamageEffect 162
-        SetEntityAnimation 162, 2
-        PushMulti 162, 10
-        Negate
-        PushByte 16
-        Negate
-        EntitySetVelocity
-        EntitySetVelocity 162, 10, 16
-        PushMulti 162, 16
-        Negate
-        EntitySetVelocity 8
-        CommitCommandBatch
-        WaitFrames 20
-        BeginCommandBatch
-        ScreenShake 0, 20, 20
-        PlayDamageEffect 30
-        SetEntityAnimation 30, 2
-        PlaySFX 30, 31
-        PushMulti 30, 12
-        Negate
-        EntitySetVelocity 24
-        PlaySFX 30, 20
-        PushMulti 30, 0, 24
-        Negate
-        EntitySetVelocity
-        PlayDamageEffect 162
-        SetEntityAnimation 162, 2
-        PushMulti 162, 12
-        Negate
-        EntitySetVelocity 24
-        PushMulti 162, 0, 24
-        Negate
-        EntitySetVelocity
-        CommitCommandBatch
-        WaitFrames 20
-        BeginCommandBatch
+        FadeToWhite 20
         ScreenShake 0, 20, 80
-        PlayDamageEffect 30
-        SetEntityAnimation 30, 2
         PlaySFX 30, 21
-        EntitySetVelocity 30, 0, 0
-        EntitySetVelocity 30, 16, 16
-        PushMulti 30, 16
-        Negate
-        PushByte 16
-        Negate
-        EntitySetVelocity
-        PushMulti 30, 16, 16
-        Negate
-        EntitySetVelocity
-        PushMulti 30, 16
-        Negate
-        EntitySetVelocity 16
-        PlayDamageEffect 162
-        SetEntityAnimation 162, 2
-        EntitySetVelocity 162, 0, 0
-        EntitySetVelocity 162, 16, 16
-        PushMulti 162, 16
-        Negate
-        PushByte 16
-        Negate
-        EntitySetVelocity
-        PushMulti 162, 16, 16
-        Negate
-        EntitySetVelocity
-        PushMulti 162, 16
-        Negate
-        EntitySetVelocity 16
+        GetActiveEntityContext
         DespawnEntity 30
         DespawnEntity 162
-        CommitCommandBatch
+        DespawnEntity 121
+        DespawnEntity 156
+        DespawnEntity 76
+        DespawnEntity 103
+        DespawnEntity 137
+        UploadSpritePalette
         CoopCall 16, 72, 0, 0
-        WaitFrames 80
+        SetEntityAnimationNoWait 72, 30
+        SetCharacterTransformation 0, 56
+        SetEntityFacing 0, 2
+        WaitFrames 50
+        WhiteFadeOut 40
+        SetEntityAnimationNoWait 0, 3
+        WaitFrames 70
+        SetEntityAnimationNoWait 72, 0
+        SetEntityFacing 72, 0
+        WaitFrames 36
+        SetEntityFacing 72, 2
+        WaitFrames 30
         AddEXP 500000
         PlayMusic 37
         FadeOut 120

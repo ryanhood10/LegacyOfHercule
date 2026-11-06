@@ -100,15 +100,49 @@ typedef struct Beam {
 } Beam;
 _Static_assert(sizeof(Beam) == 0x50, "Beam size");
 #define BEAM_VTABLE   0x08025830u            // relative offsets (Beam_Init's subclass); slot 10 = update
-#define BEAM_VT_SLOTS 16                     // 14 known slots (partyram is tight: 16 words)
+#define BEAM_VT_SLOTS 14                     // the 14 known slots
 #define CG_CLASH_X    440                    // map 326: the middle of the stock clash
 ROM_FN(void, Beam_Update, (Beam *b, int run), 0x0801D88B);
-static u32 cg_beam_vt[BEAM_VT_SLOTS] __attribute__((section(".party.bv")));   // last in partyram: the tests peek cg_state, s13, rv by address
+// The capped beams' vtable copy and the struggle's scene state (CoopCall 16 on 3 / 4), in the 0x40 bytes the 16-word copy had
+// (partyram is full, and the tests peek cg_state, s13, rv by address: nothing before this moves).
+typedef struct CgBeamRam {
+    u32 vt[BEAM_VT_SLOTS];
+    s16 clash_x, clash_to;   // where the held beams meet now (map px) and where the script sent it; it moves `step` px a frame
+    u8 step;
+    u8 spirit;               // a body shown as a spirit: 0 none, 1 flickering (two frames in four), 2 whole, 3 hidden
+    u8 spirit_id;            // its sprite id
+    u8 _pad;
+} CgBeamRam;
+_Static_assert(sizeof(CgBeamRam) == 0x40, "CgBeamRam: .party.bv holds 0x40");
+static CgBeamRam cgb __attribute__((section(".party.bv")));
+#define cg_beam_vt cgb.vt
+static const u8 cg_clear_remap[256];         // every colour transparent (the Rumble's blink, tny_engine.c)
+
+// The spirit's body through the transparent remap or its own colours (entity +0x24 the remap, +0x20 the decoded frame)
+static void cg_spirit_show(int whole) {
+    Entity *e = Vm_FindCharEntity(cgb.spirit_id);
+    if (!e || e == g_PlayerObject || e == coop.p2) return;
+    const u8 *want = whole ? 0 : cg_clear_remap, **slot = (const u8 **)((u8 *)e + 0x24);
+    if (*slot == want || (*slot && *slot != cg_clear_remap)) return;   // never over another remap
+    *slot = want;
+    *(u32 *)((u8 *)e + 0x20) = 0;            // the next frame is decoded through it
+}
+
+// Every input poll in the arena: the clash walks to where the script sent it (not from the beams' own update: a text
+// box may have them away, or one of them gone).
+static void cg_scene_step(void) {
+    if (cgb.clash_x < 64 || cgb.clash_x > 2000) cgb.clash_x = cgb.clash_to = CG_CLASH_X;   // partyram is not cleared at boot
+    int d = cgb.clash_to - cgb.clash_x, s = cgb.step ? cgb.step : 1;
+    if (d > s) d = s;
+    if (d < -s) d = -s;
+    cgb.clash_x = (s16)(cgb.clash_x + d);
+}
 
 static void cg_beam_update(Beam *b, int run) {
     Beam_Update(b, run);
     if (b->state != 1 || !b->dx) return;
-    s32 cap = (CG_CLASH_X - b->x) * b->dx - 16;   // the drawn tip on the clash's middle
+    if (b->ticks > 600) b->ticks -= 480;     // a held beam is held: it faded on its own after a while (the script refired it at every step)
+    s32 cap = (cgb.clash_x - b->x) * b->dx - 16;   // the drawn tip on the clash's middle
     if (cap < 8) cap = 8;
     if (b->len > cap) { b->len = cap; b->impact = 1; }
 }
@@ -120,24 +154,36 @@ static void cg_beam_capped(Beam *b) {
     b->vtable = cg_beam_vt;
 }
 
-void cg_beam(int id, int on) {
+int cg_beam(int id, int on, int c) {
+    if (on == 3) {                           // the clash goes to x = c px at id px a frame (0 = 1; 99 = at once)
+        cgb.clash_to = (s16)c;
+        cgb.step = (u8)(id == 99 ? 0 : id);
+        if (id == 99) cgb.clash_x = (s16)c;
+        return 0;
+    }
+    if (on == 4) {                           // sprite id as a spirit: c = 1 flickering, 2 whole, 3 hidden, 0 as any body again
+        cgb.spirit_id = (u8)id;
+        cgb.spirit = (u8)c;
+        cg_spirit_show(c == 0 || c == 2);
+        return 0;
+    }
     Entity *e = Vm_FindCharEntity(id);
-    if (!e) return;
+    if (!e) return 0;
     int k;
     for (k = 0; k < 2 && cg_state.owner[k] != e; k++) {}
     if (!on) {
         if (k < 2) { Beam_End(cg_state.beam[k]); cg_state.owner[k] = 0; cg_state.beam[k] = 0; Entity_SetAnimation(e, 0); }
-        return;
+        return 0;
     }
-    if (k < 2) return;                       // already holding one
+    if (k < 2) return 0;                       // already holding one
     for (k = 0; k < 2 && cg_state.owner[k]; k++) {}
-    if (k == 2) return;
+    if (k == 2) return 0;
     s32 box[4], pos[2];
     Entity_GetBox(box, e);
     pos[0] = (box[0] + box[2]) >> 1;
     pos[1] = (box[1] + box[3]) >> 1;
     void *beam = Beam_Init(0, pos, 0, e);
-    if (!beam) return;
+    if (!beam) return 0;
     if (g_PlayerObject) ((Beam *)beam)->owner = g_PlayerObject;   // a known hit type (see above)
     if (on != 2) cg_beam_capped(beam);   // 2: the finale's push through Cell
     EntityList_Add(g_EntityList, (Entity *)beam);
@@ -150,6 +196,7 @@ void cg_beam(int id, int on) {
     cg_state.magic = CG_MAGIC;
     cg_state.owner[k] = e;
     cg_state.beam[k] = beam;
+    return 0;
 }
 
 // CoopCall 18 Choice (op): a yes / no question in an ordinary text box. op 1 arms it right before the
@@ -171,6 +218,10 @@ int cg_choice_take(void) {
 }
 
 void cg_choice_input(u16 *p1, u16 *p2) {
+    if (cg_state.magic == CG_MAGIC && in_arena()) {
+        if (cg_state.owner[0] || cg_state.owner[1]) cg_scene_step();   // while a beam is held
+        if (cgb.spirit && cgb.spirit <= 3) cg_spirit_show(cgb.spirit == 2 || (cgb.spirit == 1 && ((g_FrameCounter >> 1) & 1)));   // the spirit flickers
+    } else if (cgb.spirit) cgb.spirit = 0;   // partyram is not cleared at boot; nothing of it outside the arena
     if (cg_state.magic != CG_MAGIC || !cg_state.choice_armed) return;
     u16 held = (u16)((*p1 | *p2) & (KEY_A | KEY_B));
     u16 edge = (u16)(held & ~cg_state.choice_prev);

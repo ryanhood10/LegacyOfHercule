@@ -150,10 +150,19 @@ def games(tag, p2):
     p2_stands(coop)
     herc(1 if coop else 0)
     win(26, duo)
-    out("frames 1500", f"shot cs_{tag}_struggle", "mash 42 100", f"shot cs_{tag}_after1", "ents", "mash 14 100", f"shot cs_{tag}_after2", "mash 8 100", f"shot cs_{tag}_after3")
+    # the beam struggle (docs/cutscenes/batch3 3.10): the picture in 2 s; Goku's spirit (sprite 176) stands from the start, hidden between his lines; the
+    # clash (cgb.clash_x / clash_to, .party.bv + 0x38) starts in the middle (440), is pushed toward Gohan, and has run into the Cells (384) at the end
+    out("frames 300", f"shot cs_{tag}_struggle", "deref TBL 0x0800959C", f"deref R176 TBL+{(176 - 7) * 4:#x}")
+    expect("entrec [0-9a-f]+: 1$", "entrec R176")
+    expect("0203fad8: 01b8 01b8", "peek16 0x0203FAD8 2")
+    out("mash 7 100", f"shot cs_{tag}_push", "ents")
+    expect("0203fad8: 01[cd][0-9a-f] 01(c8|d4)", "peek16 0x0203FAD8 2")
+    out("mash 35 100", f"shot cs_{tag}_after1", "ents", "mash 14 100", f"shot cs_{tag}_after2", "mash 8 100", f"shot cs_{tag}_after3")
     out("mashmap 6 99 200", "frames 120", f"shot cs_{tag}_world", "ents")
     expect("map zone 6 area 99", "map")
     expect("[0-9a-f]+: 1a", "peek8 0x0203F084 1")   # Goku's halo
+    expect("0203fad8: 0180 0180", "peek16 0x0203FAD8 2")   # the clash ran into the Cells
+    expect("0203fadd: 00", "peek8 0x0203FADD 1")           # no spirit left behind
 
 
 if len(sys.argv) > 2 and sys.argv[1] == "check":
