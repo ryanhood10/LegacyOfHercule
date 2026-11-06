@@ -100,6 +100,12 @@ tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercul
 
 A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
 
+**The poses `herc_record` adds, in gold (2026-11-06, `docs/art-audit.md`).** The clone is made from the stock record 72, so
+it had neither the Kamehameha pose (group 18: a transformed Hercule sent into a beam scene had no group there, the
+heap-damage trap) nor the flight's side view. `spriteclone.py` now takes both from `herculesprites.py` (`build`,
+`fly_side`), recolours them with its own `recolour` (the afro gold) and puts them in `ssj_record`: group 12's left /
+right arrays and all of group 18 (7 frames a facing, as the base form's). The group count stays 22.
+
 ## Buu's Fury (roms/buu.gba, USA BG3E): format, tools, ids (2026-10-17)
 
 Same engine family, different tables. Found by scanning for pointer tables into regions of
