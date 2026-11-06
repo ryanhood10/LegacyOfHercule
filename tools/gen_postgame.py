@@ -92,6 +92,18 @@ def stop():
     emit("  stop 0x0")
     entries += 1
 
+# the finale's stage (zone 9 area 7): player 1's spot when he plays one of the map's four party actors (slot: x, y, facing), and the two
+# spots beside the group for the bodies the stock scene has no place for (Goku, Hercule, a second Gohan)
+FIN_SPOT = {1: (168, 112, 2), 2: (176, 72, 2), 3: (200, 96, 2), 6: (56, 112, 3)}
+FIN_SIDE_A, FIN_SIDE_B = (172, 144), (204, 136)
+
+def gohan_faces(f):
+    """Gohan's body turns: player 1 when he plays a Gohan (slot 0 or 8), else Gohan's actor (56, or 58 when player 2 is Super Saiyan 2 Gohan)."""
+    return ["PushActiveCharIndex", "PushByte 0", "CmpEq", "JumpIfFalse gf1", f"SetEntityFacing 0, {f}", "Jump gf9", "gf1:",
+            "PushActiveCharIndex", "PushByte 8", "CmpEq", "JumpIfFalse gf2", f"SetEntityFacing 0, {f}", "Jump gf9", "gf2:",
+            "CoopCall 22, 2, 56, 0", "JumpIfFalse gf3", f"SetEntityFacing 56, {f}", "gf3:",
+            "CoopCall 22, 2, 58, 0", "JumpIfFalse gf9", f"SetEntityFacing 58, {f}", "gf9:"]
+
 # Two passes: the branch script needs the sections' indexes, known after the first pass.
 for pass_no in (1, 2):
     out.clear()
@@ -144,11 +156,50 @@ for pass_no in (1, 2):
     stop()
     # ---- the finale ----------------------------------------------------------------------------------
     label("finale")
-    script(["FadeOut 120", "SetPlayerVisible 0", "WarpToMapNoEntities 9, 7, 1, 144, 136", "DisableLayer 0",
-            "DisableLayer 1", "DespawnEntity 11", "SetEntityFacing 36, 3", "FadeFromWhite 120"], "back on the Lookout's edge, 18 gone")
-    text(1, "Finally...  some time to relax.\\x0bNo more enemies to fight!")
+    # Who stands (docs/cutscenes/batch3 5.5; Ryan, 2026-11-05: only who is played, and the players present stand). The map's own cast stays
+    # (the wish scene's: kept for the plot), with Gohan, whose lines and whose goodbyes these are, as an actor when nobody plays him.
+    # Player 1 on one of the four stock actors takes that actor's spot (its record's condition, pg_stand_*, hides the actor: a step on
+    # a sprite player 1 shows could find the player). Player 2 has no entity here (the warp): his stock actor is his body; as Goku,
+    # Hercule or the other Gohan an actor of his sprite stands beside the group. Nothing changes who plays whom, no flag but 483.
+    a = ["FadeOut 120", "SetPlayerVisible 0", "WarpToMapNoEntities 9, 7, 1, 144, 136", "DisableLayer 0", "DisableLayer 1",
+         "DespawnEntity 11", "SetEntityFacing 36, 3"]
+    for slot, (x, y, f) in FIN_SPOT.items():
+        a += ["PushActiveCharIndex", f"PushByte {slot}", "CmpEq", f"JumpIfFalse s{slot}",
+              f"SetEntityPositionInstant 0, {x}, {y}", f"SetEntityFacing 0, {f}", f"s{slot}:"]
+    ax, ay = FIN_SIDE_A
+    bx, by = FIN_SIDE_B
+    p2is = lambda n, lab: ["CoopCall 8, 0, 0, 0", f"PushByte {n}", "CmpEq", f"JumpIfFalse {lab}"]
+    stand = lambda sp, x, y, f: [f"SpawnCharacterEntity {sp}, {x}, {y}", f"SetEntityFacing {sp}, {f}"]
+    a += (["PushActiveCharIndex", "PushByte 0", "CmpEq", "JumpIfFalse g1"] + p2is(8, "gz") + stand(58, ax, ay, 2) + ["Jump gz", "g1:",
+           "PushActiveCharIndex", "PushByte 8", "CmpEq", "JumpIfFalse g2"] + p2is(0, "gz") + stand(56, ax, ay, 2) + ["Jump gz", "g2:"] +
+          p2is(8, "g3") + stand(58, 144, 136, 2) + ["Jump gz", "g3:"] + stand(56, 144, 136, 2) + ["gz:"])
+    a += (["PushActiveCharIndex", "PushByte 4", "CmpEq", "JumpIfFalse h1", f"SetEntityPositionInstant 0, {ax}, {ay}", "SetEntityFacing 0, 2"] +
+          p2is(5, "hz") + stand(72, bx, by, 1) + ["Jump hz", "h1:",
+           "PushActiveCharIndex", "PushByte 5", "CmpEq", "JumpIfFalse h2", f"SetEntityPositionInstant 0, {ax}, {ay}", "SetEntityFacing 0, 2"] +
+          p2is(4, "hz") + stand(176, bx, by, 1) + ["Jump hz", "h2:"] +
+          p2is(4, "h3") + stand(176, ax, ay, 2) + ["h3:"] + p2is(5, "hz") + stand(72, ax, ay, 2) + ["hz:"])
+    a += ["FadeFromWhite 120", "PushActiveCharIndex", "PushByte 1", "CmpEq", "JumpIfFalse o1", f"PushByte {L('peace')}", "END", "o1:",
+          f"PushByte {L('relax')}", "END"]
+    script(a, "back on the Lookout's edge, 18 gone; who stands by who plays; player 1 Piccolo opens with his own line (next but two)")
+    label("relax")
+    text(250, "Finally...  some time to relax.\\x0bNo more enemies to fight!")
+    script(["SetEntityFacing 103, 0"], "Piccolo's actor answers (player 1 is not Piccolo here)")
+    label("peace")
     text(90, "PICCOLO: Peace...  for now.")
-    stockseq(WISH, 75, 86, "the goodbyes: Tien and Yamcha leave, Piccolo stays, \"Goodbye Gohan!  Be sure to visit!\"")
+    stockseq(WISH, 75, 77, "the goodbyes: \"Well it's about time I get going.\", \"Yeah, same here.\"")
+    script(["WalkToPosition 121, 76, 96", "SetEntityFacing 121, 3"] + gohan_faces(2), "Tien steps toward Gohan, who looks at him")
+    stock(WISH, 78, "\"You take good care of your mother Gohan!  You're the man of the house now!\"")
+    script(["PlayAudio 26", "BeginCommandBatch", "FlyToPosition 121, 88, 192", "DespawnEntity 121", "FlyToPosition 156, 176, 192", "DespawnEntity 156",
+            "CommitCommandBatch", "PlayAudio 26", "BeginCommandBatch",
+            "CoopCall 22, 2, 137, 0", "JumpIfFalse v1", "FlyToPosition 137, 200, 192", "DespawnEntity 137", "v1:",
+            "CoopCall 22, 2, 132, 0", "JumpIfFalse t1", "FlyToPosition 132, 232, 192", "DespawnEntity 132", "t1:",
+            "CommitCommandBatch"], "stock entry 79: Tien and Yamcha, then Vegeta and Trunks fly off (their actors: a player who is one of them stays)")
+    stock(WISH, 80, "\"Will you be staying here Piccolo?\"")
+    script(["CoopCall 22, 2, 103, 0", "JumpIfFalse p1", "SetEntityFacing 103, 0", "Jump p2", "p1:", "SetEntityFacing 0, 0", "p2:", "WaitFrames 30"],
+           "stock entry 81: Piccolo (the actor, or player 1) turns")
+    stockseq(WISH, 82, 84, "\"Yes.\", \"Goodbye Gohan!  Be sure to visit!\"")
+    script(gohan_faces(2), "stock entry 85: Gohan turns to Dende")
+    stock(WISH, 86, "\"Goodbye!\"")
     text(46, "DENDE: Talk to me if you want to discuss our times of peace!")
     script([f"SetStoryFlag {F_FINALE}", "FadeOut 120", "WarpToMapWithEntities 9, 1, 1, 792, 544", "SetPlayerVisible 1"],
            "the finale is seen: from now on Dende asks about Buu's Fury")
@@ -202,6 +253,13 @@ out += ["",
         "    StackTestStoryFlagNot 483",
         "    And",
         "    END",
-        "end"]
+        "end",
+        "",
+        "; the Lookout's edge (zone 9 area 7): in the finale (382) the actor of the character player 1 plays does not stand: player 1 takes its spot",
+        "; (two Piccolos stood there, and a step on a sprite the player shows could find the player). In the wish scene Gohan is player 1."]
+for nm, slot in (("piccolo", 1), ("vegeta", 2), ("trunks", 3), ("krillin", 6)):
+    out += ["script pg_stand_" + nm, "    StackTestStoryFlagNot 382", "    PushActiveCharIndex", f"    PushByte {slot}", "    CmpNe",
+            "    Not                            ; the VM's 0x05 is a binary OR (docs/scripts.md 2.1): not the finale, or player 1 is someone else", "    END", "end", ""]
+out.pop()
 open("data/story/postgame.lscript", "w", encoding="utf-8", newline="\n").write("\n".join(out) + "\n")
 print(len(out), "lines", labels)

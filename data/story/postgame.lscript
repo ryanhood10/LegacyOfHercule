@@ -7,7 +7,7 @@ sequence pg_dende
   script                                 ; which part of the post-game (the wishes keep the party: CoopCall 10)
         StackTestStoryFlag 483
         JumpIfFalse L1
-        PushByte 83
+        PushByte 85
         END
       L1:
         StackTestStoryFlag 382
@@ -95,7 +95,7 @@ sequence pg_dende
   stop 0x0
   text 46 "DENDE: That power in the Arctic...  someone has to stop it!"
   stop 0x0
-  script                                 ; back on the Lookout's edge, 18 gone
+  script                                 ; back on the Lookout's edge, 18 gone; who stands by who plays; player 1 Piccolo opens with his own line (next but two)
         FadeOut 120
         SetPlayerVisible 0
         WarpToMapNoEntities 9, 7, 1, 144, 136
@@ -103,10 +103,208 @@ sequence pg_dende
         DisableLayer 1
         DespawnEntity 11
         SetEntityFacing 36, 3
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse s1
+        SetEntityPositionInstant 0, 168, 112
+        SetEntityFacing 0, 2
+      s1:
+        PushActiveCharIndex
+        PushByte 2
+        CmpEq
+        JumpIfFalse s2
+        SetEntityPositionInstant 0, 176, 72
+        SetEntityFacing 0, 2
+      s2:
+        PushActiveCharIndex
+        PushByte 3
+        CmpEq
+        JumpIfFalse s3
+        SetEntityPositionInstant 0, 200, 96
+        SetEntityFacing 0, 2
+      s3:
+        PushActiveCharIndex
+        PushByte 6
+        CmpEq
+        JumpIfFalse s6
+        SetEntityPositionInstant 0, 56, 112
+        SetEntityFacing 0, 3
+      s6:
+        PushActiveCharIndex
+        PushByte 0
+        CmpEq
+        JumpIfFalse g1
+        CoopCall 8, 0, 0, 0
+        PushByte 8
+        CmpEq
+        JumpIfFalse gz
+        SpawnCharacterEntity 58, 172, 144
+        SetEntityFacing 58, 2
+        Jump gz
+      g1:
+        PushActiveCharIndex
+        PushByte 8
+        CmpEq
+        JumpIfFalse g2
+        CoopCall 8, 0, 0, 0
+        PushByte 0
+        CmpEq
+        JumpIfFalse gz
+        SpawnCharacterEntity 56, 172, 144
+        SetEntityFacing 56, 2
+        Jump gz
+      g2:
+        CoopCall 8, 0, 0, 0
+        PushByte 8
+        CmpEq
+        JumpIfFalse g3
+        SpawnCharacterEntity 58, 144, 136
+        SetEntityFacing 58, 2
+        Jump gz
+      g3:
+        SpawnCharacterEntity 56, 144, 136
+        SetEntityFacing 56, 2
+      gz:
+        PushActiveCharIndex
+        PushByte 4
+        CmpEq
+        JumpIfFalse h1
+        SetEntityPositionInstant 0, 172, 144
+        SetEntityFacing 0, 2
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpEq
+        JumpIfFalse hz
+        SpawnCharacterEntity 72, 204, 136
+        SetEntityFacing 72, 1
+        Jump hz
+      h1:
+        PushActiveCharIndex
+        PushByte 5
+        CmpEq
+        JumpIfFalse h2
+        SetEntityPositionInstant 0, 172, 144
+        SetEntityFacing 0, 2
+        CoopCall 8, 0, 0, 0
+        PushByte 4
+        CmpEq
+        JumpIfFalse hz
+        SpawnCharacterEntity 176, 204, 136
+        SetEntityFacing 176, 1
+        Jump hz
+      h2:
+        CoopCall 8, 0, 0, 0
+        PushByte 4
+        CmpEq
+        JumpIfFalse h3
+        SpawnCharacterEntity 176, 172, 144
+        SetEntityFacing 176, 2
+      h3:
+        CoopCall 8, 0, 0, 0
+        PushByte 5
+        CmpEq
+        JumpIfFalse hz
+        SpawnCharacterEntity 72, 172, 144
+        SetEntityFacing 72, 2
+      hz:
         FadeFromWhite 120
-  text 1 "Finally...  some time to relax.\x0bNo more enemies to fight!"
+        PushActiveCharIndex
+        PushByte 1
+        CmpEq
+        JumpIfFalse o1
+        PushByte 68
+        END
+      o1:
+        PushByte 66
+        END
+  text 250 "Finally...  some time to relax.\x0bNo more enemies to fight!"
+  script                                 ; Piccolo's actor answers (player 1 is not Piccolo here)
+        SetEntityFacing 103, 0
   text 90 "PICCOLO: Peace...  for now."
-  stockseq @083dd044 75 86    ; the goodbyes: Tien and Yamcha leave, Piccolo stays, "Goodbye Gohan!  Be sure to visit!"
+  stockseq @083dd044 75 77    ; the goodbyes: "Well it's about time I get going.", "Yeah, same here."
+  script                                 ; Tien steps toward Gohan, who looks at him
+        WalkToPosition 121, 76, 96
+        SetEntityFacing 121, 3
+        PushActiveCharIndex
+        PushByte 0
+        CmpEq
+        JumpIfFalse gf1
+        SetEntityFacing 0, 2
+        Jump gf9
+      gf1:
+        PushActiveCharIndex
+        PushByte 8
+        CmpEq
+        JumpIfFalse gf2
+        SetEntityFacing 0, 2
+        Jump gf9
+      gf2:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse gf3
+        SetEntityFacing 56, 2
+      gf3:
+        CoopCall 22, 2, 58, 0
+        JumpIfFalse gf9
+        SetEntityFacing 58, 2
+      gf9:
+  stock @083dcdc4    ; "You take good care of your mother Gohan!  You're the man of the house now!"
+  script                                 ; stock entry 79: Tien and Yamcha, then Vegeta and Trunks fly off (their actors: a player who is one of them stays)
+        PlayAudio 26
+        BeginCommandBatch
+        FlyToPosition 121, 88, 192
+        DespawnEntity 121
+        FlyToPosition 156, 176, 192
+        DespawnEntity 156
+        CommitCommandBatch
+        PlayAudio 26
+        BeginCommandBatch
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse v1
+        FlyToPosition 137, 200, 192
+        DespawnEntity 137
+      v1:
+        CoopCall 22, 2, 132, 0
+        JumpIfFalse t1
+        FlyToPosition 132, 232, 192
+        DespawnEntity 132
+      t1:
+        CommitCommandBatch
+  stock @083dce54    ; "Will you be staying here Piccolo?"
+  script                                 ; stock entry 81: Piccolo (the actor, or player 1) turns
+        CoopCall 22, 2, 103, 0
+        JumpIfFalse p1
+        SetEntityFacing 103, 0
+        Jump p2
+      p1:
+        SetEntityFacing 0, 0
+      p2:
+        WaitFrames 30
+  stockseq @083dd044 82 84    ; "Yes.", "Goodbye Gohan!  Be sure to visit!"
+  script                                 ; stock entry 85: Gohan turns to Dende
+        PushActiveCharIndex
+        PushByte 0
+        CmpEq
+        JumpIfFalse gf1
+        SetEntityFacing 0, 2
+        Jump gf9
+      gf1:
+        PushActiveCharIndex
+        PushByte 8
+        CmpEq
+        JumpIfFalse gf2
+        SetEntityFacing 0, 2
+        Jump gf9
+      gf2:
+        CoopCall 22, 2, 56, 0
+        JumpIfFalse gf3
+        SetEntityFacing 56, 2
+      gf3:
+        CoopCall 22, 2, 58, 0
+        JumpIfFalse gf9
+        SetEntityFacing 58, 2
+      gf9:
+  stock @083dcece    ; "Goodbye!"
   text 46 "DENDE: Talk to me if you want to discuss our times of peace!"
   script                                 ; the finale is seen: from now on Dende asks about Buu's Fury
         SetStoryFlag 483
@@ -122,10 +320,10 @@ sequence pg_dende
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 88
+        PushByte 90
         END
       L1:
-        PushByte 86
+        PushByte 88
         END
   text 46 "DENDE: Okay.  Come talk to me when you're ready!"
   stop 0x0
@@ -137,10 +335,10 @@ sequence pg_dende
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 91
+        PushByte 93
         END
       L1:
-        PushByte 86
+        PushByte 88
         END
   script                                 ; stock entry 0 of the talk show without the walk to its door; Hercule is the guest (player 1 from here to the title screen)
         SetPlayerVisible 0
@@ -201,5 +399,43 @@ script pg_finale_cond
     StackTestStoryFlag 382
     StackTestStoryFlagNot 483
     And
+    END
+end
+
+; the Lookout's edge (zone 9 area 7): in the finale (382) the actor of the character player 1 plays does not stand: player 1 takes its spot
+; (two Piccolos stood there, and a step on a sprite the player shows could find the player). In the wish scene Gohan is player 1.
+script pg_stand_piccolo
+    StackTestStoryFlagNot 382
+    PushActiveCharIndex
+    PushByte 1
+    CmpNe
+    Not                            ; the VM's 0x05 is a binary OR (docs/scripts.md 2.1): not the finale, or player 1 is someone else
+    END
+end
+
+script pg_stand_vegeta
+    StackTestStoryFlagNot 382
+    PushActiveCharIndex
+    PushByte 2
+    CmpNe
+    Not                            ; the VM's 0x05 is a binary OR (docs/scripts.md 2.1): not the finale, or player 1 is someone else
+    END
+end
+
+script pg_stand_trunks
+    StackTestStoryFlagNot 382
+    PushActiveCharIndex
+    PushByte 3
+    CmpNe
+    Not                            ; the VM's 0x05 is a binary OR (docs/scripts.md 2.1): not the finale, or player 1 is someone else
+    END
+end
+
+script pg_stand_krillin
+    StackTestStoryFlagNot 382
+    PushActiveCharIndex
+    PushByte 6
+    CmpNe
+    Not                            ; the VM's 0x05 is a binary OR (docs/scripts.md 2.1): not the finale, or player 1 is someone else
     END
 end

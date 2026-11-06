@@ -31,6 +31,27 @@
     },
     {
       "map": {
+        "zone": 9,
+        "area": 7
+      },
+      "_": "the Lookout's edge: in the finale the actor of the character player 1 plays does not stand (player 1 takes its spot)",
+      "records": {
+        "1": {
+          "condition": "script:pg_stand_piccolo"
+        },
+        "2": {
+          "condition": "script:pg_stand_trunks"
+        },
+        "4": {
+          "condition": "script:pg_stand_vegeta"
+        },
+        "6": {
+          "condition": "script:pg_stand_krillin"
+        }
+      }
+    },
+    {
+      "map": {
         "zone": 6,
         "area": 99
       },

@@ -32,6 +32,7 @@ These are not staging taste; they are wrong pictures. All three are in the endin
    Krillins (`pga/zoom_pga.png`). In both, Gohan's stock lines ("Will you be staying here Piccolo?", "Goodbye!") and the
    lines to him ("You take good care of your mother Gohan!", "Goodbye Gohan!  Be sure to visit!") play with no Gohan on
    the map. As Vegeta the opening line is out of voice. Scene 5.5 has the rework.
+   **Fixed (`nb-cs3`, 2026-11-06):** scene 5.5, "Built".
 3. **Player 1's own text box hides him in the rage before Super Saiyan 2.** Gohan stands in the top third of the view
    and his lines open at the top: for "You loved life!...", "I just let you die!" and "I won't watch this ANYMORE!!!!!!"
    the box sits on his body (`head/sheet_head_00.png`, first row). Fixed by the reframing in scene 3.6.
@@ -614,6 +615,17 @@ One line when talked to before Super 13 is beaten. **Leave.**
   5. Small moves on the stock lines: Tien steps to Gohan for "man of the house"; the two pairs fly off in different
      directions (stock); Vegeta, when an actor, has his back turned through the goodbyes and leaves last without
      turning; Piccolo walks to the rim after "Yes." and looks out.
+- **Built (`nb-cs3`, 2026-11-06; `gen_postgame.py` "finale", `postgame.json` zone 9 area 7):** the four stock party actors' records carry a
+  condition (`pg_stand_*`: not in the finale, or player 1 is someone else), so player 1 on Piccolo, Vegeta, Trunks or Krillin stands on that
+  actor's spot and there is one of him; Gohan is an actor on his stock spot unless player 1 plays a Gohan (kept for the plot); player 1 as
+  Goku or Hercule stands beside him; player 2 has no entity here, so his stock actor is his body, and as Goku (176), Hercule (72) or the
+  other Gohan (56 / 58) an actor stands beside the group (Ryan's decision: players present stand). The opening line is `text 250`
+  (player 1's own portrait, never the lead's); player 1 Piccolo skips it and opens with "PICCOLO: Peace...  for now."; Vegeta says the line
+  as written (no variant, decided). Tien steps toward Gohan for "man of the house"; Vegeta and Trunks fly off as actors only (a player who is
+  one of them stays); the facings of entries 81 / 85 go to the body that is there. No `SetActiveCharacter`, no flag but 483.
+  **Research corrections:** the VM's `Not` is a binary OR (`docs/scripts.md` 2.1), so a record condition is written `A; B; Not`; `DespawnEntity`
+  on a sprite player 1 shows was not used (it could find the player): conditions on the records instead. Speaker 1 would have shown the
+  lead (Gohan) once his actor stands, hence 250. Test: `staging_postgame.txt` `fin_*`, 18 lineups (sprite records, the map, flags, who plays).
 - **Risks:** the scene starts from an arrival trigger with player 2's entity alive on area 1, then warps without
   entities; the party is not switched (no `CoopCall 10` here): do not add `SetActiveCharacter`. A sprite step on a
   despawned actor is a null write: guard every later step on 103 / 76 / 137 / 132 with `CoopCall 22, 2, sprite, 0` (the
