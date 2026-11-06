@@ -847,6 +847,8 @@ with the second baby looking back. It is already what this document asks of the 
 
 **State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), 3.1 in part (item 7), and of item 8 the charge of 3.4, the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 4.1, 4.7 and the rest of 3.1 / 4.2 / 4.5 (the HUD is still shown at the generators).**
 
+**State (2026-11-06, branch `nb-cs4`):** built 3.5 beats 1-2, 1.1, 1.2, 1.5, 1.6 (beats 1-3), 1.8 (beat 2, the landing), 2.2, 2.3 (beats 1-2 and the end's shake), 4.1 (the rest: the HUD, Gero's palm, 13's punch), 4.7 (beats 2-4); 1.3's beats 3-4 were already played by Cine (`nb-cs1`'s second commit). Not built: 1.8 beats 1, 3, 4 (no faithful film route yet), 4.7's rises, 2.4, the rest of 3.1 / 4.5 (each note says why).
+
 Measured on the build (A pressed every 100 frames, so each figure is good to about 2 s; `perf` on the two heaviest): 1.7 +14 s, 1.3 +5 s,
 3.5 +7 s (the entrance and the debut), 3.6 +3.5 s, 4.6 +9 s (13 s of fight in place of a 2 s fade), 4.4 +2 s, 3.2 3.5 s shorter. Gohan's death in
 the rain: 12 OBJs at most, no scanline cut, no lagged frame; the road's montage: 20 entities, 11 OBJs, none cut. Every added second is action:
