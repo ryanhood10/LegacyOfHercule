@@ -102,6 +102,24 @@ echo EXPECT 0203ed52: 01
 peek8 0x0203ED52 1
 echo EXPECT 0203ed2c: c4
 peek8 0x0203ED2C 1
+key 1 6
+frames 20
+key 1 6
+frames 20
+key 1 6
+waitnz ST+8 3000
+frames 2
+ents
+shot a4_cel
+frames 8
+shot a5_hop
+frames 50
+shot a6_held
+echo the fight is won: Piccolo celebrates (docs/tournament.md 28): his cheer (group 4, standing 0x80), one winner, hopped 6 px
+echo EXPECT 0203ed2c: 84
+peek8 0x0203ED2C 1
+echo EXPECT [0-9a-f]{8}: 01 06 01
+peek8 ST+8 3
 stepz 0x0203ECFD 250
 frames 30
 map
@@ -155,7 +173,12 @@ waitnz ST+4 3000
 frames 24
 ents
 shot b1_line0
-echo line 0: Mecha Frieza opens (upper right): King Cold below him looks up, player 2 looks right
+echo four boxes (docs/tournament.md 28): Mecha Frieza opens, King Cold and Piccolo their new exchange, player 2 (Hercule) last
+echo line 0: Mecha Frieza (upper right) to his partner below: King Cold looks up, player 2 looks right
+deref O0 0x0203EC2C
+echo Mecha Frieza faces down, to King Cold
+echo EXPECT [0-9a-f]{8}: 00
+peek8 O0+0x10 1
 deref O1 0x0203EC30
 echo King Cold faces up, to his partner
 echo EXPECT [0-9a-f]{8}: 01
@@ -173,7 +196,35 @@ key 1 6
 frames 30
 ents
 shot b2_line1
-echo line 1: Piccolo answers (upper left): player 2 below him looks up, both opponents look left
+echo line 1: King Cold (lower right) to Piccolo: Mecha Frieza looks down at him, the players look right
+deref O1 0x0203EC30
+echo King Cold faces left, to Piccolo
+echo EXPECT [0-9a-f]{8}: 02
+peek8 O1+0x10 1
+deref O0 0x0203EC2C
+echo Mecha Frieza faces down
+echo EXPECT [0-9a-f]{8}: 00
+peek8 O0+0x10 1
+deref PA 0x03001FA8
+echo Piccolo faces right
+echo EXPECT [0-9a-f]{8}: 03
+peek8 PA+0x10 1
+deref PB 0x0203FF08
+echo player 2 faces right
+echo EXPECT [0-9a-f]{8}: 03
+peek8 PB+0x10 1
+echo EXPECT [0-9a-f]{8}: 02 00 00 0[0-2]
+peek8 ST+4 4
+frames 70
+key 1 6
+frames 30
+ents
+shot b3_line2
+echo line 2: Piccolo (upper left) answers, to his partner who speaks next: player 2 below looks up, both opponents look left
+deref PA 0x03001FA8
+echo Piccolo faces down, to player 2
+echo EXPECT [0-9a-f]{8}: 00
+peek8 PA+0x10 1
 deref PB 0x0203FF08
 echo player 2 faces up, to his partner
 echo EXPECT [0-9a-f]{8}: 01
@@ -186,9 +237,22 @@ deref O1 0x0203EC30
 echo King Cold faces left
 echo EXPECT [0-9a-f]{8}: 02
 peek8 O1+0x10 1
-echo EXPECT [0-9a-f]{8}: 02 00 00 0[0-2]
+frames 70
+key 1 6
+frames 30
+ents
+shot b4_line3
+echo line 3: player 2 has the last word, to Piccolo: Piccolo looks down at him
+deref PB 0x0203FF08
+echo player 2 faces up, to Piccolo
+echo EXPECT [0-9a-f]{8}: 01
+peek8 PB+0x10 1
+deref PA 0x03001FA8
+echo Piccolo faces down
+echo EXPECT [0-9a-f]{8}: 00
+peek8 PA+0x10 1
+echo EXPECT [0-9a-f]{8}: 04 00 00 0[0-4]
 peek8 ST+4 4
-echo (the box of Piccolo's line went to the bottom: he stands in the view's upper part)
 stepz 0x0203ECFD 250
 frames 30
 map
@@ -203,6 +267,9 @@ peek8 0x0203ED52 1
 echo the staging's counts (a won 2 v 2: the champions hopped): lines, the announcer's lines, the highest hop, boxes at the bottom
 echo EXPECT [0-9a-f]{8}: [0-9a-f]{2} [0-9a-f]{2} 06
 peek8 ST+4 4
+echo every fight's winners celebrated, two at a time (the celebrations, the highest hop, the bodies posed)
+echo EXPECT [0-9a-f]{8}: 0[1-9a-f] 06 ([0-9a-f][02468ace])
+peek8 ST+8 3
 echo === C. 2P co-op 1 v 1: the turns, the duel final's talk (player 2 opens, player 1 answers), player 2 the champion
 load menu.ss
 p2 0
@@ -559,6 +626,20 @@ shot i1_call
 echo after Start and A: one line staged, the call is up
 echo EXPECT [0-9a-f]{8}: 01 01
 peek8 ST+4 2
+key 1 6
+frames 20
+key 1 6
+frames 20
+key 1 6
+waitnz ST+8 3000
+frames 12
+ents
+shot i2_cel
+echo the fight is lost: the opponent standing celebrates (his own pose, standing 0x80), hopping
+echo EXPECT 0203ed2c: 8[0-9a-f]
+peek8 0x0203ED2C 1
+echo EXPECT [0-9a-f]{8}: 01 0[4-6] 01
+peek8 ST+8 3
 stepz 0x0203ECFD 250
 frames 30
 map
@@ -573,6 +654,1559 @@ peek8 0x0203ED52 1
 echo the staging's counts (lost: the winner's line, the result call, no hop): lines, the announcer's lines, the highest hop, boxes at the bottom
 echo EXPECT [0-9a-f]{8}: 0[1-9a-f] 0[2-9a-f] 00
 peek8 ST+4 4
+echo === K. 1P Rookie 1 v 1 as Android 16: his drawn raised fist (group 0x3F), hopping, then held
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x3
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 23
+frames 10
+poke32 0x0203FD0C 0x2a
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 21
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x1e
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 40
+frames 10
+poke32 0x0203FD0C 0x5
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+find ST 0x47415453
+flags +421
+poke32 0x0203FD0C 0x0
+poke32 0x0203FD54 0xff39
+poke32 0x0203FD08 25
+frames 10
+stepnz 0x0203ED16 40
+ents
+shot k1_posed
+echo EXPECT 0203ed2c: bf
+peek8 0x0203ED2C 1
+stepz 0x0203ECFD 300
+frames 30
+map
+ents
+shot k_end
+echo EXPECT map zone 15 area 15
+map
+echo EXPECT 0203ec04: 00
+peek8 0x0203EC04 1
+echo EXPECT 0203ed52: 00
+peek8 0x0203ED52 1
+echo the staging's counts (16 won): lines, the announcer's lines, the highest hop, boxes at the bottom
+echo EXPECT [0-9a-f]{8}: [0-9a-f]{2} [0-9a-f]{2} 06
+peek8 ST+4 4
+echo === L. the pre-fight talk in 2 v 2: both members of each side speak (test command 31)
+load menu.ss
+p2 off
+maptest 13
+frames 300
+echo l1: a team and team-vs-team history: Mecha Frieza & King Cold vs Goku & Vegeta (a new exchange, two boxes)
+poke32 0x0203FD0C 0x403
+poke32 0x0203FD54 0x3537
+poke32 0x0203FD08 31
+frames 10
+frames 20
+find TK 0x4b4c4154
+echo EXPECT [0-9a-f]{8}: 02
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x3d 1
+frames 70
+shot l1_0
+key 1 6
+frames 70
+shot l1_1
+key 1 6
+frames 60
+echo l2: a rival across, the partners around it: Mecha Frieza & Yamcha vs Goku & Piccolo (Mecha opens, Yamcha and Goku, Piccolo last)
+poke32 0x0203FD0C 0x3
+poke32 0x0203FD54 0x3437
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 04
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x3d 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x49 1
+echo EXPECT [0-9a-f]{8}: 11
+peek8 TK+0x55 1
+frames 70
+shot l2_0
+key 1 6
+frames 70
+shot l2_1
+key 1 6
+frames 70
+shot l2_2
+key 1 6
+frames 70
+shot l2_3
+key 1 6
+frames 60
+echo l3: no history: Yamu & Tao (both open) vs Vegeta & Hercule (their new team lines, Hercule first)
+poke32 0x0203FD0C 0x709
+poke32 0x0203FD54 0x3835
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 04
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x3d 1
+echo EXPECT [0-9a-f]{8}: 11
+peek8 TK+0x49 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x55 1
+frames 70
+shot l3_0
+key 1 6
+frames 70
+shot l3_1
+key 1 6
+frames 70
+shot l3_2
+key 1 6
+frames 70
+shot l3_3
+key 1 6
+frames 60
+echo l4: the same fighter twice answers once: Yamu & Tao vs Piccolo & Piccolo
+poke32 0x0203FD0C 0x709
+poke32 0x0203FD54 0x3434
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 03
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x3d 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x49 1
+frames 70
+shot l4_0
+key 1 6
+frames 70
+shot l4_1
+key 1 6
+frames 70
+shot l4_2
+key 1 6
+frames 60
+echo l5: a three-box team: Android 16 & 17 vs Yamcha & Tien (their team lines do not fit: Yamcha answers alone)
+poke32 0x0203FD0C 0x1013
+poke32 0x0203FD54 0x100
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 04
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x3d 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x49 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x55 1
+frames 70
+shot l5_0
+key 1 6
+frames 70
+shot l5_1
+key 1 6
+frames 70
+shot l5_2
+key 1 6
+frames 70
+shot l5_3
+key 1 6
+frames 60
+echo l6: 1 v 1, a new rival exchange: Android 17 vs your Android 16 (17 opens)
+poke32 0x0203FD0C 0xff10
+poke32 0x0203FD54 0xff39
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 02
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x3d 1
+frames 70
+shot l6_0
+key 1 6
+frames 70
+shot l6_1
+key 1 6
+frames 60
+echo l7: a challenger pair against one player: Goten & Kid Trunks vs Krillin (their team lines, Krillin answers)
+poke32 0x0203FD0C 0x2625
+poke32 0x0203FD54 0xff33
+poke32 0x0203FD08 31
+frames 10
+frames 20
+echo EXPECT [0-9a-f]{8}: 03
+peek8 TK+0x58 1
+echo EXPECT [0-9a-f]{8}: 00
+peek8 TK+0x31 1
+echo EXPECT [0-9a-f]{8}: 01
+peek8 TK+0x3d 1
+echo EXPECT [0-9a-f]{8}: 10
+peek8 TK+0x49 1
+frames 70
+shot l7_0
+key 1 6
+frames 70
+shot l7_1
+key 1 6
+frames 70
+shot l7_2
+key 1 6
+frames 60
+echo === M. every tournament body's win pose: a group the record has, every frame drawable; posed, hopping, held
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x9c
+poke32 0x0203FD08 38
+frames 10
+echo sprite 156: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xeb
+poke32 0x0203FD08 38
+frames 10
+echo sprite 235: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x79
+poke32 0x0203FD08 38
+frames 10
+echo sprite 121: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xec
+poke32 0x0203FD08 38
+frames 10
+echo sprite 236: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x30
+poke32 0x0203FD08 38
+frames 10
+echo sprite 48: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xed
+poke32 0x0203FD08 38
+frames 10
+echo sprite 237: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x31
+poke32 0x0203FD08 38
+frames 10
+echo sprite 49: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xee
+poke32 0x0203FD08 38
+frames 10
+echo sprite 238: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xb9
+poke32 0x0203FD08 38
+frames 10
+echo sprite 185: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x48
+poke32 0x0203FD08 38
+frames 10
+echo sprite 72: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xba
+poke32 0x0203FD08 38
+frames 10
+echo sprite 186: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x32
+poke32 0x0203FD08 38
+frames 10
+echo sprite 50: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xef
+poke32 0x0203FD08 38
+frames 10
+echo sprite 239: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc3
+poke32 0x0203FD08 38
+frames 10
+echo sprite 195: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc4
+poke32 0x0203FD08 38
+frames 10
+echo sprite 196: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xbb
+poke32 0x0203FD08 38
+frames 10
+echo sprite 187: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xbc
+poke32 0x0203FD08 38
+frames 10
+echo sprite 188: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xbd
+poke32 0x0203FD08 38
+frames 10
+echo sprite 189: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc
+poke32 0x0203FD08 38
+frames 10
+echo sprite 12: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xe
+poke32 0x0203FD08 38
+frames 10
+echo sprite 14: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xa5
+poke32 0x0203FD08 38
+frames 10
+echo sprite 165: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xf0
+poke32 0x0203FD08 38
+frames 10
+echo sprite 240: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x9
+poke32 0x0203FD08 38
+frames 10
+echo sprite 9: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xf1
+poke32 0x0203FD08 38
+frames 10
+echo sprite 241: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xb
+poke32 0x0203FD08 38
+frames 10
+echo sprite 11: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xf2
+poke32 0x0203FD08 38
+frames 10
+echo sprite 242: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x1c
+poke32 0x0203FD08 38
+frames 10
+echo sprite 28: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xa0
+poke32 0x0203FD08 38
+frames 10
+echo sprite 160: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+echo Android 16: the drawn raised fist (0x3f), held on its second frame
+echo EXPECT 0203fd0c: 3f 01 02 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x1d
+poke32 0x0203FD08 38
+frames 10
+echo sprite 29: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x1e
+poke32 0x0203FD08 38
+frames 10
+echo sprite 30: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xf3
+poke32 0x0203FD08 38
+frames 10
+echo sprite 243: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x1f
+poke32 0x0203FD08 38
+frames 10
+echo sprite 31: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x22
+poke32 0x0203FD08 38
+frames 10
+echo sprite 34: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xf4
+poke32 0x0203FD08 38
+frames 10
+echo sprite 244: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xa6
+poke32 0x0203FD08 38
+frames 10
+echo sprite 166: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x9f
+poke32 0x0203FD08 38
+frames 10
+echo sprite 159: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xaa
+poke32 0x0203FD08 38
+frames 10
+echo sprite 170: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xb4
+poke32 0x0203FD08 38
+frames 10
+echo sprite 180: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd8
+poke32 0x0203FD08 38
+frames 10
+echo sprite 216: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xdb
+poke32 0x0203FD08 38
+frames 10
+echo sprite 219: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xdc
+poke32 0x0203FD08 38
+frames 10
+echo sprite 220: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xdd
+poke32 0x0203FD08 38
+frames 10
+echo sprite 221: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x9e
+poke32 0x0203FD08 38
+frames 10
+echo sprite 158: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xde
+poke32 0x0203FD08 38
+frames 10
+echo sprite 222: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xcd
+poke32 0x0203FD08 38
+frames 10
+echo sprite 205: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc5
+poke32 0x0203FD08 38
+frames 10
+echo sprite 197: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd1
+poke32 0x0203FD08 38
+frames 10
+echo sprite 209: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd2
+poke32 0x0203FD08 38
+frames 10
+echo sprite 210: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc6
+poke32 0x0203FD08 38
+frames 10
+echo sprite 198: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc8
+poke32 0x0203FD08 38
+frames 10
+echo sprite 200: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc9
+poke32 0x0203FD08 38
+frames 10
+echo sprite 201: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xcb
+poke32 0x0203FD08 38
+frames 10
+echo sprite 203: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xc7
+poke32 0x0203FD08 38
+frames 10
+echo sprite 199: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xca
+poke32 0x0203FD08 38
+frames 10
+echo sprite 202: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd0
+poke32 0x0203FD08 38
+frames 10
+echo sprite 208: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xcc
+poke32 0x0203FD08 38
+frames 10
+echo sprite 204: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd3
+poke32 0x0203FD08 38
+frames 10
+echo sprite 211: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd7
+poke32 0x0203FD08 38
+frames 10
+echo sprite 215: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd6
+poke32 0x0203FD08 38
+frames 10
+echo sprite 214: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x39
+poke32 0x0203FD08 38
+frames 10
+echo sprite 57: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xa1
+poke32 0x0203FD08 38
+frames 10
+echo sprite 161: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x67
+poke32 0x0203FD08 38
+frames 10
+echo sprite 103: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x89
+poke32 0x0203FD08 38
+frames 10
+echo sprite 137: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x87
+poke32 0x0203FD08 38
+frames 10
+echo sprite 135: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x3c
+poke32 0x0203FD08 38
+frames 10
+echo sprite 60: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xaf
+poke32 0x0203FD08 38
+frames 10
+echo sprite 175: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+echo Android 16: the drawn raised fist (0x3f), held on its second frame
+echo EXPECT 0203fd0c: 3f 01 02 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0x3a
+poke32 0x0203FD08 38
+frames 10
+echo sprite 58: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xce
+poke32 0x0203FD08 38
+frames 10
+echo sprite 206: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xcf
+poke32 0x0203FD08 38
+frames 10
+echo sprite 207: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd4
+poke32 0x0203FD08 38
+frames 10
+echo sprite 212: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd5
+poke32 0x0203FD08 38
+frames 10
+echo sprite 213: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xd9
+poke32 0x0203FD08 38
+frames 10
+echo sprite 217: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x6
+poke32 0x0203FD54 0xda
+poke32 0x0203FD08 38
+frames 10
+echo sprite 218: in the build, frames ok (bit 31 clear), a group (not 0xff)
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+peek8 0x0203FD0C 4
+poke32 0x0203FD0C 0x9c
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xeb
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x79
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xec
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x9c
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xeb
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x79
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xec
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m00a
+frames 40
+ents
+shot m00b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0x30
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xed
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x31
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xee
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x30
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xed
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x31
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xee
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m04a
+frames 40
+ents
+shot m04b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xb9
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x48
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xba
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x32
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xb9
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x48
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xba
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x32
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m08a
+frames 40
+ents
+shot m08b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xef
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc4
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xbb
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xef
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc3
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc4
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xbb
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m12a
+frames 40
+ents
+shot m12b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xbc
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xbd
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xe
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xbc
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xbd
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xe
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m16a
+frames 40
+ents
+shot m16b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xa5
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xf0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x9
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xf1
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xa5
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xf0
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x9
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xf1
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m20a
+frames 40
+ents
+shot m20b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xb
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xf2
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x1c
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xa0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xb
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xf2
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x1c
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xa0
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m24a
+frames 40
+ents
+shot m24b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0x1d
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x1e
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xf3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x1f
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x1d
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x1e
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xf3
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x1f
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m28a
+frames 40
+ents
+shot m28b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0x22
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xf4
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xa6
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x9f
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x22
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xf4
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xa6
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x9f
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m32a
+frames 40
+ents
+shot m32b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xaa
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xb4
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xdb
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xaa
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xb4
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd8
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xdb
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m36a
+frames 40
+ents
+shot m36b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xdc
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xdd
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x9e
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xde
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xdc
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xdd
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x9e
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xde
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m40a
+frames 40
+ents
+shot m40b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xcd
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc5
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd1
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd2
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xcd
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc5
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd1
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd2
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m44a
+frames 40
+ents
+shot m44b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xc6
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xc9
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xcb
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc6
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc8
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc9
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xcb
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m48a
+frames 40
+ents
+shot m48b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xc7
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xca
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xcc
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xc7
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xca
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd0
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xcc
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m52a
+frames 40
+ents
+shot m52b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xd3
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd7
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd6
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x39
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd3
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd7
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd6
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x39
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m56a
+frames 40
+ents
+shot m56b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xa1
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x67
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x89
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x87
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xa1
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x67
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x89
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x87
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m60a
+frames 40
+ents
+shot m60b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0x3c
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xaf
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0x3a
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xce
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x3c
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xaf
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0x3a
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xce
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m64a
+frames 40
+ents
+shot m64b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xcf
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd4
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd5
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+poke32 0x0203FD0C 0xd9
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xcf
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd4
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd5
+poke32 0x0203FD08 38
+frames 10
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xd9
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m68a
+frames 40
+ents
+shot m68b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+poke32 0x0203FD0C 0xda
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 3
+frames 10
+frames 20
+poke32 0x0203FD0C 0x7
+poke32 0x0203FD54 0xda
+poke32 0x0203FD08 38
+frames 10
+frames 4
+shot m72a
+frames 40
+ents
+shot m72b
+poke32 0x0203FD0C 0x8
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 38
+frames 10
+frames 10
+ents
 echo === J. the plaza's welcome (one player): the players turn to the announcer
 load menu.ss
 p2 off
