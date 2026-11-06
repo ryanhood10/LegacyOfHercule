@@ -19,7 +19,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
   in 4.7, 1.8's last two beats, the end beats of 1.6 and 2.3 (each note says why). No line added, changed or moved. Tests extended:
   `staging_ch1` (training, knock-out, spirit, visit), `staging_ch2` (deal, jungle), `staging_ch3` (battle), `staging_ch5`
   (gingertown), `staging_ch6` (kame, island half), `staging_ch8` (Cooler), `cell_staging`, `ch4_staging` (the aftermath);
-  `staging_lib.cine_last` checks a Cine move played. Flags, party and player 2's slot after each changed scene equal the build before.
+  `staging_lib.cine_last` checks a Cine move played. Flags, party and player 2's slot after each changed scene equal the build before. Full regression clean on the branch's
+  head (`regfull.sh`, 98 blocks, a private play ROM, about 40 minutes).
 - **Cutscenes, batch 3: the Cell Games, the post-game, the summit (branch `nb-cs3`; `docs/cutscenes/batch3_games-postgame.md`, each scene's "Built"
   note; one commit a scene).** The defects first: the talk show's guest is Hercule whoever player 1 was; the finale on the Lookout stands whoever
   plays (no doubles, a Gohan for his lines); Gohan is clear of his own boxes before Super Saiyan 2; fight 2's end places Goku and Cell; Android 18 is
