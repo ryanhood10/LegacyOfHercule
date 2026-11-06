@@ -2,7 +2,7 @@ r"""Write tools/headless/staging_ch2.txt and staging_ch3.txt: chapters 2 and 3's
 usage: python tools/headless/staging_ch23_gen.py     (the scripts are committed; rerun this after changing them here)
 Chapter 2: the mansion deal alone as Gohan / Krillin and with both; the jungle's end alone as Piccolo, alone as Hercule and with both.
 Chapter 3: zone 7's cutaway; 19's battlefield alone as Vegeta, alone as Hercule (made Vegeta), both ways round with two players; the landing
-alone (no Hercule: he only becomes selectable) and with player 2's entity handed over from Hercule's actor. Only who is played is in a scene
+alone (no Hercule: he only becomes selectable) and with player 2's entity handed over from Hercule's actor; space, alone and to the duel. Only who is played is in a scene
 (Ryan, 2026-11-05): Piccolo's actor 103 never, Hercule's sprite 72 only on a player (or his hand-over actor with two players at the landing)."""
 from staging_lib import *
 
@@ -95,4 +95,27 @@ for p1, p2, s72 in ((VEGETA, None, 0), (VEGETA, TRUNKS, 1)):
     s.shot(f"c3_{n}_landed")
     s.actors(s72=s72)              # alone he walked off; with two players player 2 is him now
     s.on_map(6, 22)
+# space, Vegeta and his clone (the cutscene pass, 2026-11-06: the blows played by the cinematic helpers): alone to the landing (the fight's end shown,
+# no clone left, Vegeta back in base form on sprite 137); with two players to the duel's start (duel_active, coop2 + 0x25C)
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.begin(f"space {n}", VEGETA, HERCULE if two else None, "", ["poke8 FLAGS+0x3A 3"])
+    s.warp(6, 50, 248, 560, 120)
+    for i, k in enumerate((1, 2, 2, 2, 3, 3, 3)):
+        s.out(f"mash {k} 160", "frames 60")
+        s.shot(f"c3_space{n}_{i}")
+    s.out("ents")
+    if two:
+        s.out("stepnz 0x0203FD5C 60", "frames 60", "echo EXPECT 0203fd5c: 01", "peek8 0x0203FD5C 1")
+        s.shot(f"c3_space{n}_duel")
+        s.out("ents")
+        s.on_map(6, 50)
+    else:
+        for i in range(4):
+            s.out("key 1 6", "frames 60")
+            s.shot(f"c3_space{n}_end{i}")
+        s.end_scene()
+        s.out("frames 60")
+        s.actors(s140=0, s137=1)
+        s.on_map(6, 22)
 s.write("staging_ch3.txt")

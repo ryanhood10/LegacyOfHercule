@@ -7,80 +7,94 @@
 
 ; ---- space (zone 6 area 50): Vegeta and his clone ----------------------------------------------------
 
+; The cutscene pass (2026-11-06, docs/cutscenes/batch1_ch1-4.md 3.2), with the cinematic helpers (CoopCall 37): the same beats and lines,
+; the blows played instead of posed. The two come at each other from the rock's two edges and trade a flurry; the clone is behind him for
+; the two "lucky" blows; Vegeta's blast throws it to the edge; it gets up, powers up and is gold; one blow throws Vegeta across the rock;
+; he is on a knee through the first half of the monologue and on his feet for the second; the long power-up; the stock transformation; a
+; first clash, and the duel (two players) or the fight itself, ended by his blow (one player, in place of two blind flashes). The HUD is
+; hidden until the duel. Player 1's body is Cine's body 0; the clone is an actor (137, then 140).
 sequence ch3_space
   script
         SetPlayerVisible 0
-        SetEntityPositionInstant 0, 248, 560
+        SetEntityPositionInstant 0, 220, 560
         SetEntityFacing 0, 3
-        SpawnCharacterEntity 137, 304, 560
+        SpawnCharacterEntity 137, 340, 560
         SetEntityFacing 137, 2
         SetCharacterLevel 2, 18
         PlayMusic 39
-        SetPlayerVisible 1
         WaitFrames 60
         PlayAudio 50
   text 0 "@^In the deep reaches of space, Vegeta trains against a clone of himself..."
   script
-        WalkToPosition 137, 268, 560
-        SetEntityAnimation 137, 5
-        PlayDamageEffect 0
-        PlaySFX 0, 31
-        SetEntityAnimation 0, 2
-        WaitFrames 20
-        SetEntityAnimation 137, 5
-        PlayDamageEffect 0
-        PlaySFX 0, 31
-        SetEntityAnimation 0, 2
-        WaitFrames 30
+        CoopCall 37, 1, 0, 137
+        CoopCall 37, 6, 45, 0                 ; from the two edges into a flurry at the centre; they break apart
+        WaitFrames 12
+        CoopCall 37, 1, 137, 0
+        CoopCall 37, 4, 5, 0                  ; the clone is behind him
+        CoopCall 37, 5, 0, 0
+        CoopCall 37, 5, 2, 0
+        WaitFrames 24
   text 1 "#VEGETA: Tch...  A lucky shot."
   script
-        SetEntityAnimation 0, 34
-        NPCFireKiBlastAtEntity 0, 137, 100
-        WaitFrames 20
-        PlayDamageEffect 137
-        SetEntityAnimation 137, 2
-        PlaySFX 137, 20
-        FlyToPosition 137, 352, 536
-        ScreenShake 0, 20, 40
-        WhiteFlash 10
-        WaitFrames 40
+        CoopCall 37, 1, 0, 137
+        CoopCall 37, 8, 32, 0                 ; his blast throws the clone to the edge
+        WaitFrames 30
   text 1 "#Pathetic.  You're nothing but a cheap copy, made to keep the real prince sharp.\x0bKnow your place, shadow!"
   script
-        WalkToPosition 137, 312, 560
-        SetEntityFacing 137, 2
-        WaitFrames 40
-        WhiteFlash 20
+        CoopCall 37, 1, 137, 0
+        CoopCall 37, 10, 0, 0                 ; it gets up
+        WaitFrames 20
+        CoopCall 37, 7, 50, 1                 ; its power, and the gold
+        PushVarint 140
+        PushEntityPosition 137
+        PushVarint 65536
+        Div
+        PushEntityPosition 137
+        PushEntityPosition 137
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step SpawnCharacterEntity
         DespawnEntity 137
-        SpawnCharacterEntity 140, 312, 560
-        SetEntityFacing 140, 2
+        CoopCall 37, 11, 140, 0
+        WhiteFlash 20
         WaitFrames 40
   text 106 "CLONE: A copy?  Look again, Prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
   script
-        FlyToPosition 140, 272, 560
-        SetEntityAnimation 140, 5
-        PlayDamageEffect 0
-        SetEntityAnimation 0, 2
-        FlyToPosition 0, 208, 576
-        WhiteFlash 30
-        ScreenShake 0, 30, 60
-        PlaySFX 0, 20
-        WaitFrames 60
-        SetEntityFacing 0, 3
-        SetEntityAnimation 0, 6
-        WaitFrames 60
+        CoopCall 37, 1, 140, 0
+        CoopCall 37, 4, 0, 0                  ; it is on him
+        CoopCall 37, 5, 1, 56                 ; one blow: he is thrown across the rock
+        WaitFrames 40                         ; it stands and waits
+        CoopCall 37, 10, 1, 1                 ; he gets to a knee
+        WaitFrames 20
   text 1 "#VEGETA: Frieza enslaved my race...\x0bThe true prince of all Saiyans was surpassed by a low-class warrior raised on Earth...\x0b...and now a clone, made for paltry training, reaches the legend before me?!"
+  script                                 ; on his feet for the rest
+        CoopCall 37, 1, 0, 140
+        CoopCall 37, 10, 0, 0
   text 1 "#No!  It is in my blood.  This is MY legend...\x0b...and I will take what is mine!"
   script
         SetCharacterFlag_Bit5 2
         SetCharacterFlag_Dynamic 2, 1
+        CoopCall 37, 1, 0, 140
+        CoopCall 37, 7, 80, 2                 ; the long power-up, then the stock transformation
         SetEntityAnimation 0, 35
         SetCharacterTransformation 2, 140
         WhiteFlash 20
   stock @083d1fe8                        ; Vegeta: I'm finally a Super Saiyan!
   stock @083d1fac                        ; You are now playing as Vegeta.
   text 1 "#Only one of us leaves alive, shadow?  So be it!"
-  script
+  script                                 ; two players: a first clash, then the clone is player 2's and the duel starts; one player: the clone stays for the end scene's fight
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse one
+        CoopCall 37, 1, 0, 140
+        CoopCall 37, 6, 24, 0
+        CoopCall 37, 3, 208, 576              ; and he is back on the spot the duel starts from (the stock's)
+        SetEntityFacing 0, 3
+        CoopCall 37, 0, 0, 0
         DespawnEntity 140
+      one:
         PlayMusic 35
         CoopCall 1, -1, 15, seq:ch3_space_end
         SetPlayerVisible 1
@@ -88,7 +102,7 @@ end
 
 ; the duel is over: the winner is Vegeta (player 1's entity; the pads swapped if player 2 won)
 sequence ch3_space_end
-  script                                 ; [0] two players dueled: on to 2; alone: the flash at 1
+  script                                 ; [0] two players dueled: on to 2; alone: the fight at 1
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 2
@@ -96,14 +110,20 @@ sequence ch3_space_end
       L1:
         PushByte 1
         END
-  script                                 ; [1] alone (no duel): the fight happens in a flash
-        WhiteFlash 20
-        PlayAudio 20
-        ScreenShake 0, 20, 50
-        WaitFrames 30
-        WhiteFlash 20
+  script                                 ; [1] alone (no duel): the fight is shown (the stock: two blind flashes): a flurry, and his blow ends it
+        SetPlayerVisible 0
+        CoopCall 37, 1, 0, 140
+        CoopCall 37, 6, 60, 1
+        WaitFrames 10
+        WhiteFlash 8
+        CoopCall 37, 0, 0, 0
+        CoopCall 22, 2, 140, 0
+        JumpIfFalse gone
+        DespawnEntity 140
+      gone:
         PlayAudio 21
-        WaitFrames 50
+        WaitFrames 20
+        SetPlayerVisible 1
   script
         WaitFrames 40
         PlayMusic 39

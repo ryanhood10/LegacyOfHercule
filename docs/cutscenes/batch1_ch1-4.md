@@ -437,6 +437,16 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
   come at the same entry (`CoopCall 1, -1, 15`) with the clone actor despawned first, as today; beat 8's one-player
   branch must fit in the time the two blind flashes take today (about 120 frames), not add to it. Hide the HP bars until the duel.
 - **Size M.** The Short: beats 4 to 7, about 30 seconds, ending on the gold.
+- **Built 2026-11-06 (`nb-cs1`, with Cine): all eight beats, the lines untouched.** They start at the rock's two edges (220 and 340);
+  an exchange of 45 frames, they break; the clone is behind him: a punch, a kick; his blast throws it (Cine blast 0 + 32); it gets up,
+  a charge, the gold (140 spawned on its own spot, `PushEntityPosition 137`); it is on him, one heavy blow throws him across the rock;
+  40 frames; he is on a knee through the monologue's first box and on his feet for the second (a script entry between the two boxes);
+  a charge of 80 frames at level 2 into the stock transformation. Two players: a clash of 24 frames, he dashes back to (208, 576),
+  the stock's spot for the duel's start (`duel_end.txt` hits from there), the clone goes and the duel starts as before. One player: the
+  clone stays, and in place of the two blind flashes the end sequence plays an exchange of 60 frames that his heavy blow ends (about
+  125 frames against 120), a flash, the clone gone. The HUD is hidden from the first frame to the duel (the stock's second
+  `SetPlayerVisible 1` in entry 0 is gone) and through the one-player fight. Not built: Vegeta's step back at the clone's gold and the
+  clone pushed back at each flash of his charge. Flags and party after it: identical, one and two players.
 
 ### 3.3 The landing: leave
 
