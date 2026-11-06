@@ -1254,20 +1254,22 @@ sequence cg_beam_struggle
         CoopCall 16, 99, 3, 440
         CoopCall 16, 72, 3000, 0
         CoopCall 16, 162, 3000, 0
+        PlayAudio 43
+        WhiteFadeOut 120
+        WaitFrames 30
         DespawnEntity 137
         SpawnCharacterEntity 176, 503, 376
         SetEntityFacing 176, 2
         SetEntityAnimationNoWait 176, 30
-        CoopCall 16, 176, 4, 3
-        SpawnCharacterEntity 137, 112, 272
-        SetEntityFacing 137, 3
-        PlayAudio 43
-        WhiteFadeOut 120
-        WaitFrames 30
         CoopCall 16, 176, 4, 1
   text 64 "GOKU: Dig deeper, Gohan!  You too, Hercule!"
   script                                 ; Hercule's beam falters: he looks round for the voice
-        CoopCall 16, 176, 4, 3
+        CoopCall 16, 176, 4, 0
+        DespawnEntity 176
+        SpawnCharacterEntity 137, 112, 272
+        SetEntityFacing 137, 3
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         CoopCall 16, 72, 0, 0
         SetEntityFacing 72, 3
         WaitFrames 16
@@ -1277,9 +1279,12 @@ sequence cg_beam_struggle
   script                                 ; stock entry 2 (its wait): back to his beam
         SetEntityFacing 72, 2
         CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         WaitFrames 50
   text 40 "CELL: These are your last minutes!  Make them count!"
   script                                 ; stock entry 4: Cell pushes, the clash moves toward Gohan (the middle's starburst goes); Krillin and Tien now blast the second Cell
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         WhiteFlash 4
         DisableLayer 1
         CoopCall 16, 1, 3, 456
@@ -1327,6 +1332,8 @@ sequence cg_beam_struggle
         END
   stock @083eba2a    ; "Would you stop interfering?!"
   script                                 ; stock entry 6: the four go down; back on the clash, closer to Gohan still
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         CoopCall 16, 1, 3, 468
         BeginCommandBatch
         FlashScreenColor 30, 0, 0, 0, 20
@@ -1343,12 +1350,23 @@ sequence cg_beam_struggle
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
         ScreenShake 0, 4, 16
+        DespawnEntity 137
+        SpawnCharacterEntity 176, 503, 376
+        SetEntityFacing 176, 2
+        SetEntityAnimationNoWait 176, 30
         CoopCall 16, 176, 4, 1
   text 64 "Gohan, raise it higher!  Hercule, hold on!  He needs you!"
   script
-        CoopCall 16, 176, 4, 3
+        CoopCall 16, 176, 4, 0
+        DespawnEntity 176
+        SpawnCharacterEntity 137, 112, 272
+        SetEntityFacing 137, 3
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
   text 67 "HERCULE: The champ...  never...  backs down!!!"
   script                                 ; stock entry 8: Hercule's beam flares and the clash is pushed back to the middle, no further; the blasts again
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         CoopCall 16, 72, 0, 0
         CoopCall 16, 72, 1, 0
         WhiteFlash 2
@@ -1407,6 +1425,8 @@ sequence cg_beam_struggle
         END
   stock @083ebc58    ; "They just keep lining up to die!"
   script                                 ; stock entry 10; the clash creeps toward Gohan again
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         DisableLayer 1
         CoopCall 16, 1, 3, 462
         BeginCommandBatch
@@ -1423,17 +1443,30 @@ sequence cg_beam_struggle
         END
   stock @083ebcc6    ; Vegeta's "ARGHHH!!!"
   script                                 ; stock entry 12
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         WaitFrames 60
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
+        DespawnEntity 137
+        SpawnCharacterEntity 176, 503, 376
+        SetEntityFacing 176, 2
+        SetEntityAnimationNoWait 176, 30
         CoopCall 16, 176, 4, 1
   text 64 "Release it, both of you!  Remember all the pain he's caused!\x0bNOW MAKE THAT YOUR POWER!"
   script                                 ; stock entry 14
-        CoopCall 16, 176, 4, 3
+        CoopCall 16, 176, 4, 0
+        DespawnEntity 176
+        SpawnCharacterEntity 137, 112, 272
+        SetEntityFacing 137, 3
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         WaitFrames 60
         END
   stock @083ebd68    ; "SAY GOODBYE!!!"
   script                                 ; stock entry 16 without its white: Vegeta flies down, the view takes him and the Cells, the Big Bang lands; Cell's head turns
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         PlayMusic 35
         PanCameraToPosition 64, 200, 3
         WaitFrames 40
@@ -1457,14 +1490,24 @@ sequence cg_beam_struggle
         PanCameraToPosition 176, 264, 3
   stockseq @083ec758 17 17    ; "VEGETA!"
   script                                 ; back on the clash; Goku's spirit, whole
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         SetEntityFacing 30, 3
         SetEntityAnimationNoWait 30, 30
         PanCameraToPosition 320, 312, 4
+        DespawnEntity 137
+        SpawnCharacterEntity 176, 503, 376
+        SetEntityFacing 176, 2
+        SetEntityAnimationNoWait 176, 30
         CoopCall 16, 176, 4, 2
   text 64 "Now's your chance!"
   script                                 ; stock entry 19: the clash runs into the Cells, the beams take them both and the screen goes white (no explosions); Gohan falls, Hercule lowers his hands late; the stock fade and the aftermath's walk-in
         CoopCall 16, 176, 4, 0
         DespawnEntity 176
+        SpawnCharacterEntity 137, 112, 272
+        SetEntityFacing 137, 3
+        CoopCall 16, 72, 1, 0
+        CoopCall 16, 162, 1, 0
         CoopCall 16, 2, 3, 384
         ScreenShake 0, 6, 20
         WaitFrames 20

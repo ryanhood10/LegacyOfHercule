@@ -155,6 +155,22 @@ static void cg_beam_capped(Beam *b) {
     b->vtable = cg_beam_vt;
 }
 
+// A held beam can be destroyed under us: a text box that needs OBJ VRAM evicts effect objects first (docs/engine.md "OBJ VRAM
+// and the text box"), and the beam's memory is then free for the next allocation. A slot's beam counts only while it is on the
+// entity list with a beam's vtable; a dead one is forgotten at the next poll (cg_beams_sweep) and fired again by the script's
+// next `on` (the struggle re-asserts its two beams at every script entry).
+static int cg_beam_alive(const void *b) {
+    if (!b) return 0;
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++)
+        if ((const void *)l->items[i] == b) { u32 vt = *(const u32 *)b; return vt == (u32)cg_beam_vt || vt == BEAM_VTABLE; }
+    return 0;
+}
+static void cg_beams_sweep(void) {
+    for (int k = 0; k < 2; k++) if (cg_state.beam[k] && !cg_beam_alive(cg_state.beam[k])) cg_state.beam[k] = 0;
+    if (cg_state.beam[0] && cg_state.beam[0] == cg_state.beam[1]) cg_state.beam[1] = 0;   // never one object in both slots
+}
+
 int cg_beam(int id, int on, int c) {
     if (on == 5) { cgb.seen = c ? CG_SEEN : 0; return 0; }   // the summit's scene (arctic_summit.lscript): seen in full / forget
     if (on == 6) return cgb.seen == CG_SEEN;                 // -> 1 on a retry in the same session (pushed by vmcall.c)
@@ -173,13 +189,17 @@ int cg_beam(int id, int on, int c) {
     Entity *e = Vm_FindCharEntity(id);
     if (!e) return 0;
     int k;
+    cg_beams_sweep();
     for (k = 0; k < 2 && cg_state.owner[k] != e; k++) {}
     if (!on) {
-        if (k < 2) { Beam_End(cg_state.beam[k]); cg_state.owner[k] = 0; cg_state.beam[k] = 0; Entity_SetAnimation(e, 0); }
+        if (k < 2) {
+            if (cg_state.beam[k]) Beam_End(cg_state.beam[k]);
+            cg_state.owner[k] = 0; cg_state.beam[k] = 0; Entity_SetAnimation(e, 0);
+        }
         return 0;
     }
-    if (k < 2) return 0;                       // already holding one
-    for (k = 0; k < 2 && cg_state.owner[k]; k++) {}
+    if (k < 2 && cg_state.beam[k]) return 0;   // already holding one, and it is alive
+    if (k == 2) for (k = 0; k < 2 && cg_state.owner[k]; k++) {}
     if (k == 2) return 0;
     s32 box[4], pos[2];
     Entity_GetBox(box, e);
@@ -222,7 +242,7 @@ int cg_choice_take(void) {
 
 void cg_choice_input(u16 *p1, u16 *p2) {
     if (cg_state.magic == CG_MAGIC && in_arena()) {
-        if (cg_state.owner[0] || cg_state.owner[1]) cg_scene_step();   // while a beam is held
+        if (cg_state.owner[0] || cg_state.owner[1]) { cg_beams_sweep(); cg_scene_step(); }   // while a beam is held
         if (cgb.spirit && cgb.spirit <= 3) cg_spirit_show(cgb.spirit == 2 || (cgb.spirit == 1 && ((g_FrameCounter >> 1) & 1)));   // the spirit flickers
     } else if (cgb.spirit) cgb.spirit = 0;   // partyram is not cleared at boot; nothing of it outside the arena
     if (cg_state.magic != CG_MAGIC || !cg_state.choice_armed) return;

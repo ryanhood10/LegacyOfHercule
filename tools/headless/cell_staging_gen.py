@@ -27,8 +27,11 @@ def expect(rx, *line):
 
 def scene_done(tag, mx=150):
     # twice: an EXP level-up's box clears the flag for a moment between two scripts of one scene
-    out(f"stepz {SC} {mx}", "frames 120", f"stepz {SC} 150", "frames 120", f"shot cs_{tag}", "ents")
-    expect("03001fdc: 00000000", f"peek {SC} 1")
+    # the end is read from stepz's own line, not from a peek after it: the fight starts as the scene ends, and while an idle fighter is being hit
+    # the same word reads 1 for a moment (seen at the summit and at fights 2 and 7, 2026-11-06)
+    out(f"stepz {SC} {mx}", "frames 120")
+    expect("stepz 03001fdc: zero", f"stepz {SC} 150")
+    out("frames 120", f"shot cs_{tag}", "ents")
 
 
 def p2_stands(coop):

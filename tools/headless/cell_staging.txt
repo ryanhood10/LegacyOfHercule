@@ -47,12 +47,11 @@ key 1 6
 frames 70
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_V_semi
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -135,12 +134,11 @@ key 1 6
 frames 70
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_V_perfect
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
 echo EXPECT 0203ff08: 00000000
@@ -149,12 +147,11 @@ poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_V_stage2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 120
 shot cs_V_e_00
@@ -202,12 +199,11 @@ key 1 6
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_V_end
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -233,12 +229,11 @@ echo EXPECT 0203f000: 02
 peek8 0x0203F000 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_T_semi
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -246,12 +241,11 @@ frames 120
 mashmap 12 6 150
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_T_perfect
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
 echo EXPECT 0203ff08: 00000000
@@ -260,22 +254,20 @@ poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_T_stage2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_T_end
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -335,12 +327,11 @@ key 1 6
 frames 70
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_VT_semi
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -423,12 +414,11 @@ key 1 6
 frames 70
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_VT_perfect
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
 echo EXPECT 0203ff84: 06
@@ -439,12 +429,11 @@ poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_VT_stage2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 120
 shot cs_VT_e_00
@@ -492,12 +481,11 @@ key 1 6
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_VT_end
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -528,12 +516,11 @@ echo EXPECT 0203ff84: 03
 peek8 0x0203FF84 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_TV_semi
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 4
 map
 poke32 0x0203FD08 7
@@ -541,12 +528,11 @@ frames 120
 mashmap 12 6 150
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_TV_perfect
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
 echo EXPECT 0203ff84: 06
@@ -557,22 +543,20 @@ poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_TV_stage2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203FD08 7
 frames 120
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_TV_end
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -602,12 +586,11 @@ waitmap 14 2 300
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_ring
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 22
 poke8 0x0203F9B6 0
@@ -616,12 +599,11 @@ echo EXPECT 0203f9b7: 14
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_desert
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0xfa00
 poke32 P1+0x15C 0x14a00
@@ -638,12 +620,11 @@ echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_f3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
 deref TBL 0x0800959C
@@ -658,12 +639,11 @@ echo EXPECT 0203f9b7: 00
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_j1
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref TBL 0x0800959C
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -676,12 +656,11 @@ echo EXPECT 0203f9b7: 16
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_j2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -690,12 +669,11 @@ echo EXPECT 0203f9b7: 21
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_j3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -704,12 +682,11 @@ echo EXPECT 0203f9b7: 12
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_j4
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -718,12 +695,11 @@ echo EXPECT 0203f9b7: 23
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_f7
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
 deref TBL 0x0800959C
@@ -744,12 +720,11 @@ echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
 stepz 0x03001FDC 200
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_alone_f8
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R11
 echo EXPECT 0203ff08: 00000000
@@ -818,12 +793,11 @@ waitmap 14 2 300
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_ring
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 22
 poke8 0x0203F9B6 0
@@ -832,12 +806,11 @@ echo EXPECT 0203f9b7: 14
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_desert
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0xfa00
 poke32 P1+0x15C 0x14a00
@@ -854,12 +827,11 @@ echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_f3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -876,12 +848,11 @@ echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_j1
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref TBL 0x0800959C
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -894,12 +865,11 @@ echo EXPECT 0203f9b7: 16
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_j2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -908,12 +878,11 @@ echo EXPECT 0203f9b7: 21
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_j3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -922,12 +891,11 @@ echo EXPECT 0203f9b7: 12
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_j4
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -936,12 +904,11 @@ echo EXPECT 0203f9b7: 23
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_f7
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -964,12 +931,11 @@ echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
 stepz 0x03001FDC 200
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_H_f8
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R11
 echo EXPECT 0203ff84: 05
@@ -1040,12 +1006,11 @@ waitmap 14 2 300
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_ring
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 22
 poke8 0x0203F9B6 0
@@ -1054,12 +1019,11 @@ echo EXPECT 0203f9b7: 14
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_desert
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0xfa00
 poke32 P1+0x15C 0x14a00
@@ -1076,12 +1040,11 @@ echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_f3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -1098,12 +1061,11 @@ echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_j1
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref TBL 0x0800959C
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -1116,12 +1078,11 @@ echo EXPECT 0203f9b7: 16
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_j2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -1130,12 +1091,11 @@ echo EXPECT 0203f9b7: 21
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_j3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -1144,12 +1104,11 @@ echo EXPECT 0203f9b7: 12
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_j4
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -1158,12 +1117,11 @@ echo EXPECT 0203f9b7: 23
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_f7
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -1186,12 +1144,11 @@ echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
 stepz 0x03001FDC 200
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_K_f8
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R11
 echo EXPECT 0203ff84: 05
@@ -1262,12 +1219,11 @@ waitmap 14 2 300
 frames 60
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_ring
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 22
 poke8 0x0203F9B6 0
@@ -1276,12 +1232,11 @@ echo EXPECT 0203f9b7: 14
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_desert
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0xfa00
 poke32 P1+0x15C 0x14a00
@@ -1298,12 +1253,11 @@ echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_f3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -1320,12 +1274,11 @@ echo EXPECT 0203f9b7: 80
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_j1
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 deref TBL 0x0800959C
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -1338,12 +1291,11 @@ echo EXPECT 0203f9b7: 16
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_j2
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -1352,12 +1304,11 @@ echo EXPECT 0203f9b7: 21
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_j3
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -1366,12 +1317,11 @@ echo EXPECT 0203f9b7: 12
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_j4
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 142
 poke8 0x0203F9B6 0
@@ -1380,12 +1330,11 @@ echo EXPECT 0203f9b7: 23
 peek8 0x0203F9B7 1
 stepz 0x03001FDC 150
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_f7
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -1408,12 +1357,11 @@ echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
 stepz 0x03001FDC 200
 frames 120
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 150
 frames 120
 shot cs_Ve_f8
 ents
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R11
 echo EXPECT 0203ff84: 05

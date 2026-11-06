@@ -547,20 +547,22 @@ emit("sequence cg_beam_struggle")
 #    flickering, only while a line of his is open; whole for "Now's your chance!".
 #  * Vegeta's Big Bang is seen landing, with Cell's head turning, and "VEGETA!" is read over that picture.
 #  * the end: the clash runs into the Cells, both beams go through them, one second of them hurt inside it, then white. No puffs.
-# A held beam no longer fades (cellgames.c): the refires at every step are gone.
+# The held beams are asserted at every script entry (HOLD: fired again only if a text box's eviction took one; cellgames.c), not switched off and on.
 CLASH_MID, CLASH_PUSH1, CLASH_PUSH2, CLASH_CREEP, CLASH_END = 440, 456, 468, 462, 384
 SPIRIT = 176
 STRUGGLE_VIEW = "320, 312"
-def spirit(mode):
+# OBJ VRAM (docs/engine.md "OBJ VRAM and the text box"): a text box wants 0x3800 bytes in one piece and this map leaves it 256 to spare. One
+# body more and every box evicts: the held beams are effect objects and are destroyed first (the stock scene's "fading" beams), then bodies
+# go. So the spirit never adds a body: while a line of Goku's is open it stands in the block of Vegeta's actor, who is off the view on his
+# ledge at each of them (despawned, the spirit spawned into his block; after the line the other way round).
+VX, VY = 112, 272                # Vegeta's ledge (record 1 of map 326)
+def spirit(mode, vegeta_gone=False):
     """Before a line of Goku's: his spirit at Gohan's far shoulder, mode 1 flickering / 2 whole."""
-    return [f"CoopCall 16, {SPIRIT}, 4, {mode}"]
-SPIRIT_OFF = [f"CoopCall 16, {SPIRIT}, 4, 3"]          # hidden between his lines (the body stays: see SPIRIT_IN)
-# OBJ VRAM (docs/engine.md "OBJ VRAM and the text box"): a box wants 0x3800 bytes in one piece and this map leaves it 256 to spare, so a
-# body spawned now would be cut from that run and the box would evict it again. The spirit is made once, under the first white, into the
-# block Vegeta's actor (off the view on his ledge) gives up; Vegeta is spawned again from the run's top, and an off-view body is what a
-# box takes first. The spirit then stands hidden (every colour transparent) except while Goku speaks.
-SPIRIT_IN = ["DespawnEntity 137", f"SpawnCharacterEntity {SPIRIT}, 503, 376", f"SetEntityFacing {SPIRIT}, 2", f"SetEntityAnimationNoWait {SPIRIT}, 30",
-             f"CoopCall 16, {SPIRIT}, 4, 3", "SpawnCharacterEntity 137, 112, 272", "SetEntityFacing 137, 3"]
+    return ([] if vegeta_gone else ["DespawnEntity 137"]) + [f"SpawnCharacterEntity {SPIRIT}, 503, 376", f"SetEntityFacing {SPIRIT}, 2", f"SetEntityAnimationNoWait {SPIRIT}, 30",
+            f"CoopCall 16, {SPIRIT}, 4, {mode}"]
+SPIRIT_OFF = [f"CoopCall 16, {SPIRIT}, 4, 0", f"DespawnEntity {SPIRIT}", f"SpawnCharacterEntity 137, {VX}, {VY}", "SetEntityFacing 137, 3"]
+HOLD = ["CoopCall 16, 72, 1, 0", "CoopCall 16, 162, 1, 0"]   # the two held beams, fired again if something took them (cellgames.c: nothing when they are out)
+SPIRIT_IN = []
 b = body(A3, "m325_r12_defeat", 0)
 k = b.index("SetEntityAnimationNoWait 30, 30")
 b = (["CoopCall 15, 1, 0, 0"] + b[:k + 1] +
@@ -570,9 +572,9 @@ b = (["CoopCall 15, 1, 0, 0"] + b[:k + 1] +
 b[b.index("WhiteFadeOut 600")] = "WhiteFadeOut 120"                      # the picture in 2 s (it took 10)
 script(b[:-1] + ["WaitFrames 30"] + spirit(1), "stock entry 0: Gohan and Hercule against the two Cells, the held beams out as the white lifts; Goku's spirit for his line")
 text(64, "GOKU: Dig deeper, Gohan!  You too, Hercule!")
-script(SPIRIT_OFF + ["CoopCall 16, 72, 0, 0", "SetEntityFacing 72, 3", "WaitFrames 16", "SetEntityFacing 72, 1", "WaitFrames 12"], "Hercule's beam falters: he looks round for the voice")
+script(SPIRIT_OFF + HOLD + ["CoopCall 16, 72, 0, 0", "SetEntityFacing 72, 3", "WaitFrames 16", "SetEntityFacing 72, 1", "WaitFrames 12"], "Hercule's beam falters: he looks round for the voice")
 text(67, "HERCULE: Wh-who said that?!")
-script(["SetEntityFacing 72, 2", "CoopCall 16, 72, 1, 0", "WaitFrames 50"], "stock entry 2 (its wait): back to his beam")
+script(["SetEntityFacing 72, 2"] + HOLD + ["WaitFrames 50"], "stock entry 2 (its wait): back to his beam")
 text(40, "CELL: These are your last minutes!  Make them count!")
 
 def blasts(b):
@@ -584,35 +586,35 @@ def blasts(b):
         r.append(x)
     return r
 
-script(["WhiteFlash 4", "DisableLayer 1", f"CoopCall 16, 1, 3, {CLASH_PUSH1}", "ScreenShake 0, 6, 20"] + blasts(body(A3, "m325_r12_defeat", 4)),
+script(HOLD + ["WhiteFlash 4", "DisableLayer 1", f"CoopCall 16, 1, 3, {CLASH_PUSH1}", "ScreenShake 0, 6, 20"] + blasts(body(A3, "m325_r12_defeat", 4)),
        "stock entry 4: Cell pushes, the clash moves toward Gohan (the middle's starburst goes); Krillin and Tien now blast the second Cell")
 emit(f"  stock @{A3['m325_r12_defeat']['entries'][5]['head'].split('@')[1].split()[0]}    ; \"Would you stop interfering?!\"")
-script([f"CoopCall 16, 1, 3, {CLASH_PUSH2}"] + body(A3, "m325_r12_defeat", 6)[:-1] + ["ScreenShake 0, 4, 16"] + spirit(1), "stock entry 6: the four go down; back on the clash, closer to Gohan still")
+script(HOLD + [f"CoopCall 16, 1, 3, {CLASH_PUSH2}"] + body(A3, "m325_r12_defeat", 6)[:-1] + ["ScreenShake 0, 4, 16"] + spirit(1), "stock entry 6: the four go down; back on the clash, closer to Gohan still")
 text(64, "Gohan, raise it higher!  Hercule, hold on!  He needs you!")
-script(SPIRIT_OFF)
+script(SPIRIT_OFF + HOLD)
 text(67, "HERCULE: The champ...  never...  backs down!!!")
 b = body(A3, "m325_r12_defeat", 8)
 assert b[0] == "WaitFrames 120"
-script(["CoopCall 16, 72, 0, 0", "CoopCall 16, 72, 1, 0", "WhiteFlash 2", f"CoopCall 16, 1, 3, {CLASH_MID}", "ScreenShake 0, 5, 24", "WaitFrames 36",
+script(HOLD + ["CoopCall 16, 72, 0, 0", "CoopCall 16, 72, 1, 0", "WhiteFlash 2", f"CoopCall 16, 1, 3, {CLASH_MID}", "ScreenShake 0, 5, 24", "WaitFrames 36",
         "WhiteFlash 2", "EnableLayer 1", "WaitFrames 60"] + blasts(b[1:]),
        "stock entry 8: Hercule's beam flares and the clash is pushed back to the middle, no further; the blasts again")
 emit(f"  stock @{A3['m325_r12_defeat']['entries'][9]['head'].split('@')[1].split()[0]}    ; \"They just keep lining up to die!\"")
-script(["DisableLayer 1", f"CoopCall 16, 1, 3, {CLASH_CREEP}"] + body(A3, "m325_r12_defeat", 10), "stock entry 10; the clash creeps toward Gohan again")
+script(HOLD + ["DisableLayer 1", f"CoopCall 16, 1, 3, {CLASH_CREEP}"] + body(A3, "m325_r12_defeat", 10), "stock entry 10; the clash creeps toward Gohan again")
 emit(f"  stock @{A3['m325_r12_defeat']['entries'][11]['head'].split('@')[1].split()[0]}    ; Vegeta's \"ARGHHH!!!\"")
-script(body(A3, "m325_r12_defeat", 12)[:-1] + spirit(1), "stock entry 12")
+script(HOLD + body(A3, "m325_r12_defeat", 12)[:-1] + spirit(1), "stock entry 12")
 text(64, "Release it, both of you!  Remember all the pain he's caused!\\x0bNOW MAKE THAT YOUR POWER!")
-script(SPIRIT_OFF + body(A3, "m325_r12_defeat", 14), "stock entry 14")
+script(SPIRIT_OFF + HOLD + body(A3, "m325_r12_defeat", 14), "stock entry 14")
 emit(f"  stock @{A3['m325_r12_defeat']['entries'][15]['head'].split('@')[1].split()[0]}    ; \"SAY GOODBYE!!!\"")
 b = body(A3, "m325_r12_defeat", 16)
 k = b.index("FadeToWhite 20")
 HIDE = b[k + 1:-1]                 # the stock white hid the bodies it was done with; ours does it under the last white
 assert HIDE[0] == "GetActiveEntityContext" and HIDE[-1] == "UploadSpritePalette" and b[k - 1] == "CommitCommandBatch"
 kk = b.index("BeginCommandBatch")
-script(b[:kk] + ["PanCameraToPosition 176, 312, 4", "WaitFrames 10"] + b[kk:k] +
+script(HOLD + b[:kk] + ["PanCameraToPosition 176, 312, 4", "WaitFrames 10"] + b[kk:k] +
        ["WhiteFlash 6", "ScreenShake 0, 12, 20", "SpawnDustCloud 30, 352, 420", "SetEntityFacing 30, 2", "WaitFrames 20", "PanCameraToPosition 176, 264, 3"],
        "stock entry 16 without its white: Vegeta flies down, the view takes him and the Cells, the Big Bang lands; Cell's head turns")
 stockseq(A3, "m325_r12_defeat", 17, 17, "\"VEGETA!\"")
-script(["SetEntityFacing 30, 3", "SetEntityAnimationNoWait 30, 30", f"PanCameraToPosition {STRUGGLE_VIEW}, 4"] + spirit(2), "back on the clash; Goku's spirit, whole")
+script(HOLD + ["SetEntityFacing 30, 3", "SetEntityAnimationNoWait 30, 30", f"PanCameraToPosition {STRUGGLE_VIEW}, 4"] + spirit(2), "back on the clash; Goku's spirit, whole")
 text(64, "Now's your chance!")
 b = body(A3, "m325_r12_defeat", 19)
 k = b.index("AddEXP 500000")
@@ -630,7 +632,7 @@ assert wave[1] == "NPCFireKamehameha 0, 140"
 wave = wave[:2] + ["CoopCall 16, 72, 2, 0"] + wave[2:]          # Hercule's beam goes through with Gohan's (no cap)
 kd = wave.index("PlayDamageEffect 30")
 wave = wave[:kd + 1] + ["PlayDamageEffect 162", "SetEntityAnimationNoWait 162, 2"] + wave[kd + 1:]
-end = ([f"CoopCall 16, {SPIRIT}, 4, 0", f"DespawnEntity {SPIRIT}"] +
+end = (SPIRIT_OFF + HOLD +
        [f"CoopCall 16, 2, 3, {CLASH_END}", "ScreenShake 0, 6, 20", "WaitFrames 20", "ScreenShake 0, 12, 24", "WaitFrames 22",        # the clash runs into the Cells
         "CoopCall 16, 162, 0, 0", "CoopCall 16, 72, 0, 0",                                                                              # the second Cell's beam breaks
         "DisableLayer 0", "DisableLayer 1", "StopAudio 43", "SetEntityAnimationNoWait 30, 2", "SetEntityAnimationNoWait 162, 2",
