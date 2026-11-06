@@ -241,10 +241,64 @@ end
 ; map 0 record 0 (Future Gohan) talk: the knock-out, then Hercule's protest and Gohan's answer (Ryan, 2026-11-01)
 ; before Gohan's "Sorry about that, Trunks." (stock entry 15)
 sequence ch1_knockout
-  stockseq @083b725c 0 14                ; the melee / ki lessons, "Let's go get 'em!", the knock-out
+  stockseq @083b725c 0 13                ; the melee / ki lessons, "Let's go get 'em!", "Right!  Cool!"
+  script                                 ; stock 14, the knock-out (batch 1, 1.2): old Hercule (player 2, or the companion) becomes an actor on his
+        CoopCall 31, 0, 0, 0             ; spot and walks up (this hand-over was a json edit of the stock entry); the chop has weight: the flash, a
+        JumpIfFalse H1                   ; jolt, and Trunks falls where he stands in smoke with a thud
+        PushVarint 158
+        CoopCall 31, 1, 0, 0
+        CoopCall 31, 2, 0, 0
+        Step SpawnCharacterEntity
+        CoopCall 31, 3, 0, 0
+      H1:
+        BeginCommandBatch
+        WalkToPosition 0, 208, 111
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H2
+        WalkToPosition 158, 240, 128
+        SetEntityFacing 158, 2
+      H2:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        WaitFrames 90
+        WalkToPosition 54, 192, 112
+        WaitFrames 60
+        PlayAudio 34
+        SetEntityAnimation 54, 10
+        WhiteFlash 10
+        CoopCall 37, 15, 8, 1
+        SetEntityFacing 0, 3
+        CoopCall 37, 1, 0, 54
+        CoopCall 37, 10, 0, 2
+        WaitFrames 98
+        SetEntityFacing 54, 0
+  script                                 ; old Hercule takes a step toward Gohan
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H1
+        WalkToPosition 158, 228, 124
+        SetEntityFacing 158, 2
+      H1:
   text 126 "#HERCULE: What are you doing?!"
+  script                                 ; Gohan turns to him for the answer
+        SetEntityFacing 54, 3
   text 57 "#GOHAN: It's not safe out there, Hercule!  You stay here and watch after Trunks."
-  stockseq @083b725c 15 20               ; "Sorry about that, Trunks", Gohan flies off, Trunks wakes
+  script                                 ; and back down to Trunks
+        SetEntityFacing 54, 0
+  stockseq @083b725c 15 15               ; "Sorry about that, Trunks..."
+  script                                 ; stock 16: his take-off kicks up dust
+        WaitFrames 40
+        PlayAudio 26
+        SpawnDustCloud 54, 192, 114
+        FlyToPosition 54, 160, 0
+        FadeOut 120
+        WarpToMapNoEntities 1, 5, 1, 224, 128
+        SetEntityFacing 0, 3
+        SetEntityAnimation 0, 3
+        WaitFrames 40
+        FadeFromWhite 120
+        WaitFrames 100
+        SetEntityAnimation 0, 0
+  stockseq @083b725c 17 20               ; Trunks wakes
 end
 
 ; ---- present day: Krillin visits ------------------------------------------------------------------

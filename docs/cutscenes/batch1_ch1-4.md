@@ -116,6 +116,12 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Lines kept:** "#HERCULE: What are you doing?!" and "#GOHAN: It's not safe out there, Hercule!  You stay here and
   watch after Trunks." are Ryan's: word for word.
 - **Risks:** none beyond the existing actor hand-over.
+- **Built 2026-11-06 (`nb-cs4`).** Stock entry 14 restated in our sequence (the hand-over of old Hercule to an actor, a json edit of
+  that stock entry until now, is in it; the edit is gone): the chop's white flash with a jolt (`CoopCall 37, 15, 8, 1`), Trunks falls
+  where he stands in smoke with a thud (`CoopCall 37, 10, 0, 2`) instead of popping into the lying pose; old Hercule steps toward
+  Gohan before "What are you doing?!", Gohan turns to him for his answer and back down to Trunks for "Sorry about that"; his take-off
+  kicks up dust. Ryan's two lines word for word. `staging_ch1` "knock-out" (alone and two players) shoots the chop and the answer,
+  and checks no actor of old Hercule is left on map 1/5; `ch1_notes` (1) reads as before (player 2 gone, one actor).
 
 ### 1.3 Gohan's death: SHOWCASE (L)
 

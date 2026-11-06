@@ -135,4 +135,22 @@ for two in (False, True):
     s.actors(s158=1)                # one body of old Hercule: player 2's own (or the companion's) again, the actor gone
     s.out("ents")
     s.on_map(1, 1)
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.out(f"echo === knock-out {n}", "load menu.ss", "p2 0" if two else "p2 off", "maptest 7", "frames 200",
+          "poke8 0x0203F000 3", "poke8 0x0203F0A0 24", "flags +466", "poke8 0x0203FF84 5", "deref TBL 0x0800959C")
+    s.warp(1, 1, 200, 664, 200)
+    s.out("mash 40 120", "frames 300", "flags +0 +1",
+          "findent PL 0x08025604", "poke32 PL+0x158 0x9000", "poke32 PL+0x15C 0x25000", "deref P2 0x0203FF08",
+          "poke32 P2+0x158 0xA800", "poke32 P2+0x15C 0x26000", "frames 30", "key 0x40 30", "frames 20")
+    s.press(9, 150)
+    s.out("frames 750")
+    s.shot(f"c1_knock{n}_down")
+    s.actors(s158=1)
+    s.press(3, 120)
+    s.shot(f"c1_knock{n}_answer")
+    s.end_scene()
+    s.actors(s158=1)                # one: player 2's own again, no actor left
+    s.out("ents")
+    s.on_map(1, 5)
 s.write("staging_ch1.txt")

@@ -37,18 +37,7 @@
           "talk": "seq:ch1_knockout"
         }
       },
-      "_": "the training (difficulty question first); Future Gohan's talk: the knock-out with old Hercule's protest (Ryan, 2026-11-01); old Hercule (player 2) becomes an actor on his spot and walks up for the knock-out (CoopCall 31)",
-      "edits": [
-        {
-          "at": "record:0/talk/entry:14",
-          "replace": [
-            [
-              "WalkToPosition 0, 208, 111",
-              "CoopCall 31, 0, 0, 0\nJumpIfFalse H1\nPushVarint 158\nCoopCall 31, 1, 0, 0\nCoopCall 31, 2, 0, 0\nStep SpawnCharacterEntity\nCoopCall 31, 3, 0, 0\nH1:\nBeginCommandBatch\nWalkToPosition 0, 208, 111\nCoopCall 22, 2, 158, 0\nJumpIfFalse H2\nWalkToPosition 158, 240, 128\nSetEntityFacing 158, 2\nH2:\nCommitCommandBatch"
-            ]
-          ]
-        }
-      ]
+      "_": "the training (difficulty question first); Future Gohan's talk: the knock-out with old Hercule's protest (Ryan, 2026-11-01); old Hercule (player 2) becomes an actor on his spot and walks up for the knock-out (CoopCall 31)"
     },
     {
       "map": {
