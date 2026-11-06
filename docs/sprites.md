@@ -263,6 +263,18 @@ own stock frames are already broader than 17's at the game's 16x32 / 32x32 sizes
 groups taken from 17 keep 17's silhouette below the head (a wider torso would need hand-drawn
 frames). Frames are LZ-compressed with `buu2log2.compress`.
 
+**The art pass (2026-11-06, `docs/art-audit.md`):** the four groups taken from 17 were a step duller than 16's own frames
+(his trousers went onto the dark end of the armour ramp: the punch 6 was lime and yellow, the kicks 7 / 8 olive) and
+olive specks floated round the head: 17's black hair has grey strands and glints (palette 9-15, the vest's greys) that
+are not part of the black component `swap_head` removes, so they were recoloured with the vest. Now the trousers map
+`215: 42, 80: 41, 79: 41, 78: 46, 214: 54` (as bright as sprite 8's legs); grey pieces of at most 10 pixels at head
+height that touch only what is removed anyway go with the hair (a cuff touches its hand and stays; the vest is bigger);
+skin left above the hair's top row (a hand raised over the head, cut from its arm) goes; pieces of at most 5 pixels
+(14 when wholly at head height) that touch nothing and are not white go. In back views the head was anchored on the
+middle of 17's hair or on a raised hand's skin taken for a face, and in the spin kick it floated beside the body: a
+back view (`back=True`, facing up) puts the head over 17's orange scarf (the neck), its chin at most one row under the
+scarf's top. Sprites 160 and 175 change; Android 13 (165, 240) shares `swap_head` and loses its brown specks too.
+
 ### Rocket, fist, bomb and explosion frames (same generator)
 
 The ROM's projectile class (`0x08013BC0` base, 0x58-byte objects, vtable slots 3 cull / 4 OAM /
