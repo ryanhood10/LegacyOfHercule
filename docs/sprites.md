@@ -729,6 +729,14 @@ and Evil Buu, each a stock portrait of the body his sprite came from repainted a
 Cell's 40, Piccolo's 94; Buu's Fury's Super Buu 127 for Evil Buu, who has none there). A recolour is an index map
 applied inside the 3 px frame, the background found by a flood from the top edge through its colours, so a body colour
 that is also a background colour (Piccolo's purple gi) keeps its own map.
+**173** (2026-11-05, the same tool, recipe `dino`): the mother dinosaur of the generator's eggs (`ch4_eggs.lscript`). LoG2
+has King Triceratops' own dialogue portrait, **96** (the bestiary 0x086F8E40 entry 112, Triceratops King, sprite 127,
+portrait 96; his stock lines in Triceratops Jungle use 96, and 97 when he gives up, the same face in tears), so it is
+recoloured, not drawn from his sprite: the hide's browns (19, 20, 22, 23,
+113) onto `tools/dinosprites.py`'s ramps (its `HIDE`, `RAMPS`, `nearest`, so the colours are the sprite's own), pink above
+row 21 (the frill, down to just under the horns) and orange below (the face), as her sprite's head is; the sprite's
+green is the feet, not in the picture. Horns, eyes and the red background stay. Players' frame and size (64 x 64, the
+3 px grey frame).
 
 **Test records:** after each sprite record (record + 0x1A0, behind the 21 groups the engine reads) the generator puts an
 enemy record for `COOP_CMD_SPAWN_RECORD` (which takes ROM records only): stat 29 (Cooler, AI set 21) for King Cold, stat

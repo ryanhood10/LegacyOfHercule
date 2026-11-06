@@ -27,6 +27,30 @@ shot eg2p_before
 key 1 6
 frames 50
 shot eg2p_line1
+key 1 6
+frames 60
+shot eg2p_line1b
+key 1 6
+frames 90
+shot eg2p_slick
+key 1 6
+frames 60
+shot eg2p_crack
+key 1 6
+frames 90
+shot eg2p_line4
+key 1 6
+frames 60
+shot eg2p_line4b
+key 1 6
+frames 200
+shot eg2p_mother1
+key 1 6
+frames 60
+shot eg2p_mother1b
+key 1 6
+frames 90
+shot eg2p_mother2
 frames 40
 stepz 0x03001FDC 60
 frames 60
@@ -64,6 +88,27 @@ poke32 0x0203FD08 7
 frames 60
 frames 40
 shot eg2p_hatch_line
+key 1 6
+frames 60
+shot eg2p_hatch1b
+key 1 6
+frames 90
+shot eg2p_hatch2
+key 1 6
+frames 110
+shot eg2p_rattle
+key 1 6
+frames 90
+shot eg2p_crack2
+key 1 6
+frames 60
+shot eg2p_crack2b
+key 1 6
+frames 90
+shot eg2p_babies
+key 1 6
+frames 60
+shot eg2p_babiesb
 stepz 0x03001FDC 60
 frames 60
 frames 30
@@ -105,6 +150,40 @@ poke32 0x0203FD08 7
 frames 60
 frames 40
 shot eg2p_end_line
+key 1 6
+frames 60
+shot eg2p_end_lineb
+key 1 6
+frames 30
+shot eg2p_out0
+frames 30
+shot eg2p_out1
+frames 30
+shot eg2p_out2
+frames 30
+shot eg2p_out3
+frames 30
+shot eg2p_out4
+frames 30
+shot eg2p_out5
+frames 30
+shot eg2p_out6
+frames 30
+shot eg2p_out7
+frames 30
+shot eg2p_out8
+frames 30
+shot eg2p_out9
+frames 30
+shot eg2p_out10
+frames 30
+shot eg2p_out11
+frames 30
+shot eg2p_out12
+frames 30
+shot eg2p_out13
+frames 30
+shot eg2p_out14
 stepz 0x03001FDC 60
 frames 60
 frames 60
