@@ -22,6 +22,8 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, P
     n = lineup_name(p1, p2)
     s.begin(f"jungle {n}", p1, p2)
     s.warp(4, 58, 112, 420, 100)
+    s.out("frames 230")             # (batch 1, 2.3) the King stamps as the camera reaches him, before his first word; the HUD hidden
+    s.shot(f"c2_{n}_stamp")
     s.end_scene()
     s.win(200)
     s.press(9, 90)

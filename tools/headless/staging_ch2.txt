@@ -112,6 +112,8 @@ poke32 0x0203FD0C 0x3a04
 poke32 0x0203FD54 0x1a40070
 poke32 0x0203FD08 5
 frames 100
+frames 230
+shot c2_P_stamp
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -147,6 +149,8 @@ poke32 0x0203FD0C 0x3a04
 poke32 0x0203FD54 0x1a40070
 poke32 0x0203FD08 5
 frames 100
+frames 230
+shot c2_H_stamp
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -183,6 +187,8 @@ poke32 0x0203FD0C 0x3a04
 poke32 0x0203FD54 0x1a40070
 poke32 0x0203FD08 5
 frames 100
+frames 230
+shot c2_PH_stamp
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -219,6 +225,8 @@ poke32 0x0203FD0C 0x3a04
 poke32 0x0203FD54 0x1a40070
 poke32 0x0203FD08 5
 frames 100
+frames 230
+shot c2_HP_stamp
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000

@@ -400,6 +400,13 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
   ha!\x0bAnother peace treaty, brought to you by the World Martial Arts Champion!", so that "!PICCOLO: You hid
   behind a rock the whole fight." has something to point at.
 - **Risks:** sprite 127 has groups 0, 1, 2, 4, 6 only.
+- **Built 2026-11-06 (`nb-cs4`), beats 1-2 and the end's shake.** The intro is ours now (`ch2_triceratops`, map 105 trigger 0; the
+  stock's indexes kept: entry 4 still returns 8): the HUD's bars go (they sat over him) and come back at the fight; as the camera
+  reaches him he stamps (his group 6, the roar 60, `ScreenShake 0, 6, 16`) before "What do you want?"; before the hard way he takes
+  two heavy steps toward the players (to (112, 152), a thud and a shake each). The end: he sinks with a last small jolt. With two
+  players his co-op twin stands beside him from the load (as before) and stays when he steps out. Not built: the players' brace (a
+  player's step needs his spot), player 2 placed beside player 1 at the end and Hercule stepping out from the edge (the fight leaves
+  them anywhere). `staging_ch2` "jungle" shoots the stamp; flags and party after the scene equal the build before.
 
 ### 2.4 The three-year skip: touch up (M)
 

@@ -67,8 +67,56 @@ sequence ch2_piccolo_deal
 end
 
 ; map 105 (zone 4 area 58) record 0 defeat: King Triceratops gives up, Hercule takes the credit
+; zone 4 area 58 trigger 0 (the stock intro 083c9a38, its indexes kept: entry 4 returns 8): the King's power before his words
+; (batch 1, 2.3): as the camera reaches him he stamps, the ground answers, and only then "What do you want?"; when he will not
+; listen he takes two heavy steps at the players
+sequence ch2_triceratops
+  [0] script                             ; stock 0 and the stamp (the HUD's bars are hidden until the fight: they sat over him)
+        SetPlayerVisible 0
+        PanCameraToPosition 8, 64, 3
+        PlayAudio 60
+        BeginCommandBatch
+        SetEntityAnimation 127, 6
+        ScreenShake 0, 6, 16
+        CommitCommandBatch
+        SetEntityAnimation 127, 0
+        SetEntityFacing 127, 0
+  [1] stockseq @083c9a38 1 3             ; "What do you want?", the farmers' right, "This place belongs to the dinosaurs now!"
+  [4] script                             ; stock 4 (Gohan as player 1 skips to the fight, 8), after two heavy steps toward the players
+        WalkToPosition 127, 112, 140
+        PlayAudio 60
+        BeginCommandBatch
+        ScreenShake 0, 4, 10
+        CommitCommandBatch
+        WalkToPosition 127, 112, 152
+        PlayAudio 60
+        BeginCommandBatch
+        ScreenShake 0, 4, 10
+        CommitCommandBatch
+        SetEntityFacing 127, 0
+        PushActiveCharIndex
+        PushByte 0
+        CmpEq
+        JumpIfFalse L1
+        PushByte 8
+      L1:
+  [5] stockseq @083c9a38 5 7             ; "Listen, I don't have all day...", "I'm King Triceratops!", "the hard way"
+  [8] script                             ; stock 8, the fight, with the HUD back
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 127, 25, 100
+end
+
 sequence ch2_triceratops_end
-  stockseq @083c9bf8 0 3                 ; "OK OK!  I give up!", the Triceratops of honor
+  [0] script                             ; stock 0: he sinks (his pose 4) with a last small shake
+        PlayAudio 60
+        PlayMusic 0
+        FindPlayerEntity
+        SetEntityAnimation 127, 4
+        CoopCall 37, 15, 12, 0
+        AddEXP 1500
+        WaitFrames 60
+  stockseq @083c9bf8 1 3                 ; "OK OK!  I give up!", the Triceratops of honor
   [4] script                             ; only who is played (Ryan, 2026-11-05: a party member nobody plays is not in the scene):
         CoopCall 22, 4, 5, 0                  ; Hercule takes the credit when someone plays him (next 5), else the stock end (8)
         JumpIfFalse a
