@@ -457,4 +457,123 @@ peek 0x03001FDC 1
 echo EXPECT map zone 11 area 1\b
 map
 ents
+echo === island break P
+load menu.ss
+p2 off
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x40b
+poke32 0x0203FD54 0xe00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+poke32 0x0203FD08 7
+frames 120
+shot c6_P_break0
+deref R160 TBL+0x264
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R160
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+ents
+echo EXPECT map zone 11 area 4 var 1 player 304,168
+map
+mash 3 110
+shot c6_P_break1
+mashmap 11 5 60
+frames 400
+ents
+echo EXPECT map zone 11 area 5\b
+map
+ents
+echo === island break PH
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x40b
+poke32 0x0203FD54 0xe00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+poke32 0x0203FD08 7
+frames 120
+shot c6_PH_break0
+deref R160 TBL+0x264
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R160
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+ents
+echo EXPECT map zone 11 area 4 var 1 player 304,168
+map
+mash 3 110
+shot c6_PH_break1
+mashmap 11 5 60
+frames 400
+ents
+echo EXPECT map zone 11 area 5\b
+map
+ents
+echo === island break PK
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 6
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x40b
+poke32 0x0203FD54 0xe00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+poke32 0x0203FD08 7
+frames 120
+shot c6_PK_break0
+deref R160 TBL+0x264
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R160
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+ents
+echo EXPECT map zone 11 area 4 var 1 player 304,168
+map
+mash 3 110
+shot c6_PK_break1
+mashmap 11 5 60
+frames 400
+ents
+echo EXPECT map zone 11 area 5\b
+map
+ents
 echo ALIVE

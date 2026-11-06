@@ -420,6 +420,16 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.7 "This island is breaking apart!" (rework, S)
 
+- **Built 2026-11-06 (`nb-cs2`).** Behind a 20-frame fade 16 (the boss, sprite 160) stands at (264, 164), player 1 at (304, 168), player 2
+  at (328, 172) (`CoopCall 9`), the camera at (152, 100) with 17 and 18 on their cliff in the same view; dust bursts across the grass
+  during the two rumbles, 18 looks down at them, 16 looks up at her and back, 17 steps to the cliff's edge, Piccolo steps up for his
+  line. The HUD is hidden as before. Tested in `staging_ch6` ("island break", three lineups).
+- **Research corrected:** "nothing breaking" was half wrong. `PlayAudioBlocking a, b` is not a sound of b frames: decompiled
+  (`0x0800A5BE`) it starts sound 43 (the rumble) and runs a modal camera shake of **b frames at strength a**; the stock scene
+  already shook for 180, 120 and 90 frames, over a tree. The scene keeps those lengths (as `PlayAudio 43` + a batched
+  `ScreenShake` so the dust and turns run beside it): no new wait. A `SetEntityPositionInstant` on the live boss at 75 % holds.
+  A bottom box of three lines covers the view's lowest 72 px: marks' feet stay at camera y + 84 or higher.
+
 - **Where:** `a16_island_break`, map 296 record 1's defeat (16 at 75 %). Film `isl_PH` (sheet 1).
 - **Today:** the camera stays on player 1 wherever the fight left him (in the film: half behind a tree at the
   shore); 18's, 17's and Piccolo's lines play **with no speaker in view and nothing breaking**; two seconds of

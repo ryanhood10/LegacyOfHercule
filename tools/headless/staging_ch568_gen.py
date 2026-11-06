@@ -59,6 +59,21 @@ for p1, p2, s76 in ((TRUNKS, None, 0), (KRILLIN, None, 0), (TRUNKS, KRILLIN, 0),
     s.actors(s76=s76)
     s.end_scene()
     s.on_map(11, 1)
+# The island (a16_island): 16's first stage ends at 75 %: the break scene on marks in the clearing (16 the boss 160, 17 and 18 on their
+# cliff, the players beside 16, the camera on all of them), then area 5. An idle player dies fast against 16: win at once.
+for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
+    n = lineup_name(p1, p2)
+    s.begin(f"island break {n}", p1, p2, "+136 +140 +141 +142 +143 +144 +145")
+    s.warp(11, 4, 352, 224, 100)
+    s.end_scene()
+    s.win(120)
+    s.shot(f"c6_{n}_break0")
+    s.actors(s160=1, s9=1, s11=1)
+    s.out("ents", "echo EXPECT map zone 11 area 4 var 1 player 304,168", "map")      # player 1 on his mark
+    s.press(3, 110)
+    s.shot(f"c6_{n}_break1")
+    s.out("mashmap 11 5 60", "frames 400", "ents")
+    s.on_map(11, 5)
 s.write("staging_ch6.txt")
 
 s = Script("staging_ch568_gen.py")

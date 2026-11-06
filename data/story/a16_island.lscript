@@ -65,12 +65,56 @@ end
 
 ; map 296 record 1 defeat (16 at 75 %): the island breaks apart, everyone moves to area 5
 sequence a16_island_break
-  [0] stock @083e4818                   ; rumble
+  [0] script                            ; stock 083e4818 behind a short fade: everyone on marks in the clearing with the camera on them
+        PlayAudio 60                    ; (the fight left player 1 anywhere: the lines played over a tree with no speaker in view).
+        SetPlayerVisible 0              ; The stock rumble (PlayAudioBlocking 30, 180 = sound 43 and a camera shake of 180 frames) as a
+        FindPlayerEntity                ; batch, so dust bursts across the ground and 18 and 16 turn while it shakes
+        FadeOut 20
+        SetEntityPositionInstant 160, 264, 164
+        SetEntityFacing 160, 3
+        SetEntityPositionInstant 0, 304, 168
+        SetEntityFacing 0, 2
+        CoopCall 9, 1, 328, 172
+        SetEntityFacing 9, 3
+        SetEntityFacing 11, 3
+        PanCameraToPosition 152, 100, 10
+        FadeFromWhite 20
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 30, 180
+        EntityWaitFrames 160, 20
+        SpawnDustCloud 160, 232, 216
+        EntityWaitFrames 160, 30
+        SpawnDustCloud 160, 344, 150
+        EntityWaitFrames 160, 30
+        SpawnDustCloud 160, 290, 230
+        SetEntityFacing 160, 1
+        EntityWaitFrames 160, 30
+        SpawnDustCloud 160, 200, 180
+        EntityWaitFrames 11, 60
+        SetEntityFacing 11, 0
+        CommitCommandBatch
+        StopAudio 43
   [1] text 29 "ANDROID 18: This island is breaking apart!\x0b16, is he really pushing you around?"
-  [2] stock @083e4884                   ; rumble
+  [2] script                            ; stock 083e4884 (the second rumble) the same way: 16 turns back to Piccolo, 17 steps to the cliff's edge
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 40, 120
+        SetEntityFacing 160, 3
+        EntityWaitFrames 160, 30
+        SpawnDustCloud 160, 250, 224
+        EntityWaitFrames 160, 40
+        SpawnDustCloud 160, 350, 200
+        WalkToPosition 9, 196, 150
+        SetEntityFacing 9, 3
+        CommitCommandBatch
+        StopAudio 43
   [3] stock @083e4890                   ; 17: he can't keep this up
-  [4] stock @083e4904                   ; Piccolo: you're not perfect
-  [5] script                            ; stock 083e494c with 16 = 160 (the boss) and 17 = 9 (watching)
+  [4] script                            ; Piccolo steps up to 16 for his answer
+        WalkToPosition 0, 290, 166
+        SetEntityFacing 0, 2
+  [5] stock @083e4904                   ; Piccolo: you're not perfect
+  [6] script                            ; stock 083e494c with 16 = 160 (the boss) and 17 = 9 (watching)
         PlayAudioBlocking 50, 90
         PlayAudio 43
         FadeToWhite 120
