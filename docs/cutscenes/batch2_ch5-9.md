@@ -108,7 +108,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (but Cooler's charge), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
 | built in part | 7.2 (the power-up; not the first blow), 7.6 (the knee, Cell's turns and exit; not the two misses) |
 | not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
@@ -817,7 +817,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### W.3 Cooler's fight: the opening and his end (rework, S)
 
-- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (Cooler's CHARGE waits for the cine helpers).** The HUD is hidden for the opening
+- **Built 2026-11-06 (`nb-cs2`); beat 3 built 2026-11-06 (`nb-cs4`):** before the fight every eye turns to Cooler (`CoopCall 37, 12`) and he powers up (`CoopCall 37, 7, 70, 1`: rings, the flicker, a growing shake, the burst), the servant's actor still beside him in co-op (it makes way for its twin after the charge, in entry 16 now; entry 15 only turns him to his lord). `staging_ch8` checks the charge played in every lineup (`cine_last`) and shoots it (`c8_charge`). Earlier note: The HUD is hidden for the opening
   (`SetPlayerVisible 0`, back at the fight's entry). Player 1 walks up to (200, 298), 34 px under Cooler, player 2 is placed beside him
   (`CoopCall 9`), the camera at (100, 214): Cooler above a bottom box and the players just clear of it; a top box (the player's
   lines) covers Cooler and leaves the players. Cooler starts with his back turned and turns round as they arrive. The three

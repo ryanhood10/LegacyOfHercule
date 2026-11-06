@@ -62,6 +62,13 @@ class Script:
     def win(self, frames=240):
         self.out(f"poke32 {CMD} 7", f"frames {frames}")
 
+    def cine_last(self, op, how=1):
+        """the cine helpers' last move was `op` and it ended `how` (1 played, 2 skipped: cine.c END_*), and every move started has
+        ended (CineRam +0x0C's top byte, +0x10's low byte, +0x18 ops = done; docs/testing.md "Cinematic helpers")"""
+        self.out("find CN 0xC14E0001",
+                 f"echo EXPECT [0-9a-f]{{8}}: {op:02x}[0-9a-f]{{6}} [0-9a-f]{{6}}{how:02x}", "peek CN+0x0C 2",
+                 r"echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1", "peek CN+0x18 1")
+
     def on_map(self, zone, area):
         self.out(f"echo EXPECT map zone {zone} area {area}\\b", "map", "ents")
 
