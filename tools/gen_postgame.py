@@ -140,9 +140,13 @@ for pass_no in (1, 2):
     # Hercule at the TV station: the wish's mystery
     script(["FadeOut 120", "PushMulti 4, 20, 1, 16", "Negate", "WarpToMapNoEntities 88",
             "SpawnCharacterEntity 72, 120, 104", "SetEntityFacing 72, 0", "PanCameraToPosition 120, 88, 1",
-            "FadeFromWhite 120", "WaitFrames 40", "SetEntityAnimation 72, 2"], "cut to Hercule at the TV station")
+            # he is mid-brag when we arrive (docs/cutscenes/batch3 5.2): his win pose to the crowd as the fade lifts; the growl is shown (a low
+            # shake, a rumble) and breaks the pose into the stock hurt pose. Poses 2 and 7 are the ones the stock scenes play on his actor.
+            "SetEntityAnimationNoWait 72, 7", "FadeFromWhite 120", "SetEntityAnimation 72, 7", "WaitFrames 16",
+            "ScreenShake 0, 2, 20", "PlayAudio 20", "SetEntityAnimation 72, 2"], "cut to Hercule at the TV station, mid-brag; his stomach growls")
     text(67, "HERCULE: *grrrumble*\\x0bHuh?  Must've been something I ate!")
-    script(["FadeOut 120", "DespawnEntity 72", "WarpToMapNoEntities 9, 7, 1, 144, 136", "DisableLayer 0", "DisableLayer 1",
+    script(["SetEntityFacing 72, 2", "WaitFrames 16", "SetEntityFacing 72, 3", "WaitFrames 16", "SetEntityFacing 72, 0", "SetEntityAnimationNoWait 72, 7",   # he shrugs it off
+            "FadeOut 120", "DespawnEntity 72", "WarpToMapNoEntities 9, 7, 1, 144, 136", "DisableLayer 0", "DisableLayer 1",
             "SetEntityFacing 36, 3", "SetEntityFacing 11, 1", "FadeFromWhite 120", "WaitFrames 30",
             "ScreenShake 0, 20, 60", "PlayAudio 21", "SpawnCharacterEntity 24, 144, 232", "WalkToPosition 24, 136, 176",
             "SetEntityFacing 24, 1"], "back on the Lookout: an explosion, Bulma runs up")

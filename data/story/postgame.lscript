@@ -68,7 +68,7 @@ sequence pg_dende
         WhiteFadeOut 180
         SetEntityFacing 11, 2
         END
-  script                                 ; cut to Hercule at the TV station
+  script                                 ; cut to Hercule at the TV station, mid-brag; his stomach growls
         FadeOut 120
         PushMulti 4, 20, 1, 16
         Negate
@@ -76,11 +76,21 @@ sequence pg_dende
         SpawnCharacterEntity 72, 120, 104
         SetEntityFacing 72, 0
         PanCameraToPosition 120, 88, 1
+        SetEntityAnimationNoWait 72, 7
         FadeFromWhite 120
-        WaitFrames 40
+        SetEntityAnimation 72, 7
+        WaitFrames 16
+        ScreenShake 0, 2, 20
+        PlayAudio 20
         SetEntityAnimation 72, 2
   text 67 "HERCULE: *grrrumble*\x0bHuh?  Must've been something I ate!"
   script                                 ; back on the Lookout: an explosion, Bulma runs up
+        SetEntityFacing 72, 2
+        WaitFrames 16
+        SetEntityFacing 72, 3
+        WaitFrames 16
+        SetEntityFacing 72, 0
+        SetEntityAnimationNoWait 72, 7
         FadeOut 120
         DespawnEntity 72
         WarpToMapNoEntities 9, 7, 1, 144, 136
