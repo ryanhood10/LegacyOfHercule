@@ -270,7 +270,27 @@ end
 ; ---- map 325 (zone 14 area 3), the desert ----
 
 sequence cg_fight2_end
-  stockseq @083e93e8 0 9    ; Goku gives up, Vegeta, Trunks, Cell: "which one of these pitiful specimens"
+  script                                 ; stock entry 0, and Goku and Cell stand where the scene's pans look (368 / 484, 440): the last exchange just ended
+        PlayAudio 60
+        SetPlayerVisible 0
+        FindPlayerEntity
+        WhiteFlash 6
+        SetEntityPositionInstant 0, 368, 440
+        SetEntityPositionInstant 30, 484, 440
+        SetEntityFacing 0, 3
+        SetEntityFacing 30, 2
+        PanCameraToPosition 306, 356, 3
+        SpawnDustCloud 30, 420, 444
+        SpawnDustCloud 30, 440, 436
+        WaitFrames 40
+        PlayAudio 50
+        END
+  stockseq @083e93e8 1 5    ; Goku gives up, Vegeta: "You coward!!!", Trunks: "Don't give up!"
+  script                                 ; stock entry 6: the camera comes back to Goku and Cell, both in the view
+        WaitFrames 60
+        PanCameraToPosition 306, 356, 3
+        END
+  stockseq @083e93e8 7 9    ; Cell: "which one of these pitiful specimens"
   text 1 "#I need someone to take over...\x0b...Hercule!  Get out here!"
   script                                 ; Hercule walks out between Goku and Cell
         PanCameraToPosition 400, 40, 3

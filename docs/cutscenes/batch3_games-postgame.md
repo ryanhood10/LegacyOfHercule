@@ -40,6 +40,9 @@ These are not staging taste; they are wrong pictures. All three are in the endin
 A fourth, smaller: in fight 2's end nobody is placed, so the pans that follow are aimed at where Goku and Cell were
 assumed to stand. Filmed after a fight that ended elsewhere: "CELL: This is your replacement, Goku?" shows Hercule alone
 and no Cell (`gc/zoom_gc1.png`, first tile). Scene 3.3, beat 1.
+**Fixed (`nb-cs3`, 2026-11-06):** behind a flash Goku and Cell stand at (368, 440) and (484, 440), dust between them, and the view that comes back
+from the plateau frames both (centred on Goku it cut Cell at its edge). Test: `cell_staging.txt` ends fight 2 with player 1 poked to (250, 330) and
+expects him at (368, 440) once the scene has begun, in its four Games lineups.
 
 ## 1. Lineups of this batch
 

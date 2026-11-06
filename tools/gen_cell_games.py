@@ -191,7 +191,18 @@ emit("")
 emit("; ---- map 325 (zone 14 area 3), the desert ----")
 emit("")
 emit("sequence cg_fight2_end")
-stockseq(A3, "m325_r0_defeat", 0, 9, "Goku gives up, Vegeta, Trunks, Cell: \"which one of these pitiful specimens\"")
+# The stock scene placed nobody: its pans (and ours after it) are aimed at where the fight began, and after a fight that ended elsewhere
+# "CELL: This is your replacement, Goku?" showed Hercule alone (docs/cutscenes/batch3 0, 3.3). Behind a flash the two stand where the pans look.
+b = body(A3, "m325_r0_defeat", 0)
+k = b.index("WaitFrames 40")
+b = b[:k] + ["WhiteFlash 6", "SetEntityPositionInstant 0, 368, 440", "SetEntityPositionInstant 30, 484, 440", "SetEntityFacing 0, 3", "SetEntityFacing 30, 2",
+             "PanCameraToPosition 306, 356, 3", "SpawnDustCloud 30, 420, 444", "SpawnDustCloud 30, 440, 436"] + b[k:]
+script(b, "stock entry 0, and Goku and Cell stand where the scene's pans look (368 / 484, 440): the last exchange just ended")
+stockseq(A3, "m325_r0_defeat", 1, 5, "Goku gives up, Vegeta: \"You coward!!!\", Trunks: \"Don't give up!\"")
+b = body(A3, "m325_r0_defeat", 6)
+b[b.index("SetActiveEntity 0")] = "PanCameraToPosition 306, 356, 3"     # back on the two of them (centred on Goku, the view cut Cell at its edge)
+script(b, "stock entry 6: the camera comes back to Goku and Cell, both in the view")
+stockseq(A3, "m325_r0_defeat", 7, 9, "Cell: \"which one of these pitiful specimens\"")
 text(1, "#I need someone to take over...\\x0b...Hercule!  Get out here!")
 # Ryan: the camera follows Hercule out and pans to Cell when he talks; Gohan flies into the ring. Desert map 325:
 # the crowd stands on the plateau (y 96-120), Goku at (368, 440) faces Cell at (484, 440) on the floor below.

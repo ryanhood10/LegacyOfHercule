@@ -622,12 +622,20 @@ shot cs_alone_desert
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0xfa00
+poke32 P1+0x15C 0x14a00
+frames 4
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 23
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
+frames 200
+shot cs_alone_giveup
+echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+map
 stepz 0x03001FDC 150
 frames 120
 stepz 0x03001FDC 150
@@ -807,12 +815,20 @@ shot cs_H_desert
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0xfa00
+poke32 P1+0x15C 0x14a00
+frames 4
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 23
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
+frames 200
+shot cs_H_giveup
+echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+map
 stepz 0x03001FDC 150
 frames 120
 stepz 0x03001FDC 150
@@ -998,12 +1014,20 @@ shot cs_K_desert
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0xfa00
+poke32 P1+0x15C 0x14a00
+frames 4
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 23
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
+frames 200
+shot cs_K_giveup
+echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+map
 stepz 0x03001FDC 150
 frames 120
 stepz 0x03001FDC 150
@@ -1189,12 +1213,20 @@ shot cs_Ve_desert
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref P1 0x03001FA8
+poke32 P1+0x158 0xfa00
+poke32 P1+0x15C 0x14a00
+frames 4
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 23
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 150
 echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
+frames 200
+shot cs_Ve_giveup
+echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+map
 stepz 0x03001FDC 150
 frames 120
 stepz 0x03001FDC 150

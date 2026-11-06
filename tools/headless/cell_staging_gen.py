@@ -114,7 +114,11 @@ def games(tag, p2):
     scene_done(f"{tag}_ring")
     win(22, "14")
     scene_done(f"{tag}_desert")
+    # fight 2's end places the two (docs/cutscenes/batch3 0, 3.3): the fight ends away from where the scene's pans look
+    out("deref P1 0x03001FA8", f"poke32 P1+0x158 {250 << 8:#x}", f"poke32 P1+0x15C {330 << 8:#x}", "frames 4")
     win(23, "24")
+    out("frames 200", f"shot cs_{tag}_giveup")
+    expect("map zone 14 area 3 var [0-9]+ player 368,440", "map")
     scene_done(f"{tag}_f3")      # fight 3: player 2's Hercule beside Gohan, or Gohan alone and no actor
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")
