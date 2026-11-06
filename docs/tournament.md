@@ -1937,20 +1937,24 @@ shows; a pose that is no group's first frame needs a group of its own.
   the hanging right arm taken off and drawn raised, bent at the elbow, the fist above his head, in his own armour and skin
   colours, 32 x 32 (his slot is 0x400), the same array for all four facings (the pose faces the crowd and keeps it when he
   turns); the party's 16 (175) and the opponent (160) share it. **Gohan and Krillin:** their cheer's arms-up frame (group 4
-  frame 3; frame 0 is the arms down) as a one-frame group per facing, their own descriptors pointing at the ROM's blobs.
+  frame 3; frame 0 is the arms down) as a group of its own per facing (that frame, repeated), their own descriptors pointing at the ROM's blobs.
 - **Rows:** Hercule group 5 (the wave; his 4 is a shout), Pui Pui and Janemba group 5 still (a fist / claw up on one leg; their
   4 is their idle). **Super Buu's three forms:** their group 4 (`data/tny_buu.txt`) now starts on the flex (Buu's anim 18)
   before the roar, so frame 0, the pose and his talking pose, is the flex (it was the roar with the steam web).
-- **The lying fix:** `tools/tnyplayables.py`'s lying table builds the same kind of one-frame group for its "own" rows (the
+- **The lying fix:** `tools/tnyplayables.py`'s lying table builds the same kind of group for its "own" rows (the
   knock-down's last frame per facing): the six bodies above lie at a fight's end and when knocked out mid-fight (`tny_moves.c`
   `fallen()` reads the same table). Every other body's group 12 was checked frame 0 against its last frame: lying in both.
 - **The celebration:** 40 frames into the end's pause (the last body has fallen; the announcer is walking back on) the winners
-  strike their pose and hop twice (6 px, 16 frames a hop, each next winner 6 frames later: the trophy's hop); while they hop the
-  pose and the idle take turns, 6 frames each (the arms pumped: idle, cheer, idle, cheer), then the pose holds through the
-  result line and the winner's line. The players when they won (both on a 2 v 2 floor), else the opponents still standing (a
-  loss: the opponent cheers). A line opening lands them at once (`cel_land`: from `stage_ann` and `tny_stage_line`, and before
-  any pose is let go), so nobody hangs in the air under a box. The Rumble's rounds and the challenge use the same; the trophy
-  keeps its own two hops and pumps the pose the same way. The co-op final's duel keeps the stock duel's end.
+  strike their pose and hop twice in it (6 px, 16 frames a hop, each next winner 6 frames later: the trophy's hop), then hold it
+  through the result line and the winner's line. The players when they won (both on a 2 v 2 floor), else the opponents still
+  standing (a loss: the opponent cheers); when a player still lies downed it starts with the end's line instead, after he is
+  got up (as the poses always started). A line opening lands them at once (`cel_land`: from `stage_ann` and
+  `tny_stage_line`, and before any pose is let go), so nobody hangs in the air under a box. The Rumble's rounds and the
+  challenge use the same; the trophy keeps its own two hops in the new poses. The co-op final's duel keeps the stock duel's end.
+- **Tried and dropped: the pose and the idle in turn while they hop** (a cheer pumped). Switching a held pose's group every few
+  frames crashed `tny_n32`'s real 2 v 2 (an entity freed under the entity list at the next fight's start, read as a vtable of
+  0: bisected to the switching alone, the hops alone pass). A held pose's group is now set once. Built groups repeat their
+  frame 8 times (a body's state could pick another index; a zero descriptor read as a frame would decode from address 0).
 - **What it costs:** nothing new before control (the pause was 90 frames already; the result line opens when it did), A as
   before (the end's pause had no line), nothing on a fight's frames (it starts after the fight is decided). RAM: two bytes of
   `TnyEng`'s padding (`cel_t` +0x115, `cel_on` +0x116), `.combo.st` grows to 12 bytes for the tests.
@@ -1976,6 +1980,9 @@ Cold, had no team line (the table's was Frieza's); every pair of the story party
 **Tests** (`docs/testing.md` "Tournament scenes"): `tny_scenes.txt` A (Piccolo wins: his pose, one winner, a 6 px hop), B (the 2 v 2's four boxes line by line, every
 fight's winners two at a time), I (a loss: the opponent cheers), K (Android 16: the drawn group 0x3F held), L (who speaks in
 seven lineups), M (73 bodies: each pick valid, then posed four at a time and celebrating, `ents` sane); 193 checks.
+`tny_n32.txt`'s "the team loses in the first round" now presses A until the team is out (`stepnz` on `eng.out`) instead of
+looking every 100 frames for the 120-frame fight: the longer 2 v 2 talk moved the looks off it and the presses went on into a
+new tournament.
 
 **Not checked by a person:** all headless. Whether 16's drawn arm reads well at game size, the hop's height on the giants and
 which bodies' poses could be better (the plain stances of Frieza, Vegeta, Piccolo, Trunks, the androids: their group 4 / 5

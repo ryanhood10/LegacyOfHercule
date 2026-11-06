@@ -868,10 +868,10 @@ the engine shows them):
 
 **Lying, the same finding:** the lying table's rows "the knock-down's last frame" (Hercule 72, Gohan 57, Trunks 135, Super Saiyan 2
 Gohan 58, Semi-Perfect 29 and Perfect Cell 30) showed the knock-down's first frame, the recoil standing. `tools/tnyplayables.py`
-`lie_table` now builds a one-frame group per facing for them (`tp_lieown<id>`). Every other body's group 12 lies at frame 0 too
+`lie_table` now builds a group per facing for them (`tp_lieown<id>`: that frame 8 times, as every built group). Every other body's group 12 lies at frame 0 too
 (checked against its last frame).
 
 `tools/tnywins.py` draws on 16's own 16 x 32 idle in a 32 x 32 frame (x offset -8, his slot 0x400): the hanging arm's columns
 cleared, the arm painted from a character map in his armour (0x29 olive, 0x2A dark, 0x2E yellow, 0x36 green, black outline)
-and skin ramp (0x72-0x75, outline 0x17), the shoulder pad kept over it. Every built group is one frame and a zero descriptor
-(the engine's frame count stops there) per facing; 16's is one array for all four. Preview `$(BUILD)/tny_wins_preview.png`.
+and skin ramp (0x72-0x75, outline 0x17), the shoulder pad kept over it. Every built group is its frame 8 times and a zero
+descriptor per facing (whatever index a body's state picks finds the frame); 16's is one array for all four. Preview `$(BUILD)/tny_wins_preview.png`.
