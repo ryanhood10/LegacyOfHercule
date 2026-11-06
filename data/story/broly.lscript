@@ -1,12 +1,12 @@
 ; The Broly side chapter of the ten-day wait (docs/story.md 4g "Broly side chapter"), applied by
 ; data/story/broly.json (Capsule Corp maps) and data/maps/broly_arena.json (zone 15 area 3, which names
-; this file in "sources"). Generated guard blocks: an actor of a trip member is spawned, moved or
-; despawned only when neither player plays that character (the stock scenes' pattern; a script step on
-; a sprite with no entity writes through a null pointer).
+; this file in "sources"). Only who is played is in a scene (Ryan, 2026-11-05): the trip's others have no
+; actors and their lines play only when someone plays them (CoopCall 22 op 4); Paragus, Broly and Bulma are the
+; story's. A script step on a sprite with no entity writes through a null pointer: Vegeta's actor is guarded.
 ;
 ; Right after Cell's TV broadcast Bulma walks in: a Saiyan ship has landed in the backyard for Vegeta
 ; (flag 400). In the backyard (zone 6 area 21), with Vegeta as a player, Paragus steps out of the ship
-; and offers him New Planet Vegeta; Trunks, Krillin, Gohan and Piccolo come along; everyone boards through the
+; and offers him New Planet Vegeta; whoever plays Trunks, Krillin, Gohan or Piccolo speaks up; the players board through the
 ; ship's door, the ship shakes through the flight and lands (flag 401; the party's state is kept in flags 404-419 by CoopCall 10 and the trip's five
 ; are selectable, Hercule stays home). The arena (zone 15 area 3) has the landing zone with the ship (no
 ; save pad: there is no way back until Broly falls); crossing the basin's rim brings everyone on screen for Paragus' betrayal and Broly
@@ -101,114 +101,79 @@ sequence broly_yard
   text 120 "PARAGUS: My name is Paragus.\x0bI served your father, King Vegeta, before Frieza destroyed our world."
   text 120 "PARAGUS: I have found a new home for our people, my prince.  A New Planet Vegeta.\x0bIt has everything a Saiyan could want...  except a king."
   text 4 "VEGETA: A planet of my own...  Hmph.\x0bA prince belongs on a throne, not guarding this mud ball."
-  script
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse N1
-        SpawnCharacterEntity 132, 16, 272
-        WalkToPosition 132, 200, 476
-        SetEntityFacing 132, 3
-      N1:
-        PushActiveCharIndex
+  [9] script
+        CoopCall 22, 4, 3, 0
+        JumpIfFalse skip
+        PushByte 10
+        END
+      skip:
+        PushByte 11
+        END
+  [10] text 5 "TRUNKS: Father, wait!  You can't just fly off with a stranger!\x0bWe don't know anything about this man!"
+  [11] script
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse skip
+        PushByte 12
+        END
+      skip:
+        PushByte 13
+        END
+  [12] text 73 "KRILLIN: A brand-new Planet Vegeta, out of nowhere?  This smells like a trap to me..."
+  [13] script
+        CoopCall 22, 4, 1, 0
+        JumpIfFalse skip
+        PushByte 14
+        END
+      skip:
+        PushByte 15
+        END
+  [14] text 3 "PICCOLO: Then we all go.  If it's a trap, we spring it together."
+  [15] script
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse skip
+        PushByte 16
+        END
+      skip:
+        PushByte 17
+        END
+  [16] text 2 "GOHAN: I'm coming too!"
+  [17] script
+        CoopCall 22, 4, 3, 0
+        CoopCall 22, 4, 6, 0
+        Not
+        CoopCall 22, 4, 1, 0
+        Not
+        CoopCall 22, 4, 0, 0
+        Not
+        JumpIfFalse skip
+        PushByte 18
+        END
+      skip:
+        PushByte 19
+        END
+  [18] text 120 "PARAGUS: ...As you wish.  All are welcome.  Come, my king."
+  [19] script  ; Vegeta alone (draft)
+        CoopCall 22, 4, 3, 0
+        CoopCall 22, 4, 6, 0
+        Not
+        CoopCall 22, 4, 1, 0
+        Not
+        CoopCall 22, 4, 0, 0
+        Not
         PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse N2
-        SpawnCharacterEntity 56, 16, 272
-        WalkToPosition 56, 176, 468
-        SetEntityFacing 56, 3
-      N2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse N3
-        SpawnCharacterEntity 103, 16, 272
-        WalkToPosition 103, 152, 476
-        SetEntityFacing 103, 3
-      N3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse N4
-        SpawnCharacterEntity 76, 16, 272
-        WalkToPosition 76, 176, 448
-        SetEntityFacing 76, 3
-      N4:
-        WaitFrames 20
-  text 5 "TRUNKS: Father, wait!  You can't just fly off with a stranger!\x0bWe don't know anything about this man!"
-  text 73 "KRILLIN: A brand-new Planet Vegeta, out of nowhere?  This smells like a trap to me..."
-  text 3 "PICCOLO: Then we all go.  If it's a trap, we spring it together."
-  text 2 "GOHAN: I'm coming too!"
-  text 120 "PARAGUS: ...As you wish.  All are welcome.  Come, my king."
-  script
+        CmpEq
+        JumpIfFalse skip
+        PushByte 20
+        END
+      skip:
+        PushByte 21
+        END
+  [20] text 120 "PARAGUS: Then come, my king.  Your people are waiting."
+  [21] script  ; Paragus goes back in; the players board through the ship's door themselves (broly_board)
         WalkToPosition 170, 344, 456
         WalkToPosition 170, 344, 412
         DespawnEntity 170
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse N5
-        WalkToPosition 132, 344, 476
-        WalkToPosition 132, 344, 412
-        DespawnEntity 132
-      N5:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse N6
-        WalkToPosition 56, 344, 476
-        WalkToPosition 56, 344, 412
-        DespawnEntity 56
-      N6:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse N7
-        WalkToPosition 103, 344, 476
-        WalkToPosition 103, 344, 412
-        DespawnEntity 103
-      N7:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse N8
-        WalkToPosition 76, 344, 476
-        WalkToPosition 76, 344, 412
-        DespawnEntity 76
-      N8:
-        SetStoryFlag 377                 ; the players board through the ship's door themselves (broly_board)
+        SetStoryFlag 377
         SetPlayerVisible 1
         SetActiveEntity 0
 end
@@ -271,63 +236,8 @@ sequence broly_board
         CoopCall 6, 3, 0, 0                ; player 2 (kept across the warp) plays Trunks
         CoopCall 9, 1, 128, 196
         SetEntityFacing 0, 0
-        SpawnCharacterEntity 170, 120, 92  ; Paragus and the others ride along (Ryan, 2026-10-21)
+        SpawnCharacterEntity 170, 120, 92  ; Paragus rides along (Ryan, 2026-10-21); the others only as players (Ryan, 2026-11-05)
         SetEntityFacing 170, 0
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse R0
-        SpawnCharacterEntity 137, 64, 112
-        SetEntityFacing 137, 3
-      R0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse R1
-        SpawnCharacterEntity 132, 48, 148
-        SetEntityFacing 132, 3
-      R1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse R2
-        SpawnCharacterEntity 56, 56, 184
-        SetEntityFacing 56, 3
-      R2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse R3
-        SpawnCharacterEntity 103, 168, 84
-        SetEntityFacing 103, 2
-      R3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse R4
-        SpawnCharacterEntity 76, 200, 100
-        SetEntityFacing 76, 2
-      R4:
         SetPlayerVisible 1
         WaitFrames 40
         PlayAudio 26
@@ -343,70 +253,10 @@ sequence broly_board
         PlayAudio 50
         SetStoryFlag 378
   text 0 "@^The ship lands."
-  script                                 ; Paragus and the others get off first, out of the room's door
+  script                                 ; Paragus gets off first, out of the room's door
         WaitFrames 20
         WalkToPosition 170, 120, 60
         DespawnEntity 170
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse O0
-        WalkToPosition 137, 120, 100
-        WalkToPosition 137, 120, 60
-        DespawnEntity 137
-      O0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse O1
-        WalkToPosition 132, 120, 100
-        WalkToPosition 132, 120, 60
-        DespawnEntity 132
-      O1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse O2
-        WalkToPosition 56, 120, 100
-        WalkToPosition 56, 120, 60
-        DespawnEntity 56
-      O2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse O3
-        WalkToPosition 103, 120, 100
-        WalkToPosition 103, 120, 60
-        DespawnEntity 103
-      O3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse O4
-        WalkToPosition 76, 120, 100
-        WalkToPosition 76, 120, 60
-        DespawnEntity 76
-      O4:
         SetActiveEntity 0
 end
 
@@ -418,64 +268,9 @@ sequence broly_ship_out
         CoopCall 6, 3, 0, 0
         CoopCall 9, 1, 352, 684            ; player 2 already down the ramp
         SetEntityFacing 0, 0
-        PanCameraToPosition 200, 600, 8  ; the ship's door, its ramp and everyone at its foot, above the text box
+        PanCameraToPosition 200, 600, 8  ; the ship's door, its ramp and Paragus at its foot, above the text box
         SpawnCharacterEntity 170, 256, 680
         SetEntityFacing 170, 3
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse P0
-        SpawnCharacterEntity 137, 216, 672
-        SetEntityFacing 137, 3
-      P0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse P1
-        SpawnCharacterEntity 132, 376, 668
-        SetEntityFacing 132, 2
-      P1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse P2
-        SpawnCharacterEntity 56, 408, 684
-        SetEntityFacing 56, 2
-      P2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse P3
-        SpawnCharacterEntity 103, 232, 690
-        SetEntityFacing 103, 3
-      P3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse P4
-        SpawnCharacterEntity 76, 432, 668
-        SetEntityFacing 76, 2
-      P4:
         FadeFromWhite 60
         PlayAudio 50
         WalkToPosition 0, 320, 680
@@ -483,164 +278,14 @@ sequence broly_ship_out
   text 120 "PARAGUS: Welcome to New Planet Vegeta, my king.\x0bYour people await you beyond that ridge.  Come."
   text 4 "VEGETA: Hmph.  Lead the way, old man."
   script
-        BeginCommandBatch                ; everyone around the ship, up to the basin's rim
+        BeginCommandBatch                ; Paragus around the ship, up to the basin's rim
         WalkToPosition 170, 176, 680
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse A0
-        WalkToPosition 137, 144, 672
-      A0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse A1
-        WalkToPosition 132, 464, 668
-      A1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse A2
-        WalkToPosition 56, 488, 684
-      A2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse A3
-        WalkToPosition 103, 160, 690
-      A3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse A4
-        WalkToPosition 76, 512, 668
-      A4:
         CommitCommandBatch
         BeginCommandBatch
         WalkToPosition 170, 176, 520
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse B0
-        WalkToPosition 137, 144, 500
-      B0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse B1
-        WalkToPosition 132, 464, 500
-      B1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse B2
-        WalkToPosition 56, 488, 516
-      B2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse B3
-        WalkToPosition 103, 160, 516
-      B3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse B4
-        WalkToPosition 76, 512, 516
-      B4:
         CommitCommandBatch
         WaitFrames 10
         DespawnEntity 170
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse C0
-        DespawnEntity 137
-      C0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse C1
-        DespawnEntity 132
-      C1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse C2
-        DespawnEntity 56
-      C2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse C3
-        DespawnEntity 103
-      C3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse C4
-        DespawnEntity 76
-      C4:
 
         SetPlayerVisible 1
         SetActiveEntity 0
@@ -648,16 +293,19 @@ end
 
 ; ---- zone 15 area 3: New Planet Vegeta ------------------------------------------------------------
 
+; Only who is played is in a scene (Ryan, 2026-11-05; docs/howto.md "Stage a scene" rule 2): the trip's others (Trunks, Gohan, Piccolo,
+; Krillin) have no actors; a line of one nobody plays is skipped, or said by player 1 (speaker 250) where the scene needs it. Kept for the
+; plot: Vegeta at the rim when nobody plays him (Paragus' betrayal and Broly are his). CoopCall 22 op 4: 1 = played.
 sequence broly_rim
-  script                                 ; seen before (flag 403): straight to the fight (the last entry)
+  [0] script                             ; seen before (flag 403): straight to the fight (the last entry, 17)
         StackTestStoryFlag 403
         JumpIfFalse L1
-        PushByte 14
+        PushByte 17
         END
       L1:
         PushByte 1
         END
-  script
+  [1] script  ; Paragus comes round the rim from above; Vegeta's actor runs up from the left when nobody plays him (kept: the scene is his)
         SetPlayerVisible 0
         PlayMusic 39
         WalkToPosition 0, 312, 414
@@ -666,114 +314,52 @@ sequence broly_rim
         PanCameraToPosition 212, 330, 2
         WalkToPosition 159, 400, 414
         SetEntityFacing 159, 2
-        SpawnCharacterEntity 170, 360, 310     ; Paragus comes round the rim from above, the others run up from the left, all off screen first
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
+        SpawnCharacterEntity 170, 360, 310
+        CoopCall 22, 1, 2, 0
         JumpIfFalse N9
         SpawnCharacterEntity 137, 150, 414
       N9:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse N10
-        SpawnCharacterEntity 132, 118, 414
-      N10:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse N11
-        SpawnCharacterEntity 56, 198, 390
-      N11:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse N12
-        SpawnCharacterEntity 103, 166, 390
-      N12:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse N13
-        SpawnCharacterEntity 76, 134, 390
-      N13:
         BeginCommandBatch
         WalkToPosition 170, 360, 400
         CoopCall 22, 2, 137, 0
         JumpIfFalse W1
         WalkToPosition 137, 248, 414
       W1:
-        CoopCall 22, 2, 132, 0
-        JumpIfFalse W2
-        WalkToPosition 132, 216, 414
-      W2:
-        CoopCall 22, 2, 56, 0
-        JumpIfFalse W3
-        WalkToPosition 56, 296, 390
-      W3:
-        CoopCall 22, 2, 103, 0
-        JumpIfFalse W4
-        WalkToPosition 103, 264, 390
-      W4:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse W5
-        WalkToPosition 76, 232, 390
-      W5:
         CommitCommandBatch
         SetEntityFacing 170, 2
         CoopCall 22, 2, 137, 0
         JumpIfFalse F1
         SetEntityFacing 137, 3
       F1:
-        CoopCall 22, 2, 132, 0
-        JumpIfFalse F2
-        SetEntityFacing 132, 3
-      F2:
-        CoopCall 22, 2, 56, 0
-        JumpIfFalse F3
-        SetEntityFacing 56, 3
-      F3:
-        CoopCall 22, 2, 103, 0
-        JumpIfFalse F4
-        SetEntityFacing 103, 3
-      F4:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse F5
-        SetEntityFacing 76, 3
-      F5:
         WaitFrames 30
-  text 4 "VEGETA: Paragus!  What is this?  Where are my people?"
-  text 120 "PARAGUS: Your people?  There are none, Prince.  There is no kingdom.\x0bThis planet is a graveyard...  and it is about to become yours."
-  text 120 "PARAGUS: Your father sentenced my son to death as an infant because his power dwarfed yours.\x0bWe survived.  Now meet him.  Broly!"
-  script
+  [2] text 4 "VEGETA: Paragus!  What is this?  Where are my people?"
+  [3] text 120 "PARAGUS: Your people?  There are none, Prince.  There is no kingdom.\x0bThis planet is a graveyard...  and it is about to become yours."
+  [4] text 120 "PARAGUS: Your father sentenced my son to death as an infant because his power dwarfed yours.\x0bWe survived.  Now meet him.  Broly!"
+  [5] script
         PlayAudio 50
         SetEntityFacing 159, 2
         WhiteFlash 5
         ScreenShake 0, 20, 30
-  text 0 "@^BROLY: ...Ka...  ka...  rot..."
-  text 2 "GOHAN: Kakarot?  That's my dad's Saiyan name!  He thinks I'm...?"
-  text 3 "PICCOLO: His power is off the charts...  Everyone, stay sharp!"
-  script                                 ; Vegeta backs away a step
+  [6] text 0 "@^BROLY: ...Ka...  ka...  rot..."
+  [7] script
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse skip
+        PushByte 8
+        END
+      skip:
+        PushByte 9
+        END
+  [8] text 2 "GOHAN: Kakarot?  That's my dad's Saiyan name!  He thinks I'm...?"
+  [9] script
+        CoopCall 22, 4, 1, 0
+        JumpIfFalse skip
+        PushByte 10
+        END
+      skip:
+        PushByte 11
+        END
+  [10] text 3 "PICCOLO: His power is off the charts...  Everyone, stay sharp!"
+  [11] script  ; Vegeta backs away a step
         CoopCall 22, 2, 137, 0
         JumpIfFalse V1
         WalkToPosition 137, 232, 414
@@ -786,10 +372,18 @@ sequence broly_rim
         WalkToPosition 0, 296, 414
         SetEntityFacing 0, 3
       V2:
-  text 4 "VEGETA: The Legendary Super Saiyan...  It can't be..."
-  text 5 "TRUNKS: Father, snap out of it!  We have to fight!"
-  text 0 "@^BROLY: KAKAROOOOT!!"
-  script                                 ; the others step back out of it; Paragus goes to his son's side, to the spot his boss twin takes (TWIN_OFFSET right of Broly), so the swap does not show
+  [12] text 4 "VEGETA: The Legendary Super Saiyan...  It can't be..."
+  [13] script
+        CoopCall 22, 4, 3, 0
+        JumpIfFalse skip
+        PushByte 14
+        END
+      skip:
+        PushByte 15
+        END
+  [14] text 5 "TRUNKS: Father, snap out of it!  We have to fight!"
+  [15] text 0 "@^BROLY: KAKAROOOOT!!"
+  [16] script  ; Vegeta's actor steps back out of it; Paragus goes to his son's side, to the spot his boss twin takes (TWIN_OFFSET right of Broly)
         SetStoryFlag 403
         BeginCommandBatch
         WalkToPosition 170, 424, 414
@@ -797,45 +391,13 @@ sequence broly_rim
         JumpIfFalse W1
         WalkToPosition 137, 150, 414
       W1:
-        CoopCall 22, 2, 132, 0
-        JumpIfFalse W2
-        WalkToPosition 132, 118, 414
-      W2:
-        CoopCall 22, 2, 56, 0
-        JumpIfFalse W3
-        WalkToPosition 56, 198, 390
-      W3:
-        CoopCall 22, 2, 103, 0
-        JumpIfFalse W4
-        WalkToPosition 103, 166, 390
-      W4:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse W5
-        WalkToPosition 76, 134, 390
-      W5:
         CommitCommandBatch
         DespawnEntity 170
         CoopCall 22, 2, 137, 0
         JumpIfFalse D1
         DespawnEntity 137
       D1:
-        CoopCall 22, 2, 132, 0
-        JumpIfFalse D2
-        DespawnEntity 132
-      D2:
-        CoopCall 22, 2, 56, 0
-        JumpIfFalse D3
-        DespawnEntity 56
-      D3:
-        CoopCall 22, 2, 103, 0
-        JumpIfFalse D4
-        DespawnEntity 103
-      D4:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse D5
-        DespawnEntity 76
-      D5:
-  script
+  [17] script
         PlayMusic 30
         CoopCall 9, 0, seq:broly_rage, 0
         DespawnCharacterAndRecordPosition 159, 2
@@ -880,41 +442,29 @@ sequence broly_end
         ScreenShake 0, 20, 40
         PlaySFX 159, 20
         WaitFrames 20
-  script                                 ; nobody plays Vegeta (he stepped back for the fight): he flies in beside player 1 to say it
-        CoopCall 22, 1, 2, 0
-        JumpIfFalse V1
-        PushByte 137
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 136
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        Step SpawnCharacterEntity
-        PushByte 137
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 36
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        Step FlyToPosition
-        SetEntityFacing 137, 3
-      V1:
-  text 4 "VEGETA: His power is tearing the whole planet apart!  Everyone, back to the ship!"
-  script
+  [3] script
+        CoopCall 22, 4, 2, 0
+        JumpIfFalse skip
+        PushByte 4
+        END
+      skip:
+        PushByte 5
+        END
+  [4] text 4 "VEGETA: His power is tearing the whole planet apart!  Everyone, back to the ship!"
+  [5] script  ; nobody plays Vegeta: player 1 says it
+        CoopCall 22, 4, 2, 0
+        PushByte 0
+        CmpEq
+        JumpIfFalse skip
+        PushByte 6
+        END
+      skip:
+        PushByte 7
+        END
+  [6] fmt 250 "%s: His power is tearing the whole planet apart!  Everyone, back to the ship!"
+        PushActiveCharNameUpper
+        END
+  [7] script  ; back aboard: the ride home (Ryan), the players only
         BeginCommandBatch
         ScreenShake 0, 20, 80
         PlaySFX 159, 21
@@ -927,143 +477,28 @@ sequence broly_end
         FadeToWhite 10
         WhiteFadeOut 20
         WaitFrames 60
-        WarpToMapWithEntities 15, 9, 1, 96, 192   ; back aboard: the ride home (Ryan)
+        WarpToMapWithEntities 15, 9, 1, 96, 192
         CoopCall 9, 1, 128, 196
         SetEntityFacing 0, 0
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse H0
-        SpawnCharacterEntity 137, 64, 112
-        SetEntityFacing 137, 3
-      H0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse H1
-        SpawnCharacterEntity 132, 48, 148
-        SetEntityFacing 132, 3
-      H1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse H2
-        SpawnCharacterEntity 56, 56, 184
-        SetEntityFacing 56, 3
-      H2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse H3
-        SpawnCharacterEntity 103, 168, 84
-        SetEntityFacing 103, 2
-      H3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse H4
-        SpawnCharacterEntity 76, 200, 100
-        SetEntityFacing 76, 2
-      H4:
         SetPlayerVisible 1
         WaitFrames 30
         PlayAudio 26
         ScreenShake 0, 12, 200
         WaitFrames 60
-  text 0 "@^The ship escapes the exploding planet and heads home..."
-  script
+  [8] text 0 "@^The ship escapes the exploding planet and heads home..."
+  [9] script
         PlayAudio 26
         ScreenShake 0, 8, 160
         WaitFrames 150
         PlayAudio 50
-  text 0 "@^The ship lands back at Capsule Corp."
-  script                                 ; the others get off first; the players walk out of the room's door themselves (broly_home_out)
+  [10] text 0 "@^The ship lands back at Capsule Corp."
+  [11] script  ; the players walk out of the room's door themselves (broly_home_out)
         WaitFrames 20
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse G0
-        WalkToPosition 137, 120, 100
-        WalkToPosition 137, 120, 60
-        DespawnEntity 137
-      G0:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse G1
-        WalkToPosition 132, 120, 100
-        WalkToPosition 132, 120, 60
-        DespawnEntity 132
-      G1:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse G2
-        WalkToPosition 56, 120, 100
-        WalkToPosition 56, 120, 60
-        DespawnEntity 56
-      G2:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse G3
-        WalkToPosition 103, 120, 100
-        WalkToPosition 103, 120, 60
-        DespawnEntity 103
-      G3:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse G4
-        WalkToPosition 76, 120, 100
-        WalkToPosition 76, 120, 60
-        DespawnEntity 76
-      G4:
         SetActiveEntity 0
 end
 
 sequence broly_home_out
-  script                                 ; out of the ship's door and down its ramp: home, the others waiting
+  [0] script  ; out of the ship's door and down its ramp: home, Bulma coming to meet them
         SetPlayerVisible 0
         FadeOut 60
         SetStoryFlag 379
@@ -1072,162 +507,80 @@ sequence broly_home_out
         CoopCall 9, 1, 376, 476
         SpawnCharacterEntity 24, 248, 462
         SetEntityFacing 24, 3
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse N19
-        SpawnCharacterEntity 137, 296, 470
-        SetEntityFacing 137, 3
-      N19:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse N20
-        SpawnCharacterEntity 132, 392, 462
-        SetEntityFacing 132, 2
-      N20:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse N21
-        SpawnCharacterEntity 56, 432, 472
-        SetEntityFacing 56, 2
-      N21:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse N22
-        SpawnCharacterEntity 103, 288, 448
-        SetEntityFacing 103, 3
-      N22:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse N23
-        SpawnCharacterEntity 76, 440, 448
-        SetEntityFacing 76, 2
-      N23:
         PlayMusic 41
         FadeFromWhite 60
-        BeginCommandBatch                ; down the ramp, Bulma coming to meet them
+        BeginCommandBatch
         WalkToPosition 0, 344, 456
         WalkToPosition 24, 316, 458
         CommitCommandBatch
         SetEntityFacing 0, 2
         SetEntityFacing 24, 3
-  text 36 "BULMA: You're back!  What happened out there?"
-  script                                 ; steps up to say it
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse S1
-        WalkToPosition 76, 420, 452
-        SetEntityFacing 76, 2
-      S1:
-  text 73 "KRILLIN: Long story.  New Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
-  script                                 ; steps up to say it
-        CoopCall 22, 2, 56, 0
-        JumpIfFalse S1
-        WalkToPosition 56, 412, 470
-        SetEntityFacing 56, 2
-      S1:
-  text 2 "GOHAN: He kept calling me Kakarot.  He really hated my dad."
-  script                                 ; steps up to say it
-        CoopCall 22, 2, 132, 0
-        JumpIfFalse S1
-        WalkToPosition 132, 376, 460
-        SetEntityFacing 132, 2
-      S1:
-  text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...\x0bI hope we never meet another one."
-  script                                 ; steps up to say it
-        CoopCall 22, 2, 103, 0
-        JumpIfFalse S1
-        WalkToPosition 103, 296, 442
-        SetEntityFacing 103, 3
-      S1:
-  text 3 "PICCOLO: Then we keep training.  Something worse is always coming."
-  script                                 ; steps up to say it
-        CoopCall 22, 2, 137, 0
-        JumpIfFalse S1
-        WalkToPosition 137, 304, 478
-        SetEntityFacing 137, 3
-      S1:
-  text 4 "VEGETA: Hmph.  A Legendary Super Saiyan...  and I sent him to the grave.  Remember that."
-  script
+  [1] text 36 "BULMA: You're back!  What happened out there?"
+  [2] script
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse skip
+        PushByte 3
+        END
+      skip:
+        PushByte 4
+        END
+  [3] text 73 "KRILLIN: Long story.  New Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
+  [4] script  ; nobody plays Krillin: player 1 answers her
+        CoopCall 22, 4, 6, 0
+        PushByte 0
+        CmpEq
+        JumpIfFalse skip
+        PushByte 5
+        END
+      skip:
+        PushByte 6
+        END
+  [5] fmt 250 "%s: Long story.  New Planet Vegeta was a trap...\x0band the guy waiting for us there was a monster."
+        PushActiveCharNameUpper
+        END
+  [6] script
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse skip
+        PushByte 7
+        END
+      skip:
+        PushByte 8
+        END
+  [7] text 2 "GOHAN: He kept calling me Kakarot.  He really hated my dad."
+  [8] script
+        CoopCall 22, 4, 3, 0
+        JumpIfFalse skip
+        PushByte 9
+        END
+      skip:
+        PushByte 10
+        END
+  [9] text 5 "TRUNKS: If that's what a Legendary Super Saiyan is like...\x0bI hope we never meet another one."
+  [10] script
+        CoopCall 22, 4, 1, 0
+        JumpIfFalse skip
+        PushByte 11
+        END
+      skip:
+        PushByte 12
+        END
+  [11] text 3 "PICCOLO: Then we keep training.  Something worse is always coming."
+  [12] script
+        CoopCall 22, 4, 2, 0
+        JumpIfFalse skip
+        PushByte 13
+        END
+      skip:
+        PushByte 14
+        END
+  [13] text 4 "VEGETA: Hmph.  A Legendary Super Saiyan...  and I sent him to the grave.  Remember that."
+  [14] script  ; the party as before the trip (CoopCall 10 op 1 pushes player 1's slot), player 2 too
         FadeOut 120
         WaitFrames 60
         DespawnEntity 24
-        PushActiveCharIndex
-        PushByte 2
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 2
-        CmpNe
-        And
-        JumpIfFalse N24
-        DespawnEntity 137
-      N24:
-        PushActiveCharIndex
-        PushByte 3
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 3
-        CmpNe
-        And
-        JumpIfFalse N25
-        DespawnEntity 132
-      N25:
-        PushActiveCharIndex
-        PushByte 0
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 0
-        CmpNe
-        And
-        JumpIfFalse N26
-        DespawnEntity 56
-      N26:
-        PushActiveCharIndex
-        PushByte 1
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 1
-        CmpNe
-        And
-        JumpIfFalse N27
-        DespawnEntity 103
-      N27:
-        PushActiveCharIndex
-        PushByte 6
-        CmpNe
-        CoopCall 8, 0, 0, 0
-        PushByte 6
-        CmpNe
-        And
-        JumpIfFalse N28
-        DespawnEntity 76
-      N28:
-        CoopCall 10, 1, 0, 0             ; the party as before the trip; pushes player 1's slot
+        CoopCall 10, 1, 0, 0
         Step SetActiveCharacter
-        CoopCall 10, 2, 0, 0             ; player 2 as before the trip
+        CoopCall 10, 2, 0, 0
         SetPlayerVisible 1
         SetActiveEntity 0
         ReloadMap

@@ -129,108 +129,59 @@ end
 
 ; trigger 0: on the way to the cave the forest goes quiet, Frieza and Cooler appear
 sequence ch1_spirit
-  script
+  [0] script                             ; only who is played (Ryan, 2026-11-05): player 1 walks up; both played: Gohan's line (1), Gohan alone (2), Krillin alone (3)
         SetPlayerVisible 0
-        CoopCall 22, 1, 0, 0                  ; nobody plays Gohan (alone as Krillin): he walks up beside him (sprite 53)
-        JumpIfFalse G0
-        SpawnCharacterEntity 53, 128, 260
-      G0:
-        CoopCall 22, 1, 6, 0                  ; nobody plays Krillin (alone as Gohan): the same, sprite 76
-        JumpIfFalse K0
-        SpawnCharacterEntity 76, 64, 260
-      K0:
-        BeginCommandBatch
         WalkToPosition 0, 96, 176
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        WalkToPosition 53, 128, 176
-      G1:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        WalkToPosition 76, 64, 176
-      K1:
-        CommitCommandBatch
         SetEntityFacing 0, 1
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G2
-        SetEntityFacing 53, 1
-      G2:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K2
-        SetEntityFacing 76, 1
-      K2:
         PanCameraToPosition 0, 104, 2         ; (was 0, 0: the box hid Frieza and the players stood below the view)
         WaitFrames 40
         PlayAudio 50
-  text 1 "#GOHAN: Krillin, wait...\x0bHuh?  The whole forest just went quiet."
-  script                                 ; the actor turns to the other, then back at the forest
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        SetEntityFacing 76, 3
-        WaitFrames 20
-      K1:
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        SetEntityFacing 53, 2
-        WaitFrames 20
-      G1:
-  text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us."
-  script
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        SetEntityFacing 76, 1
-      K1:
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        SetEntityFacing 53, 1
-      G1:
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse g
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse k
+        PushByte 1
+        END
+      g:
+        PushByte 2
+        END
+      k:
+        PushByte 5
+        END
+  [1] text 1 "#GOHAN: Krillin, wait...\x0bHuh?  The whole forest just went quiet." -> 4
+  [2] text 1 "#GOHAN: Huh?  The whole forest just went quiet." -> 6
+  stop
+  [4] text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us." -> 6
+  [5] text 73 "KRILLIN: Huh?  The whole forest just went quiet...\x0bSomething is here." -> 6
+  [6] script
         FadeToWhite 120
         TriggerMapEvent 1
         WhiteFadeOut 30
         WhiteFlash 40
-  stock @083b952c                        ; Frieza: your dad isn't coming back!
-  text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
-  script                                 ; they recoil a step
-        BeginCommandBatch
+  [7] stock @083b952c                    ; Frieza: your dad isn't coming back!
+  [8] text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
+  [9] script                             ; player 1 recoils a step; Krillin played: his line (10), else Gohan's (11)
         WalkToPosition 0, 96, 186
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        WalkToPosition 53, 128, 186
-      G1:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        WalkToPosition 76, 64, 186
-      K1:
-        CommitCommandBatch
         SetEntityFacing 0, 1
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G2
-        SetEntityFacing 53, 1
-      G2:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K2
-        SetEntityFacing 76, 1
-      K2:
-  text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!"
-  stock @083b958c                        ; boss bar, battle music, control back
-  script                                 ; the camera follows the player again (entry 0's pan kept it on the clearing's top);
-        CoopCall 22, 2, 53, 0                 ; Gohan's actor steps back to the clearing's edge for the fight
-        JumpIfFalse G1
-        WalkToPosition 53, 168, 240
-      G1:
-        CoopCall 22, 2, 76, 0                 ; Krillin's too
-        JumpIfFalse K1
-        WalkToPosition 76, 48, 236
-      K1:
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 10
+        END
+      a:
+        PushByte 11
+        END
+  [10] text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!" -> 12
+  [11] text 1 "#GOHAN: Frieza AND Cooler?!  This can't be happening!"
+  [12] stock @083b958c                   ; boss bar, battle music, control back
+  [13] script                            ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
         SetActiveEntity 0
 end
 
-; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade and Gohan and
-; Krillin are told it was the forest's spirit. They stay in the clearing: behind the white fade the scene
-; moves to the real clearing (zone 2 area 3: the fight's area 8 has the same layout but no way out), which
-; also clears both bodies
+; record 1 (Frieza, stat 41; Cooler is his pair, src/coop/bosses.c) defeat: the two fade and the players are told it was the
+; forest's spirit. They stay in the clearing: behind the white fade the scene moves to the real clearing (zone 2 area 3: the
+; fight's area 8 has the same layout but no way out), which also clears both bodies. Only who is played (Ryan, 2026-11-05).
 sequence ch1_spirit_end
-  script
+  [0] script                             ; Gohan played: his line (1), else Krillin's (2)
         WhiteFlash 5
         WaitFrames 40
         FindPlayerEntity
@@ -239,58 +190,43 @@ sequence ch1_spirit_end
         SetStoryFlag 9
         FadeToWhite 120
         WarpToMapWithEntities 2, 3, 0, 96, 176
-        CoopCall 22, 1, 0, 0                  ; Gohan beside him in the real clearing (an actor when nobody plays him)
-        JumpIfFalse G1
-        SpawnCharacterEntity 53, 128, 176
-        SetEntityFacing 53, 2
-        SetEntityFacing 0, 3
-      G1:
-        CoopCall 22, 1, 6, 0                  ; Krillin the same
-        JumpIfFalse K1
-        SpawnCharacterEntity 76, 64, 176
-        SetEntityFacing 76, 3
-        SetEntityFacing 0, 2
-      K1:
         WhiteFadeOut 120
         PlayAudio 50
-  text 0 "@^The two figures melted away into the mist..."
-  text 1 "#GOHAN: They're gone...  Were they even real?"
-  script                                 ; the voice comes from everywhere: they look up
+  [1] text 0 "@^The two figures melted away into the mist..."
+  [2] script
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 3
+        END
+      a:
+        PushByte 4
+        END
+  [3] text 1 "#GOHAN: They're gone...  Were they even real?" -> 5
+  [4] text 73 "KRILLIN: They're gone...  Were they even real?"
+  [5] script                             ; the voice comes from everywhere: player 1 looks up
         SetEntityFacing 0, 1
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        SetEntityFacing 53, 1
-      G1:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        SetEntityFacing 76, 1
-      K1:
         WaitFrames 20
-  text 0 "@^VOICE: Do not be afraid, children.  You did not fight Frieza and Cooler...\x0b...but the spirit of the forest, wearing the faces of your fears."
-  script                                 ; and back at each other
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        SetEntityFacing 53, 2
-        SetEntityFacing 0, 3
-      G1:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        SetEntityFacing 76, 3
-        SetEntityFacing 0, 2
-      K1:
-  text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
-  text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
-  script
-        CoopCall 22, 2, 76, 0                 ; his actor runs on ahead, west to the forest and the cave
-        JumpIfFalse K1
-        WalkToPosition 76, 0, 176
-        DespawnEntity 76
-      K1:
-        CoopCall 22, 2, 53, 0
-        JumpIfFalse G1
-        WalkToPosition 53, 0, 176
-        DespawnEntity 53
-      G1:
+  [6] text 0 "@^VOICE: Do not be afraid, children.  You did not fight Frieza and Cooler...\x0b...but the spirit of the forest, wearing the faces of your fears."
+  [7] script                             ; both played (8, 9), Krillin alone (8), Gohan alone (10)
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse g
+        PushByte 8
+        END
+      g:
+        PushByte 10
+        END
+  [8] text 73 "KRILLIN: The spirit of the forest?  Well, it sure hit like Frieza!"
+  [9] script
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 11
+        END
+      a:
+        PushByte 12
+        END
+  [10] text 1 "#GOHAN: The spirit of the forest...\x0bLet's get my armor from the cave." -> 12
+  [11] text 1 "#Never mind, Krillin.  Let's get my armor from the cave."
+  [12] script
         SetPlayerVisible 1
 end
 
@@ -299,7 +235,7 @@ end
 ; Trunks knows him, he knocks out one of Frieza's soldiers (66) himself, and leaves with Trunks. Krillin's
 ; actor stays out (Krillin is in the party by now). Entries 0, 15, 37, 48 and 52 are restated from the stock.
 sequence ch1_frieza_landing
-  script                                 ; stock 0 without Krillin's actor: the Z fighters gather (Gohan's actor when nobody plays him), Frieza and King Cold land
+  script                                 ; stock 0 without Krillin's actor: the Z fighters gather (only who is played of Gohan and Krillin: Ryan, 2026-11-05), Frieza and King Cold land
         SetPlayerVisible 0
         PlayMusic 14
         PlayAudioBlocking 30, 120
@@ -312,14 +248,6 @@ sequence ch1_frieza_landing
         SpawnCharacterEntity 107, 240, 224
         SpawnCharacterEntity 23, 240, 216
         SpawnCharacterEntity 103, 216, 232
-        CoopCall 22, 1, 0, 0                  ; nobody plays Gohan: he walks in with the others (sprite 55)
-        JumpIfFalse G1
-        SpawnCharacterEntity 55, 248, 200
-      G1:
-        CoopCall 22, 1, 6, 0                  ; nobody plays Krillin (alone as Gohan): his stock walk-in (76)
-        JumpIfFalse K1
-        SpawnCharacterEntity 76, 248, 200
-      K1:
         BeginCommandBatch
         WalkToPosition 137, 152, 112
         SetEntityFacing 137, 1
@@ -334,18 +262,6 @@ sequence ch1_frieza_landing
         SetEntityAnimation 121, 4
         WalkToPosition 107, 208, 120
         SetEntityFacing 107, 1
-        CoopCall 22, 2, 55, 0
-        JumpIfFalse G2
-        WalkToPosition 55, 216, 112
-        SetEntityFacing 55, 1
-        SetEntityAnimation 55, 4
-      G2:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K2
-        WalkToPosition 76, 216, 112
-        SetEntityFacing 76, 1
-        SetEntityAnimation 76, 4
-      K2:
         CommitCommandBatch
         BeginCommandBatch
         WalkToPosition 23, 224, 120
@@ -381,8 +297,26 @@ sequence ch1_frieza_landing
   stockseq @083be798 16 16    ; "Not so fast!  You must be Frieza!"
   text 126 "OLD HERCULE: Yeah!  What he said!"
   text 70 "!We have guests!\x0b...And what is that thing with the hair?"
-  stockseq @083be798 18 27    ; Trunks and Frieza, the Z fighters sense Trunks' power
-  text 73 "!KRILLIN: And who's that old guy with the afro?\x0bHis power level is...  um...  barely there."
+  [19] stockseq @083be798 18 24          ; Trunks and Frieza
+  [26] script                            ; Krillin's stock line only when he is played (next 27), else 28
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 27
+        END
+      a:
+        PushByte 28
+        END
+  [27] stock @083bdf50                   ; Krillin: "Who is this guy?  His power level is huge!"
+  [28] stockseq @083be798 26 27          ; Tien and Vegeta sense Trunks' power
+  [30] script                            ; Krillin played (next 31), else 32
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 31
+        END
+      a:
+        PushByte 32
+        END
+  [31] text 73 "!KRILLIN: And who's that old guy with the afro?\x0bHis power level is...  um...  barely there."
   stockseq @083be798 28 36    ; the Super Saiyan
   script                                 ; stock 37, first half: Trunks cuts down five soldiers; old Hercule knocks out the sixth
         SetEntityFacing 67, 0
@@ -464,20 +398,10 @@ sequence ch1_frieza_landing
         SetEntityFacing 134, 1
         END
   stockseq @083be798 38 47    ; Frieza falls, King Cold's offer, King Cold falls
-  script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule runs up; Gohan's actor when nobody plays him
+  script                                 ; stock 48 without Krillin's actor: Trunks flies to the landing site; old Hercule runs up
         SetStoryFlag 21
         WarpToMapWithEntities 3, 4, 1, 192, 88
         SetActiveEntity 0
-        CoopCall 22, 1, 0, 0                  ; Gohan with the others (Krillin's spot)
-        JumpIfFalse G1
-        SpawnCharacterEntity 55, 208, 112
-        SetEntityFacing 55, 0
-      G1:
-        CoopCall 22, 1, 6, 0                  ; Krillin with the others when nobody plays him (his stock spot)
-        JumpIfFalse K1
-        SpawnCharacterEntity 76, 208, 112
-        SetEntityFacing 76, 0
-      K1:
         SetEntityFacing 103, 0
         WaitFrames 15
         WaitFrames 10
@@ -495,14 +419,6 @@ sequence ch1_frieza_landing
         SetEntityFollow 121, 128
         SetEntityFollow 23, 128
         SetEntityFollow 156, 128
-        CoopCall 22, 2, 55, 0
-        JumpIfFalse G2
-        SetEntityFollow 55, 128
-      G2:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K2
-        SetEntityFollow 76, 128
-      K2:
         PanCameraToPosition 8, 96, 2
         FlyToPosition 128, 88, 200
         FlyToPosition 128, 136, 184
@@ -516,10 +432,29 @@ sequence ch1_frieza_landing
         PlayAudio 50
         END
   text 126 "OLD HERCULE: *huff*  *huff*\x0bTrunks...  wait up...  I can't fly, remember?"
-  text 73 "!KRILLIN: Uh...  who's your friend?"
+  [57] script                            ; Krillin played: his question (next 58), else Gohan's (59)
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 58
+        END
+      a:
+        PushByte 59
+        END
+  [58] text 73 "!KRILLIN: Uh...  who's your friend?" -> 60
+  [59] text 1 "#GOHAN: Uh...  who's your friend?"
   text 126 "OLD HERCULE: Friend?  I'm his bodyguard!"
   text 98 "TRUNKS: He's...  with me.  Don't worry about him."
-  stockseq @083be798 49 51    ; "I'm heading off to meet Goku", "Just follow me."
+  [62] stockseq @083be798 49 49          ; "I'm heading off to meet Goku"
+  [63] script                            ; Gohan's stock line only when he is played (next 64), else 65
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 64
+        END
+      a:
+        PushByte 65
+        END
+  [64] stock @083be710                   ; Gohan: "Weird, how does he know about my father?"
+  [65] stockseq @083be798 51 51          ; "Just follow me."
   script                                 ; stock 52: Trunks flies off, old Hercule runs after him
         PlayAudio 47
         FindCharacterEntity 0
@@ -535,14 +470,6 @@ sequence ch1_frieza_landing
         WalkToPosition 158, 300, 200             ; old Hercule runs off down the path he came by
         WalkToPosition 158, 364, 248
         DespawnEntity 158
-        CoopCall 22, 2, 55, 0
-        JumpIfFalse G1
-        DespawnEntity 55
-      G1:
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse K1
-        DespawnEntity 76
-      K1:
         SetActiveEntity 0
         ReloadMap
         SetPlayerVisible 1
@@ -552,14 +479,79 @@ end
 ; ---- the Goku-arrival scene (zone 3 area 6, map 54): old Hercule travels with Trunks and leaves with him --------------
 
 sequence ch1_trunks_talk
-  stockseq @083bfddc 0 77                ; the whole stock conversation up to Trunks' secret
-  script                                 ; old Hercule comes out from the crater's rim to Trunks
+  [0] stockseq @083bfddc 0 0             ; the stock conversation (its indexes kept: its scripts' returned indexes are absolute); a line of
+  [1] script                             ; Gohan or Krillin is replaced by a script that runs it (from the end, after the stop) or skips it
+        CoopCall 22, 4, 0, 0                  ; (Ryan, 2026-11-05). Gohan played: his question (92), else Krillin's own (93, skips 2 and 3)
+        JumpIfFalse a
+        PushByte 92
+        END
+      a:
+        PushByte 93
+        END
+  [2] stockseq @083bfddc 2 2             ; Trunks: "I haven't met your dad"
+  [3] script                             ; Krillin played: his question (94), else Yamcha asks it (95)
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 94
+        END
+      a:
+        PushByte 95
+        END
+  [4] stockseq @083bfddc 4 18            ; Trunks can't say, Vegeta, the Super Saiyan question, Goku lands
+  [19] script                            ; Gohan played: "Hey dad!" (96), else 20
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 96
+        END
+      a:
+        PushByte 20
+        END
+  [20] stockseq @083bfddc 20 23          ; Yamcha, Goku, Bulma
+  [24] script                            ; Gohan played: "He knows all about you, daddy!" (97), else 25
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 97
+        END
+      a:
+        PushByte 25
+        END
+  [25] stockseq @083bfddc 25 77          ; the rest of the stock conversation up to Trunks' secret
+  [78] script                            ; old Hercule comes out from the crater's rim to Trunks
         WalkToPosition 158, 552, 272
         SetEntityFacing 158, 3
         SetEntityFollow 158, 128
-  text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bTrunks!  You didn't say we would be runnin' into guys like that on this trip!\x0bThat Frieza fella isn't coming back, is he?"
-  text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
-  stockseq @083bfddc 78                  ; everyone gathers, the warning retold, home
+  [79] text 126 "#HERCULE: Psst!  Trunks!  Is it safe to come out now?\x0bTrunks!  You didn't say we would be runnin' into guys like that on this trip!\x0bThat Frieza fella isn't coming back, is he?"
+  [80] text 98 "#He's gone for good, Hercule.  Come on, it's time we went home."
+  [81] stockseq @083bfddc 78 82          ; everyone gathers, the warning retold
+  [86] script                            ; Krillin played: "Whoa dude..." (98), else 87
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 98
+        END
+      a:
+        PushByte 87
+        END
+  [87] stockseq @083bfddc 84 85          ; Vegeta, Goku
+  [89] script                            ; Gohan played: "Yeah dad, let's head home." (99), else 90
+        CoopCall 22, 4, 0, 0
+        JumpIfFalse a
+        PushByte 99
+        END
+      a:
+        PushByte 90
+        END
+  [90] stockseq @083bfddc 87 87          ; home
+  stop
+  [92] stock @083be878 -> 2              ; Gohan: "Excuse me mister, but how do you know my dad?"
+  [93] text 73 "KRILLIN: So how do you know Goku's going to arrive at this spot, anyway?" -> 4
+  [94] stock @083be904 -> 4              ; Krillin: "Then how do you know that he's going to arrive at this spot?"
+  [95] text 114 "YAMCHA: Then how do you know that he's going to arrive at this spot?" -> 4
+  [96] fmt 1 fmt=@083becd4 "%s: Hey dad!" -> 20
+        CoopCall 22, 3, 0, 0
+        END
+  [97] stock @083bedbc -> 25             ; "He knows all about you, daddy!"
+  [98] stock @083bfc98 -> 87             ; Krillin: "Whoa dude..."
+  [99] stock @083bfd94 -> 90             ; "Yeah dad, let's head home."
 end
 
 ; map 54 (zone 3 area 6): old Hercule beside Trunks, talked to (Ryan, 2026-11-01): player 1's character asks, he

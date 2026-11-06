@@ -1,14 +1,15 @@
 r"""Write tools/headless/staging_ch1.txt: chapter 1's added scenes, staged for each lineup (data/story/ch1_opening.lscript).
 usage: python tools/headless/staging_ch1_gen.py     (the script is committed; rerun this after changing it here)
-The forest spirit: alone as Gohan (Krillin's actor, 76), alone as Krillin (Gohan's, 53), both players either way round (no actor).
+The forest spirit, Frieza's landing and the Goku-arrival talk: only who is played is there (Ryan, 2026-11-05): no actor of Gohan or Krillin in any lineup.
 Krillin's visit, with the party as it really is then (only Gohan) so player 2's entity is born when Krillin joins: alone Krillin leaves by
 the door, with two players he stands where player 2 appears; he does not blink out at "Krillin is now available!"."""
 from staging_lib import *
 
 s = Script("staging_ch1_gen.py")
-# entrec counts a player on that record too: a played Gohan shows 53; a played Krillin shows 161
-for p1, p2, want, after in ((GOHAN, None, dict(s53=1, s76=1), dict(s53=1, s76=0)), (KRILLIN, None, dict(s53=1, s76=0), dict(s53=0, s76=0)),
-                            (GOHAN, KRILLIN, dict(s53=1, s76=0), dict(s53=1, s76=0)), (KRILLIN, GOHAN, dict(s53=1, s76=0), dict(s53=1, s76=0))):
+# entrec counts a player on that record too: a played Gohan shows 53; a played Krillin shows 161. Only who is played is in the scene (Ryan,
+# 2026-11-05): alone as Gohan no Krillin (76), alone as Krillin no Gohan (53)
+for p1, p2, want in ((GOHAN, None, dict(s53=1, s76=0)), (KRILLIN, None, dict(s53=0, s76=0)),
+                     (GOHAN, KRILLIN, dict(s53=1, s76=0)), (KRILLIN, GOHAN, dict(s53=1, s76=0))):
     n = lineup_name(p1, p2)
     s.begin(f"spirit {n}", p1, p2, "+4 +360")
     s.warp(2, 8, 96, 220, 100)
@@ -25,10 +26,37 @@ for p1, p2, want, after in ((GOHAN, None, dict(s53=1, s76=1), dict(s53=1, s76=0)
     s.press(3, 90)
     s.shot(f"c1_{n}_after")
     s.on_map(2, 3)
-    s.actors(**(want if p1 == GOHAN or p2 is None else dict(s76=0)))  # player 2's entity is away until the scene's end
+    s.actors(**(want if p2 is None else dict(s76=0)))  # player 2's entity is away until the scene's end
     s.end_scene()
-    s.actors(**after)           # the actor ran on ahead
+    s.actors(**want)
     s.on_map(2, 3)
+
+# Frieza's landing and the Goku-arrival site (zone 3 areas 4 and 6): no actor of Gohan (55) or Krillin (76) in any lineup
+LEAD_GOHAN = ["poke8 FLAGS+0x3A 1"]          # flags 464-467: the story's lead is Gohan (slot + 1)
+for p1, p2 in ((GOHAN, None), (KRILLIN, None), (KRILLIN, GOHAN)):
+    n = lineup_name(p1, p2)
+    s.begin(f"landing {n}", p1, p2, "+4 +360", LEAD_GOHAN, maptest=52)
+    s.warp(3, 4, 200, 120, 280)
+    s.actors(s55=0, s76=0)
+    s.shot(f"c1_{n}_land")
+    s.press(70, 110)
+    s.actors(s55=0, s76=0)
+    s.press(60, 110)
+    s.end_scene(200)
+    s.shot(f"c1_{n}_landed")
+for p1 in (GOHAN, KRILLIN):
+    n = lineup_name(p1, None)
+    s.begin(f"arrival {n}", p1, None, "+4 +360 +21 +22", LEAD_GOHAN, maptest=54)
+    s.warp(3, 6, 416, 456, 500)
+    s.actors(s55=0, s76=0)
+    s.out("keys 0x20", "frames 200", "keys 0", "key 0x01 4", "frames 300")
+    s.shot(f"c1_{n}_arr0")
+    for i in range(1, 6):
+        s.out("key 1 6", "frames 140")
+        s.shot(f"c1_{n}_arr{i}")
+    s.actors(s55=0, s76=0)
+    s.end_scene(200)
+    s.on_map(2, 1)
 
 only_gohan = [f"poke8 {flags_of(i)} 0" for i in range(1, 9)] + ["frames 30"]
 s.begin("visit alone", GOHAN, None, "+4", only_gohan)

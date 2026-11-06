@@ -249,11 +249,11 @@
           "replace": [
             [
               "SetEntityPositionInstant 76, 592, 520",
-              "CoopCall 22, 1, 0, 0\nJumpIfFalse G1\nSpawnCharacterEntity 55, 592, 520\nG1:\nCoopCall 22, 1, 6, 0\nJumpIfFalse K1\nSpawnCharacterEntity 76, 592, 520\nK1:"
+              ""
             ],
             [
               "FlyToPosition 76, 456, 488",
-              "CoopCall 22, 2, 55, 0\nJumpIfFalse G2\nFlyToPosition 55, 456, 488\nSetEntityFacing 55, 2\nG2:\nCoopCall 22, 2, 76, 0\nJumpIfFalse K2\nFlyToPosition 76, 456, 488\nK2:"
+              ""
             ]
           ]
         }

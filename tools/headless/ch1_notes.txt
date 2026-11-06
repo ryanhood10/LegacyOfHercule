@@ -71,7 +71,7 @@ frames 1000
 shot n2_beside
 peek 0x0203FF08 1
 entrec OH
-echo == (3) Frieza's landing alone as Gohan: Krillin walks up with the Z fighters (1), none after (0)
+echo == (3) Frieza's landing alone as Gohan: no Krillin actor (Ryan, 2026-11-05: a party member nobody plays is not in the scene) (0), none after (0)
 load menu.ss
 p2 off
 preset +4 +360
@@ -101,7 +101,7 @@ poke32 0x0203FD54 0x007800C8
 poke32 0x0203FD08 5
 frames 280
 entrec 0x082E94B4
-echo == (3) the Goku-arrival site alone as Gohan: Krillin flew in with the group (1)
+echo == (3) the Goku-arrival site alone as Gohan: no Krillin actor (Ryan, 2026-11-05: a party member nobody plays is not in the scene) (0)
 load menu.ss
 p2 off
 preset +4 +360 +21 +22

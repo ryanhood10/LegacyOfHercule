@@ -12,6 +12,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_P_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -33,6 +36,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_H_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -54,6 +60,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_K_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -75,6 +84,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_G_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -97,6 +109,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_PH_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -119,6 +134,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_HP_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -141,6 +159,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_PK_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30
@@ -163,6 +184,9 @@ poke32 0x0203FD08 5
 frames 300
 mash 26 110
 shot c5_KP_stay
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 ents
 stepz 0x03001FDC 200
 frames 30

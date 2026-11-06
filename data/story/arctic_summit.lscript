@@ -11,97 +11,31 @@ script summit_on                                 ; the post-game's Arctic is ope
     And
 end
 
-; a sideline watcher stands only while neither player plays that character (party slot)
+; a sideline watcher of the party never stands now: a party member nobody plays is not in the scene (Ryan, 2026-11-05;
+; docs/howto.md "Stage a scene" rule 2), and one who is played is a player. Tien and Yamcha (records with summit_on) stay.
+; The scene's steps on the watchers' sprites stay guarded by CoopCall 22 op 2.
 script watch_gohan
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
     PushByte 0
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 0
-    CmpNe
-    And
-    PushActiveCharIndex
-    PushByte 8
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 8
-    CmpNe
-    And
 end
 
 script watch_piccolo
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
-    PushByte 1
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 1
-    CmpNe
-    And
+    PushByte 0
 end
 
 script watch_vegeta
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
-    PushByte 2
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 2
-    CmpNe
-    And
+    PushByte 0
 end
 
 script watch_trunks
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
-    PushByte 3
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 3
-    CmpNe
-    And
+    PushByte 0
 end
 
 script watch_hercule
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
-    PushByte 5
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 5
-    CmpNe
-    And
+    PushByte 0
 end
 
 script watch_krillin
-    StackTestStoryFlag 381
-    StackTestStoryFlagNot 382
-    And
-    PushActiveCharIndex
-    PushByte 6
-    CmpNe
-    And
-    CoopCall 8, 0, 0, 0
-    PushByte 6
-    CmpNe
-    And
+    PushByte 0
 end
 
 ; ---- the scene ---------------------------------------------------------------------------------------
@@ -441,31 +375,17 @@ sequence summit_13_end
         PlayAudio 20
         WaitFrames 60
         FadeToWhite 30
-        CoopCall 22, 2, 137, 0                 ; behind the white, Vegeta's actor comes over from the rim to say it
-        JumpIfFalse V1
-        PushByte 137
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 36
-        Add
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 6
-        Sub
-        Step SetEntityPositionInstant
-        SetEntityFacing 137, 2
-        SetEntityFacing 0, 3
-      V1:
         WaitFrames 30
         WhiteFadeOut 60
-  text 106 "VEGETA: *spits*  At last.  The end of those clankers."
-  script
+        CoopCall 22, 4, 2, 0                   ; Vegeta's line only when someone plays him (next 1), else 2
+        JumpIfFalse V1
+        PushByte 1
+        END
+      V1:
+        PushByte 2
+        END
+  [1] text 106 "VEGETA: *spits*  At last.  The end of those clankers."
+  [2] script
         SetStoryFlag 382
         PlayMusic 5                      ; the summit's own music again
         PlayAudio 62

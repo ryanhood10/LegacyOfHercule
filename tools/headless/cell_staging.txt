@@ -638,6 +638,10 @@ echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 24
 poke8 0x0203F9B6 0
@@ -652,6 +656,10 @@ shot cs_alone_j1
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -710,6 +718,10 @@ echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 25
 poke8 0x0203F9B6 0
@@ -726,6 +738,10 @@ echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 26
 poke8 0x0203F9B6 0
@@ -809,6 +825,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 24
 poke8 0x0203F9B6 0
@@ -823,6 +843,10 @@ shot cs_H_j1
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -883,6 +907,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 25
 poke8 0x0203F9B6 0
@@ -901,6 +929,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 26
 poke8 0x0203F9B6 0
@@ -984,6 +1016,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 24
 poke8 0x0203F9B6 0
@@ -998,6 +1034,10 @@ shot cs_K_j1
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -1058,6 +1098,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 25
 poke8 0x0203F9B6 0
@@ -1076,6 +1120,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 26
 poke8 0x0203F9B6 0
@@ -1159,6 +1207,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 24
 poke8 0x0203F9B6 0
@@ -1173,6 +1225,10 @@ shot cs_Ve_j1
 ents
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 27
 poke8 0x0203F9B6 0
@@ -1233,6 +1289,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 25
 poke8 0x0203F9B6 0
@@ -1251,6 +1311,10 @@ echo EXPECT 0203ff84: 05
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
 peek 0x0203FF08 1
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 26
 poke8 0x0203F9B6 0

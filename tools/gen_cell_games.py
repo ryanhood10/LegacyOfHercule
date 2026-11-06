@@ -82,9 +82,15 @@ def resolve_labels(lines):
                     res[i] = res[i].replace("{" + k + "}", str(v))
     return res
 
-def alone_or_duo(duo_label):
-    """A branch on player 2: two players go to the fight's title card, alone Hercule's actor has a line and clears off."""
-    script(["CoopCall 5, 0, 0, 0", "JumpIfFalse L1", f"PushByte {{{duo_label}}}", "END", "L1:", "END"], "two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries")
+def duo_only(lines, skip_label, comment, check="CoopCall 5, 0, 0, 0"):
+    """A script that runs lines only with two players (Hercule is player 2's) and goes on to the next entries; alone it jumps to skip_label
+    (Ryan, 2026-11-05: a party member nobody plays is not in the scene)."""
+    script([check, "JumpIfFalse HS9"] + lines + ["END", "HS9:", f"PushByte {{{skip_label}}}", "END"], comment)
+
+
+def guard72(lines, tag):
+    """Steps on Hercule's actor only while it stands (alone it is not there: a step on a sprite nobody shows writes through a null pointer)."""
+    return ["CoopCall 22, 2, 72, 0", f"JumpIfFalse G72{tag}"] + lines + [f"G72{tag}:"]
 
 # Hercule's actor hands over to player 2's entity by standing where it respawns (12 px left of player 1, player.c ensure_p2)
 HANDOVER = ["CoopCall 22, 2, 72, 0", "JumpIfFalse H1", "DespawnEntity 72", "H1:"]
@@ -108,9 +114,10 @@ emit(";   7 Super Saiyan 2 Gohan + Hercule; 8 Gohan + Hercule against two Perfec
 emit("; Solo fights: CoopCall 15 (cellgames.c): 1 player 1 alone, 2 player 2 alone on player 1's entity, 0 both.")
 emit("; Stock text is referenced (stock / stockseq), never restated; edited scripts are spelled out.")
 emit("; Staging (Ryan, 2026-11-05: \"characters shouldnt be stagnant\", \"account for 1p mode or 2p mode\"). Player 2 has no entity in any scene here: the solo")
-emit("; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. So every scene plays one staging")
-emit("; in both modes with Hercule's actor (sprite 72, only ever walked: his fly pose is a stub); before a team fight he stands where player 2 will respawn and")
-emit("; goes as it does; alone he has a line and clears off. Lines marked (draft) are Claude's, for Ryan to read.")
+emit("; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. With two players Hercule (player 2's")
+emit("; character) is his actor (sprite 72, only ever walked: his fly pose is a stub) and before a team fight stands where player 2 will respawn. Alone")
+emit("; Hercule is in a scene only where the Games' plot needs him (Ryan, 2026-11-05: a party member nobody plays is not in the scene): called out")
+emit("; by Goku after fight 2, 16's head, the beam struggle and its aftermath. Lines marked (draft) are Claude's, for Ryan to read.")
 emit("")
 
 # ---------------------------------------------------------------- map 324: the ring ------------------
@@ -174,15 +181,11 @@ b = body(A3, "m325_r0_defeat", 20)
 i = b.index("SetActiveCharacter 0")
 b = b[:i + 1] + ["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"] + b[i + 1:]
 i = b.index("SetEntityFacing 0, 3")
-b = b[:i + 1] + ["SpawnCharacterEntity 72, 356, 440", "SetEntityFacing 72, 3"] + b[i + 1:]   # the warp took his actor: he stands at Gohan's side
+b = b[:i + 1] + ["CoopCall 5, 0, 0, 0", "JumpIfFalse HS1", "SpawnCharacterEntity 72, 356, 440", "SetEntityFacing 72, 3", "HS1:"] + b[i + 1:]   # the warp took his actor: with two players he stands at Gohan's side
 j = b.index("DrawBossHealthBarRange 30, 60, 100")
 tail = ["SetPlayerVisible 1"] + b[j:]            # the HUD after the card, as fights 7 and 8
 b = [x for x in b[:j] if x != "SetPlayerVisible 1"]
 script(b, "stock entry 20: Gohan player 1, player 2 is Hercule")
-alone_or_duo("card3")
-text(67, "HERCULE: Go ahead, kid, you warm him up for me!\\x0bI'll, uh...  study his weak points from back here!", draft=True)
-script(["WalkToPosition 72, 308, 448", "DespawnEntity 72"])
-label("card3")
 title(BOTH)
 script(HANDOVER + tail, "fight 3")
 emit("end")
@@ -193,8 +196,8 @@ FLY_DOWN = ["PlayAudio 26", "FlyToPosition 0, 432, 296", "SetEntityFacing 0, 0",
 emit("sequence cg_fight3_end")
 b = body(A3, "m325_r5_defeat", 0)
 k = b.index("SetEntityFacing 0, 3")
-b = b[:k] + ["SpawnCharacterEntity 72, 540, 400", "SetEntityFacing 72, 2", "CoopCall 5, 0, 0, 0", "JumpIfFalse H1", "SetEntityAnimation 72, 3", "H1:"] + b[k:]
-script(b, "stock entry 0, with Hercule's actor beyond Cell (the warp took player 2's entity): flat on his back if player 2 just fought as him, alone he has crept back")
+b = b[:k] + ["CoopCall 5, 0, 0, 0", "JumpIfFalse HS1", "SpawnCharacterEntity 72, 540, 400", "SetEntityFacing 72, 2", "SetEntityAnimation 72, 3", "HS1:"] + b[k:]
+script(b, "stock entry 0, with two players Hercule's actor beyond Cell (the warp took player 2's entity), flat on his back: player 2 just fought as him")
 stockseq(A3, "m325_r5_defeat", 1, 25, "Cell and Gohan, 16's last stand (his bomb was removed), \"Still not angry enough?\"")
 b = body(A3, "m325_r5_defeat", 26)
 k = b.index("SetEntityFacing 0, 1")
@@ -203,9 +206,11 @@ b = b[:k] + ["WaitFrames 40", "FadeToWhite 5", "SpawnCharacterEntity 31, 480, 37
     ["WaitFrames 40", "FadeToWhite 5", "SpawnCharacterEntity 31, 504, 392", "WhiteFadeOut 5"] + b[k:]
 script(b, "stock entry 26 with six Juniors (Ryan: Vegeta and Trunks face two each)")
 stockseq(A3, "m325_r5_defeat", 27, 29, "\"What the heck are those things?\", \"My children!  Give them pain!\"")
-script(["CoopCall 15, 1, 0, 0", "SetEntityAnimation 72, 0", "SetEntityFacing 72, 2", "WaitFrames 30"], "Hercule's actor picks himself up; player 2 watches from here")
+script(["CoopCall 15, 1, 0, 0"], "player 2 watches from here")
+duo_only(["SetEntityAnimation 72, 0", "SetEntityFacing 72, 2", "WaitFrames 30"], "j1", "two players: Hercule's actor picks himself up (next), alone on to the Juniors", check="CoopCall 22, 2, 72, 0")
 text(67, "HERCULE: Uh...  this fight is a little too much for the champ right now.\\x0bI'll, uh...  supervise from over there!")
 script(["WalkToPosition 72, 640, 240", "DespawnEntity 72"])
+label("j1")
 b = body(A3, "m325_r5_defeat", 30)
 b = ["DespawnEntity 76" if x == "DespawnEntity 103" else x for x in b]
 k = b.index("DespawnEntity 30")
@@ -254,12 +259,9 @@ k = b.index("SetEntityAnimationNoWait 0, 9")
 b = b[:k + 1] + ["WaitFrames 60"] + b[k + 1:]
 script(b, "stock entry 26, the power-up without the blocking wait (it never ended in co-op tests): Super Saiyan 2")
 stockseq(A3, "m325_r10_defeat", 27, 30, "\"Gohan has entered Super Saiyan Rage!\", \"NOW TASTE MY TRUE POWER\"")
-script(["SpawnCharacterEntity 72, 648, 320", "WalkToPosition 72, 564, 376", "SetEntityFacing 72, 2"], "Hercule comes back the way he left, to Gohan's side")
-text(67, "HERCULE: The champ is back!\\x0bLet's finish this together, kid!")
 script(["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
-alone_or_duo("card7")
-text(67, "...Right behind you, kid!\\x0bWay, way behind you!", draft=True)
-script(["WalkToPosition 72, 648, 320", "DespawnEntity 72"])
+duo_only(["SpawnCharacterEntity 72, 648, 320", "WalkToPosition 72, 564, 376", "SetEntityFacing 72, 2"], "card7", "two players: Hercule comes back the way he left, to Gohan's side (next); alone he stays away")
+text(67, "HERCULE: The champ is back!\\x0bLet's finish this together, kid!")
 label("card7")
 title(BOTH)
 script(HANDOVER + body(A3, "m325_r10_defeat", 31), "stock entry 31: fight 7")
@@ -269,21 +271,21 @@ emit("")
 emit("sequence cg_fight7_end")
 b = body(A3, "m325_r11_defeat", 0)
 k = b.index("FadeFromWhite 60")
-b = b[:k] + ["SpawnCharacterEntity 72, 500, 440", "SetEntityFacing 72, 2"] + b[k:]
-script(b, "stock entry 0, with Hercule's actor on the field (the warp took player 2's entity)")
+b = b[:k] + ["CoopCall 5, 0, 0, 0", "JumpIfFalse HS1", "SpawnCharacterEntity 72, 500, 440", "SetEntityFacing 72, 2", "HS1:"] + b[k:]
+script(b, "stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity)")
 stockseq(A3, "m325_r11_defeat", 1, 6, "Cell spits out 18, \"I'm going to blow myself up now!\"")
 b = body(A3, "m325_r11_defeat", 7)
 k = b.index("FlyToPosition 121, 368, 456")
-b = b[:k] + ["WalkToPosition 72, 536, 484"] + b[k:]
+b = b[:k] + guard72(["WalkToPosition 72, 536, 484"], "a") + b[k:]
 k = b.index("SetEntityFollow 121, 27")
-b = b[:k] + ["SetEntityFollow 72, 27"] + b[k:]
+b = b[:k] + guard72(["SetEntityFollow 72, 27"], "b") + b[k:]
 script(b, "stock entry 7: everyone gathers; Hercule's actor backs away from the bomb")
 stockseq(A3, "m325_r11_defeat", 8, 38, "Goku's Instant Transmission, \"He's back!!!!\"")
 b = body(A3, "m325_r11_defeat", 39)
 k = b.index("SpawnCharacterEntity 30, 428, 328")
 b = b[:k + 1] + ["SpawnCharacterEntity 162, 468, 328", "WalkToPosition 162, 468, 400"] + b[k + 1:]
 k = b.index("SetEntityAnimation 121, 4")
-b = b[:k] + ["SetEntityFollow 72, 132", "SetEntityAnimation 72, 4"] + b[k:]
+b = b[:k] + guard72(["SetEntityFollow 72, 132", "SetEntityAnimation 72, 4"], "a") + b[k:]
 script(b, "stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest")
 emit(f"  stock @{A3['m325_r11_defeat']['entries'][40]['head'].split('@')[1].split()[0]}    ; \"Surprised to see me?\"")
 text(40, "When I exploded, two pieces of my core survived...\\x0b...and each one grew back perfect!")
@@ -293,15 +295,11 @@ b = body(A3, "m325_r11_defeat", 51)
 k = b.index("DespawnEntity 30")
 b = b[:k + 1] + ["DespawnEntity 162"] + b[k + 1:]
 k = b.index("SetEntityFacing 0, 3")
-b = b[:k + 1] + ["SetEntityPositionInstant 72, 420, 472", "SetEntityFacing 72, 3"] + b[k + 1:]   # at Gohan's side, where player 2 respawns
+b = b[:k + 1] + guard72(["SetEntityPositionInstant 72, 420, 472", "SetEntityFacing 72, 3"], "a") + b[k + 1:]   # with two players at Gohan's side, where player 2 respawns
 script(b, "stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side")
 stockseq(A3, "m325_r11_defeat", 52, 63, "\"ultimate perfection\", Goku from the Other World, \"I will!\"")
 b = body(A3, "m325_r11_defeat", 64)
 script(b[:1])
-alone_or_duo("card8")
-text(67, "HERCULE: Tell you what, kid...  this one's all yours.\\x0bThe champ wouldn't dream of stealing your moment!", draft=True)
-script(["WalkToPosition 72, 340, 480", "DespawnEntity 72"])
-label("card8")
 title(BOTH)
 b = ["DrawBossHealthBarRange 30, 0, 100" if x.startswith("DrawBossHealthBarRange 30,") else x for x in b]   # Ryan: to 0 HP
 script(HANDOVER + b[1:], "fight 8: two Perfect Cells (stat 25 + its pair, both-down), fought to 0: the bars run over the whole HP")

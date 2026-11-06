@@ -50,65 +50,16 @@ sequence ch3_z7_battle
         WalkToPosition 165, 504, 408
         SetEntityFacing 165, 2
   stockseq @083d40c8 39 40               ; 20 flies up to watch; Vegeta: "does a machine experience fear?"
-  script                                 ; alone Vegeta's "clown" runs up behind him (player 2 plays him otherwise)
-        CoopCall 22, 1, 5, 0
-        JumpIfFalse H1
-        PushByte 72
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 96
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 12
-        Add
-        Step SpawnCharacterEntity
-        PushByte 72
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 30
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 12
-        Add
-        Step WalkToPosition
-        SetEntityFacing 72, 3
-      H1:
-  text 1 "!VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
-  script                                 ; stock entry 41, plus 13's actor leaving for his boss twin
-        CoopCall 22, 2, 72, 0            ; Hercule's actor takes the advice from further away
-        JumpIfFalse H1
-        PushByte 72
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 96
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        PushVarint 12
-        Add
-        Step WalkToPosition
-        DespawnEntity 72
-      H1:
+  [44] script                            ; "clown" only when someone plays Hercule (Ryan, 2026-11-05: a party member nobody plays is not in the scene)
+        CoopCall 22, 4, 5, 0
+        JumpIfFalse a
+        PushByte 45
+        END
+      a:
+        PushByte 46
+        END
+  [45] text 1 "!VEGETA: Watch those hands, clown.  They drink ki.\x0bFists...  or whatever that toy of yours is."
+  [46] script                            ; stock entry 41, plus 13's actor leaving for his boss twin
         SetPlayerVisible 1
         DespawnEntity 165
         DespawnCharacterAndRecordPosition 12, 2

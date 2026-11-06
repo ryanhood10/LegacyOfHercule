@@ -6,9 +6,10 @@
 ; Solo fights: CoopCall 15 (cellgames.c): 1 player 1 alone, 2 player 2 alone on player 1's entity, 0 both.
 ; Stock text is referenced (stock / stockseq), never restated; edited scripts are spelled out.
 ; Staging (Ryan, 2026-11-05: "characters shouldnt be stagnant", "account for 1p mode or 2p mode"). Player 2 has no entity in any scene here: the solo
-; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. So every scene plays one staging
-; in both modes with Hercule's actor (sprite 72, only ever walked: his fly pose is a stub); before a team fight he stands where player 2 will respawn and
-; goes as it does; alone he has a line and clears off. Lines marked (draft) are Claude's, for Ryan to read.
+; modes and the warps without entities remove it, it respawns beside player 1 only when a team fight starts. With two players Hercule (player 2's
+; character) is his actor (sprite 72, only ever walked: his fly pose is a stub) and before a team fight stands where player 2 will respawn. Alone
+; Hercule is in a scene only where the Games' plot needs him (Ryan, 2026-11-05: a party member nobody plays is not in the scene): called out
+; by Goku after fight 2, 16's head, the beam struggle and its aftermath. Lines marked (draft) are Claude's, for Ryan to read.
 
 ; ---- map 324 (zone 14 area 2), the ring ----
 
@@ -125,24 +126,16 @@ sequence cg_fight2_end
         CoopCall 6, 5, 0, 0
         SetEntityFacing 30, 2
         SetEntityFacing 0, 3
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse HS1
         SpawnCharacterEntity 72, 356, 440
         SetEntityFacing 72, 3
+      HS1:
         PanCameraToPosition 328, 344, 10
         SpawnCharacterEntity 60, 552, 96
         FadeFromWhite 120
         WaitFrames 60
         SetActiveEntity 0
-  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 26
-        END
-      L1:
-        END
-  text 67 "HERCULE: Go ahead, kid, you warm him up for me!\x0bI'll, uh...  study his weak points from back here!"    ; (draft)
-  script
-        WalkToPosition 72, 308, 448
-        DespawnEntity 72
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END
@@ -158,7 +151,7 @@ sequence cg_fight2_end
 end
 
 sequence cg_fight3_end
-  script                                 ; stock entry 0, with Hercule's actor beyond Cell (the warp took player 2's entity): flat on his back if player 2 just fought as him, alone he has crept back
+  script                                 ; stock entry 0, with two players Hercule's actor beyond Cell (the warp took player 2's entity), flat on his back: player 2 just fought as him
         PlayAudio 60
         SetPlayerVisible 0
         FindPlayerEntity
@@ -167,12 +160,12 @@ sequence cg_fight3_end
         DisableLayer 0
         PanCameraToPosition 328, 304, 10
         SpawnCharacterEntity 60, 552, 96
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse HS1
         SpawnCharacterEntity 72, 540, 400
         SetEntityFacing 72, 2
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse H1
         SetEntityAnimation 72, 3
-      H1:
+      HS1:
         SetEntityFacing 0, 3
         SetEntityFacing 30, 2
         FadeFromWhite 120
@@ -208,11 +201,18 @@ sequence cg_fight3_end
         SetEntityAnimation 0, 4
         END
   stockseq @083e9d4c 27 29    ; "What the heck are those things?", "My children!  Give them pain!"
-  script                                 ; Hercule's actor picks himself up; player 2 watches from here
+  script                                 ; player 2 watches from here
         CoopCall 15, 1, 0, 0
+  script                                 ; two players: Hercule's actor picks himself up (next), alone on to the Juniors
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse HS9
         SetEntityAnimation 72, 0
         SetEntityFacing 72, 2
         WaitFrames 30
+        END
+      HS9:
+        PushByte 34
+        END
   text 67 "HERCULE: Uh...  this fight is a little too much for the champ right now.\x0bI'll, uh...  supervise from over there!"
   script
         WalkToPosition 72, 640, 240
@@ -384,25 +384,20 @@ sequence cg_head_scene
         WhiteFadeOut 10
         END
   stockseq @083ea400 27 30    ; "Gohan has entered Super Saiyan Rage!", "NOW TASTE MY TRUE POWER"
-  script                                 ; Hercule comes back the way he left, to Gohan's side
-        SpawnCharacterEntity 72, 648, 320
-        WalkToPosition 72, 564, 376
-        SetEntityFacing 72, 2
-  text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   script                                 ; player 2 is Hercule again
         CoopCall 15, 0, 0, 0
         CoopCall 6, 5, 0, 0
-  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
+  script                                 ; two players: Hercule comes back the way he left, to Gohan's side (next); alone he stays away
         CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 38
+        JumpIfFalse HS9
+        SpawnCharacterEntity 72, 648, 320
+        WalkToPosition 72, 564, 376
+        SetEntityFacing 72, 2
         END
-      L1:
+      HS9:
+        PushByte 35
         END
-  text 67 "...Right behind you, kid!\x0bWay, way behind you!"    ; (draft)
-  script
-        WalkToPosition 72, 648, 320
-        DespawnEntity 72
+  text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END
@@ -418,7 +413,7 @@ sequence cg_head_scene
 end
 
 sequence cg_fight7_end
-  script                                 ; stock entry 0, with Hercule's actor on the field (the warp took player 2's entity)
+  script                                 ; stock entry 0, with two players Hercule's actor on the field (the warp took player 2's entity)
         SetEntityAnimation 30, 3
         PlayAudio 60
         FindPlayerEntity
@@ -430,8 +425,11 @@ sequence cg_fight7_end
         PanCameraToPosition 320, 344, 30
         SetEntityPositionInstant 30, 428, 408
         SetEntityFacing 0, 1
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse HS1
         SpawnCharacterEntity 72, 500, 440
         SetEntityFacing 72, 2
+      HS1:
         FadeFromWhite 60
         WaitFrames 40
         SetEntityAnimation 30, 0
@@ -466,7 +464,10 @@ sequence cg_fight7_end
         SpawnCharacterEntity 156, 272, 408
         SpawnCharacterEntity 60, 424, 96
         BeginCommandBatch
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse G72a
         WalkToPosition 72, 536, 484
+      G72a:
         FlyToPosition 121, 368, 456
         FlyToPosition 156, 392, 488
         FlyToPosition 60, 464, 472
@@ -474,7 +475,10 @@ sequence cg_fight7_end
         FlyToPosition 132, 344, 448
         FlyToPosition 76, 496, 456
         FlyToPosition 103, 520, 432
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse G72b
         SetEntityFollow 72, 27
+      G72b:
         SetEntityFollow 121, 27
         SetEntityFollow 60, 27
         SetEntityFollow 137, 27
@@ -510,8 +514,11 @@ sequence cg_fight7_end
         SetEntityAnimation 76, 4
         SetEntityAnimation 137, 4
         SetEntityAnimation 156, 4
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse G72a
         SetEntityFollow 72, 132
         SetEntityAnimation 72, 4
+      G72a:
         SetEntityAnimation 121, 4
         CommitCommandBatch
         SetActiveEntity 30
@@ -533,8 +540,11 @@ sequence cg_fight7_end
         DespawnEntity 162
         SetEntityPositionInstant 0, 432, 472
         SetEntityFacing 0, 3
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse G72a
         SetEntityPositionInstant 72, 420, 472
         SetEntityFacing 72, 3
+      G72a:
         TriggerMapEvent 12
         SetEntityFacing 30, 2
         PanCameraToPosition 360, 352, 10
@@ -543,17 +553,6 @@ sequence cg_fight7_end
   stockseq @083eb704 52 63    ; "ultimate perfection", Goku from the Other World, "I will!"
   script
         SetEntityFacing 0, 3
-  script                                 ; two players: on to the title card, player 2's Hercule takes over from the actor at the fight; alone the next entries
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 70
-        END
-      L1:
-        END
-  text 67 "HERCULE: Tell you what, kid...  this one's all yours.\x0bThe champ wouldn't dream of stealing your moment!"    ; (draft)
-  script
-        WalkToPosition 72, 340, 480
-        DespawnEntity 72
   fmt 0 "%s"
         CoopCall 14, 3, 2, 0
         END

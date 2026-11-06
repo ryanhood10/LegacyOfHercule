@@ -8,18 +8,17 @@
 
 sequence ch5_lookout_first
   stockseq @083df720 0 16                ; Kami and Piccolo: "I'll be waiting."
-  script                                 ; nobody plays Hercule: he comes over, taking in the view
-        CoopCall 22, 1, 5, 0
-        JumpIfFalse H1
-        SpawnCharacterEntity 72, 112, 262
-        WalkToPosition 72, 112, 234
-        WalkToPosition 72, 140, 206
-        SetEntityFacing 72, 2
-        SetEntityFacing 0, 3
-      H1:
-  text 67 "!HERCULE: So, uh...  we're waiting?  Up here?\x0bGreat!  Nice view.  Nice and far away from those Androids!"
-  text 3 "!PICCOLO: You stay here, Hercule.  And don't touch anything."
-  script                                 ; stock entry 17, with Hercule (5) and Krillin (6) locked too and
+  [17] script                            ; only who is played (Ryan, 2026-11-05): Hercule's question when someone plays him (next 18), else 20;
+        CoopCall 22, 4, 5, 0                  ; Piccolo is player 1 here (the lead's fade), so he answers
+        JumpIfFalse a
+        PushByte 18
+        END
+      a:
+        PushByte 20
+        END
+  [18] text 67 "!HERCULE: So, uh...  we're waiting?  Up here?\x0bGreat!  Nice view.  Nice and far away from those Androids!"
+  [19] text 3 "!PICCOLO: You stay here, Hercule.  And don't touch anything."
+  [20] script                            ; stock entry 17, with Hercule (5) and Krillin (6) locked too and
         SetStoryFlag 129                 ; player 2 on Gohan after the warp to Gohan's house
         FadeOut 90
         WarpToMapNoEntities 2, 20, 1, 160, 264

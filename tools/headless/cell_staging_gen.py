@@ -5,7 +5,8 @@ usage: python tools/headless/cell_staging_gen.py                write the script
        python tools/headless/cell_staging_gen.py check LOG       every vtable in the `ents` lists sane (a sprite without the group an animation needs
                                                                   corrupts the heap and the runner keeps going: a clean CRASH grep is not enough)
 Lineups. Zone 12: Vegeta alone, Trunks alone (the fade makes him Vegeta), Vegeta + Trunks, Trunks + Vegeta. The chamber exit clears everyone else's selectable bit, so
-Hercule cannot be player 2 there. The Games: alone, and player 2 chosen as Hercule, Krillin or Vegeta before the ring (player 1 must be Goku for the barrier): player 2's choice
+Hercule cannot be player 2 there. The Games: alone (Hercule only where the plot needs him: called out after fight 2, 16's head, the
+beam struggle and its end; no Hercule on the map at the start of fights 3, J1, 7 and 8), and player 2 chosen as Hercule, Krillin or Vegeta before the ring (player 1 must be Goku for the barrier): player 2's choice
 must not change a scene, since his entity is gone in all of them and he is Hercule in the team fights. Each scene is pressed through until 0x03001FDC (a scene runs) clears:
 a walk or an animation that hung would leave the next EXPECT failing."""
 import os
@@ -86,6 +87,12 @@ def zone12(tag, p1, p2, shots):
     p2_stands(coop)
 
 
+def herc(n):
+    """Hercule's sprite 72 on the map: alone he is in no scene before a fight (Ryan, 2026-11-05), with two players player 2's entity is him in a team fight."""
+    out("deref TBL 0x0800959C", f"deref R72 TBL+{(72 - 7) * 4:#x}")
+    expect(f"entrec [0-9a-f]+: {n}$", "entrec R72")
+
+
 def win(stat, who):
     out("poke32 0x0203F9B0 0xCE11CA3E", f"poke8 0x0203F9B5 {stat}", "poke8 0x0203F9B6 0", "stepz 0x0203F9B5 150")
     expect(f"0203f9b7: {who}", "peek8 0x0203F9B7 1")
@@ -112,8 +119,10 @@ def games(tag, p2):
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")
     p2_stands(coop)
+    herc(1 if coop else 0)
     win(24, duo)
     scene_done(f"{tag}_j1")
+    herc(0)
     win(27, "16")
     scene_done(f"{tag}_j2")
     win(27, "21")
@@ -125,11 +134,13 @@ def games(tag, p2):
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")
     p2_stands(coop)
+    herc(1 if coop else 0)
     win(25, duo)
     scene_done(f"{tag}_f8")      # fight 8
     if coop:
         expect("0203ff84: 05", "peek8 0x0203FF84 1")
     p2_stands(coop)
+    herc(1 if coop else 0)
     win(26, duo)
     out("frames 1500", f"shot cs_{tag}_struggle", "mash 42 100", f"shot cs_{tag}_after1", "ents", "mash 14 100", f"shot cs_{tag}_after2", "mash 8 100", f"shot cs_{tag}_after3")
     out("mashmap 6 99 200", "frames 120", f"shot cs_{tag}_world", "ents")

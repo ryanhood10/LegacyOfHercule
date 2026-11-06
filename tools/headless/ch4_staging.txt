@@ -12,10 +12,48 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_a13_0
+key 1 6
+frames 100
+shot st_P_a13_1
+key 1 6
+frames 100
+shot st_P_a13_2
+key 1 6
+frames 100
+shot st_P_a13_3
+key 1 6
+frames 100
+shot st_P_a13_4
+key 1 6
+frames 100
+shot st_P_a13_5
+key 1 6
+frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_P_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -33,10 +71,57 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_a27_0
+key 1 6
+frames 100
+shot st_P_a27_1
+key 1 6
+frames 100
+shot st_P_a27_2
+key 1 6
+frames 100
+shot st_P_a27_3
+key 1 6
+frames 100
+shot st_P_a27_4
+key 1 6
+frames 100
+shot st_P_a27_5
+key 1 6
+frames 100
+shot st_P_a27_6
+key 1 6
+frames 100
+shot st_P_a27_7
+key 1 6
+frames 100
+shot st_P_a27_8
+key 1 6
+frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_P_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -54,10 +139,57 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_a40_0
+key 1 6
+frames 100
+shot st_P_a40_1
+key 1 6
+frames 100
+shot st_P_a40_2
+key 1 6
+frames 100
+shot st_P_a40_3
+key 1 6
+frames 100
+shot st_P_a40_4
+key 1 6
+frames 100
+shot st_P_a40_5
+key 1 6
+frames 100
+shot st_P_a40_6
+key 1 6
+frames 100
+shot st_P_a40_7
+key 1 6
+frames 100
+shot st_P_a40_8
+key 1 6
+frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_P_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -75,10 +207,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_P_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -96,6 +248,16 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_H_a13_0
 key 1 6
 frames 100
@@ -114,16 +276,20 @@ frames 100
 shot st_H_a13_5
 key 1 6
 frames 100
-shot st_H_a13_6
-key 1 6
-frames 100
-shot st_H_a13_7
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_H_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -141,6 +307,16 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_H_a27_0
 key 1 6
 frames 100
@@ -168,16 +344,20 @@ frames 100
 shot st_H_a27_8
 key 1 6
 frames 100
-shot st_H_a27_9
-key 1 6
-frames 100
-shot st_H_a27_10
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_H_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -195,6 +375,16 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_H_a40_0
 key 1 6
 frames 100
@@ -222,16 +412,20 @@ frames 100
 shot st_H_a40_8
 key 1 6
 frames 100
-shot st_H_a40_9
-key 1 6
-frames 100
-shot st_H_a40_10
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_H_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -249,10 +443,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_H_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -270,10 +484,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_K_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -291,10 +525,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_K_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -312,10 +566,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_K_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -333,10 +607,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_K_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -355,6 +649,16 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_PH_a13_0
 key 1 6
 frames 100
@@ -373,16 +677,20 @@ frames 100
 shot st_PH_a13_5
 key 1 6
 frames 100
-shot st_PH_a13_6
-key 1 6
-frames 100
-shot st_PH_a13_7
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_PH_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -401,6 +709,16 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_PH_a27_0
 key 1 6
 frames 100
@@ -428,16 +746,20 @@ frames 100
 shot st_PH_a27_8
 key 1 6
 frames 100
-shot st_PH_a27_9
-key 1 6
-frames 100
-shot st_PH_a27_10
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_PH_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -456,6 +778,16 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_PH_a40_0
 key 1 6
 frames 100
@@ -483,16 +815,20 @@ frames 100
 shot st_PH_a40_8
 key 1 6
 frames 100
-shot st_PH_a40_9
-key 1 6
-frames 100
-shot st_PH_a40_10
-key 1 6
-frames 100
 stepz 0x03001FDC 80
 frames 30
 shot st_PH_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -511,10 +847,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PH_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -533,10 +889,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HP_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -555,10 +931,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HP_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -577,10 +973,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HP_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -599,10 +1015,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HP_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -621,10 +1057,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PK_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -643,10 +1099,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PK_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -665,10 +1141,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PK_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -687,10 +1183,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PK_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -709,10 +1225,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x11600c0
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HK_a13_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -731,10 +1267,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HK_a27_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -753,10 +1309,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HK_a40_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -775,10 +1351,30 @@ poke32 0x0203FD0C 0x3108
 poke32 0x0203FD54 0x2bc00c8
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_HK_r49_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 49 var 1 player [0-9]+,[0-9]+ 
@@ -796,6 +1392,16 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_H_a27b_0
 key 1 6
 frames 100
@@ -812,6 +1418,16 @@ stepz 0x03001FDC 80
 frames 30
 shot st_H_a27b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -829,10 +1445,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_H_a40b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -851,6 +1487,16 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xbe01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 shot st_PH_a27b_0
 key 1 6
 frames 100
@@ -867,6 +1513,16 @@ stepz 0x03001FDC 80
 frames 30
 shot st_PH_a27b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -885,10 +1541,124 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x12c000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_PH_a40b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+echo EXPECT 03001fdc: 00
+peek8 0x03001FDC 1
+echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
+map
+echo === P_a27b
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 FLAGS+11 1
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x1b08
+poke32 0x0203FD54 0xbe01f4
+poke32 0x0203FD08 5
+frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_a27b_0
+key 1 6
+frames 100
+shot st_P_a27b_1
+key 1 6
+frames 100
+shot st_P_a27b_2
+key 1 6
+frames 100
+shot st_P_a27b_3
+key 1 6
+frames 100
+stepz 0x03001FDC 80
+frames 30
+shot st_P_a27b_fight
+ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+echo EXPECT 03001fdc: 00
+peek8 0x03001FDC 1
+echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
+map
+echo === P_a40b
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 FLAGS+11 2
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x2808
+poke32 0x0203FD54 0x12c000c
+poke32 0x0203FD08 5
+frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+stepz 0x03001FDC 80
+frames 30
+shot st_P_a40b_fight
+ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -906,10 +1676,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x1160073
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c13a_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -927,10 +1717,30 @@ poke32 0x0203FD0C 0xd08
 poke32 0x0203FD54 0x116010e
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c13b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 13 var 1 player [0-9]+,[0-9]+ 
@@ -948,10 +1758,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0x9a01f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c27a_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -969,10 +1799,30 @@ poke32 0x0203FD0C 0x1b08
 poke32 0x0203FD54 0xe701f4
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c27b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 27 var 1 player [0-9]+,[0-9]+ 
@@ -990,10 +1840,30 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0xf3000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c40a_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
@@ -1011,12 +1881,533 @@ poke32 0x0203FD0C 0x2808
 poke32 0x0203FD54 0x16e000c
 poke32 0x0203FD08 5
 frames 300
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 stepz 0x03001FDC 80
 frames 30
 shot st_c40b_fight
 ents
+deref TBL 0x0800959C
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R103
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
 echo EXPECT 03001fdc: 00
 peek8 0x03001FDC 1
 echo EXPECT map zone 8 area 40 var 1 player [0-9]+,[0-9]+ 
 map
+echo === lab
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x2e08
+poke32 0x0203FD54 0x35200c0
+poke32 0x0203FD08 5
+frames 300
+frames 200
+deref TBL 0x0800959C
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R165
+shot st_lab_0
+key 1 6
+frames 140
+shot st_lab_1
+key 1 6
+frames 140
+shot st_lab_2
+key 1 6
+frames 140
+shot st_lab_3
+key 1 6
+frames 140
+shot st_lab_4
+key 1 6
+frames 140
+shot st_lab_5
+key 1 6
+frames 140
+shot st_lab_6
+key 1 6
+frames 140
+shot st_lab_7
+key 1 6
+frames 140
+shot st_lab_8
+key 1 6
+frames 140
+shot st_lab_9
+key 1 6
+frames 140
+stepz 0x03001FDC 150
+frames 60
+echo EXPECT map zone 8 area 46 
+map
+ents
+deref TBL 0x0800959C
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+echo === P_end
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 1
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_P_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
+echo === K_end
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 6
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+shot st_K_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
+echo === H_end
+load menu.ss
+p2 off
+maptest 13
+frames 300
+poke8 0x0203F000 5
+poke8 FLAGS+11 0
+poke16 0x0203F028 900
+poke16 0x0203F098 900
+poke32 0x0203FD0C 0x3108
+poke32 0x0203FD54 0x2bc00c8
+poke32 0x0203FD08 5
+frames 300
+stepz 0x03001FDC 80
+frames 60
+poke32 0x0203FD08 7
+frames 400
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_0
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_1
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_2
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_3
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_4
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_5
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_6
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_7
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_8
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_9
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_10
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_11
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_12
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_13
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_14
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_15
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_16
+key 1 6
+frames 160
+deref TBL 0x0800959C
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+shot st_H_end_17
+stepz 0x03001FDC 200
+frames 200
+echo EXPECT map zone 6 area 99 
+map
+ents
 echo ALIVE
