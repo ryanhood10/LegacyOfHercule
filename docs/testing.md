@@ -1522,6 +1522,12 @@ Rush 4, Big Bang 10, Ki Blast 2), an older save's entry (flags 0x43, the old num
 16. In Map Test 13 the snakes interrupt moves (hurt state); the same steps in the town (Map Test 7, `mash 60 20`
 first) show every EP drop.
 
+**Test drop-ins for the latest pieces (2026-11-06):** `python -I tools/headless/dropins_test.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR` writes
+`<rom>.ss1`-`.ss9`, each just before one new thing (its docstring lists them; `build/play/DROP-INS.txt` says what to do at each):
+Map Test and test warps on the debug ROM, re-saved on the play ROM, every party member full, "How many players?" asked again
+on load, no cartridge save inside. Check each with a walk-in (`build/drops/verify.txt` pattern) before installing: a spot can be
+off the walkable ground (the road's was: F4 there is saved while the map loads, so its scene plays as it fades in).
+
 `python tools/headless/dropins.py PLAY_ROM DEBUG_ROM MENU_SS SAV OUTDIR` writes `<rom>.ss1`-`.ss7` next to the play
 ROM: mGBA loads slot n with Fn (Shift+Fn saves over it). F1 his save on the Northern Wastelands save pad (Krillin),
 F2 Goku's landing site as the group flies in, F3 Gero's computer, F4 the Cell Games path (Goku player 1 for the

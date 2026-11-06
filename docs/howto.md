@@ -111,7 +111,11 @@ bunker and Android 16 as a player").
 Reference: `data/maps/broly_arena.json` (stock basin + new landing zone + a story's records).
 Format and tools in `docs/maps.md` (8, 9). New areas live in zone 15; take the area from
 `docs/ids.md`. Build previews land in `$(BUILD)/maps/`. Test with `COOP_CMD_WARP` (5).
-Stock-map edits that only add triggers, exits or records go in a story `.json` through `mapedit.py`.
+Stock-map edits that only add triggers, exits or records go in a story `.json` through `mapedit.py`. A stock scene run by a
+broken item (a door: Gero's lab door at zone 8 area 46 runs the 16 scene) is repointed with `"items": {"0": {"script":
+"seq:NAME"}}`; restate its sequence with `stockseq` and put added entries after the end (`stop`, then `[N]`), so the stock
+entries keep their absolute indexes (`ch4_lab_door`). A scene that reloads a map mid-way drops its actors: spawn them again
+after each reload.
 
 ## Change a team combo
 

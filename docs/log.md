@@ -4,9 +4,9 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **The lab door's scene keeps 13 through its cut back into the lab (Ryan: his model vanished at the third view):** the scene reloads map 8/60 at entry 16 after the cut outside, which drops actors; `ch4_lab_door` entry 79 spawns him again beside Gero.
+- **F1-F9 for Ryan's one-player tests (`tools/headless/dropins_test.py`, `docs/testing.md`):** Gero's stage, the door generator, the lab, the eggs, the Chamber's door (a fresh run), the tournament's waiting room, Broly's ship with five lights out, the portal, Frieza's ship.
 - **One death for Gero (Ryan):** the first lab cutaway is back to the stock beat (Gero wakes 17 and 18, the controller) with 13 beside him; 13's revenge moved into the stock 16 scene at the lab door, after 17's blast ("scrap heap"): `ch4_lab_door`, run by area 46's item 0 (`tools/mapedit.py` gained `"items": {"N": {"script": REF}}`). `ch4_staging.txt` door blocks, one player and two.
-
-## 2026-11-06
 
 - **The Time Chamber, Ryan's second round (`docs/time-chamber.md` 13.6; branch `nb-chamber2`):** mid-run the door home asks twice
   ("Leave the Time Chamber?", then his "Are you sure? You will lose all progress."; the six and Popo are one run); Broly's ship's
