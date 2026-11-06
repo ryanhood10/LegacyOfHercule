@@ -729,5 +729,110 @@ sequence ch4_road_end
         WalkToPosition 0, 16, 372
       a:
         END
-  [19] stockseq @083d98ac 12 48          ; 17's game, the kiss, Vegeta storms off, Piccolo leaves alone
+  [19] stockseq @083d98ac 12 18          ; 17's game, "Good luck!  Bye!", the kiss (batch 1, 4.7: stock entries 19, 23, 25, 38 and 40 restated
+  script                                 ; in place, so the stock's indexes hold). Stock 19: they fly off; Krillin's shout pose holds after
+        BeginCommandBatch                ; she has gone, before "What am I doing?"
+        SetEntityAnimation 76, 4
+        WalkToPosition 11, 216, 416
+        WaitFrames 40
+        SetEntityFacing 76, 0
+        PlaySFX 11, 26
+        FlyToPosition 11, 288, 512
+        DespawnEntity 11
+        CommitCommandBatch
+        PlayAudio 26
+        FlyToPosition 9, 248, 512
+        DespawnEntity 9
+        SetEntityFacing 76, 3
+        WaitFrames 40
+        SetEntityFacing 8, 2
+        WaitFrames 60
+        PlayAudio 26
+        FlyToPosition 8, 376, 480
+        DespawnEntity 8
+        SetEntityAnimation 76, 4
+        WaitFrames 90
+  stockseq @083d98ac 20 22               ; "What am I doing?", Krillin walks over, "Are you guys alright?"
+  script                                 ; stock 23: the Senzu; Vegeta up (an actor, or player 1's own body), Trunks; Vegeta's power rises
+        SetCharEP 2, 5000                ; under his scream (a held charge, ended with its burst as he leaves)
+        SetCharHP 2, 5000
+        SetCharEP 0, 5000
+        SetCharHP 0, 5000
+        SetCharEP 1, 5000
+        SetCharHP 1, 5000
+        FindEntityByType 3
+        PushActiveCharIndex
+        PushByte 2
+        CmpNe
+        JumpIfFalse L1
+        SpawnCharacterEntity 137, 224, 400
+        Jump L2
+      L1:
+        SetEntityPositionInstant 0, 224, 400
+      L2:
+        WaitFrames 30
+        SetEntityFacing 137, 2
+        WaitFrames 30
+        SetEntityFacing 137, 1
+        WaitFrames 60
+        FindEntityByType 4
+        SpawnCharacterEntity 128, 236, 440
+        SetEntityFacing 137, 0
+        SetEntityAnimation 137, 4
+        SetEntityFacing 128, 1
+        CoopCall 37, 16, -12, 0
+        JumpIfFalse V1
+        CoopCall 37, 1, -12, -3
+        Jump V2
+      V1:
+        CoopCall 37, 1, 137, -3
+      V2:
+        CoopCall 37, 7, 0, 1
+  stockseq @083d98ac 24 24               ; "VEGETA: ARRRRRGGGHHHHHH!!!!!"
+  script                                 ; stock 25: the burst, Piccolo up, Vegeta takes off; Trunks takes two steps after him
+        CoopCall 37, 7, -1, 0
+        FindEntityByType 1
+        PushActiveCharIndex
+        PushByte 1
+        CmpNe
+        JumpIfFalse L1
+        SpawnCharacterEntity 103, 252, 416
+        Jump L2
+      L1:
+        SetEntityPositionInstant 0, 252, 416
+      L2:
+        BeginCommandBatch
+        PlaySFX 137, 26
+        FlyToPosition 137, 408, 384
+        SetEntityFacing 76, 3
+        SetEntityFacing 128, 3
+        DespawnEntity 137
+        CommitCommandBatch
+        SetEntityFacing 103, 3
+        FindEntityByType 0
+        SpawnCharacterEntity 121, 208, 432
+        WalkToPosition 128, 262, 446
+        SetEntityFacing 128, 3
+  stockseq @083d98ac 26 37               ; "Father!  Where are you going?" ... "Why don't you tell us what your scheme is?"
+  script                                 ; stock 38: Piccolo rounds on them, the ground answers, Krillin and Tien give a step
+        SetEntityFacing 103, 2
+        PlayAudio 60
+        BeginCommandBatch
+        SetEntityAnimation 103, 4
+        ScreenShake 0, 8, 20
+        WalkToPosition 76, 190, 408
+        WalkToPosition 121, 198, 436
+        CommitCommandBatch
+        SetEntityFacing 76, 3
+        SetEntityFacing 121, 3
+  stockseq @083d98ac 39 39               ; "This is something that I have to do ALONE!!!!"
+  script                                 ; stock 40: his take-off kicks up dust
+        SetEntityFacing 103, 0
+        WaitFrames 40
+        PlayAudio 26
+        SpawnDustCloud 103, 252, 418
+        FlyToPosition 103, 128, 408
+        DespawnEntity 103
+        SetEntityFacing 121, 1
+  stockseq @083d98ac 41 48               ; Tien and Krillin on Kami, the journal
 end

@@ -821,6 +821,14 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   something that I have to do ALONE!!!!": a short shake, the others give a step, his take-off with dust.
 - **Risks:** entries 23, 25, 27 place player 1's own body or an actor by who plays: the RISE has both cases.
   Absolute indexes throughout.
+- **Built 2026-11-06 (`nb-cs4`), beats 2-4** (stock entries 19, 23, 25, 38, 40 restated in place; no stock entry of 12-48 returns an
+  index): Krillin's shout pose holds 90 frames after the androids have gone, before "What am I doing?"; Vegeta's power rises under
+  "ARRRRRGGGHHHHHH!!!!!" (a held Cine charge on him, his actor or player 1's body, `-12` / 137) and bursts as he takes off; Trunks takes
+  two steps after him for "Father!  Where are you going?"; Piccolo rounds on them with a shake and Krillin and Tien give a step for
+  "...ALONE!!!!"; his take-off kicks up dust. **Not built: the rises (beat 1).** The stock lying bodies are map decorations
+  (`FindEntityByType n` removes one, then a standing actor is spawned): to play a rise the actor would first have to lie, and nothing
+  can put a body straight into a held lying pose from a script (Cine's fall plays the fall). `ch4_staging` "end" now presses 40 times
+  (into Piccolo's exit; shots `st_<n>_end_19`-`39`), every lineup passing as before.
 
 ### 4.8 The generator's eggs: leave
 
