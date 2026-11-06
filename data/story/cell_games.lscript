@@ -1544,6 +1544,7 @@ sequence cg_beam_struggle
         PanCameraToPosition 320, 344, 30
         SpawnCharacterEntity 56, 432, 440
         SetEntityFacing 56, 1
+        SetEntityAnimationNoWait 56, 3
         SpawnCharacterEntity 121, 572, 432
         SetEntityFacing 121, 2
         SpawnCharacterEntity 137, 308, 456
@@ -1560,19 +1561,23 @@ sequence cg_beam_struggle
         WalkToPosition 76, 400, 480
         CommitCommandBatch
         SetEntityFacing 121, 2
-        SetEntityFacing 137, 3
+        SetEntityFacing 137, 2
         SetEntityFacing 156, 0
         SetEntityFacing 76, 1
         SetEntityAnimation 0, 4
         PlayAudio 50
         END
   stockseq @083ec758 20 25    ; the aftermath: "Cell's energy completely vanished!"
-  script                                 ; Hercule's actor takes it in
+  script                                 ; Hercule's actor walks into the middle of them; nobody turns from Gohan
         WalkToPosition 72, 516, 410
-        SetEntityFacing 72, 2
+        WalkToPosition 72, 458, 404
+        SetEntityFacing 72, 0
   text 67 "HERCULE: Is...  is it over?\x0bHa!  Hahaha!  Of course it's over!  Did everybody see that?!"    ; (draft)
   stockseq @083ec758 26 35    ; Krillin, Tien, 18, "You guys go ahead!"
-  script                                 ; stock entry 36: they fly off, and nobody saw Hercule's actor; he goes to find the cameras
+  script                                 ; stock entry 36: Gohan is on his feet; they fly off, and nobody saw Hercule's actor; he goes to find the cameras
+        SetEntityAnimation 56, 0
+        SetEntityFacing 56, 0
+        WaitFrames 16
         SetEntityFacing 137, 1
         PlayAudio 26
         FlyToPosition 156, 280, 512
@@ -1586,6 +1591,7 @@ sequence cg_beam_struggle
         FlyToPosition 121, 448, 512
         DespawnEntity 121
         CommitCommandBatch
+        WalkToPosition 72, 516, 410
         WalkToPosition 72, 584, 440
         DespawnEntity 72
         SetEntityFacing 0, 2

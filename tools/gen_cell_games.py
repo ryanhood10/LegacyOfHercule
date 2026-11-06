@@ -620,7 +620,11 @@ for x, y, far in ((121, "496, 432", "572, 432"), (137, "360, 456", "308, 456"), 
     tail[tail.index(f"SpawnCharacterEntity {x}, {y}")] = f"SpawnCharacterEntity {x}, {far}"
 k = tail.index("SetEntityAnimation 0, 4", tail.index("FadeFromWhite 120"))
 tail = tail[:k] + ["BeginCommandBatch", "WalkToPosition 121, 496, 432", "WalkToPosition 137, 360, 456", "WalkToPosition 156, 376, 408", "WalkToPosition 76, 400, 480", "CommitCommandBatch",
-                   "SetEntityFacing 121, 2", "SetEntityFacing 137, 3", "SetEntityFacing 156, 0", "SetEntityFacing 76, 1"] + tail[k:]
+                   "SetEntityFacing 121, 2", "SetEntityFacing 137, 2", "SetEntityFacing 156, 0", "SetEntityFacing 76, 1"] + tail[k:]
+# the aftermath (docs/cutscenes/batch3 3.11): Gohan, who went down as the white lifted, lies among them (actor 56: the pose player 1 just
+# played on the same sprite) until they leave; Vegeta walks in and keeps his back to the group
+k = tail.index("SetEntityFacing 56, 1")
+tail = tail[:k + 1] + ["SetEntityAnimationNoWait 56, 3"] + tail[k + 1:]
 k = b.index("BeginCommandBatch")
 kc = b.index("CommitCommandBatch", k)
 wave = b[k:kc + 1]                 # the stock wave: Gohan's Kamehameha and twelve beats of Cell hurt inside it
@@ -642,13 +646,13 @@ b = end + tail
 assert "DespawnEntity 162" in b and "DespawnEntity 72" not in b
 script(b, "stock entry 19: the clash runs into the Cells, the beams take them both and the screen goes white (no explosions); Gohan falls, Hercule lowers his hands late; the stock fade and the aftermath's walk-in")
 stockseq(A3, "m325_r12_defeat", 20, 25, "the aftermath: \"Cell's energy completely vanished!\"")
-script(["WalkToPosition 72, 516, 410", "SetEntityFacing 72, 2"], "Hercule's actor takes it in")
+script(["WalkToPosition 72, 516, 410", "WalkToPosition 72, 458, 404", "SetEntityFacing 72, 0"], "Hercule's actor walks into the middle of them; nobody turns from Gohan")
 text(67, "HERCULE: Is...  is it over?\\x0bHa!  Hahaha!  Of course it's over!  Did everybody see that?!", draft=True)
 stockseq(A3, "m325_r12_defeat", 26, 35, "Krillin, Tien, 18, \"You guys go ahead!\"")
 b = body(A3, "m325_r12_defeat", 36)
 k = b.index("SetEntityFacing 0, 2")
-b = b[:k] + ["WalkToPosition 72, 584, 440", "DespawnEntity 72"] + b[k:]
-script(b, "stock entry 36: they fly off, and nobody saw Hercule's actor; he goes to find the cameras")
+b = b[:k] + ["WalkToPosition 72, 516, 410", "WalkToPosition 72, 584, 440", "DespawnEntity 72"] + b[k:]
+script(["SetEntityAnimation 56, 0", "SetEntityFacing 56, 0", "WaitFrames 16"] + b, "stock entry 36: Gohan is on his feet; they fly off, and nobody saw Hercule's actor; he goes to find the cameras")
 stockseq(A3, "m325_r12_defeat", 37, 48, "Vegeta's thoughts, \"I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!\"")
 # stock 49 picked 50 (Hercule joins) or 53 (journal); ours always goes to the journal step, now right after it
 b = body(A3, "m325_r12_defeat", 49)
