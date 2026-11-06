@@ -71,10 +71,13 @@ ARMOUR = {42, 41, 46, 54}        # 16's armour: dark olive, olive, yellow, green
 SKIN16 = {117, 115, 114, 116, 23, 19, 20, 18}
 HAIR16 = {35, 34, 33, 32}
 SKIN17 = {23, 22, 21, 20, 19, 18, 17, 16}
+STRAND17 = {9, 10, 11, 12, 13, 14, 15}   # the greys inside his black hair
+SCARF17 = {32, 33, 34, 35}               # his orange scarf
 # Android 17 -> Android 16 colours (indices into the shared OBJ palette 0x081DA6C8)
 RECOLOUR = {
     15: 42, 14: 42, 13: 41, 12: 41, 11: 54, 10: 46, 9: 46,          # grey vest -> green armour
-    215: 42, 80: 42, 79: 41, 78: 41, 214: 54,                        # blue trousers -> olive armour
+    215: 42, 80: 41, 79: 41, 78: 46, 214: 54,                        # blue trousers -> his leg armour, as bright as
+                                                                     # his own frames' (was a step darker: dull olive)
     35: 42, 34: 41, 33: 46, 32: 46,                                  # orange scarf -> armour collar
     23: 23, 22: 117, 21: 117, 20: 116, 19: 115, 18: 115, 17: 114, 16: 114,   # skin
     58: 15, 57: 13, 50: 15,                                          # green shoes -> grey boots
@@ -150,7 +153,7 @@ def head_metrics17(px, w, h):
     return hair, top
 
 
-def swap_head(px, w, h, head, chin17):
+def swap_head(px, w, h, head, chin17, back=False):
     """Remove 17's hair and face, recolour the rest of the body into 16's colours and paste 16's
     head (chin on 17's chin row). Returns (new pixels, swapped?)."""
     out = [row[:] for row in px]
@@ -164,11 +167,51 @@ def swap_head(px, w, h, head, chin17):
     band = [(y, x) for y in range(top, min(chin + 1, h)) for x in range(x0, x1 + 1)]
     face = [x for y, x in band if px[y][x] in SKIN17 | {203}]
     cx = (sum(face) / len(face)) if len(face) >= 6 else (sum(xs) / len(xs))
+    if back or len(face) < 6:
+        cx = sum(xs) / len(xs)
+        # no face (a back view; skin up there is a raised hand): 17's long hair swings wide of his neck in a spin, and its middle put 16's head
+        # beside his body with air between. His scarf is the neck: the head goes over it.
+        scarf = [(y, x) for y in range(top, min(chin + 7, h)) for x in range(w) if px[y][x] in SCARF17]
+        if len(scarf) >= 4:
+            cx = sum(x for _, x in scarf) / len(scarf)
+            chin = min(chin, min(y for y, _ in scarf) + 1)
     for y, x in hair:
         out[y][x] = 0
     for y, x in band:
         if px[y][x] in SKIN17 | {203, 2, BLACK}:
             out[y][x] = 0
+    # 17's hair has grey strands and glints (9-15, the vest's greys) that are not part of the black component: left
+    # in, they were recoloured with the vest and floated round 16's head as olive specks (brown ones on Android 13).
+    # Take the grey pieces of at most 10 pixels at head height that touch the hair and nothing else, and what is
+    # left of a hand raised above the head.
+    hairset, seen = set(hair), set()
+    gone = hairset | {q for q in band if px[q[0]][q[1]] in SKIN17 | {203, 2, BLACK}} | {
+        (y, x) for y in range(top) for x in range(max(0, x0 - 2), min(w, x1 + 3)) if px[y][x] in SKIN17}
+    for hy, hx in hair:
+        for s0 in ((hy + dy, hx + dx) for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+            if (s0 in seen or not (0 <= s0[0] < h and 0 <= s0[1] < w) or px[s0[0]][s0[1]] not in STRAND17
+                    or not top <= s0[0] <= chin):
+                continue
+            comp, stack = [], [s0]
+            seen.add(s0)
+            while stack:
+                y, x = stack.pop()
+                comp.append((y, x))
+                for q in ((y + dy, x + dx) for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+                    if 0 <= q[0] < h and 0 <= q[1] < w and q not in seen and px[q[0]][q[1]] in STRAND17:
+                        seen.add(q)
+                        stack.append(q)
+            cset = set(comp)
+            ring = {q for y, x in comp for q in ((y + dy, x + dx) for dy in (-1, 0, 1) for dx in (-1, 0, 1))
+                    if q not in cset and 0 <= q[0] < h and 0 <= q[1] < w and px[q[0]][q[1]]}
+            # a strand or a glint: small, and all it touches goes too (a cuff touches its hand, the vest is bigger)
+            if len(comp) <= 10 and ring and all(q in gone for q in ring):
+                for y, x in comp:
+                    out[y][x] = 0
+    for y in range(top):
+        for x in range(max(0, x0 - 2), min(w, x1 + 3)):
+            if px[y][x] in SKIN17:
+                out[y][x] = 0
     out = recolour17(out)
     dx = int(round(cx - head.cx))
     y0 = chin - head.h + 1
@@ -177,6 +220,26 @@ def swap_head(px, w, h, head, chin17):
             ty, tx = y0 + ry, rx + dx
             if v and 0 <= ty < h and 0 <= tx < w:
                 out[ty][tx] = v
+    # crumbs: pieces of at most 5 pixels (14 when wholly at head height) that touch nothing (not white: sparks and
+    # swing arcs stay)
+    seen = set()
+    for sy in range(min(chin + 1, h)):
+        for sx in range(w):
+            if not out[sy][sx] or (sy, sx) in seen:
+                continue
+            comp, stack = [], [(sy, sx)]
+            seen.add((sy, sx))
+            while stack:
+                y, x = stack.pop()
+                comp.append((y, x))
+                for q in ((y + dy, x + dx) for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+                    if 0 <= q[0] < h and 0 <= q[1] < w and out[q[0]][q[1]] and q not in seen:
+                        seen.add(q)
+                        stack.append(q)
+            small = 14 if all(y <= chin for y, _ in comp) else 5   # all of it beside or above the head: a hand
+            if len(comp) <= small and not any(out[y][x] == 2 for y, x in comp):   # whose arm the hair hid
+                for y, x in comp:
+                    out[y][x] = 0
     return out, True
 
 
@@ -317,7 +380,7 @@ def main():
                         flip = bool(attr & HFLIP)
                         work = hflip(px) if flip else px          # left-facing art for the right facing
                         face = 2 if d == 3 else d
-                        new, ok = swap_head(work, w, h, heads[face], chins[face])
+                        new, ok = swap_head(work, w, h, heads[face], chins[face], back=(d == 1))
                         stats["swapped"] += ok
                         if flip:
                             new = hflip(new)

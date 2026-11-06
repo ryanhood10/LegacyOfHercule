@@ -23,6 +23,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `docs/widescreen.md` | dynamic wide view design, map streaming, the mGBA fork | wide view / fork |
 | `docs/maps.md` | map format (MapEntry, variation, layers, tiles, palette, collision, triggers, exits, gates), the map tools, adding maps, the zone-15 maps, Buu's Fury maps | maps, warps, new areas |
 | `docs/sprites.md` | sprite record format, atlas, Super Saiyan Hercule, Buu's Fury conversion, Android 16 (boss and player), Krillin, Android 13 / Namekian, Paragus / ship, Super Android 13, rules for new enemy models | sprites, new characters |
+| `docs/art-audit.md` | the art audit (2026-11-06): which body has which cutscene pose (the groups a scene may play on each actor, and the ones that crash), every sprite and portrait we made with its faults, fixes and priority, what the art pass fixed and left, how to render the sheets | before posing an actor in a scene; before touching a sprite |
 | `docs/hercule.md` | Hercule hero pass: data patch flow, growth, moveset, Keep Goku, dialogue tooling | stats / abilities / text |
 | `docs/plan-legacy-of-hercule.md` | the game plan: pillars, milestones, order of work, rules | planning |
 | `docs/story.md` | the current story plan: status, standing rules, chapter table, Ryan's decisions per chapter, what is open | story work |
@@ -172,6 +173,8 @@ Keep-Goku byte, included text records); `hercule-text.json` holds dialogue recor
 | `patientart.py` | the injured man in the infirmary's first bed, drawn by code (a `png` op with `"draw": "patientart"`) |
 | `headcheck.py` | flags playable frames with a head floating off the body (a built ROM's records, `docs/testing.md` "Playable bodies") |
 | `tnysheet.py` | contact sheets of every tournament body from a built ROM: the engine's lying pose (`--lying`, reads `tny_lie`), the victory pose as `tny_engine.c` `tny_wins` picks it (`--cheer`, labelled with the names), groups' last frames (`--last`) or every frame (`--groups`) (`docs/testing.md` "Tournament bodies") |
+| `artsheet.py` | audit sheets of any sprite records of a built ROM: every group x 4 facings x every frame on a ground line, ids one under another or `--side` by side, `--first`, `--groups`, `--box`; prints each record's filled groups and frame counts (`docs/art-audit.md` 7) |
+| `headless/art_poses.py` | every frame of a sprite record shown by the running game (an actor held in each group, facing and frame by the runner's `pose`), cropped and tiled; fails on a crash, a pose without a body or a changed entity list (`docs/testing.md` "Art checks") |
 | `tnywins.py` | the win poses the tournament's bodies lack as groups of their own (a held pose shows a group's first frame): Android 16's raised fist drawn from his idle (`tny_win_a16`), Gohan's and Krillin's cheer frame (`tny_win_gohan`, `tny_win_krillin`; `docs/tournament.md` 28, `docs/sprites.md` "Win poses") |
 | `lying.py` | a lying-down frame made from an upright one (turned, sparks dropped, on its back or face down, on the ground line), for `tnyplayables.py`, `tnysprites.py`, `buu2log2.py` |
 | `vanart.py` | the ZZTV news van on Papaya Island's street, drawn by code (a `png` op with `"draw": "vanart"` and its `art_footprint`) |

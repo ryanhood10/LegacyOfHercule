@@ -1012,7 +1012,7 @@ and a violet tint in its white.
        lab ======================== H3 ======================== dojo
 ```
 
-**The door home** is a dark doorway in a gold frame on the canopy's front with a green EXIT sign beside it. Walking up into it
+**The door home** is a dark doorway in a gold frame on the canopy's front with a green EXIT sign beside it. (The sign's board has cut corners, a white line inside its rim and light from the top since 2026-11-06, `tools/chamberpath.py` `sign`; it was a flat green rectangle.) Walking up into it
 (either player) asks, in a box of its own after a beat: "Are you sure you want to leave? / You'll lose all progress. / (A: Yes
 B: No)" (with no light out yet: "Leave the Time Chamber? (A: Yes B: No)"). B: a step back, still inside; walking up again asks
 again. An A held when the question comes does not answer it (CoopCall 18). Yes: the run's progress resets (flags 504-509 the

@@ -176,17 +176,24 @@ FONT = {   # 5 x 7
 
 
 def sign():
-    """40 x 32: a green EXIT board (white letters, a dark rim) on two wooden posts."""
+    """40 x 32: a green EXIT board (white letters, a dark rim with cut corners, the white line a real exit sign has
+    inside its edge, lit from the top and shaded along the bottom) on two wooden posts (lit on the left, the board's
+    shadow across their tops). Until 2026-11-06 a flat green rectangle (docs/art-audit.md 6)."""
     from PIL import Image
     im = Image.new("RGBA", (40, 32), CLEAR)
     px = im.load()
     for y in range(32):
         for x in range(40):
             if y < 15:
+                if (x in (0, 39)) and (y in (0, 14)):
+                    continue                                    # the corners cut
                 rim = x in (0, 39) or y in (0, 14)
-                px[x, y] = (GREY[1] if rim else GREEN[2] if y > 1 else GREEN[3]) + (255,)
+                line = (x in (2, 37) and 2 <= y <= 12) or (y in (2, 12) and 2 <= x <= 37)
+                face = GREEN[3] if y <= 4 else GREEN[1] if y >= 11 else GREEN[2]
+                px[x, y] = (GREY[1] if rim else (255, 255, 255) if line else face) + (255,)
             elif x in (6, 7, 32, 33):
-                px[x, y] = (WOOD[1] if x in (6, 32) else WOOD[0]) + (255,)
+                lit = WOOD[2] if y > 16 else WOOD[1]            # the board's shadow on the posts' tops
+                px[x, y] = ((lit if x in (6, 32) else WOOD[0]) if y > 15 else WOOD[0]) + (255,)
     x0 = 6
     for ch in "EXIT":
         for r, row in enumerate(FONT[ch]):
