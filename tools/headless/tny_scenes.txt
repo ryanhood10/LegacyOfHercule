@@ -901,517 +901,523 @@ poke32 0x0203FD54 0x9c
 poke32 0x0203FD08 38
 frames 10
 echo sprite 156: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xeb
 poke32 0x0203FD08 38
 frames 10
 echo sprite 235: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x79
 poke32 0x0203FD08 38
 frames 10
 echo sprite 121: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xec
 poke32 0x0203FD08 38
 frames 10
 echo sprite 236: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x30
 poke32 0x0203FD08 38
 frames 10
 echo sprite 48: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xed
 poke32 0x0203FD08 38
 frames 10
 echo sprite 237: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x31
 poke32 0x0203FD08 38
 frames 10
 echo sprite 49: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xee
 poke32 0x0203FD08 38
 frames 10
 echo sprite 238: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xb9
 poke32 0x0203FD08 38
 frames 10
 echo sprite 185: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x48
 poke32 0x0203FD08 38
 frames 10
 echo sprite 72: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xba
 poke32 0x0203FD08 38
 frames 10
 echo sprite 186: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x32
 poke32 0x0203FD08 38
 frames 10
 echo sprite 50: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xef
 poke32 0x0203FD08 38
 frames 10
 echo sprite 239: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc3
 poke32 0x0203FD08 38
 frames 10
 echo sprite 195: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc4
 poke32 0x0203FD08 38
 frames 10
 echo sprite 196: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xbb
 poke32 0x0203FD08 38
 frames 10
 echo sprite 187: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xbc
 poke32 0x0203FD08 38
 frames 10
 echo sprite 188: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xbd
 poke32 0x0203FD08 38
 frames 10
 echo sprite 189: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc
 poke32 0x0203FD08 38
 frames 10
 echo sprite 12: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xe
 poke32 0x0203FD08 38
 frames 10
 echo sprite 14: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xa5
 poke32 0x0203FD08 38
 frames 10
 echo sprite 165: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xf0
 poke32 0x0203FD08 38
 frames 10
 echo sprite 240: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x9
 poke32 0x0203FD08 38
 frames 10
 echo sprite 9: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xf1
 poke32 0x0203FD08 38
 frames 10
 echo sprite 241: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xb
 poke32 0x0203FD08 38
 frames 10
 echo sprite 11: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xf2
 poke32 0x0203FD08 38
 frames 10
 echo sprite 242: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x1c
 poke32 0x0203FD08 38
 frames 10
 echo sprite 28: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xa0
 poke32 0x0203FD08 38
 frames 10
 echo sprite 160: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Android 16: the drawn raised fist (0x3f), held on its second frame
-echo EXPECT 0203fd0c: 3f 01 02 01
+echo Android 16: the drawn raised fist (0x3f), one frame
+echo EXPECT 0203fd0c: 3f 00 01 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x1d
 poke32 0x0203FD08 38
 frames 10
 echo sprite 29: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x1e
 poke32 0x0203FD08 38
 frames 10
 echo sprite 30: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xf3
 poke32 0x0203FD08 38
 frames 10
 echo sprite 243: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x1f
 poke32 0x0203FD08 38
 frames 10
 echo sprite 31: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x22
 poke32 0x0203FD08 38
 frames 10
 echo sprite 34: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xf4
 poke32 0x0203FD08 38
 frames 10
 echo sprite 244: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xa6
 poke32 0x0203FD08 38
 frames 10
 echo sprite 166: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x9f
 poke32 0x0203FD08 38
 frames 10
 echo sprite 159: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xaa
 poke32 0x0203FD08 38
 frames 10
 echo sprite 170: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xb4
 poke32 0x0203FD08 38
 frames 10
 echo sprite 180: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd8
 poke32 0x0203FD08 38
 frames 10
 echo sprite 216: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xdb
 poke32 0x0203FD08 38
 frames 10
 echo sprite 219: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xdc
 poke32 0x0203FD08 38
 frames 10
 echo sprite 220: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xdd
 poke32 0x0203FD08 38
 frames 10
 echo sprite 221: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x9e
 poke32 0x0203FD08 38
 frames 10
 echo sprite 158: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xde
 poke32 0x0203FD08 38
 frames 10
 echo sprite 222: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xcd
 poke32 0x0203FD08 38
 frames 10
 echo sprite 205: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc5
 poke32 0x0203FD08 38
 frames 10
 echo sprite 197: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd1
 poke32 0x0203FD08 38
 frames 10
 echo sprite 209: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd2
 poke32 0x0203FD08 38
 frames 10
 echo sprite 210: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc6
 poke32 0x0203FD08 38
 frames 10
 echo sprite 198: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc8
 poke32 0x0203FD08 38
 frames 10
 echo sprite 200: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc9
 poke32 0x0203FD08 38
 frames 10
 echo sprite 201: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xcb
 poke32 0x0203FD08 38
 frames 10
 echo sprite 203: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xc7
 poke32 0x0203FD08 38
 frames 10
 echo sprite 199: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xca
 poke32 0x0203FD08 38
 frames 10
 echo sprite 202: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd0
 poke32 0x0203FD08 38
 frames 10
 echo sprite 208: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xcc
 poke32 0x0203FD08 38
 frames 10
 echo sprite 204: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd3
 poke32 0x0203FD08 38
 frames 10
 echo sprite 211: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd7
 poke32 0x0203FD08 38
 frames 10
 echo sprite 215: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd6
 poke32 0x0203FD08 38
 frames 10
 echo sprite 214: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x39
 poke32 0x0203FD08 38
 frames 10
 echo sprite 57: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
+peek8 0x0203FD0C 4
+echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f)
+echo EXPECT 0203fd0c: 3f 00 01 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xa1
 poke32 0x0203FD08 38
 frames 10
 echo sprite 161: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
+peek8 0x0203FD0C 4
+echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f)
+echo EXPECT 0203fd0c: 3f 00 01 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x67
 poke32 0x0203FD08 38
 frames 10
 echo sprite 103: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x89
 poke32 0x0203FD08 38
 frames 10
 echo sprite 137: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x87
 poke32 0x0203FD08 38
 frames 10
 echo sprite 135: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x3c
 poke32 0x0203FD08 38
 frames 10
 echo sprite 60: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xaf
 poke32 0x0203FD08 38
 frames 10
 echo sprite 175: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
-echo Android 16: the drawn raised fist (0x3f), held on its second frame
-echo EXPECT 0203fd0c: 3f 01 02 01
+echo Android 16: the drawn raised fist (0x3f), one frame
+echo EXPECT 0203fd0c: 3f 00 01 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0x3a
 poke32 0x0203FD08 38
 frames 10
 echo sprite 58: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xce
 poke32 0x0203FD08 38
 frames 10
 echo sprite 206: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xcf
 poke32 0x0203FD08 38
 frames 10
 echo sprite 207: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd4
 poke32 0x0203FD08 38
 frames 10
 echo sprite 212: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd5
 poke32 0x0203FD08 38
 frames 10
 echo sprite 213: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xd9
 poke32 0x0203FD08 38
 frames 10
 echo sprite 217: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x6
 poke32 0x0203FD54 0xda
 poke32 0x0203FD08 38
 frames 10
 echo sprite 218: in the build, frames ok (bit 31 clear), a group (not 0xff)
-echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} [0-9a-f]{2} 0[1-8] 01
+echo EXPECT 0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01
 peek8 0x0203FD0C 4
 poke32 0x0203FD0C 0x9c
 poke32 0x0203FD54 0x0

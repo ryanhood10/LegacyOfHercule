@@ -9,8 +9,8 @@ modes:
                      pose_hold: group 12's last frame, else the generated lying table tny_lie (read from the ROM),
                      else 3's last, else 2's first; Super 13 kneels in 23)
   --cheer            the winner's pose as tny_engine.c win_pose picks it (docs/tournament.md 28): the body's row of
-                     `tny_wins` (its group and held frame, or the drawn group `tny_win_a16` read from the ROM), else group
-                     4's last frame, else 14's first, else 5's first; facing down. Labelled with the fighters' names.
+                     `tny_wins` (its group, or a built group `tny_win_*` read from the ROM), else group 4, 14, 5; frame 0
+                     (what the engine shows), facing down. Labelled with the fighters' names.
   --groups G[,G..]   every frame of these groups (e.g. 1,13 for the walk and the dash)
   --last G[,G..]     the last frame of these groups (e.g. 12,3: the lying candidates)
 
@@ -48,17 +48,17 @@ def roster_ids():
 
 
 def win_rows():
-    """tny_engine.c `tny_wins`: sprite -> (group, held frame, flags, drawn-art symbol or None)."""
+    """tny_engine.c `tny_wins`: sprite -> (group, flags, built-group symbol or None); the pose is the group's frame 0."""
     ts = {m.group(1): int(m.group(2)) for m in
           re.finditer(r"#define\s+(TS_\w+)\s+(\d+)", open(os.path.join(SRC, "tourney.h"), encoding="utf-8").read())}
     ts.update({"A16P_SPRITE": 175, "A16_SPRITE": 160})          # the Makefile's defaults
     txt = open(os.path.join(SRC, "tny_engine.c"), encoding="utf-8").read()
     body = re.search(r"tny_wins\[\]\s*=\s*\{(.*?)\n\};", txt, re.S).group(1)
     out = {}
-    for m in re.finditer(r"\{\s*(\w+),\s*(\d+),\s*(-?\d+),\s*([\w|]+),\s*(\w+)\s*\}", body):
+    for m in re.finditer(r"\{\s*(\w+),\s*(\d+),\s*([\w|]+),\s*(\w+)\s*\}", body):
         sid = int(m.group(1)) if m.group(1).isdigit() else ts[m.group(1)]
-        flags = (1 if "WF_STILL" in m.group(4) else 0) | (2 if "WF_BUILT" in m.group(4) else 0)
-        out[sid] = (int(m.group(2)), int(m.group(3)), flags, None if m.group(5) == "0" else m.group(5))
+        flags = (1 if "WF_STILL" in m.group(3) else 0) | (2 if "WF_BUILT" in m.group(3) else 0)
+        out[sid] = (int(m.group(2)), flags, None if m.group(4) == "0" else m.group(4))
     return out
 
 
@@ -135,30 +135,25 @@ class Built:
         return out
 
     def win_pick(self, sid, rows, sym):
-        """tny_engine.c win_pose, facing down: (descriptor array, frame, tag) or None."""
+        """tny_engine.c win_pose, facing down, frame 0 (a held pose shows its group's first frame: docs/tournament.md 28):
+        (descriptor array, 0, tag) or None."""
         rec = self.record(sid)
         row = rows.get(sid)
         if row:
-            g, hold, flags, art = row
-            arrs = None
+            g, flags, art = row
+            arrs, tag = None, f"g{g}"
             if flags & 2 and art and art in sym:
                 ptrs = [self.sp.u32(sym[art] + 4 * d) for d in range(4)]
                 arrs = ptrs if all(ptrs) and all(self.desc_ok(p) for p in ptrs) else None
-                tag = "drawn"
+                tag = "built"
             elif not flags & 2:
                 arrs = self.group(rec, g)
-                tag = f"g{g}"
             if arrs:
-                n = 1
-                while n < 8 and self.desc_ok(arrs[0] + 12 * n) and arrs[0] + 12 * n not in {
-                        self.sp.u32(rec + 0x4C + 0x10 * k + 4 * d) for k in range(self.rom[rec - S.ROM_BASE + 2])
-                        for d in range(4)}:
-                    n += 1
-                return arrs[0], (n - 1 if hold < 0 or hold >= n else hold), tag + (" still" if flags & 1 else "")
-        for g, f in ((4, -1), (14, 0), (5, 0)):
+                return arrs[0], 0, tag + (" still" if flags & 1 else "")
+        for g in (4, 14, 5):
             grp = self.group(rec, g)
             if grp:
-                return grp[0], self.frames(rec, grp[0]) - 1 if f < 0 else f, f"g{g}"
+                return grp[0], 0, f"g{g}"
         return None
 
     def pick(self, sid, mode, lie):

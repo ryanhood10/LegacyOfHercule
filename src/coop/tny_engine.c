@@ -1176,46 +1176,36 @@ const u32 *tny_lie_pose(const Entity *e, int *frame) {
 
 // ---- the winners' celebration (docs/tournament.md 28; Ryan, 2026-11-05: Android 16 "didnt celebrate, he just looked
 // left and right") -----------------------------------------------------------------------------------------------------
-// Each body's victory pose (facing the crowd): the row of `tny_wins` for its record, else the old order (group 4's last
-// frame, the fidget's first, the charge's first: only groups the record has, grp_of). A row names the group, the frame
-// held (-1 the last) and whether its frames may play as the celebration (WF_STILL: they are an attack's, swooshes and
-// all); WF_BUILT takes a group drawn by tools/tnywins.py (`art`, weak: absent in a build without it) for a body that has
-// none (Android 16: his group 4 is the startled look round). A row whose group the body lacks is skipped, so no body is
-// ever animated on a group it does not have (docs/sprites.md: a missing group overwrites the heap).
-// The bodies were looked at frame by frame (docs/sprites.md "Win poses"): the stock playables' shout (group 4) is two
-// cheers with the arms up at frames 0 and 2 and ends on the arms down, so the old last frame showed no cheer at all.
+// A held pose shows the FIRST frame of the group it is given: the engine writes the frame (+0x14), but every body's
+// control state recomputes it from its timer (+0x12, which the poses reset) before the draw, and that gives 0 (found
+// headless, docs/tournament.md 28: +0x14 read 0 on actors, opponents and players alike). So a pose is a group, and a pose
+// that is no group's first frame gets a group of its own (tools/tnywins.py: one frame per facing).
+// Each body's victory pose: the row of `tny_wins` for its record (its group, or WF_BUILT a group from tnywins.py, `art`,
+// weak: absent in a build without it), else the old order (group 4, the fidget 14, the charge 5: only groups the record
+// has, grp_of). WF_STILL: the pose is held through the hops (no alternation with the idle; Pui Pui's and Janemba's are an
+// attack's first frame). A row whose group the body lacks is skipped, so no body is ever shown in a group it does not have
+// (docs/sprites.md: a missing group overwrites the heap). The bodies were looked at group by group (docs/sprites.md "Win
+// poses"): the stock playables' shout is a cheer whose first frame has the arms up (Goku, Yamcha, Tien ...) or down
+// (Gohan, Krillin: their frame 3 is drawn as a group of its own); Android 16's group 4 is the startled look round.
 extern const void *const tny_win_a16[4] __attribute__((weak));
-#define WF_STILL       1                     // hold the frame through the hops (the group's other frames are attacks)
-#define WF_BUILT       2                     // the drawn group (`art`), not one of the record's
-#define WIN_BUILT      0x3F                  // pose_g's group for a drawn pose (no record has 63 groups)
-static const struct { u16 sprite; u8 group; s8 hold; u8 flags; const void *const *art; } tny_wins[] = {
-    { A16P_SPRITE,     0, 1, WF_BUILT, tny_win_a16 },  // Android 16, the party's: the raised fist (drawn)
-    { A16_SPRITE,      0, 1, WF_BUILT, tny_win_a16 },  // the opponent (the same idle, the same 0x400 slot)
-    { 60,              4, 0, 0, 0 },                   // Goku: the cheer, arms up
-    { 156,             4, 0, 0, 0 },                   // Yamcha (the opponent, the player body)
-    { TS_P_YAMCHA,     4, 0, 0, 0 },
-    { 121,             4, 0, 0, 0 },                   // Tien
-    { TS_P_TIEN,       4, 0, 0, 0 },
-    { 72,              5, 0, 0, 0 },                   // Hercule: the wave to the crowd (his group 4 is a shout)
-    { TS_KING_COLD,    4, 0, 0, 0 },                   // King Cold: arms out, the cape spread
-    { TS_P_TAO,        4, 0, 0, 0 },                   // General Tao: the raised arm
-    { TS_YAMU,         4, 0, 0, 0 },                   // Yamu: arms out
-    { TS_P_PCELL,      4, 0, 0, 0 },                   // Perfect Cell: the hand out
-    { TS_P_COOLER,     4, 0, 0, 0 },                   // Cooler: standing tall
-    { TS_BGOKU,        4, 0, 0, 0 },                   // Goku (Buu Saga) and his forms: the cheer
-    { TS_BGOKU_SSJ,    4, 0, 0, 0 },
-    { TS_BGOKU_SSJ3,   4, 0, 0, 0 },
-    { TS_MYSTIC_GOHAN, 4, 0, 0, 0 },                   // Mystic Gohan: the cheer
-    { TS_SAIYAMAN,     4, 0, 0, 0 },                   // Great Saiyaman: his justice pose
-    { TS_VEGITO,       4, 0, 0, 0 },                   // Vegito: the cheer
-    { TS_PIKKON,       4, 0, 0, 0 },                   // Pikkon: the arms up
-    { TS_PUIPUI,       5, 0, WF_STILL, 0 },            // Pui Pui: a fist up on one leg (his group 4 is his idle)
-    { TS_JANEMBA,      5, 0, WF_STILL, 0 },            // Janemba: the claw up on one leg (his group 4 is his idle)
+extern const void *const tny_win_gohan[4] __attribute__((weak));
+extern const void *const tny_win_krillin[4] __attribute__((weak));
+#define WF_STILL       1                     // hold the pose through the hops (no alternation with the idle)
+#define WF_BUILT       2                     // the group from tnywins.py (`art`), not one of the record's
+#define WIN_BUILT      0x3F                  // pose_g's group for a built pose (no record has 63 groups)
+static const struct { u16 sprite; u8 group, flags; const void *const *art; } tny_wins[] = {
+    { A16P_SPRITE,     0, WF_BUILT, tny_win_a16 },     // Android 16, the party's: the raised fist (drawn)
+    { A16_SPRITE,      0, WF_BUILT, tny_win_a16 },     // the opponent (the same idle, the same 0x400 slot)
+    { 57,              0, WF_BUILT, tny_win_gohan },   // Gohan: his cheer's arms up (group 4 frame 3)
+    { 161,             0, WF_BUILT, tny_win_krillin }, // Krillin: the same (sprite 76's shout, frame 3)
+    { 72,              5, 0, 0 },                      // Hercule: the wave to the crowd (his group 4 is a shout)
+    { TS_PUIPUI,       5, WF_STILL, 0 },               // Pui Pui: a fist up on one leg (his group 4 is his idle)
+    { TS_JANEMBA,      5, WF_STILL, 0 },               // Janemba: the claw up on one leg (his group 4 is his idle)
 };
 #define CEL_OFF        0xFF                  // eng.cel_t: no celebration runs
 #define CEL_START      40                    // the end's pause (90 frames) at which the winners start
 #define CEL_HOP        16                    // frames a hop (two of them, 6 px: the trophy's)
-#define CEL_STEP       4                     // frames per frame of the pose's group while they hop
+#define CEL_SWAP       6                     // while they hop: the pose and the idle in turn, this many frames each
 #define CEL_STAGGER    6                     // each next winner hops this much later (as the trophy's)
 #define CEL_LEN        (2 * CEL_HOP + 3 * CEL_STAGGER)
 static int win_row(const Entity *e) {
@@ -1224,7 +1214,7 @@ static int win_row(const Entity *e) {
             return i;
     return -1;
 }
-// A drawn group for e: all four facings set, its frame drawable and no larger than the body's frame buffer (the
+// A built group for e: all four facings set, its frame drawable and no larger than the body's frame buffer (the
 // record's first half-word: 0x400 for a 32 x 32 body, docs/sprites.md "The tournament's player bodies")
 static const u32 *win_art(const Entity *e) {
     int r = win_row(e);
@@ -1234,28 +1224,18 @@ static const u32 *win_art(const Entity *e) {
     const u8 *d = (const u8 *)g[e->facing & 3];
     return (u32)d[2] * d[3] <= *(const u16 *)e->sprite_record ? g : 0;
 }
-// A held pose's group: the record's, or the drawn one
+// A held pose's group: the record's, or the built one
 static const u32 *pose_grp(const Entity *e, u8 g) {
     return (g & PG_GROUP) == WIN_BUILT ? win_art(e) : grp_of(e, g & PG_GROUP);
 }
-// e's victory pose: its group (WIN_BUILT for the drawn one) and the frame held; -1 when the body has none of them
+// e's victory pose: its group (WIN_BUILT for a built one), shown at its first frame; -1 when the body has none of them
 static int win_pose(const Entity *e, int *frame) {
+    *frame = 0;
     int r = win_row(e);
-    if (r >= 0) {
-        const u32 *g = (tny_wins[r].flags & WF_BUILT) ? win_art(e) : grp_of(e, tny_wins[r].group);
-        if (g) {
-            int n = frames_of(e, g), h = tny_wins[r].hold;
-            *frame = h < 0 || h >= n ? n - 1 : h;
-            return (tny_wins[r].flags & WF_BUILT) ? WIN_BUILT : tny_wins[r].group;
-        }
-    }
-    static const s8 cheer[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };
-    for (int i = 0; i < 3; i++) {
-        const u32 *g = grp_of(e, cheer[i][0]);
-        if (!g) continue;
-        *frame = cheer[i][1] < 0 ? frames_of(e, g) - 1 : cheer[i][1];
-        return cheer[i][0];
-    }
+    if (r >= 0 && ((tny_wins[r].flags & WF_BUILT) ? win_art(e) != 0 : grp_of(e, tny_wins[r].group) != 0))
+        return (tny_wins[r].flags & WF_BUILT) ? WIN_BUILT : tny_wins[r].group;
+    static const u8 cheer[] = { 4, 14, 5 };
+    for (int i = 0; i < 3; i++) if (grp_of(e, cheer[i])) return cheer[i];
     return -1;
 }
 static int win_still(const Entity *e) { int r = win_row(e); return r >= 0 && (tny_wins[r].flags & WF_STILL); }
@@ -1291,14 +1271,15 @@ static void pose_hold(Entity *e, int win) {
     eng.pose_g[k] = (u8)(g == POSE_LIE_TABLE ? g : g | (win ? PG_WIN : 0));
     eng.pose_f[k] = (u8)f;
 }
-// The frame a pose shows now: while the winners hop (the celebration, or the trophy's hops) a standing victory pose plays
-// its group's frames in turn, CEL_STEP frames each, and its last beat is its own held frame
-static int pose_frame(const Entity *e, int k, const u32 *grp) {
+// While the winners hop (the celebration, or the trophy's hops) a standing victory pose and the body's idle (group 0, which
+// every body has) take turns, CEL_SWAP frames each: the cheer pumped; then the pose holds (WF_STILL bodies hold it all along)
+static const u32 *pose_now(const Entity *e, int k, const u32 *grp) {
     u8 g = eng.pose_g[k];
-    if (g == POSE_LIE_TABLE || (g & (PG_WIN | PG_TALK)) != PG_WIN) return eng.pose_f[k];
+    if (g == POSE_LIE_TABLE || (g & (PG_WIN | PG_TALK)) != PG_WIN) return grp;
     int t = eng.cel_t != CEL_OFF ? eng.cel_t : eng.phase == P_PRIZE ? (int)eng.timer : 9999;
-    if (t >= 2 * CEL_HOP || win_still(e)) return eng.pose_f[k];
-    return (t / CEL_STEP) % frames_of(e, grp);
+    if (t >= 2 * CEL_HOP || !((t / CEL_SWAP) & 1) || win_still(e)) return grp;
+    const u32 *idle = grp_of(e, 0);
+    return idle ? idle : grp;
 }
 static void poses_apply(int still) {
     for (int k = 0; k < eng.npose; k++) {
@@ -1306,8 +1287,8 @@ static void poses_apply(int still) {
         const u32 *grp = !e || !in_list(e) ? 0
                        : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : pose_grp(e, eng.pose_g[k]);
         if (!grp) continue;
-        E32(e, 0x4C) = (u32)grp;
-        E16(e, 0x14) = (u16)pose_frame(e, k, grp);
+        E32(e, 0x4C) = (u32)pose_now(e, k, grp);
+        E16(e, 0x14) = eng.pose_f[k];
         E16(e, 0x12) = 0;
     }
     // nobody moves while they are held (the frames before the line's freeze; never during it: A closes the line)
