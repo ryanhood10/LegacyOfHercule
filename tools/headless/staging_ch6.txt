@@ -778,4 +778,113 @@ ents
 echo EXPECT map zone 11 area 5\b
 map
 ents
+echo === island half P
+load menu.ss
+p2 off
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x40b
+poke32 0x0203FD54 0xe00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+poke32 0x0203FD08 7
+frames 120
+mashmap 11 5 60
+frames 300
+mashmap 11 6 30
+frames 200
+poke32 0x0203FD08 7
+frames 20
+mash 110 60
+frames 45
+shot c6_P_tri0
+frames 45
+shot c6_P_tri1
+frames 45
+shot c6_P_tri2
+frames 45
+shot c6_P_tri3
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R29 TBL+0x58
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R29
+deref R60 TBL+0xd4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R60
+ents
+mash 30 60
+shot c6_P_tri4
+ents
+mashmap 9 1 200
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 9 area 1\b
+map
+ents
+echo === island half PH
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x40b
+poke32 0x0203FD54 0xe00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+poke32 0x0203FD08 7
+frames 120
+mashmap 11 5 60
+frames 300
+mashmap 11 6 30
+frames 200
+poke32 0x0203FD08 7
+frames 20
+mash 110 60
+frames 45
+shot c6_PH_tri0
+frames 45
+shot c6_PH_tri1
+frames 45
+shot c6_PH_tri2
+frames 45
+shot c6_PH_tri3
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R121
+deref R29 TBL+0x58
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R29
+deref R60 TBL+0xd4
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R60
+ents
+mash 30 60
+shot c6_PH_tri4
+ents
+mashmap 9 1 200
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 9 area 1\b
+map
+ents
 echo ALIVE

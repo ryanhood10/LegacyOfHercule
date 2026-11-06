@@ -94,6 +94,27 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
     s.shot(f"c6_{n}_break1")
     s.out("mashmap 11 5 60", "frames 400", "ents")
     s.on_map(11, 5)
+# The island's end (a16_island_half): 16 stops at half health, Cell arrives, 17 is absorbed, Tien's Tri-Beam from above (Tien 121 up at
+# (396, 148), Semi-Perfect Cell 29 hammered flat), Goku's rescue by Instant Transmission, the Lookout. Win both stages at once.
+for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
+    n = lineup_name(p1, p2)
+    s.begin(f"island half {n}", p1, p2, "+136 +140 +141 +142 +143 +144 +145")
+    s.warp(11, 4, 352, 224, 100)
+    s.end_scene()
+    s.win(120)
+    s.out("mashmap 11 5 60", "frames 300", "mashmap 11 6 30", "frames 200")
+    s.win(20)
+    s.press(110, 60)                                # to Tien's "NO!!!!!!!!"
+    for i in range(4):
+        s.out("frames 45")
+        s.shot(f"c6_{n}_tri{i}")
+    s.actors(s121=1, s29=1, s60=0)
+    s.out("ents")
+    s.press(30, 60)
+    s.shot(f"c6_{n}_tri4")
+    s.out("ents", "mashmap 9 1 200")
+    s.end_scene()
+    s.on_map(9, 1)
 s.write("staging_ch6.txt")
 
 s = Script("staging_ch568_gen.py")

@@ -454,6 +454,21 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.8 Cell arrives, 17 is absorbed, Tien's stand, Goku's rescue (showcase, L)
 
+- **(c) built 2026-11-06 (`nb-cs2`); (a) and (b) are not built** (the stock arrival, Piccolo's fall, 16's punches and 17's absorption
+  play as before). Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
+  jolt (`CoopCall 37, 15`), the hit blink on Cell, four dust clouds in a square round him, and Cell falls flat (`CoopCall 37, 10`
+  pose 2); three, 24, 18 and 12 frames apart. Cell gets up for "What do you think you're doing?"; after the Lookout cutaway and "You
+  fool." he takes a step and two more flatten him; 18 and 16 fly off while four more land 14 frames apart; then the gaps grow and
+  Tien sinks 8 px lower with each; "Can't... do... this... much... longer..."; a last flash and he drops out of the air (glide, fall,
+  the stock lying pose). Cell rises and walks to the body. Goku appears between them (the stock blink), and the pick-ups are
+  Instant Transmission: a dash to Tien (a flash, Tien gone), a dash to Piccolo's side (a flash, the player gone, as stock, last);
+  on "Be seeing you!" Cell fires and the blast crosses the place Goku stood. Every stock line kept; entry count unchanged (the
+  stock indexes hold).
+- **What the cutaway does:** `SetMapRestoreFlag` / `LoadMapWithEntities` / `RestoreMap` brought everyone back as they were (Tien up
+  at his mark, Cell standing, Piccolo lying). Cell does not fire back at Tien any more (the stock's three blasts): he is pinned
+  until Tien is spent, as in the anime; the outcome is the same. Filmed alone, with Hercule and with Krillin; `staging_ch6`
+  "island half" (two lineups; about four minutes each).
+
 - **Where:** `a16_island_half` (map 298, 11/6, record 0's defeat): entries 0-7 ours, then the stock sequence
   `083e6078` from its entry 1 (90 stock entries; 97 in the merged sequence), with a cutaway to the Lookout (9/4) and the end on 9/1. Film
   `isl_PH` (sheets 2-4).

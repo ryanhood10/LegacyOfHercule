@@ -267,5 +267,218 @@ sequence a16_island_half
         WalkToPosition 28, 368, 256
         WaitFrames 60
         PlayAudio 50
-  stockseq @083e6078 1                  ; the stock Cell scene from his first line to the warp
+  stockseq @083e6078 1 58               ; the stock Cell scene from his first line: the inspection, Piccolo's fall, 16, 17 absorbed, "NO!!!!!!!!"
+  script                                ; stock entry 59, restaged (batch 2, 6.8 c). Tien's stand is the Tri-Beam from above: he flies up over
+        PanCameraToPosition 236, 104, 3 ; Cell and each blast is light, a boom, a square of dust and Cell hammered flat (the stock threw
+        PlayAudio 26                    ; four small ki blasts level across the grass). Three, faster each time
+        FlyToPosition 121, 396, 148
+        SetEntityFacing 121, 2
+        CoopCall 37, 1, 29, -3
+        WaitFrames 10
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 296, 204
+        SpawnDustCloud 121, 328, 204
+        SpawnDustCloud 121, 296, 228
+        SpawnDustCloud 121, 328, 228
+        CommitCommandBatch
+        CoopCall 37, 10, 0, 2
+        WaitFrames 24
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 296, 204
+        SpawnDustCloud 121, 328, 204
+        SpawnDustCloud 121, 296, 228
+        SpawnDustCloud 121, 328, 228
+        CommitCommandBatch
+        CoopCall 37, 10, 0, 2
+        WaitFrames 18
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 296, 204
+        SpawnDustCloud 121, 328, 204
+        SpawnDustCloud 121, 296, 228
+        SpawnDustCloud 121, 328, 228
+        CommitCommandBatch
+        CoopCall 37, 10, 0, 2
+        WaitFrames 12
+        SetEntityAnimationNoWait 121, 0
+        SetEntityFacing 121, 2
+        WaitFrames 20
+        CoopCall 37, 10, 0, 0           ; Cell gets up
+        SetEntityFacing 29, 3
+  stockseq @083e6078 60 65              ; "What do you think you're doing?", "I'm stopping you!", Goku at the Lookout, "You fool."
+  script                                ; stock entry 66: Cell takes a step toward him and two more flatten him in mid-step; Tien turns to 18
+        CoopCall 37, 1, 29, -3
+        WalkToPosition 29, 324, 212
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 10
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        CoopCall 37, 10, 0, 2
+        WaitFrames 10
+        SetEntityAnimationNoWait 121, 0
+        SetEntityFacing 121, 3
+  stock @083e5a58                       ; "18!!!!  Take 16 and run!!!! ..."
+  script                                ; stock entry 68: 18 and 16 fly off; the blasts keep coming, Cell pinned in his pit; then Tien weakens:
+        BeginCommandBatch               ; the gaps grow and he sinks lower with each (the stock had Cell shoot him down)
+        PlaySFX 11, 26
+        FlyToPosition 11, 480, 56
+        FlyToPosition 8, 512, 72
+        DespawnEntity 8
+        DespawnEntity 11
+        CommitCommandBatch
+        SetEntityFacing 121, 2
+        CoopCall 37, 1, 29, -3
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 14
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 14
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 14
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 14
+        GlideToPosition 121, 396, 156, 60
+        WaitFrames 16
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        GlideToPosition 121, 396, 164, 60
+        WaitFrames 30
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        GlideToPosition 121, 396, 172, 60
+        SetEntityAnimationNoWait 121, 0
+        SetEntityFacing 121, 2
+  stock @083e5b58                       ; "Can't... do... this... much... longer..."
+  script                                ; stock entry 70: one last flash, and Tien drops out of the air. Cell gets up and walks to the body
+        SetEntityAnimationNoWait 121, 5
+        PlayAudio 20
+        CoopCall 37, 15, 16, 2
+        BeginCommandBatch
+        PlayDamageEffect 29
+        SpawnDustCloud 121, 308, 200
+        SpawnDustCloud 121, 340, 200
+        SpawnDustCloud 121, 308, 224
+        SpawnDustCloud 121, 340, 224
+        CommitCommandBatch
+        WaitFrames 20
+        GlideToPosition 121, 396, 192, 200
+        CoopCall 37, 1, 121, -3
+        CoopCall 37, 10, 0, 2
+        SetEntityAnimation 121, 3       ; (the stock lying pose: his queue is free again for the stock steps below)
+        WaitFrames 30
+        CoopCall 37, 1, 29, -3
+        CoopCall 37, 10, 0, 0
+        WalkToPosition 29, 352, 200
+        SetEntityFacing 29, 3
+  stock @083e5be8                       ; "You puny little man..."
+  script                                ; stock entry 72: Goku is there in a blink, between Cell and Tien
+        FadeToWhite 10
+        PlayMusic 25
+        SpawnCharacterEntity 60, 376, 204
+        SetEntityFacing 60, 2
+        WhiteFadeOut 10
+  stockseq @083e6078 73 78              ; Goku's five lines and Cell's
+  script                                ; stock entry 79: the pick-ups as Instant Transmission (the stock walked him across the island): a blink to
+        PanCameraToPosition 208, 112, 3 ; Tien, both... Tien gone with him; a blink beside Piccolo; the player goes last (stock)
+        CoopCall 37, 1, 60, 121
+        CoopCall 37, 4, 0, 0
+        WaitFrames 12
+        WhiteFlash 4
+        DespawnEntity 121
+        CoopCall 37, 1, 60, 0
+        CoopCall 37, 4, 2, 0
+        SetEntityFacing 29, 0
+        SetEntityFacing 60, 1
+        WaitFrames 20
+        WhiteFlash 4
+        DespawnEntity 0
+  stockseq @083e6078 80 82              ; "We'll fight right here.  Now!", Goku turns, "Be seeing you!"
+  script                                ; stock entry 83: Cell fires; the blast passes through the place he stood
+        BeginCommandBatch
+        NPCFireKiBlast 29, 300, 226, 100
+        EntityWaitFrames 60, 6
+        FlashScreenColor 60, 255, 255, 255, 6
+        DespawnEntity 60
+        CommitCommandBatch
+        WaitFrames 60
+  stockseq @083e6078 84                 ; "Instant transmission...", the Lookout
 end
