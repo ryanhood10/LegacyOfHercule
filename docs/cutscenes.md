@@ -27,7 +27,16 @@ tells.
    character's voice, and marked DRAFT in a comment and in the batch's research file.
 4. **Keep what works.** A beat that already reads well is left alone. Do not lengthen a scene for its own sake: a
    scene may grow by a few seconds for a real moment, never by a wait.
-5. **Every change is one commit per scene** (script + its test), so Ryan can drop any one of them.
+5. **Never remove a stock animation (Ryan, 2026-11-06, after the first pass replaced Gohan's Super Saiyan 2 and
+   the transformations with the toolkit's power-up):** a transformation, a pose, an effect the scene already plays
+   stays, at its own pace; new effects are layered on top of it. "were supposed to improve on whats there, not
+   completely change it ... keep the original animation and add to it, dont remove it!"
+6. **Signature moments get their own look.** The toolkit's charge rings are the everyday power-up; the big moments
+   (Gohan's Super Saiyan 2, Super 13, Broly's rage) get something more and different (lightning, rising rocks, the
+   ground breaking), never the same effect as every other scene.
+7. **Dialogue: less is more.** The stock scenes are already wordy; a pass never adds talk, and our own added lines are
+   the first to cut.
+8. **Every change is one commit per scene** (script + its test), so Ryan can drop any one of them.
 
 ## 3. What makes it Dragon Ball Z, not cheesy
 
