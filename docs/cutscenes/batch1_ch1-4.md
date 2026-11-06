@@ -379,6 +379,12 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
 - **Lines kept:** all five, verbatim.
 - **Risks:** Hercule's actor is sprite 72 and a player may be showing 72 later, never here (he joins in this
   scene): safe to address by sprite. Piccolo's actor is the map's 103.
+- **Built 2026-11-06 (`nb-cs4`).** Once Hercule has walked in, the view comes up to (168, 860) so the top boxes leave both of them in
+  the clear (the camera stays there until the stock's `SetActiveEntity` at the exit); everyone turns to whoever speaks
+  (`CoopCall 37, 11 / 12`); after "Wires?  Mirrors?" Hercule walks once round Piccolo, looking up over his head; Piccolo turns his back
+  for "It's no trick.  Get lost." and keeps it while Hercule pitches the mansion (everyone else looks at Hercule), half turns back for
+  "(A roof over my head...)"; Hercule's shout pose (4: the audit's group 11 is his hurt pose) on "You've got yourself a deal". Lines
+  word for word. `staging_ch2` "deal" checks the view in four lineups.
 
 ### 2.3 King Triceratops: touch up (S)
 

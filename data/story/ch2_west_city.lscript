@@ -16,11 +16,32 @@ sequence ch2_piccolo_deal
         WalkToPosition 72, 304, 968
         SetEntityFacing 72, 2
         SetEntityFacing 103, 3
+        PanCameraToPosition 168, 860, 2  ; (batch 1, 2.2) the view comes up so the boxes at its top leave the two of them in the clear
+        CoopCall 37, 11, 72, 103
         PlayAudio 50
   text 67 "HERCULE: Hold it right there, Green Bean!\x0bI saw you fly in this morning.  What's the secret?  Wires?  Mirrors?"
+  script                                 ; Hercule walks round him once, looking up over his head for the wires
+        WalkToPosition 72, 302, 944
+        WalkToPosition 72, 280, 936
+        SetEntityFacing 72, 1
+        WaitFrames 12
+        WalkToPosition 72, 258, 950
+        WalkToPosition 72, 266, 972
+        WalkToPosition 72, 302, 968
+        SetEntityFacing 72, 2
+        CoopCall 37, 11, 103, -3
+        SetEntityFacing 103, 1           ; Piccolo turns his back on him
   text 90 "PICCOLO: It's no trick.  Get lost."
+  script                                 ; everyone but Piccolo (his back still turned) looks at Hercule
+        CoopCall 37, 12, 72, 103
+
   text 67 "HERCULE: Teach me that flying act and the crowds will go wild!\x0bTell you what: you can stay at my mansion while you train.\x0bForty rooms, a pool, room service!"
+  script                                 ; he half turns back
+        CoopCall 37, 11, 103, 72
   text 90 "PICCOLO: (A roof over my head for three years...)\x0b...Fine.  But you train with us, and you do as I say."
+  script                                 ; Hercule's victory shout
+        CoopCall 37, 11, 72, 103
+        SetEntityAnimation 72, 4
   text 67 "HERCULE: Ha ha ha!  You've got yourself a deal, Green Bean!"
   script
         SetActiveEntity 103

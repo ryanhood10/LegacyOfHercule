@@ -14,6 +14,8 @@ for p1, p2 in ((GOHAN, None), (KRILLIN, None), (GOHAN, KRILLIN), (KRILLIN, GOHAN
     s.out("key 0x40 4", "frames 10")
     s.press(9, 100)
     s.shot(f"c2_{n}_deal")
+    # (batch 1, 2.2) the view is up at (168, 860) through the talk, so the top boxes leave Piccolo and Hercule in the clear
+    s.out("echo EXPECT 030010ac: 000000a8 0000035c", "peek 0x030010AC 2")
     s.end_scene()
     s.on_map(4, 3)
 for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, PICCOLO)):
