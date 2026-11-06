@@ -736,6 +736,17 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 7.6 Krillin's one hit, "pump up your muscles", the tournament (rework, M)
 
+- **Built in part 2026-11-06 (`nb-cs2`).** Built: after "...You can finish me if you want.  I've failed." Trunks drops to a knee
+  (`CoopCall 37, 10, 0, 1`; the ascended body's kneeling frames are his base-form art, so it reads as the power let go) and Cell
+  walks over to stand above him for "How gracious of you!"; Trunks gets up for "For your information, he's training to defeat
+  you!"; Cell turns away (left, then his back) before "No contest?  No contest!  Ahhh!!!  A tournament!" and back to him for
+  the rules; after "Bring me Goku!" he is gone upward in a blink (a dash without afterimage), then the stock flight out.
+- **Not built: the two misses (beat 2) and STRIKE-H for Krillin's throw (beat 1).** The misses were built and taken out: with Cell
+  standing just below Trunks (a dash to 22 px under him) a second picture of Vegeta's lying body was drawn over Trunks' head for
+  as long as Cell stood there (filmed; with and without the dash's afterimage, with and without a punch on Trunks). Cause not
+  found (OBJ tiles of the lying actor 137?); told to the coordinator. A raw `SetEntityAnimation 0, 6` on the ascended Trunks
+  was not the cause.
+
 - **Where:** `ch7_perfect_end`, map 304 record 1's defeat. Films `z12b_VT`, `z12b_V`.
 - **Today:** marks behind a fade; "KRILLIN: He's wide open!  Now's my chance!  Hyaaaah!", his rush, Cell's arm, a
   flash and a shake, Krillin thrown past Trunks and down (staged 2026-11-05: it reads). Then Cell's lesson on speed
