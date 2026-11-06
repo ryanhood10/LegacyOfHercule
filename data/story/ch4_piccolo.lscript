@@ -448,7 +448,10 @@ sequence ch4_road
         PlayAudio 60
         FlyToPosition 137, 204, 300
         SetEntityFacing 137, 3
-        WaitFrames 16
+        BeginCommandBatch                     ; he lands hard: dust, the road shakes (in place of a wait)
+        EntitySetVelocity 137, 0, 8
+        ScreenShake 0, 8, 14
+        CommitCommandBatch
   [27] text 4 "!VEGETA: Out of my way, clown.\x0bThe machines are mine.  Namek, try to keep up."
   [28] script                            ; player 2 plays Vegeta for the fight, where his actor stood
         FadeOut 30
