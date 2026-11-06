@@ -752,6 +752,17 @@ and Evil Buu, each a stock portrait of the body his sprite came from repainted a
 Cell's 40, Piccolo's 94; Buu's Fury's Super Buu 127 for Evil Buu, who has none there). A recolour is an index map
 applied inside the 3 px frame, the background found by a flood from the top edge through its colours, so a body colour
 that is also a background colour (Piccolo's purple gi) keeps its own map.
+**169 again (2026-11-06, Ryan: "even android 13's photo when he speaks is recycled from 16 and looks too much like 16 ...
+improve his trucker hat on his head and have it say '13' on it"):** neither ROM has an Android 13 or Super 13 face (all
+155 entries of Buu's Fury's module 0x086F393C, ids 8-162, and LoG2's 8-114 were drawn as atlases and looked at: Buu's
+Fury has Broly 16 and Bojack's crew 104-109, no 13), so it stays a repaint, on another face: **Tien's portrait 95**, a
+bald three-quarter head with a heavy brow and a smirk (13's look in the film; 16's is a calm front face with a mohawk
+to hide). `ppportraits.py` `a13`: the skull above the cap's band cleared, a crown (a superellipse cut by the tilted
+band) with a foam front panel and a two-tone mesh back past the seam, a button, a black two-pixel **"13"** (8 px high,
+legible at 1x in the dialogue box) and the Red Ribbon dot his sprite's cap wears, the peak a flat ellipse down over the
+brow with its shadow on the skin; long white hair from under the cap down both sides to points on the shoulders; the
+whites' greys pale blue; Tien's green strap and its mirror on the other shoulder a sleeveless yellow vest; the
+androids' red background (17's 28, 18's 29). The cap's yellows (36 / 38 / 120 / 21) are the sprite's (`bossmodels.py`).
 **173** (2026-11-05, the same tool, recipe `dino`): the mother dinosaur of the generator's eggs (`ch4_eggs.lscript`). LoG2
 has King Triceratops' own dialogue portrait, **96** (the bestiary 0x086F8E40 entry 112, Triceratops King, sprite 127,
 portrait 96; his stock lines in Triceratops Jungle use 96, and 97 when he gives up, the same face in tears), so it is
