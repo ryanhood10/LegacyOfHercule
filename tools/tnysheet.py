@@ -8,7 +8,9 @@ modes:
   --lying            the frame the tournament engine poses a loser in, facing left and right (tny_engine.c
                      pose_hold: group 12's last frame, else the generated lying table tny_lie (read from the ROM),
                      else 3's last, else 2's first; Super 13 kneels in 23)
-  --cheer            the winner's pose (group 4's last frame, else 14's first, else 5's first; facing down)
+  --cheer            the winner's pose as tny_engine.c win_pose picks it (docs/tournament.md 28): the body's row of
+                     `tny_wins` (its group and held frame, or the drawn group `tny_win_a16` read from the ROM), else group
+                     4's last frame, else 14's first, else 5's first; facing down. Labelled with the fighters' names.
   --groups G[,G..]   every frame of these groups (e.g. 1,13 for the walk and the dash)
   --last G[,G..]     the last frame of these groups (e.g. 12,3: the lying candidates)
 
@@ -43,6 +45,39 @@ def roster_ids():
         if n not in ids:
             ids.append(n)
     return ids
+
+
+def win_rows():
+    """tny_engine.c `tny_wins`: sprite -> (group, held frame, flags, drawn-art symbol or None)."""
+    ts = {m.group(1): int(m.group(2)) for m in
+          re.finditer(r"#define\s+(TS_\w+)\s+(\d+)", open(os.path.join(SRC, "tourney.h"), encoding="utf-8").read())}
+    ts.update({"A16P_SPRITE": 175, "A16_SPRITE": 160})          # the Makefile's defaults
+    txt = open(os.path.join(SRC, "tny_engine.c"), encoding="utf-8").read()
+    body = re.search(r"tny_wins\[\]\s*=\s*\{(.*?)\n\};", txt, re.S).group(1)
+    out = {}
+    for m in re.finditer(r"\{\s*(\w+),\s*(\d+),\s*(-?\d+),\s*([\w|]+),\s*(\w+)\s*\}", body):
+        sid = int(m.group(1)) if m.group(1).isdigit() else ts[m.group(1)]
+        flags = (1 if "WF_STILL" in m.group(4) else 0) | (2 if "WF_BUILT" in m.group(4) else 0)
+        out[sid] = (int(m.group(2)), int(m.group(3)), flags, None if m.group(5) == "0" else m.group(5))
+    return out
+
+
+def fighter_names():
+    """sprite id -> the roster's names showing it (opponent sprite or play sprite), and the story's bodies."""
+    ts = {m.group(1): int(m.group(2)) for m in
+          re.finditer(r"#define\s+(TS_\w+)\s+(\d+)", open(os.path.join(SRC, "tourney.h"), encoding="utf-8").read())}
+    out = {}
+    for m in re.finditer(r'\[TF_\w+\]\s*=\s*\{\s*"([^"]*)",\s*(\w+),\s*(\w+),',
+                         open(os.path.join(SRC, "tourney_data.c"), encoding="utf-8").read()):
+        for v in m.group(2, 3):
+            n = int(v) if v.isdigit() else ts.get(v)
+            if n and m.group(1) not in out.setdefault(n, []):
+                out[n].append(m.group(1))
+    out.setdefault(175, []).append("Android 16")
+    for sid, name in ((206, "Super Buu (Gotenks)"), (207, "Super Buu (Gohan)"), (212, "Gotenks SSJ"),
+                      (213, "Gotenks SSJ3"), (217, "Goku SSJ"), (218, "Goku SSJ3")):
+        out.setdefault(sid, []).append(name)
+    return out
 
 
 def lie_order():
@@ -99,6 +134,33 @@ class Built:
             a += 8
         return out
 
+    def win_pick(self, sid, rows, sym):
+        """tny_engine.c win_pose, facing down: (descriptor array, frame, tag) or None."""
+        rec = self.record(sid)
+        row = rows.get(sid)
+        if row:
+            g, hold, flags, art = row
+            arrs = None
+            if flags & 2 and art and art in sym:
+                ptrs = [self.sp.u32(sym[art] + 4 * d) for d in range(4)]
+                arrs = ptrs if all(ptrs) and all(self.desc_ok(p) for p in ptrs) else None
+                tag = "drawn"
+            elif not flags & 2:
+                arrs = self.group(rec, g)
+                tag = f"g{g}"
+            if arrs:
+                n = 1
+                while n < 8 and self.desc_ok(arrs[0] + 12 * n) and arrs[0] + 12 * n not in {
+                        self.sp.u32(rec + 0x4C + 0x10 * k + 4 * d) for k in range(self.rom[rec - S.ROM_BASE + 2])
+                        for d in range(4)}:
+                    n += 1
+                return arrs[0], (n - 1 if hold < 0 or hold >= n else hold), tag + (" still" if flags & 1 else "")
+        for g, f in ((4, -1), (14, 0), (5, 0)):
+            grp = self.group(rec, g)
+            if grp:
+                return grp[0], self.frames(rec, grp[0]) - 1 if f < 0 else f, f"g{g}"
+        return None
+
     def pick(self, sid, mode, lie):
         """[(descriptor array, frame) per shown facing] as tny_engine.c pose_hold picks it: the loser lies in a side
         facing (left, right), the winner faces down."""
@@ -147,6 +209,40 @@ def draw(cv, sp, x, y, arr, fi, cell):
         cv.put(ox, oy + k, (150, 150, 150))
 
 
+def cheer_sheet(out, sp, rows, scale):
+    """The win poses' contact sheet: one cell per body, its pose on the ground line, the sprite id, the pick and the names."""
+    from PIL import Image, ImageDraw
+    cw, ch, per = 84, 104, 8
+    im = Image.new("RGB", (per * cw, ((len(rows) + per - 1) // per) * ch), (70, 90, 70))
+    dr = ImageDraw.Draw(im)
+    for i, (label, got, names) in enumerate(rows):
+        x0, y0 = (i % per) * cw, (i // per) * ch
+        dr.rectangle([x0, y0, x0 + cw - 1, y0 + ch - 1], outline=(50, 65, 50))
+        if got:
+            arr, fi, _ = got
+            xo, yo, w, h, attr, _b = sp.descriptor(arr, fi)
+            fp = sp.frame_pixels(arr, fi)
+            if fp:
+                ox, oy = x0 + cw // 2, y0 + 72
+                for yy in range(h):
+                    for xx in range(w):
+                        v = fp[2][yy][w - 1 - xx] if attr & HF else fp[2][yy][xx]
+                        if v and y0 + 12 <= oy + yo + yy < y0 + 80:
+                            im.putpixel((ox + xo + xx, oy + yo + yy), sp.pal[v])
+        dr.text((x0 + 2, y0 + 1), label, fill=(255, 255, 0))
+        words, line, ty = names.split(" "), "", y0 + 80
+        for wd in words:                                   # the names, wrapped to the cell
+            if len(line) + len(wd) > 15 and line:
+                dr.text((x0 + 2, ty), line, fill=(255, 255, 255))
+                ty += 10
+                line = ""
+            line = (line + " " + wd).strip()
+        if line:
+            dr.text((x0 + 2, ty), line, fill=(255, 255, 255))
+    im.resize((im.width * scale // 2, im.height * scale // 2), Image.NEAREST).save(out) if scale > 2 else im.save(out)
+    print(f"{out}: {len(rows)} bodies")
+
+
 def main():
     a = sys.argv
     rom = open(a[1], "rb").read()
@@ -178,8 +274,16 @@ def main():
                     cells += [(grp[d], fi) for fi in (range(n - 1, n) if last else range(n))]
                     cells.append(None)
             rows.append((f"{sid}", cells))
+    elif "--cheer" in a:
+        rows_w, names = win_rows(), fighter_names()
+        for sid in ids:
+            got = b.win_pick(sid, rows_w, sym)
+            label = f"{sid} {got[2] if got else 'NONE'}"
+            rows.append((label, got, ", ".join(names.get(sid, []))))
+        cheer_sheet(out, sp, rows, scale)
+        return
     else:
-        mode = "lying" if "--lying" in a else "cheer"
+        mode = "lying"
         for sid in ids:
             rec = b.record(sid)
             cells = []

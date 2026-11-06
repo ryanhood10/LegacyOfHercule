@@ -135,7 +135,9 @@ typedef struct TnyEng {
     const void *say_seq[3];
     u32 say_action[2];
     u8 stepping;                         // a step runs (its screens' nested input polls tick again: kept out)
-    u8 _p3[3];
+    u8 cel_t;                            // the winners' celebration (docs/tournament.md 28): its frame, CEL_OFF when none runs
+    u8 cel_on;                           // it started for this fight's end (once per P_MATCH_END)
+    u8 _p3;
     u32 step_sp;                         // the stack at the step's tick: a deeper tick is nested, a shallower one
                                          // finds a stale flag (a reset or a state loaded mid-step) and clears it
     // the ring presentation (76 bytes, where the first say entry was)
@@ -344,6 +346,7 @@ static void state_check(void) {
     memset(&eng, 0, sizeof eng);
     eng.magic = ENG_MAGIC;
     eng.rng = 0x1234567u;
+    eng.cel_t = 0xFF;                               // CEL_OFF: no celebration
     memset(&eng.br, NO, sizeof eng.br);
     eng.br.size = 0;
 }
@@ -1171,18 +1174,104 @@ const u32 *tny_lie_pose(const Entity *e, int *frame) {
     return 0;
 }
 
+// ---- the winners' celebration (docs/tournament.md 28; Ryan, 2026-11-05: Android 16 "didnt celebrate, he just looked
+// left and right") -----------------------------------------------------------------------------------------------------
+// Each body's victory pose (facing the crowd): the row of `tny_wins` for its record, else the old order (group 4's last
+// frame, the fidget's first, the charge's first: only groups the record has, grp_of). A row names the group, the frame
+// held (-1 the last) and whether its frames may play as the celebration (WF_STILL: they are an attack's, swooshes and
+// all); WF_BUILT takes a group drawn by tools/tnywins.py (`art`, weak: absent in a build without it) for a body that has
+// none (Android 16: his group 4 is the startled look round). A row whose group the body lacks is skipped, so no body is
+// ever animated on a group it does not have (docs/sprites.md: a missing group overwrites the heap).
+// The bodies were looked at frame by frame (docs/sprites.md "Win poses"): the stock playables' shout (group 4) is two
+// cheers with the arms up at frames 0 and 2 and ends on the arms down, so the old last frame showed no cheer at all.
+extern const void *const tny_win_a16[4] __attribute__((weak));
+#define WF_STILL       1                     // hold the frame through the hops (the group's other frames are attacks)
+#define WF_BUILT       2                     // the drawn group (`art`), not one of the record's
+#define WIN_BUILT      0x3F                  // pose_g's group for a drawn pose (no record has 63 groups)
+static const struct { u16 sprite; u8 group; s8 hold; u8 flags; const void *const *art; } tny_wins[] = {
+    { A16P_SPRITE,     0, 1, WF_BUILT, tny_win_a16 },  // Android 16, the party's: the raised fist (drawn)
+    { A16_SPRITE,      0, 1, WF_BUILT, tny_win_a16 },  // the opponent (the same idle, the same 0x400 slot)
+    { 60,              4, 0, 0, 0 },                   // Goku: the cheer, arms up
+    { 156,             4, 0, 0, 0 },                   // Yamcha (the opponent, the player body)
+    { TS_P_YAMCHA,     4, 0, 0, 0 },
+    { 121,             4, 0, 0, 0 },                   // Tien
+    { TS_P_TIEN,       4, 0, 0, 0 },
+    { 72,              5, 0, 0, 0 },                   // Hercule: the wave to the crowd (his group 4 is a shout)
+    { TS_KING_COLD,    4, 0, 0, 0 },                   // King Cold: arms out, the cape spread
+    { TS_P_TAO,        4, 0, 0, 0 },                   // General Tao: the raised arm
+    { TS_YAMU,         4, 0, 0, 0 },                   // Yamu: arms out
+    { TS_P_PCELL,      4, 0, 0, 0 },                   // Perfect Cell: the hand out
+    { TS_P_COOLER,     4, 0, 0, 0 },                   // Cooler: standing tall
+    { TS_BGOKU,        4, 0, 0, 0 },                   // Goku (Buu Saga) and his forms: the cheer
+    { TS_BGOKU_SSJ,    4, 0, 0, 0 },
+    { TS_BGOKU_SSJ3,   4, 0, 0, 0 },
+    { TS_MYSTIC_GOHAN, 4, 0, 0, 0 },                   // Mystic Gohan: the cheer
+    { TS_SAIYAMAN,     4, 0, 0, 0 },                   // Great Saiyaman: his justice pose
+    { TS_VEGITO,       4, 0, 0, 0 },                   // Vegito: the cheer
+    { TS_PIKKON,       4, 0, 0, 0 },                   // Pikkon: the arms up
+    { TS_PUIPUI,       5, 0, WF_STILL, 0 },            // Pui Pui: a fist up on one leg (his group 4 is his idle)
+    { TS_JANEMBA,      5, 0, WF_STILL, 0 },            // Janemba: the claw up on one leg (his group 4 is his idle)
+};
+#define CEL_OFF        0xFF                  // eng.cel_t: no celebration runs
+#define CEL_START      40                    // the end's pause (90 frames) at which the winners start
+#define CEL_HOP        16                    // frames a hop (two of them, 6 px: the trophy's)
+#define CEL_STEP       4                     // frames per frame of the pose's group while they hop
+#define CEL_STAGGER    6                     // each next winner hops this much later (as the trophy's)
+#define CEL_LEN        (2 * CEL_HOP + 3 * CEL_STAGGER)
+static int win_row(const Entity *e) {
+    for (int i = 0; i < (int)(sizeof tny_wins / sizeof tny_wins[0]); i++)
+        if (sprite_ok(tny_wins[i].sprite) && (const void *)Character_GetSpriteRecord(tny_wins[i].sprite) == e->sprite_record)
+            return i;
+    return -1;
+}
+// A drawn group for e: all four facings set, its frame drawable and no larger than the body's frame buffer (the
+// record's first half-word: 0x400 for a 32 x 32 body, docs/sprites.md "The tournament's player bodies")
+static const u32 *win_art(const Entity *e) {
+    int r = win_row(e);
+    if (r < 0 || !(tny_wins[r].flags & WF_BUILT) || !tny_wins[r].art) return 0;
+    const u32 *g = (const u32 *)tny_wins[r].art;
+    if (!g[0] || !g[1] || !g[2] || !g[3] || !desc_ok((const u8 *)g[e->facing & 3])) return 0;
+    const u8 *d = (const u8 *)g[e->facing & 3];
+    return (u32)d[2] * d[3] <= *(const u16 *)e->sprite_record ? g : 0;
+}
+// A held pose's group: the record's, or the drawn one
+static const u32 *pose_grp(const Entity *e, u8 g) {
+    return (g & PG_GROUP) == WIN_BUILT ? win_art(e) : grp_of(e, g & PG_GROUP);
+}
+// e's victory pose: its group (WIN_BUILT for the drawn one) and the frame held; -1 when the body has none of them
+static int win_pose(const Entity *e, int *frame) {
+    int r = win_row(e);
+    if (r >= 0) {
+        const u32 *g = (tny_wins[r].flags & WF_BUILT) ? win_art(e) : grp_of(e, tny_wins[r].group);
+        if (g) {
+            int n = frames_of(e, g), h = tny_wins[r].hold;
+            *frame = h < 0 || h >= n ? n - 1 : h;
+            return (tny_wins[r].flags & WF_BUILT) ? WIN_BUILT : tny_wins[r].group;
+        }
+    }
+    static const s8 cheer[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };
+    for (int i = 0; i < 3; i++) {
+        const u32 *g = grp_of(e, cheer[i][0]);
+        if (!g) continue;
+        *frame = cheer[i][1] < 0 ? frames_of(e, g) - 1 : cheer[i][1];
+        return cheer[i][0];
+    }
+    return -1;
+}
+static int win_still(const Entity *e) { int r = win_row(e); return r >= 0 && (tny_wins[r].flags & WF_STILL); }
+
+static int pose_at(const Entity *e);
 // Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd). The loser lies
 // in a side facing (the down / up facings of the lying groups are front views of a body half sitting up); the
 // lying group is group 12 (every tournament body has a real lying pose there: docs/sprites.md "Lying poses"),
 // else the lying table's, else the knock-down's last frame, else the hit-stun.
 static void pose_hold(Entity *e, int win) {
-    if (!e || !in_list(e) || eng.npose >= 4) return;
+    if (!e || !in_list(e) || eng.npose >= 4 || pose_at(e) >= 0) return;   // a winner posing since his celebration keeps it
     if (win) e->facing = 0;
     else e->facing = (e->facing == 1 || e->facing == 3) ? 3 : 2;
     static const s8 lie[][2] = { { 12, -1 }, { 3, -1 }, { 2, 0 } };     // group, frame (-1 = the last)
-    static const s8 cheer[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };
-    const s8 (*tab)[2] = win ? cheer : lie;
     int g = -1, f = 0;
+    if (win) g = win_pose(e, &f);
     if (!win && is_s13(e)) { g = S13_G_POWER; f = 0; }          // Super 13's group 12 is his death light: he kneels
     const TnyLie *l = win || g >= 0 ? 0 : lie_entry(e);
     const u32 *lg = lie_grp(e, l);
@@ -1190,26 +1279,35 @@ static void pose_hold(Entity *e, int win) {
         g = l->grp ? POSE_LIE_TABLE : l->group;
         f = l->frame < 0 ? frames_of(e, lg) - 1 : l->frame;
     }
-    for (int i = 0; g < 0 && i < 3; i++) {
-        const u32 *grp = grp_of(e, tab[i][0]);
+    for (int i = 0; !win && g < 0 && i < 3; i++) {
+        const u32 *grp = grp_of(e, lie[i][0]);
         if (!grp) continue;
-        g = tab[i][0];
-        f = tab[i][1] < 0 ? frames_of(e, grp) - 1 : tab[i][1];
+        g = lie[i][0];
+        f = lie[i][1] < 0 ? frames_of(e, grp) - 1 : lie[i][1];
     }
-    if (g < 0 || !(g == POSE_LIE_TABLE ? lg : grp_of(e, g))) return;
+    if (g < 0 || !(g == POSE_LIE_TABLE ? lg : pose_grp(e, (u8)g))) return;
     int k = eng.npose++;
     eng.pose_e[k] = e;
     eng.pose_g[k] = (u8)(g == POSE_LIE_TABLE ? g : g | (win ? PG_WIN : 0));
     eng.pose_f[k] = (u8)f;
 }
+// The frame a pose shows now: while the winners hop (the celebration, or the trophy's hops) a standing victory pose plays
+// its group's frames in turn, CEL_STEP frames each, and its last beat is its own held frame
+static int pose_frame(const Entity *e, int k, const u32 *grp) {
+    u8 g = eng.pose_g[k];
+    if (g == POSE_LIE_TABLE || (g & (PG_WIN | PG_TALK)) != PG_WIN) return eng.pose_f[k];
+    int t = eng.cel_t != CEL_OFF ? eng.cel_t : eng.phase == P_PRIZE ? (int)eng.timer : 9999;
+    if (t >= 2 * CEL_HOP || win_still(e)) return eng.pose_f[k];
+    return (t / CEL_STEP) % frames_of(e, grp);
+}
 static void poses_apply(int still) {
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
         const u32 *grp = !e || !in_list(e) ? 0
-                       : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : grp_of(e, eng.pose_g[k] & PG_GROUP);
+                       : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : pose_grp(e, eng.pose_g[k]);
         if (!grp) continue;
         E32(e, 0x4C) = (u32)grp;
-        E16(e, 0x14) = eng.pose_f[k];
+        E16(e, 0x14) = (u16)pose_frame(e, k, grp);
         E16(e, 0x12) = 0;
     }
     // nobody moves while they are held (the frames before the line's freeze; never during it: A closes the line)
@@ -1220,7 +1318,9 @@ static void poses_apply(int still) {
 // The players' poses only (the fallen keep lying): before the fight's EXP, whose level-up plays the player's own
 // animation and waits for it to end; a held pose never ends it and the game hung in the level-up (found headless:
 // tny_engine.txt's co-op Rumble challenge)
+static void cel_land(void);
 static void poses_release_players(void) {
+    cel_land();
     int n = 0;
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
@@ -1230,6 +1330,7 @@ static void poses_release_players(void) {
     eng.npose = (u8)n;
 }
 static void poses_release(void) {
+    cel_land();
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
         if (e && in_list(e) && (e == g_PlayerObject || e == coop.p2)) Entity_SetAnimation(e, 0);
@@ -1267,10 +1368,12 @@ static void turn(Entity *e, int f) {
     if (g == POSE_LIE_TABLE || !(g & PG_WIN)) return;
     u8 was = e->facing;
     e->facing = (u8)f;
-    const u32 *grp = grp_of(e, g & PG_GROUP);
+    const u32 *grp = pose_grp(e, g);
     if (!grp) { e->facing = was; return; }
-    int n = frames_of(e, grp);
-    if ((g & PG_GROUP) == 4 || eng.pose_f[k] >= n) eng.pose_f[k] = (u8)(n - 1);   // the shout's pose is its last frame
+    int n = frames_of(e, grp), h = 0;
+    if (!(g & PG_TALK) && win_pose(e, &h) == (g & PG_GROUP)) eng.pose_f[k] = (u8)h;   // a winner: his own pose's frame
+    else if ((g & PG_GROUP) == 4) eng.pose_f[k] = (u8)(n - 1);                        // the shout's pose is its last frame
+    if (eng.pose_f[k] >= n) eng.pose_f[k] = (u8)(n - 1);
 }
 // One line's pose, held until the next line starts (talk_poses_release): `tab` the groups to try, first that the body has
 static void talk_pose(Entity *e, const s8 (*tab)[2], int ntab) {
@@ -1318,8 +1421,8 @@ static int floor_ents(Entity **out) {
 }
 // What the staging did since test command 38 arg 5 wiped it (tools/headless/tny_scenes.txt; `find ST 0x47415453`)
 #define STG_MAGIC   0x47415453u             // "STAG"
-static struct { u32 magic; u8 lines, anns, hop, low; } stg COMBO_SECTION("st");
-_Static_assert(sizeof(stg) == 8, ".combo.st is 8 bytes (docs/ids.md)");
+static struct { u32 magic; u8 lines, anns, hop, low, cels, chop, cposed, _p; } stg COMBO_SECTION("st");
+_Static_assert(sizeof(stg) == 12, ".combo.st is 12 bytes (docs/ids.md)");
 static void stg_count(u8 *c) { if (stg.magic == STG_MAGIC && *c < 255) (*c)++; }
 #define BOX_CLEAR_Y 100                     // a speaker's feet above this screen row: the box at the top would hide him
 static const s8 speak_pose[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };   // the shout's last frame, the fidget, the ki pose
@@ -1328,6 +1431,7 @@ static const s8 mic_pose[][2] = { { 4, -1 } };                           // the 
 // top, where it hid a speaker standing on the players' upper row: docs/tournament.md 27)
 int tny_stage_line(int who, int to) {
     if (eng.magic != ENG_MAGIC || !tny_ring_active()) return 0;
+    cel_land();
     talk_poses_release();
     Entity *sp = seat_ent(who), *at = seat_ent(to), *all[MAX_OPP + 3];
     if (!sp) return 0;
@@ -1361,6 +1465,7 @@ static Entity *winner_ent(void) {
 }
 static void stage_ann(void) {
     Entity *a = eng.ann, *t = 0;
+    if (eng.magic == ENG_MAGIC) cel_land();         // the winners are on the floor for the line
     if (eng.magic != ENG_MAGIC || !tny_ring_active() || !a || !in_list(a) || eng.ann_walk) return;
     talk_poses_release();
     int f = 0;
@@ -1388,6 +1493,56 @@ static void trophy_hop(void) {
             if (stg.magic == STG_MAGIC && h > stg.hop) stg.hop = (u8)h;
         }
     }
+}
+
+// The winners' celebration at a fight's end (docs/tournament.md 28): CEL_START frames into the end's pause (the last body
+// has fallen, the announcer walks back on) the winners strike their victory pose (win_pose), play its frames while they
+// hop twice (6 px, CEL_HOP frames a hop, each next winner CEL_STAGGER later: the trophy's hop) and land on the frame they
+// hold through the result line. The players when they won (both on a 2 v 2 floor), else the opponents still standing.
+// It costs nothing: the fight is decided, the pause was there, and a line opening lands them at once (cel_land).
+static int cel_h(int t) { return t > 0 && t < 2 * CEL_HOP ? (t % CEL_HOP) * (CEL_HOP - t % CEL_HOP) / 10 : 0; }
+static int cel_is(int k) {                  // pose k is a celebrating winner's (a standing victory pose, not a line's)
+    Entity *e = eng.pose_e[k];
+    return e && in_list(e) && eng.pose_g[k] != POSE_LIE_TABLE && (eng.pose_g[k] & (PG_WIN | PG_TALK)) == PG_WIN;
+}
+static void cel_frame(void) {
+    if (eng.cel_t == CEL_OFF) return;
+    int t = eng.cel_t, n = 0;
+    for (int k = 0; k < eng.npose; k++) {
+        if (!cel_is(k)) continue;
+        int now = cel_h(t - CEL_STAGGER * n), next = cel_h(t + 1 - CEL_STAGGER * n);
+        eng.pose_e[k]->y -= (next - now) << 8;
+        if (stg.magic == STG_MAGIC && next > stg.chop) stg.chop = (u8)next;
+        n++;
+    }
+    eng.cel_t = (u8)(t + 1 >= CEL_LEN ? CEL_OFF : t + 1);
+}
+// Back on the floor at once (a line opens, the poses are let go, the curtain): the pose's own frame from here
+static void cel_land(void) {
+    if (eng.cel_t == CEL_OFF) return;
+    int t = eng.cel_t, n = 0;
+    for (int k = 0; k < eng.npose; k++) {
+        if (!cel_is(k)) continue;
+        eng.pose_e[k]->y += cel_h(t - CEL_STAGGER * n) << 8;
+        n++;
+    }
+    eng.cel_t = CEL_OFF;
+}
+static Entity *floor_p2(void);
+static void cel_start(void) {
+    if (eng.cel_on || eng.result == R_NONE) return;
+    eng.cel_on = 1;
+    revive_fight_over();                             // a body down: up before the poses (his pad closes the line)
+    int n = eng.npose;
+    if (eng.result == R_WON) { pose_hold(g_PlayerObject, 1); pose_hold(floor_p2(), 1); }
+    else for (int i = 0; i < eng.nopp && i < MAX_OPP; i++) {
+        Entity *e = eng.opp[i];
+        if (e && in_list(e) && e->hp > 0) pose_hold(e, 1);
+    }
+    if (eng.npose == n) return;
+    eng.cel_t = 0;
+    stg_count(&stg.cels);
+    for (int k = n; k < eng.npose; k++) stg_count(&stg.cposed);
 }
 
 // The walk-in: the fighters from their sides of the platform to their marks (the command modal: nothing else
@@ -1607,6 +1762,7 @@ static void fight_frame(void) {
     if (eng.result != R_NONE) {
         eng.phase = P_MATCH_END;
         eng.timer = 0;
+        eng.cel_on = 0;
         bars_out();
         ann_enter();                                 // back on during the end's pause (24.4)
     }
@@ -1901,7 +2057,7 @@ static void rumble_round(void) {
     }
     u8 down[MAX_OPP] = { 0 };
     tny_ui_rumble_board(ids, down, n);
-    if (!n) { eng.result = R_WON; eng.kind = K_RUMBLE; eng.phase = P_MATCH_END; eng.timer = 90; return; }
+    if (!n) { eng.result = R_WON; eng.kind = K_RUMBLE; eng.phase = P_MATCH_END; eng.timer = 90; eng.cel_on = 0; return; }
     char num[2] = { (char)('1' + eng.rb_round), 0 };
     // the announcer's calls (docs/tournament-dialogue.md 8: the Rumble has no fighter lines)
     int head = ids[n - 1], alt = (int)(g_FrameCounter & 1);   // not rnd(): the draws stay as seeded
@@ -2004,7 +2160,7 @@ static int arrived(int zone, int area) {
     int fresh = p1 && (p1 != eng.from || (p1->x == eng.warp_x << 8 && p1->y == eng.warp_y << 8));
     int in = eng.timer > ARRIVE_MIN && on_map(zone, area) && p1 && (fresh || eng.timer > 90)
              && !coop2.cmd && p1_in_play() && !scene_running();
-    if (in) { eng.ann = 0; eng.ann_walk = 0; eng.npose = 0; }   // a new map: the announcer and the posed bodies are gone
+    if (in) { eng.ann = 0; eng.ann_walk = 0; eng.npose = 0; eng.cel_t = CEL_OFF; }   // a new map: the announcer and the posed bodies are gone
     return in;
 }
 
@@ -2239,6 +2395,7 @@ static void end_show(void) {
     // needs their OBJ VRAM
     if (eng.kind == K_RUMBLE && won && !eng.ann && ObjVram_Largest(g_EntityList) < 0x800) clear_opps();
     for (int i = 0; i < eng.nopp; i++) if (eng.opp[i] && in_list(eng.opp[i])) blink(eng.opp[i], 0);
+    cel_start();                                     // (when the pause did not start it) the winners' pose
     revive_fight_over();                             // a body down: up before the poses (his pad closes the line)
     Entity *pl[2] = { g_PlayerObject, floor_p2() };
     for (int i = 0; i < 2; i++) if (pl[i]) pose_hold(pl[i], won);
@@ -2598,6 +2755,7 @@ void tny_engine_frame(void) {
         break;
     case P_MATCH_END:
         if (eng.timer < 90) eng.timer++;
+        if (eng.timer == CEL_START && eng.pres == 0 && !scene_running()) cel_start();   // the winners celebrate
         break;
     case P_INTRO: case P_TROPHY:
         if (eng.timer < 0xFFFF) eng.timer++;         // the dark frames before the curtain opens
@@ -2654,8 +2812,9 @@ void tny_engine_frame(void) {
     }
     if (eng.npose) {                                 // the end's poses hold while the announcer speaks
         if (eng.phase == P_PRIZE && scene_running()) trophy_hop();   // the champions (posed) hop while the trophy's line opens
+        if (eng.cel_t != CEL_OFF && !scene_running()) cel_frame();  // the winners hop (docs/tournament.md 28)
         poses_apply(!scene_running());
-    }
+    } else eng.cel_t = CEL_OFF;
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
@@ -2716,13 +2875,58 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 //                 ring reload (P_RESTAGE) took 1..n frames (answer: its frames); 1: the announcer walked off and on at
 //                 least once each (answer: offs | ons << 8); 2: player 1 walked n px (+-1) right of the mark (answer:
 //                 the px). arg 2: mark player 1's x; arg 4: clear the count of walks started.
+// Test command 38 ops 6-8 (docs/tournament.md 28, tools/headless/tny_scenes.txt): every tournament body's win pose.
+// 6: the pose sprite arg2 would strike (facing the crowd): 0 when its record is not in the build, else 1 << 24 | the frames
+// in its group << 16 | the frame held << 8 | the group (0x3F the drawn one), bit 31 set when that frame is not drawable
+static u32 test_win_pick(int sprite) {
+    if (!sprite_ok(sprite)) return 0;
+    Entity t;
+    memset(&t, 0, sizeof t);
+    t.sprite_record = (void *)Character_GetSpriteRecord(sprite);
+    int f = 0, g = win_pose(&t, &f);
+    const u32 *grp = g < 0 ? 0 : pose_grp(&t, (u8)g);
+    if (!grp) return 1u << 24 | 0xFF;
+    int n = frames_of(&t, grp);
+    u32 r = 1u << 24 | (u32)n << 16 | (u32)f << 8 | (u32)g;
+    for (int k = 0; k < n; k++) if (!desc_ok((const u8 *)grp[0] + 12 * k)) r |= 0x80000000u;
+    if (f >= n) r |= 0x80000000u;
+    return r;
+}
+// 7: every actor (test command 3) showing sprite arg2 strikes his win pose and the celebration starts over (its hops and
+// frames, as at a fight's end: the tick runs it wherever the poses are held); 8: the poses go, the posed actors leave
+static void test_win_pose(int sprite) {
+    if (!sprite_ok(sprite)) return;
+    const void *rec = Character_GetSpriteRecord(sprite);
+    EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++) {
+        Entity *e = l->items[i];
+        if (e == g_PlayerObject || e == coop.p2 || e == eng.ann || e->sprite_record != rec) continue;
+        cel_land();
+        pose_hold(e, 1);
+    }
+    eng.cel_t = 0;
+}
+static void test_win_clear(void) {
+    cel_land();
+    Entity *gone[4];
+    int n = 0;
+    for (int k = 0; k < eng.npose; k++) {
+        Entity *e = eng.pose_e[k];
+        if (e && in_list(e) && e != g_PlayerObject && e != coop.p2 && e != eng.ann) gone[n++] = e;
+    }
+    poses_release();
+    for (int k = 0; k < n; k++) EntityList_Remove(g_SceneTable[1], gone[k], 0);
+}
 static void test_checks(u32 arg, u32 arg2) {
     Entity *p1 = g_PlayerObject;
     int n = (int)(arg2 & 0xFFFF);
     u32 r = 0;
     if (arg == 2) { if (p1) eng.mark_x = (s16)(p1->x >> 8); return; }
     if (arg == 4) { eng.ann_starts = 0; return; }
-    if (arg == 5) { stg.magic = STG_MAGIC; stg.lines = stg.anns = stg.hop = stg.low = 0; return; }   // the staging's counts (27)
+    if (arg == 5) { stg.magic = STG_MAGIC; stg.lines = stg.anns = stg.hop = stg.low = stg.cels = stg.chop = stg.cposed = 0; return; }   // the staging's counts (27, 28)
+    if (arg == 6) { coop2.cmd_arg = test_win_pick((int)arg2); return; }   // the win pose of sprite arg2 (docs/tournament.md 28)
+    if (arg == 7) { test_win_pose((int)arg2); return; }                   // pose the actors of sprite arg2, celebrate
+    if (arg == 8) { test_win_clear(); return; }                           // let them go and remove them
     if (arg != 0) return;
     switch (arg2 >> 16) {
     case 0: r = eng.restage_t && eng.restage_t <= n ? eng.restage_t : 0; break;
