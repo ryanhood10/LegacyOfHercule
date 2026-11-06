@@ -16,8 +16,7 @@
     {
       "map": {"zone": 10, "area": 17},
       "_": "Gingertown: Cell's introduction; in co-op the Multi-Form lines",
-      "triggers": {"0": {"payload": "seq:ch5_gingertown"}},
-      "pre_edits": [{"at": "trigger:0/entry:0", "replace": [["SetPlayerVisible 0", "PushActiveCharIndex\nPushByte 1\nCmpNe\nJumpIfFalse F9\nFadeOut 20\nCoopCall 8, 0, 0, 0\nPushByte 1\nCmpEq\nJumpIfFalse F1\nPushByte 6\nPushActiveCharIndex\nPushByte 0\nPushByte 0\nStep CoopCall\nF1:\nSetActiveCharacter 1\nFadeFromWhite 20\nF9:\nSetPlayerVisible 0"]]}]
+      "triggers": {"0": {"payload": "seq:ch5_gingertown"}}
     },
     {
       "map": {"zone": 10, "area": 20},

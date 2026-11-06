@@ -417,10 +417,22 @@ poke32 0x0203FD0C 0x110a
 poke32 0x0203FD54 0x12c0118
 poke32 0x0203FD08 5
 frames 100
+mash 16 100
+frames 30
+shot c5_P_charge
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+shot c5_P_split
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R72
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
 echo EXPECT map zone 10 area 20\b
 map
 ents
@@ -471,10 +483,25 @@ poke32 0x0203FD0C 0x110a
 poke32 0x0203FD54 0x12c0118
 poke32 0x0203FD08 5
 frames 100
+mash 16 100
+frames 30
+shot c5_PH_charge
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+shot c5_PH_split
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: [01]$
+entrec R72
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 2$
+entrec R28
+ents
 echo EXPECT map zone 10 area 20\b
 map
 ents
@@ -527,10 +554,25 @@ poke32 0x0203FD0C 0x110a
 poke32 0x0203FD54 0x12c0118
 poke32 0x0203FD08 5
 frames 100
+mash 16 100
+frames 30
+shot c5_HP_charge
+deref R103 TBL+0x180
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R103
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+shot c5_HP_split
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 2$
+entrec R28
+ents
 echo EXPECT map zone 10 area 20\b
 map
 ents

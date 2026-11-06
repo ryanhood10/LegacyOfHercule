@@ -108,9 +108,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 6.8 (a), (b) (`nb-cs4`), 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built | 5.7 (`nb-cs4`), 6.8 (a), (b) (`nb-cs4`), 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
 | built in part | - |
-| not built | 5.1, 5.7, 6.1, 6.6, 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
+| not built | 5.1, 6.1, 6.6, 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
 
@@ -236,6 +236,20 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.7 Gingertown: the meeting and the town blown away (showcase with 5.8, M)
 
+- **Built 2026-11-06 (`nb-cs4`).** `ch5_gingertown` restated (26 entries; its branch's indexes are ours). Piccolo is player 1 by the
+  fade as before: that hand-over was a json `pre_edit` on the stock entry 0, which no longer runs, so it is in our entry 0 now (without
+  it the lineup "Hercule with Piccolo" played the scene on Hercule's body and crashed in 5.8: found by the staging test). With two
+  players a stand-in of Hercule (72, the `CoopCall 31` hand-over) walks up the street at Piccolo's side to (304, 214), in view; Cell
+  starts with his back turned and turns (left, then to them) before the hiss; the tail goes up once in the hiss's wait; he paces
+  three short walks through the talk (to 248, to 280, back to 264). Before the blast: the view comes down 10 px, Piccolo powers up
+  (a held Cine charge, level 2: he sheds the cape for it), Cell braces in his hurt pose, Hercule is thrown flat (`CoopCall 37, 10`),
+  the burst, the stock blast and white; the crater is held 40 frames before Cell speaks. Co-op: the twin stands from the map's load,
+  so the record (a step finds it first) stands on the twin's spot until the split, and on the flash it walks back to its own: one Cell
+  becomes two; Hercule's stand-in is beside Piccolo under that flash and backs off a step at his line; it goes before the fight.
+  Every line kept. `staging_ch5` "gingertown" shoots the charge and the split and counts the Cells (2 in co-op) and the stand-in;
+  flags, party and who plays after it equal the build before (one player, Piccolo + Hercule, Hercule + Piccolo). Not built: Piccolo's
+  ki pose before "I'll still destroy you" (a player's pose is not a script's to hold), the first clash (optional).
+
 - **Where:** `ch5_gingertown`, map 284 (zone 10 area 17) trigger 0; the fight is on map 287 (10/20). Films
   `gin_PH`, `gin_P`.
 - **Today:** Piccolo walks up the empty street, the camera pans to Cell standing still. "@???: Hisssss!!!" and
@@ -271,7 +285,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.8 Cell's Kamehameha, the arm, Cell's story, the escape (showcase, L)
 
-- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 (the meeting, the town blown away) is not built.** Player 2 has a mark (324, 250)
+- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 built by `nb-cs4`.** Player 2 has a mark (324, 250)
   and looks at Cell. Cell is in a charge with blue light before "Kaaaaaaaaa..." (`CoopCall 37, 7, 40, 0`). The beam is cine's
   (`CoopCall 37, 8, 2, 60`: the stock batch of twelve contact-waits is gone): it holds on Piccolo with bursts and shakes and
   pushes him back a few pixels (not the 40 px of the shot list: the op moves him a pixel at a time and stops at the hits);

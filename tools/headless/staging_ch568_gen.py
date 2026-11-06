@@ -39,7 +39,19 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (HERCULE, PICCOLO)):
     n = lineup_name(p1, p2)
     s.begin(f"gingertown {n}", p1, p2, "+129 +131 +132")
     s.warp(10, 17, 280, 300, 100)
+    # (batch 2, 5.7) Gingertown's meeting: player 2's stand-in walks up beside player 1 (Hercule 72, or Piccolo 103 when player 1 is
+    # Hercule), Cell paces, the Namek's power-up before the blast (Hercule thrown flat), the crater, in co-op the split (the record stands on
+    # its twin until it steps out) with the stand-in beside player 1; every stand-in gone at the fight
+    s.press(16, 100)
+    s.out("frames 30")
+    s.shot(f"c5_{n}_charge")
+    if p2 is not None:
+        s.actors(**{"s72" if p2 == HERCULE else "s103": 1})
+    s.out("ents")
     s.end_scene()
+    s.shot(f"c5_{n}_split")
+    s.actors(s72=1 if p1 == HERCULE else "[01]" if p2 == HERCULE else 0, s28=2 if p2 is not None else 1)
+    s.out("ents")
     s.on_map(10, 20)
     s.win(120)
     s.press(8, 60)

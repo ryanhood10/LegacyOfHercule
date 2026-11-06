@@ -214,19 +214,134 @@ end
 ; ---- zone 10 area 17 -> 20: Gingertown. In co-op Cell splits (Tien's Multi-Form) ---------------------
 
 sequence ch5_gingertown
-  stockseq @083e11e4 0 15                ; "Hisssss!", "call me The Namek", the blast, "Don't count on it."
-  script                                 ; co-op: the duplicate (next 17), else the fight (20)
+  [0] script                             ; stock entry 0 (batch 2, 5.7): Piccolo is player 1 (the fade hands it over: this was a json pre_edit of the
+        PushActiveCharIndex              ; stock entry, which no longer runs), he walks up the empty street with player 2 at his side (a stand-in
+        PushByte 1                       ; of Hercule's sprite walks for him: the pan left his entity below the view), and Cell stands with his
+        CmpNe                            ; back to them; he turns, slowly, before the hiss
+        JumpIfFalse Z9
+        FadeOut 20
+        CoopCall 8, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse Z1
+        PushByte 6
+        PushActiveCharIndex
+        PushByte 0
+        PushByte 0
+        Step CoopCall
+      Z1:
+        SetActiveCharacter 1
+        FadeFromWhite 20
+      Z9:
+        SetEntityFacing 28, 1
+        SetPlayerVisible 0
+        CoopCall 31, 0, 0, 0
+        JumpIfFalse N1
+        PushVarint 72
+        CoopCall 31, 1, 0, 0
+        CoopCall 31, 2, 0, 0
+        Step SpawnCharacterEntity
+        CoopCall 31, 3, 0, 0
+        BeginCommandBatch
+        WalkToPosition 0, 280, 296
+        WalkToPosition 0, 280, 208
+        WalkToPosition 72, 304, 300
+        WalkToPosition 72, 304, 214
+        CommitCommandBatch
+        SetEntityFacing 72, 1
+        Jump N2
+      N1:
+        WalkToPosition 0, 280, 296
+        WalkToPosition 0, 280, 208
+      N2:
+        PanCameraToPosition 160, 64, 2
+        WaitFrames 50
+        SetEntityFacing 28, 2
+        WaitFrames 15
+        SetEntityFacing 28, 0
+        WaitFrames 15
+        PlayAudio 50
+  [1] stockseq @083e11e4 1 1             ; "Hisssss!!!"
+  [2] script                             ; stock entry 2 (a wait of 90): the tail goes up once
+        SetEntityAnimationNoWait 28, 27
+        WaitFrames 40
+        SetEntityAnimation 28, 0
+        WaitFrames 30
+  [3] stockseq @083e11e4 3 6             ; "you're next, Piccolo!" ... "how do you know my name?"
+  [7] script                             ; Cell paces while he talks, Piccolo's eyes on him
+        WalkToPosition 28, 248, 132
+        SetEntityFacing 28, 0
+  [8] stockseq @083e11e4 7 8             ; "One might say that we're brothers!", "Who are you?"
+  [10] script
+        WalkToPosition 28, 280, 134
+        SetEntityFacing 28, 0
+  [11] stockseq @083e11e4 9 10           ; "My secrets will not be unlocked so easily.", "I'll still destroy you, whoever you are."
+  [13] script
+        WalkToPosition 28, 264, 128
+        SetEntityFacing 28, 0
+  [14] stockseq @083e11e4 11 12          ; "Such a fighting spirit...", "...call me, "The Namek". And as for you, well, you're history!"
+  [16] script                            ; stock entry 13: the power before the blast. Piccolo powers up (rings, a growing rumble), Cell braces
+        PanCameraToPosition 160, 74, 2   ; in his hurt pose, player 2's Hercule (his stand-in) is thrown flat by it; the burst, the stock blast, the white,
+        CoopCall 37, 1, 0, 28            ; the crater (held a moment before Cell speaks). The view comes down 10 px so that Piccolo's feet show
+        CoopCall 37, 7, 0, 2
+        WaitFrames 40
+        SetEntityAnimationNoWait 28, 2
+        CoopCall 37, 1, 72, 0
+        CoopCall 37, 10, 0, 2
+        WaitFrames 30
+        CoopCall 37, 1, 0, 28
+        CoopCall 37, 7, -1, 0
+        BeginCommandBatch
+        NPCFireKiBlast 0, 280, 160, 100
+        SpawnDustCloud 0, 280, 160
+        CommitCommandBatch
+        FadeToWhite 30
+        PlayAudio 20
+        PlayAudio 21
+        WaitFrames 20
+        PlayAudio 20
+        CoopCall 37, 0, 0, 0
+        WarpToMapNoEntities 10, 20, 1, 272, 208
+        CoopCall 5, 0, 0, 0              ; in co-op his twin stands from the load (TWIN_OFFSET right of the record): the record (a step finds it
+        JumpIfFalse T1                   ; first) stands on the twin until the split, so one Cell is seen
+        SetEntityPositionInstant 28, 288, 128
+      T1:
+        PlayMusic 28
+        PanCameraToPosition 160, 64, 10
+        SetEntityFacing 0, 1
+        WhiteFadeOut 30
+        WaitFrames 40
+  [17] stockseq @083e11e4 14 15          ; "I'm impressed, "Namek"...", "Don't count on it."
+  [19] script                            ; co-op: the duplicate (next 20), else the fight (25)
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
-        PushByte 17
-        END
-      L1:
         PushByte 20
         END
-  text 38 "@???: Two of you?  Then two of me!"
-  text 1 "@PICCOLO: He split himself in two...  That's Tien's Multi-Form technique!"
-  text 67 "HERCULE: T-two bugs?!  Nobody said anything about two bugs!"
-  stock @083e11d0                        ; the fight
+      L1:
+        PushByte 25
+        END
+  [20] text 38 "@???: Two of you?  Then two of me!"
+  [21] script                            ; the second body steps out of Cell (the record walks back to its own spot, the twin stays); under the
+        WhiteFlash 10                    ; flash player 2's Hercule stands beside Piccolo (his entity is gone after the warp: a stand-in, gone
+        PlayAudio 26                     ; before control)
+        SpawnCharacterEntity 72, 248, 212
+        SetEntityFacing 72, 1
+        WalkToPosition 28, 264, 128
+        SetEntityFacing 28, 0
+        WaitFrames 20
+  [22] text 1 "@PICCOLO: He split himself in two...  That's Tien's Multi-Form technique!"
+  [23] script                            ; Hercule backs off a step
+        WalkToPosition 72, 244, 224
+        SetEntityFacing 72, 1
+  [24] text 67 "HERCULE: T-two bugs?!  Nobody said anything about two bugs!"
+  [25] script                            ; stock 083e11d0, the fight; in co-op first the stand-in goes
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse L2
+        DespawnEntity 72
+      L2:
+        SetActiveEntity 0
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 28, 50, 100
 end
 
 ; Cell beaten. In co-op the body that fell first is taken back in (one Cell stays for the stock scene)
