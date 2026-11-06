@@ -24,10 +24,11 @@
 203=32 2:7,3:7.0+lie,4:18,5:3,7:3,8:18,9:18,11:7,12:lie,13:18,17:0,18:18,19:3,20:7.0+lie   # Evil Buu (grey, caped; partial set)
 204=37 4:12.0+12.1+12.0,13:2                                                # Kid Buu (dash = its run; shout / victory pose without 12's steam clouds)
 # Super Buu's three forms: one map for all three (the moves piece chains them). The Buus' shout (anim 12) vents steam
-# from the head (frames 2-6, a cloud over him): group 4 (the shout, its last frame the winner's pose) stops before it
-205=40 4:12.0+12.1+18.0,13:2                                                # Super Buu (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
-206=41 4:12.0+12.1+18.0,13:2                                                # Super Buu, Gotenks absorbed (the vest) (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
-207=43 4:12.0+12.1+18.0,13:2                                                # Super Buu, Gohan absorbed (the gi top) (dash = its run; shout then the flex 18 as the victory pose: 12 ends in steam clouds)
+# from the head (frames 2-6, a cloud over him): group 4 (the shout) stops before it, and starts on the flex (anim 18), the
+# winner's pose (a held pose shows a group's first frame: docs/tournament.md 28)
+205=40 4:18.0+12.0+12.1+18.0,13:2                                               # Super Buu (dash = its run; the flex 18, the shout, the flex again: 12 ends in steam clouds)
+206=41 4:18.0+12.0+12.1+18.0,13:2                                               # Super Buu, Gotenks absorbed (the vest) (dash = its run; the flex 18, the shout, the flex again: 12 ends in steam clouds)
+207=43 4:18.0+12.0+12.1+18.0,13:2                                               # Super Buu, Gohan absorbed (the gi top) (dash = its run; the flex 18, the shout, the flex again: 12 ends in steam clouds)
 208=144 13:2                                                                # Super Janemba (dash = its run, 2026-10-25)
 209=114 13:2                                                                # Goten (Super Saiyan) (dash = its run, 2026-10-25)
 210=260 13:2                                                                # Kid Trunks (Super Saiyan) (dash = its run, 2026-10-25)

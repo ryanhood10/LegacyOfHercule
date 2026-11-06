@@ -78,7 +78,7 @@ CFLAGS  := -mthumb -mcpu=arm7tdmi -Os -Wall -Wextra -ffreestanding -fno-builtin 
 LDFLAGS := -nostdlib -nostartfiles -T src/coop/coop.ld -Wl,--gc-sections -Wl,-u,journal_quests -Wl,-u,vm_set_active_hook -Wl,-u,vm_set_active_noreset_hook -Wl,-u,portrait_get_hook -Wl,-Map,$(BUILD)/coop.map
 
 SRCS := $(wildcard src/coop/*.c)
-OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/dino_sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o $(BUILD)/obj/tny_combo_data.o
+OBJS := $(patsubst src/coop/%.c,$(BUILD)/obj/%.o,$(SRCS)) $(BUILD)/obj/sprites_data.o $(BUILD)/obj/dino_sprites_data.o $(BUILD)/obj/a16_sprites_data.o $(BUILD)/obj/krillin_sprites_data.o $(BUILD)/obj/boss_models_data.o $(BUILD)/obj/broly_sprites_data.o $(BUILD)/obj/hercule_sprites_data.o $(BUILD)/obj/halo_sprites_data.o $(BUILD)/obj/ssj2_sprites_data.o $(BUILD)/obj/super13_sprites_data.o $(BUILD)/obj/journal_data.o $(BUILD)/obj/oldherc_portrait_data.o $(BUILD)/obj/tny_play_sprites_data.o $(BUILD)/obj/tny_portraits_data.o $(BUILD)/obj/tny_sprites_data.o $(BUILD)/obj/tny_talk_data.o $(BUILD)/obj/tny_combo_data.o $(BUILD)/obj/tny_wins_data.o
 
 SSJ_TEST ?= 0
 
@@ -316,6 +316,16 @@ $(BUILD)/gen/popo_sprites_data.c: tools/popoart.py tools/lying.py tools/buu2log2
 	$(PYTHON) tools/popoart.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
 
 $(BUILD)/obj/popo_sprites_data.o: $(BUILD)/gen/popo_sprites_data.c src/coop/rom.h
+	@mkdir -p $(BUILD)/obj
+	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
+
+# the win poses the tournament's bodies lack, drawn from the ROM's frames (tools/tnywins.py: Android 16's raised fist;
+# docs/tournament.md 28; never committed); preview tny_wins_preview.png beside it
+$(BUILD)/gen/tny_wins_data.c: tools/tnywins.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM)
+	@mkdir -p $(BUILD)/gen
+	$(PYTHON) tools/tnywins.py $(ROM) $@ --preview $(BUILD)/tny_wins_preview.png
+
+$(BUILD)/obj/tny_wins_data.o: $(BUILD)/gen/tny_wins_data.c src/coop/rom.h src/coop/tourney.h
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 

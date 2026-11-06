@@ -146,44 +146,69 @@ static const TalkTvt *tvt_of(const u8 *x, const u8 *y, int *who) {
     return 0;
 }
 
+// One side's default lines (no rival across, no team-vs-team history): a known team's own lines, else each member's (the
+// opening side its openers, one of each variant so two members never say the same, the answering side its replies; a
+// member twice, the same fighter on both pads, speaks once). `max` the boxes this side may take.
+static int side_lines(const int *ids, int n, const int *seat, int opening, int max) {
+    int swap;
+    const TalkPair *t = n == 2 ? pair_of(tny_talk_teams, ids[0], ids[1], &swap) : 0;
+    if (t && t->n <= max) {
+        add_pair(t, ids[0], ids[1], swap, seat[0], seat[1]);
+        return t->n;
+    }
+    int alt = (int)(g_FrameCounter & 1), k = 0;
+    for (int i = 0; i < n && k < max; i++) {
+        if (i && canon(ids[i]) == canon(ids[0])) break;
+        add(seat[i], ids[i], voice(ids[i], opening ? ((alt ^ i) ? TALK_OPEN2 : TALK_OPEN1) : TALK_REPLY));
+        k++;
+    }
+    return k;
+}
+
+// Before a fight (docs/tournament-dialogue.md 2): meeting yourself or a rival exchange (any fighter of one side against any of
+// the other's), then in 2 v 2 two teams with history; else each side's own lines. In 2 v 2 every member has a voice (Ryan,
+// 2026-11-05: "does it work WELL for 2v2 scenarios too??"): around a rival exchange the other side's partner opens and the
+// players' partner has the last word when the four boxes allow, and without one both members of each side speak (a known
+// team its two lines, an answer to the other team's). At most TALK_MAX boxes; the players' side always answers last.
 int tny_talk_pre(const u8 *opp, int nopp, const u8 *mine, int nmine) {
     start();
-    int a0 = nopp > 0 && ok(opp[0]) ? opp[0] : -1, a1 = nopp > 1 && ok(opp[1]) ? opp[1] : -1;
-    int b0 = nmine > 0 && ok(mine[0]) ? mine[0] : -1, b1 = nmine > 1 && ok(mine[1]) ? mine[1] : -1;
-    if (a0 < 0 || b0 < 0) return 0;
+    int as[2] = { -1, -1 }, bs[2] = { -1, -1 }, na = 0, nb = 0;
+    for (int i = 0; i < nopp && i < 2; i++) if (ok(opp[i])) as[na++] = opp[i];
+    for (int i = 0; i < nmine && i < 2; i++) if (ok(mine[i])) bs[nb++] = mine[i];
+    if (!na || !nb) return 0;
+    // the seats keep the floor's places (side << 4 | index): a fighter's index on his side as the engine passed it
+    int sa[2] = { SEAT_OPP, SEAT_OPP + 1 }, sb[2] = { SEAT_MINE, SEAT_MINE + 1 };
+    if (nopp > 1 && !ok(opp[0])) sa[0] = SEAT_OPP + 1;
+    if (nmine > 1 && !ok(mine[0])) sb[0] = SEAT_MINE + 1;
     int swap;
-    if (a1 >= 0 && b1 >= 0) {                       // 2 v 2
-        const u8 x[2] = { (u8)a0, (u8)a1 }, y[2] = { (u8)b0, (u8)b1 };
+    if (na == 2 && nb == 2) {                       // two teams with history
+        const u8 x[2] = { (u8)as[0], (u8)as[1] }, y[2] = { (u8)bs[0], (u8)bs[1] };
         int who[4];
         const TalkTvt *t = tvt_of(x, y, who);
         if (t) {
-            // who[] holds the ids in the table's order; each one's seat on the floor
             for (int k = 0; k < t->n; k++) {
                 int id = who[t->spk[k]];
-                add(id == a0 ? SEAT_OPP : id == a1 ? SEAT_OPP + 1 : id == b0 ? SEAT_MINE : SEAT_MINE + 1, id, t->l[k]);
+                add(id == as[0] ? sa[0] : id == as[1] ? sa[1] : id == bs[0] ? sb[0] : sb[1], id, t->l[k]);
             }
             return run();
         }
-        const int as[2] = { a0, a1 }, bs[2] = { b0, b1 };
-        for (int i = 0; i < 2; i++)                 // a rival across the ring
-            for (int j = 0; j < 2; j++) {
-                const TalkPair *p = pair_of(tny_talk_pairs, as[i], bs[j], &swap);
-                if (p) { add_pair(p, as[i], bs[j], swap, SEAT_OPP + i, SEAT_MINE + j); return run(); }
-            }
-        const TalkPair *ta = pair_of(tny_talk_teams, a0, a1, &swap);
-        if (ta) add_pair(ta, a0, a1, swap, SEAT_OPP, SEAT_OPP + 1);
-        else add(SEAT_OPP, a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
-        const TalkPair *tb = pair_of(tny_talk_teams, b0, b1, &swap);
-        if (tb) add_pair(tb, b0, b1, swap, SEAT_MINE, SEAT_MINE + 1);
-        else add(SEAT_MINE, b0, voice(b0, TALK_REPLY));
-        return run();
     }
-    const TalkPair *p = pair_of(tny_talk_pairs, a0, b0, &swap);
-    if (p) add_pair(p, a0, b0, swap, SEAT_OPP, SEAT_MINE);
-    else {
-        add(SEAT_OPP, a0, voice(a0, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
-        add(SEAT_MINE, b0, voice(b0, TALK_REPLY));
-    }
+    for (int i = 0; i < na; i++)                    // a rival across the ring (meeting yourself first: the table's order)
+        for (int j = 0; j < nb; j++) {
+            const TalkPair *p = pair_of(tny_talk_pairs, as[i], bs[j], &swap);
+            if (!p) continue;
+            int oa = na == 2 && canon(as[i ^ 1]) != canon(as[i]) ? as[i ^ 1] : -1;   // the partners not in the exchange
+            int ob = nb == 2 && canon(bs[j ^ 1]) != canon(bs[j]) ? bs[j ^ 1] : -1;
+            int room = TALK_MAX - p->n;
+            if (ob >= 0 && room > 0) room--; else ob = -1;
+            if (oa >= 0 && room > 0) add(sa[i ^ 1], oa, voice(oa, (g_FrameCounter & 1) ? TALK_OPEN2 : TALK_OPEN1));
+            add_pair(p, as[i], bs[j], swap, sa[i], sb[j]);
+            if (ob >= 0) add(sb[j ^ 1], ob, voice(ob, TALK_REPLY));
+            return run();
+        }
+    // each side's own: the opening side first (a box always left for the answer), then the answer in the boxes left
+    side_lines(as, na, sa, 1, TALK_MAX - 1);
+    side_lines(bs, nb, sb, 0, TALK_MAX - talk.n);
     return run();
 }
 

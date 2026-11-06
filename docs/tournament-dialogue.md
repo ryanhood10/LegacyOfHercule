@@ -44,6 +44,11 @@ Contents: 1 when lines play, 2 how a line is chosen, 3 writing rules, 4 every fi
 Who speaks first: the opponent (or the challenger) opens and your fighter answers, so the player always gets the
 last word before "Begin!". In a player-vs-player final, player 2's fighter opens.
 
+**2 v 2 (built 2026-11-05, `docs/tournament.md` 28):** every member of a side speaks. Around a rival exchange the other
+side's partner opens with his opener and your partner answers last with his reply (when the four boxes allow); without a
+rival each side speaks with both members (a known team its lines, else each member's opener / reply; the same fighter
+twice once). The new lines marked DRAFT below are Claude's, waiting for your review.
+
 ## 3. Writing rules
 
 - About 60 characters fit one box (three short rows), speaker's name included. The lines below aim for 45 or less
@@ -273,6 +278,47 @@ When the pair meets in 1 v 1 (or faces each other in a 2 v 2), these replace the
 | Yakon, Goku | Y: Your light! Give it! / G: Sure, have all you want! |
 | Pui Pui, Vegeta | P: A Saiyan? Babidi will love this. / V: You won't live to tell him. |
 
+### New matchups (DRAFT, 2026-11-05: Claude's, for Ryan's review; not yet approved)
+
+Ryan: "i DID notice that we have some unique pre-fight lines now based on whos fighting who. thats good! lean into that!"
+Android 16 (he played him), Hercule, the story party against each other (the co-op 1 v 1 and its final) and the Rookie
+regulars. Mark any to change or cut.
+
+| pair | lines |
+|---|---|
+| Android 16, Android 17 | 17: Big guy. Don't hold back on my account. / 16: I never do. |
+| Android 16, Android 18 | 18: You're really going to fight me? / 16: Only in the ring. / 18: ...Fine. |
+| Android 16, Android 19 | 19: Unit 16. Your power source, please. / 16: My energy is not yours. |
+| Android 16, Android 13 | 13: Old model. Outta my way. / 16: Older. Not weaker. |
+| Android 16, Imperfect Cell | C: 16. You're on my menu too. / 16: You will not reach the others. |
+| Android 16, Semi-Perfect Cell | C: The broken one. Still standing? / 16: Long enough. |
+| Android 16, Cell Jr. | J: Hee hee! Big robot! / 16: Careful. I hit hard. |
+| Android 16, Goku | 16: Son Goku. Once, my target. / G: And now? / 16: Now, a match. |
+| Android 16, Gohan | 16: Gohan. Show me what you protect. / G: Everyone. Same as you. |
+| Android 16, Krillin | K: Uh, no crushing, okay? / 16: I will be careful. |
+| Android 16, Piccolo | P: Let's see what Gero built. / 16: He built me to fight. Not to lose. |
+| Hercule, Yamcha | H: Hey, I know you! Baseball, right? / Y: ...It was ONE season. |
+| Hercule, Master Roshi | R: The world champ! Can I get an autograph? / H: Ha ha! After I win, old timer! |
+| Hercule, Tien | T: You talk a lot for a fighter. / H: And I win a lot too! |
+| Hercule, King Cold | C: A human? Is this a joke? / H: The joke's on you, buddy! ...I hope. |
+| Hercule, Broly | B: ...Insect. / H: Whoa, whoa! Nobody said giants! |
+| Hercule, Android 18 | 18: You're the champion? Really? / H: Er... the one and only! |
+| Hercule, Krillin | K: Mr. Hercule! Big fan! Sort of. / H: Sort of?! I'll make you a real fan! |
+| Hercule, Piccolo | P: Hmph. The loud one. / H: The loud CHAMP, green bean! |
+| Hercule, Vegeta | V: Out of my way, clown. / H: Clown?! I'm the world champion! |
+| Goku, Gohan | Gohan: Dad, I'm not going easy on you! / Goku: That's my boy! Show me! |
+| Goku, Trunks | T: Goku. I've waited a long time for this. / G: Then let's not wait any longer! |
+| Gohan, Krillin | K: Gohan! Remember Namek? / G: How could I forget? Let's go! |
+| Gohan, Trunks | T: In my time, you taught me. / G: Then let's see if I did it right! |
+| Piccolo, Vegeta | V: The Namekian. You're no match for me. / P: Keep talking. It helps me. |
+| Krillin, Vegeta | V: You? Don't waste my time. / K: Wow. Okay. Now I'm mad. |
+| Piccolo, King Cold | C: A Namekian? How quaint. / P: Say that again. Slowly. |
+| Piccolo, Master Roshi | R: You've grown since the last tournament! / P: And you've gotten older. |
+| Krillin, Spopovich | S: Grrr... small... / K: Hey! I'm average! ...Ish. |
+| Vegeta, King Cold | C: The prince of nothing. / V: Then I'll make you king of nothing! |
+| Vegeta, Yamcha | Y: Remember the Saibamen? / V: I remember you losing to one. |
+| Gohan, Yamu | Y: Such energy in a child. / G: You're not taking it! |
+
 ## 6. Meeting yourself
 
 | pair | lines |
@@ -285,6 +331,13 @@ When the pair meets in 1 v 1 (or faces each other in a 2 v 2), these replace the
 | Piccolo, Piccolo (Buu Saga) | B: You're slow. / P: You're arrogant. / B: We both are. Fight. |
 | Trunks, Kid Trunks | K: Who are you? / T: ...Someone who knows you very well. |
 | Hercule, Hercule (Buu Saga) | B: Hey! Nice moustache! / H: I was gonna say the same thing! / B: Champ vs champ! |
+
+### New (DRAFT, 2026-11-05)
+
+| pair | lines |
+|---|---|
+| Frieza, Mecha Frieza | M: Look what that monkey did to us. / F: Don't remind me. |
+| Imperfect Cell, Perfect Cell | I: Is that... what I become? / P: Admire it while you can. |
 
 ## 7. Layer 3: 2 v 2 team lines
 
@@ -332,6 +385,61 @@ default openers. Any other pair uses each member's layer-1 lines.
 | Krillin & 18 vs Android 17 & 16 | 17: Sis, really? Him? / 18: Mind your own business. |
 | Gohan & Piccolo vs Perfect Cell & Cell Jr. | C: Teacher and student. How sweet. / P: Gohan, don't hold back. |
 | Hercule & Videl vs Spopovich & Yamu | S: Grrr... / H: Don't worry, honey! Daddy's got this! / V: Dad, behind you! |
+
+### New team lines (DRAFT, 2026-11-05: Claude's, for Ryan's review)
+
+Ryan: "does it work WELL for 2v2 scenarios too??" Every pair of the story party now has its own lines (two players in a
+2 v 2 are always two of them), and so do the opponent teams the draw puts together (`tny_engine.c` `pair_up`: the combo
+pairs; Mecha Frieza and King Cold had none, the androids' pairs few).
+
+| team | lines |
+|---|---|
+| Gohan, Krillin | K: Just like Namek, huh Gohan? / G: Minus the scary parts! |
+| Piccolo, Hercule | H: Stick with me, green guy! / P: ...Try not to get hurt. |
+| Hercule, Gohan | H: Follow the champ, kid! / G: Right behind you, Mr. Hercule! |
+| Goku, Hercule | H: Leave the big ones to me! / G: Heh, you got it! |
+| Krillin, Piccolo | K: Never thought we'd team up, Piccolo. / P: Don't make me regret it. |
+| Krillin, Vegeta | K: So... we're a team now? / V: Stay out of my way. |
+| Krillin, Trunks | T: Ready, Krillin? / K: Ready as I'll ever be! |
+| Krillin, Hercule | H: Watch and learn, little guy! / K: Oh boy. This'll be fun. |
+| Vegeta, Piccolo | V: Try to keep up, Namekian. / P: Worry about yourself. |
+| Vegeta, Gohan | V: Don't hold back, boy. / G: I won't, Vegeta! |
+| Vegeta, Hercule | H: The champ and... the other guy! / V: You're next after them. |
+| Trunks, Gohan | G: Ready, Trunks? / T: Always. Let's finish this fast. |
+| Trunks, Goku | G: Let's do it, Trunks! / T: Right with you, Goku! |
+| Trunks, Piccolo | P: Don't rush in. / T: Understood. Watch my back. |
+| Trunks, Hercule | H: Nice sword! Not allowed, though! / T: I'll use my fists. |
+| Android 16, Gohan | 16: I will protect you, Gohan. / G: We'll protect each other! |
+| Android 16, Krillin | K: Glad you're on our side, big guy. / 16: So am I. |
+| Android 16, Hercule | H: A robot sidekick! Perfect! / 16: I am not a sidekick. |
+| Android 16, Goku | G: Hey, 16! Let's have some fun! / 16: Fun. I will try. |
+| Android 16, Piccolo | P: Don't slow down. / 16: I do not slow down. |
+| Android 16, Vegeta | V: Keep up, machine. / 16: Understood, Vegeta. |
+| Android 16, Trunks | T: You're not the androids I knew. / 16: No. I am 16. |
+| Mecha Frieza, King Cold | C: Rebuilt, my son? Try not to rust. / F: Just watch me, Father. |
+| Android 13, Dr. Gero | G: 13. Crush them. / 13: You got it, Doc. |
+| Android 13, Android 19 | 13: Stay outta my way. / 19: Energy levels nominal. |
+| Android 17, Dr. Gero | G: 17! Obey me for once! / 17: Yeah, no. |
+| Android 18, Dr. Gero | G: 18. Follow your orders. / 18: Whatever, old man. |
+| Android 19, Android 18 | 19: I will absorb the left one. / 18: Ugh. Fine. |
+| Android 13, Android 17 | 13: Kid, stay outta my way. / 17: Cute. You stay out of mine. |
+
+**Team vs team, new (DRAFT, 2026-11-05):** the pairs Ryan named (the androids, Frieza and King Cold, Broly and Paragus,
+Goku and Vegeta, Gohan and Piccolo) against the teams they would meet.
+
+| teams | lines |
+|---|---|
+| Goku & Vegeta vs Broly & Paragus | P: Broly! The Saiyans are here! / B: KAKAROT! / V: Tch. He's all yours, Kakarot. |
+| Goku & Vegeta vs Mecha Frieza & King Cold | F: Monkeys again. I was rebuilt for this. / G: Then we'll go all out! |
+| Goku & Vegeta vs Android 17 & 18 | 18: Two Saiyans. Lucky us. / V: Don't get cocky, tin can. |
+| Gohan & Piccolo vs Android 17 & 18 | 17: The kid and his babysitter. / Piccolo: Gohan. Left side. / Gohan: Got it! |
+| Gohan & Piccolo vs Broly & Paragus | Paragus: Broly, the Namekian first. / Piccolo: Gohan, stay behind me. / Gohan: Not a chance! |
+| Goku & Gohan vs Perfect Cell & Cell Jr. | C: Father and son. How poetic. / Goku: Gohan, ready? / Gohan: Ready, Dad! |
+| Vegeta & Trunks vs Mecha Frieza & King Cold | C: The boy who cut us down. / T: And I'll do it again. / V: Hah! That's my son. |
+| Goku & Krillin vs Frieza & Cooler | C: The monkey and his bald friend. / K: Hey! / G: Don't worry, Krillin. We got this. |
+| Gohan & Krillin vs Android 17 & 18 | 17: Remember us, baldy? / K: I'm trying REALLY hard not to. |
+| Goku & Piccolo vs Android 19 & Dr. Gero | Gero: Son Goku. At last. / Goku: Who's the old guy? / Piccolo: Focus, Goku. |
+| Piccolo & Hercule vs Spopovich & Yamu | Y: More energy for our master. / H: Your master's gonna be disappointed! |
 
 ## 8. The Royal Rumble: the announcer only
 

@@ -14,11 +14,18 @@ frames. Each block starts from the debug menu's state (`load menu.ss`: it must s
 groups (0x80 standing, 0x40 one line's), +0x14C the announcer, +0x152 the poses held); an entity's facing is +0x10 (0 down, 1 up,
 2 left, 3 right); player 1 0x03001FA8, player 2 0x0203FF08."""
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import tnysheet  # noqa: E402  (the roster's bodies, read from src/coop: no ROM)
 
 ENG = 0x0203EC00
 PHASE, BUSY, NPOSE, POSEG, ANN, OPP = "0x0203EC04", "0x0203ECFD", "0x0203ED52", "0x0203ED2C", "0x0203ED4C", "0x0203EC2C"
 P1, P2 = "0x03001FA8", "0x0203FF08"
 TF_YAMCHA, TF_YAMU, TF_PICCOLO = 0, 9, 52
+TF_P_A16 = 57
+CEL_ON = "0x0203ED16"                 # eng +0x116: the winners' celebration started (docs/tournament.md 28)
+TALK = 0x4B4C4154                       # `.tny.talk`'s magic: +0x58 the lines, line i's speaker seat at +0x31 + 12 i
 L = []
 
 
@@ -105,6 +112,10 @@ facing("PA", P1, "03", "player 1 faces right")
 facing("O0", OPP, "02", "the opponent faces left")
 expect(r"0203ed52: 01", f"peek8 {NPOSE} 1")
 expect(r"0203ed2c: c4", f"peek8 {POSEG} 1")
+out("key 1 6", "frames 20", "key 1 6", "frames 20", "key 1 6", "waitnz ST+8 3000", "frames 2", "ents", "shot a4_cel", "frames 8", "shot a5_hop", "frames 50", "shot a6_held")
+out("echo the fight is won: Piccolo celebrates (docs/tournament.md 28): his cheer (group 4, standing 0x80), one winner, hopped 6 px")
+expect(r"0203ed2c: 84", f"peek8 {POSEG} 1")
+expect(r"[0-9a-f]{8}: 01 06 01", "peek8 ST+8 3")
 finish("a")
 counts(r"[0-9a-f]{8}: ([0-9a-f][0-9a-f]) ([0-9a-f][0-9a-f]) 06", "a won 1 v 1: the champion hopped 6 px")
 
@@ -113,19 +124,34 @@ out("echo === B. 2P Rookie 2 v 2: the partners look at each other, the other sid
 start(p2=True)
 go(1)
 out("waitnz ST+4 3000", "frames 24", "ents", "shot b1_line0")
-out("echo line 0: Mecha Frieza opens (upper right): King Cold below him looks up, player 2 looks right")
+out("echo four boxes (docs/tournament.md 28): Mecha Frieza opens, King Cold and Piccolo their new exchange, player 2 (Hercule) last")
+out("echo line 0: Mecha Frieza (upper right) to his partner below: King Cold looks up, player 2 looks right")
+facing("O0", OPP, "00", "Mecha Frieza faces down, to King Cold")
 facing("O1", "0x0203EC30", "01", "King Cold faces up, to his partner")
 facing("PB", P2, "03", "player 2 faces right")
 facing("AN", ANN, "03", "the announcer faces right")
 out("frames 70", "key 1 6", "frames 30", "ents", "shot b2_line1")
-out("echo line 1: Piccolo answers (upper left): player 2 below him looks up, both opponents look left")
+out("echo line 1: King Cold (lower right) to Piccolo: Mecha Frieza looks down at him, the players look right")
+facing("O1", "0x0203EC30", "02", "King Cold faces left, to Piccolo")
+facing("O0", OPP, "00", "Mecha Frieza faces down")
+facing("PA", P1, "03", "Piccolo faces right")
+facing("PB", P2, "03", "player 2 faces right")
+expect(r"[0-9a-f]{8}: 02 00 00 0[0-2]", "peek8 ST+4 4")
+out("frames 70", "key 1 6", "frames 30", "ents", "shot b3_line2")
+out("echo line 2: Piccolo (upper left) answers, to his partner who speaks next: player 2 below looks up, both opponents look left")
+facing("PA", P1, "00", "Piccolo faces down, to player 2")
 facing("PB", P2, "01", "player 2 faces up, to his partner")
 facing("O0", OPP, "02", "Mecha Frieza faces left")
 facing("O1", "0x0203EC30", "02", "King Cold faces left")
-expect(r"[0-9a-f]{8}: 02 00 00 0[0-2]", "peek8 ST+4 4")
-out("echo (the box of Piccolo's line went to the bottom: he stands in the view's upper part)")
+out("frames 70", "key 1 6", "frames 30", "ents", "shot b4_line3")
+out("echo line 3: player 2 has the last word, to Piccolo: Piccolo looks down at him")
+facing("PB", P2, "01", "player 2 faces up, to Piccolo")
+facing("PA", P1, "00", "Piccolo faces down")
+expect(r"[0-9a-f]{8}: 04 00 00 0[0-4]", "peek8 ST+4 4")
 finish("b")
 counts(r"[0-9a-f]{8}: [0-9a-f]{2} [0-9a-f]{2} 06", "a won 2 v 2: the champions hopped")
+out("echo every fight's winners celebrated, two at a time (the celebrations, the highest hop, the bodies posed)")
+expect(r"[0-9a-f]{8}: 0[1-9a-f] 06 ([0-9a-f][02468ace])", "peek8 ST+8 3")
 
 # ---- C. two players, co-op 1 v 1 to the duel final (player 2 wins it) -----------------------------------------------------
 out("echo === C. 2P co-op 1 v 1: the turns, the duel final's talk (player 2 opens, player 1 answers), player 2 the champion")
@@ -179,8 +205,81 @@ go(0)
 out("waitnz ST+4 3000", "frames 24", "key 8 6", "frames 10", "key 1 6", "frames 60", "shot i1_call")
 out("echo after Start and A: one line staged, the call is up")
 expect(r"[0-9a-f]{8}: 01 01", "peek8 ST+4 2")
+out("key 1 6", "frames 20", "key 1 6", "frames 20", "key 1 6", "waitnz ST+8 3000", "frames 12", "ents", "shot i2_cel")
+out("echo the fight is lost: the opponent standing celebrates (his own pose, standing 0x80), hopping")
+expect(r"0203ed2c: 8[0-9a-f]", f"peek8 {POSEG} 1")
+expect(r"[0-9a-f]{8}: 01 0[4-6] 01", "peek8 ST+8 3")
 finish("i")
 counts(r"[0-9a-f]{8}: 0[1-9a-f] 0[2-9a-f] 00", "lost: the winner's line, the result call, no hop")
+
+# ---- K. Android 16 wins (Ryan: "he didnt celebrate, he just looked left and right") ------------------------------------------
+out("echo === K. 1P Rookie 1 v 1 as Android 16: his drawn raised fist (group 0x3F), hopping, then held")
+start(flags=3)
+out("flags +421")                       # Gero's computer over: 16 is ours to pick (tny_engine.c a16_ours)
+go(0, pick1=TF_P_A16)
+out(f"stepnz {CEL_ON} 40", "ents", "shot k1_posed")   # A through the talk until the celebration starts (cel_on)
+expect(r"0203ed2c: bf", f"peek8 {POSEG} 1")
+finish("k", 300)
+counts(r"[0-9a-f]{8}: [0-9a-f]{2} [0-9a-f]{2} 06", "16 won")
+
+# ---- L. 2 v 2 talk: who speaks (test command 31; seats side << 4 | index, 0 the opening side) -------------------------------------
+TALK_CASES = [
+    ("l1", "a team and team-vs-team history: Mecha Frieza & King Cold vs Goku & Vegeta (a new exchange, two boxes)",
+     (3, 4), (55, 53), ["00", "10"]),
+    ("l2", "a rival across, the partners around it: Mecha Frieza & Yamcha vs Goku & Piccolo (Mecha opens, Yamcha and Goku, Piccolo last)",
+     (3, 0), (55, 52), ["00", "01", "10", "11"]),
+    ("l3", "no history: Yamu & Tao (both open) vs Vegeta & Hercule (their new team lines, Hercule first)",
+     (9, 7), (53, 56), ["00", "01", "11", "10"]),
+    ("l4", "the same fighter twice answers once: Yamu & Tao vs Piccolo & Piccolo",
+     (9, 7), (52, 52), ["00", "01", "10"]),
+    ("l5", "a three-box team: Android 16 & 17 vs Yamcha & Tien (their team lines do not fit: Yamcha answers alone)",
+     (19, 16), (0, 1), ["01", "00", "01", "10"]),
+    ("l6", "1 v 1, a new rival exchange: Android 17 vs your Android 16 (17 opens)",
+     (16, 0xFF), (57, 0xFF), ["00", "10"]),
+    ("l7", "a challenger pair against one player: Goten & Kid Trunks vs Krillin (their team lines, Krillin answers)",
+     (37, 38), (51, 0xFF), ["00", "01", "10"]),
+]
+out("echo === L. the pre-fight talk in 2 v 2: both members of each side speak (test command 31)")
+out("load menu.ss", "p2 off", "maptest 13", "frames 300")
+for tag, why, a, b, seats in TALK_CASES:
+    out(f"echo {tag}: {why}")
+    cmd(31, a[0] | a[1] << 8, b[0] | b[1] << 8)
+    out("frames 20")
+    if tag == "l1":
+        out(f"find TK {TALK:#x}")            # the talk's RAM has its magic from the first talk on
+    expect(rf"[0-9a-f]{{8}}: 0{len(seats)}", "peek8 TK+0x58 1")
+    for i, seat in enumerate(seats):
+        expect(rf"[0-9a-f]{{8}}: {seat}", f"peek8 TK+{0x31 + 12 * i:#x} 1")
+    for i in range(len(seats)):
+        out("frames 70", f"shot {tag}_{i}", "key 1 6")
+    out("frames 60")
+
+# ---- M. every body's win pose: the pick (test command 38 op 6), then four at a time posed and celebrating, `ents` checked ---------
+BODIES = tnysheet.roster_ids() + [206, 207, 212, 213, 217, 218]   # the roster's bodies, the story's, the form changes
+out("echo === M. every tournament body's win pose: a group the record has, every frame drawable; posed, hopping, held")
+out("load menu.ss", "p2 off", "maptest 13", "frames 300")
+out("poke32 0x0203FD0C 0x0F0F", "poke32 0x0203FD54 0x013200A8", "poke32 0x0203FD08 5", "frames 300")
+for sid in BODIES:
+    cmd(38, 6, sid)
+    out(f"echo sprite {sid}: in the build, frames ok (bit 31 clear), a group (not 0xff)")
+    expect(r"0203fd0c: (?!ff)[0-9a-f]{2} 00 0[1-8] 01", "peek8 0x0203FD0C 4")
+    if sid in (160, 175):
+        out("echo Android 16: the drawn raised fist (0x3f), its frame 8 times")
+        expect(r"0203fd0c: 3f 00 08 01", "peek8 0x0203FD0C 4")
+    if sid in (57, 161):
+        out("echo Gohan / Krillin: their cheer's arms-up frame as a group of its own (0x3f, the frame 8 times)")
+        expect(r"0203fd0c: 3f 00 08 01", "peek8 0x0203FD0C 4")
+for b in range(0, len(BODIES), 4):
+    batch = BODIES[b:b + 4]
+    for sid in batch:
+        cmd(3, sid)
+    out("frames 20")
+    for sid in batch:
+        cmd(38, 7, sid)
+    out("frames 4", f"shot m{b:02d}a", "frames 40", "ents", f"shot m{b:02d}b")
+    cmd(38, 8)
+    out("frames 10")
+out("ents")
 
 # ---- J. the plaza's welcome, one player and two ------------------------------------------------------------------------------------
 for p2 in (False, True):

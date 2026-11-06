@@ -3582,7 +3582,7 @@ frames 4
 p2 0
 frames 80
 frames 60
-stepz 0x0203ECFC 200
+stepnz 0x0203EC13 200
 frames 200
 poke16 UI+0x82 0
 stepnz UI+0x82 300
