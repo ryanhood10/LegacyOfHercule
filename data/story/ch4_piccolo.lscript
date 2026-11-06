@@ -105,7 +105,10 @@ sequence ch4_gero_door_a27
         PlayAudio 60
         FlyToPosition 165, 360, 176
         SetEntityFacing 165, 3
-        WaitFrames 20
+        BeginCommandBatch                     ; he lands: dust at his feet, the ground shakes (in place of a wait)
+        EntitySetVelocity 165, 0, 8
+        ScreenShake 0, 6, 12
+        CommitCommandBatch
         CoopCall 22, 4, 5, 0
         JumpIfFalse c
         CoopCall 5, 0, 0, 0
@@ -132,7 +135,10 @@ sequence ch4_gero_door_a27
         PlayAudio 60
         FlyToPosition 165, 360, 176
         SetEntityFacing 165, 3
-        WaitFrames 20
+        BeginCommandBatch                     ; he lands: dust at his feet, the ground shakes (in place of a wait)
+        EntitySetVelocity 165, 0, 8
+        ScreenShake 0, 6, 12
+        CommitCommandBatch
   [17] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
   [18] script
         DespawnEntity 165
@@ -190,7 +196,10 @@ sequence ch4_gero_door_a40
         PlayAudio 60
         FlyToPosition 165, 232, 264
         SetEntityFacing 165, 2
-        WaitFrames 20
+        BeginCommandBatch                     ; he lands: dust at his feet, the ground shakes (in place of a wait)
+        EntitySetVelocity 165, 0, 8
+        ScreenShake 0, 6, 12
+        CommitCommandBatch
         CoopCall 22, 4, 5, 0
         JumpIfFalse c
         CoopCall 5, 0, 0, 0
@@ -217,7 +226,10 @@ sequence ch4_gero_door_a40
         PlayAudio 60
         FlyToPosition 165, 232, 264
         SetEntityFacing 165, 2
-        WaitFrames 20
+        BeginCommandBatch                     ; he lands: dust at his feet, the ground shakes (in place of a wait)
+        EntitySetVelocity 165, 0, 8
+        ScreenShake 0, 6, 12
+        CommitCommandBatch
   [17] text 169 "ANDROID 13: Back for seconds, huh?\x0bSuit yourself."
   [18] script
         DespawnEntity 165
