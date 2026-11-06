@@ -378,6 +378,7 @@ sequence ch1_spirit
         SetPlayerVisible 0
         WalkToPosition 0, 96, 176
         SetEntityFacing 0, 1
+        CoopCall 9, 1, 72, 178           ; (batch 1, 1.6) player 2 stands beside him in the clearing (he stayed at its edge, under the box)
         PanCameraToPosition 0, 104, 2         ; (was 0, 0: the box hid Frieza and the players stood below the view)
         WaitFrames 40
         PlayAudio 50
@@ -398,27 +399,40 @@ sequence ch1_spirit
   stop
   [4] text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us." -> 6
   [5] text 73 "KRILLIN: Huh?  The whole forest just went quiet...\x0bSomething is here." -> 6
-  [6] script
+  [6] script                             ; (1.6) the music dies, a held silence, the ground starts to tremble; the white; they are there, and a
+        StopMusic                        ; harder jolt
+        WaitFrames 30
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 3, 50
+        CommitCommandBatch
+        StopAudio 43
         FadeToWhite 120
         TriggerMapEvent 1
         WhiteFadeOut 30
         WhiteFlash 40
+        BeginCommandBatch
+        ScreenShake 0, 8, 20
+        CommitCommandBatch
   [7] stock @083b952c                    ; Frieza: your dad isn't coming back!
-  [8] text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
-  [9] script                             ; player 1 recoils a step; Krillin played: his line (10), else Gohan's (11)
+  [8] script                             ; Cooler steps up for his line
+        WalkToPosition 34, 136, 152
+        SetEntityFacing 34, 0
+  [9] text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
+  [10] script                            ; player 1 recoils a step; Krillin played: his line (11), else Gohan's (12)
         WalkToPosition 0, 96, 186
         SetEntityFacing 0, 1
         CoopCall 22, 4, 6, 0
         JumpIfFalse a
-        PushByte 10
-        END
-      a:
         PushByte 11
         END
-  [10] text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!" -> 12
-  [11] text 1 "#GOHAN: Frieza AND Cooler?!  This can't be happening!"
-  [12] stock @083b958c                   ; boss bar, battle music, control back
-  [13] script                            ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
+      a:
+        PushByte 12
+        END
+  [11] text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!" -> 13
+  [12] text 1 "#GOHAN: Frieza AND Cooler?!  This can't be happening!"
+  [13] stock @083b958c                   ; boss bar, battle music, control back
+  [14] script                            ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
         SetActiveEntity 0
 end
 

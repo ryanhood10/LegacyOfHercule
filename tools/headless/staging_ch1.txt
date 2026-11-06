@@ -144,6 +144,9 @@ echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 mash 2 110
 shot c1_GK_talk
+deref P2 0x0203FF08
+echo EXPECT [0-9a-f]+: 00004800 0000b200
+peek P2+0x158 2
 mash 6 110
 shot c1_GK_frieza
 stepz 0x03001FDC 150
@@ -204,6 +207,9 @@ echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 mash 2 110
 shot c1_KG_talk
+deref P2 0x0203FF08
+echo EXPECT [0-9a-f]+: 00004800 0000b200
+peek P2+0x158 2
 mash 6 110
 shot c1_KG_frieza
 stepz 0x03001FDC 150

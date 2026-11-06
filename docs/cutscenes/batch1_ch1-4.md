@@ -217,6 +217,12 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Lines kept:** all as built (the reworded variants are drafts already listed in `docs/story.md` 0).
 - **Risks:** Frieza's dream sprite 48 has no knock-down group, Cooler 34 none either: no pose for the "melting",
   dust only. The end warps to area 3 with entities: player 2 is away until the scene ends (as today).
+- **Built 2026-11-06 (`nb-cs4`), beats 1-3.** Player 2 is placed beside player 1 in the clearing (`CoopCall 9, 1, 72, 178`); before
+  the fade the music stops, a 30-frame silence, a low rumble with a light shake, then the stock white, and a harder shake once the two
+  stand there; Cooler steps up to (136, 152) for his line (one script entry added: the branch's indexes 10-13 became 11-14). Not built:
+  player 2's recoil (a player's body cannot be walked by a script; a placement would be a pop), the figures bursting into dust at the
+  end (the defeat runs with the pair's fight state; left as the stock white). `staging_ch1` "spirit" checks player 2's spot in both
+  two-player lineups.
 
 ### 1.7 Trunks against Frieza and King Cold: SHOWCASE (L)
 

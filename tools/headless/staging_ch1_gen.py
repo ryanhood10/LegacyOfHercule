@@ -16,6 +16,8 @@ for p1, p2, want in ((GOHAN, None, dict(s53=1, s76=0)), (KRILLIN, None, dict(s53
     s.actors(**want)
     s.press(2, 110)
     s.shot(f"c1_{n}_talk")
+    if p2 is not None:          # (batch 1, 1.6) player 2 stands beside player 1 in the clearing (72, 178)
+        s.out("deref P2 0x0203FF08", "echo EXPECT [0-9a-f]+: 00004800 0000b200", "peek P2+0x158 2")
     s.press(6, 110)
     s.shot(f"c1_{n}_frieza")
     s.end_scene()
