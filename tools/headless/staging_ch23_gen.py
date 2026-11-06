@@ -33,6 +33,20 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, P
 s.write("staging_ch2.txt")
 
 s = Script("staging_ch23_gen.py")
+# Amenbo Island (the cutscene pass, 2026-11-06): 20's power and his volley at the city in place of one blast, the white cut to the burning street
+# (zone 5 area 4), Goku's flare before "You monster!!!"; alone as Gohan and with Piccolo and Hercule
+for p1, p2 in ((GOHAN, None), (PICCOLO, HERCULE)):
+    n = lineup_name(p1, p2)
+    s.begin(f"amenbo {n}", p1, p2)
+    s.warp(5, 3, 144, 300, 60)
+    s.press(19, 112)
+    for i in range(4):
+        s.out("key 1 6", "frames 56")
+        s.shot(f"c3_{n}_amenbo{i}a")
+        s.out("frames 56")
+        s.shot(f"c3_{n}_amenbo{i}b")
+    s.out("ents")
+    s.on_map(5, 4)
 s.begin("cutaway", VEGETA, None)
 s.warp(7, 1, 200, 310, 200)
 s.press(16, 100)

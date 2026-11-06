@@ -407,6 +407,10 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
 - **Lines kept:** all stock.
 - **Risks:** entry 15 warps without entities to the burning map (5/4): actors placed again by the stock; nothing
   added may straddle it. 19 and 20: no shout or knock-down groups.
+- **Built 2026-11-06 (`nb-cs1`), beats 1 and 3 in part** (two `edits` on the stock entries in `ch3_duels.json`, map 143): entry 15: 20 turns
+  away, a short charge, a volley of six at the building (bursts, the last an explosion) in place of the single blast, then the stock white
+  cut to the burning street; entry 17: Goku's flare (a charge of 24 frames, rings at his feet) before his stock attack pose and "@You
+  monster!!!". Not built: the players shielding their faces, the held shot in the ruins, 19's half step, the fly-off's spacing.
 
 ### 3.2 Space: Vegeta and his clone: SHOWCASE (M)
 
@@ -778,7 +782,7 @@ with the second baby looking back. It is already what this document asks of the 
 
 ## 6. Priority list for the developer (build order, showcases first)
 
-**State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), and of item 8 the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 3.1, 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 3.4, 4.1, 4.7 and the rest of 4.2 / 4.5 (the HUD is still shown at the generators).**
+**State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), 3.1 in part (item 7), and of item 8 the charge of 3.4, the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 4.1, 4.7 and the rest of 3.1 / 4.2 / 4.5 (the HUD is still shown at the generators).**
 
 1. **1.7 Trunks against Frieza and King Cold** (L). No player body in the fight, so one choreography for every
    lineup: the cheapest showcase to test and the scene every fan knows. It is also the helpers' first full use
