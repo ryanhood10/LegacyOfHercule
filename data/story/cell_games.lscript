@@ -53,7 +53,195 @@ sequence cg_ring
         SetEntityFacing 76, 1
         PlayAudio 50
         END
-  stockseq @083e8d98 1 26    ; "I'll fight Cell first", Hercule's ring scene, "Let's do this!"
+  stockseq @083e8d98 1 14    ; "I'll fight Cell first", Hercule's ring scene to "LET'S GO!!!!!!"
+  script                                 ; stock entry 15: the run-up stops under Cell; ten punches, none of them flashes Cell; Cell looks away
+        SetEntityFacing 16, 1
+        SetActiveEntity 72
+        WalkToPosition 72, 446, 466
+        SetEntityFacing 72, 1
+        PushByte 3
+        PushToAltStack
+      F10:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F10
+        SpawnDustCloud 72, 440, 448
+        PushByte 3
+        PushToAltStack
+      F7:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F7
+        SpawnDustCloud 72, 450, 448
+        PushByte 3
+        PushToAltStack
+      F4:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F4
+        SpawnDustCloud 72, 440, 448
+        PushByte 1
+        PushToAltStack
+      F1:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F1
+        WaitFrames 20
+        SetEntityFacing 30, 2
+        WaitFrames 20
+  stock @083e8aa6    ; "CELL: Your ignorance is painful."
+  script                                 ; stock entry 17: ten more; Cell looks back down at him
+        PushByte 3
+        PushToAltStack
+      F10:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F10
+        SpawnDustCloud 72, 440, 448
+        PushByte 3
+        PushToAltStack
+      F7:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F7
+        SpawnDustCloud 72, 450, 448
+        PushByte 3
+        PushToAltStack
+      F4:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F4
+        SpawnDustCloud 72, 440, 448
+        PushByte 1
+        PushToAltStack
+      F1:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F1
+        SetEntityFacing 30, 0
+        WaitFrames 30
+  stock @083e8afc    ; the announcer: "This man never rests!"
+  script                                 ; stock entry 19: five more
+        PushByte 3
+        PushToAltStack
+      F5:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F5
+        SpawnDustCloud 72, 450, 448
+        PushByte 2
+        PushToAltStack
+      F2:
+        BeginCommandBatch
+        StackRand 72, 6, 3
+        Add
+        SetEntityAnimation
+        StackRand 30, 34, 3
+        Add
+        PlaySFX
+        CommitCommandBatch
+        LoopOrJump F2
+        SetEntityFacing 72, 0
+        WaitFrames 60
+  stock @083e8bbe    ; "And now for my finishing move!"
+  script                                 ; stock entry 21: he backs off, poses, charges; Cell's one blow (a flash, a shake), the glide off the ring, dust where he lands
+        SetEntityFacing 72, 1
+        WalkToPosition 72, 446, 492
+        SetEntityFacing 72, 1
+        SetEntityAnimation 72, 8
+        WaitFrames 10
+        WalkToPosition 72, 446, 466
+        SetEntityFacing 72, 1
+        ScreenShake 0, 10, 12
+        BeginCommandBatch
+        SetEntityAnimation 30, 6
+        StackRand 72, 34, 3
+        Add
+        PlaySFX
+        PlayDamageEffect 72
+        SetEntityAnimation 72, 29
+        GlideToPosition 72, 448, 850, 1000
+        CommitCommandBatch
+        PlayAudio 21
+        ScreenShake 0, 6, 10
+        SpawnDustCloud 72, 440, 846
+        SpawnDustCloud 72, 458, 852
+        BeginCommandBatch
+        SetEntityFacing 0, 0
+        SetEntityFacing 76, 0
+        SetEntityFacing 56, 0
+        SetEntityFacing 137, 0
+        SetEntityFacing 132, 0
+        SetEntityFacing 103, 0
+        CommitCommandBatch
+        WaitFrames 50
+        SetEntityFacing 137, 1
+        WaitFrames 14
+        SetEntityFacing 103, 1
+        WaitFrames 14
+        SetEntityFacing 132, 1
+        WaitFrames 14
+        SetEntityFacing 56, 1
+        WaitFrames 28
+        SetActiveEntity 0
+        DespawnEntity 72
+        WaitFrames 50
+        END
+  stockseq @083e8d98 22 26    ; "I was rooting for Cell", "How about Goku to start?", "Let's do this!"
   fmt 0 "%s"
         CoopCall 14, 3, 0, 0
         END

@@ -95,6 +95,9 @@ def guard72(lines, tag):
 # Hercule's actor hands over to player 2's entity by standing where it respawns (12 px left of player 1, player.c ensure_p2)
 HANDOVER = ["CoopCall 22, 2, 72, 0", "JumpIfFalse H1", "DespawnEntity 72", "H1:"]
 
+def stock_at(seqs, name, idx, comment=""):
+    emit(f"  stock @{seqs[name]['entries'][idx]['head'].split('@')[1].split()[0]}" + (f"    ; {comment}" if comment else ""))
+
 def stockseq(seqs, name, a, b, comment=""):
     emit(f"  stockseq {addr(seqs, name)} {a} {b}" + (f"    ; {comment}" if comment else ""))
 
@@ -133,7 +136,45 @@ for s in (5, 6):
 # Android 16 (selectable since Gero's computer) leaves the party for good: here he is the stock NPC who dies
 b = ["CoopCall 12, 1, 0, 0", "SetActiveCharacter 4", "CoopCall 15, 1, 0, 0", "SetCharacterTransformation 0, 56"] + b[:10] + heal + b[10:]
 script(b, "stock entry 0: Goku is player 1, player 2 watches; Hercule and Krillin are refilled too; Gohan can go Super Saiyan")
-stockseq(A2, "m324_t0", 1, 26, "\"I'll fight Cell first\", Hercule's ring scene, \"Let's do this!\"")
+stockseq(A2, "m324_t0", 1, 14, "\"I'll fight Cell first\", Hercule's ring scene to \"LET'S GO!!!!!!\"")
+# Hercule's flurry (docs/cutscenes/batch3 3.1). The stock walked him onto Cell's own spot (his body sat inside Cell's) and flashed Cell red
+# at each of his 25 punches, which read as Cell being hurt by blows that "do nothing". Now he stops below Cell, the punches keep their poses
+# and sounds (paced by the poses: the stock's EntityWaitTouchPlayer needs the overlap), dust at his fists, and Cell does not flinch: he looks
+# away before "Your ignorance is painful." and back down at him afterwards. The one blow has a flash, a shake and dust where Hercule lands.
+HX, HY = 446, 466                # Hercule's spot under Cell (the actor of record 0 stands at 440, 432)
+def flurry(n):
+    r = []
+    while n > 0:
+        k = min(3, n)
+        r += [f"PushByte {k}", "PushToAltStack", f"F{n}:", "BeginCommandBatch", "StackRand 72, 6, 3", "Add", "SetEntityAnimation",
+              "StackRand 30, 34, 3", "Add", "PlaySFX", "CommitCommandBatch", f"LoopOrJump F{n}"]
+        if k == 3:
+            r += [f"SpawnDustCloud 72, {HX + (4 if n % 2 else -6)}, {HY - 18}"]
+        n -= k
+    return r
+b = body(A2, "m324_t0", 15)
+assert b[2:4] == ["WalkToPosition 72, 448, 440", "SetEntityFacing 72, 1"] and b[-2:] == ["WaitFrames 30", "END"]
+script(b[:2] + [f"WalkToPosition 72, {HX}, {HY}", "SetEntityFacing 72, 1"] + flurry(10) + ["WaitFrames 20", "SetEntityFacing 30, 2", "WaitFrames 20"],
+       "stock entry 15: the run-up stops under Cell; ten punches, none of them flashes Cell; Cell looks away")
+stock_at(A2, "m324_t0", 16, "\"CELL: Your ignorance is painful.\"")
+script(flurry(10) + ["SetEntityFacing 30, 0", "WaitFrames 30"], "stock entry 17: ten more; Cell looks back down at him")
+stock_at(A2, "m324_t0", 18, "the announcer: \"This man never rests!\"")
+script(flurry(5) + ["SetEntityFacing 72, 0", "WaitFrames 60"], "stock entry 19: five more")
+stock_at(A2, "m324_t0", 20, "\"And now for my finishing move!\"")
+b = body(A2, "m324_t0", 21)
+k = b.index("BeginCommandBatch")
+assert b[k + 2] == "EntityWaitTouchPlayer 72"
+blow = b[k:k + 2] + b[k + 3:]                        # without the wait for a touch: the two no longer overlap
+k2 = blow.index("CommitCommandBatch")
+blow = (["WhiteFlash 3", "ScreenShake 0, 10, 12"] + blow[:k2 + 1] +
+        ["PlayAudio 21", "ScreenShake 0, 6, 10", "SpawnDustCloud 72, 440, 846", "SpawnDustCloud 72, 458, 852"] + blow[k2 + 1:])
+k3 = blow.index("WaitFrames 120")                    # the stock hold: the watchers look back up at the ring one by one inside it
+blow = blow[:k3] + ["WaitFrames 50", "SetEntityFacing 137, 1", "WaitFrames 14", "SetEntityFacing 103, 1", "WaitFrames 14", "SetEntityFacing 132, 1",
+                    "WaitFrames 14", "SetEntityFacing 56, 1", "WaitFrames 28"] + blow[k3 + 1:]
+script(["SetEntityFacing 72, 1", f"WalkToPosition 72, {HX}, {HY + 26}", "SetEntityFacing 72, 1", "SetEntityAnimation 72, 8", "WaitFrames 10",
+        f"WalkToPosition 72, {HX}, {HY}", "SetEntityFacing 72, 1"] + blow[1:],
+       "stock entry 21: he backs off, poses, charges; Cell's one blow (a flash, a shake), the glide off the ring, dust where he lands")
+stockseq(A2, "m324_t0", 22, 26, "\"I was rooting for Cell\", \"How about Goku to start?\", \"Let's do this!\"")
 title(P1)
 script(body(A2, "m324_t0", 27), "stock entry 27: fight 1")
 emit("end")

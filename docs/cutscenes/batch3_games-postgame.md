@@ -113,6 +113,11 @@ a step that is moved or removed breaks an insertion further down, so change one 
      glide with the camera.
   5. Landing: `SpawnDustCloud` twice and `ScreenShake 0, 6, 10` where he stops; the watchers' heads follow him down
      (stock batch), then turn back up to the ring one by one during the hold. Krillin's line as stock.
+- **Built (`nb-cs3`, 2026-11-06), beats 1-5:** Hercule stops under Cell at (446, 466); the 25 punches keep their poses and sounds, flash nothing on
+  Cell, and puff dust at his fists every third; Cell looks away before "Your ignorance is painful." and back down during the announcer; before the
+  finishing move he backs off, poses (8) and charges; the blow has a flash and a shake, the landing a boom, a shake and two dust clouds; the watchers
+  look back up one by one inside the stock 120-frame hold (no time added there). The punches are paced by their poses (`EntityWaitTouchPlayer` needs
+  the overlap that is gone). Entries 15-21 are restated; indexes unchanged. Filmed; `cell_staging.txt` and `cell_games.txt` pass through it.
 - **Risks:** the glide's `GlideToPosition 72, 448, 850, 1000` and `SetActiveEntity 72` are in one batch with Cell's pose;
   keep the batch. `EntityWaitTouchPlayer 30` paces the punches: with Hercule no longer overlapping Cell it may never
   fire; use fixed waits instead. The ring scene is the Games' first: `cell_games.txt` and `cell_staging.txt` reach it by
