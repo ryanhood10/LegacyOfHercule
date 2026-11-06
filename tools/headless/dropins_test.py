@@ -4,9 +4,8 @@ usage: python tools/headless/dropins_test.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR
 Made on the debug ROM by Map Test and test warps, then re-saved on the play ROM (dropins.py's way: the two differ only in
 the title patch). Every state: one player, the party at full HP and ki, "How many players?" asked again on load, no
 cartridge save inside (loading one never touches the .sav). Rerun after every rebuild: states break with it.
-F1 Gero's first stage   F2 the lab (13's revenge)   F3 the generator's eggs   F4 the road (17 and 18)
-F5 Papaya Island's welcome   F6 the waiting room, every tier open (Legend 2 v 2: 32 fighters)
-F7 the Time Chamber, first steps in   F8 the Chamber, five lights out, at the lab's door   F9 six lights out, at the gate
+F1 Gero's first stage alone   F2 the lab door's generator   F3 the lab (13 beside Gero)   F4 the eggs   F5 the Lookout at the
+Chamber's door (the opening scene)   F6 a run under way   F7 five lights out at Broly's ship   F8 six out, the portal   F9 Frieza's ship
 """
 import os, re, shutil, struct, subprocess, sys
 
@@ -57,16 +56,15 @@ def chamber(lights, spot=None):
 
 
 STATES = {
-    "f1": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x0D08, 192, 336),          # below Gero's trigger (y <= 280)
-    "f2": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2E08, 190, 740),          # above the lab cutaway's rect (y >= 769): walk down
-    "f3": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2C08, 224, 90),           # area 44 by the north door: walk up
-    "f4": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x3108, 200, 700, 12),      # inside the road's rect, saved while the map loads: the scene plays as it fades in
-    "f5": "p2 off\nmaptest 263\nframes 300\nflags -441\n" + warp(0x0B0F, 0x188, 0xE8),             # the beach, the welcome ahead
-    "f6": f"p2 off\nmaptest 263\nframes 300\nflags {LEGEND} +441\n" + warp(0x0F0F, 300, 200)      # beside the director
-          + "key 1 6\nframes 150\n" * 8,                                                         # the new tiers' pop-ups read
-    "f7": chamber(0),
-    "f8": chamber(0x2F, (432, 1800)),                                                             # lights 0-3 and 5 out: the lab (4) left
-    "f9": chamber(0x3F, (1028, 400)),                                                             # all six out: walk up between the pillars
+    "f1": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x0D08, 192, 336),          # Gero's first stage alone as Piccolo: walk up
+    "f2": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\npoke8 FLAGS+11 4\n" + warp(0x1B08, 524, 192),  # the lab door's generator (a27): walk left
+    "f3": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2E08, 190, 740),          # above the lab cutaway: walk down (13 beside Gero)
+    "f4": "p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 1\n" + warp(0x2C08, 224, 90),           # the eggs: walk up through the north door
+    "f5": f"p2 off\npreset {WAIT}\nmaptest 263\nframes 200\npoke8 0x0203F000 1\n" + warp(0x0309, 96, 160),   # the Lookout at the Chamber's door: up + A
+    "f6": chamber(0x40),                                                                          # a run under way, no lights out: explore
+    "f7": chamber(0x40 | 0x1F, (240, 1180)),                                                      # five out, at Broly's ship (side rooms after its lever)
+    "f8": chamber(0x40 | 0x3F, (1028, 440)),                                                      # six out: the portal ahead, Mr. Popo
+    "f9": chamber(0x40, (1616, 600)),                                                             # at Frieza's ship: the throne room after his lever
 }
 shutil.copy(menu, os.path.join(work, "menu.ss"))
 text = ""
