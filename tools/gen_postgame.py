@@ -147,13 +147,22 @@ for pass_no in (1, 2):
     text(67, "HERCULE: *grrrumble*\\x0bHuh?  Must've been something I ate!")
     script(["SetEntityFacing 72, 2", "WaitFrames 16", "SetEntityFacing 72, 3", "WaitFrames 16", "SetEntityFacing 72, 0", "SetEntityAnimationNoWait 72, 7",   # he shrugs it off
             "FadeOut 120", "DespawnEntity 72", "WarpToMapNoEntities 9, 7, 1, 144, 136", "DisableLayer 0", "DisableLayer 1",
-            "SetEntityFacing 36, 3", "SetEntityFacing 11, 1", "FadeFromWhite 120", "WaitFrames 30",
-            "ScreenShake 0, 20, 60", "PlayAudio 21", "SpawnCharacterEntity 24, 144, 232", "WalkToPosition 24, 136, 176",
-            "SetEntityFacing 24, 1"], "back on the Lookout: an explosion, Bulma runs up")
+            "SetEntityFacing 36, 3", "SetEntityFacing 11, 1", "FadeFromWhite 120", "WaitFrames 20",
+            # Piccolo senses it before anything is heard and turns that way (docs/cutscenes/batch3 5.3); then the flash and the shake from that
+            # side, and they all turn the way 18 will fly
+            "SetEntityFacing 103, 3", "WaitFrames 24", "WhiteFlash 4",
+            "ScreenShake 0, 20, 60", "PlayAudio 21",
+            "BeginCommandBatch", "SetEntityFacing 0, 3", "SetEntityFacing 11, 3", "SetEntityFacing 76, 3", "SetEntityFacing 121, 3", "SetEntityFacing 137, 3",
+            "SetEntityFacing 132, 3", "SetEntityFacing 156, 3", "CommitCommandBatch", "WaitFrames 20",
+            "SpawnCharacterEntity 24, 144, 232", "WalkToPosition 24, 136, 176",
+            "SetEntityFacing 24, 1"], "back on the Lookout: Piccolo turns first, an explosion, they all turn, Bulma runs up")
     text(36, "BULMA: What was that explosion!?\\x0bDon't tell me you guys didn't finish off Cell!")
     text(90, "PICCOLO: No, I told you I no longer sense Cell!\\x0bThere was just a great pulse of power in the Arctic.")
     text(29, "ANDROID 18: It must be my brother.\\x0bI'm going to go check on him.")
-    script(["PlayAudio 26", "FlyToPosition 11, 272, 136", "DespawnEntity 11"], "18 flies north (stock entry 72's flight)")
+    script(["WalkToPosition 11, 84, 152", "SetEntityFacing 11, 1", "WaitFrames 24", "SetEntityFacing 11, 3",        # a few steps from the group; one look back at Krillin
+            "PlayAudio 26", "FlyToPosition 11, 272, 136", "DespawnEntity 11",
+            "BeginCommandBatch", "WalkToPosition 76, 76, 128", "WalkToPosition 137, 222, 80", "CommitCommandBatch",  # Krillin first, after her; Vegeta already on his way
+            "SetEntityFacing 76, 3", "SetEntityFacing 137, 3"], "18 walks off a few steps, looks back once, flies north (stock entry 72's flight); Krillin and Vegeta start after her")
     text(90, "PICCOLO: We're all going.")
     script([f"SetStoryFlag {F_WISHED}", f"SetStoryFlag {F_ARCTIC_OPEN}", "FadeOut 120",
             "WarpToMapWithEntities 9, 1, 1, 792, 544",
