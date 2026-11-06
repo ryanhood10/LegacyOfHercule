@@ -52,10 +52,133 @@ sequence ch1_training
 end
 
 ; map 1 (zone 1 area 2) trigger 0: Gohan's death and the jump to the present
+; The cutscene pass (2026-11-06, docs/cutscenes/batch1_ch1-4.md 1.3): the androids are seen (the stock spawned them above the view and the
+; blasts came from off screen): the view sits 56 px higher, 17 and 18 walk in from the top, a held look, and the stock's six batches fall as
+; one storm from both of them with the ground shaking harder; the stock ending; 17 turns away first and both fly off (the stock despawned
+; them where they stood). Old Hercule's line is Ryan's and stays where it is; the scream's power-up shakes the ground and old Hercule is
+; pushed back a step. Entry 0 holds the hand-over of player 2's old Hercule to an actor (CoopCall 31) that a json edit used to add.
+; CINE (when cine.c is in): Gohan's charge, his dash at 17, the flurry, 18's blow in his back before the storm.
 sequence ch1_future_end
-  stockseq @083b7adc 0 3                 ; the androids' attack, Trunks finds Gohan
+  [0] script                             ; stock 0 re-staged
+        SetPlayerVisible 0
+        CoopCall 31, 0, 0, 0
+        JumpIfFalse H1
+        PushVarint 158
+        CoopCall 31, 1, 0, 0
+        CoopCall 31, 2, 0, 0
+        Step SpawnCharacterEntity
+        CoopCall 31, 3, 0, 0
+      H1:
+        PanCameraToPosition 104, 232, 3
+        WaitFrames 40
+        WhiteFlash 3
+        SpawnCharacterEntity 11, 200, 204
+        SpawnCharacterEntity 9, 244, 204
+        BeginCommandBatch
+        WalkToPosition 9, 244, 292
+        WalkToPosition 11, 200, 280
+        SetEntityFacing 11, 2                 ; 18 looks away
+        CommitCommandBatch
+        WaitFrames 40                         ; a held look
+        SetEntityFacing 11, 0
+        WaitFrames 10
+        BeginCommandBatch                     ; the storm: eight blasts from both sides, each a hit
+        NPCFireKiBlastAtEntity 9, 54, 120
+        EntityWaitFrames 9, 34
+        NPCFireKiBlastAtEntity 9, 54, 120
+        EntityWaitFrames 9, 30
+        NPCFireKiBlastAtEntity 9, 54, 120
+        EntityWaitFrames 9, 22
+        NPCFireKiBlastAtEntity 9, 54, 120
+        EntityWaitFrames 11, 18
+        NPCFireKiBlastAtEntity 11, 54, 120
+        EntityWaitFrames 11, 32
+        NPCFireKiBlastAtEntity 11, 54, 120
+        EntityWaitFrames 11, 26
+        NPCFireKiBlastAtEntity 11, 54, 120
+        EntityWaitFrames 11, 20
+        NPCFireKiBlastAtEntity 11, 54, 120
+        PushByte 8
+        PushToAltStack
+      hit:
+        EntityWaitTouchPlayer 54
+        StackRand 54, 34, 3
+        Add
+        PlaySFX
+        PlayDamageEffect 54
+        SetEntityAnimationNoWait 54, 2
+        LoopOrJump hit
+        ScreenShake 0, 2, 40
+        ScreenShake 0, 4, 40
+        ScreenShake 0, 7, 50
+        CommitCommandBatch
+        PlaySFX 54, 20                        ; the stock ending: the explosions round him, the flash, he lies in the water
+        EntitySetVelocity 54, 16, 8
+        EntityWaitFrames 54, 2
+        EntitySetVelocity 54, -8, -16
+        EntityWaitFrames 54, 2
+        EntitySetVelocity 54, 12, 0
+        EntityWaitFrames 54, 2
+        EntitySetVelocity 54, -16, 8
+        EntityWaitFrames 54, 2
+        EntitySetVelocity 54, 0, 0
+        PlayAudioBlocking 20, 10
+        WhiteFlash 10
+        PlayMusic 22
+        SetEntityAnimation 54, 3
+        DespawnEntity 54
+        FindCharacterEntity 0
+        WaitFrames 50
+        SetEntityFacing 9, 1                  ; 17 turns away first
+        WaitFrames 30
+        SetEntityFacing 11, 1
+        PlayAudio 26
+        BeginCommandBatch
+        FlyToPosition 9, 260, 190
+        EntityWaitFrames 11, 10
+        FlyToPosition 11, 190, 190
+        CommitCommandBatch
+        DespawnEntity 9
+        DespawnEntity 11
+        PanCameraToPosition 104, 288, 2
+        SetActiveEntity 0
+        WalkToPosition 0, 272, 392
+        WalkToPosition 0, 256, 352
+        WalkToPosition 0, 208, 360
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H2
+        WalkToPosition 158, 240, 376
+        SetEntityFacing 158, 2
+      H2:
+        SetEntityFacing 0, 0
+        WaitFrames 150
+        PlayAudio 50
+        END
+  stockseq @083b7adc 1 3                 ; Trunks finds Gohan; "GOHAN!!!!!!!!!!!!!"
   text 126 "#T-Trunks...  They're gone.\x0bLet's get out of here before those two come back!"
-  stockseq @083b7adc 4                   ; "Present day Earth...", Gohan's chapter begins
+  [5] script                             ; stock 4: the scream becomes his first Super Saiyan: the ground shakes under the stock power-up, old Hercule is pushed back a step
+        PlayAudio 55
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse a
+        BeginCommandBatch
+        SetEntityAnimation 0, 24
+        ScreenShake 158, 3, 24
+        ScreenShake 158, 7, 30
+        GlideToPosition 158, 258, 382, 250
+        CommitCommandBatch
+        Jump b
+      a:
+        SetEntityAnimation 0, 24
+      b:
+        WarpToMapNoEntities 1, 6, 1, 120, 80
+        PlayAudio 23
+        StopAudio 55
+        StopAudio 39
+        WaitFrames 180
+        UploadSpritePalette
+        PlayMusic 10
+        END
+  stockseq @083b7adc 5                   ; "Present day Earth...", Gohan's chapter begins
 end
 
 ; map 0 record 0 (Future Gohan) talk: the knock-out, then Hercule's protest and Gohan's answer (Ryan, 2026-11-01)

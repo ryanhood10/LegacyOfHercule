@@ -663,6 +663,103 @@ peek 0x03001FDC 1
 echo EXPECT map zone 2 area 1\b
 map
 ents
+echo === death 1p
+load menu.ss
+p2 off
+maptest 1
+frames 30
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x201
+poke32 0x0203FD54 0x1b00110
+poke32 0x0203FD08 5
+frames 330
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+shot c1_death1p_androids
+frames 200
+shot c1_death1p_storm
+frames 300
+shot c1_death1p_lies
+frames 300
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+frames 200
+shot c1_death1p_trunks
+mash 7 120
+shot c1_death1p_scream
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 22\b
+map
+ents
+echo === death 2p
+load menu.ss
+p2 0
+maptest 1
+frames 30
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x201
+poke32 0x0203FD54 0x1b00110
+poke32 0x0203FD08 5
+frames 330
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+shot c1_death2p_androids
+frames 200
+shot c1_death2p_storm
+frames 300
+shot c1_death2p_lies
+frames 300
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+frames 200
+shot c1_death2p_trunks
+mash 7 120
+shot c1_death2p_scream
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 22\b
+map
+ents
 echo === visit alone
 load menu.ss
 p2 off

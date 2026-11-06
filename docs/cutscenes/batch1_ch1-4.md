@@ -148,6 +148,14 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   (`FindCharacterEntity 0`), keep that exact step; the first frames show the HP bars; the reference film had Piccolo
   as player 1 (Map Test), so Trunks' own animation 24 was not seen: film it from a real prologue start.
 - **Size L** (M without beats 3-4: the androids in view, the volley, the reordered line).
+- **Built 2026-11-06 (`nb-cs1`), the M version with script steps; beats 3-4 (Gohan's charge, the flurry, 18's blow) are marked CINE.**
+  The view sits at (104, 232), 56 px above the stock's: the androids' ground is in it and the players, who wait at the trigger, are not
+  (the stock had Trunks stand in view watching). 17 and 18 walk in from the top, 18 looking away, a held look; eight blasts from both
+  fall as one batch (each a hit: the stock sound, the red flinch) with the shake growing 2, 4, 7; the stock ending; 17 turns away, then
+  18, and they fly off the top; the view comes down for Trunks' walk. **Old Hercule's line stays where Ryan put it** (the research
+  wanted it before the scream: not done). The stock transformation (entry 4) gets a rising shake and old Hercule slides back a step.
+  The hand-over of player 2's old Hercule moved from a json edit into the restated entry 0. The HP bars in the research film's first
+  frames come from the test warp's fade, not the scene. Flags and party after it: identical (one and two players).
 
 ### 1.5 Krillin's visit: touch up (S)
 

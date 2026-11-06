@@ -69,6 +69,30 @@ for p1 in (GOHAN, KRILLIN):
     s.end_scene(200)
     s.on_map(2, 1)
 
+# Gohan's death (zone 1 area 2; the cutscene pass of 2026-11-06): the androids walk into view (9 and 11 stand while the blasts fall), fly off
+# (none after), old Hercule's actor (158) beside Trunks, the scene runs on into the present (zone 2 area 22). Alone (the companion) and two players.
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.out(f"echo === death {n}", "load menu.ss", "p2 0" if two else "p2 off", "maptest 1", "frames 30", "poke8 0x0203F000 3", "poke8 0x0203F0A0 24", "flags +466")
+    if two:
+        s.out("poke8 0x0203FF84 5")
+    s.out("deref TBL 0x0800959C")
+    s.warp(1, 2, 272, 432, 330)
+    s.actors(s9=1, s11=1, s158=1)
+    s.shot(f"c1_death{n}_androids")
+    s.out("frames 200")
+    s.shot(f"c1_death{n}_storm")
+    s.out("frames 300")
+    s.shot(f"c1_death{n}_lies")
+    s.out("frames 300")
+    s.actors(s9=0, s11=0, s158=1)
+    s.out("frames 200")
+    s.shot(f"c1_death{n}_trunks")
+    s.press(7, 120)
+    s.shot(f"c1_death{n}_scream")
+    s.end_scene(200)
+    s.on_map(2, 22)
+
 only_gohan = [f"poke8 {flags_of(i)} 0" for i in range(1, 9)] + ["frames 30"]
 s.begin("visit alone", GOHAN, None, "+4", only_gohan)
 s.warp(2, 22, 136, 170, 150)
