@@ -108,8 +108,8 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 7.2 (the first blow: `nb-cs4`), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
-| built in part | 7.6 (the knee, Cell's turns and exit; not the two misses) |
+| built | 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built in part | - |
 | not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
@@ -757,7 +757,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   walks over to stand above him for "How gracious of you!"; Trunks gets up for "For your information, he's training to defeat
   you!"; Cell turns away (left, then his back) before "No contest?  No contest!  Ahhh!!!  A tournament!" and back to him for
   the rules; after "Bring me Goku!" he is gone upward in a blink (a dash without afterimage), then the stock flight out.
-- **Not built: the two misses (beat 2) and STRIKE-H for Krillin's throw (beat 1).** The misses were built and taken out: with Cell
+- **The two misses built 2026-11-06 (`nb-cs4`):** after "One hit..." Trunks steps up and swings; Cell is at his left in a blink (`CoopCall 37, 4, 1, 26`, in a batch with Trunks' punch, 6); Trunks turns and kicks (7) as Cell is back on his spot (`CoopCall 37, 3, 248, 280`), facing down; Trunks walks back to his mark (248, 320). The camera follows the pair for the two dashes (`CoopCall 37, 13`): Cell's spot is above the view's safe band and a fitted dash put him on Trunks. **The "second Vegeta" was found:** it is the map's own lying Vegeta, decoration 1 (the stock body the end's `FindEntityByType 1` hides), at about (248, 264) right under Cell's spot, so Cell's body hid it until he moved; the 2026-11-05 staging's actor at (296, 262) is his body here. Entry 1 hides the decoration behind its fade now. Beat 1 (Krillin's throw as STRIKE-H) is left hand-rolled: a Cine knock-back flies straight away from Cell, onto Trunks below him; the stock glide past Trunks reads. `cell_staging` checks the moves all ended (`cine_last(4)`). Flags, party and player 2 after the scene equal the build before (one and two players). Earlier note: the misses were built and taken out: with Cell
   standing just below Trunks (a dash to 22 px under him) a second picture of Vegeta's lying body was drawn over Trunks' head for
   as long as Cell stood there (filmed; with and without the dash's afterimage, with and without a punch on Trunks). Cause not
   found (OBJ tiles of the lying actor 137?); told to the coordinator. A raw `SetEntityAnimation 0, 6` on the ascended Trunks

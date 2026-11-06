@@ -84,6 +84,7 @@ def zone12(tag, p1, p2, shots):
         out("frames 60")
         presses(f"{tag}_f", 8, 60)
     scene_done(f"{tag}_end")
+    cine_last(4)                                    # 7.6: Trunks' two misses and Cell's exit in a blink all played and ended
     expect("map zone 12 area 6", "map")
     expect("[0-9a-f]+: [89a-f][0-9a-f]", "peek8 FLAGS+18 1")   # flag 151, Perfect Cell's end
     expect("0203f000: 03", "peek8 0x0203F000 1")

@@ -209,6 +209,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_V_end
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -278,6 +283,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_T_end
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -501,6 +511,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_VT_end
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
@@ -577,6 +592,11 @@ stepz 0x03001FDC 150
 frames 120
 shot cs_TV_end
 ents
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 12 area 6
 map
 echo EXPECT [0-9a-f]+: [89a-f][0-9a-f]
