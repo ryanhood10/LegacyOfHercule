@@ -1,7 +1,8 @@
 r"""Write tools/headless/staging_ch5.txt, staging_ch6.txt and staging_ch8.txt: chapters 5, 6 and Cooler per lineup (ch5_lookout, ch6_basement, ch8_cooler).
 usage: python tools/headless/staging_ch568_gen.py     (the scripts are committed; rerun this after changing them here)
-Chapter 5: Kami defers, whoever is selectable (the fade makes Piccolo player 1; Hercule's actor when nobody plays him), then Kami's boost and
-the fusion. Chapter 6: Goku wakes, Krillin's actor comes up only when nobody plays him. Cooler: the three openings alone (no servant) and with
+Chapter 5: Kami defers, whoever is selectable (the fade makes Piccolo player 1; Hercule only when played), then Kami's boost and
+the fusion (Hercule kept there for the plot: Kami draws out his potential). Chapter 6: the basement and Goku's waking, only who is played: no
+Krillin NPC or actor alone as Trunks, no Trunks actor alone as Krillin (Ryan, 2026-11-05). Cooler: the three openings alone (no servant) and with
 two players (the servant's actor, then his twin on the same sprite 166)."""
 from staging_lib import *
 
@@ -12,6 +13,7 @@ for p1, p2 in ((PICCOLO, None), (HERCULE, None), (KRILLIN, None), (GOHAN, None),
     s.warp(9, 6, 112, 224, 300)
     s.press(26, 110)
     s.shot(f"c5_{n}_stay")
+    s.actors(s72=int(HERCULE in (p1, p2) and p2 is not None))   # alone the fade makes Piccolo player 1: Hercule is not there
     s.out("ents")
     s.end_scene(200)
     s.on_map(2, 20)
@@ -27,7 +29,20 @@ for p1, p2 in ((TRUNKS, None), (GOHAN, None), (TRUNKS, GOHAN), (GOHAN, TRUNKS)):
 s.write("staging_ch5.txt")
 
 s = Script("staging_ch568_gen.py")
-for p1, p2, s76 in ((TRUNKS, None, 1), (KRILLIN, None, 0), (TRUNKS, KRILLIN, 0), (KRILLIN, TRUNKS, 0)):
+for p1, p2 in ((TRUNKS, None), (KRILLIN, None), (TRUNKS, KRILLIN), (KRILLIN, TRUNKS)):
+    n = lineup_name(p1, p2)
+    t128 = 1 if p1 == TRUNKS else "[01]" if p2 == TRUNKS else 0   # a played Trunks shows 128 himself (player 2's entity may be away after a warp)
+    for tag, area, x, y, shots in (("larva", 62, 128, 240, 4), ("computer", 63, 200, 320, 6)):
+        s.begin(f"{tag} {n}", p1, p2, "+136 +466")
+        s.warp(8, area, x, y, 150)
+        s.actors(s76=0, s128=t128)
+        for i in range(shots):
+            s.press(1, 120)
+            s.shot(f"c6_{n}_{tag}{i}")
+        s.actors(s76=0, s128=t128)
+        s.end_scene(150)
+        s.actors(s76=0, s128=t128)
+for p1, p2, s76 in ((TRUNKS, None, 0), (KRILLIN, None, 0), (TRUNKS, KRILLIN, 0), (KRILLIN, TRUNKS, 0)):
     n = lineup_name(p1, p2)
     s.begin(f"wakes {n}", p1, p2, "+141")
     s.warp(11, 3, 136, 100, 100)

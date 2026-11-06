@@ -1,189 +1,113 @@
 ; Chapter 6 before the Time Chamber (docs/story.md section 0 item 6, section 4e "After the fight"),
 ; applied by ch6_basement.json. Trunks and Krillin are the locked pair for Dr. Gero's lab basement:
-; player 1 Trunks, player 2 Krillin (Gingertown's end, ch5_lookout, locks them). Stock Krillin walks
-; beside Trunks as an NPC (sprite 76); in co-op player 2 is Krillin, so every script below leaves the
-; NPC out when player 2 is there (CoopCall 5) and keeps the stock walk in single-player. His lines
-; stay (portrait 73). At Kame House Piccolo is a scene actor (his selectable bit stays clear after the
-; lab), Goku wakes as stock, and Krillin stays home when Trunks flies to the Lookout.
+; player 1 Trunks, player 2 Krillin (Gingertown's end, ch5_lookout, locks them). The stock Krillin NPC that walked
+; beside Trunks is gone (his lines are his only when he is played). At Kame House Piccolo is a scene actor (his selectable
+; bit stays clear after the lab), Goku wakes as stock, and Krillin stays home when Trunks flies to the Lookout.
+; Only who is played is in a scene (Ryan, 2026-11-05; docs/howto.md "Stage a scene" rule 2): alone as Trunks no Krillin (no NPC walk,
+; no actor at the lab's exit), alone as Krillin no Trunks; with two players both are the players. Krillin's stock lines play only
+; when someone plays him; the exchange at the computer only with both; his "We better get out" and "head back to Roshi's" go to
+; player 1 (speaker 1) without his name when he is not there (drafts). CoopCall 22 op 4: 1 = played.
 
 ; ---- zone 8 area 61: the plans room -------------------------------------------------------------
 
 sequence ch6_basement_enter
   script
-        CoopCall 22, 1, 6, 0                  ; nobody plays Krillin: his stock walk
-        JumpIfFalse L1
-        TriggerMapEvent 0
-        WalkToPosition 76, 208, 280
-        WalkToPosition 76, 168, 264
-      L1:
-        CoopCall 22, 1, 3, 0                  ; nobody plays Trunks (alone as Krillin): Trunks walks in beside him
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 208, 330
-        WalkToPosition 128, 208, 280
-        SetEntityFacing 128, 1
-      T1:
         SetStoryFlag 137
 end
 
 ; ---- zone 8 area 62: Cell's larva ----------------------------------------------------------------
 
 sequence ch6_larva
-  script                                 ; stock entry 0, Krillin's NPC only without player 2
+  [0] script                             ; stock entry 0 without Krillin's NPC
         SetPlayerVisible 0
         WalkToPosition 0, 128, 208
-        CoopCall 22, 1, 6, 0
-        JumpIfFalse L1
-        SpawnCharacterEntity 76, 128, 340
-        WalkToPosition 76, 128, 240
-        WalkToPosition 76, 160, 200
-        SetEntityAnimation 76, 4
-      L1:
-        CoopCall 22, 1, 3, 0
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 128, 340
-        WalkToPosition 128, 128, 240
-        WalkToPosition 128, 96, 200
-        SetEntityFacing 128, 1
-      T1:
         PanCameraToPosition 16, 80, 2
         PlayAudio 50
-  stockseq @083db220 1 3                 ; "Cell in his larval form", Krillin: "even mine!", "I better destroy it"
-  script                                 ; stock entry 4: the blast (Trunks' actor fires it when he is one), area 64
-        CoopCall 22, 2, 128, 0
-        JumpIfFalse T0
-        BeginCommandBatch
-        NPCFireKiBlast 128, 136, 144, 100
-        SpawnDustCloud 128, 136, 144
-        CommitCommandBatch
-        Jump T9
-      T0:
+  [1] stockseq @083db220 1 1             ; "%s: This has to be Cell in his larval form."
+  [2] script                             ; Krillin played: "even mine!" (next 3), else 4
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 3
+        END
+      a:
+        PushByte 4
+        END
+  [3] stock @083db0d8                    ; Krillin: "It has Goku's cells... and even mine!"
+  [4] stock @083db14c                    ; "I better destroy it"
+  [5] script                             ; stock entry 4: player 1's blast, area 64
         BeginCommandBatch
         NPCFireKiBlast 0, 136, 144, 100
         SpawnDustCloud 0, 136, 144
         CommitCommandBatch
-      T9:
         PlayAudio 20
         FadeToWhite 10
         WarpToMapNoEntities 8, 64, 1, 128, 208
-        CoopCall 22, 1, 6, 0
-        JumpIfFalse L1
-        TriggerMapEvent 0
-        SetEntityFacing 76, 1
-      L1:
-        CoopCall 22, 1, 3, 0
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 104, 208
-        SetEntityFacing 128, 1
-      T1:
         PanCameraToPosition 16, 80, 10
         SetEntityFacing 0, 1
         WhiteFadeOut 20
-  stockseq @083db220 5 6                 ; "Now let's go find Dr. Gero's master computer.", flag 138
-  script                                 ; Trunks' actor goes on ahead (he comes in behind at the computer)
-        CoopCall 22, 2, 128, 0
-        JumpIfFalse T1
-        WalkToPosition 128, 104, 120
-        DespawnEntity 128
-      T1:
+  [6] stockseq @083db220 5 6             ; "Now let's go find Dr. Gero's master computer.", flag 138
 end
 
 ; ---- zone 8 area 63: the master computer and the self-destruct -----------------------------------
 
 sequence ch6_computer
-  script                                 ; stock entry 0
+  [0] script                             ; stock entry 0 without Krillin's NPC
         WalkToPosition 0, 216, 256
         PanCameraToPosition 64, 96, 2
-        CoopCall 22, 1, 6, 0
-        JumpIfFalse L1
-        TriggerMapEvent 0
-        WalkToPosition 76, 248, 240
-        SetEntityFacing 76, 2
-      L1:
-        CoopCall 22, 1, 3, 0
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 216, 368
-        WalkToPosition 128, 184, 256
-        SetEntityFacing 128, 1
-      T1:
         PlayAudio 50
-  stockseq @083db43c 1 4                 ; "Dr. Gero's master computer", Krillin: "blast it"
-  script                                 ; stock entry 5: flags 139, 140, the blast, area 65
+  [1] stockseq @083db43c 1 1             ; "%s: This must be Dr. Gero's master computer."
+  [2] script                             ; both played: Krillin's question and the plan (next 3), else the blast (6)
+        CoopCall 22, 4, 3, 0
+        CoopCall 22, 4, 6, 0
+        And
+        JumpIfFalse a
+        PushByte 3
+        END
+      a:
+        PushByte 6
+        END
+  [3] stock @083db2ac                    ; Krillin: "You mean this is the thing that created Cell?"
+  [4] stock @083db2e8                    ; "Yeah."
+  [5] stock @083db2f4                    ; Krillin: "Why don't we blast it?"
+  [6] script                             ; stock entry 5: flags 139, 140, player 1's blast, area 65
         SetStoryFlag 139
         SetStoryFlag 140
-        CoopCall 22, 2, 128, 0
-        JumpIfFalse T0
-        BeginCommandBatch
-        NPCFireKiBlast 128, 184, 192, 100
-        SpawnDustCloud 128, 184, 192
-        CommitCommandBatch
-        Jump T9
-      T0:
         BeginCommandBatch
         NPCFireKiBlast 0, 184, 192, 100
         SpawnDustCloud 0, 184, 192
         CommitCommandBatch
-      T9:
         PlayAudio 20
         FadeToWhite 10
         WarpToMapNoEntities 8, 65, 1, 216, 256
-        CoopCall 22, 1, 6, 0
-        JumpIfFalse L1
-        TriggerMapEvent 0
-      L1:
-        CoopCall 22, 1, 3, 0
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 184, 256
-        SetEntityFacing 128, 1
-      T1:
         SetEntityFacing 0, 1
         WhiteFadeOut 20
-  stockseq @083db43c 6 8                 ; WARNING!  SELF-DESTRUCT; Krillin: "We better get out of here!"
-  script                                 ; stock entry 9: the actors run out first
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse L1
-        WalkToPosition 76, 208, 344
-        WalkToPosition 76, 208, 400
-        DespawnEntity 76
-      L1:
-        CoopCall 22, 2, 128, 0
-        JumpIfFalse T1
-        WalkToPosition 128, 208, 344
-        WalkToPosition 128, 208, 400
-        DespawnEntity 128
-      T1:
+  [7] stock @083db374                    ; WARNING!  SELF-DESTRUCT
+  [8] script                             ; stock entry 7; Krillin played: his line (next 9), else player 1's (10)
+        PlayAudioBlocking 20, 80
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 9
+        END
+      a:
+        PushByte 10
+        END
+  [9] stock @083db3c0 -> 11              ; Krillin: "We better get out of here!"
+  [10] text 1 "Destroying the computer set off some sort of self-destruct!\x0bWe better get out of here!"
+  [11] script                            ; stock entry 9
         SetActiveEntity 0
 end
 
 ; ---- zone 8 area 48: out of the lab, "head back to Master Roshi's Island" -------------------------
 
-; the stock actor 76 stands here after the blast (flag 140, not 141): not when player 2 is Krillin
+; the stock actor 76 stood here after the blast (flag 140, not 141): never now (nobody plays him: he is not there; played, he is a player)
 script ch6_a48_krillin_cond
-        StackTestStoryFlag 140
-        StackTestStoryFlagNot 141
-        And
-        CoopCall 22, 1, 6, 0
-        And
+        PushByte 0
 end
 
 sequence ch6_lab_exit
-  script                                 ; stock entry 0
+  [0] script                             ; stock entry 0, without Krillin's actor; Krillin played: his line (next 1), else player 1's (2)
         SetPlayerVisible 0
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse L1
-        BeginCommandBatch
         WalkToPosition 0, 152, 304
-        SetEntityAnimation 76, 4
-        CommitCommandBatch
-        Jump L2
-      L1:
-        WalkToPosition 0, 152, 304
-      L2:
-        CoopCall 22, 1, 3, 0                  ; Trunks beside him when nobody plays Trunks
-        JumpIfFalse T1
-        SpawnCharacterEntity 128, 184, 360
-        WalkToPosition 128, 184, 304
-        SetEntityFacing 128, 1
-      T1:
         SetEntityFacing 0, 1
         PlayAudioBlocking 30, 120
         PlayAudio 20
@@ -193,33 +117,23 @@ sequence ch6_lab_exit
         WaitFrames 60
         SetEntityFacing 0, 3
         WaitFrames 60
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse L3
-        SetEntityFacing 76, 2
-      L3:
         PlayAudio 50
-  stock @083d86bc                        ; Krillin: "head back to Master Roshi's Island?"
-  script                                 ; stock entry 2
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 1
+        END
+      a:
+        PushByte 2
+        END
+  [1] stock @083d86bc -> 3               ; Krillin: "head back to Master Roshi's Island?"
+  [2] text 1 "Let's head back to Master Roshi's Island.\x0bMaybe Goku is getting better."
+  [3] script                             ; stock entry 2
         WaitFrames 60
-        CoopCall 22, 2, 76, 0
-        JumpIfFalse L1
-        SetEntityFacing 76, 0
-        WaitFrames 60
-        PlayAudio 26
-        FlyToPosition 76, 184, 448
-        DespawnEntity 76
-      L1:
-        CoopCall 22, 2, 128, 0                ; Trunks' actor flies off too (player 1 follows on the world map)
-        JumpIfFalse T1
-        PlayAudio 26
-        FlyToPosition 128, 184, 448
-        DespawnEntity 128
-      T1:
         SetStoryFlag 141
         PlayAudio 62
         ReloadMap
-  stock @083d8758                        ; Journal Updated!
-  script                                 ; stock entry 4, without Piccolo's selectable bit (a scene actor
+  [4] stock @083d8758                    ; Journal Updated!
+  [5] script                             ; stock entry 4, without Piccolo's selectable bit (a scene actor
         PanCameraToPosition 80, 368, 3   ; at Kame House; the Time Chamber's end makes him player 1)
         WaitFrames 120
         PlayAudio 47
@@ -232,18 +146,20 @@ sequence ch6_lab_exit
 end
 
 ; ---- zone 11 area 3: Goku wakes; Krillin stays at Kame House --------------------------------------
+; Trunks stays in this stock scene alone as Krillin: Goku takes him to the Lookout (the plot); Krillin's line only when he is played
 
 sequence ch6_goku_wakes
-  stockseq @083e42f4 0 36                ; Piccolo and Chi-Chi, Goku wakes, "Kamiccolo", "Meet me at Kami's Lookout."
-  script                                 ; nobody plays Krillin: he comes up to say it
-        CoopCall 22, 1, 6, 0
-        JumpIfFalse K1
-        SpawnCharacterEntity 76, 184, 200
-        WalkToPosition 76, 160, 168
-        SetEntityFacing 76, 1
-      K1:
-  text 73 "!KRILLIN: I'll stay here and keep an eye on things, Trunks.\x0bIf the Androids show up, somebody has to warn everybody!"
-  script                                 ; stock entry 37, with Krillin's selectable bit cleared
+  [0] stockseq @083e42f4 0 36            ; Piccolo and Chi-Chi, Goku wakes, "Kamiccolo", "Meet me at Kami's Lookout."
+  [37] script                            ; Krillin played: he stays (next 38), else 39
+        CoopCall 22, 4, 6, 0
+        JumpIfFalse a
+        PushByte 38
+        END
+      a:
+        PushByte 39
+        END
+  [38] text 73 "!KRILLIN: I'll stay here and keep an eye on things, Trunks.\x0bIf the Androids show up, somebody has to warn everybody!"
+  [39] script                            ; stock entry 37, with Krillin's selectable bit cleared
         WalkToPosition 60, 88, 152
         SetEntityFacing 60, 2
         WaitFrames 60
@@ -277,5 +193,5 @@ sequence ch6_goku_wakes
         SetPlayerVisible 1
         SetBgLayerPriority 0, 1
         PlayAudio 62
-  stock @083e42dc                        ; Journal Updated!
+  [40] stock @083e42dc                   ; Journal Updated!
 end
