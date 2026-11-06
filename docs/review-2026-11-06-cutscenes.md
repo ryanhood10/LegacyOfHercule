@@ -4,7 +4,7 @@ Your brief, while you were away: captivating cutscenes for the game and for your
 whoever talks, blasts and fights that are not basic, true to Dragon Ball Z, nothing cheesy, dynamic by who plays,
 improving the stock scenes rather than replacing them; and better sprites, especially the ones we made.
 
-Everything here is merged, pushed and tested headless: the full regression passes (99 scripts) and every changed scene
+Everything here is merged, pushed and tested headless: the full regression passes and every changed scene
 was filmed in its lineups and looked at. **Nothing has been played in real time and no sound has been heard.** Lines:
 no dialogue was added or reworded in this pass; stock lines and yours are word for word.
 
@@ -38,6 +38,12 @@ no dialogue was added or reworded in this pass; stock lines and yours are word f
 - **The road's end, "Who's next?":** the anime's fight the stock hid in a black fade, about 13 seconds, silent:
   Vegeta's charge and exchange with 18, and the others.
 - **The lab door:** weight on your approved flow (17's blast throws Gero; 13's blasts land in dust).
+- **Finished afterwards:** Goku's fall to the virus (an exchange he wins first, a jolt at each flinch, a knee before the
+  collapse), the training talk (Gohan's blow puts Trunks on a knee; old Hercule backs off and winds up at the boulder),
+  the knock-out (the chop has weight; your two lines word for word), Krillin's visit, the forest spirit (silence and a
+  rumble before the white), Goku's arrival (everyone looks up, a flash, dust on the pod), the mansion deal (Hercule
+  walks round Piccolo looking for wires), King Triceratops (he stamps and steps in), Gero's stages, the road's
+  aftermath (Vegeta's power bursts as he takes off, Piccolo shakes the ground).
 - **Small ones:** Amenbo Island (20's power, a volley at the city), the zone 7 cutaway (Goku's power shown before the
   gold), Gero's generators (13 lands with dust and a shake), the lab cutaway (a shake as 17 crushes the controller),
   the road (Vegeta lands hard).
@@ -58,7 +64,12 @@ no dialogue was added or reworded in this pass; stock lines and yours are word f
 - **Broly:** the basin empty, the ground shudders, the camera finds him powering up with his back turned; his rage at
   his father's body in green light; his end (his power tears him apart, a knee, the white). *For your review:* Vegeta
   drops to one knee at Broly's power and gets up on his own; drop that one commit to remove it.
-- Not built (the developer stopped): the town blown away (5.7), a few player-2 moves, Cooler's charge.
+- **Finished afterwards** (a fourth developer took up what the stopped ones left): Gingertown (Cell turns slowly with his
+  back to them, his tail up on the hiss, Piccolo powers up, the town blown flat, the crater held; a real crash with
+  Hercule as player 1 and Piccolo as player 2 found and fixed there), Cooler powers up before his fight, Vegeta's first
+  blow on Semi-Perfect Cell (a blink and a heavy body blow, Cell on a knee), Trunks' two misses on Perfect Cell, the
+  island's arrival (the ground trembles first, Piccolo's volley, Cell's blink and one blow lays him out, 16 throws
+  Cell, Goku's Instant Transmission takes player 2 too), Hercule cowering at 16's stomp at Kame House.
 
 **The Cell Games, the post-game, the summit**
 - **Fixed (they were wrong pictures):** the talk show starred whoever player 1 was (Piccolo's body under "HERCULE: OH
@@ -103,3 +114,6 @@ no dialogue was added or reworded in this pass; stock lines and yours are word f
 3. **Best Shorts, by the developers:** Trunks against Frieza (about 35 s), Perfect Cell (about 35 s, same whoever plays),
    16's head into Super Saiyan 2 (about 30 s), the road's end (13 s).
 4. **Sound:** nobody has heard the new impacts and power-ups in place.
+5. **Still not built** (each scene's note in `docs/cutscenes/` says why): the five fighters getting up after the road's
+   fight (they are map decorations), the rest of Goku's arrival talk, two small beats in the forest and the jungle,
+   Hercule hopping behind Piccolo, and the batch 3 touch-ups listed in its research file.
