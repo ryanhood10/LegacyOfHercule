@@ -2559,7 +2559,10 @@ _Static_assert(sizeof(TnyCp) <= 0x20, ".tny.cp holds at most 0x20 bytes (docs/id
 static TnyCp cp TNY_SECTION("cp") __attribute__((used));
 static void cp_tick(void) {
     if (cp.magic != CP_MAGIC || !cp.after) return;
-    if (eng.t_nofight) { cp.t = 0; return; }
+    // a fight's frames are counted; a hit-stop (the stock hurt event's one-frame modal, FUN_08008660, which sets the scene
+    // flag and so t_nofight) only pauses the count: it reset it before, and an opponent landing a hit every < `after` frames
+    // kept the fight from ever being decided (tny_n32's whole bracket, on any build whose timing had the AI hit early)
+    if (eng.t_nofight) { if (eng.phase != P_MATCH && eng.phase != P_DUEL) cp.t = 0; return; }
     if (++cp.t < cp.after || coop2.cmd) return;
     cp.t = 0;
     if (eng.phase == P_DUEL) { coop2.cmd_arg = 2; coop2.cmd_arg2 = cp.duel; }

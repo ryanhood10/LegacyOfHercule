@@ -1275,6 +1275,8 @@ python tools/headless/st_expect.py tools/headless/tny_bracket.txt build/<dir>/lo
 
 **A timing-sensitive neighbour (found 2026-11-05):** `staging_ch9`'s bunker blocks (KA, AK) expect no scene 30 frames after the bunker's intro, while the androids already fight; a few more cycles in every frame (the trophy hop's check in the frame tick, before it moved under `eng.npose`) moved the first hit enough for a pick-up box to open there. The same padding elsewhere did not. If those two blocks fail after an unrelated change, look at their `ka` shots before looking for a bug.
 
+**Test command 40 and hit-stops (found 2026-11-05, on the merged head):** a player's hit-stop (the stock hurt event's one-frame modal, `FUN_08008660`) sets the scene flag, so `t_nofight` blips; test command 40 reset its count on every blip, so once the AI landed a hit within each `arg` frames a fight was never decided and an idle team was worn down (`tny_n32`'s whole bracket: a player down in round 4). Whether the AI hits that early is chaos (on the bracket branch's own ROM, starting the same block 1 or 2 frames later did it too). The count now pauses through a hit-stop. `tny_n32`'s lost first fight is decided after 120 frames (was 60): `stepz` on `t_nofight` looks every 100 frames and caught a 60-frame fight only while the resets stretched it.
+
 ```
 python tools/headless/tny_scenes_gen.py
 python tools/headless/staging_run.py tools/headless/tny_scenes.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6

@@ -309,7 +309,9 @@ for seed in (47, 53, 61):
     out(f"shot r{seed}_fight", "map")
 
 out("echo === The team loses in the first round: the rest of the bracket plays to a champion, nobody's prize")
-to_size_menu(4, LEGEND, 23, "l", decide=(60, 1))
+# the lost fight lasts 120 frames: `stepz` looks for it every 100 (with 60 it was caught only while hit-stops reset test command
+# 40's count, which they no longer do: docs/testing.md "Tournament scenes")
+to_size_menu(4, LEGEND, 23, "l", decide=(120, 1))
 down(2)
 p1(1)
 picks()
