@@ -274,8 +274,11 @@ sequence ch4_lab
   script                                 ; 13 turns to Gero and 18
         SetEntityFacing 165, 2
   stockseq @083d9f5c 11 24               ; 18 and Gero; 17 takes the controller
-  script                                 ; 13 takes a step back
+  script                                 ; the crushed controller: a shake; 13 takes a step back
+        BeginCommandBatch
+        ScreenShake 9, 4, 12
         WalkToPosition 165, 300, 184
+        CommitCommandBatch
         SetEntityFacing 165, 2
   stockseq @083d9f5c 25 27               ; "You destroyed it!", "not going to put us to sleep again"
   script                                 ; 13 has seen what they are; he stays by Gero (he dies in the next scene, at the door)
