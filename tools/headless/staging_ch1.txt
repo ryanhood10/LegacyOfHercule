@@ -836,4 +836,80 @@ map
 ents
 echo EXPECT 0203ff84: 06
 peek8 0x0203FF84 1
+echo === training 1p
+load menu.ss
+p2 off
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+key 1 6
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 150
+shot c1_train1p_knee
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+mash 6 100
+shot c1_train1p_back
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 1\b
+map
+ents
+echo === training 2p
+load menu.ss
+p2 0
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+key 1 6
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 150
+shot c1_train2p_knee
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+mash 6 100
+shot c1_train2p_back
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 1\b
+map
+ents
 echo ALIVE
