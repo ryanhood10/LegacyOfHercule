@@ -701,7 +701,8 @@ entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the 
 ## Time Chamber (headless, 2026-11-05, branch `nb-chamber`; `docs/time-chamber.md` 12)
 
 ```
-python -I tools/headless/chamber_gen.py                     # writes chamber_gate / chamber_tiers / chamber_room / chamber_rooms(_plain) / gohan_ssj1 / chamber_perf .txt
+python -I tools/headless/chamber_gen.py                     # writes chamber_run(_plain) / chamber_gate / chamber_tiers / chamber_room / chamber_rooms(_plain) / gohan_ssj1 / chamber_perf .txt
+python tools/headless/staging_run.py tools/headless/chamber_run.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
 python tools/headless/staging_run.py tools/headless/chamber_room.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
 python tools/headless/staging_run.py tools/headless/chamber_rooms.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
 python tools/headless/staging_run.py tools/headless/chamber_rooms_plain.txt build/<dir0>/log2-coop.gba build/<dir0>/hl/menu.ss --out build/<dir0>/hl   # a BUU=0 build
@@ -726,6 +727,20 @@ machine `chamber_rooms` (eleven cases, 356 checks) ran in about a minute.
 - **Test command 13 kills every standing regular enemy** on any map (`wave_clear_all`), not only in the old rounds: the
   airship's crew.
 
+- **Ryan's first play (2026-11-05, `nb-chamber2`, `docs/time-chamber.md` 13):** `chamber_run.txt` (the opening in one and two players,
+  its skip by Start and by player 2's B in a room's view, the training's end after Popo; `chamber_run_plain.txt` the same on a `BUU=0`
+  build, not in regfull). **A new run plays the opening** when flag 510 is clear: `door()` sets it first with test command 48 op 7
+  (`door(opening=True)` leaves it clear), and op 0 (the lights) sets it too. **Test commands wait while a scene runs**: read the open
+  area's scene from RAM (`find CH 0x4348414D`, `peek CH+0x30 1`: kind | 0x40 running | 0x80 skip, then the bits) and the last prize
+  at `CH+0x27`. The rooms' views: `mashmap 15 <area> 40` steps through the boxes to each (no player is built there: `map` shows
+  -1, -1). **The lever's cut-away** now opens on the room's entrance (the camera's view top-left at `deref CAM 0x081DA974`,
+  `peek CAM+0x1C 2`) and travels to the gate (908, 280): wait for the light with `stepz D+0x10 10`; through the sixth's line use
+  `mashmap` back to the room; the prize's box is up 80 frames after the room's load. **The door home's question:** player 1 at
+  (1012, 1262), Up 40 frames, `quiet()` first (the refill frozen, test command 13): B or A only once the text is out (about 120
+  frames: a press while it types only speeds it). **The portal:** player 1 at (1028, 346), Up; it queues its own scene (a flash,
+  a white fade), so the hidden room's scene starts about 60 frames later than it did. Out of Popo's room after a win (flag 530) the
+  training's end plays: `stepz` through it. **The side rooms** (`chamber_rooms`): the doorways shut before the lever, then
+  each entered, its find (A, the item count, flags 531-533), the look, out again.
 - **Into the open area:** Map Test 263 with the wait's flags, test-warp to (96, 160), Up, A, `waitmap 15 18`, then **260 frames**:
   the door's `FadeFromWhite` scene runs about 230 frames after the map changes, and a test warp (`COOP_CMD_WARP`) issued inside
   that scene breaks the modal stack and crashes when the scene ends (frame 756 in the first runs): a test artefact, not the game.

@@ -1,7 +1,9 @@
 # The Hyperbolic Time Chamber as a game mode (plan approved by Ryan, 2026-11-05; state of the build at section 12)
 
-**Status: phases 1-3 built on branch `nb-chamber` (section 12: what stands, the numbers measured, how to add a room); phases 4-9 to
-come.** Ryan reads part 1
+**Status: phases 1-6 and the loop built (section 12: what stands, the numbers measured, how to add a room); Ryan's first play
+answered on branch `nb-chamber2` (section 13: the door home asks, no save pad, plaques ON then OFF, the lever's way to the gate,
+every reward in a box, the red carpet, the gate's wall and portal, the opening scene, side rooms, the training's end). Where 13
+and an older section differ, 13 holds.** Ryan reads part 1
 first (what the player sees), part 2 for what the stock game really has, parts 3-6 for the content, part 7 for the
 technical notes, then the phases, the risks and the decisions (section 10). Facts carry their source; anything not
 checked is marked **(not verified)** and listed again in section 11. All dialogue here is Claude's draft or a
@@ -957,3 +959,158 @@ timing put a hawk on the player and the menu stayed shut).
 Popo's line naming whoever threw the last lever (section 5, step 4) is not built (nobody records the thrower). A player who
 talks to Popo and then mashes A answers both questions yes after their beats (the fight again first: the loop needs a B). Music stays the chamber's (39). The wide view was not run. The trophy hall and the panel (phase 8's other parts)
 are not built.
+
+---
+
+## 13. Ryan's first play (2026-11-05, branch `nb-chamber2`)
+
+Ryan played the chamber alone as Goku: "i love the open area", Broly's ship and its fight enjoyed; then the notes this section
+answers. His words, shortened: the exit is not obvious and he could leave mid-run by accident; the plaque should start ON and be
+switched OFF; after a switch it "animated like i found a capsule" with no pop-up, and once "now gohan can turn super sayain" read
+as his own reward though he played Goku; Broly's ship has doorways that lead nowhere, Frieza's ship a back room that could be a
+throne or control room; he could not find the other places, so a red carpet from the centre to each; no save point inside; a
+question before leaving ("are you sure you want to leave? youll lose all progress"); an opening scene that shows the ships, the
+rooms and the switches. Then, through the coordinator: he "couldnt find the gate or where to go after i beat 18" (the lever's
+cut-away now travels the way), the gate "just looks like a gate sitting in the middle of the room" (a wall and a portal), and
+after Popo "it didnt tell em what they were" (every reward named) and "all the enemies ... should be gone. Training is
+completed. and we should have a clear path to leave".
+
+### 13.1 What the player sees now
+
+**Coming in.** The Lookout's door, the white fade, the players at the quarters. A new run (flag 510 clear) opens with a scene:
+the players look round; Mr. Popo's voice (portrait 82, never seen here): "The chamber is ready. Six rooms stand in this white.
+Popo will show you." The camera pans to each entrance in turn, Popo naming it (Master Roshi's dojo; the pirates' airship,
+General Tao and his men; Frieza's ship; the Namekian ship; the Saiyan ship; Dr. Gero's lab), then "In every room a fighter
+waits, and on the wall beside him, a lever. Lit." Six short views follow, a map each with the load's own fade: inside every
+room its boss standing at the far end (with his partner when two play: Chiaotzu, King Cold, the Namekian, 17, Paragus; Tao
+alone), the camera tilting from the lit plaque to him. Back on the open area (on the lab's entrance, where the last view was) the
+camera travels to the quarters and climbs the red carpet behind them to the gate in its wall, its six red lights and beams over the dark portal: "Each lever puts out one light on Popo's
+gate. Six lights out, and the gate opens." / "Defeat the six. Switch off their six levers. Then walk into the gate. Follow the
+red carpet." A white cut back to the players. Start or B (either pad) skips it: the boxes close by themselves and it ends
+(through the way back from a room's view if it was in one). About 40 s read at a normal pace; a run under way never shows it
+again (out to a room and back, a lever's cut-away); leaving starts a new run.
+
+**Finding the way.** A red carpet with gold trim, 32 px wide, joins the quarters' door to every entrance's door and runs up the
+middle to the gate (the sketch below). The gate's pillars stand in a white stone wall across the whole map: nothing walks round
+the gate, and the north of the map is shut. Between the pillars a portal: a dark violet swirl in a stone ring while the beams
+are up; with all six lights out the swirl is lit and turns (two frames in turn). Walking into it: a flash and the portal's sound
+(audio 26, Popo's own flash), a white fade, Mr. Popo's room, which now has the same portal between its pillars (the way back)
+and a violet tint in its white.
+
+```
+              [ wall ======== | gate + portal | ======== wall ]
+                                     |
+      Namek ===================== H0 ======================= Frieza
+        |                            |                          |
+        |                    .---- behind ----.                 |
+        |                    |   [quarters]   |                 |
+  Saiyan|                    |   door, mat    |                 |pirate
+    |   |                    |                |                 |  |
+    ======================== H1 (the arrival) ======================
+                                     |
+       lab ======================== H3 ======================== dojo
+```
+
+**The door home** is a dark doorway in a gold frame on the canopy's front with a green EXIT sign beside it. Walking up into it
+(either player) asks, in a box of its own after a beat: "Are you sure you want to leave? / You'll lose all progress. / (A: Yes
+B: No)" (with no light out yet: "Leave the Time Chamber? (A: Yes B: No)"). B: a step back, still inside; walking up again asks
+again. An A held when the question comes does not answer it (CoopCall 18). Yes: the run's progress resets (flags 504-509 the
+lights, 510 the run, 530 Popo beaten this time round: the six lights on, tier 0, every room's boss back), then the Lookout.
+First-win rewards (514-519), the finds (531-533) and Popo's rounds (520-521) stay earned. **No save pad** inside: the quarters'
+pad is gone (and with it the character switch; the lineup is chosen before going in). A game over loses the run too: the last
+save was made outside.
+
+**A lever.** The plaque is ON (lit, its decoration shown) from the start; pressing it before the fight clicks; after the win the
+press switches it OFF (the decoration hides, the stock switch sound). The cut-away then opens on this room's entrance on the open
+map and pans along the carpet, leg by leg, to the gate (chamber.c `way`, 8 px a frame; 2-6 s by room), where the room's light
+goes out. The sixth also drops the three beams one by one, cuts the hum, lights the portal (a flash, its sound) and holds on it
+with Popo's line: "Six lights are out. The gate is open. / Follow the red carpet north, past the quarters, into the light." Back
+in the room the door's beam goes, then, 30 frames later and only when owed, the prize: the stock pick-up pose and a box of its
+own in the stock wording ("You received a +3 Strength Capsule!", Power, Endurance, or "You received a Senzu Bean!" once round).
+Then, once, before the Cell Games and only while Gohan is in the party: "Gohan's training has paid off! / Gohan can now become a
+Super Saiyan!" in a box of its own (decision 6's gift now behind that test: a lever thrown without Gohan in the party leaves it
+for a later one).
+
+**The side rooms** (Buu's Fury's art; explore only, open once the room's lever is thrown, so a fight cannot be fled through them):
+the Saiyan ship's left doorway leads to its bedroom (Buu's 6/8: the bed, two lamps; the round room's own neighbours in Buu's
+Fury), the right to its store room (Buu's 6/7: the cold box); Frieza's top doorway to his throne room (Buu's 8/27 inside Babidi's
+ship: four pillars, the round pad, the dome at the back as Frieza's hover pod; a doorway cut into its bottom wall from 8/19's
+corridor). Each has two stone jars (the chamber's drop) and one find, taken once ever: beside the bed (A anywhere there) "A bed,
+neatly made. Something is under the pillow..." and a +3 Endurance Capsule; facing the cold box "The cold box is stocked with
+rations... / and something green at the back." and a Senzu Bean; facing the pod "Frieza's hover pod. Something is wedged in the
+seat..." and a +3 Power Capsule; later only the look ("Nothing else here.", "Rations, and nothing else.", "It hums quietly.").
+A `BUU=0` build has neither the art nor the doorways (the fallback Capsule Ship rooms have none).
+
+**After Popo.** Each reward he gives has its own box: the first win "You received a Senzu Bean!" and each +3 capsule's, a later
+win the Senzu's. Two lines more from him ("Popo will stay here. Talk to Popo when you want more." / "Outside, the chamber is quiet
+now. The training is complete. The way home is open."). Back out through the portal (flag 530 set): no enemy stands or comes (the
+spot records' condition `noflag:530`, the refill off), a box "Training complete!", the camera runs down the carpet from the gate
+to the quarters' door, Popo: "Popo's training is complete. The chamber is quiet. / The door home is open. Follow the red
+carpet." Leaving then asks nothing: the run is over (the lights reset as above, the round kept). Talking to Popo for the loop
+(start again, harder) works as before: the lights on, 530 clear, the enemies back at the next load.
+
+### 13.2 The numbers
+
+| thing | value |
+|---|---|
+| maps | 15/18 602 of 896 slots (the carpet, the wall, the portal's ring, the door and the sign in; the save pad out); 15/25 70; new 15/27 the bedroom 240 x 160, 119 slots; 15/28 the store room 240 x 160, 52; 15/29 the throne room 400 x 400, 376 (the three `"requires": "buu"`) |
+| open map decorations | 0-8 the gate, 9-24 the jars, **25 / 26 the portal** (32 x 64, one 2 KB frame drawn by `tools/chamberpath.py`, 26 the same frame turned half round by OAM's flips): the sheet holds 5248 bytes of OBJ VRAM (3200 before) |
+| collision | the wall and the whole north: rows 0-49 blocked (the gate's way between the pillars opens with all six as before); the sign's posts |
+| flags | 510 a run under way (its opening has played; cleared by leaving); 531-533 the side rooms' finds (once ever). Both cleared by a new game (504-535) |
+| RAM | `.combo.ch` 0x34 (was 0x2C of 0x30): +0x27 the last prize, +0x2C the open area's scenes, +0x30 the scene (kind 1 opening, 2 the door, 3 the training's end, 4 the portal; 0x40 running, 0x80 skip), +0x31 bits (1 a player at the door, 2 the training's end seen, 4 the portal lit, 8 its phase), +0x32 the portal's frames, +0x33 the scene's wait. `.combo.po` moved to 0x0203EBBC (tests find both by magic) |
+| timings | the opening's pans 12 px a frame, each room's view 72 frames after its load; the lever's way 8 px a frame and 30 frames at each end; the door's question 32 frames after the step in, the portal's warp 2 |
+
+**Draft lines** (all Claude's, marked DRAFT in `data/story/chamber.lscript` / `chamber_popo.lscript`): the opening's nine boxes,
+the two questions, "Training complete!" and Popo's line after it, the sixth lever's line, the four prize boxes (stock wording),
+Gohan's box, the three finds and their looks, Popo's two new lines after his fight.
+
+### 13.3 How it is built
+
+- **chamber.c**: the opening, the door's question, the training's end and the portal's warp are one sequence (`ch_open_scenes`)
+  started like Popo's scenes (`coop_run_sequence` through `coop2.call_action`) once player 1 is free; its entry 0 asks C where
+  (CoopCall 35 op 24). The open area's on-load hands it over (op 23) and queues the opening (flag 510 clear) or the training's
+  end (530 set, not yet seen this visit). The skip: `chamber_input` (input.c, after the yes / no hook) sees Start or B on either
+  pad and from then on presses A every other frame so boxes close; every entry's end and every 24 frames of a pan ask op 32 / 27
+  and jump to the end (or to the way back from a room's view). The rooms' views: `LoadMapNoEntities` to each room in turn under
+  one `SetMapRestoreFlag` (no player is built: `map` shows -1, -1), its actors made by `MapScript_CreateCharacter` on the map's
+  heap (op 28), its on-load lighting the plaque, then `RestoreMap`. The door's watch runs in `open_tick` (either player in the
+  door's strip holding Up); the step back is a command-batch walk (op 36). The portal's trigger only queues its scene (op 53): a
+  warp inside an "enter" trigger's own fire crashed (the box is taken off a list the load had reset).
+- **The lever** (`ch_lever`, 22 entries now): the throw (3), the legs of the way (4-10, one entry each: a script's forward jumps
+  reach 255 bytes), the gate (11), the sixth's line (12), back in the room (13), the prize boxes (14-17), Gohan (18-20).
+- **Rows** (`ChRoom`): `stand` (the actors' spots for the opening), `shot` (its two views; alone, the boss's view centres on him),
+  `ways` (the side doorways' rects, blocked by the map, opened by the on-load once thrown and at the lever).
+- **mapbuild**: an `objects` part may be `{"draw": NAME, "arg": ARG}` (tools/NAME.py's `obj(ARG)`, converted to 8bpp in the OBJ
+  palette), a `"32x64"` shape, a list entry's `"flip"` (`"h"`, `"v"`, `"hv"`: OAM attribute 1's flips).
+- **Art**: `tools/chamberpath.py` (the carpet's runs `SEGMENTS`, its trim by depth inside their union; the wall; the portal's ring
+  sealed and lit; the door; the EXIT sign; the portal's swirl as a decoration frame); previews `python tools/chamberpath.py OUT.png`.
+
+### 13.4 Tests
+
+`chamber_gen.py` writes `chamber_run.txt` (new, in `regfull.sh`): the opening in one player (Goku) and two (Gohan + Piccolo): it
+starts, flag 510, the void's bodies gone, each room's view with its boss (and partner by lineup) and the plaque lit, the end with
+the camera back on player 1 (player 2 beside him), the void filling again; skipped by Start in the first pan and by player 2's B
+inside Frieza's view, no opening on a reload during the run; the training's end out of Popo's room (two players): its scene, no
+enemies after 400 frames, out by the door at once with the lights and 530 reset and the round kept. `chamber_gate`: the save pad
+gone; the question (lights out, the lose wording), B steps back with the lights kept, an A held as it comes does not answer, A
+leaves with the run reset and the first win and the round kept; the plain question without lights; the wall stops a player at x
+600; the portal closed with five lights, its two frames in turn with six. `chamber_room` / `chamber_rooms`: the plaque lit before,
+clicked twice, OFF after; the cut-away opening on the room's entrance (the camera's view), arriving at the gate, the light out;
+the sixth: the beams, the portal lit and the line; the prize's item (ChState +0x27) with its box up; the side rooms shut before
+the lever, then each entered, its find (the item, its flag), the look, out again. `gohan_ssj1` and `chamber_popo` (the rewards'
+boxes stepped through; out of his room after a win, the training's end) adjusted; `chamber_tiers` unchanged (the lights set flag
+510).
+
+**Test recipes changed**: `door()` sets flag 510 first (test command 48 op 7) unless the opening is wanted; op 0 (the lights) sets
+it too. Read the scene state from RAM (`find CH`, `peek CH+0x30`): test commands wait while a scene runs. The lever's cut-away
+takes 300-600 frames: wait for the light (`stepz D+0x10 10`), and `mashmap` back to the room through the sixth's line. The
+portal: player 1 at (1028, 346), Up; the hidden room's scene starts after the portal's own fade (60 frames).
+
+### 13.5 Not verified, open
+
+- Real time, by Ryan: the opening's length (about 40 s read; skippable), the pans' speed (12 px a frame on the tour, 8 on the
+  lever's way), whether the six rooms' views are wanted every run or only the first ever (flag 510 makes it once a run; a
+  first-ever flag would be one line).
+- The carpet's look over the whole map, the portal's two-frame turn and the wall at the top are seen in headless shots only.
+- The rooms' views stand only the lead and the partner (Tao without his crew).
+- A player 2 alone walking into the portal does nothing (player 1's position fires it, as the stock doors).
