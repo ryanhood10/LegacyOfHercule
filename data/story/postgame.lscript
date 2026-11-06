@@ -7,17 +7,17 @@ sequence pg_dende
   script                                 ; which part of the post-game (the wishes keep the party: CoopCall 10)
         StackTestStoryFlag 483
         JumpIfFalse L1
-        PushByte 85
+        PushByte 87
         END
       L1:
         StackTestStoryFlag 382
         JumpIfFalse L2
-        PushByte 65
+        PushByte 67
         END
       L2:
         StackTestStoryFlag 480
         JumpIfFalse L3
-        PushByte 63
+        PushByte 65
         END
       L3:
         CoopCall 10, 0, 0, 0
@@ -25,16 +25,38 @@ sequence pg_dende
         END
   stock @083dbf38    ; the scene moves to the Lookout's edge (zone 9 area 7)
   stockseq @083dd044 1 44    ; Dende heals Gohan, Krillin and 18, Shenron, the first wish, Goku stays dead, "ONE WISH REMAINING"
+  script                                 ; Krillin steps toward the dragon; 18 looks at him
+        WalkToPosition 76, 66, 98
+        SetEntityFacing 76, 1
+        SetEntityFacing 11, 2
   text 73 "KRILLIN: I have a wish..."
-  script
-        WaitFrames 20
+  script                                 ; Yamcha, looking up
+        SetEntityFacing 156, 1
+        SetEntityAnimation 156, 4
+        WaitFrames 10
   text 114 "YAMCHA: I wish we always had someone strong like Goku around!"
-  script                                 ; stock entry 58: the wish is granted
+  script                                 ; stock entry 58: the wish is granted; everyone turns on Yamcha (stock entry 46's batch), Krillin spins round
         WaitFrames 100
         PlayAudio 61
         WhiteFlash 20
-        END
+        BeginCommandBatch
+        SetEntityFollow 76, 156
+        SetEntityFollow 103, 156
+        SetEntityFollow 132, 156
+        SetEntityFollow 121, 156
+        SetEntityFollow 93, 156
+        CommitCommandBatch
+        SetEntityFacing 76, 3
+        SetEntityAnimation 76, 4
+        WaitFrames 30
   text 93 "@YOUR WISH HAS BEEN GRANTED.\x0bI MUST GO NOW."
+  script                                 ; Yamcha looks about (stock entry 48's looks)
+        SetEntityFacing 156, 2
+        WaitFrames 24
+        SetEntityFacing 156, 0
+        WaitFrames 24
+        SetEntityFacing 156, 2
+        WaitFrames 20
   script                                 ; stock entry 64: Shenron leaves
         WaitFrames 60
         FadeToWhite 180
@@ -213,10 +235,10 @@ sequence pg_dende
         PushByte 1
         CmpEq
         JumpIfFalse o1
-        PushByte 68
+        PushByte 70
         END
       o1:
-        PushByte 66
+        PushByte 68
         END
   text 250 "Finally...  some time to relax.\x0bNo more enemies to fight!"
   script                                 ; Piccolo's actor answers (player 1 is not Piccolo here)
@@ -320,10 +342,10 @@ sequence pg_dende
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 90
+        PushByte 92
         END
       L1:
-        PushByte 88
+        PushByte 90
         END
   text 46 "DENDE: Okay.  Come talk to me when you're ready!"
   stop 0x0
@@ -335,10 +357,10 @@ sequence pg_dende
         PushByte 1
         CmpEq
         JumpIfFalse L1
-        PushByte 93
+        PushByte 95
         END
       L1:
-        PushByte 88
+        PushByte 90
         END
   script                                 ; stock entry 0 of the talk show without the walk to its door; Hercule is the guest (player 1 from here to the title screen)
         SetPlayerVisible 0

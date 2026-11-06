@@ -124,11 +124,18 @@ for pass_no in (1, 2):
     label("wish")
     stock(WISH, 0, "the scene moves to the Lookout's edge (zone 9 area 7)")
     stockseq(WISH, 1, 44, "Dende heals Gohan, Krillin and 18, Shenron, the first wish, Goku stays dead, \"ONE WISH REMAINING\"")
+    # Our beat was three boxes with nobody moving (docs/cutscenes/batch3 5.1): Krillin steps up to the dragon and 18 looks at him; Yamcha, musing
+    # with his eyes on the sky, says it first; as the wish is granted they all turn on him (the stock scene's own batch, entry 46) and
+    # Krillin spins round; Yamcha looks left and right (stock entry 48's looks): what did he do?
+    script(["WalkToPosition 76, 66, 98", "SetEntityFacing 76, 1", "SetEntityFacing 11, 2"], "Krillin steps toward the dragon; 18 looks at him")
     text(73, "KRILLIN: I have a wish...")
-    script(["WaitFrames 20"])
+    script(["SetEntityFacing 156, 1", "SetEntityAnimation 156, 4", "WaitFrames 10"], "Yamcha, looking up")
     text(114, "YAMCHA: I wish we always had someone strong like Goku around!")
-    script(body(WISH, 58), "stock entry 58: the wish is granted")
+    b = body(WISH, 46)
+    script(body(WISH, 58)[:-1] + [x for x in b if x != "WaitFrames 120" and x != "END"] + ["SetEntityFacing 76, 3", "SetEntityAnimation 76, 4", "WaitFrames 30"],
+           "stock entry 58: the wish is granted; everyone turns on Yamcha (stock entry 46's batch), Krillin spins round")
     text(93, "@YOUR WISH HAS BEEN GRANTED.\\x0bI MUST GO NOW.")
+    script(["SetEntityFacing 156, 2", "WaitFrames 24", "SetEntityFacing 156, 0", "WaitFrames 24", "SetEntityFacing 156, 2", "WaitFrames 20"], "Yamcha looks about (stock entry 48's looks)")
     script(body(WISH, 64), "stock entry 64: Shenron leaves")
     # Hercule at the TV station: the wish's mystery
     script(["FadeOut 120", "PushMulti 4, 20, 1, 16", "Negate", "WarpToMapNoEntities 88",
