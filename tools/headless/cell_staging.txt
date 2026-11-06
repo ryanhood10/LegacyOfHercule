@@ -743,7 +743,7 @@ frames 300
 shot cs_alone_struggle
 deref TBL 0x0800959C
 deref R176 TBL+0x2a4
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R176
 echo EXPECT 0203fad8: 01b8 01b8
 peek16 0x0203FAD8 2
@@ -956,7 +956,7 @@ frames 300
 shot cs_H_struggle
 deref TBL 0x0800959C
 deref R176 TBL+0x2a4
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R176
 echo EXPECT 0203fad8: 01b8 01b8
 peek16 0x0203FAD8 2
@@ -1169,7 +1169,7 @@ frames 300
 shot cs_K_struggle
 deref TBL 0x0800959C
 deref R176 TBL+0x2a4
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R176
 echo EXPECT 0203fad8: 01b8 01b8
 peek16 0x0203FAD8 2
@@ -1382,7 +1382,7 @@ frames 300
 shot cs_Ve_struggle
 deref TBL 0x0800959C
 deref R176 TBL+0x2a4
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R176
 echo EXPECT 0203fad8: 01b8 01b8
 peek16 0x0203FAD8 2

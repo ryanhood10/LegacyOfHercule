@@ -332,6 +332,9 @@ junior_end("cg_j2_end", "m325_r9_defeat", 137, 2, 1, 10, 38, P1, "J3: Vegeta, pl
 junior_end("cg_j3_end", "m325_r9_defeat", 132, 3, 2, 13, 39, P2, "J4: Trunks, played by player 2's pad (record 13, the fourth Junior)")
 
 CAM_TALK, CAM_RAGE = "456, 336", "456, 280"   # the view's top-left corners (Gohan stands at 576, 376)
+# For Ryan's review (decided 2026-11-06, each switched on by one commit of its own, so reverting that commit drops it):
+SCREAM_FIRST = False      # 16's head: the scream is read during the first tremor, before the white (stock order: pose, white, scream)
+GOKU_SPIRIT = False       # the beam struggle: haloed Goku flickers at Gohan's shoulder while a line of his is open (the stock has only his voice)
 emit("sequence cg_head_scene")
 b = body(A3, "m325_r10_defeat", 0)
 k = b.index("SetActiveCharacter 0")
@@ -397,9 +400,13 @@ SS2_BURST = (["WhiteFlash 6", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 1
               "WaitFrames 30"])
 # The scream comes before the white (decided 2026-11-06; one commit, so it can be dropped): stock entry 27 is read during the first tremor,
 # the aura's sound under it, and once transformed he says nothing: the caption follows the flicker. The stock order was pose, white, scream.
-script(SS2_RISE, "stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)")
-stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\", moved here from after the transformation")
-script(SS2_BURST, "stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still")
+if SCREAM_FIRST:
+    script(SS2_RISE, "stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)")
+    stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\", moved here from after the transformation")
+    script(SS2_BURST, "stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still")
+else:
+    script(SS2_RISE + SS2_BURST, "stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)")
+    stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\"")
 script(body(A3, "m325_r10_defeat", 28)[:-1] + [f"PanCameraToPosition {CAM_TALK}, 2"], "stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box")
 stock_at(A3, "m325_r10_defeat", 29, "\"Gohan has entered Super Saiyan Rage!\"")
 script(["CoopCall 37, 1, 30, 0", "CoopCall 37, 7, 28, 1"], "Cell powers up (the helpers' charge), then speaks")
@@ -554,9 +561,11 @@ STRUGGLE_VIEW = "320, 312"
 VX, VY = 112, 272                # Vegeta's ledge (record 1 of map 326)
 def spirit(mode, vegeta_gone=False):
     """Before a line of Goku's: his spirit at Gohan's far shoulder, mode 1 flickering / 2 whole."""
+    if not GOKU_SPIRIT:
+        return []
     return ([] if vegeta_gone else ["DespawnEntity 137"]) + [f"SpawnCharacterEntity {SPIRIT}, 503, 376", f"SetEntityFacing {SPIRIT}, 2", f"SetEntityAnimationNoWait {SPIRIT}, 30",
             f"CoopCall 16, {SPIRIT}, 4, {mode}"]
-SPIRIT_OFF = [f"CoopCall 16, {SPIRIT}, 4, 0", f"DespawnEntity {SPIRIT}", f"SpawnCharacterEntity 137, {VX}, {VY}", "SetEntityFacing 137, 3"]
+SPIRIT_OFF = [f"CoopCall 16, {SPIRIT}, 4, 0", f"DespawnEntity {SPIRIT}", f"SpawnCharacterEntity 137, {VX}, {VY}", "SetEntityFacing 137, 3"] if GOKU_SPIRIT else []
 HOLD = ["CoopCall 16, 72, 1, 0", "CoopCall 16, 162, 1, 0"]   # the two held beams, fired again if something took them (cellgames.c: nothing when they are out)
 SPIRIT_IN = []
 b = body(A3, "m325_r12_defeat", 0)

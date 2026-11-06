@@ -755,7 +755,7 @@ sequence cg_head_scene
         SpawnDustCloud 0, 564, 382
         SpawnDustCloud 0, 588, 382
   stockseq @083ea400 23 25    ; "You loved life!...  I just let you die!", "I won't watch this ANYMORE!!!!!!"
-  script                                 ; stock entry 26, first half: the first tremor (the power-up pose never blocks: it never ended in co-op tests)
+  script                                 ; stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)
         PlayMusic 20
         PlayAudio 55
         SetEntityAnimationNoWait 0, 9
@@ -765,8 +765,6 @@ sequence cg_head_scene
         SpawnDustCloud 0, 576, 358
         SpawnDustCloud 0, 576, 398
         WaitFrames 40
-  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!", moved here from after the transformation
-  script                                 ; stock entry 26, second half, Super Saiyan 2: the harder tremor, Cell gives ground, a silence, the white, and he stands still
         WhiteFlash 6
         SetEntityAnimationNoWait 0, 9
         ScreenShake 0, 10, 40
@@ -803,6 +801,7 @@ sequence cg_head_scene
         WhiteFlash 3
         WaitFrames 19
         WaitFrames 30
+  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!"
   script                                 ; stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box
         PlayAudio 27
         PanCameraToPosition 456, 336, 2
@@ -827,7 +826,7 @@ sequence cg_head_scene
         SetEntityFacing 72, 2
         END
       HS9:
-        PushByte 39
+        PushByte 38
         END
   text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   fmt 0 "%s"
@@ -1224,17 +1223,8 @@ sequence cg_beam_struggle
         PlayAudio 43
         WhiteFadeOut 120
         WaitFrames 30
-        DespawnEntity 137
-        SpawnCharacterEntity 176, 503, 376
-        SetEntityFacing 176, 2
-        SetEntityAnimationNoWait 176, 30
-        CoopCall 16, 176, 4, 1
   text 64 "GOKU: Dig deeper, Gohan!  You too, Hercule!"
   script                                 ; Hercule's beam falters: he looks round for the voice
-        CoopCall 16, 176, 4, 0
-        DespawnEntity 176
-        SpawnCharacterEntity 137, 112, 272
-        SetEntityFacing 137, 3
         CoopCall 16, 72, 1, 0
         CoopCall 16, 162, 1, 0
         CoopCall 16, 72, 0, 0
@@ -1317,17 +1307,8 @@ sequence cg_beam_struggle
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
         ScreenShake 0, 4, 16
-        DespawnEntity 137
-        SpawnCharacterEntity 176, 503, 376
-        SetEntityFacing 176, 2
-        SetEntityAnimationNoWait 176, 30
-        CoopCall 16, 176, 4, 1
   text 64 "Gohan, raise it higher!  Hercule, hold on!  He needs you!"
   script
-        CoopCall 16, 176, 4, 0
-        DespawnEntity 176
-        SpawnCharacterEntity 137, 112, 272
-        SetEntityFacing 137, 3
         CoopCall 16, 72, 1, 0
         CoopCall 16, 162, 1, 0
   text 67 "HERCULE: The champ...  never...  backs down!!!"
@@ -1415,17 +1396,8 @@ sequence cg_beam_struggle
         WaitFrames 60
         PanCameraToPosition 320, 312, 3
         WaitFrames 60
-        DespawnEntity 137
-        SpawnCharacterEntity 176, 503, 376
-        SetEntityFacing 176, 2
-        SetEntityAnimationNoWait 176, 30
-        CoopCall 16, 176, 4, 1
   text 64 "Release it, both of you!  Remember all the pain he's caused!\x0bNOW MAKE THAT YOUR POWER!"
   script                                 ; stock entry 14
-        CoopCall 16, 176, 4, 0
-        DespawnEntity 176
-        SpawnCharacterEntity 137, 112, 272
-        SetEntityFacing 137, 3
         CoopCall 16, 72, 1, 0
         CoopCall 16, 162, 1, 0
         WaitFrames 60
@@ -1462,17 +1434,8 @@ sequence cg_beam_struggle
         SetEntityFacing 30, 3
         SetEntityAnimationNoWait 30, 30
         PanCameraToPosition 320, 312, 4
-        DespawnEntity 137
-        SpawnCharacterEntity 176, 503, 376
-        SetEntityFacing 176, 2
-        SetEntityAnimationNoWait 176, 30
-        CoopCall 16, 176, 4, 2
   text 64 "Now's your chance!"
   script                                 ; stock entry 19: the clash runs into the Cells, the beams take them both and the screen goes white (no explosions); Gohan falls, Hercule lowers his hands late; the stock fade and the aftermath's walk-in
-        CoopCall 16, 176, 4, 0
-        DespawnEntity 176
-        SpawnCharacterEntity 137, 112, 272
-        SetEntityFacing 137, 3
         CoopCall 16, 72, 1, 0
         CoopCall 16, 162, 1, 0
         CoopCall 16, 2, 3, 384
