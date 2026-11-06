@@ -1,6 +1,7 @@
 // Replacement for Input_Poll (0x0801EEFC; its first 8 bytes are patched to jump here).
 // Same behaviour for player 1, plus player 2's InputSystem filled from the selected source.
 #include "coop.h"
+#include "chamber.h"
 #include "revive.h"
 #include "wide.h"
 #include "android16.h"
@@ -179,6 +180,7 @@ void input_poll_hook(InputSystem *in) {
     u16 p2 = p2_source(now, &p1);
     if (coop2.pad_swap && p2_present()) { u16 t = p1; p1 = p2; p2 = t; }   // a duel's winner took over
     cg_choice_input(&p1, &p2);             // a yes / no question (CoopCall 18): B answers no and closes the box
+    chamber_input(&p1, &p2);               // chamber.c: Start or B skips the Time Chamber's opening (its boxes close by themselves)
     u16 pad2 = p2;                         // player 2's buttons before the solo modes and the revive take them
     agency_pads(&p1, &p2);                 // agency.c: a menu or a world map player 2 opened runs on his pad
     switch (coop_solo()) {                 // the Cell Games' solo fights (cellgames.c)

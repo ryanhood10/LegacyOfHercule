@@ -62,7 +62,9 @@ Spec (coordinates: "c, r" in 8-px tiles for layout and collision ops, pixels for
                                      hidden; "hits" makes it a breakable (item, handler 0x0800F9A3) running "drop"; the
                                      Time Chamber's gate, jars, plaque (docs/time-chamber.md 12); a part with "turn":
                                      {"shape": "64x32", "rect": [x, y, w, h]} is that piece of its frame turned upright
-                                     into one 16x32 frame (the gate's beam across a door in a side wall)
+                                     into one 16x32 frame (the gate's beam across a door in a side wall); a part {"draw": NAME, "arg": ARG}
+                                     is tools/NAME.py's obj(ARG) frame (our art, converted to the OBJ palette); shape "32x64";
+                                     "flip": "h" / "v" / "hv" on a list entry (OAM attribute 1)
   "onleave": "script:NAME",          the map's on-leave script (+0x34)
   an enemy record may name "behaviours": ["0x083EE430"] (inline pointers, as stock records have) instead of "like"
   a png op's "arg": draw(arg) for a tools/NAME.py that holds several pictures
@@ -577,6 +579,36 @@ def nearest(pal, rgb):
     return _NEAR[key]
 
 
+OBJ_PALETTE = 0x081DA6C8         # the game's one 256-colour OBJ palette (docs/sprites.md)
+_NEAR_OBJ = {}
+
+
+def obj_frame(rom, im):
+    """An RGBA picture (width and height multiples of 8) -> 8bpp OBJ tiles in rows (1D mapping), nearest colour of the OBJ
+    palette, alpha < 128 transparent (index 0). A decoration frame drawn by code (the Time Chamber's portal)."""
+    pal = L.bg_palette(rom, OBJ_PALETTE)
+    im = im.convert("RGBA")
+    out = bytearray()
+    for ty in range(im.height // 8):
+        for tx in range(im.width // 8):
+            for p in range(64):
+                rgba = im.getpixel((tx * 8 + p % 8, ty * 8 + p // 8))
+                if rgba[3] < 128:
+                    out.append(0)
+                    continue
+                key = rgba[:3]
+                if key not in _NEAR_OBJ:
+                    best, bi = None, 1
+                    for i in range(1, 256):
+                        r, g, b = L.bgr555_to_rgb(pal[i])
+                        d = 2 * (r - key[0]) ** 2 + 4 * (g - key[1]) ** 2 + 3 * (b - key[2]) ** 2
+                        if best is None or d < best:
+                            best, bi = d, i
+                    _NEAR_OBJ[key] = bi
+                out.append(_NEAR_OBJ[key])
+    return bytes(out)
+
+
 def turn_frame(data, turn):
     """A part's frame turned a quarter clockwise: {"shape": "64x32" (the frame read, 8bpp, 8x8 tiles in rows), "rect": [x, y,
     w, h] (the piece of it taken)} -> one 16x32 frame (512 bytes) with the piece standing upright in its middle (w <= 32,
@@ -933,8 +965,11 @@ def emit(b, pk):
             raise SpecError("objects: the map already has decorations")
         sheet_bytes, starts = b"", []
         for part in objects["parts"]:
-            whole = rom.resource(b.source(part["map"]).var.sheet)
-            cut = whole[part.get("from", 0):part.get("from", 0) + part.get("bytes", len(whole))]
+            if "draw" in part:      # a frame drawn by code (tools/NAME.py obj(arg)): 8bpp in the OBJ palette, our own art
+                cut = obj_frame(rom, art_module(part["draw"]).obj(part["arg"]))
+            else:
+                whole = rom.resource(b.source(part["map"]).var.sheet)
+                cut = whole[part.get("from", 0):part.get("from", 0) + part.get("bytes", len(whole))]
             if "turn" in part:
                 cut = turn_frame(cut, part["turn"])
             if len(sheet_bytes) % 32 or len(cut) % 32:
@@ -943,9 +978,10 @@ def emit(b, pk):
             sheet_bytes += cut
         b.sheet = pk.put(lz(sheet_bytes), f"{spec['name']} decoration sheet")
         shapes = {"8x16": (8, 16, 0xA000, 0x0000), "16x32": (16, 32, 0xA000, 0x8000), "32x32": (32, 32, 0x2000, 0x8000),
-                  "64x32": (64, 32, 0x6000, 0xC000)}
+                  "64x32": (64, 32, 0x6000, 0xC000), "32x64": (32, 64, 0xA000, 0xC000)}
         for r in objects["list"]:
             w, h, a0, a1 = shapes[r.get("shape", "32x32")]
+            a1 |= {"": 0, "h": 0x1000, "v": 0x2000, "hv": 0x3000}[r.get("flip", "")]   # OAM attribute 1's flips
             if "hits" in r:
                 object_items.append((len(b.decos), r))
             b.decos.append(struct.pack("<iiiiHHHBB", r["x"], r["y"], r["x"] + w, r["y"] + h, a0, a1,

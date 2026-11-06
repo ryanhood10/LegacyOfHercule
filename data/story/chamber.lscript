@@ -1,12 +1,16 @@
-; The Hyperbolic Time Chamber as a game mode (docs/time-chamber.md; state of the build and how to add a room: section 12).
-; Shared by the open area (data/maps/chamber_open.json) and every room's map (data/maps/chamber_dojo.json is the pattern); the
-; rows and the lines are in src/coop/chamber.c. CoopCall 35's op numbers are chamber.c's enum.
+; The Hyperbolic Time Chamber as a game mode (docs/time-chamber.md; state of the build and how to add a room: section 12; Ryan's
+; first play and what changed for it: section 13). Shared by the open area (data/maps/chamber_open.json), every room's map
+; (data/maps/chamber_dojo.json is the pattern) and the side rooms (chamber_saiyan_bed / _store, chamber_frieza_throne); the rows
+; and the rooms' lines are in src/coop/chamber.c. CoopCall 35's op numbers are chamber.c's enum.
 ; Every line here is Claude's draft (DRAFT), not dictated.
 
 ; ---- the open area --------------------------------------------------------------------------------------------------
 
-; the gate as stock zone 8 area 16 has it, with six flags, one light each: decorations 0-5 the lights, 6-8 the beams
+; the gate as stock zone 8 area 16 has it, with six flags, one light each: decorations 0-5 the lights, 6-8 the beams; all six
+; out: the beams gone, the way open, the portal between the pillars lit (decorations 25 / 26, chamber.c shows them in turn).
+; CoopCall 35, 23 hands chamber.c the open area's scenes (the opening of a run, the door home's question, the training's end)
 script ch_open_onload
+        CoopCall 35, 23, seq:ch_open_scenes, 0
         PlayAudioVolume 17, 40
         StackTestStoryFlag 504
         JumpIfFalse L1
@@ -39,6 +43,7 @@ script ch_open_onload
         FindEntityByType 7
         FindEntityByType 8
         SetCollisionRect 1008, 320, 1048, 400
+        CoopCall 35, 39, 1, 0
       L7:
 end
 
@@ -55,13 +60,420 @@ script ch_enemy_drop
         CoopCall 35, 18, 0, 0
 end
 
+; the portal between the gate's pillars (its rect is blocked until all six lights are out): chamber.c queues the warp, a flash, its
+; sound, the hidden room (Mr. Popo's, popo.c; ch_open_scenes 42). A warp inside this trigger's own fire broke the trigger scan
+; (an "enter" box is taken off the list after its fire, and the load had reset the list: a crash)
+script ch_portal
+        CoopCall 35, 53, 0, 0
+end
+
+; ---- the open area's scenes (docs/time-chamber.md 13, Ryan's first play) ---------------------------------------------
+; One sequence for the open area's three scenes; chamber.c starts it (coop2's action object) once player 1 is free and entry 0
+; asks where: the opening of a run (1), the question at the door home (28), the training's end (36), the portal (42). The opening is skipped
+; with Start or B (chamber.c sets the skip; every entry's end and every 24 frames of a pan ask CH_GOING / CH_GO): out of the
+; rooms' views through RestoreMap (22), else to the end (26). Absolute indexes (chamber.c's E_*): keep the `[n]` checks.
+; Lines: DRAFT, Mr. Popo's voice (portrait 82, his third-person way of talking); he is not seen here.
+sequence ch_open_scenes
+  [0] script                             ; -> the queued scene's first entry
+        CoopCall 35, 24, 0, 0
+        END
+  [1] script                             ; the run begins: the void's bodies leave, the players look round
+        CoopCall 35, 25, 0, 0
+        WaitFrames 20
+        CoopCall 35, 26, 2, 0
+        WaitFrames 18
+        CoopCall 35, 26, 3, 0
+        WaitFrames 18
+        CoopCall 35, 26, 1, 0
+        WaitFrames 12
+        CoopCall 35, 27, 2, 26
+        END
+  [2] text 82 "MR. POPO: The chamber is ready.\x0bSix rooms stand in this white. Popo will show you."
+  [3] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 1496, 1624, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 10
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 4, 26
+        END
+      S:
+        PushByte 26
+        END
+  [4] text 82 "MR. POPO: Master Roshi's dojo."
+  [5] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 1688, 1016, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 10
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 6, 26
+        END
+      S:
+        PushByte 26
+        END
+  [6] text 82 "MR. POPO: The pirates' airship.\x0bGeneral Tao and his men."
+  [7] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 1496, 440, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 8
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 8, 26
+        END
+      S:
+        PushByte 26
+        END
+  [8] text 82 "MR. POPO: Frieza's ship."
+  [9] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 312, 440, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 10
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 10, 26
+        END
+      S:
+        PushByte 26
+        END
+  [10] text 82 "MR. POPO: The Namekian ship."
+  [11] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 120, 1016, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 8
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 12, 26
+        END
+      S:
+        PushByte 26
+        END
+  [12] text 82 "MR. POPO: The Saiyan ship."
+  [13] script                             ; the pan to the next entrance
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 312, 1624, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 10
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 14, 26
+        END
+      S:
+        PushByte 26
+        END
+  [14] text 82 "MR. POPO: Dr. Gero's lab."
+  [15] text 82 "MR. POPO: In every room a fighter waits,\x0band on the wall beside him, a lever. Lit."
+  [16] script                            ; inside room 0: the lit plaque, then the boss at the far end
+        SetMapRestoreFlag
+        PushByte 15
+        CoopCall 35, 31, 0, 0
+        PushByte 1
+        CoopCall 35, 29, 0, 0
+        CoopCall 35, 30, 0, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 0, 0
+        WaitFrames 24
+        CoopCall 35, 29, 0, 1
+        CoopCall 35, 30, 0, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 17, 22
+        END
+      S:
+        PushByte 22
+        END
+  [17] script                            ; inside room 1: the lit plaque, then the boss at the far end
+        PushByte 15
+        CoopCall 35, 31, 1, 0
+        PushByte 1
+        CoopCall 35, 29, 1, 0
+        CoopCall 35, 30, 1, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 1, 0
+        WaitFrames 24
+        CoopCall 35, 29, 1, 1
+        CoopCall 35, 30, 1, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 18, 22
+        END
+      S:
+        PushByte 22
+        END
+  [18] script                            ; inside room 2: the lit plaque, then the boss at the far end
+        PushByte 15
+        CoopCall 35, 31, 2, 0
+        PushByte 1
+        CoopCall 35, 29, 2, 0
+        CoopCall 35, 30, 2, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 2, 0
+        WaitFrames 24
+        CoopCall 35, 29, 2, 1
+        CoopCall 35, 30, 2, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 19, 22
+        END
+      S:
+        PushByte 22
+        END
+  [19] script                            ; inside room 3: the lit plaque, then the boss at the far end
+        PushByte 15
+        CoopCall 35, 31, 3, 0
+        PushByte 1
+        CoopCall 35, 29, 3, 0
+        CoopCall 35, 30, 3, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 3, 0
+        WaitFrames 24
+        CoopCall 35, 29, 3, 1
+        CoopCall 35, 30, 3, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 20, 22
+        END
+      S:
+        PushByte 22
+        END
+  [20] script                            ; inside room 5: the lit plaque, then the boss at the far end
+        PushByte 15
+        CoopCall 35, 31, 5, 0
+        PushByte 1
+        CoopCall 35, 29, 5, 0
+        CoopCall 35, 30, 5, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 5, 0
+        WaitFrames 24
+        CoopCall 35, 29, 5, 1
+        CoopCall 35, 30, 5, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 21, 22
+        END
+      S:
+        PushByte 22
+        END
+  [21] script                            ; inside room 4: the lit plaque, then the boss at the far end
+        PushByte 15
+        CoopCall 35, 31, 4, 0
+        PushByte 1
+        CoopCall 35, 29, 4, 0
+        CoopCall 35, 30, 4, 0
+        Step LoadMapNoEntities
+        CoopCall 35, 28, 4, 0
+        WaitFrames 24
+        CoopCall 35, 29, 4, 1
+        CoopCall 35, 30, 4, 1
+        PushByte 2
+        Step PanCameraToPosition
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 22, 22
+        END
+      S:
+        PushByte 22
+        END
+  [22] script                            ; back to the open area (from any room's view)
+        RestoreMap
+        WaitFrames 10
+        CoopCall 35, 27, 23, 26
+        END
+  [23] script                            ; from the quarters up the red carpet to the gate in its wall
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 908, 920, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 18
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        PanCameraToPosition 908, 280, 12
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 24
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        WaitFrames 13
+        CoopCall 35, 32, 0, 0
+        JumpIfFalse S
+        CoopCall 35, 27, 24, 26
+        END
+      S:
+        PushByte 26
+        END
+  [24] text 82 "MR. POPO: Each lever puts out one light on Popo's gate.\x0bSix lights out, and the gate opens."
+  [25] text 82 "MR. POPO: Defeat the six. Switch off their six levers.\x0bThen walk into the gate. Follow the red carpet."
+  [26] script                            ; the end (and the skip's): the camera back on player 1
+        FadeToWhite 16
+        SetActiveEntity 0
+        WaitFrames 6
+        WhiteFadeOut 16
+        CoopCall 35, 33, 0, 0
+  [27] stop 0x0
+  [28] script                            ; the door home: the players face it; -> 29 lights out, 31 none, 34 the training is done
+        CoopCall 35, 34, 0, 0
+        WaitFrames 12
+        CoopCall 35, 35, 0, 0
+        END
+  [29] script
+        CoopCall 18, 1, 0, 0
+  [30] text 0 "@^Are you sure you want to leave?\x0aYou'll lose all progress.\x0a(A: Yes  B: No)" -> 33
+  [31] script
+        CoopCall 18, 1, 0, 0
+  [32] text 0 "@^Leave the Time Chamber?\x0a(A: Yes  B: No)" -> 33
+  [33] script                            ; yes: out; no: a step back from the door
+        CoopCall 18, 0, 0, 0
+        PushByte 1
+        CmpEq
+        JumpIfFalse L1
+        PushByte 34
+        END
+      L1:
+        BeginCommandBatch
+        CoopCall 35, 36, 0, 0
+        CommitCommandBatch
+        CoopCall 35, 33, 0, 0
+        PushByte 35
+        END
+  [34] script                            ; out: the run's lights on again (first wins and Popo's rounds stay), the Lookout
+        CoopCall 35, 37, 0, 0
+        CoopCall 35, 33, 0, 0
+        PlayAudio 10
+        FadeOut 60
+        WaitFrames 20
+        WarpToMapWithEntities 9, 3, 1, 96, 168
+        FadeFromWhite 60
+  [35] stop 0x0
+  [36] script                            ; back from Popo's room, the training complete: the way home shown
+        CoopCall 35, 38, 0, 0
+        WaitFrames 20
+  [37] text 0 "@^Training complete!"
+  [38] script                            ; down the carpet from the gate to the quarters' door
+        PanCameraToPosition 896, 1160, 12
+        WaitFrames 24
+        WaitFrames 24
+        WaitFrames 24
+        WaitFrames 4
+  [39] text 82 "MR. POPO: Popo's training is complete. The chamber is quiet.\x0bThe door home is open. Follow the red carpet."
+  [40] script
+        FadeToWhite 16
+        SetActiveEntity 0
+        WaitFrames 6
+        WhiteFadeOut 16
+        CoopCall 35, 33, 0, 0
+  [41] stop 0x0
+  [42] script                            ; the portal: a flash, its sound, the hidden room (another part of the chamber)
+        PlayAudio 26
+        WhiteFlash 8
+        WaitFrames 10
+        FadeToWhite 24
+        CoopCall 35, 33, 0, 0
+        WarpToMapWithEntities 15, 25, 1, 244, 340
+        WhiteFadeOut 30
+  [43] stop 0x0
+end
+
 ; ---- a room ---------------------------------------------------------------------------------------------------------
 
+; the plaque starts ON (lit: decoration 0) and the player switches it OFF (Ryan, 2026-11-05); once thrown, a side room's
+; doorways are open (Broly's ship, Frieza's throne room: chamber.c ChRoom.ways)
 script ch_room_onload
         CoopCall 35, 1, 0, 0
         JumpIfFalse L1
-        FindCharacterEntity 0
+        CoopCall 35, 46, 0, 0
+        Jump L2
       L1:
+        FindCharacterEntity 0
+      L2:
 end
 
 script ch_boss_cond
@@ -123,21 +535,131 @@ end
 
 ; the plaque: refused (the stock click) until the room's boss is down and its bodies gone, and once thrown. Both stop words are
 ; 0: a dialogue trigger starts its next run at the index its last stop word names, so a plain `stop` here made the second press
-; start at the throw (entry 3) without asking CH_LEVER (found 2026-11-05: a click before the fight, then any press threw it)
+; start at the throw (entry 3) without asking CH_LEVER (found 2026-11-05: a click before the fight, then any press threw it).
+; The throw (Ryan's first play, docs/time-chamber.md 13): the plaque goes OFF; the cut-away starts at this room's entrance on the
+; open map and pans along the red carpet to the gate (chamber.c `way`), where the light goes out; the sixth also drops the
+; beams, opens the portal and holds on it with a line; back in the room the door opens, then the prize in a box of its own
+; (stock wording), then, once and only with Gohan in the party, Gohan's Super Saiyan in a box of its own (decision 6).
+; Absolute indexes (chamber.c's E_PRIZE_SENZU .. E_LEVER_END): keep the `[n]` checks.
 sequence ch_lever
-  script
+  [0] script
         CoopCall 35, 14, 0, 0
         END
-  script
+  [1] script
         PlayAudio 19
-  stop 0x0
-  script
-        FindCharacterEntity 0
+  [2] stop 0x0
+  [3] script                             ; the throw: OFF; the open map at this room's entrance
+        FindEntityByType 0
         PlayAudio 57
         WaitFrames 40
         SetMapRestoreFlag
-        LoadMapNoEntities 15, 18, 1, 908, 284
-        WaitFrames 60
+        PushByte 15
+        PushByte 18
+        PushByte 1
+        CoopCall 35, 40, 0, 0
+        CoopCall 35, 41, 0, 0
+        Step LoadMapNoEntities
+        WaitFrames 30
+  [4] script                             ; leg 0 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 0, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 0, 0
+        CoopCall 35, 44, 0, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 0, 0
+        Step WaitFrames
+        PushByte 5
+        END
+      G:
+        PushByte 11
+        END
+  [5] script                             ; leg 1 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 1, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 1, 0
+        CoopCall 35, 44, 1, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 1, 0
+        Step WaitFrames
+        PushByte 6
+        END
+      G:
+        PushByte 11
+        END
+  [6] script                             ; leg 2 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 2, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 2, 0
+        CoopCall 35, 44, 2, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 2, 0
+        Step WaitFrames
+        PushByte 7
+        END
+      G:
+        PushByte 11
+        END
+  [7] script                             ; leg 3 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 3, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 3, 0
+        CoopCall 35, 44, 3, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 3, 0
+        Step WaitFrames
+        PushByte 8
+        END
+      G:
+        PushByte 11
+        END
+  [8] script                             ; leg 4 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 4, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 4, 0
+        CoopCall 35, 44, 4, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 4, 0
+        Step WaitFrames
+        PushByte 9
+        END
+      G:
+        PushByte 11
+        END
+  [9] script                             ; leg 5 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 5, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 5, 0
+        CoopCall 35, 44, 5, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 5, 0
+        Step WaitFrames
+        PushByte 10
+        END
+      G:
+        PushByte 11
+        END
+  [10] script                             ; leg 6 of the way along the carpet (chamber.c `way`), else the gate
+        CoopCall 35, 42, 6, 0
+        JumpIfFalse G
+        CoopCall 35, 43, 6, 0
+        CoopCall 35, 44, 6, 0
+        PushByte 8
+        Step PanCameraToPosition
+        CoopCall 35, 45, 6, 0
+        Step WaitFrames
+        PushByte 11
+        END
+      G:
+        PushByte 11
+        END
+  [11] script                            ; at the gate: the light goes out; the sixth: the beams, the portal
+        WaitFrames 30
         PlayAudio 47
         CoopCall 35, 16, 0, 0
         Step FindEntityByType
@@ -154,28 +676,71 @@ sequence ch_lever
         WaitFrames 80
         StopAudio 17
         PlayAudio 18
-        WaitFrames 90
+        WaitFrames 60
+        CoopCall 35, 39, 1, 0                  ; the portal opens
+        PlayAudio 26
+        WhiteFlash 6
+        WaitFrames 70
+        PushByte 12
+        END
       L1:
+        PushByte 13
+        END
+  [12] text 82 "MR. POPO: Six lights are out. The gate is open.\x0bFollow the red carpet north, past the quarters, into the light." -> 13
+  [13] script                            ; back in the room: the door opens; then the prize (if owed) with its box
         RestoreMap
         CoopCall 35, 20, 0, 0
         PlayAudio 47
-        CoopCall 36, 19, 0, 0                  ; the room's prize (popo.c): its first win a +3 capsule, any win once round a Senzu
+        WaitFrames 30
+        CoopCall 35, 47, 0, 0
         JumpIfFalse P1
-        CoopCall 36, 20, 0, 0
+        CoopCall 35, 48, 0, 0
         Step PickUpItem
+        CoopCall 35, 49, 0, 0
+        END
       P1:
-        StackTestStoryFlagNot 468
-        StackTestStoryFlagNot 193
-        And
-        JumpIfFalse L2
+        PushByte 18
+        END
+  [14] text 0 "@^You received a Senzu Bean!" -> 18
+  [15] text 0 "@^You received a +3 Strength Capsule!" -> 18
+  [16] text 0 "@^You received a +3 Power Capsule!" -> 18
+  [17] text 0 "@^You received a +3 Endurance Capsule!" -> 18
+  [18] script                            ; -> 19 Gohan's Super Saiyan now, 21 the end
+        CoopCall 35, 50, 0, 0
+        END
+  [19] script
         SetStoryFlag 468
         SetCharacterTransformation 0, 56
         PlayAudio 62
-        PushByte 4
+        WaitFrames 20
+  [20] text 0 "@^Gohan's training has paid off!\x0bGohan can now become a Super Saiyan!"
+  [21] stop 0x0
+end
+
+; ---- the side rooms (Broly's ship: the bedroom 15/27, the store room 15/28; Frieza's throne room 15/29) -------------------
+; Explore only: two jars, and one thing to find (A facing it, either player); the find is taken once ever (flags 531-533).
+; Entries: 1 + 2n room n's find, 2 + 2n its look once taken (chamber.c CH_FIND); the find's item and its box follow it
+sequence ch_find
+  [0] script
+        CoopCall 35, 51, 0, 0
         END
-      L2:
-        PushByte 5
-        END
-  text 0 "@^Gohan can now transform into a Super Saiyan!"
-  stop 0x0
+  [1] text 0 "@^A bed, neatly made. Something is under the pillow..." -> 7
+  [2] text 0 "@^A bed, neatly made. Nothing else here." -> 13
+  [3] text 0 "@^The cold box is stocked with rations...\x0band something green at the back." -> 9
+  [4] text 0 "@^Rations, and nothing else." -> 13
+  [5] text 0 "@^Frieza's hover pod. Something is wedged in the seat..." -> 11
+  [6] text 0 "@^Frieza's hover pod. It hums quietly." -> 13
+  [7] script                             ; the find is taken (flag 531 + n): the item
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [8] text 0 "@^You received a +3 Endurance Capsule!" -> 13
+  [9] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [10] text 0 "@^You received a Senzu Bean!" -> 13
+  [11] script
+        CoopCall 35, 52, 0, 0
+        Step PickUpItem
+  [12] text 0 "@^You received a +3 Power Capsule!" -> 13
+  [13] stop 0x0
 end

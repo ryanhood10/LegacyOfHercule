@@ -1,0 +1,125 @@
+{
+ "_": "A Time Chamber side room (docs/time-chamber.md 13): the Saiyan ship's store room, Buu's Fury's 6/7 (variation 0x08253DE4, the round room's right-hand room there: the cold box) imported but its BG0 and its decorations; its opening on the left back to the Saiyan ship (15/24), open once that room's lever is thrown. Explore only: two stone jars, and in the cold box a Senzu Bean, once ever (ch_find, flag 532).",
+ "name": "chamber_saiyan_store",
+ "zone": 15,
+ "area": 28,
+ "requires": "buu",
+ "tileset": "fresh",
+ "layout": [
+  240,
+  160
+ ],
+ "priorities": [
+  2,
+  2,
+  3,
+  3
+ ],
+ "ops": [
+  {
+   "op": "stamp",
+   "at": [
+    0,
+    0
+   ],
+   "src": {
+    "map": {
+     "rom": "buu",
+     "variation": "0x08253DE4"
+    },
+    "rect": [
+     0,
+     0,
+     30,
+     20
+    ]
+   },
+   "layers": [
+    1,
+    2,
+    3
+   ],
+   "to_layers": [
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "objects": {
+  "parts": [
+   {
+    "map": [
+     14,
+     2
+    ]
+   }
+  ],
+  "list": [
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 176,
+    "y": 64,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   },
+   {
+    "part": 0,
+    "frame": 0,
+    "x": 176,
+    "y": 120,
+    "shape": "32x32",
+    "hits": 3,
+    "drop": "script:ch_jar_drop"
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "type": "dialogue",
+   "rect": [
+    112,
+    76,
+    152,
+    104
+   ],
+   "payload": "seq:ch_find",
+   "activation": "facing",
+   "_": "below the cold box, facing it"
+  }
+ ],
+ "exits": [
+  {
+   "type": "door",
+   "rect": [
+    0,
+    96,
+    24,
+    124
+   ],
+   "dir": "left",
+   "to": [
+    15,
+    24,
+    1
+   ],
+   "at": [
+    200,
+    160
+   ],
+   "facing": 2
+  }
+ ],
+ "spawn": [
+  36,
+  108
+ ],
+ "name_id": 221,
+ "music": 39,
+ "flags": 1,
+ "sources": [
+  "data/story/chamber.lscript"
+ ]
+}

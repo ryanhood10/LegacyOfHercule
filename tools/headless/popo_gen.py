@@ -112,7 +112,7 @@ def routes(p1, p2):
 def into_room(s, p2=True):
     """from the open area through the gate (all six lights out) into the hidden room: a real load (the actor's record)"""
     s.place(1028, 346, p2)
-    s.out("frames 4", "keys 0x40", "waitmap 15 25 300", "keys 0", "frames 40")
+    s.out("frames 4", "keys 0x40", "waitmap 15 25 300", "keys 0", "frames 60")   # the portal's flash and white fade (a scene of chamber.c)
     s.expect(r"map zone 15 area 25 ", "map")
 
 
@@ -167,7 +167,7 @@ def win_and_end(s, first, items_before, two):
     s.state(P_DONE)
     s.deco(0, 0)
     s.flag(530, True)
-    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
+    s.expect(r"\w+: 7f$", "peek8 FLAGS+0x3F 1")       # the six lights, the run under way (510)
     s.actor(1)
 
 
@@ -202,6 +202,8 @@ def out_of_room(s, p2):
     s.place(244, 368, p2)
     s.out("frames 2", "keys 0x80", "waitmap 15 18 200", "keys 0", "frames 120")
     s.expect(r"map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d", "map")
+    s.echo("(Popo beaten this time round: the training's end plays on the open area; A through it)")
+    s.out(f"stepz {SCENE} 20", "frames 30")
 
 
 def main_script():
@@ -267,7 +269,7 @@ def main_script():
     win_and_end(s, True, (0, 0), False)
     s.echo("talking to him: no fight, no start again: the lights stay out, no time round")
     talk(s, False, False)
-    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
+    s.expect(r"\w+: 7f$", "peek8 FLAGS+0x3F 1")       # the six lights, the run under way (510)
     s.popo_expect(0, r"000[bf]0007")
     out_of_room(s, p2=False)
 
@@ -285,7 +287,7 @@ def main_script():
     win_and_end(s, False, (1, 1), False)
     talk(s, False, True)
     s.echo("started again: the six lights back on, time round 1 (flag 520), flag 530 clear")
-    s.expect(r"\w+: 00$", "peek8 FLAGS+0x3F 1")
+    s.expect(r"\w+: 40$", "peek8 FLAGS+0x3F 1")       # the six lights on again, the run goes on (510)
     s.flag(520, True)
     s.flag(530, False)
     s.echo("asked once more: only his line (nothing armed), still standing")
@@ -339,11 +341,11 @@ def main_script():
     s.echo("A on both pads through the end: no question, the lights untouched")
     s.out(f"stepz {SCENE} 30", "frames 60")
     s.state(P_DONE)
-    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
+    s.expect(r"\w+: 7f$", "peek8 FLAGS+0x3F 1")       # the six lights, the run under way (510)
     s.out(f"shot {s.tag}_done")
     s.echo("player 2 walks up and asks: no fight, no start again")
     talk(s, False, False, by_p2=True)
-    s.expect(r"\w+: 3f$", "peek8 FLAGS+0x3F 1")
+    s.expect(r"\w+: 7f$", "peek8 FLAGS+0x3F 1")       # the six lights, the run under way (510)
 
     # ---- more lineups: the scene's routes and bodies -------------------------------------------------------------------
     for tag, p1, p2 in (("hercule_vegeta", HERCULE, VEGETA), ("krillin_alone", KRILLIN, None), ("gohan_piccolo", GOHAN, PICCOLO),
@@ -404,10 +406,10 @@ def main_script():
     s.out("frames 4", "keys 0x40", "frames 4", "keys 0", "key 1 6", "frames 30", "key 1 6", "frames 30", "key 1 6", "frames 20")
     s.out("shot jar_drop", "ents")
     s.echo("player 1 full, player 2 hurt and out of ki: both drop (player 2's bars), he walks over them: 30 % of 9999 HP and of 400 ki back")
-    s.place(440, 40)
-    s.out("frames 10")
-    s.place(440, 48)
-    s.out("frames 30")
+    s.place(300, 200, p2=False)                     # player 1 (full) away: his own scan would take the drops
+    for x, y in ((424, 40), (424, 48), (436, 44), (448, 44), (440, 56), (428, 56), (452, 56), (440, 36)):   # player 2 over both drops
+        s.out("deref P2 0x0203FF08", f"poke32 P2+0x158 {x << 8:#x}", f"poke32 P2+0x15C {y << 8:#x}", "frames 10")
+    s.out("frames 20")
     s.expect(r"\w+: (?!0064)[0-9a-f]{4}$", f"peek16 {entry(HERCULE):#x} 1")
     s.expect(r"\w+: (?!000a)[0-9a-f]{4}$", f"peek16 {entry(HERCULE) + 4:#x} 1")
     s.write("chamber_popo.txt")

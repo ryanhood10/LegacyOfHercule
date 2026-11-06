@@ -1,5 +1,5 @@
 {
- "_": "A Time Chamber room (docs/time-chamber.md 12): the Saiyan ship, the Broly chapter's round room again (Buu's Fury's 6/6, variation 0x082546A0 there, as saiyan_ship.json): its Capsule Corp pad (BG2) cleared, the side openings and the top doorway closed, the bottom opening the door (the map is 16 px taller: the way out below it), a black plaque (8/37's) on the back wall right of the doorway (BG1). Broly, with two players Paragus (his fall first enrages Broly: chamber.c RF_RAGE). Without roms/buu.gba chamber_saiyan_plain.json stands here.",
+ "_": "A Time Chamber room (docs/time-chamber.md 12): the Saiyan ship, the Broly chapter's round room again (Buu's Fury's 6/6, variation 0x082546A0 there, as saiyan_ship.json): its Capsule Corp pad (BG2) cleared, the top doorway closed, the side openings closed until the lever is thrown (then the bedroom 15/27 and the store room 15/28), the bottom opening the door (the map is 16 px taller: the way out below it), a black plaque (8/37's) on the back wall right of the doorway (BG1). Broly, with two players Paragus (his fall first enrages Broly: chamber.c RF_RAGE). Without roms/buu.gba chamber_saiyan_plain.json stands here.",
  "name": "chamber_saiyan",
  "zone": 15,
  "area": 24,
@@ -232,6 +232,48 @@
     1156
    ],
    "facing": 0
+  },
+  {
+   "type": "door",
+   "rect": [
+    0,
+    136,
+    24,
+    184
+   ],
+   "dir": "left",
+   "to": [
+    15,
+    27,
+    1
+   ],
+   "at": [
+    204,
+    108
+   ],
+   "facing": 2,
+   "_": "the bedroom (the left opening, blocked until the lever)"
+  },
+  {
+   "type": "door",
+   "rect": [
+    216,
+    136,
+    240,
+    184
+   ],
+   "dir": "right",
+   "to": [
+    15,
+    28,
+    1
+   ],
+   "at": [
+    36,
+    108
+   ],
+   "facing": 3,
+   "_": "the store room (the right opening, blocked until the lever)"
   }
  ],
  "onload": "script:ch_room_onload",

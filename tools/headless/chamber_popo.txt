@@ -51,7 +51,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 ents
@@ -389,7 +389,7 @@ peek D+0x10 1
 echo flag 530 set
 echo EXPECT \w+: (04|05|06|07|0c|0d|0e|0f|14|15|16|17|1c|1d|1e|1f|24|25|26|27|2c|2d|2e|2f|34|35|36|37|3c|3d|3e|3f|44|45|46|47|4c|4d|4e|4f|54|55|56|57|5c|5d|5e|5f|64|65|66|67|6c|6d|6e|6f|74|75|76|77|7c|7d|7e|7f|84|85|86|87|8c|8d|8e|8f|94|95|96|97|9c|9d|9e|9f|a4|a5|a6|a7|ac|ad|ae|af|b4|b5|b6|b7|bc|bd|be|bf|c4|c5|c6|c7|cc|cd|ce|cf|d4|d5|d6|d7|dc|dd|de|df|e4|e5|e6|e7|ec|ed|ee|ef|f4|f5|f6|f7|fc|fd|fe|ff)$
 peek8 FLAGS+0x42 1
-echo EXPECT \w+: 3f$
+echo EXPECT \w+: 7f$
 peek8 FLAGS+0x3F 1
 deref R TBL+0x270
 echo EXPECT entrec [0-9a-f]+: 1$
@@ -428,7 +428,7 @@ frames 60
 find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
-echo EXPECT \w+: 3f$
+echo EXPECT \w+: 7f$
 peek8 FLAGS+0x3F 1
 poke32 0x0203FD0C 0x0
 poke32 0x0203FD54 0x0
@@ -446,6 +446,9 @@ keys 0
 frames 120
 echo EXPECT map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d
 map
+echo (Popo beaten this time round: the training's end plays on the open area; A through it)
+stepz 0x03001FDC 20
+frames 30
 echo --- back in the room after the win: no scene, he stands facing them; asked, a fight again, won; then the loop
 poke16 0x203f00c 9999
 poke16 0x203f00e 9999
@@ -482,7 +485,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 150
@@ -591,7 +594,7 @@ peek D+0x10 1
 echo flag 530 set
 echo EXPECT \w+: (04|05|06|07|0c|0d|0e|0f|14|15|16|17|1c|1d|1e|1f|24|25|26|27|2c|2d|2e|2f|34|35|36|37|3c|3d|3e|3f|44|45|46|47|4c|4d|4e|4f|54|55|56|57|5c|5d|5e|5f|64|65|66|67|6c|6d|6e|6f|74|75|76|77|7c|7d|7e|7f|84|85|86|87|8c|8d|8e|8f|94|95|96|97|9c|9d|9e|9f|a4|a5|a6|a7|ac|ad|ae|af|b4|b5|b6|b7|bc|bd|be|bf|c4|c5|c6|c7|cc|cd|ce|cf|d4|d5|d6|d7|dc|dd|de|df|e4|e5|e6|e7|ec|ed|ee|ef|f4|f5|f6|f7|fc|fd|fe|ff)$
 peek8 FLAGS+0x42 1
-echo EXPECT \w+: 3f$
+echo EXPECT \w+: 7f$
 peek8 FLAGS+0x3F 1
 deref R TBL+0x270
 echo EXPECT entrec [0-9a-f]+: 1$
@@ -630,7 +633,7 @@ find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
 echo started again: the six lights back on, time round 1 (flag 520), flag 530 clear
-echo EXPECT \w+: 00$
+echo EXPECT \w+: 40$
 peek8 FLAGS+0x3F 1
 echo flag 520 set
 echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
@@ -669,6 +672,9 @@ keys 0
 frames 120
 echo EXPECT map zone 15 area 18 var 1 player 10[0-4]\d,4[0-4]\d
 map
+echo (Popo beaten this time round: the training's end plays on the open area; A through it)
+stepz 0x03001FDC 20
+frames 30
 echo outside: the gate's lights and beams stand again at the next load, the way shut
 frames 60
 deref D 0x3001128
@@ -749,7 +755,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -841,7 +847,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1026,7 +1032,7 @@ frames 60
 find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
-echo EXPECT \w+: 3f$
+echo EXPECT \w+: 7f$
 peek8 FLAGS+0x3F 1
 shot two_goku_done
 echo player 2 walks up and asks: no fight, no start again
@@ -1068,7 +1074,7 @@ frames 60
 find PO 0x4F504F50
 echo EXPECT \w+: 07
 peek8 PO+4 1
-echo EXPECT \w+: 3f$
+echo EXPECT \w+: 7f$
 peek8 FLAGS+0x3F 1
 echo === lineup hercule_vegeta: the scene and the fight's start
 load menu.ss
@@ -1131,7 +1137,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1232,7 +1238,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1337,7 +1343,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1442,7 +1448,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1547,7 +1553,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1652,7 +1658,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -1952,7 +1958,7 @@ frames 4
 keys 0x40
 waitmap 15 25 300
 keys 0
-frames 40
+frames 60
 echo EXPECT map zone 15 area 25 
 map
 frames 60
@@ -2030,19 +2036,41 @@ shot jar_drop
 ents
 echo player 1 full, player 2 hurt and out of ki: both drop (player 2's bars), he walks over them: 30 % of 9999 HP and of 400 ki back
 deref P1 0x03001FA8
-poke32 P1+0x158 0x1b800
-poke32 P1+0x15C 0x2800
+poke32 P1+0x158 0x12c00
+poke32 P1+0x15C 0xc800
 deref P2 0x0203FF08
 poke32 P2+0x158 0x1a800
 poke32 P2+0x15C 0x2800
 frames 10
-deref P1 0x03001FA8
-poke32 P1+0x158 0x1b800
-poke32 P1+0x15C 0x3000
 deref P2 0x0203FF08
 poke32 P2+0x158 0x1a800
 poke32 P2+0x15C 0x3000
-frames 30
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1b400
+poke32 P2+0x15C 0x2c00
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1c000
+poke32 P2+0x15C 0x2c00
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1b800
+poke32 P2+0x15C 0x3800
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1ac00
+poke32 P2+0x15C 0x3800
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1c400
+poke32 P2+0x15C 0x3800
+frames 10
+deref P2 0x0203FF08
+poke32 P2+0x158 0x1b800
+poke32 P2+0x15C 0x2400
+frames 10
+frames 20
 echo EXPECT \w+: (?!0064)[0-9a-f]{4}$
 peek16 0x203f098 1
 echo EXPECT \w+: (?!000a)[0-9a-f]{4}$

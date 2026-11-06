@@ -9,6 +9,10 @@ frames 200
 poke8 0x0203F000 1
 poke8 0x0203FF84 5
 deref TBL 0x0800959C
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 1
+poke32 0x0203FD08 48
+frames 2
 poke32 0x0203FD0C 0x309
 poke32 0x0203FD54 0xa00060
 poke32 0x0203FD08 5
@@ -296,6 +300,40 @@ deref D 0x3001140
 echo EXPECT \w+: 00000001
 peek D+0x10 1
 shot g_lights
+echo the wall the gate stands in: walking up at x 600 stops below it, nothing walks round the gate
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD0C 0x120f
+poke32 0x0203FD54 0x1d60258
+poke32 0x0203FD08 5
+frames 150
+deref P1 0x03001FA8
+poke32 P1+0x158 0x25800
+poke32 P1+0x15C 0x1d600
+keys 0x40
+frames 90
+keys 0
+echo EXPECT map zone 15 area 18 var 1 player 6\d\d,(39\d|4[0-6]\d)
+map
+shot g_wall
+echo five lights out: the portal closed (decorations 25 / 26 hidden)
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x1f
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD0C 0x120f
+poke32 0x0203FD54 0x1ae0404
+poke32 0x0203FD08 5
+frames 150
+frames 30
+deref D 0x300118c
+echo EXPECT \w+: 00000000
+peek D+0x10 1
+deref D 0x3001190
+echo EXPECT \w+: 00000000
+peek D+0x10 1
 echo the beams shut the way: walking up into them stops below the gate
 poke32 0x0203FD0C 0
 poke32 0x0203FD54 0x0
@@ -350,13 +388,29 @@ peek D+0x10 1
 deref D 0x3001148
 echo EXPECT \w+: 00000000
 peek D+0x10 1
+echo the portal between the pillars is open: its two frames (decorations 25 / 26) shown in turn
+frames 5
+deref PA 0x300118c
+deref PB 0x3001190
+peek PA+0x10 1
+peek PB+0x10 1
+frames 6
+frames 5
+deref PA 0x300118c
+deref PB 0x3001190
+peek PA+0x10 1
+peek PB+0x10 1
+frames 6
+find CH 0x4348414D
+echo EXPECT \w+: [0-9a-f]{4}0[4-7c-f][0-9a-f]{2}
+peek CH+0x30 1
 deref P1 0x03001FA8
 poke32 P1+0x158 0x40400
 poke32 P1+0x15C 0x1ae00
 keys 0x40
-frames 50
+frames 30
 keys 0
-echo EXPECT map zone 15 area 18 var 1 player 10\d\d,3[4-8]\d
+echo EXPECT map zone 15 area 18 var 1 player 10\d\d,(3[5-9]\d|4[0-2]\d)
 map
 shot g_open
 poke32 0x0203FD0C 0
@@ -511,7 +565,7 @@ frames 90
 keys 0
 echo EXPECT map zone 15 area 18 var 1 player 20[0-3]\d,20[0-3]\d
 map
-echo --- the save pad at the quarters: a save with lights out, a soft reset, a load
+echo --- no save pad inside the chamber any more (Ryan, 2026-11-05): A on its old spot opens nothing
 poke32 0x0203FD0C 0
 poke32 0x0203FD54 0x5
 poke32 0x0203FD08 48
@@ -520,7 +574,6 @@ poke32 0x0203FD0C 0x120f
 poke32 0x0203FD54 0x4cc04c8
 poke32 0x0203FD08 5
 frames 150
-echo (no body near the pad: the refill frozen, the standing ones gone; a hit on the way in kept the menu shut once)
 poke32 0x0203FD0C 3
 poke32 0x0203FD54 1
 poke32 0x0203FD08 48
@@ -534,62 +587,102 @@ deref P2 0x0203FF08
 poke32 P2+0x158 0x4b800
 poke32 P2+0x15C 0x4cc00
 frames 30
-mash 6 50
-frames 60
-key 1 4
-frames 80
-key 1 4
-frames 80
-key 1 4
-frames 80
-key 1 4
-frames 60
-shot g_saved
-echo saved on zone 15 area 18
-echo EXPECT \w+: 0f 12
-peek8 PARTY+2 2
-key 0xF 6
-frames 400
-key 8 6
-frames 200
-key 8 6
-frames 200
-key 8 6
-frames 200
 key 1 6
-frames 100
-key 1 6
-frames 100
-stepnz 0x0203FA49 10
-find PS 0x91A7E250
 frames 60
+shot g_nopad
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo --- the door home asks first (Ryan: a player may leave mid-run by accident)
+flags +514 +520
+deref P1 0x03001FA8
+poke32 P1+0x158 0x3f400
+poke32 P1+0x15C 0x4ee00
+keys 0x40
+frames 40
+keys 0
+frames 50
+shot g_ask_lose
+find CH 0x4348414D
+echo EXPECT \w+: [0-9a-f]{6}42
+peek CH+0x30 1
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+echo B (once its text is out): no; a step back from the door, still inside, the lights kept (0 and 2 out, the run's 510)
+frames 120
 key 2 6
-frames 100
-key 1 6
-frames 300
-shot g_loaded
+frames 90
+shot g_no
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 15 area 18 var 1 player \d+,12[5-9]\d
+map
+echo EXPECT \w+: 45$
+peek8 FLAGS+0x3F 1
+echo an A held when the question comes does not answer it: A down as the scene starts and held, the box waits (CoopCall 18 ignores a held A)
+deref P1 0x03001FA8
+poke32 P1+0x158 0x3f400
+poke32 P1+0x15C 0x4ee00
+keys 0x40
+waitnz 0x03001FDC 200
+keys 0x41
+frames 200
+shot g_held
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
 echo EXPECT map zone 15 area 18 
 map
-echo the load: lights 0 and 2 out, the rest on, its spots standing (the bodies of tier 2)
-deref D 0x3001128
-echo EXPECT \w+: 00000000
-peek D+0x10 1
-deref D 0x300112c
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001130
-echo EXPECT \w+: 00000000
-peek D+0x10 1
-deref D 0x3001134
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x3001138
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-deref D 0x300113c
-echo EXPECT \w+: 00000001
-peek D+0x10 1
-ents
+keys 0
+frames 20
+echo A now: yes; the run's progress reset (the six lights on, flag 510 clear), the first win and the time round kept, the Lookout
+key 1 6
+waitmap 9 3 400
+frames 120
+shot g_left
+echo EXPECT map zone 9 area 3 var 1 player 9\d,1[67]\d
+map
+echo flags 504-510 clear (the lights; the run: the next way in is a new run, its opening in chamber_run.txt)
+echo EXPECT \w+: 00$
+peek8 FLAGS+0x3F 1
+echo EXPECT \w+: (04|05|06|07|0c|0d|0e|0f|14|15|16|17|1c|1d|1e|1f|24|25|26|27|2c|2d|2e|2f|34|35|36|37|3c|3d|3e|3f|44|45|46|47|4c|4d|4e|4f|54|55|56|57|5c|5d|5e|5f|64|65|66|67|6c|6d|6e|6f|74|75|76|77|7c|7d|7e|7f|84|85|86|87|8c|8d|8e|8f|94|95|96|97|9c|9d|9e|9f|a4|a5|a6|a7|ac|ad|ae|af|b4|b5|b6|b7|bc|bd|be|bf|c4|c5|c6|c7|cc|cd|ce|cf|d4|d5|d6|d7|dc|dd|de|df|e4|e5|e6|e7|ec|ed|ee|ef|f4|f5|f6|f7|fc|fd|fe|ff)$
+peek8 FLAGS+0x40 1
+echo EXPECT \w+: (01|03|05|07|09|0b|0d|0f|11|13|15|17|19|1b|1d|1f|21|23|25|27|29|2b|2d|2f|31|33|35|37|39|3b|3d|3f|41|43|45|47|49|4b|4d|4f|51|53|55|57|59|5b|5d|5f|61|63|65|67|69|6b|6d|6f|71|73|75|77|79|7b|7d|7f|81|83|85|87|89|8b|8d|8f|91|93|95|97|99|9b|9d|9f|a1|a3|a5|a7|a9|ab|ad|af|b1|b3|b5|b7|b9|bb|bd|bf|c1|c3|c5|c7|c9|cb|cd|cf|d1|d3|d5|d7|d9|db|dd|df|e1|e3|e5|e7|e9|eb|ed|ef|f1|f3|f5|f7|f9|fb|fd|ff)$
+peek8 FLAGS+0x41 1
+frames 200
+echo --- no lights out: the plain question, B, still inside
+poke32 0x0203FD0C 0
+poke32 0x0203FD54 0x0
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD0C 0x120f
+poke32 0x0203FD54 0x4f803f8
+poke32 0x0203FD08 5
+frames 150
+poke32 0x0203FD0C 3
+poke32 0x0203FD54 1
+poke32 0x0203FD08 48
+frames 2
+poke32 0x0203FD08 13
+frames 30
+deref P1 0x03001FA8
+poke32 P1+0x158 0x3f400
+poke32 P1+0x15C 0x4ee00
+keys 0x40
+frames 40
+keys 0
+frames 50
+shot g_ask_plain
+find CH 0x4348414D
+echo EXPECT \w+: [0-9a-f]{6}42
+peek CH+0x30 1
+echo EXPECT 03001fdc: 0000000[1-9a-f]
+peek 0x03001FDC 1
+frames 120
+key 2 6
+frames 90
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 15 area 18 
+map
 echo === a new game clears flags 504-535 (party_new_game), not 496-503's neighbour 536+: set at the title after a soft reset
 load menu.ss
 p2 off

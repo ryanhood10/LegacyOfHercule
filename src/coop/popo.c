@@ -268,7 +268,7 @@ enum {
     POPO_BEHIND,        // the flash's other side: he stands behind the players, they turn round to him
     POPO_FIGHT,         // the door seals; the fight starts when the scene ends
     POPO_AWAY,          // the end scene's flash: the fighter's body goes, he stands at the far end facing them
-    POPO_WIN,           // -> the end's entry: 1 the first win ever, 3 a later one
+    POPO_WIN,           // -> the end's entry: 1 the first win ever, 10 a later one
     POPO_PAID,          // his first reward is paid (flag 513)
     POPO_LOOP,          // the loop: the six lights back on, one time round more (at most CH_ROUND_MAX)
     POPO_OPEN,          // the door opens
@@ -393,7 +393,7 @@ int popo_call(s32 op, s32 a, s32 b, s32 *push) {
         }
         return 0;
     }
-    case POPO_WIN: *push = po.first ? 1 : 3; return 1;
+    case POPO_WIN: *push = po.first ? 1 : 10; return 1;   // ch_popo_end's entries
     case POPO_PAID: flag_set_hook(g_Party, CH_FLAG_POPO); return 0;
     case POPO_LOOP: {
         for (int i = 0; i < CH_ROOMS; i++) flag_clear_hook(g_Party, CH_FLAG_LEVER0 + i);

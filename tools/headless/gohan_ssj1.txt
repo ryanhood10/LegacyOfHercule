@@ -41,6 +41,10 @@ poke16 0x203f0b4 999
 poke16 0x203f0b6 999
 poke16 0x203f0b8 400
 poke16 0x203f0ba 400
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 1
+poke32 0x0203FD08 48
+frames 2
 poke32 0x0203FD0C 0x309
 poke32 0x0203FD54 0xa00060
 poke32 0x0203FD08 5
@@ -132,9 +136,13 @@ frames 6
 keys 0
 key 1 4
 waitmap 15 18 300
-frames 500
+waitmap 15 19 900
+frames 80
+shot gohan_p1_prize
+key 1 6
+frames 70
 shot gohan_p1_caption
-mash 2 90
+stepz 0x03001FDC 10
 frames 60
 echo EXPECT map zone 15 area 19 
 map
@@ -191,6 +199,10 @@ poke16 0x203f0b4 999
 poke16 0x203f0b6 999
 poke16 0x203f0b8 400
 poke16 0x203f0ba 400
+poke32 0x0203FD0C 7
+poke32 0x0203FD54 1
+poke32 0x0203FD08 48
+frames 2
 poke32 0x0203FD0C 0x309
 poke32 0x0203FD54 0xa00060
 poke32 0x0203FD08 5
@@ -282,9 +294,13 @@ frames 6
 keys 0
 key 1 4
 waitmap 15 18 300
-frames 500
+waitmap 15 19 900
+frames 80
+shot gohan_p2_prize
+key 1 6
+frames 70
 shot gohan_p2_caption
-mash 2 90
+stepz 0x03001FDC 10
 frames 60
 echo EXPECT map zone 15 area 19 
 map
