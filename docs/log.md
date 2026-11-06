@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **Cutscenes, batch 2 (chapters 5 to 9, the wait, Broly; branch `nb-cs2`; `docs/cutscenes/batch2_ch5-9.md` marks each scene):**
+  one commit a scene. Showcases: the fusion (5.5 / 5.6), Perfect Cell (7.4, with the Final Flash as its own commit), Broly's
+  entrance, rage and end (B.3 with Vegeta's knee as its own commit, B.4, B.5), Tien's Tri-Beam and Goku's rescue (6.8 c),
+  Gingertown's end (5.8, with Cell's escape as a white as its own commit), the Time Chamber duel (6.4: alone the spar is played).
+  Repairs: the island's break (6.7), Cooler (W.3), Kame House (6.5, and no second Krillin at the flight pad), Trunks' knee and
+  Cell's turns (7.6 in part), Vegeta's charge (7.2 in part). Not built: 5.1, 5.7, 6.1, 6.6, 6.8 a / b, 7.1, 7.3, 7.5, W.2, W.4,
+  W.5, 9.x, B.1, B.6. Three variant beats wait for Ryan's word (each one commit). No line added or changed (two box prefixes
+  changed: the fusion's three lines and Vegeta's "So this is your new body?" to the bottom box; Broly's three lines from
+  captions to bottom boxes). Facts: `docs/scripts.md` 2.1 (PlayAudioBlocking is a shake, GlideToPosition's speed, batches as
+  timelines). Cine findings told to the coordinator: a held charge on Broly's defeated boss body hangs the next blocking step;
+  a dash of player 1 after a charge and a transformation lets the camera drift; a lying-Vegeta picture over Trunks in zone 12.
 - **The cinematic helpers (`src/coop/cine.c`, `CoopCall 37`; branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine"):** the moves a
   cutscene fight needs, each one call from lscript: the afterimage dash, a light or heavy strike (the knock-back in an arc, the
   landing, lying or on a knee), a melee exchange (beats, clashes, both vanishing and meeting again), a charge (blocking, or held

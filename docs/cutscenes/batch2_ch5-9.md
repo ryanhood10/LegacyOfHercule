@@ -104,6 +104,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 | B.5 | **Broly's end, the planet** | `broly_end` 0-7 | **showcase** (with B.3) | M |
 | B.6 | the debrief | `broly_home_out`, map 165 | touch up | S |
 
+### Development status (2026-11-06, branch `nb-cs2`; each built scene has a "Built" note under its heading)
+
+| state | scenes |
+|---|---|
+| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (but Cooler's charge), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built in part | 7.2 (the power-up; not the first blow), 7.6 (the knee, Cell's turns and exit; not the two misses) |
+| not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
+
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
 
 ### 5.1 The Lookout, first visit: Kami defers (touch up, S)
