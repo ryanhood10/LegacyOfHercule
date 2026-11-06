@@ -1597,7 +1597,40 @@ sequence cg_beam_struggle
         SetEntityFacing 0, 2
         PanCameraToPosition 304, 408, 2
         END
-  stockseq @083ec758 37 48    ; Vegeta's thoughts, "I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!"
+  stockseq @083ec758 37 41    ; Piccolo and Vegeta, Vegeta's thoughts
+  script                                 ; stock entry 42: Vegeta leaves; the rocks: the announcer, and Hercule looking up at where they flew off
+        WaitFrames 80
+        PlayAudio 26
+        FlyToPosition 137, 264, 560
+        DespawnEntity 137
+        WaitFrames 60
+        PlayMusic 21
+        SpawnCharacterEntity 16, 472, 736
+        SetEntityFacing 16, 1
+        SpawnCharacterEntity 72, 400, 656
+        PanCameraToPosition 336, 624, 3
+        WalkToPosition 72, 408, 688
+        SetEntityFacing 72, 1
+        WaitFrames 30
+  stock @083ec492    ; "ANNOUNCER: Hercule!  What on this crazy Earth happened?"
+  script                                 ; he turns, looks left and right: nobody
+        SetEntityFacing 72, 3
+        WaitFrames 20
+        SetEntityFacing 72, 2
+        WaitFrames 18
+        SetEntityFacing 72, 3
+        WaitFrames 18
+        SetEntityFacing 72, 0
+        WaitFrames 10
+  stock @083ec4d0    ; "Well... What if I said...  I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!"
+  script                                 ; his win pose
+        SetEntityAnimation 72, 7
+  stockseq @083ec758 45 46    ; "Just how did you do it?", the "light shows and tricks" speech, "CHOP!!!!"
+  script                                 ; the chop
+        SetEntityFacing 72, 3
+        SetEntityAnimation 72, 6
+        SetEntityFacing 72, 0
+  stockseq @083ec758 47 48    ; "what happened to the little boy and all his friends?", "they all thanked me kindly and went home of course!"
   script                                 ; stock entry 49: the statue for beating Cell, flag 195; no Hercule join (he is in the party already)
         WaitFrames 60
         FadeOut 240

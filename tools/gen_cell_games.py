@@ -653,7 +653,21 @@ b = body(A3, "m325_r12_defeat", 36)
 k = b.index("SetEntityFacing 0, 2")
 b = b[:k] + ["WalkToPosition 72, 516, 410", "WalkToPosition 72, 584, 440", "DespawnEntity 72"] + b[k:]
 script(["SetEntityAnimation 56, 0", "SetEntityFacing 56, 0", "WaitFrames 16"] + b, "stock entry 36: Gohan is on his feet; they fly off, and nobody saw Hercule's actor; he goes to find the cameras")
-stockseq(A3, "m325_r12_defeat", 37, 48, "Vegeta's thoughts, \"I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!\"")
+stockseq(A3, "m325_r12_defeat", 37, 41, "Piccolo and Vegeta, Vegeta's thoughts")
+# Hercule and the announcer (docs/cutscenes/batch3 3.12; every line as it was): he is looking at where the fighters flew off when the
+# announcer finds him; he looks about (nobody is left to contradict him) before he claims it, throws his win pose on "SINGLE
+# HANDEDLY!!!!!!" and a punch on "CHOP!!!!". Poses 6 and 7 are the ones the stock ring scene and talk show play on his actor.
+b = body(A3, "m325_r12_defeat", 42)
+assert b[-2:] == ["SetEntityFacing 72, 0", "END"]
+script(b[:-2] + ["SetEntityFacing 72, 1", "WaitFrames 30"], "stock entry 42: Vegeta leaves; the rocks: the announcer, and Hercule looking up at where they flew off")
+stock_at(A3, "m325_r12_defeat", 43, "\"ANNOUNCER: Hercule!  What on this crazy Earth happened?\"")
+script(["SetEntityFacing 72, 3", "WaitFrames 20", "SetEntityFacing 72, 2", "WaitFrames 18", "SetEntityFacing 72, 3", "WaitFrames 18", "SetEntityFacing 72, 0", "WaitFrames 10"],
+       "he turns, looks left and right: nobody")
+stock_at(A3, "m325_r12_defeat", 44, "\"Well... What if I said...  I DEFEATED CELL!!!!  SINGLE HANDEDLY!!!!!!\"")
+script(["SetEntityAnimation 72, 7"], "his win pose")
+stockseq(A3, "m325_r12_defeat", 45, 46, "\"Just how did you do it?\", the \"light shows and tricks\" speech, \"CHOP!!!!\"")
+script(["SetEntityFacing 72, 3", "SetEntityAnimation 72, 6", "SetEntityFacing 72, 0"], "the chop")
+stockseq(A3, "m325_r12_defeat", 47, 48, "\"what happened to the little boy and all his friends?\", \"they all thanked me kindly and went home of course!\"")
 # stock 49 picked 50 (Hercule joins) or 53 (journal); ours always goes to the journal step, now right after it
 b = body(A3, "m325_r12_defeat", 49)
 cut = b.index("SetStoryFlag 195")
