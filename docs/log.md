@@ -18,6 +18,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
   checks fail on the build before). The showcase's F9 state now pokes his abilities too (`dropins_showcase.py`); the
   staging generators' Super Saiyan 2 Gohan pokes (`staging_ch9_gen.py`, `postgame_staging_gen.py`) still leave his list
   0 0 0 0 (they never press B). Flags 0-32 that late maps could set, and what that does: `docs/party-8-slots.md`.
+  Full regression clean (99 blocks, `PLAY=` a private play ROM; `chamber_save` on Ryan's save: every slot loads, slot 8's
+  bank bytes zeroed in all three files, none of which had him joined).
 - **Cutscenes, the leftovers of batches 1 and 2 (branch `nb-cs4`; each scene's "Built" note in `docs/cutscenes/batch1_ch1-4.md`
   and `batch2_ch5-9.md`; one commit a scene).** Batch 2, the beats that waited for the cinematic helpers: Cooler powers up before his
   fight (W.3), Vegeta's first blow on Semi-Perfect Cell (7.2), Trunks' two misses before Cell's lesson (7.6), player 2 at Kame House
