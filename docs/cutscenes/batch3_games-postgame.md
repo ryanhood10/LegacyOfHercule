@@ -201,6 +201,13 @@ a step that is moved or removed breaks an insertion further down, so change one 
   10. **Alone only:** during "Wonderful.  Let's get started!" Hercule backs away three steps and runs off to the right
       (the way he hides later, `WalkToPosition 72, 640, 240` cut by the fade), so the empty field after the fade is
       explained. Two players: he stays, as today.
+- **Built (`nb-cs3`, 2026-11-06), beats 1-10 with script steps (look-at by facings):** as listed, with these differences: Piccolo and Krillin are not
+  in the plateau's first view (Vegeta and Trunks only), so beat 3 is Vegeta coming to the edge; the crowd that turns at Hercule's name is 16,
+  Krillin, Gohan and Piccolo (16's actor guarded: record 7 has a condition); Hercule is found at the far right walking away, starts (pose 4), looks
+  left, right, down, then the white cut and three steps to (424, 440) and his taunt (8); Cell steps to (458, 440) and Hercule goes round behind Goku
+  **before** Cell's box (a script cannot move under an open box); Gohan lands at (412, 432) with dust; alone, Hercule turns and runs off the left
+  edge before the fade (running right would have taken him past Cell). The pan "over to Cell" is gone: the floor view holds all of them.
+  The Senzu Bean was not built (decided). Filmed with two players and alone; `cell_staging.txt` passes through it.
 - **Optional, Ryan decides (a beat the stock game lacks):** the Senzu. Cell starts fight 3 on a new stat at a full bar
   (`DrawBossHealthBarRange 30, 60, 100`), which the bean would explain. After beat 8: Goku tosses it (`NPCFireKiBlast`
   has no bean art; a pick-up sound and Cell's catch pose would carry it), Cell's heal sound and a flash, Vegeta's hop.

@@ -316,7 +316,7 @@ end
 ; ---- map 325 (zone 14 area 3), the desert ----
 
 sequence cg_fight2_end
-  script                                 ; stock entry 0, and Goku and Cell stand where the scene's pans look (368 / 484, 440): the last exchange just ended
+  script                                 ; stock entry 0, and Goku and Cell stand where the scene's pans look: the last exchange just ended; Cell holds his charge, Goku lowers his guard and steps back
         PlayAudio 60
         SetPlayerVisible 0
         FindPlayerEntity
@@ -328,47 +328,111 @@ sequence cg_fight2_end
         PanCameraToPosition 306, 356, 3
         SpawnDustCloud 30, 420, 444
         SpawnDustCloud 30, 440, 436
+        SetEntityAnimationNoWait 30, 5
         WaitFrames 40
+        WalkToPosition 0, 358, 440
+        SetEntityFacing 0, 3
+        WaitFrames 20
         PlayAudio 50
         END
-  stockseq @083e93e8 1 5    ; Goku gives up, Vegeta: "You coward!!!", Trunks: "Don't give up!"
-  script                                 ; stock entry 6: the camera comes back to Goku and Cell, both in the view
+  stock @083e8f80    ; "It's over Cell.  You win.  I give up."
+  script                                 ; stock entry 2: the plateau; Vegeta hops and comes to the edge
+        PanCameraToPosition 176, 56, 3
+        WaitFrames 60
+        SetEntityAnimation 137, 4
+        WalkToPosition 137, 296, 124
+        SetEntityFacing 137, 0
+  stockseq @083e93e8 3 5    ; "You coward!!!", Trunks: "Don't give up!"
+  script                                 ; stock entry 6: the camera comes back to Goku and Cell, both in the view; Cell lowers his hands
         WaitFrames 60
         PanCameraToPosition 306, 356, 3
-        END
+        SetEntityAnimationNoWait 30, 0
+        SetEntityFacing 30, 2
   stockseq @083e93e8 7 9    ; Cell: "which one of these pitiful specimens"
   text 1 "#I need someone to take over...\x0b...Hercule!  Get out here!"
-  script                                 ; Hercule walks out between Goku and Cell
-        PanCameraToPosition 400, 40, 3
-        SpawnCharacterEntity 72, 664, 112
+  script                                 ; the crowd turns to Hercule, who was leaving; a white cut, and he comes the last steps between Goku and Cell
+        SpawnCharacterEntity 72, 610, 116
+        SetEntityFacing 72, 3
+        PanCameraToPosition 424, 40, 3
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse N16a
+        SetEntityFacing 8, 3
+      N16a:
+        SetEntityFacing 76, 3
+        WaitFrames 8
+        SetEntityFacing 56, 3
+        SetEntityFacing 103, 3
+        WalkToPosition 72, 636, 112
+        WaitFrames 20
+        SetEntityAnimation 72, 4
         SetEntityFacing 72, 2
-        WalkToPosition 72, 584, 124
-        SetActiveEntity 72
+        WaitFrames 24
+        SetEntityFacing 72, 3
+        WaitFrames 20
+        SetEntityFacing 72, 0
+        WaitFrames 30
+        FadeToWhite 8
+        SetEntityPositionInstant 72, 424, 376
+        PanCameraToPosition 306, 356, 30
+        WaitFrames 8
+        WhiteFadeOut 8
+        SetEntityFacing 56, 0
+        SetEntityFacing 103, 0
+        SetEntityFacing 76, 0
+        CoopCall 22, 2, 8, 0
+        JumpIfFalse N16b
+        SetEntityFacing 8, 0
+      N16b:
+        WalkToPosition 72, 424, 396
+        WaitFrames 16
+        WalkToPosition 72, 424, 418
+        WaitFrames 20
         WalkToPosition 72, 424, 440
         SetEntityFacing 72, 3
-        SetActiveEntity 0
+        SetEntityAnimation 72, 8
   text 67 "HERCULE: Heh...  I only slipped last time, you know!"
   script
         SetEntityAnimation 72, 2
         WaitFrames 30
   text 67 "Ooh...  ohhh, my stomach!  Must have been something I ate!\x0bThe champ can't fight like this!"
-  script                                 ; over to Cell
-        PanCameraToPosition 364, 360, 3
+  script                                 ; Cell steps up to him; he gets behind Goku
+        WalkToPosition 30, 458, 440
+        SetEntityFacing 30, 2
+        WaitFrames 10
+        WalkToPosition 72, 364, 462
+        WalkToPosition 72, 338, 444
+        SetEntityFacing 72, 3
   text 40 "CELL: This is your replacement, Goku?\x0bThe clown I threw out of the ring?"
-  script
+  script                                 ; the plateau: Piccolo starts forward and stops
         PanCameraToPosition 392, 48, 3
-        WaitFrames 60
+        WaitFrames 30
+        WalkToPosition 103, 514, 118
+        SetEntityFacing 103, 0
+        WaitFrames 20
   text 59 "GOHAN: I can't let Hercule face Cell alone!"
-  script                                 ; Gohan flies into the ring
+  script                                 ; Gohan lands between them, facing Cell; Hercule comes out from behind Goku to Gohan's shoulder
         SetActiveEntity 56
         PlayAudio 26
-        FlyToPosition 56, 400, 412
+        FlyToPosition 56, 412, 432
         SetEntityFacing 56, 3
+        SpawnDustCloud 56, 412, 438
         SetActiveEntity 0
         PanCameraToPosition 306, 356, 3
+        WalkToPosition 72, 364, 462
+        WalkToPosition 72, 392, 444
+        SetEntityFacing 72, 3
+        SetEntityAnimation 72, 8
   text 67 "HERCULE: Well...  since the kid insists...\x0bstand back, boy, and watch a professional!"
   stock @083e9362    ; "Wonderful.  Let's get started!"
-  script                                 ; stock entry 20: Gohan player 1, player 2 is Hercule
+  script                                 ; stock entry 20: alone, Hercule backs off and runs before the fade; Gohan player 1, player 2 is Hercule
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse AL1
+        Jump AL2
+      AL1:
+        SetEntityFacing 72, 2
+        WaitFrames 10
+        WalkToPosition 72, 292, 460
+      AL2:
         FadeOut 120
         WarpToMapNoEntities 14, 3, 1, 368, 440
         DisableLayer 0

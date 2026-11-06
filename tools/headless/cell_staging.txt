@@ -634,7 +634,7 @@ echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
 frames 200
 shot cs_alone_giveup
-echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
@@ -835,7 +835,7 @@ echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
 frames 200
 shot cs_H_giveup
-echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
@@ -1042,7 +1042,7 @@ echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
 frames 200
 shot cs_K_giveup
-echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120
@@ -1249,7 +1249,7 @@ echo EXPECT 0203f9b7: 24
 peek8 0x0203F9B7 1
 frames 200
 shot cs_Ve_giveup
-echo EXPECT map zone 14 area 3 var [0-9]+ player 368,440
+echo EXPECT map zone 14 area 3 var [0-9]+ player 358,440
 map
 stepz 0x03001FDC 150
 frames 120

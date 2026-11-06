@@ -210,45 +210,60 @@ emit("")
 emit("; ---- map 325 (zone 14 area 3), the desert ----")
 emit("")
 emit("sequence cg_fight2_end")
-# The stock scene placed nobody: its pans (and ours after it) are aimed at where the fight began, and after a fight that ended elsewhere
-# "CELL: This is your replacement, Goku?" showed Hercule alone (docs/cutscenes/batch3 0, 3.3). Behind a flash the two stand where the pans look.
+# "I give up" and Hercule called out (docs/cutscenes/batch3 3.3). Every line as it was. What moves now: the two are placed (the stock scene
+# placed nobody and its pans looked at where the fight began); Goku drops his guard while Cell still holds his charge; Vegeta comes to the
+# plateau's edge; at "...Hercule!  Get out here!" the crowd turns and the camera finds him at the far end, walking away; his 6 s walk down is a
+# white cut and three reluctant steps; Cell steps up to him and he gets behind Goku; Gohan lands between them; alone, he clears off before
+# the fade (he is not in fight 3: a party member nobody plays). Poses on Hercule's actor: 2, 4, 8, the ones the stock scenes play on it.
+FX, FY = 368, 440                # Goku; Cell stands at 484, 440; the floor view's top-left corner is 306, 356
+FLOOR = "306, 356"
 b = body(A3, "m325_r0_defeat", 0)
 k = b.index("WaitFrames 40")
-b = b[:k] + ["WhiteFlash 6", "SetEntityPositionInstant 0, 368, 440", "SetEntityPositionInstant 30, 484, 440", "SetEntityFacing 0, 3", "SetEntityFacing 30, 2",
-             "PanCameraToPosition 306, 356, 3", "SpawnDustCloud 30, 420, 444", "SpawnDustCloud 30, 440, 436"] + b[k:]
-script(b, "stock entry 0, and Goku and Cell stand where the scene's pans look (368 / 484, 440): the last exchange just ended")
-stockseq(A3, "m325_r0_defeat", 1, 5, "Goku gives up, Vegeta: \"You coward!!!\", Trunks: \"Don't give up!\"")
+b = b[:k] + ["WhiteFlash 6", f"SetEntityPositionInstant 0, {FX}, {FY}", f"SetEntityPositionInstant 30, 484, {FY}", "SetEntityFacing 0, 3", "SetEntityFacing 30, 2",
+             f"PanCameraToPosition {FLOOR}, 3", "SpawnDustCloud 30, 420, 444", "SpawnDustCloud 30, 440, 436",
+             "SetEntityAnimationNoWait 30, 5"] + b[k:k + 1] + [f"WalkToPosition 0, {FX - 10}, {FY}", "SetEntityFacing 0, 3", "WaitFrames 20"] + b[k + 1:]
+script(b, "stock entry 0, and Goku and Cell stand where the scene's pans look: the last exchange just ended; Cell holds his charge, Goku lowers his guard and steps back")
+stock_at(A3, "m325_r0_defeat", 1, "\"It's over Cell.  You win.  I give up.\"")
+b = body(A3, "m325_r0_defeat", 2)
+script(b[:-1] + ["WalkToPosition 137, 296, 124", "SetEntityFacing 137, 0"], "stock entry 2: the plateau; Vegeta hops and comes to the edge")
+stockseq(A3, "m325_r0_defeat", 3, 5, "\"You coward!!!\", Trunks: \"Don't give up!\"")
 b = body(A3, "m325_r0_defeat", 6)
-b[b.index("SetActiveEntity 0")] = "PanCameraToPosition 306, 356, 3"     # back on the two of them (centred on Goku, the view cut Cell at its edge)
-script(b, "stock entry 6: the camera comes back to Goku and Cell, both in the view")
+b[b.index("SetActiveEntity 0")] = f"PanCameraToPosition {FLOOR}, 3"     # back on the two of them (centred on Goku, the view cut Cell at its edge)
+script(b[:-1] + ["SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 2"], "stock entry 6: the camera comes back to Goku and Cell, both in the view; Cell lowers his hands")
 stockseq(A3, "m325_r0_defeat", 7, 9, "Cell: \"which one of these pitiful specimens\"")
 text(1, "#I need someone to take over...\\x0b...Hercule!  Get out here!")
-# Ryan: the camera follows Hercule out and pans to Cell when he talks; Gohan flies into the ring. Desert map 325:
-# the crowd stands on the plateau (y 96-120), Goku at (368, 440) faces Cell at (484, 440) on the floor below.
-script(["PanCameraToPosition 400, 40, 3",                  # up to the crowd on the plateau
-        "SpawnCharacterEntity 72, 664, 112",               # Hercule steps in from just off screen ...
-        "SetEntityFacing 72, 2",
-        "WalkToPosition 72, 584, 124",
-        "SetActiveEntity 72",                              # ... and the camera follows him down into the ring
-        "WalkToPosition 72, 424, 440",
-        "SetEntityFacing 72, 3",
-        "SetActiveEntity 0"], "Hercule walks out between Goku and Cell")
+# Desert map 325: the crowd stands on the plateau (y 96-120): 16 (424), Krillin (448), Gohan (496), Piccolo (520)
+script(["SpawnCharacterEntity 72, 610, 116", "SetEntityFacing 72, 3",
+        "PanCameraToPosition 424, 40, 3",                  # up to the crowd on the plateau: they all look to the right ...
+        "CoopCall 22, 2, 8, 0", "JumpIfFalse N16a", "SetEntityFacing 8, 3", "N16a:", "SetEntityFacing 76, 3", "WaitFrames 8", "SetEntityFacing 56, 3", "SetEntityFacing 103, 3",
+        "WalkToPosition 72, 636, 112",                     # ... where he is on his way out
+        "WaitFrames 20", "SetEntityAnimation 72, 4",       # he stops; a start
+        "SetEntityFacing 72, 2", "WaitFrames 24", "SetEntityFacing 72, 3", "WaitFrames 20", "SetEntityFacing 72, 0", "WaitFrames 30",   # him?
+        "FadeToWhite 8", "SetEntityPositionInstant 72, 424, 376", f"PanCameraToPosition {FLOOR}, 30", "WaitFrames 8", "WhiteFadeOut 8",
+        "SetEntityFacing 56, 0", "SetEntityFacing 103, 0", "SetEntityFacing 76, 0", "CoopCall 22, 2, 8, 0", "JumpIfFalse N16b", "SetEntityFacing 8, 0", "N16b:",
+        f"WalkToPosition 72, 424, 396", "WaitFrames 16", f"WalkToPosition 72, 424, 418", "WaitFrames 20", f"WalkToPosition 72, 424, {FY}",
+        "SetEntityFacing 72, 3", "SetEntityAnimation 72, 8"], "the crowd turns to Hercule, who was leaving; a white cut, and he comes the last steps between Goku and Cell")
 text(67, "HERCULE: Heh...  I only slipped last time, you know!")
 script(["SetEntityAnimation 72, 2", "WaitFrames 30"])
 text(67, "Ooh...  ohhh, my stomach!  Must have been something I ate!\\x0bThe champ can't fight like this!")
-script(["PanCameraToPosition 364, 360, 3"], "over to Cell")
+script(["WalkToPosition 30, 458, 440", "SetEntityFacing 30, 2", "WaitFrames 10",
+        f"WalkToPosition 72, {FX - 4}, {FY + 22}", f"WalkToPosition 72, {FX - 30}, {FY + 4}", "SetEntityFacing 72, 3"], "Cell steps up to him; he gets behind Goku")
 text(40, "CELL: This is your replacement, Goku?\\x0bThe clown I threw out of the ring?")
-script(["PanCameraToPosition 392, 48, 3", "WaitFrames 60"])
+script(["PanCameraToPosition 392, 48, 3", "WaitFrames 30", "WalkToPosition 103, 514, 118", "SetEntityFacing 103, 0", "WaitFrames 20"], "the plateau: Piccolo starts forward and stops")
 text(59, "GOHAN: I can't let Hercule face Cell alone!")
 script(["SetActiveEntity 56",                              # the camera follows Gohan's flight into the ring
         "PlayAudio 26",
-        "FlyToPosition 56, 400, 412",
+        "FlyToPosition 56, 412, 432",
         "SetEntityFacing 56, 3",
+        "SpawnDustCloud 56, 412, 438",
         "SetActiveEntity 0",
-        "PanCameraToPosition 306, 356, 3"], "Gohan flies into the ring")
+        f"PanCameraToPosition {FLOOR}, 3",
+        f"WalkToPosition 72, {FX - 4}, {FY + 22}", f"WalkToPosition 72, 392, {FY + 4}", "SetEntityFacing 72, 3", "SetEntityAnimation 72, 8"],
+       "Gohan lands between them, facing Cell; Hercule comes out from behind Goku to Gohan's shoulder")
 text(67, "HERCULE: Well...  since the kid insists...\\x0bstand back, boy, and watch a professional!")
 emit(f"  stock @{A3['m325_r0_defeat']['entries'][19]['head'].split('@')[1].split()[0]}    ; \"Wonderful.  Let's get started!\"")
 b = body(A3, "m325_r0_defeat", 20)
+b = ["CoopCall 5, 0, 0, 0", "JumpIfFalse AL1", "Jump AL2", "AL1:", "SetEntityFacing 72, 2", "WaitFrames 10", f"WalkToPosition 72, 292, {FY + 20}", "AL2:"] + b   # alone: he clears off before the fade
 i = b.index("SetActiveCharacter 0")
 b = b[:i + 1] + ["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"] + b[i + 1:]
 i = b.index("SetEntityFacing 0, 3")
@@ -256,7 +271,7 @@ b = b[:i + 1] + ["CoopCall 5, 0, 0, 0", "JumpIfFalse HS1", "SpawnCharacterEntity
 j = b.index("DrawBossHealthBarRange 30, 60, 100")
 tail = ["SetPlayerVisible 1"] + b[j:]            # the HUD after the card, as fights 7 and 8
 b = [x for x in b[:j] if x != "SetPlayerVisible 1"]
-script(b, "stock entry 20: Gohan player 1, player 2 is Hercule")
+script(b, "stock entry 20: alone, Hercule backs off and runs before the fade; Gohan player 1, player 2 is Hercule")
 title(BOTH)
 script(HANDOVER + tail, "fight 3")
 emit("end")
