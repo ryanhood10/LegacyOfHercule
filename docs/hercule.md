@@ -80,7 +80,15 @@ animations 5, 34, 44, 45, 46, 47 run; 43 (Energy Punch) crashes ("Jumped to inva
 | 17 | Hercule Taunt (tournament fighters only; icon 8; the Transformation icon until 2026-11-02, read as a Super Saiyan move) | 31, the wall-bump recoil, plus SFX 40 | restores 8 | own code |
 | 18 | Super Hercule (the Transformation icon in his colours, `herc_ssj_icon_0/1`) | the stock Transformation (ability 12): animation 0x23, then display row 22 (sprite 157); again: animation 0x24, back to row 21 | none (needs 10; drains 3 a second while transformed) | `ssj_ready` / `ssj_use` in `src/coop/ssj.c` (section 3b) |
 
-| 25 | Gun (`herc_gun_icon_0/1`, a pistol) | 34, the ki blast's own object with `herc_bullet`'s frames at twice the speed; damage x 3/4 (`kiblast_spawn_hook`, `hercule_bullet_hit`) | 1 | stock onUse `0x080131E1`, 1 EP refunded |
+| 25 | Gun (`herc_gun_icon_0/1`, a pistol) | 34, the ki blast's own object with `herc_bullet`'s frames at twice the speed; damage x 3/4 (`kiblast_spawn_hook`, `hercule_bullet_hit`); the pose is his record's group 22, the pistol (below) | 1 | stock onUse `0x080131E1`, 1 EP refunded |
+
+**The poses (2026-11-06, Ryan: "when he shoots his gun, he just shoots up the peace sign, and same with his ki blasts").**
+Animation 34 shows group 5, which on 72 / 157 is the peace sign (the Flash's pose, which stays). `shoot_pose` (`hercule.c`)
+points the entity at group 22 for the Gun (Buu's Fury's Hercule aiming his pistol, then firing: the gun kicks up and the
+muzzle flashes) and 23 for the Ki Blast (from the side the guard, then the front arm thrust out, palm open; from the
+front and the back the two-handed push of his beam pose), in all four facings, gold-haired as Super Saiyan Hercule. Old
+Hercule (158) fires the Gun in his own drawing of it. `docs/sprites.md` "Hercule's shooting poses";
+`tools/headless/hercule_shoot.txt`.
 
 **His kit (Ryan, 2026-11-02: "true to the original game and the anime"):** the list is **14, 15, 16, 25**. `Ability_Cycle` (`0x08004284`) stops only on index i with flag `8 << i`: flags 0x48 give the Flash (0) and the Gun (3); the stock skip's `SetCharacterFlag_Dynamic 5, 2` (flags `|= 4 << n`: `ch3_zone7.lscript`, with the line "Hercule has learned the Ki Blast!") adds the Ki Blast (1). Bit 5 stays off: the Megaton Punch's index is unreachable, and it is also the charged A attack and the panel's meter. `hercule_lock` (`ssj.c`, at every load) brings an older save to this once: flags, the Taunt's slot to the Gun, index 0, the Ki Blast if flag 68 is set, str and end cut to the new growth for his level, pow set to it.
 

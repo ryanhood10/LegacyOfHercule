@@ -537,6 +537,36 @@ Old Hercule (158, the Buu's Fury import) and the tournament's lying table are un
 knock-down's last frame, not group 12). Checks: `tools/headless/hercule_fly.txt` (a flight circle's real flight with
 Hercule as player 1, his facing held left and right for a few frames of it) and `art_poses.py --ids 72 --groups 12`.
 
+## Hercule's shooting poses (groups 22 and 23 of 72, 157, 158; `tools/herculesprites.py`, 2026-11-06)
+
+Ryan: "when he shoots his gun, he just shoots up the peace sign, and same with his ki blasts ... we will need them for all
+4 shooting directions". The Gun (ability 25) and the Ki Blast (15) both run the ki blast's control state, animation 34
+(onUse `0x080131E1`). Decompiled: its enter (`0x08014DE0` -> `0x0800E248`) sets +0x12 / +0x14 to 0, +8 = 0x28 and
+**+0x4C = record + 0x9C, group 5**, then the timer to 8; its update (`0x08014DF4`) counts +0x12, shows frame 1 from 0x10,
+fires a ki blast every 16 frames (`0x0800EAD8`, the first at 16) and at 0x20 either ends (animation 0) or, for a held fire
+with 3 EP, takes 2 EP, toggles the frame 1 <-> 2 and goes back to 0x10. It never touches +0x4C again. Group 5 on Hercule's
+72 (and its gold clone 157) is the peace sign, the same front-view frame in all four facings: the Flash's pose (animation
+5), so both shots showed it.
+
+**The fix.** `hercule.c` `shoot_pose`: after the stock onUse, when the entity still shows group 5 and its record has the
+move's group in all four facings, +0x4C is pointed at **group 22 (the Gun)** or **23 (the Ki Blast)**. A record without
+the group keeps group 5. Frames: 0 the wind-up (8 frames), 1 the shot, 2 the next shot of a held fire.
+
+| group | 72 / 157 (gold afro) | 158 old Hercule |
+|---|---|---|
+| 22 the Gun | Buu's Fury's Hercule's gun anim (record 128 anim 3: the same drawing as 72; Buu's Fury reused LoG2's Hercule), every facing drawn there (right = left mirrored): 0 aimed (frame 1 of Buu's), 1 fired (frame 2: the gun kicks up, the muzzle flash), 2 the same with the flash one step hotter; LoG2's ground shadow added under the feet (Buu's Fury draws none; 72's frames all have one) | `buu2log2.py --map 158 22:3.1+3.2+3.2` (no shadow, as all of 158) |
+| 23 the Ki Blast | a push. Side: 0 his guard (the lunge, group 7 frame 0), 1 / 2 the front arm thrust out, palm open: Goku's ki-blast arm (his group 5 frame 2) in Hercule's colours (`compose`, as the beam pose). Front and back: his beam pose's charge (hands at the hip) and thrust (both palms forward over the belt; from behind the arms out of sight) without the bristling afro: a one-handed thrust at the viewer is a foreshortened arm that reads as a tan block | none: his Ki Blast keeps group 5 (he never has the move: the prologue is before the three years) |
+
+`herc_record` and `ssj_record` now have 24 groups (21 empty in `herc_record`; in `ssj_record` it is the turn back),
+`buu_record_158` 23 (21 empty). Without `roms/buu.gba` (`BUU=0`) group 22 is group 5's arrays (the peace sign, as before).
+`herculesprites.py --buu` / `spriteclone.py --buu` take the Buu ROM (the Makefile's `HERC_BUU`). Preview:
+`build/<dir>/hercule_shoot_preview.png` (+ `_x4`: rows 5, 22, 23, four facings x three frames). Old Hercule's Flash
+(animation 5) still shows his group 5, which is Buu's gun anim (reach, aim, fire): untouched here.
+
+Users of the new groups: only `shoot_pose`. Every group helper (`cine.c`, `tny_engine.c`, `tny_moves.c`,
+`tny_combo_run.c`, `wrap.c`) checks the count and the four pointers, so 21's empty slot is never played. Checks:
+`tools/headless/hercule_shoot.txt` (below, `docs/testing.md`), `art_poses.py --ids 72,157,158`.
+
 ## Haloed Goku (ids 176, 177; display rows 26, 27; `tools/halosprites.py`, 2026-10-19)
 
 After the Cell Games Goku stays playable but dead, so he wears a halo (`docs/story.md` 4h "After the

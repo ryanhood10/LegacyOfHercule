@@ -4,6 +4,13 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **Hercule's shooting poses (branch `nb-hgun`, Ryan's play: "when he shoots his gun, he just shoots up the peace sign, and same with
+  his ki blasts").** Both moves run the ki blast's state, which shows group 5: on 72 / 157 the peace sign (the Flash's pose). Now
+  `hercule.c` `shoot_pose` shows group 22 for the Gun (Buu's Fury's Hercule aiming and firing his pistol: Buu's Fury reused LoG2's
+  Hercule drawing, every facing, LoG2's shadow added) and 23 for the Ki Blast (a push: the arm thrust out from the side, the beam
+  pose's two-handed push from the front and back), base and gold-haired; old Hercule (158) fires the Gun in his own drawing. Built
+  from the ROMs at build time (`herculesprites.py` / `spriteclone.py --buu`, `buu2log2.py --map 158 22:...`). `docs/sprites.md`
+  "Hercule's shooting poses"; test `hercule_shoot.txt` (153 checks, in `regfull.sh`).
 - **Cutscenes, the leftovers of batches 1 and 2 (branch `nb-cs4`; each scene's "Built" note in `docs/cutscenes/batch1_ch1-4.md`
   and `batch2_ch5-9.md`; one commit a scene).** Batch 2, the beats that waited for the cinematic helpers: Cooler powers up before his
   fight (W.3), Vegeta's first blow on Semi-Perfect Cell (7.2), Trunks' two misses before Cell's lesson (7.6), player 2 at Kame House

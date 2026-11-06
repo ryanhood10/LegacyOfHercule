@@ -127,6 +127,11 @@ CLONE_FLAGS := --extra $(subst $(space),$(comma),$(strip $(EXTRA_SPRITES)))
 CLONE_FLAGS += --row-sprite $(SSJ_SPRITE)
 OLD_HERCULE_SPRITE ?= $(if $(filter 1,$(BUU)),158,72)
 CLONE_FLAGS += --krillin-sprite $(KRILLIN_SPRITE) --old-hercule-sprite $(OLD_HERCULE_SPRITE) --a16-sprite $(A16P_SPRITE) --halo-sprites $(HALO_GOKU_SPRITE),$(HALO_SSJ_SPRITE)
+# Hercule's Gun pose (group 22 of 72, 157 and old Hercule's 158; docs/sprites.md "Hercule's shooting poses"): Buu's Fury's
+# Hercule's gun anim; without roms/buu.gba the Gun keeps the peace sign (group 5)
+HERC_BUU := $(if $(filter 1,$(BUU)),$(BUU_ROM),none)
+CLONE_FLAGS += --buu $(HERC_BUU)
+BUU_MAPS := --map 158 22:3.1+3.2+3.2
 
 all: $(OUT)
 
@@ -145,12 +150,12 @@ $(BUILD)/gen/sprites_data.c: tools/spriteclone.py tools/ssjhercule.py tools/herc
 # re-generate the index when the flags change (BUU, BUU_SPRITES, SSJ_SPRITE)
 $(BUILD)/.spriteflags: FORCE
 	@mkdir -p $(BUILD)
-	@echo "$(CLONE_FLAGS) $(BUU_SPRITES)" | cmp -s - $@ || echo "$(CLONE_FLAGS) $(BUU_SPRITES)" > $@
+	@echo "$(CLONE_FLAGS) $(BUU_SPRITES) $(BUU_MAPS)" | cmp -s - $@ || echo "$(CLONE_FLAGS) $(BUU_SPRITES) $(BUU_MAPS)" > $@
 FORCE:
 
 # Buu's Fury records converted to LoG2 format (never committed); preview PNGs and a colour report beside them
 $(BUILD)/gen/buu_sprites_data.c: tools/buu2log2.py tools/lying.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUU_ROM) $(BUILD)/.spriteflags
-	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ $(BUU_SPRITES) --preview-dir $(BUILD) --report $(BUILD)/gen/buu_sprites_report.md
+	$(PYTHON) tools/buu2log2.py $(ROM) $(BUU_ROM) $@ $(BUU_SPRITES) $(BUU_MAPS) --preview-dir $(BUILD) --report $(BUILD)/gen/buu_sprites_report.md
 
 $(BUILD)/obj/buu_sprites_data.o: $(BUILD)/gen/buu_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj
@@ -226,8 +231,8 @@ $(BUILD)/obj/broly_sprites_data.o: $(BUILD)/gen/broly_sprites_data.c src/coop/ro
 
 # Hercule's record 72 with the Kamehameha pose (group 18) for the Cell Games beam struggle (never committed);
 # preview beside it (Goku and Gohan's beam frames above Hercule's)
-$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py tools/spriteclone.py tools/a16sprites.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM)
-	$(PYTHON) tools/herculesprites.py $(ROM) $@ --preview-dir $(BUILD)
+$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py tools/spriteclone.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags $(if $(filter 1,$(BUU)),$(BUU_ROM))
+	$(PYTHON) tools/herculesprites.py $(ROM) $@ --buu $(HERC_BUU) --preview-dir $(BUILD)
 
 $(BUILD)/obj/hercule_sprites_data.o: $(BUILD)/gen/hercule_sprites_data.c src/coop/rom.h
 	@mkdir -p $(BUILD)/obj

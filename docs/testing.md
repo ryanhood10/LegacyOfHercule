@@ -42,6 +42,7 @@ inspection goes through the GDB stub.
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
 | Art checks: every frame in game | any changed sprite record: all its frames through the game's loader, the entity list checked; Hercule's flight |
+| Hercule's shooting poses | the Gun's and the Ki Blast's poses in every facing, both players, both forms, old Hercule (`hercule_shoot.txt`) |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
 
 Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
@@ -1486,6 +1487,21 @@ A headless run still going (a stopped task's children go on; `xargs` starts new 
 ## Hercule's kit (headless, 2026-11-02)
 
 `tools/headless/hercule_kit.txt` (self-checking, in `regfull.sh`): the flags and list of a new game, L between the Flash and the Gun, the flash's two seconds and a punch thawing one enemy (test command 47 counts the held), the Ki Blast's and the Gun's damage at the same stats (printed: the bullet about 3/4), player 2's level-up box and status page, and the three-year scene from its trigger (flag 66 set, 68 clear: Hercule's flags 0x4B -> 0x5B). `ssj_lock.txt` takes an old save's Hercule through the load.
+
+## Hercule's shooting poses (headless, 2026-11-06, branch `nb-hgun`)
+
+`tools/headless/hercule_shoot.txt` (self-checking, in `regfull.sh`; written by a loop, 153 checks): in the town (Map Test
+7) player 2 Hercule fires the Gun (index 3) and the Ki Blast (index 1) facing down, up, left and right; each shot checks
+the entity's group pointer (+0x4C) is the move's group by its four facing arrays (`{herc_gun_d0}` ... `{herc_ki_d3}`),
+the facing byte, frame 1 eight frames later, and that the pose is gone when the state ends. Then the same as Super
+Saiyan Hercule (`ssj_gun_d*`, `ssj_ki_d*`), as player 1 (both forms; `poke8 PARTY 5` and a warp), and old Hercule (row
+24) as player 2: the Gun's `buu158_g22_d*`, the Ki Blast's group 5 kept. Shots `hs_<who>_<move>_<facing>_0` (the wind-up)
+and `_1` (the shot, the bullet or blast leaving).
+
+```
+python tools/headless/st_expect.py tools/headless/hercule_shoot.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 8
+python tools/headless/art_poses.py build/<dir>/log2-coop.gba build/<dir>/coop.sym build/<dir>/hl/menu.ss --ids 72,157,158 --groups 5,22,23 --out build/<dir>/hl
+```
 
 ## Tournament screens (headless, 2026-10-25)
 
