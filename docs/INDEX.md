@@ -13,6 +13,7 @@ taken (flags, stats, sprites, rows, portraits, abilities, CoopCall, test command
 | `CLAUDE.md` | rules, current phase, build and test commands, key addresses, where to start per task | every session |
 | `docs/ids.md` | registry: every flag, stat, sprite, row, portrait, ability, CoopCall, test command, zone-15 area and RAM region the mod uses, and what is free | before taking any new number |
 | `docs/review-2026-11-05.md` | the overnight polish for Ryan: what changed, decisions waiting, draft lines, what could not be checked | start of the next session with him |
+| `docs/cutscenes.md` | the cutscene guidelines (Ryan, 2026-11-06): improve not replace, what is DBZ and what is cheesy, dynamic by who plays, the toolkit, how research and development split; per-batch research in `docs/cutscenes/` | before touching any scene |
 | `docs/howto.md` | recipes: add a chapter, CoopCall, boss, sprite, portrait, playable character, map; test; run parallel sessions; find things fast | doing a common job |
 | `docs/log.md` | dated progress log: what landed, what is open | resuming work |
 | `docs/testing.md` | test loop: Windows mGBA, WSL fork, pad senders, GDB stub, savestates | before testing anything |
