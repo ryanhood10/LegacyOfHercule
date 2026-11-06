@@ -1,5 +1,9 @@
 # Sprite inventory (tools/sprites.py; Buu's Fury: tools/buu_sprites.py, tools/buu2log2.py, last section)
 
+**The audit of everything below, and which body has which cutscene pose: `docs/art-audit.md` (2026-11-06).** Sheets of a
+built ROM's records (stock and generated alike): `tools/artsheet.py`; every frame in the running game:
+`tools/headless/art_poses.py`.
+
 `python tools\sprites.py roms\log2.gba build\sprites` writes `build/sprites/atlas.png` (every sprite
 id, first frame facing down/up/left/right), `build/sprites/<id>.png` (every pose group x 4
 directions) and `build/sprites/report.md` (groups, frames, sizes). Sprites are 8-bit OBJ tiles,

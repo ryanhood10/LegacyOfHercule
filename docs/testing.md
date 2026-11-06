@@ -40,9 +40,33 @@ inspection goes through the GDB stub.
 | Tournament art (Buu's Fury imports) | any new fighter sprite: spawn it as an opponent from a RAM record, fight, hit test, OBJ VRAM with giants |
 | GDB stub | crash causes ("Jumped to invalid address"), breakpoints, traces |
 | Windows mGBA (stock ROM) | the stock-size ROM with Lua helpers |
+| Art checks: every frame in game | any changed sprite record: all its frames through the game's loader, the entity list checked; Hercule's flight |
 | Savestates, Reading screenshots, Ghidra headless | supporting tools |
 
 Test commands (warp, spawn, win a fight) and RAM words: `docs/ids.md`.
+
+## Art checks: every frame in game (headless, 2026-11-06, `docs/art-audit.md`)
+
+```
+wsl -d Ubuntu -u root -- bash -c "cd /mnt/f/MeltyCreations/<checkout> && gcc -O2 -o /root/st_headless tools/headless/st_headless.c ..."   # once: the runner needs `pose` / `entmove`
+python -I tools/artsheet.py build/<dir>/log2-coop.gba build/<dir>/coop.sym OUT.png --ids 165,9 --scale 4      # the frames as data
+python tools/headless/art_poses.py build/<dir>/log2-coop.gba build/<dir>/coop.sym build/<dir>/hl/menu.ss --ids 165,160 --out build/<dir>/hl
+python tools/headless/st_expect.py tools/headless/hercule_fly.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 4   # in regfull.sh
+```
+
+`art_poses.py` warps to the yard of zone 15 area 3 (as `tny_artnew.txt`), stands an actor of each sprite 48 px left of
+player 1 (test command 3, then the runner's `entmove SPRITE DX DY`) and holds it in every group x facing x frame the
+built record has with `pose SPRITE GROUP FACING FRAME [N]`: a standing body's state shows frame 0 of its group pointer
+(+0x4C) while its timer (+0x12) is 0, so the runner writes a four-pointer group of its own into `coop2.boss_rec`
+(0x0203FD6C, a test's scratch) whose frame 0 is the wanted descriptor, and re-pokes group, facing and timer before each
+of N frames (3). The game's own loader decompresses every frame into the entity's OBJ slot, so a bad blob, a frame larger
+than the record's slot or a descriptor past an array shows as garbage, a CRASH line or a damaged entity list. Out:
+`art_<id>.png` (+ `_x3`), one row a group, each cell labelled facing and frame; `art_<id>.out` the runner's output. Pass
+(the tool exits 1 otherwise): no CRASH, every pose "1 bodies", the `ents` list the same before, after and 120 frames
+later, every vtable in the ROM. A private runner: `ST_HEADLESS=/root/<name>` (with `MSYS_NO_PATHCONV=1` in Git Bash).
+2026-11-06: 72 (groups 3, 9, 12, 18), 157, 160, 163, 165, 175, 180, 240: ok. `hercule_fly.txt`: Hercule as player 1
+takes a flight circle (zone 3 area 3); the fly state 0x03002130 is checked and his facing held left and right for a few
+frames of the real flight (the circle flies him up the map).
 
 ## Full regression (headless, `tools/headless/regfull.sh`)
 
