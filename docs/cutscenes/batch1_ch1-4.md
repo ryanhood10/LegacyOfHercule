@@ -93,6 +93,14 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Lines kept:** all, verbatim. No new line.
 - **Risks:** the scene runs right after a new game's first fade: nothing may delay control (the flurry replaces the
   stock wait, it does not add to it). Sprite 54 has no groups 6-8: the FLURRY's Gohan side uses 5 and 10 only.
+- **Built 2026-11-06 (`nb-cs4`).** Stock entry 0's 60-frame wait is now the lesson: old Hercule (player 2's entity, or the companion
+  alone: both are player 2's entity) hands over to an actor on his spot (`CoopCall 31`) and backs off 36 px, a 30-frame exchange
+  Trunks-Gohan, and Gohan's blow puts Trunks on a knee (`CoopCall 37, 5, 5, 16`, held; he ends 35 px right of the stock's spot, where
+  he gets control back) while Gohan steps back to his place; Trunks says "This isn't fair..." on his knee and gets up in stock entry
+  4's beat. Old Hercule takes two steps further back for "I'll be guarding the rear", steps up and winds up a punch (his group 6) for
+  "A boulder?  Ha!", and at the end walks, as Gohan walks off, to where player 2 comes back (12 px left of player 1) and makes way at
+  the last moment, so the respawn does not show. About a second longer before control than the stock's wait. `staging_ch1`
+  "training" (alone and two players) shoots the knee and checks one body of old Hercule at the end.
 
 ### 1.2 The knock-out: touch up (S)
 
@@ -109,6 +117,12 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Lines kept:** "#HERCULE: What are you doing?!" and "#GOHAN: It's not safe out there, Hercule!  You stay here and
   watch after Trunks." are Ryan's: word for word.
 - **Risks:** none beyond the existing actor hand-over.
+- **Built 2026-11-06 (`nb-cs4`).** Stock entry 14 restated in our sequence (the hand-over of old Hercule to an actor, a json edit of
+  that stock entry until now, is in it; the edit is gone): the chop's white flash with a jolt (`CoopCall 37, 15, 8, 1`), Trunks falls
+  where he stands in smoke with a thud (`CoopCall 37, 10, 0, 2`) instead of popping into the lying pose; old Hercule steps toward
+  Gohan before "What are you doing?!", Gohan turns to him for his answer and back down to Trunks for "Sorry about that"; his take-off
+  kicks up dust. Ryan's two lines word for word. `staging_ch1` "knock-out" (alone and two players) shoots the chop and the answer,
+  and checks no actor of old Hercule is left on map 1/5; `ch1_notes` (1) reads as before (player 2 gone, one actor).
 
 ### 1.3 Gohan's death: SHOWCASE (L)
 
@@ -174,6 +188,10 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   door and looks back. Nothing else.
 - **Risks:** the stock "sit" puts Gohan inside the desk's collision (already handled at the end): stand him only by
   the same `SetEntityPositionInstant`.
+- **Built 2026-11-06 (`nb-cs4`).** After "I guess I'll just do my math": a low rumble, the room trembles (`ScreenShake 0, 3, 40` in a
+  batch, so it blocks with the sound), Gohan is up beside the desk (the same `SetEntityPositionInstant 0, 136, 104` as the end) and
+  looks up; then the door and Krillin as before. Before "I'll come with you" Krillin takes a step toward the door and looks back.
+  `staging_ch1` "visit alone" shoots the rumble (`c1_G_rumble`); both visit blocks pass as before.
 
 ### 1.6 The forest spirit and its end: touch up (M)
 
@@ -200,6 +218,12 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
 - **Lines kept:** all as built (the reworded variants are drafts already listed in `docs/story.md` 0).
 - **Risks:** Frieza's dream sprite 48 has no knock-down group, Cooler 34 none either: no pose for the "melting",
   dust only. The end warps to area 3 with entities: player 2 is away until the scene ends (as today).
+- **Built 2026-11-06 (`nb-cs4`), beats 1-3.** Player 2 is placed beside player 1 in the clearing (`CoopCall 9, 1, 72, 178`); before
+  the fade the music stops, a 30-frame silence, a low rumble with a light shake, then the stock white, and a harder shake once the two
+  stand there; Cooler steps up to (136, 152) for his line (one script entry added: the branch's indexes 10-13 became 11-14). Not built:
+  player 2's recoil (a player's body cannot be walked by a script; a placement would be a pop), the figures bursting into dust at the
+  end (the defeat runs with the pair's fight state; left as the stock white). `staging_ch1` "spirit" checks player 2's spot in both
+  two-player lineups.
 
 ### 1.7 Trunks against Frieza and King Cold: SHOWCASE (L)
 
@@ -323,6 +347,16 @@ Research only: no game data was changed. The guidelines are `docs/cutscenes.md` 
   would be runnin' into guys like that on this trip!\x0bThat Frieza fella isn't coming back, is he?" word for word.
 - **Risks:** the sequence's indexes are absolute (every stock script returns them): add only inside existing script
   entries or after the end, as `ch1_trunks_talk` already does. Sprite 62: never an attack or hurt animation.
+- **Built 2026-11-06 (`nb-cs4`), beat 2 only (the landing):** stock entry 18 restated in place (`[18] script`): between the stock's
+  two rumbles (`PlayAudioBlocking` is the rumble and a camera shake) everyone on screen looks up toward the sky over the crater
+  (`CoopCall 37, 12` at the point (488, 160)) and a white flash marks the impact; when the camera reaches the crater two dust clouds
+  are still settling on the open pod; the rest of the entry is the stock's, step for step. **Beat 1 too:** Vegeta walks into view
+  from the left to stand below Trunks, facing him, for "Why not?  I'll tell you..." (stock entries 5 and 10 restated in place; the
+  stock had him follow Trunks from the group's spot, off the stage, so his lines came from nowhere), and squares up 10 px closer with
+  his shout for "That's a lie!"; below Trunks because the talk's boxes are at the top. **Not built: beats 3, 4.** The headless route
+  into this talk (Map Test of area 6) parks the group's other actors at (672, 728), off the stage, so the group's step toward Goku and
+  the private talk's moves cannot be judged in their real places; they want a film from the real flight in (the landing site, area 4)
+  first. `staging_ch1` "arrival" passes as before (the scene ends on map 2/1).
 
 ### 1.4, 1.9 Leave
 
@@ -355,6 +389,12 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
 - **Lines kept:** all five, verbatim.
 - **Risks:** Hercule's actor is sprite 72 and a player may be showing 72 later, never here (he joins in this
   scene): safe to address by sprite. Piccolo's actor is the map's 103.
+- **Built 2026-11-06 (`nb-cs4`).** Once Hercule has walked in, the view comes up to (168, 860) so the top boxes leave both of them in
+  the clear (the camera stays there until the stock's `SetActiveEntity` at the exit); everyone turns to whoever speaks
+  (`CoopCall 37, 11 / 12`); after "Wires?  Mirrors?" Hercule walks once round Piccolo, looking up over his head; Piccolo turns his back
+  for "It's no trick.  Get lost." and keeps it while Hercule pitches the mansion (everyone else looks at Hercule), half turns back for
+  "(A roof over my head...)"; Hercule's shout pose (4: the audit's group 11 is his hurt pose) on "You've got yourself a deal". Lines
+  word for word. `staging_ch2` "deal" checks the view in four lineups.
 
 ### 2.3 King Triceratops: touch up (S)
 
@@ -370,6 +410,13 @@ parade crowd, four boxes, Goku walks off; later Piccolo walks up, one line, flie
   ha!\x0bAnother peace treaty, brought to you by the World Martial Arts Champion!", so that "!PICCOLO: You hid
   behind a rock the whole fight." has something to point at.
 - **Risks:** sprite 127 has groups 0, 1, 2, 4, 6 only.
+- **Built 2026-11-06 (`nb-cs4`), beats 1-2 and the end's shake.** The intro is ours now (`ch2_triceratops`, map 105 trigger 0; the
+  stock's indexes kept: entry 4 still returns 8): the HUD's bars go (they sat over him) and come back at the fight; as the camera
+  reaches him he stamps (his group 6, the roar 60, `ScreenShake 0, 6, 16`) before "What do you want?"; before the hard way he takes
+  two heavy steps toward the players (to (112, 152), a thud and a shake each). The end: he sinks with a last small jolt. With two
+  players his co-op twin stands beside him from the load (as before) and stays when he steps out. Not built: the players' brace (a
+  player's step needs his spot), player 2 placed beside player 1 at the end and Hercule stepping out from the edge (the fight leaves
+  them anywhere). `staging_ch2` "jungle" shoots the stamp; flags and party after the scene equal the build before.
 
 ### 2.4 The three-year skip: touch up (M)
 
@@ -530,6 +577,12 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   play the CHARGE without the form. In real play the player walks into this area from its edge; the test warp puts
   him beside Goku: film it once from the area's entrance.
 - **Size L.** The Short: beat 3 to beat 6, about 35 seconds.
+- **Beats 1 and 2 built 2026-11-06 (`nb-cs4`):** the opening is one Cine exchange Goku wins (`CoopCall 37, 6, 60, 0`: 60 frames,
+  they spring apart), then his heavy blow throws 19 28 px (he reels, lies, gets up) and both walk back to their marks before Tien's
+  line (stock entry 0 restated; the stock's own punch at entry 2 stays). The virus: a small jolt under each of Goku's flinches
+  (entries 5 and 7, `CoopCall 37, 15`), and at entry 20 he drops to a knee first (`CoopCall 37, 10, 0, 1`), then the stock collapse
+  out of Super Saiyan (25). `staging_ch3` "battle" shoots the opening (`c3_<n>_open`) and its press count to the drain moved by one;
+  flags and party after the scene equal the build before (alone and with Hercule).
 - **Built 2026-11-06 (`nb-cs1`, with Cine): beats 3 (in part), 4 and 6; 1 and 2 left as the stock plays them** (its opening is the
   liveliest stock choreography of the batch: kept). The scene's trigger is the whole map, so in play the players stand at the area's
   entry (468, 556), below the view, through Goku's fight (the research film's Vegeta "30 px from Goku" was the test warp). 19 raises
@@ -605,6 +658,11 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   defeat: Gero's flight off gets a dust cloud; 13 follows after a beat (as built).
 - **Risks:** the actor Gero here is the record's sprite 14 (the boss set): group 5 is there; never group 4. Player 2
   may show any sprite: only player 1 (char 0), Gero and 13 are addressed, as today.
+- **Built 2026-11-06 (`nb-cs4`), the rest of 4.1 / 4.2:** the HUD's bars are hidden for Gero's first stage and both generator scenes
+  and come back at each fight (the doors' two stock fight entries restated with `SetPlayerVisible 1`); at the generators Gero raises
+  his palm at the players for "I won't let you get into my lab!" (his ki pose, group 5, without waiting on it) and 13, landed, throws
+  one punch at the air before his offer (group 6). 13's landings were built by `nb-cs1`. `ch4_staging` (554 checks, every lineup)
+  passes as before; its shots `st_<n>_a27_*` / `a40_*` show the pose and the hidden bars.
 
 ### 4.3 The lab cutaway: leave (one beat, S)
 
@@ -773,6 +831,14 @@ Three captions (`ch3_z7_autograph`). A text gag that needs no staging.
   something that I have to do ALONE!!!!": a short shake, the others give a step, his take-off with dust.
 - **Risks:** entries 23, 25, 27 place player 1's own body or an actor by who plays: the RISE has both cases.
   Absolute indexes throughout.
+- **Built 2026-11-06 (`nb-cs4`), beats 2-4** (stock entries 19, 23, 25, 38, 40 restated in place; no stock entry of 12-48 returns an
+  index): Krillin's shout pose holds 90 frames after the androids have gone, before "What am I doing?"; Vegeta's power rises under
+  "ARRRRRGGGHHHHHH!!!!!" (a held Cine charge on him, his actor or player 1's body, `-12` / 137) and bursts as he takes off; Trunks takes
+  two steps after him for "Father!  Where are you going?"; Piccolo rounds on them with a shake and Krillin and Tien give a step for
+  "...ALONE!!!!"; his take-off kicks up dust. **Not built: the rises (beat 1).** The stock lying bodies are map decorations
+  (`FindEntityByType n` removes one, then a standing actor is spawned): to play a rise the actor would first have to lie, and nothing
+  can put a body straight into a held lying pose from a script (Cine's fall plays the fall). `ch4_staging` "end" now presses 40 times
+  (into Piccolo's exit; shots `st_<n>_end_19`-`39`), every lineup passing as before.
 
 ### 4.8 The generator's eggs: leave
 
@@ -783,6 +849,8 @@ with the second baby looking back. It is already what this document asks of the 
 ## 6. Priority list for the developer (build order, showcases first)
 
 **State (2026-11-06, branch `nb-cs1`): built 1.7, 4.6, 3.5, 3.6, 3.2, 1.3, 4.4 (items 1-6: each scene's "Built" note says what and what not), 3.1 in part (item 7), and of item 8 the charge of 3.4, the landings of 4.2, the shake of 4.3 and Vegeta's landing of 4.5. Not built: 1.6 (item 7), 1.1, 1.2, 1.5, 1.8, 2.2, 2.3, 2.4, 4.1, 4.7 and the rest of 3.1 / 4.2 / 4.5 (the HUD is still shown at the generators).**
+
+**State (2026-11-06, branch `nb-cs4`):** built 3.5 beats 1-2, 1.1, 1.2, 1.5, 1.6 (beats 1-3), 1.8 (beats 1-2: Vegeta's walk-in, the landing), 2.2, 2.3 (beats 1-2 and the end's shake), 4.1 (the rest: the HUD, Gero's palm, 13's punch), 4.7 (beats 2-4); 1.3's beats 3-4 were already played by Cine (`nb-cs1`'s second commit). Not built: 1.8 beats 3, 4 (no faithful film route yet), 4.7's rises, 2.4, the rest of 3.1 / 4.5 (each note says why).
 
 Measured on the build (A pressed every 100 frames, so each figure is good to about 2 s; `perf` on the two heaviest): 1.7 +14 s, 1.3 +5 s,
 3.5 +7 s (the entrance and the debut), 3.6 +3.5 s, 4.6 +9 s (13 s of fight in place of a 2 s fade), 4.4 +2 s, 3.2 3.5 s shorter. Gohan's death in

@@ -27,6 +27,8 @@
     },
     {
       "map": {"zone": 4, "area": 58},
+      "_": "King Triceratops: the intro (trigger 0) restaged, his end",
+      "triggers": {"0": {"payload": "seq:ch2_triceratops"}},
       "records": {"0": {"action": "seq:ch2_triceratops_end"}}
     }
   ]

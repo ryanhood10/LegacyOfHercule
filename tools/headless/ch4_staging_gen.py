@@ -112,7 +112,7 @@ for name, p1, p2 in (("P", 1, None), ("K", 6, None), ("H", 5, None), ("PH", 1, 5
     actors(s9=1, s11=1, s8=1, s76=1, s140=0, s128=0, s53=0, s121=0, s103=int(1 in (p1, after2)))
     if p2 is not None:
         out(f"echo EXPECT 0203ff84: 0{after2}", "peek8 0x0203FF84 1")
-    for i in range(18):
+    for i in range(40):             # (batch 1, 4.7) on into the aftermath: the kiss, Vegeta's power under his scream, Piccolo's "ALONE"
         out(f"key 1 6", "frames 160")
         actors(s72=int(HERCULE in (p1, after2)))
         out(f"shot st_{name}_end_{i}")

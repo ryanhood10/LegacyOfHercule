@@ -16,6 +16,8 @@ for p1, p2, want in ((GOHAN, None, dict(s53=1, s76=0)), (KRILLIN, None, dict(s53
     s.actors(**want)
     s.press(2, 110)
     s.shot(f"c1_{n}_talk")
+    if p2 is not None:          # (batch 1, 1.6) player 2 stands beside player 1 in the clearing (72, 178)
+        s.out("deref P2 0x0203FF08", "echo EXPECT [0-9a-f]+: 00004800 0000b200", "peek P2+0x158 2")
     s.press(6, 110)
     s.shot(f"c1_{n}_frieza")
     s.end_scene()
@@ -98,7 +100,10 @@ for two in (False, True):
 only_gohan = [f"poke8 {flags_of(i)} 0" for i in range(1, 9)] + ["frames 30"]
 s.begin("visit alone", GOHAN, None, "+4", only_gohan)
 s.warp(2, 22, 136, 170, 150)
-s.press(10, 90)
+s.press(1, 90)                  # (batch 1, 1.5) the room trembles, Gohan gets up from the desk and looks up; Krillin comes in on that
+s.out("frames 80")
+s.shot("c1_G_rumble")
+s.press(9, 90)
 s.shot("c1_G_visit")
 s.end_scene()
 s.actors(s76=0)
@@ -114,4 +119,43 @@ s.shot("c1_GK_end")
 s.out("frames 60")
 s.on_map(2, 22)
 s.out("echo EXPECT 0203ff84: 06", "peek8 0x0203FF84 1")
+
+# The future prologue's training talk and the knock-out (the cutscene pass, batch 1, 1.1 and 1.2), alone (old Hercule is the companion on
+# player 2's entity) and with two players: Trunks is player 1 (party row 24 makes slot 5 old Hercule). The training: old Hercule hands over
+# to an actor (158) that backs off, an exchange, Gohan's blow puts Trunks on a knee; at the end the actor walks to where player 2 comes
+# back and goes, player 2 stands again. The knock-out (Gohan's talk after both lessons): the actor walks up, the chop and Trunks' fall,
+# the take-off with dust, Trunks wakes on map 1/5 with no actor of old Hercule left.
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.out(f"echo === training {n}", "load menu.ss", "p2 0" if two else "p2 off", "maptest 7", "frames 200",
+          "poke8 0x0203F000 3", "poke8 0x0203F0A0 24", "flags +466", "poke8 0x0203FF84 5", "deref TBL 0x0800959C")
+    s.warp(1, 1, 200, 664, 200)
+    s.out("key 1 6", "frames 60", "key 1 6", "frames 60", "key 1 6", "frames 150")     # Normal difficulty; the exchange
+    s.shot(f"c1_train{n}_knee")
+    s.actors(s158=1)
+    s.out("ents")
+    s.press(6, 100)
+    s.shot(f"c1_train{n}_back")
+    s.end_scene()
+    s.actors(s158=1)                # one body of old Hercule: player 2's own (or the companion's) again, the actor gone
+    s.out("ents")
+    s.on_map(1, 1)
+for two in (False, True):
+    n = "2p" if two else "1p"
+    s.out(f"echo === knock-out {n}", "load menu.ss", "p2 0" if two else "p2 off", "maptest 7", "frames 200",
+          "poke8 0x0203F000 3", "poke8 0x0203F0A0 24", "flags +466", "poke8 0x0203FF84 5", "deref TBL 0x0800959C")
+    s.warp(1, 1, 200, 664, 200)
+    s.out("mash 40 120", "frames 300", "flags +0 +1",
+          "findent PL 0x08025604", "poke32 PL+0x158 0x9000", "poke32 PL+0x15C 0x25000", "deref P2 0x0203FF08",
+          "poke32 P2+0x158 0xA800", "poke32 P2+0x15C 0x26000", "frames 30", "key 0x40 30", "frames 20")
+    s.press(9, 150)
+    s.out("frames 750")
+    s.shot(f"c1_knock{n}_down")
+    s.actors(s158=1)
+    s.press(3, 120)
+    s.shot(f"c1_knock{n}_answer")
+    s.end_scene()
+    s.actors(s158=1)                # one: player 2's own again, no actor left
+    s.out("ents")
+    s.on_map(1, 5)
 s.write("staging_ch1.txt")

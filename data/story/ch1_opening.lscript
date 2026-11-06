@@ -44,11 +44,66 @@ sequence ch1_training
   text 0 "@^Easy difficulty." -> 10
   text 0 "@^Hard difficulty." -> 10
   text 0 "@^Normal difficulty."
-  stockseq @083b6ec8 0 5                 ; Trunks' doubts, Gohan's answer, "I won't let you down"
+  script                                 ; stock 0 (batch 1, 1.1): the lesson the talk is about, in place of the stock's wait: old Hercule (player
+        SetCharacterInPartyFlag 3        ; 2, or the companion) hands over to an actor on his spot and backs off out of the way (CoopCall 31), a
+        CoopCall 31, 0, 0, 0             ; short exchange Trunks-Gohan, and Gohan's blow puts Trunks on a knee
+        JumpIfFalse H1
+        PushVarint 158
+        CoopCall 31, 1, 0, 0
+        CoopCall 31, 2, 0, 0
+        Step SpawnCharacterEntity
+        CoopCall 31, 3, 0, 0
+      H1:
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H2
+        WalkToPosition 158, 196, 700
+        SetEntityFacing 158, 1
+      H2:
+        SetEntityFacing 0, 2
+        CoopCall 37, 1, 0, 54
+        CoopCall 37, 6, 30, 0
+        CoopCall 37, 1, 54, 0
+        CoopCall 37, 5, 5, 16
+        WalkToPosition 54, 180, 664      ; the master steps back to his place
+        SetEntityFacing 54, 3
+  stockseq @083b6ec8 1 3                 ; Trunks' doubts (on his knee), Gohan turns to him, his answer
+  script                                 ; stock 4: Trunks gets up, looks down, a long beat
+        CoopCall 37, 1, 0, 54
+        CoopCall 37, 10, 0, 0
+        SetEntityFacing 0, 0
+        WaitFrames 100
+  stockseq @083b6ec8 5 5                 ; "I won't let you down."
+  script                                 ; old Hercule takes two more steps back for his line
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H1
+        WalkToPosition 158, 196, 716
+        SetEntityFacing 158, 1
+      H1:
   text 126 "#HERCULE: And don't you boys worry about me!\x0bI'll be guarding the rear.  From way back here."
   stockseq @083b6ec8 6 7                 ; Gohan: the melee practice, destroy that boulder
+  script                                 ; he steps up and winds up a punch
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H1
+        WalkToPosition 158, 196, 690
+        SetEntityFacing 158, 1
+        SetEntityAnimation 158, 6
+      H1:
   text 126 "#A boulder?  Ha!  I've chopped bigger rocks than that in my sleep!\x0b...You go first, kid."
-  stockseq @083b6ec8 8                   ; Gohan walks off, control back
+  script                                 ; stock 8: Gohan walks off while old Hercule steps back to where player 2 comes back (12 px left of player 1)
+        SetEntityFacing 0, 1             ; and makes way at the last moment; control back
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H1
+        BeginCommandBatch
+        WalkToPosition 54, 144, 568
+        WalkToPosition 158, 223, 664
+        CommitCommandBatch
+        SetEntityFacing 158, 1
+        DespawnEntity 158
+        Jump H2
+      H1:
+        WalkToPosition 54, 144, 568
+      H2:
+        SetPlayerVisible 1
 end
 
 ; map 1 (zone 1 area 2) trigger 0: Gohan's death and the jump to the present
@@ -194,10 +249,64 @@ end
 ; map 0 record 0 (Future Gohan) talk: the knock-out, then Hercule's protest and Gohan's answer (Ryan, 2026-11-01)
 ; before Gohan's "Sorry about that, Trunks." (stock entry 15)
 sequence ch1_knockout
-  stockseq @083b725c 0 14                ; the melee / ki lessons, "Let's go get 'em!", the knock-out
+  stockseq @083b725c 0 13                ; the melee / ki lessons, "Let's go get 'em!", "Right!  Cool!"
+  script                                 ; stock 14, the knock-out (batch 1, 1.2): old Hercule (player 2, or the companion) becomes an actor on his
+        CoopCall 31, 0, 0, 0             ; spot and walks up (this hand-over was a json edit of the stock entry); the chop has weight: the flash, a
+        JumpIfFalse H1                   ; jolt, and Trunks falls where he stands in smoke with a thud
+        PushVarint 158
+        CoopCall 31, 1, 0, 0
+        CoopCall 31, 2, 0, 0
+        Step SpawnCharacterEntity
+        CoopCall 31, 3, 0, 0
+      H1:
+        BeginCommandBatch
+        WalkToPosition 0, 208, 111
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H2
+        WalkToPosition 158, 240, 128
+        SetEntityFacing 158, 2
+      H2:
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        WaitFrames 90
+        WalkToPosition 54, 192, 112
+        WaitFrames 60
+        PlayAudio 34
+        SetEntityAnimation 54, 10
+        WhiteFlash 10
+        CoopCall 37, 15, 8, 1
+        SetEntityFacing 0, 3
+        CoopCall 37, 1, 0, 54
+        CoopCall 37, 10, 0, 2
+        WaitFrames 98
+        SetEntityFacing 54, 0
+  script                                 ; old Hercule takes a step toward Gohan
+        CoopCall 22, 2, 158, 0
+        JumpIfFalse H1
+        WalkToPosition 158, 228, 124
+        SetEntityFacing 158, 2
+      H1:
   text 126 "#HERCULE: What are you doing?!"
+  script                                 ; Gohan turns to him for the answer
+        SetEntityFacing 54, 3
   text 57 "#GOHAN: It's not safe out there, Hercule!  You stay here and watch after Trunks."
-  stockseq @083b725c 15 20               ; "Sorry about that, Trunks", Gohan flies off, Trunks wakes
+  script                                 ; and back down to Trunks
+        SetEntityFacing 54, 0
+  stockseq @083b725c 15 15               ; "Sorry about that, Trunks..."
+  script                                 ; stock 16: his take-off kicks up dust
+        WaitFrames 40
+        PlayAudio 26
+        SpawnDustCloud 54, 192, 114
+        FlyToPosition 54, 160, 0
+        FadeOut 120
+        WarpToMapNoEntities 1, 5, 1, 224, 128
+        SetEntityFacing 0, 3
+        SetEntityAnimation 0, 3
+        WaitFrames 40
+        FadeFromWhite 120
+        WaitFrames 100
+        SetEntityAnimation 0, 0
+  stockseq @083b725c 17 20               ; Trunks wakes
 end
 
 ; ---- present day: Krillin visits ------------------------------------------------------------------
@@ -213,8 +322,16 @@ end
 sequence ch1_krillin_visit
   stock @083bb624                        ; Gohan sits down at his desk
   stock @083bb662                        ; "I guess I'll just do my math for a while..."
-  script
-        WaitFrames 40
+  script                                 ; (batch 1, 1.5) the power is felt before it is spoken: a low rumble, the room trembles, Gohan gets up
+        WaitFrames 20                    ; from the desk and looks up; Krillin comes in on that
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 3, 40
+        CommitCommandBatch
+        SetEntityPositionInstant 0, 136, 104
+        SetEntityFacing 0, 1
+        WaitFrames 24
+        StopAudio 43
         PlayAudio 10
         SpawnCharacterEntity 76, 216, 148
         WalkToPosition 76, 160, 120
@@ -229,6 +346,9 @@ sequence ch1_krillin_visit
   stock @083b9e30
   stock @083b9ec0                        ; Gohan: first I need my Saiyan Battle Armor, hidden in a cave
   stock @083b9f2c
+  script                                 ; Krillin takes a step toward the door and looks back
+        WalkToPosition 76, 160, 120
+        SetEntityFacing 76, 2
   text 73 "KRILLIN: I'll come with you.  With Frieza around, two of us are safer than one."
   text 1 "#Thanks, Krillin!  The cave is in the forest, just past our house."
   script
@@ -266,6 +386,7 @@ sequence ch1_spirit
         SetPlayerVisible 0
         WalkToPosition 0, 96, 176
         SetEntityFacing 0, 1
+        CoopCall 9, 1, 72, 178           ; (batch 1, 1.6) player 2 stands beside him in the clearing (he stayed at its edge, under the box)
         PanCameraToPosition 0, 104, 2         ; (was 0, 0: the box hid Frieza and the players stood below the view)
         WaitFrames 40
         PlayAudio 50
@@ -286,27 +407,40 @@ sequence ch1_spirit
   stop
   [4] text 73 "KRILLIN: Gohan...  Do you feel that?  Something is here with us." -> 6
   [5] text 73 "KRILLIN: Huh?  The whole forest just went quiet...\x0bSomething is here." -> 6
-  [6] script
+  [6] script                             ; (1.6) the music dies, a held silence, the ground starts to tremble; the white; they are there, and a
+        StopMusic                        ; harder jolt
+        WaitFrames 30
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 3, 50
+        CommitCommandBatch
+        StopAudio 43
         FadeToWhite 120
         TriggerMapEvent 1
         WhiteFadeOut 30
         WhiteFlash 40
+        BeginCommandBatch
+        ScreenShake 0, 8, 20
+        CommitCommandBatch
   [7] stock @083b952c                    ; Frieza: your dad isn't coming back!
-  [8] text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
-  [9] script                             ; player 1 recoils a step; Krillin played: his line (10), else Gohan's (11)
+  [8] script                             ; Cooler steps up for his line
+        WalkToPosition 34, 136, 152
+        SetEntityFacing 34, 0
+  [9] text 44 "COOLER: And when we are finished with you, Earth will learn what it means to cross our family."
+  [10] script                            ; player 1 recoils a step; Krillin played: his line (11), else Gohan's (12)
         WalkToPosition 0, 96, 186
         SetEntityFacing 0, 1
         CoopCall 22, 4, 6, 0
         JumpIfFalse a
-        PushByte 10
-        END
-      a:
         PushByte 11
         END
-  [10] text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!" -> 12
-  [11] text 1 "#GOHAN: Frieza AND Cooler?!  This can't be happening!"
-  [12] stock @083b958c                   ; boss bar, battle music, control back
-  [13] script                            ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
+      a:
+        PushByte 12
+        END
+  [11] text 73 "KRILLIN: Frieza AND Cooler?!  This can't be happening!" -> 13
+  [12] text 1 "#GOHAN: Frieza AND Cooler?!  This can't be happening!"
+  [13] stock @083b958c                   ; boss bar, battle music, control back
+  [14] script                            ; the camera follows the player again (entry 0's pan kept it on the clearing's top)
         SetActiveEntity 0
 end
 
@@ -756,7 +890,74 @@ sequence ch1_trunks_talk
       a:
         PushByte 95
         END
-  [4] stockseq @083bfddc 4 18            ; Trunks can't say, Vegeta, the Super Saiyan question, Goku lands
+  [4] stockseq @083bfddc 4 4             ; Trunks: "Sorry, I can't say."
+  [5] script                             ; stock 5 (batch 1, 1.8 beat 1): Vegeta walks into view to face Trunks (the stock had him follow
+        SetEntityPositionInstant 137, 104, 484 ; Trunks from the group's spot, off the stage, so his lines came from nowhere); below him,
+        WalkToPosition 137, 216, 484     ; clear of the top boxes
+        SetEntityFacing 137, 1
+  [6] stockseq @083bfddc 6 9             ; "Why not?  I'll tell you...", "I wish I could say.", the Super Saiyan question, "Yes, I was."
+  [10] script                            ; stock 10: he squares up closer and shouts
+        WalkToPosition 137, 216, 474
+        SetEntityFacing 137, 1
+        SetEntityAnimation 137, 4
+  [11] stockseq @083bfddc 11 17          ; "That's a lie!" ... "Goku should be arriving any second now."
+  [18] script                            ; stock 18, the landing (batch 1, 1.8): between the stock's two rumbles everyone looks up at the sky over
+        SetEntityFacing 128, 1           ; the crater and a white flash marks the impact; when the camera reaches the crater dust is still
+        WaitFrames 100                   ; settling on the pod; then the stock climb-out
+        PlayMusic 5
+        PlayAudioBlocking 10, 100
+        CoopCall 37, 2, 488, 160
+        CoopCall 37, 12, -2, -3
+        WhiteFlash 6
+        PlayAudioBlocking 80, 60
+        SetEntityFacing 137, 1
+        WaitFrames 60
+        BeginCommandBatch
+        WalkToPosition 128, 352, 440
+        SetEntityFacing 128, 1
+        WalkToPosition 0, 376, 456
+        SetEntityFacing 76, 1
+        SetEntityFacing 121, 1
+        SetEntityFacing 0, 1
+        SetEntityFacing 23, 1
+        SetEntityFacing 156, 1
+        CommitCommandBatch
+        WaitFrames 15
+        SetEntityFacing 103, 1
+        SetEntityFacing 107, 1
+        SetEntityFacing 32, 1
+        PanCameraToPosition 384, 104, 1
+        SpawnDustCloud 62, 476, 192
+        WaitFrames 20
+        SpawnDustCloud 62, 500, 188
+        WaitFrames 40
+        SetEntityFacing 62, 2
+        WaitFrames 30
+        SetEntityFacing 62, 1
+        WaitFrames 45
+        SetEntityFacing 62, 2
+        WaitFrames 20
+        SetEntityFacing 62, 0
+        SetActiveEntity 62
+        WalkToPosition 62, 472, 192
+        WalkToPosition 62, 432, 224
+        WaitFrames 30
+        PlayAudio 26
+        FlyToPosition 62, 392, 432
+        SetEntityFollow 32, 62
+        SetEntityFacing 23, 2
+        SetEntityFacing 121, 2
+        SetEntityFacing 103, 2
+        SetEntityFacing 128, 3
+        SetEntityFacing 137, 3
+        SetEntityFacing 156, 2
+        SetEntityFacing 107, 2
+        BeginCommandBatch
+        SetEntityAnimation 0, 4
+        SetEntityAnimation 76, 4
+        SetEntityAnimation 121, 4
+        SetEntityAnimation 156, 4
+        CommitCommandBatch
   [19] script                            ; Gohan played: "Hey dad!" (96), else 20
         CoopCall 22, 4, 0, 0
         JumpIfFalse a

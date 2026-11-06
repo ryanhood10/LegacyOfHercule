@@ -108,9 +108,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (but Cooler's charge), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
-| built in part | 7.2 (the power-up; not the first blow), 7.6 (the knee, Cell's turns and exit; not the two misses) |
-| not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
+| built | 5.7 (`nb-cs4`), 6.8 (a), (b) (`nb-cs4`), 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built in part | - |
+| not built | 5.1, 6.1, 6.6, 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
 
@@ -236,6 +236,20 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.7 Gingertown: the meeting and the town blown away (showcase with 5.8, M)
 
+- **Built 2026-11-06 (`nb-cs4`).** `ch5_gingertown` restated (26 entries; its branch's indexes are ours). Piccolo is player 1 by the
+  fade as before: that hand-over was a json `pre_edit` on the stock entry 0, which no longer runs, so it is in our entry 0 now (without
+  it the lineup "Hercule with Piccolo" played the scene on Hercule's body and crashed in 5.8: found by the staging test). With two
+  players a stand-in of Hercule (72, the `CoopCall 31` hand-over) walks up the street at Piccolo's side to (304, 214), in view; Cell
+  starts with his back turned and turns (left, then to them) before the hiss; the tail goes up once in the hiss's wait; he paces
+  three short walks through the talk (to 248, to 280, back to 264). Before the blast: the view comes down 10 px, Piccolo powers up
+  (a held Cine charge, level 2: he sheds the cape for it), Cell braces in his hurt pose, Hercule is thrown flat (`CoopCall 37, 10`),
+  the burst, the stock blast and white; the crater is held 40 frames before Cell speaks. Co-op: the twin stands from the map's load,
+  so the record (a step finds it first) stands on the twin's spot until the split, and on the flash it walks back to its own: one Cell
+  becomes two; Hercule's stand-in is beside Piccolo under that flash and backs off a step at his line; it goes before the fight.
+  Every line kept. `staging_ch5` "gingertown" shoots the charge and the split and counts the Cells (2 in co-op) and the stand-in;
+  flags, party and who plays after it equal the build before (one player, Piccolo + Hercule, Hercule + Piccolo). Not built: Piccolo's
+  ki pose before "I'll still destroy you" (a player's pose is not a script's to hold), the first clash (optional).
+
 - **Where:** `ch5_gingertown`, map 284 (zone 10 area 17) trigger 0; the fight is on map 287 (10/20). Films
   `gin_PH`, `gin_P`.
 - **Today:** Piccolo walks up the empty street, the camera pans to Cell standing still. "@???: Hisssss!!!" and
@@ -271,7 +285,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.8 Cell's Kamehameha, the arm, Cell's story, the escape (showcase, L)
 
-- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 (the meeting, the town blown away) is not built.** Player 2 has a mark (324, 250)
+- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 built by `nb-cs4`.** Player 2 has a mark (324, 250)
   and looks at Cell. Cell is in a charge with blue light before "Kaaaaaaaaa..." (`CoopCall 37, 7, 40, 0`). The beam is cine's
   (`CoopCall 37, 8, 2, 60`: the stock batch of twelve contact-waits is gone): it holds on Piccolo with bursts and shakes and
   pushes him back a few pixels (not the 40 px of the shot list: the op moves him a pixel at a time and stops at the hits);
@@ -423,7 +437,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.5 Kame House: the androids land, Piccolo's deal (touch up, S)
 
-- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (player 2's own move waits for the cine helpers' player-2 bodies).** The HUD is hidden
+- **Built 2026-11-06 (`nb-cs2`); beat 3 built 2026-11-06 (`nb-cs4`):** at the stomp player 2's Hercule drops to a knee and cowers where he stands (`CoopCall 37, 10, 0, 1` on `-15`; he gets up as Piccolo steps forward with the offer), his Krillin is at Piccolo's left in a blink, between him and 16, facing 16 (`CoopCall 37, 4, 1, 24` on `-16`); then everyone turns to 16 for his line (`CoopCall 37, 11`). The fade makes Piccolo player 1, so `-15` / `-16` can only be player 2. `staging_ch6` "kame" checks the rise played with Hercule (and found nobody otherwise). Not built: Hercule hopping *behind* Piccolo (a player's body can only be dashed or posed by Cine, not walked). Earlier note: The HUD is hidden
   from the first line. 16 walks up to (592, 448), the ground shakes and dust rises at his feet before "Not here...?"; 17 turns to him
   and steps away for "Whoa, take it easy, 16."; Piccolo steps toward 16 with the offer; after the island's pan 16 looks at the
   island, then at Piccolo, "Agreed."; **16 flies off first**, then 17's line, Piccolo's aside, and 17 and 18 leave together.
@@ -492,8 +506,20 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.8 Cell arrives, 17 is absorbed, Tien's stand, Goku's rescue (showcase, L)
 
-- **(c) built 2026-11-06 (`nb-cs2`); (a) and (b) are not built** (the stock arrival, Piccolo's fall, 16's punches and 17's absorption
-  play as before). Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
+- **(a) and (b) built 2026-11-06 (`nb-cs4`)** (stock entries 7, 31, 39 and 44 restated in place, so the stock indexes hold): the fade
+  also stands player 2 on the field at (256, 192), up by the cliff beside Piccolo (`CoopCall 9`; he stood off screen); before Cell is
+  seen the ground trembles (the rumble, `ScreenShake 0, 6, 40`) and 16 turns south first, then 17 and 18, then Piccolo; everyone looks
+  at Cell as he walks in; 18 takes a step back from him at "And 18!  Poetry in motion!". Piccolo's attack: a short charge, a volley of
+  three that bursts on Cell (`CoopCall 37, 8, 1, 3`), Cell turns, is at his side in a blink and one heavy blow throws him 32 px (the
+  view's edge is near) into the stock lying pose 33; everyone looks at him and player 2's Hercule drops to a knee and stays down
+  (Krillin only looks). 16 walks up as before and strikes twice and once heavy (`CoopCall 37, 5`: Cell thrown 64 px, the stock red
+  flash, he lies there through "16 squashed the bug!"). While the camera is up on Tien, Cell gets up and is behind 17 in a blink at
+  the bottom of the view (the stock walked him there in plain view); the absorption and the reveal are the stock's. Goku's
+  Instant-Transmission pick-ups take player 2 too (a blink beside him, `CoopCall 31, 3`), before Piccolo. Not built: Krillin's start
+  toward Piccolo, the rising shake under the tail (the stock's own shake and purple flashes stay). `staging_ch6` "island half" shoots
+  the fall and the blow and checks every move ended (`cine_last(4)`); flags and party after it equal the build before (one and two
+  players).
+- **(c) built 2026-11-06 (`nb-cs2`).** Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
   jolt (`CoopCall 37, 15`), the hit blink on Cell, four dust clouds in a square round him, and Cell falls flat (`CoopCall 37, 10`
   pose 2); three, 24, 18 and 12 frames apart. Cell gets up for "What do you think you're doing?"; after the Lookout cutaway and "You
   fool." he takes a step and two more flatten him; 18 and 16 fly off while four more land 14 frames apart; then the gaps grow and
@@ -606,7 +632,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Built in part 2026-11-06 (`nb-cs2`).** Built: after "What is this?" a 100-frame charge on Vegeta (`CoopCall 37, 7, 100, 2`: rings,
   flickers, a growing shake, the burst), the stock change at its peak (skipped when he arrived as a Super Saiyan: the charge
   plays either way), a jolt, and Cell is **pushed** back to the stock mark (216, 272) in his hit-stun instead of walking there.
-- **Not built: the first blow (beat 4).** Built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
+- **The first blow built 2026-11-06 (`nb-cs4`):** after "It's your end!" Vegeta is beside Cell in a blink (`CoopCall 37, 4`) and drives a heavy fist into his body (`CoopCall 37, 5, 5, 32`: Cell thrown 32 px, on a knee in smoke), Cell gets up and walks back to his mark (216, 272), where the boss record and the co-op split start. **The camera drift was found:** this scene never pans, so the game's follow camera is on player 1 the whole time and a dash drags it with him (7.4 had panned). The entry holds the view first (`PanCameraToPosition 71, 224, 4`: where the follow already is alone; with two players a 13 px glide off the pair's midpoint) and the fight's entry (20, stock 083e6608 restated) gives it back with `SetActiveEntity 0`. `cell_staging` checks the rise was the last move (`cine_last(10)`). Earlier note: built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
   made the camera leave its panned spot (one frame far below, then about two seconds of drifting back to centre on him); the
   same dash in 7.4 (no charge or change before it) holds the view. Told to the coordinator; not diagnosed. Beat 1's folded
   arms: no such pose.
@@ -757,7 +783,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   walks over to stand above him for "How gracious of you!"; Trunks gets up for "For your information, he's training to defeat
   you!"; Cell turns away (left, then his back) before "No contest?  No contest!  Ahhh!!!  A tournament!" and back to him for
   the rules; after "Bring me Goku!" he is gone upward in a blink (a dash without afterimage), then the stock flight out.
-- **Not built: the two misses (beat 2) and STRIKE-H for Krillin's throw (beat 1).** The misses were built and taken out: with Cell
+- **The two misses built 2026-11-06 (`nb-cs4`):** after "One hit..." Trunks steps up and swings; Cell is at his left in a blink (`CoopCall 37, 4, 1, 26`, in a batch with Trunks' punch, 6); Trunks turns and kicks (7) as Cell is back on his spot (`CoopCall 37, 3, 248, 280`), facing down; Trunks walks back to his mark (248, 320). The camera follows the pair for the two dashes (`CoopCall 37, 13`): Cell's spot is above the view's safe band and a fitted dash put him on Trunks. **The "second Vegeta" was found:** it is the map's own lying Vegeta, decoration 1 (the stock body the end's `FindEntityByType 1` hides), at about (248, 264) right under Cell's spot, so Cell's body hid it until he moved; the 2026-11-05 staging's actor at (296, 262) is his body here. Entry 1 hides the decoration behind its fade now. Beat 1 (Krillin's throw as STRIKE-H) is left hand-rolled: a Cine knock-back flies straight away from Cell, onto Trunks below him; the stock glide past Trunks reads. `cell_staging` checks the moves all ended (`cine_last(4)`). Flags, party and player 2 after the scene equal the build before (one and two players). Earlier note: the misses were built and taken out: with Cell
   standing just below Trunks (a dash to 22 px under him) a second picture of Vegeta's lying body was drawn over Trunks' head for
   as long as Cell stood there (filmed; with and without the dash's afterimage, with and without a punch on Trunks). Cause not
   found (OBJ tiles of the lying actor 137?); told to the coordinator. A raw `SetEntityAnimation 0, 6` on the ascended Trunks
@@ -817,7 +843,7 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### W.3 Cooler's fight: the opening and his end (rework, S)
 
-- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (Cooler's CHARGE waits for the cine helpers).** The HUD is hidden for the opening
+- **Built 2026-11-06 (`nb-cs2`); beat 3 built 2026-11-06 (`nb-cs4`):** before the fight every eye turns to Cooler (`CoopCall 37, 12`) and he powers up (`CoopCall 37, 7, 70, 1`: rings, the flicker, a growing shake, the burst), the servant's actor still beside him in co-op (it makes way for its twin after the charge, in entry 16 now; entry 15 only turns him to his lord). `staging_ch8` checks the charge played in every lineup (`cine_last`) and shoots it (`c8_charge`). Earlier note: The HUD is hidden for the opening
   (`SetPlayerVisible 0`, back at the fight's entry). Player 1 walks up to (200, 298), 34 px under Cooler, player 2 is placed beside him
   (`CoopCall 9`), the camera at (100, 214): Cooler above a bottom box and the players just clear of it; a top box (the player's
   lines) covers Cooler and leaves the players. Cooler starts with his back turned and turns round as they arrive. The three

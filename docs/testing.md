@@ -743,6 +743,28 @@ Tien alone when Krillin is played), "island break" (player 1 on his mark (304, 1
 - **Traps met:** an idle player dies fast in zone 12 and on the island: win at once after `stepz`; a press count before a shot
   drifts when a scene gets longer (retune it by looking at the shot); `mashmap 9 1` needs about 80 presses for the island's end.
 
+## Cutscene leftovers (headless, 2026-11-06, branch `nb-cs4`)
+
+The generators grew blocks or checks per scene (run alone by cutting the block out: `sed -n '/^echo === NAME/,$p'`):
+`staging_ch1` "training 1p / 2p" (old Hercule's actor during the talk, one body of him after), "knock-out 1p / 2p" (the chop, no actor
+left on 1/5), "spirit" (player 2 at (72, 178) in the two-player lineups), "visit alone" (`c1_G_rumble`); `staging_ch2` "deal" (the view
+at (168, 860)), "jungle" (`c2_<n>_stamp`); `staging_ch3` "battle" (`c3_<n>_open`); `staging_ch5` "gingertown" (the charge, the split:
+two Cells in co-op, the stand-in gone); `staging_ch6` "kame" (player 2's knee and rise), "island half" (`c6_<n>_fall`, `_blow`, every
+move ended); `staging_ch8` (Cooler's charge in every lineup, `c8_charge`); `cell_staging` (7.2's rise, 7.6's moves); `ch4_staging`
+"end" presses 40 times, into Piccolo's exit.
+
+- **`staging_lib.Script.cine_last(op, how=1)`** (and `cell_staging_gen.cine_last`): finds the cinematic helpers' RAM (`find CN
+  0xC14E0001`) and expects the last blocking move was `op`, ended `how` (1 played, 5 quiet: no body), and every move started has ended.
+  A non-blocking op (looks, a jolt, the held charge's end) does not set it.
+- **Films** as `nb-cs2`'s (`build/film/gen.py` on `fl.py`, not committed), with the camera's view origin (`peek 0x030010AC 2`) beside
+  each shot: that is how 7.2's drift was read. `cmpstate.py` compared the end states with the build before for 3.5, 5.7, 6.8, 7.6,
+  1.1, 1.2, 1.6, 2.3 (the player's spot differs where the scene now ends him elsewhere: the training's knee, by 35 px).
+- **Traps met:** a json `edits` / `pre_edits` entry on a stock entry stops applying once a sequence restates that entry (the build does
+  not warn): move its steps into the restated entry. A Map Test straight into zone 3 area 6 parks the arrival's group at (672, 728),
+  off the stage: film 1.8 from the real flight in. The stock lying bodies of the road's end and of zone 12 area 6 are map decorations
+  (`FindEntityByType n` hides one); a body moving off one shows it. In this environment a Bash heredoc collapses `\\` to `\`: write
+  Python that carries backslashes (`\x0b`, a regex `\1`) with the Write tool.
+
 ## Cinematic helpers (headless, 2026-11-06, branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine")
 
 `src/coop/cine.c` (`CoopCall 37`) is driven two ways: from lscript, and by **test command 50** (`docs/ids.md`): `arg` = the op,

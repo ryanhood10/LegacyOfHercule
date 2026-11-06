@@ -48,7 +48,14 @@ sequence ch7_semi_perfect
         SetEntityFacing 29, 2
         SetEntityFacing 0, 3
   [13] stock @083e65f4                   ; "It's your end!"
-  [14] script                            ; co-op: the split (next 15), else the fight (20)
+  [14] script                            ; the first blow (batch 2, 7.2 beat 4): Vegeta is beside him in a blink and drives a fist into his
+        PanCameraToPosition 71, 224, 4   ; body; Cell is thrown, gets up and is pushed back to his mark (the boss record and its twin start
+        CoopCall 37, 1, 0, 29            ; from it). The camera is held where it is first: in this scene it follows player 1, and a dash
+        CoopCall 37, 4, 0, 0             ; would drag it (entry 20 gives it back). Then co-op: the split (next 15), else the fight (20)
+        CoopCall 37, 5, 5, 32
+        CoopCall 37, 10, 1, 0
+        WalkToPosition 29, 216, 272
+        SetEntityFacing 29, 2
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 15
@@ -68,7 +75,11 @@ sequence ch7_semi_perfect
   [18] text 4 "VEGETA: Hmph.  Then I'll destroy both halves."
   [19] script                            ; the body that walked goes (a step finds the same one first); the record stands on the other and its twin on this spot
         DespawnEntity 29
-  [20] stock @083e6608                   ; the fight (25-100)
+  [20] script                            ; stock 083e6608, the fight (25-100), with the camera given back to player 1
+        SetActiveEntity 0
+        DespawnCharacterAndRecordPosition 29, 1
+        SetPlayerVisible 1
+        DrawBossHealthBarRange 29, 25, 100
 end
 
 ; Semi-Perfect Cell beaten: the duplicate is taken back in co-op; Cell talks Vegeta into letting him
@@ -349,7 +360,8 @@ sequence ch7_perfect_end
         SetEntityFacing 30, 0
         SpawnCharacterEntity 76, 216, 324
         SetEntityFacing 76, 3
-        FadeFromWhite 40
+        FindEntityByType 1               ; the map's own lying Vegeta (decoration 1, under Cell's spot) goes: the actor at (296, 262) is his
+        FadeFromWhite 40                 ; body here, and Cell's dashes uncovered the second one (nb-cs2's "ghost"); the stock end hides it too
         WaitFrames 20
   [2] text 73 "KRILLIN: He's wide open!  Now's my chance!  Hyaaaah!"
   [3] script                             ; the rush, one kick, Krillin thrown past Trunks
@@ -373,10 +385,31 @@ sequence ch7_perfect_end
         WaitFrames 40
   [4] text 40 "CELL: Hmph.  Was that supposed to be an attack?"
   [5] text 73 "KRILLIN: Ugh...  One hit...  He took me out with one hit..."
-  [6] script                             ; Cell looks from Krillin back to Trunks. (The shot list's two misses are not built: with Cell
-        SetEntityFacing 30, 2            ; standing just below Trunks here a second lying-Vegeta picture was drawn over Trunks: not understood)
-        WaitFrames 16
+  [6] script                             ; Cell looks from Krillin back to Trunks; then the two misses the lesson explains (batch 2, 7.6
+        SetEntityFacing 30, 2            ; beat 2): Trunks steps in and swings, Cell is at his side in a blink; he turns and kicks, Cell is
+        WaitFrames 16                    ; back on his spot (the camera follows the pair: his spot is above the view's
+        SetEntityFacing 30, 0            ; safe band, and a fitted dash would land him on Trunks). Trunks ends on his mark (248, 320)
+        WaitFrames 10
+        WalkToPosition 0, 248, 302
+        SetEntityFacing 0, 1
+        CoopCall 37, 1, 30, 0
+        CoopCall 37, 13, 1, 0
+        BeginCommandBatch
+        SetEntityAnimation 0, 6
+        CoopCall 37, 4, 1, 26
+        CommitCommandBatch
+        SetEntityFacing 0, 2
+        WaitFrames 6
+        BeginCommandBatch
+        SetEntityAnimation 0, 7
+        CoopCall 37, 3, 248, 280
+        CommitCommandBatch
+        CoopCall 37, 13, 0, 0
         SetEntityFacing 30, 0
+        SetEntityFacing 0, 1
+        WaitFrames 20
+        WalkToPosition 0, 248, 320
+        SetEntityFacing 0, 1
         WaitFrames 10
   [7] stockseq @083e77b0 1 2             ; "All you've done is pump up your muscles. ...", "Of course! ... You can finish me if you want.  I've failed."
   [9] script                             ; Trunks lets the power go and drops to a knee; Cell walks over to stand above him

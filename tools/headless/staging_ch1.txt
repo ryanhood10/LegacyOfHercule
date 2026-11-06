@@ -144,6 +144,9 @@ echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 mash 2 110
 shot c1_GK_talk
+deref P2 0x0203FF08
+echo EXPECT [0-9a-f]+: 00004800 0000b200
+peek P2+0x158 2
 mash 6 110
 shot c1_GK_frieza
 stepz 0x03001FDC 150
@@ -204,6 +207,9 @@ echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 mash 2 110
 shot c1_KG_talk
+deref P2 0x0203FF08
+echo EXPECT [0-9a-f]+: 00004800 0000b200
+peek P2+0x158 2
 mash 6 110
 shot c1_KG_frieza
 stepz 0x03001FDC 150
@@ -785,7 +791,10 @@ poke32 0x0203FD0C 0x1602
 poke32 0x0203FD54 0xaa0088
 poke32 0x0203FD08 5
 frames 150
-mash 10 90
+mash 1 90
+frames 80
+shot c1_G_rumble
+mash 9 90
 shot c1_G_visit
 stepz 0x03001FDC 150
 frames 30
@@ -836,4 +845,170 @@ map
 ents
 echo EXPECT 0203ff84: 06
 peek8 0x0203FF84 1
+echo === training 1p
+load menu.ss
+p2 off
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+key 1 6
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 150
+shot c1_train1p_knee
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+mash 6 100
+shot c1_train1p_back
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 1\b
+map
+ents
+echo === training 2p
+load menu.ss
+p2 0
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+key 1 6
+frames 60
+key 1 6
+frames 60
+key 1 6
+frames 150
+shot c1_train2p_knee
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+mash 6 100
+shot c1_train2p_back
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 1\b
+map
+ents
+echo === knock-out 1p
+load menu.ss
+p2 off
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+mash 40 120
+frames 300
+flags +0 +1
+findent PL 0x08025604
+poke32 PL+0x158 0x9000
+poke32 PL+0x15C 0x25000
+deref P2 0x0203FF08
+poke32 P2+0x158 0xA800
+poke32 P2+0x15C 0x26000
+frames 30
+key 0x40 30
+frames 20
+mash 9 150
+frames 750
+shot c1_knock1p_down
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+mash 3 120
+shot c1_knock1p_answer
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 5\b
+map
+ents
+echo === knock-out 2p
+load menu.ss
+p2 0
+maptest 7
+frames 200
+poke8 0x0203F000 3
+poke8 0x0203F0A0 24
+flags +466
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x101
+poke32 0x0203FD54 0x29800c8
+poke32 0x0203FD08 5
+frames 200
+mash 40 120
+frames 300
+flags +0 +1
+findent PL 0x08025604
+poke32 PL+0x158 0x9000
+poke32 PL+0x15C 0x25000
+deref P2 0x0203FF08
+poke32 P2+0x158 0xA800
+poke32 P2+0x15C 0x26000
+frames 30
+key 0x40 30
+frames 20
+mash 9 150
+frames 750
+shot c1_knock2p_down
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+mash 3 120
+shot c1_knock2p_answer
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R158 TBL+0x25c
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R158
+ents
+echo EXPECT map zone 1 area 5\b
+map
+ents
 echo ALIVE

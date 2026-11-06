@@ -3,7 +3,7 @@ usage: python tools/headless/staging_ch568_gen.py     (the scripts are committed
 Chapter 5: Kami defers, whoever is selectable (the fade makes Piccolo player 1; Hercule only when played), then Kami's boost and
 the fusion (Hercule kept there for the plot: Kami draws out his potential; flags 129 and 131 so Kami stands; he is gone after it and Mr. Popo is not). Chapter 6: the basement and Goku's waking, only who is played: no
 Krillin NPC or actor alone as Trunks, no Trunks actor alone as Krillin (Ryan, 2026-11-05). Cooler: the three openings alone (no servant) and with
-two players (the servant's actor, then his twin on the same sprite 166); player 1 walks up to (200, 298) under Cooler in each, and Cooler's end is seen (the camera pans to him)."""
+two players (the servant's actor, then his twin on the same sprite 166); player 1 walks up to (200, 298) under Cooler in each, Cooler powers up before the fight (the servant beside him in co-op), and Cooler's end is seen (the camera pans to him)."""
 from staging_lib import *
 
 s = Script("staging_ch568_gen.py")
@@ -39,7 +39,19 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (HERCULE, PICCOLO)):
     n = lineup_name(p1, p2)
     s.begin(f"gingertown {n}", p1, p2, "+129 +131 +132")
     s.warp(10, 17, 280, 300, 100)
+    # (batch 2, 5.7) Gingertown's meeting: player 2's stand-in walks up beside player 1 (Hercule 72, or Piccolo 103 when player 1 is
+    # Hercule), Cell paces, the Namek's power-up before the blast (Hercule thrown flat), the crater, in co-op the split (the record stands on
+    # its twin until it steps out) with the stand-in beside player 1; every stand-in gone at the fight
+    s.press(16, 100)
+    s.out("frames 30")
+    s.shot(f"c5_{n}_charge")
+    if p2 is not None:
+        s.actors(**{"s72" if p2 == HERCULE else "s103": 1})
+    s.out("ents")
     s.end_scene()
+    s.shot(f"c5_{n}_split")
+    s.actors(s72=1 if p1 == HERCULE else "[01]" if p2 == HERCULE else 0, s28=2 if p2 is not None else 1)
+    s.out("ents")
     s.on_map(10, 20)
     s.win(120)
     s.press(8, 60)
@@ -109,7 +121,8 @@ s.shot("c6_TK_duel")
 s.actors(s134="[01]")                               # player 2's Trunks shows 134 himself
 s.out("echo EXPECT 0203fd5c: 01", "peek8 0x0203FD5C 1", "ents")     # the duel runs
 s.on_map(15, 2)
-# Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo, 17 gives him room, 16 leaves first. The fade makes Piccolo
+# Kame House (a16_kame_house): the androids land; 16 stamps up to Piccolo (player 2's Hercule cowers on a knee, his Krillin is at Piccolo's side
+# in a blink), 17 gives him room, 16 leaves first. The fade makes Piccolo
 # player 1 whoever walks in. Then the flight pad: Tien comes out to watch, and Krillin's actor (76) only when nobody plays him.
 for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
     n = lineup_name(p1, p2)
@@ -122,6 +135,7 @@ for p1, p2 in ((PICCOLO, None), (KRILLIN, None), (PICCOLO, HERCULE), (PICCOLO, K
     s.press(6, 100)
     s.shot(f"c6_{n}_kame1")
     s.end_scene()
+    s.cine_last(10, 1 if p2 == HERCULE else 5)      # player 2's Hercule cowered at the stomp and got up (nobody to raise otherwise); Krillin dashed up
     s.out("echo EXPECT 0203f000: 01", "peek8 0x0203F000 1")
     s.on_map(11, 1)
     s.warp(11, 1, 384, 564, 120)
@@ -144,7 +158,8 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
     s.shot(f"c6_{n}_break1")
     s.out("mashmap 11 5 60", "frames 400", "ents")
     s.on_map(11, 5)
-# The island's end (a16_island_half): 16 stops at half health, Cell arrives, 17 is absorbed, Tien's Tri-Beam from above (Tien 121 up at
+# The island's end (a16_island_half): 16 stops at half health, Cell arrives (the ground shakes first; player 2 on the field beside Piccolo),
+# Piccolo's three blasts and Cell's blow that lays him out, 16's three blows that throw Cell, Cell behind 17 in a blink, 17 is absorbed, Tien's Tri-Beam from above (Tien 121 up at
 # (396, 148), Semi-Perfect Cell 29 hammered flat), Goku's rescue by Instant Transmission, the Lookout. Win both stages at once.
 for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     n = lineup_name(p1, p2)
@@ -154,7 +169,13 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     s.win(120)
     s.out("mashmap 11 5 60", "frames 300", "mashmap 11 6 30", "frames 200")
     s.win(20)
-    s.press(110, 60)                                # to Tien's "NO!!!!!!!!"
+    s.press(74, 60)                                 # (6.8 a) Piccolo's three blasts, Cell's blow: Piccolo lies, player 2 beside him on the field
+    s.shot(f"c6_{n}_fall")
+    s.actors(s28=1)
+    s.out("ents")
+    s.press(8, 60)                                  # (6.8 b) 16's three blows: Cell thrown and lying
+    s.shot(f"c6_{n}_blow")
+    s.press(33, 60)                                 # to Tien's "NO!!!!!!!!"
     for i in range(4):
         s.out("frames 45")
         s.shot(f"c6_{n}_tri{i}")
@@ -164,6 +185,7 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     s.shot(f"c6_{n}_tri4")
     s.out("ents", "mashmap 9 1 200")
     s.end_scene()
+    s.cine_last(4)                                  # Goku's last blink (beside Piccolo) played; every move of the scene ended
     s.on_map(9, 1)
 s.write("staging_ch6.txt")
 
@@ -177,6 +199,7 @@ for p1, p2, s166 in ((GOHAN, None, 0), (GOKU, None, 0), (TRUNKS, None, 0), (GOHA
     s.out("echo EXPECT map zone 6 area 61 var 1 player 200,298", "map")    # player 1 walked up to his mark
     s.end_scene()
     s.shot(f"c8_{n}_fight")
+    s.cine_last(7)                                  # Cooler's charge played before the fight (batch 2, W.3 beat 3)
     s.actors(s166=s166)
     s.on_map(6, 61)
     s.win(240)
@@ -187,5 +210,10 @@ s.warp(6, 61, 200, 400, 260)
 s.press(8, 100)
 s.shot("c8_servant")
 s.actors(s166=1)
+s.press(1, 40)
+s.out("frames 10")
+s.shot("c8_charge")                                 # Cooler powers up with his servant still beside him
+s.actors(s166=1)
 s.end_scene()
+s.cine_last(7)
 s.write("staging_ch8.txt")

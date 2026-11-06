@@ -56,9 +56,16 @@ sequence ch8_cooler
         SetEntityFacing 166, 0
   text 0 "@^NAMEKIAN: ...As you command, Lord Cooler."
   text 1 "A Namekian...  serving Frieza's family?!"
-  script                                 ; [15] his actor makes way for the twin
+  script                                 ; [15] the servant turns to his lord (his actor stays for the charge and makes way in [16])
+        SetEntityFacing 166, 2
+  script                                 ; [16] stock 083d2a98, the fight (Cooler, and his servant in co-op); the HUD back. First Cooler
+        CoopCall 37, 12, 34, 34          ; shows what "transcended far past" his brother means: every eye on him, a charge (level 1:
+        CoopCall 37, 1, 34, 0            ; the rings, a growing shake, the burst), then the fight (batch 2, W.3 beat 3)
+        CoopCall 37, 7, 70, 1
+        CoopCall 22, 2, 166, 0           ; the servant's actor makes way for his twin
+        JumpIfFalse S1
         DespawnEntity 166
-  script                                 ; [16] stock 083d2a98, the fight (Cooler, and his servant in co-op); the HUD back
+      S1:
         DespawnCharacterAndRecordPosition 34, 1
         SetPlayerVisible 1
         DrawBossHealthBar 34

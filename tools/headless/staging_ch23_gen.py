@@ -14,12 +14,16 @@ for p1, p2 in ((GOHAN, None), (KRILLIN, None), (GOHAN, KRILLIN), (KRILLIN, GOHAN
     s.out("key 0x40 4", "frames 10")
     s.press(9, 100)
     s.shot(f"c2_{n}_deal")
+    # (batch 1, 2.2) the view is up at (168, 860) through the talk, so the top boxes leave Piccolo and Hercule in the clear
+    s.out("echo EXPECT 030010ac: 000000a8 0000035c", "peek 0x030010AC 2")
     s.end_scene()
     s.on_map(4, 3)
 for p1, p2 in ((PICCOLO, None), (HERCULE, None), (PICCOLO, HERCULE), (HERCULE, PICCOLO)):
     n = lineup_name(p1, p2)
     s.begin(f"jungle {n}", p1, p2)
     s.warp(4, 58, 112, 420, 100)
+    s.out("frames 230")             # (batch 1, 2.3) the King stamps as the camera reaches him, before his first word; the HUD hidden
+    s.shot(f"c2_{n}_stamp")
     s.end_scene()
     s.win(200)
     s.press(9, 90)
@@ -67,7 +71,9 @@ for p1, p2, s72 in ((VEGETA, None, 0), (HERCULE, None, 0), (VEGETA, HERCULE, 1),
     # Vegeta (flags 464-467), so speaker 1 shows his portrait as it does in play
     s.begin(f"battle {n}", p1, p2, "+76", ["poke8 FLAGS+0x3A 3"])
     s.warp(7, 15, 468, 556, 300)
-    s.press(24, 110)
+    s.press(4, 110)                # (3.5 beats 1-2) the opening as an exchange and Goku's heavy blow; later his knee before the collapse
+    s.shot(f"c3_{n}_open")
+    s.press(21, 110)
     s.shot(f"c3_{n}_drain")
     s.press(4, 110)
     s.out("key 1 6", "frames 44")

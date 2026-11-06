@@ -71,7 +71,62 @@ sequence ch3_z7_battle
       L1:
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
-  stockseq @083d40c8 0 23                ; Goku's virus, he falls; 19: "Ah yes...  Perfect!"
+  script                                 ; stock 0 (batch 1, 3.5 beat 1): the opening as one exchange Goku wins (the stock's punches with contact
+        SetPlayerVisible 0               ; waits), then his heavy blow throws 19 back; 19 is up and both are on their marks again
+        SetEntityAnimation 0, 4
+        PanCameraToPosition 352, 288, 3
+        PlayAudio 55
+        BeginCommandBatch
+        WalkToPosition 12, 480, 408
+        SetEntityFacing 12, 2
+        WalkToPosition 61, 464, 408
+        CommitCommandBatch
+        CoopCall 37, 1, 61, 12
+        CoopCall 37, 6, 60, 0
+        CoopCall 37, 5, 1, 28
+        WaitFrames 10
+        CoopCall 37, 10, 1, 0
+        BeginCommandBatch
+        WalkToPosition 12, 480, 408
+        WalkToPosition 61, 464, 408
+        CommitCommandBatch
+        SetEntityFacing 12, 2
+        SetEntityFacing 61, 3
+        PlayAudio 50
+  stockseq @083d40c8 1 4                 ; Tien: "Goku's all over that thing!", his punch, "...in the bag!", Piccolo: "Maybe..."
+  script                                 ; stock 5 (3.5 beat 2): Goku steps back and his aura stutters (a small shake under each flinch)
+        WalkToPosition 61, 448, 408
+        WaitFrames 60
+        SetEntityAnimation 61, 2
+        CoopCall 37, 15, 8, 0
+        WaitFrames 30
+        SetEntityFacing 61, 0
+        SetEntityAnimation 61, 2
+        CoopCall 37, 15, 10, 1
+        WaitFrames 40
+  stockseq @083d40c8 6 6                 ; 19: "Hehehehehe..."
+  script                                 ; stock 7
+        SetEntityFacing 61, 2
+        WaitFrames 40
+        SetEntityAnimation 61, 2
+        CoopCall 37, 15, 10, 0
+        WaitFrames 40
+  stockseq @083d40c8 8 19                ; "What's happening?" ... "we have to get back home to get it!"
+  script                                 ; stock 20: he drops to a knee first, then the stock collapse out of Super Saiyan
+        CoopCall 37, 1, 61, -3
+        CoopCall 37, 10, 0, 1
+        WaitFrames 30
+        PlayMusic 22
+        StopAudio 55
+        SetEntityAnimation 61, 25
+        WaitFrames 30
+        BeginCommandBatch
+        SetEntityAnimation 53, 4
+        SetEntityAnimation 121, 4
+        SetEntityAnimation 76, 4
+        CommitCommandBatch
+        SetEntityAnimation 156, 4
+  stockseq @083d40c8 21 23               ; Yamcha: "Goku changed back!", wait, 19: "Ah yes...  Perfect!"
   [25] script                            ; stock 24, and 19's hand over the fallen Goku: the drain (the cutscene pass, 2026-11-06)
         SetEntityFacing 13, 2
         SetEntityAnimation 12, 8

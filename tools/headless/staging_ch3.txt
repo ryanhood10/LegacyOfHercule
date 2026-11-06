@@ -127,7 +127,9 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 24 110
+mash 4 110
+shot c3_V_open
+mash 21 110
 shot c3_V_drain
 mash 4 110
 key 1 6
@@ -217,7 +219,9 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 24 110
+mash 4 110
+shot c3_H_open
+mash 21 110
 shot c3_H_drain
 mash 4 110
 key 1 6
@@ -308,7 +312,9 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 24 110
+mash 4 110
+shot c3_VH_open
+mash 21 110
 shot c3_VH_drain
 mash 4 110
 key 1 6
@@ -399,7 +405,9 @@ poke32 0x0203FD0C 0xf07
 poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 24 110
+mash 4 110
+shot c3_HV_open
+mash 21 110
 shot c3_HV_drain
 mash 4 110
 key 1 6
