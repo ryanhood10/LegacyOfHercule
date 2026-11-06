@@ -106,6 +106,18 @@
    "payload": "seq:broly_rim",
    "condition": "script:broly_trip_cond",
    "_": "crossing the basin's rim: the confrontation (once, flag 403), then the fight"
+  },
+  {
+   "type": "dialogue",
+   "rect": [
+    250,
+    290,
+    410,
+    398
+   ],
+   "payload": "seq:cine_demo",
+   "condition": "script:cine_demo_cond",
+   "_": "test only: the cinematic helpers' demo (data/story/cine_demo.lscript), there only when test command 50 armed it before the map loaded"
   }
  ],
  "spawn": [
@@ -116,7 +128,8 @@
  "music": 30,
  "flags": 1,
  "sources": [
-  "data/story/broly.lscript"
+  "data/story/broly.lscript",
+  "data/story/cine_demo.lscript"
  ],
  "records": [
   {

@@ -23,7 +23,8 @@ MEMORY
 {
     rom   (rx)  : ORIGIN = 0x08800000, LENGTH = 0x00100000
     rom2  (r)   : ORIGIN = 0x08E00000, LENGTH = 0x00200000   /* big generated art (.rodata.art*): tools/patch_rom.py --art */
-    comboram (rw) : ORIGIN = 0x0203EA00, LENGTH = 0x00000200     /* the team combos' state (tny_combo.h); the heap cap ends here */
+    cineram (rw) : ORIGIN = 0x0203E900, LENGTH = 0x00000100      /* the cinematic helpers' state (cine.c); the heap cap ends here */
+    comboram (rw) : ORIGIN = 0x0203EA00, LENGTH = 0x00000200     /* the team combos' state (tny_combo.h) */
     tourneyram (rw) : ORIGIN = 0x0203EC00, LENGTH = 0x00000400   /* the tournament team's state (tourney.h) */
     ewram (rw)  : ORIGIN = 0x0203FF00, LENGTH = 0x00000100
     vtram (rw)  : ORIGIN = 0x0203FE00, LENGTH = 0x00000100   /* below the pinned block, above the heap */
@@ -34,7 +35,7 @@ MEMORY
 SECTIONS
 {
     /* all our EWRAM, lowest region to the end: input.c clears it before a soft reset (a power cycle's zeroed RAM) */
-    __coop_ram_start = ORIGIN(comboram);
+    __coop_ram_start = ORIGIN(cineram);
     __coop_ram_end = ORIGIN(ewram) + LENGTH(ewram);
 
     .art : {
@@ -102,6 +103,10 @@ SECTIONS
         KEEP(*(.combo.po))     /* popo.c: the hidden room and Mr. Popo (<= 0x30) */
         KEEP(*(.combo.st))     /* tny_engine.c: the ring's staging counts for the tests (8; docs/tournament.md 27) */
     } > comboram
+
+    .cineram (NOLOAD) : {
+        KEEP(*(.cine))       /* cine.c: the cast, the hold state, the held charge, the tests' counters (<= 0x100) */
+    } > cineram
 
     .bss (NOLOAD) : {
         *(.bss*)
