@@ -849,3 +849,29 @@ as `lying.sprawl(px, xo, yo, face_left, s=0.45)`: his recoil 9.3 (no sparks), up
 (nearest row): LoG2's camera looks down at an angle, so a body on its back along the view is short and wide, face up,
 limbs spread on the floor. A frame painted from shapes (on his side) was tried on the same sheet and dropped: it did
 not look like Buu's Fury's Yakon. `tuck_limbs` stays in `lying.py` (unused).
+
+## Win poses (2026-11-05, branch `nb-tny-wins`, `docs/tournament.md` 28)
+
+A held pose shows its group's **first frame** (the body's control state recomputes the frame from its timer: `docs/tournament.md`
+28), so a pose is a group. The tournament's winner strikes `tny_engine.c` `win_pose` (the table `tny_wins`); every body was drawn
+group by group (frame 0 of every group, groups 4 / 5 / 14 / 6-8 frame by frame; `tools/tnysheet.py --cheer` draws the poses as
+the engine shows them):
+
+| body | victory pose |
+|---|---|
+| Android 16 (175, 160) | built (`tools/tnywins.py`, `tny_win_a16`): sprite 8's idle with the right arm raised in a fist; his group 4 is sprite 8's startled look round, his 5 the rocket punch |
+| Gohan 57, Krillin 161 | built (`tny_win_gohan`, `tny_win_krillin`): group 4 frame 3, the cheer's arms up, as a one-frame group (their frame 0 is the arms down) |
+| Hercule 72 | group 5: the wave to the crowd (his 4 is a shout) |
+| Pui Pui 197, Janemba 208 | group 5, held still (`WF_STILL`: a fist / claw up on one leg; the rest of the group is the attack); their group 4 is their idle |
+| Super Buu 205-207 | group 4, whose first frame is now the flex (`data/tny_buu.txt`: `18.0+12.0+12.1+18.0`; was the roar with the steam web) |
+| everyone else | the old order, group 4, else 14, else the charge 5, at frame 0: the cheer, arms up (Goku 60, Yamcha, Tien, Goku and Gohan of the Buu saga, Vegito, Pikkon), arms out (King Cold, Yamu), the flexes (Broly, Super 13, Spopovich, the Buus), the power-up stances (the androids, the Cells, Frieza, Cooler, Trunks 135) |
+
+**Lying, the same finding:** the lying table's rows "the knock-down's last frame" (Hercule 72, Gohan 57, Trunks 135, Super Saiyan 2
+Gohan 58, Semi-Perfect 29 and Perfect Cell 30) showed the knock-down's first frame, the recoil standing. `tools/tnyplayables.py`
+`lie_table` now builds a one-frame group per facing for them (`tp_lieown<id>`). Every other body's group 12 lies at frame 0 too
+(checked against its last frame).
+
+`tools/tnywins.py` draws on 16's own 16 x 32 idle in a 32 x 32 frame (x offset -8, his slot 0x400): the hanging arm's columns
+cleared, the arm painted from a character map in his armour (0x29 olive, 0x2A dark, 0x2E yellow, 0x36 green, black outline)
+and skin ramp (0x72-0x75, outline 0x17), the shoulder pad kept over it. Every built group is one frame and a zero descriptor
+(the engine's frame count stops there) per facing; 16's is one array for all four. Preview `$(BUILD)/tny_wins_preview.png`.

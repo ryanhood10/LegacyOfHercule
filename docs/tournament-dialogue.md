@@ -44,6 +44,11 @@ Contents: 1 when lines play, 2 how a line is chosen, 3 writing rules, 4 every fi
 Who speaks first: the opponent (or the challenger) opens and your fighter answers, so the player always gets the
 last word before "Begin!". In a player-vs-player final, player 2's fighter opens.
 
+**2 v 2 (built 2026-11-05, `docs/tournament.md` 28):** every member of a side speaks. Around a rival exchange the other
+side's partner opens with his opener and your partner answers last with his reply (when the four boxes allow); without a
+rival each side speaks with both members (a known team its lines, else each member's opener / reply; the same fighter
+twice once). The new lines marked DRAFT below are Claude's, waiting for your review.
+
 ## 3. Writing rules
 
 - About 60 characters fit one box (three short rows), speaker's name included. The lines below aim for 45 or less
