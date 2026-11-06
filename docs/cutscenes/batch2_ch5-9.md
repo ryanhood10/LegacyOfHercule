@@ -592,6 +592,25 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 7.4 Cell absorbs 18; Perfect Cell; the kick; Vegeta falls (showcase, L)
 
+- **Built 2026-11-06 (`nb-cs2`, with the cine helpers, `CoopCall 37`).** *Area 5:* Cell waits below as Vegeta lands at (204, 272) and
+  walks up into the clearing; 16 steps in front of 18, she steps back to the cliff; Cell is at 16's side in a blink (dash) and one
+  heavy strike throws him against the right-hand tree (the stock red flash on the blow), where he stays down; 18 turns to run, two
+  steps, and Cell is in front of her; she backs onto the stock mark and the tail takes her as before (the stock poses 27 / 29 / 25),
+  under a slow rising shake, Vegeta one step forward. Then the change: the stock morph (animation 9, started with
+  `SetEntityAnimationNoWait` so the timeline is ours) under purple and white pulses and three rings of dust, Vegeta pushed back
+  16 px (`GlideToPosition 0`: a glide moves a player without turning him); **a full white, the music and the rumble cut**; out of it
+  Perfect Cell with his back to us for a second and a half of silence, a look over the shoulder, he turns, a held look; the music
+  again and the stock flights. *Area 6:* Cell stands with his back to Vegeta, who lands lower right (300, 284); the first line in
+  the bottom box (it was `@`, on both bodies); Vegeta is beside him in a blink, the kick (the stock animation 8, the hit blink on
+  Cell, a jolt) and **Cell does not move**; a hold; Cell turns his head; Vegeta slides back into the start pose for "That kick!";
+  Cell walks two steps for "Now, do you understand..."; then the blow: a dash and a heavy strike that throws Vegeta to (296, 262),
+  where the stock lays his body after the fade.
+- **One lineup** (filmed as Vegeta alone, Vegeta + Trunks, Trunks + Vegeta: the same scene). The sequence grew by one entry
+  (indexes 26-37 are 27-38). About 1.5 s longer than the stock in area 5 (the silence), none before control.
+- **Facts found:** `SetEntityAnimation 29, 9` is the whole morph into Perfect Cell and holds his new body for about a second after
+  it; `StopMusic` takes no argument and `PlayMusic n` starts the tune again; the clearing of area 5 is about x 130-210, y 170-250
+  between the trees; with `EntityWaitTouchPlayer` gone nothing in the scene waits on a contact.
+
 - **Where:** `ch7_semi_perfect_end` entries 21-26 (stock 20-22): entry 21 is one script that flies Cell and Vegeta
   out of area 4, warps with entities to area 5 (map 303: 16's actor at (176, 184), 18's at (152, 200)), plays
   the absorption, flies on and warps to area 6 (map 304). Films `z12_VT` (sheet 3), `z12_V`.
