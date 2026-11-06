@@ -538,7 +538,8 @@ a step that is moved or removed breaks an insertion further down, so change one 
       falls (`cine: fall`). Hercule is still in his beam pose a second too long, looks at his hands, lowers them
       (`CoopCall 16, 72, 0`, as today). The stock fade.
 - **Built (`nb-cs3`, 2026-11-06), every beat, with C in the Games' own file (`cellgames.c`, CoopCall 16 on 3 / 4) and no helper:**
-  the picture in 2 s; the held beams are out as the white lifts and no longer fade (their tick count wraps: the refires at every step are gone);
+  the picture in 2 s; the held beams are out as the white lifts and are asserted at every script entry (fired again only if a text box's eviction
+  destroyed one: the stock's "fading" beams were that; nothing flickers);
   **the clash moves**: the script sends the point where the two held beams meet along the line (440 the middle, 456 and 468 toward Gohan, 462
   the creep, 384 at the Cells) and it walks there 1-2 px a frame; the map's starburst (BG1) is on only while the clash sits in the middle and the
   beam's strip (BG0) stays, so what moves is the two beam heads; **Goku's spirit** (sprite 176 in the beam pose at (503, 376), behind Gohan's
@@ -550,9 +551,10 @@ a step that is moved or removed breaks an insertion further down, so change one 
   last shake, the two despawned under it; the field: Gohan in his base form goes down (pose 3), Hercule holds his beam pose a second, looks at
   his hands and at Gohan. No explosions.
   **Research corrections:** a moving cap alone needed no helper (the cap was a constant); the starburst cannot move (a background layer), so it
-  is shown only at the middle; a body spawned for each line was evicted by the text box (OBJ VRAM: `docs/scripts.md` 5b), so the spirit is made
-  once into a block Vegeta's off-view actor gives up and then only hidden and shown; the spirit's flicker runs from the input poll, since a box
-  may take the beams (and their update) away. Tests: `cell_staging.txt` (the spirit's record, the clash's x at the start, after Cell's push and
+  is shown only at the middle; one body more than the stock scene makes every text box evict (OBJ VRAM: `docs/scripts.md` 5b), which destroyed
+  the held beams and, once the memory was reused, crashed a one-player game at the scene's end: the spirit takes the block of Vegeta's off-view
+  actor for the length of each line instead, and the beams are checked alive before they are ended; the clash's walk and the spirit's flicker
+  run from the input poll. Tests: `cell_staging.txt` (the spirit's record, the clash's x at the start, after Cell's push and
   at the end, no spirit left behind), `cell_games.txt`.
 - **Draft lines:** none. For Ryan: beat 3 puts an image (Goku's spirit) where the stock has a voice.
 - **No-reveal check:** Hercule's beam was Ryan's own design (4h: "Hercule's beam pushes through with Gohan's"); beats 3
@@ -923,6 +925,24 @@ lineups and the training's end (`chx`). The opening is the standard and stays.
   each sprite; where a pose is new on a sprite the risk line says to check it.
 
 ## 10. Priority for the developer
+
+**Status (developer, `nb-cs3`, 2026-11-06). Done, each with a "Built" note in its section, filmed in both modes, tested:** section 0's four defects and
+the three the films added (18's walk-off, Cell's flashes, the players below the summit's view); **3.6**, **3.10**, **6.2** with the short form, **3.3**,
+**3.8**, **3.7**, **3.1**, **3.2**, **5.1**, **5.2**, **5.3**, **5.5**, **5.7** (the fix; its touch-up not), **3.11**, **3.12**, **5.9**. **Not built:** 2.1,
+3.4, 3.5, 3.9 (only Gohan on a knee from Cell's blast until he rises on "I will!"), 6.1, 6.3 (only Tien and Yamcha standing again), sections 7 and 8.
+**The small ones as built (script steps unless said):** 5.1 Krillin steps toward the dragon and 18 looks at him, Yamcha looks up (his hop) before his
+line, the stock turn-on-Yamcha batch (entry 46) plays as the wish is granted and Krillin spins round, Yamcha looks left and right after "GRANTED"
+(the stock "Guys?" was not reused: Ryan's call); 5.2 Hercule holds his win pose (7) as the fade lifts, a low shake and rumble break it into the stock
+hurt pose, after the line he looks left and right and takes the pose again into the fade (no glow, no light); 5.3 Piccolo turns first, then the flash
+and the shake and everyone turns that way, Bulma as before, 18 walks a few steps off, looks back once and flies, Krillin and Vegeta start after her
+before "We're all going."; 3.11 Gohan's actor lies among them (he went down at the struggle's end) until they leave, Vegeta walks in and keeps his back
+to the group, Hercule walks into the middle for his line and nobody turns; 3.12 Hercule is looking up at where they flew off, turns on his name, looks
+left and right before he claims it, his win pose after "SINGLE HANDEDLY!!!!!!" and a punch after the "CHOP!!!!" speech (a pose cannot play inside
+a text entry: they follow the box); 5.9 Trunks looks about, a rumble, old Hercule walks in from it, throws the punch at the air (`CoopCall 37` op 5:
+the pose from his own record) with dust and a small shake in front of the fist, Trunks' hop, old Hercule looks at his fist for 40 frames before
+"The End.". **Draft lines: none were written.** Decided
+against (2026-11-06) and not built: the Senzu Bean, a Vegeta variant of the finale's opening line, a change to Dende's Dragon Ball hand-in. Marked for
+Ryan's review, each its own commit: Goku's spirit in the struggle; the scream before the white.
 
 Build order, showcases first. Before them, the two ending fixes of section 0 (5.7's `SetActiveCharacter 5`, then 5.5):
 small, and they are wrong today.

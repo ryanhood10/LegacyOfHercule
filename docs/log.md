@@ -4,6 +4,18 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **Cutscenes, batch 3: the Cell Games, the post-game, the summit (branch `nb-cs3`; `docs/cutscenes/batch3_games-postgame.md`, each scene's "Built"
+  note; one commit a scene).** The defects first: the talk show's guest is Hercule whoever player 1 was; the finale on the Lookout stands whoever
+  plays (no doubles, a Gohan for his lines); Gohan is clear of his own boxes before Super Saiyan 2; fight 2's end places Goku and Cell; Android 18 is
+  thrown clear and lies there; Hercule's flurry no longer flashes Cell; the players stand in the summit's view. Then the scenes: 16's head and Super
+  Saiyan 2 (Cell crushes the head in an afterimage dash, two tremors, Cell gives ground, a silence, the white; the scream before the white is its own
+  commit), the beam struggle (the clash moves, Goku's spirit at Gohan's shoulder for Ryan to review, Vegeta's blast seen, one wave into white), the
+  summit (a flurry, the absorptions, the snow blown out, proof on Tien and Yamcha, a short form on a retry), "I give up" and Hercule called out, the
+  bomb and Goku's goodbye, Cell's return and Vegeta's charge, the ring and its breaking, the wishes, Hercule's stomach, the explosion. C: `cellgames.c`
+  CoopCall 16 on 3-6 (the clash's place, a spirit body, the summit seen this session); the cinematic helpers (CoopCall 37) carry the summit's fight, the
+  head's dash and Vegeta's charge. New facts for scene writers: `docs/scripts.md` 5b. Tests: `staging_postgame.txt` (new), `cell_staging.txt`,
+  `staging_arctic.txt` extended. No new line of dialogue anywhere; the Senzu Bean, a Vegeta variant of the finale's opening line and any change to
+  Dende's Dragon Ball hand-in were decided against and are not built.
 - **The cinematic helpers (`src/coop/cine.c`, `CoopCall 37`; branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine"):** the moves a
   cutscene fight needs, each one call from lscript: the afterimage dash, a light or heavy strike (the knock-back in an arc, the
   landing, lying or on a knee), a melee exchange (beats, clashes, both vanishing and meeting again), a charge (blocking, or held

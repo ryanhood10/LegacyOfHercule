@@ -1256,6 +1256,13 @@ Junior each (stat 26 at 432, 359, 63 px below the fighter at 432, 296), J3 and J
 
 ## Cell saga staging (headless, 2026-11-05)
 
+**Since 2026-11-06 (`nb-cs3`, the cutscene pass)** the Games part also checks: Goku on his spot after a fight 2 that ended elsewhere (player 1 is poked to
+(250, 330) before the win; expected (358, 440): his spot and the step back); Android 18's sprite 11 on the field after the bomb's lines and gone at fight
+8; at the beam struggle Goku's spirit (one entity on sprite 176), the clash's x (`cgb` at `.party.bv` + 0x38, 0x0203FAD8 in the current build: two s16,
+now / target) 440 at the start, pushed toward Gohan after Cell's line, 384 at the end, and no spirit left (+0x3D = 0). Fight 7's end is given 200
+presses (it is the Games' longest scene, about 145 at 100 frames apart; `cell_games.txt` and `cell_games_1p.txt` 190). A scene's end is read from `stepz`'s own line, not from a peek after it (while an idle fighter is being hit the word reads 1 for a moment). **Jumping straight to a scene**
+while writing one (not in the committed tests): `docs/scripts.md` 5b, last point.
+
 `tools/headless/cell_staging_gen.py` writes `cell_staging.txt`, self-checking: zone 12 for Vegeta alone, Trunks alone, Vegeta + Trunks and Trunks + Vegeta (in by the real pad of area 15), the Games for alone and player 2 as Hercule, Krillin or Vegeta at the ring (since 2026-11-05 also sprite 72 at the start of fights 3, J1, 7 and 8: none alone, player 2's Hercule with two players); every scene pressed through until `0x03001FDC` clears, so a hung walk fails the next EXPECT. Run it with `st_expect.py` into a log, then `python tools/headless/cell_staging_gen.py check LOG`: every vtable in the `ents` lists must be sane (a sprite without the group an animation needs corrupts the heap and the runner keeps going). About ten minutes. In a solo-2 scene only player 2's A advances the text, and `load` forgets the runner's `p2`: write `p2 0` after it. An actor sprite's groups: `*0x0800959C + (id - 7) * 4` is the record, +2 the group count, +0x4C the four pointers per group.
 
 ## Gohan's Super Saiyan from the Time Chamber (headless, 2026-11-01; since 2026-11-05 at the first lever)
@@ -1275,6 +1282,15 @@ player 2's B on a stock Transformation turns player 1's slot (Piccolo to row 7),
 
 ## Post-game on the Lookout (headless, 2026-10-19)
 
+**Post-game staging (2026-11-06, `nb-cs3`):** `tools/headless/postgame_staging_gen.py` writes `staging_postgame.txt` (run by regfull's `staging_*.txt`
+glob; alone: `python tools/headless/staging_run.py tools/headless/staging_postgame.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6`, about
+two minutes). The finale for 18 lineups (the eight player-1 choices alone and ten pairs): Map Test the inert entry with flags 195, 191, 480, 381, 382,
+poke who plays, a test warp below Dende (760, 448): the arrival trigger plays the finale. Checked on the Lookout's edge: one body per character (the
+map's actors 103 / 137 / 132 / 76 by who player 1 is, Gohan's actor 56 or 58 unless player 1 plays a Gohan, an actor for player 2 as Goku 176 or
+Hercule 72), then the scene's end, the map, FLAGS+60 = 0x09 and that players 1 and 2 are who they were. The talk show for four lineups: Dende's question
+answered yes twice, on zone 4 area 20 player 1 is slot 5 and one Hercule stands. A played Piccolo or Vegeta shows the actor's own record, so their counts
+read 1 either way and a double would read 2; a Map Test party's Trunks and Krillin show other records (0 when played).
+
 `python tools/headless/st_test.py tools/headless/postgame.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl` (a
 `DEBUG_MENU=1` build): Map Test 261 with flags 191 and 195, a test warp to just below Dende's record 4 (760, 448), Up,
 A. Checks: after the wishes FLAGS+47 = 0x20 (381) and FLAGS+60 bit 0 (480); the reminder; `flags +382` stands in
@@ -1284,6 +1300,11 @@ runs (a warp mid-cutscene crashes, r0 = player 2's vtable): close each dialogue 
 settle; FLAGS is the runner's variable (0x0203F108 with 9 party slots).
 
 ## The Arctic summit (headless, 2026-10-19)
+
+**Since 2026-11-06 (`nb-cs3`):** `staging_arctic.txt` (from `staging_ch9_gen.py`) also checks both players' spots mid-scene (player 1 at (324, 372),
+player 2's entity at (350, 372)), the boss and no 13 / 17 / 18 once the scene is over, and for two lineups a retry in the same session (a test warp
+back to the arrival: Super 13 stands at once, the scene is over in a few presses). The scene's end is read from `stepz`'s own line (`EXPECT stepz
+03001fdc: zero`): the fight starts as the scene ends and a hit shows the same word for a moment, so a peek after it is not reliable there.
 
 `tools/headless/arctic_summit.txt`: Map Test 261 with flags 191, 195, 480 and 381, a test warp to the summit's arrival
 (15/8, (336, 464)), both pads walk up into the scene's rect, A through the scene, then the boss stat is queued the way

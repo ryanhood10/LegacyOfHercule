@@ -289,7 +289,7 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 13 | WaveStart (seq, round) | Time Chamber |
 | 14 | Wave (op) | Time Chamber |
 | 15 | Solo (mode): 0 both, 1 player 1 alone, 2 player 2 alone on player 1's entity | Cell Games |
-| 16 | Beam (sprite, on): a held Kamehameha the script does not wait for; on 0 ends it | Cell Games |
+| 16 | Beam (sprite, on, c): a held Kamehameha the script does not wait for; on 0 ends it; on 3 the clash's place, 4 a spirit body, 5 / 6 the summit's scene seen this session (set / -> 1) (`docs/scripts.md` 2.2b; state in `.party.bv` after the 14-word vtable copy: `cgb` +0x38 clash x / target, +0x3C step, +0x3D spirit, +0x3E its sprite, +0x3F seen) | Cell Games, the summit |
 | 17 | Super13 (op, a, b): op 0 tune the next spawn (HP %, blast damage %), op 1 -> state (3 = exploded), op 2 spawn beside player 1 | Super 13 (`super13.c`) |
 | 18 | Choice (op): op 1 arms a yes / no question before its text entry (B answers no and closes the box), op 0 pushes 1 yes / 2 no | post-game |
 | 19 | allocated: post-game chapter | |

@@ -80,6 +80,8 @@ looked at:
 
 **Kept for the plot (party members in a scene nobody plays them in):** the road's stock ending (Piccolo leaves alone for Kami's Lookout, the fusion needs it; Vegeta, Gohan, Trunks arrive as in the stock story); Hercule at Kami's boost (his +3 levels are the beat); Trunks at Goku's waking alone as Krillin (Goku takes him to the Lookout and he plays on); Krillin, Trunks' fly-in and Vegeta's body in zone 12 (Krillin by Ryan's same-day answer "Krillin stays"); 16 in the birds' scene alone as Krillin (his choice to go to the Cell Games); Vegeta at the rim of New Planet Vegeta if nobody plays him (Paragus' betrayal is his; boarding makes him player 1, so not in play); Hercule at the Cell Games where Goku calls him out after fight 2, carrying 16's head, in the beam struggle and its aftermath.
 
+**Kept for the plot, added 2026-11-06 (`nb-cs3`):** Gohan in the Lookout's finale whoever plays (an actor unless player 1 plays a Gohan: three of its stock lines are his and two are said to him); the finale's other party members are the stock wish scene's cast, and a player who is one of them takes that actor's place.
+
 **New line variants (drafts, for Ryan):** 13 at the door, "Negotiate?  Heh.  Here's my offer, chump: turn around and run, or me and the Doc scrap ya." (Hercule alone) and "Heh.  Here's my offer, chump: turn around and run, or me and the Doc scrap ya." (no Hercule); the forest, "GOHAN: Huh?  The whole forest just went quiet.", "KRILLIN: Huh?  The whole forest just went quiet...  Something is here.", Gohan's "Frieza AND Cooler?!", Krillin's "They're gone...  Were they even real?", "GOHAN: The spirit of the forest...  Let's get my armor from the cave."; the landing, Gohan's "Uh...  who's your friend?"; the arrival, "KRILLIN: So how do you know Goku's going to arrive at this spot, anyway?" and Yamcha asking Krillin's stock question; the basement, player 1's "Destroying the computer set off some sort of self-destruct!  We better get out of here!" and "Let's head back to Master Roshi's Island.  Maybe Goku is getting better."; Gero's computer, "Android 16 sets out for Dr. Gero's lab in the Northern Mountains." and "KRILLIN: ...Then again, nothing a little ki can't fix.  Stand back!" (16's own lines said by player 1 alone as Krillin, unchanged words); Broly, "PARAGUS: Then come, my king.  Your people are waiting." (Vegeta alone), Vegeta's "back to the ship!" and Krillin's "Long story" said by player 1 when nobody plays them. Gone: Piccolo's exit lines in Gero's chapter ("Keep them busy", "You want this fight so badly?"), Hercule's three alone lines at the Cell Games, 16's "I will watch the computer". Tests: `ch4_staging.txt`, `staging_*.txt`, `cell_staging.txt` check that no actor of an unplayed party member stands (`docs/testing.md` "Scene staging").
 
 **Standing rules (Ryan):**
@@ -634,6 +636,15 @@ fighter flies down from the crowd. In the aftermath the four standing fighters w
 - before fight 8, alone: HERCULE: "Tell you what, kid... this one's all yours. The champ wouldn't dream of stealing your moment!"
 - the aftermath, both modes: HERCULE: "Is... is it over? Ha! Hahaha! Of course it's over! Did everybody see that?!"
 
+**The cutscene pass (2026-11-06, branch `nb-cs3`; shot by shot in `docs/cutscenes/batch3_games-postgame.md` section 3).** No line changed and none was
+added. What the player now sees differently: Hercule's punches land under a Cell who does not flinch; the ring is seen breaking; Goku lowers his guard
+to give up, the crowd turns to a Hercule who was leaving, and alone he clears off before fight 3; Cell crushes 16's head underfoot and Gohan's change
+has tremors, a silence and the white (**his scream is read before the white, so he is silent once transformed: Ryan's to keep or drop, its own
+commit**); 18 lies where Cell spat her out; the bomb ticks under every line and Goku and Cell flicker out without a white; Vegeta's charge is a volley
+and Gohan takes the shot meant for him; in the struggle the clash moves and **Goku's spirit stands at Gohan's shoulder while his lines are open (an
+image where the stock has a voice: for Ryan to review, its own commit)**; the Cells go in one wave, no explosions. Decided against and not built: a
+Senzu Bean for Cell, any new line.
+
 **Triggers and side content around the Games (Ryan, 2026-10-19):**
 - **The arena stays locked until the Krillin + 16 chapter is done** (flag 421), on top of the stock
   Dragon Ball gate (flag 191). The Broly chapter is optional: playable before or after the Games, and
@@ -777,6 +788,16 @@ neither player plays them. 13 turns into Super 13 (sprite 180, portrait 122) in 
 13 boss (stat 145, `src/coop/super13.c`); the full scene plays again after a reload at the ridge pad (a flag saved after the pad cannot tell). Notes for Ryan: Dende's
 question answers with the button that closes its last page (A yes, B no); the epilogue's old Hercule uses the Buu's
 Fury Hercule sprite (158), so builds without `roms/buu.gba` show his stock sprite instead.
+
+**The cutscene pass (2026-11-06, branch `nb-cs3`; `docs/cutscenes/batch3_games-postgame.md` sections 5 and 6).** No line changed and none was added.
+The finale stands whoever plays: player 1 on Piccolo, Vegeta, Trunks or Krillin takes that character's place (there were two of him); **Gohan is in the
+finale whoever plays** (an actor unless player 1 plays a Gohan: the goodbyes are his and to him; kept for the plot, as the wish scene's cast is); player
+2's character stands too, Goku and Hercule beside the group; player 1 Piccolo opens with his own "Peace...  for now." and the shared line shows player
+1's own portrait. The talk show's guest is Hercule whoever player 1 was. The wishes: Krillin steps up, Yamcha muses it first, everyone turns on him;
+Hercule is mid-brag when his stomach growls; Piccolo senses the Arctic before the blast and 18 looks back once at Krillin. The summit: the players
+stand in the picture; 17 and 18 fight, 13 throws them down and absorbs them where they fall; each surge blows the snow out; Tien and Yamcha's blasts
+do nothing and his one blast lays them out at the rim for the fight; **a retry in the same session plays a short form** (he stands transformed, his
+last line, the players' lines: the full scene still plays after a reload from a save, as Ryan kept it).
 
 **Pre-play check (Ryan, 2026-10-20):** no healing between the Cell Games fights (the arena's breakable rubble
 drops HP / EP pickups, as in the stock game); the journal lists our chapters; Super 13 gets a boss track; Broly
