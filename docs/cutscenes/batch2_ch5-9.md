@@ -595,6 +595,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 7.2 Vegeta and Semi-Perfect Cell (rework, M)
 
+- **Built in part 2026-11-06 (`nb-cs2`).** Built: after "What is this?" a 100-frame charge on Vegeta (`CoopCall 37, 7, 100, 2`: rings,
+  flickers, a growing shake, the burst), the stock change at its peak (skipped when he arrived as a Super Saiyan: the charge
+  plays either way), a jolt, and Cell is **pushed** back to the stock mark (216, 272) in his hit-stun instead of walking there.
+- **Not built: the first blow (beat 4).** Built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
+  made the camera leave its panned spot (one frame far below, then about two seconds of drifting back to centre on him); the
+  same dash in 7.4 (no charge or change before it) holds the view. Told to the coordinator; not diagnosed. Beat 1's folded
+  arms: no such pose.
+
 - **Where:** `ch7_semi_perfect`, map 302 (zone 12 area 4) trigger 0. Films `z12_VT`, `z12_V`.
 - **Today:** Vegeta (and Trunks beside him) below Cell; nine lines; "Tell me...  Are you ready now to witness a
   power that has not been seen for thousands of years?" is answered by the stock change (animation 35) and Cell

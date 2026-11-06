@@ -31,15 +31,22 @@ sequence ch7_semi_perfect
         WalkToPosition 0, 184, 300
         SetEntityFacing 0, 3
   [10] stockseq @083e6620 8 9            ; "a power not seen for thousands of years", "What is this?"
-  [12] script                            ; stock entry 10 (its index moved): transform unless already; Cell gives ground
+  [12] script                            ; stock entry 10 (its index moved). The power-up is the scene (it was the bare change and Cell walking
+        CoopCall 37, 1, 0, 29            ; back two steps): a long charge with rings and dust, the change at its peak unless he came as a Super
+        CoopCall 37, 7, 100, 2           ; Saiyan already, and Cell is pushed back to his mark in the hit-stun, not walking
         PushActiveCharIsTransformed
         JumpIfFalse L1
-        PushByte 13
-        END
+        Jump L2
       L1:
         SetEntityAnimation 0, 35
-        WalkToPosition 29, 216, 272
+      L2:
+        CoopCall 37, 15, 24, 0
+        SetEntityAnimationNoWait 29, 2
+        GlideToPosition 29, 216, 272, 100
+        WaitFrames 16
+        SetEntityAnimation 29, 0
         SetEntityFacing 29, 2
+        SetEntityFacing 0, 3
   [13] stock @083e65f4                   ; "It's your end!"
   [14] script                            ; co-op: the split (next 15), else the fight (20)
         CoopCall 5, 0, 0, 0
