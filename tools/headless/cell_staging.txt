@@ -146,6 +146,8 @@ shot cs_V_perfect
 ents
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
+echo EXPECT 0203f04c: 08
+peek8 0x0203F04C 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
 poke32 0x0203FD08 7
@@ -263,6 +265,8 @@ shot cs_T_perfect
 ents
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
+echo EXPECT 0203f04c: 08
+peek8 0x0203F04C 1
 echo EXPECT 0203ff08: 00000000
 peek 0x0203FF08 1
 poke32 0x0203FD08 7
@@ -446,6 +450,8 @@ shot cs_VT_perfect
 ents
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
+echo EXPECT 0203f04c: 08
+peek8 0x0203F04C 1
 echo EXPECT 0203ff84: 06
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02
@@ -570,6 +576,8 @@ shot cs_TV_perfect
 ents
 echo EXPECT 0203f000: 03
 peek8 0x0203F000 1
+echo EXPECT 0203f04c: 08
+peek8 0x0203F04C 1
 echo EXPECT 0203ff84: 06
 peek8 0x0203FF84 1
 echo EXPECT 0203ff08: 02

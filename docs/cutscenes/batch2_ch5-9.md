@@ -763,8 +763,10 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   boxes are at the bottom where Vegeta stands: pan a little lower than the stock
   `PanCameraToPosition 136, 192` so both sit above the box, or use `!`. The beam variant needs group 18 on 140 (present) and a C-driven beam on the player
   (`CoopCall 16` is the model). **Size L** (area 5 M, area 6 M; the variant S more).
-
-### 7.5 Trunks' vow, Krillin flies in, Trunks powers up (touch up, S)
+- **Vegeta falls out of his form (Ryan, 2026-11-06, F6: "even in f6 vegeta gets killed and his body is super saiyan"; branch
+  `nb-ssjfix`):** Cell's blow (`CoopCall 37, 5, 9, 28`: heavy, flag 8) knocks player 1 out of his Super Saiyan form at the impact (a white
+  flash, the form's own turn-back: row 8, the hum stopped), so he flies and lies as Vegeta, as the stock's body (137) lies after the fade.
+  `cell_staging` checks his row (8) after the scene in the four zone 12 lineups., Krillin flies in, Trunks powers up (touch up, S)
 
 - **Where:** `ch7_semi_perfect_end` entries 27-37. Films `z12_VT` (sheet 4), `z12b_V`.
 - **Today:** Trunks flies in under Vegeta's body, his vow, Krillin flies in to his side, three lines (alone:

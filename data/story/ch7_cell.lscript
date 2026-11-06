@@ -282,7 +282,7 @@ sequence ch7_semi_perfect_end
   [27] script                            ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
         CoopCall 37, 1, 30, 0            ; for the pad that played Vegeta (the pads trade players). The blow (it was Cell's arm moving
         CoopCall 37, 4, 0, 0             ; and Vegeta lying at his feet): Cell is beside him and one strike throws him to where the stock
-        CoopCall 37, 5, 1, 28            ; lays his body, (296, 262)
+        CoopCall 37, 5, 9, 28            ; lays his body, (296, 262); the blow knocks him out of his form (flag 8: he falls as Vegeta, as the next cut lays him)
         WaitFrames 40
         FadeOut 120
         CoopCall 37, 0, 0, 0             ; the held body is player 1's: let go before he becomes Trunks
