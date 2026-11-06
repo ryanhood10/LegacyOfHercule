@@ -427,6 +427,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F914 | 0x9C | `.party.wv` `waves` (the old Time Chamber rounds, tests only since 2026-11-05; 0x0203F880 with 8 slots); moves when anything before it grows |
 | 0x0203EB88 | 0x30 | `.combo.ch` the Time Chamber (`chamber.c` `ChState`, magic "CHAM"; after `.combo.ag`: find it by the magic) |
 | 0x0203EBB4 | 0x28 of 0x30 | `.combo.po` the Time Chamber's Mr. Popo (`popo.c` `PopoState`, magic "POPO"; after `.combo.ch`: find it by the magic) |
+| 0x0203EBDC | 0x8 | `.combo.st` the ring's staging counts for the tests (`tny_engine.c`, `docs/tournament.md` 27; after `.combo.po`) |
 | 0x0203F9B0 | 0x1C | `.party.cg` `cg_state` (Cell Games: magic, solo mode, test bytes, held beams; the post-game's yes / no question) |
 | 0x0203F9CC | 0x2C | `.party.s13` `s13` (Super Android 13) |
 | 0x0203F9F8 | 0x34 | `.party.rv` `rv` (revive: bodies, countdowns, progress, bars' VRAM, glow table, counters; `revive.h`) |
