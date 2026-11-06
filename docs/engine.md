@@ -251,6 +251,43 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
 - **The camera.** `CAMERA_CELL` (`src/coop/rom.h`) words 3-6 are the view rectangle in world px (left, top, right,
   bottom), 7 / 8 the origin; nothing scrolls it while the command modal runs.
 
+## Cine: what the cinematic helpers stand on (decompiled 2026-11-06; `src/coop/cine.c`, `docs/cutscenes.md` section 5)
+
+- **A command's life.** `0x0800E04C(batch, cmd, entity)` appends `cmd` to the entity's chain (+0x150, linked through
+  `cmd.next`); with the batch word 0 it then makes the modal (`0x0800DE20`) and runs it (`0x0801F2F4(obj)`, the coroutine
+  push: enter, `GameLoop_Tick`, leave). The base entity message (`0x08019B70`) on message 10: the head command's slot 2
+  (step), the control state's and the aux state's slot 1 (animate), then slot 3 (done?); when done, unless it is the last
+  and its slot 4 says stay, `0x0800E078` pops it: `entity +0x150 = cmd.next`, **`cmd` slot 0 (destroy) with 1**, message
+  0xB to the entity (start the next). Message 0xC (the entity goes) destroys the head and clears the chain. So a command
+  object may free its own block in its destroy slot: the cine run ends and frees itself there, run at once or in a batch.
+  A body whose message handler does not reach the base handler never steps a command: the modal ends at once with the
+  command still queued (cine unlinks it and ends the run).
+- **An entity's update** (`0x0800772A`, from every body class's slot 2): the aux state's slot 1, the control state's slot
+  1 (animate), the control state's **slot 2 (update)**. Slot 2 never runs inside a modal or a text box, only when the
+  world does: cine's hold state uses it to free a player a scene left lying. An actor's slot 2 (`0x0800D6C8`) first runs
+  its behaviour list (`0x0800D156` on +0x160: an actor is 0x16C bytes and has **no combat bytes** there) and its
+  SetAnimation (slot 10, `0x0800D6A6`) takes the state from the actors' own table (`0x0800D72C`).
+- **Every body class shares its draw slots:** vtable slot 3 `0x08007A85` (on screen?) and 4 `0x08007773` (OAM) on the
+  player (`0x08025604`), the actor (`0x080257D0`), the enemy (`0x080252A4`) and the RAM copies of them; projectiles
+  (`0x08013C8F`) and effects (`0x080136A7`) differ. That pair is cine's "is this a body" test.
+- **The effect object** `0x080135E0(mem, pos, frames, n, speed, vram, prio)`: 0x44 bytes, `vram` bytes of OBJ VRAM
+  (every caller passes 0x400), `frames` an array of n 12-byte descriptors with raw 8bpp tiles, +0x30 += `speed` a frame
+  and one frame further at each 0x10000 (the callers pass 0x1000 to 0x5000: 16 to 3 frames a picture), removed by its
+  own update after the last. Its message (`0x08013778`) answers 10 with the update, so it plays inside the command modal
+  and stands still in a text box. +4 is the draw order (y). The frame sets (rendered): `0x086AF614` the tan dust
+  explosion (scripts' effect steps, defeats, beams), `0x086FF09C` a grey puff of smoke (a broken jar), `0x086DBC60` an
+  orange fire burst (3 frames: a ki blast's impact), `0x086DE634` yellow rings spreading (the Masenko's impact),
+  `0x086E1590` a white dot opening into a ring (beam and Big Bang impacts), `0x086E53DC` a yellow four-point star.
+- **The palette blend** `0x0800BE14(r, g, b, level)`: all 512 colours from the 8-bit base copy toward r, g, b by level /
+  256, written to palette RAM; level 0 puts the palette back. `FlashScreenColor`'s command calls it every frame.
+- **The pan** `0x0800DF1C(0, {x, y}, speed)` then `0x0801F2F4(obj)`: `PanCameraToPosition`'s modal ((x, y) the view's
+  top-left corner).
+- **A body's tiles:** +0x0C its OBJ tile, +0x20 the frame descriptor last loaded (0 forces a reload; the cached frame is
+  dropped when the +0x24 colour remap changes). An afterimage copies w x h bytes of those tiles into a block of its own.
+- **The control states:** `0x0800763C(entity, state)` calls the old state's slot 3 (leave) and the new one's slot 0
+  (enter); the idle state (`0x08024BA0`) recomputes the frame from the timer +0x12 in its animate, which is why a pose
+  written into +0x4C / +0x14 only stays under a state whose animate does nothing (the kits' stun, the combos' hold, cine's).
+
 ## OBJ VRAM and the text box (decompiled 2026-11-02 for West City's vanishing)
 
 - **The frame.** `GameLoop_Tick`'s wait is `FUN_08020D40`: a `swi 2` (Halt) loop at 0x08020D6E until the VBlank flag. It

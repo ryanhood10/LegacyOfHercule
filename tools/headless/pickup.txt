@@ -1,6 +1,7 @@
 # Player 2 picks up dropped food (src/coop/pickup.c; docs/testing.md "Player 2's pickups"). Map Test 13; test command 13
 # kills every wolf and their defeat scripts roll the drops: one item lands at 228-244 x 256-272 (entity vtable
-# 0x08024C90; its touch box is the last pointer of the list at 0x03001FE0, class 0x08023F18). Walking there is a long
+# 0x08024C90; its touch box is the last pointer of the list at 0x03001FE0, class 0x08023F18; its last word the item, a heap
+# address that moves with the heap's cap: 02026fac until 2026-11-06, 02026eac since cineram took 0x100 of the heap). Walking there is a long
 # way round the rocks, so the box is moved onto player 2 instead (he stands alone at 540,424 after a short walk; player
 # 1 at 568). Stock, nothing happened for 120 frames; now he takes it within 60: Hercule's HP (0x0203F098) 100 -> 172
 # (item 11), the list one shorter (the number of drops moves with the random draws: a map's barrier item for two players, agency.c, shifts them), the item entity gone, Piccolo's HP (0x0203F028) untouched, the active slot restored.
@@ -19,7 +20,7 @@ frames 120
 echo EXPECT 03001fe0: 0000000[5-9]
 peek 0x03001FE0 1
 deref BX 0x03001FF4
-echo EXPECT \w+: 08023f18 00f900d\w 011000f\w 030020bc 02026fac
+echo EXPECT \w+: 08023f18 00f900d\w 011000f\w 030020bc 02026eac
 peek BX 5
 echo == player 2 walks left 24 frames (to 540; player 1 stays at 568), the box onto him alone: 516..546 x 404..444
 p2 0x20

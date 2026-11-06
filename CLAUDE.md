@@ -14,6 +14,7 @@ Buu's Fury is a later phase. Nothing from the ROM is committed: code, tools and 
 | doing a common job (chapter, boss, sprite, playable character, map, test, parallel sessions) | `docs/howto.md` |
 | story questions or story work | `docs/story.md` section 0 (status) and 4g (latest decisions); stock-game facts in `docs/story-rom.md` and `build/scripts/`; why things changed in `docs/story-archive.md` |
 | scripts, dialogue, flags, CoopCall | `docs/scripts.md` |
+| a cutscene, a cutscene fight (dash, strike, exchange, blast, beam struggle: `CoopCall 37`) | `docs/cutscenes.md` (section 5 "Cine"), `docs/howto.md` "Stage a scene" |
 | testing anything | `docs/testing.md` (headless runner first; fork for real-time and fights) |
 | what landed recently | `docs/log.md` (newest first), `git log --oneline -20` |
 
