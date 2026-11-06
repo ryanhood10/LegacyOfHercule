@@ -605,6 +605,11 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   Cell, a jolt) and **Cell does not move**; a hold; Cell turns his head; Vegeta slides back into the start pose for "That kick!";
   Cell walks two steps for "Now, do you understand..."; then the blow: a dash and a heavy strike that throws Vegeta to (296, 262),
   where the stock lays his body after the fade.
+- **The Final Flash (its own commit, for Ryan's review; decided for him while away):** after "That kick!" Vegeta springs back
+  to (330, 266), a 70-frame charge (rings, flickers), a yellow flash, the beam held 60 frames on Cell, who blocks with an arm
+  out (`CoopCall 37, 8, 18, 60`; the beam is the game's blue Kamehameha: cine has no beam colour); a white; when it clears Cell
+  stands where he stood among dust, and Vegeta drops to a knee, spent (ours, with the beat: say if he should stay on his feet).
+  Then Cell's two steps, his line, the blow. No line added; the outcome is unchanged. About 5 s.
 - **One lineup** (filmed as Vegeta alone, Vegeta + Trunks, Trunks + Vegeta: the same scene). The sequence grew by one entry
   (indexes 26-37 are 27-38). About 1.5 s longer than the stock in area 5 (the silence), none before control.
 - **Facts found:** `SetEntityAnimation 29, 9` is the whole morph into Perfect Cell and holds his new body for about a second after

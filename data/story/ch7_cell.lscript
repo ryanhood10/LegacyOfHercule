@@ -236,8 +236,26 @@ sequence ch7_semi_perfect_end
         GlideToPosition 0, 292, 266, 100 ; Vegeta drops back
         SetEntityAnimation 0, 4
   [24] stock @083e6d60                   ; "#That kick!  I put all my energy into it! "
-  [25] script                            ; Cell walks two slow steps toward him
-        WalkToPosition 30, 262, 264
+  [25] script                            ; THE FINAL FLASH (for Ryan's review: a beat the game does not have; this commit alone adds it).
+        CoopCall 37, 1, 0, 30            ; Vegeta springs back, gathers everything (the charge, yellow light) and fires; the light
+        CoopCall 37, 3, 330, 266         ; swallows Cell; when it clears he stands where he stood (the story needs him whole). No line.
+        CoopCall 37, 7, 70, 2
+        FlashScreenColor 30, 255, 230, 90, 10
+        CoopCall 37, 8, 18, 60
+        FadeToWhite 8
+        SetEntityPositionInstant 30, 248, 264
+        SetEntityFacing 30, 3
+        CoopCall 37, 15, 50, 0
+        WhiteFadeOut 40
+        BeginCommandBatch
+        SpawnDustCloud 30, 232, 270
+        SpawnDustCloud 30, 264, 272
+        SpawnDustCloud 30, 248, 248
+        CommitCommandBatch
+        WaitFrames 50
+        CoopCall 37, 10, 0, 1            ; Vegeta drops to a knee, spent
+        WaitFrames 30
+        WalkToPosition 30, 262, 264      ; then Cell walks two slow steps toward him
         SetEntityFacing 30, 3
         WaitFrames 10
   [26] stock @083e6d90                   ; "#Now, do you understand what I mean by "perfection"? ..."
