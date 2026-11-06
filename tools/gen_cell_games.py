@@ -297,22 +297,80 @@ junior_end("cg_j1_end", "m325_r8_defeat", 103, 1, 2, 9, 39, P2, "J2: Piccolo, pl
 junior_end("cg_j2_end", "m325_r9_defeat", 137, 2, 1, 10, 38, P1, "J3: Vegeta, player 1")
 junior_end("cg_j3_end", "m325_r9_defeat", 132, 3, 2, 13, 39, P2, "J4: Trunks, played by player 2's pad (record 13, the fourth Junior)")
 
+CAM_TALK, CAM_RAGE = "456, 336", "456, 280"   # the view's top-left corners (Gohan stands at 576, 376)
 emit("sequence cg_head_scene")
 b = body(A3, "m325_r10_defeat", 0)
 k = b.index("SetActiveCharacter 0")
 b = b[:k + 1] + ["CoopCall 15, 1, 0, 0"] + b[k + 1:]
 script(b, "stock entry 0 (the third Junior's in the stock game): Gohan player 1, Hercule's actor carries 16's head")
-stockseq(A3, "m325_r10_defeat", 1, 14, "16 and Hercule, \"It would be shameful for a world champion to run away\", 16's speech")
+stockseq(A3, "m325_r10_defeat", 1, 10, "16 and Hercule, \"It would be shameful for a world champion to run away\"")
+# 16's head and Super Saiyan 2 (docs/cutscenes/batch3 3.6, the batch's showcase). What changed, every line as it was:
+#  * the view: the stock camera (432, 336) left Gohan in the top third, under his own boxes ("You loved life!...", "I just let you die!",
+#    "I won't watch this ANYMORE!!!!!!"). A box at the bottom covers screen rows 74-136, one at the top rows 0-62, a caption or a shout
+#    ("@") rows 45-105, so no one view clears them all: CAM_TALK (Gohan at row 40, the stock height) while 16 and Cell speak and for
+#    the shout and the caption, CAM_RAGE (row 96) for his own lines at the top and the change.
+#  * the carry: Hercule's 7 s walk down with the camera is a white cut and the last nervous steps; he sets the head down and runs.
+#  * Cell comes closer during 16's speech and crushes the head underfoot (the stock fired one blast from where he stood); the music stops.
+#  * the transformation was one second of a pose and a 10-frame white: now two tremors with dust rings, Cell turning round and giving
+#    ground, a held silence, the white with the biggest shake, and Gohan standing still while light flickers.
+# Poses: Gohan 56's 4 / 6 / 9 are the stock scene's; after the swap to 58 he is only turned (its transformation groups are empty); Cell's 6
+# is the ring's blow, 5 his charge; Hercule's 2 the stock stomach pose.
+GX, GY = 576, 376                # Gohan (the stock warp)
+HDX, HDY = 616, 384              # where the map shows the head beside him (FindCharacterEntity 1)
+def dust_ring(r):   # four clouds round him
+    return [f"SpawnDustCloud 0, {GX - r}, {GY + 4}", f"SpawnDustCloud 0, {GX + r}, {GY + 4}", f"SpawnDustCloud 0, {GX}, {GY - r + 4}", f"SpawnDustCloud 0, {GX}, {GY + r}"]
+b = body(A3, "m325_r10_defeat", 11)
+k = b.index("FindEntityByType 0")
+assert b[k + 1:] == ["SetActiveEntity 72", "WalkToPosition 72, 616, 376", "WaitFrames 30", "FindCharacterEntity 1", "PanCameraToPosition 432, 336, 2",
+                     "WalkToPosition 72, 648, 320", "DespawnEntity 72", "WaitFrames 30", "END"]
+script(b[:k + 1] + ["FadeToWhite 8", f"SetEntityPositionInstant 72, {HDX}, 332", f"PanCameraToPosition {CAM_TALK}, 30", "WaitFrames 10", "WhiteFadeOut 8",
+                    f"WalkToPosition 72, {HDX}, 346", "WaitFrames 14", f"WalkToPosition 72, {HDX}, 356", "WaitFrames 18", f"WalkToPosition 72, {HDX}, 364",
+                    "WaitFrames 10", "PlaySFX 72, 34", "FindCharacterEntity 1", f"SpawnDustCloud 72, {HDX}, {HDY + 6}", "WaitFrames 24",
+                    "SetEntityFacing 72, 2", "WaitFrames 24",                                  # a look at Cell, and he runs
+                    "WalkToPosition 72, 648, 330", "DespawnEntity 72", "WaitFrames 20"],
+       "stock entry 11: he picks the head up; a white cut to Gohan; the last steps, he sets it down, looks at Cell and runs off the view's top")
+stock_at(A3, "m325_r10_defeat", 12, "\"Gohan.\"")
+script(body(A3, "m325_r10_defeat", 13)[:-1] + ["WalkToPosition 30, 540, 452", "SetEntityFacing 30, 3"], "stock entry 13: Gohan turns to the head; Cell starts toward them")
+stock_at(A3, "m325_r10_defeat", 14, "16's speech")
+script(["WalkToPosition 30, 572, 436", "SetEntityFacing 30, 3"], "Cell, closer")
 text(27, "The birds I watched with Krillin...\\x0bprotect them, Gohan.")
-stockseq(A3, "m325_r10_defeat", 15, 25, "Cell crushes 16, \"I won't watch this ANYMORE!!!!!!\"")
+script([f"WalkToPosition 30, {HDX - 10}, {HDY + 34}", "SetEntityFacing 30, 1"], "Cell stands over the head")
+stockseq(A3, "m325_r10_defeat", 15, 17, "\"This sentimental downpour is killing me!\", \"Just let it go.\"")
+b = body(A3, "m325_r10_defeat", 18)
+assert b == ["SetEntityFacing 0, 3", "WaitFrames 40", "BeginCommandBatch", "NPCFireKiBlast 30, 616, 384, 100", "SpawnDustCloud 30, 616, 384", "CommitCommandBatch",
+             "FindEntityByType 1", "PlayAudio 20", "END"]
+script(["SetEntityFacing 0, 3", "WaitFrames 30", f"WalkToPosition 30, {HDX - 2}, {HDY + 14}", "SetEntityFacing 30, 1", "SetEntityAnimation 30, 6",
+        "WhiteFlash 4", "PlayAudio 20", "ScreenShake 0, 8, 12", f"SpawnDustCloud 30, {HDX}, {HDY}", "FindEntityByType 1", "StopMusic",
+        "WaitFrames 40", "SetEntityFacing 30, 2", "WaitFrames 10"],
+       "stock entry 18: Cell steps onto the head and crushes it (the stock blast's sound and dust); the music stops; he turns away")
+stock_at(A3, "m325_r10_defeat", 19, "\"Yet another fighter you could have saved, Gohan.\"")
+script(["WalkToPosition 30, 524, 424", "SetEntityFacing 30, 2", "ScreenShake 0, 4, 20", "SetEntityAnimation 0, 4"],
+       "stock entry 20 (Gohan's start): Cell walks off past him first, his back turned")
+stock_at(A3, "m325_r10_defeat", 21, "\"ANDROID 16!!!!!!!\"")
+script([f"PanCameraToPosition {CAM_RAGE}, 2"] + body(A3, "m325_r10_defeat", 22)[:-1] + [f"SpawnDustCloud 0, {GX - 12}, {GY + 6}", f"SpawnDustCloud 0, {GX + 12}, {GY + 6}"],
+       "stock entry 22, dust at his feet; the view drops so he stands under his own boxes")
+stockseq(A3, "m325_r10_defeat", 23, 25, "\"You loved life!...  I just let you die!\", \"I won't watch this ANYMORE!!!!!!\"")
 b = body(A3, "m325_r10_defeat", 26)
-b = ["SetEntityAnimationNoWait 0, 9" if x == "SetEntityAnimation 0, 9" else x for x in b]
-k = b.index("SetEntityAnimationNoWait 0, 9")
-b = b[:k + 1] + ["WaitFrames 60"] + b[k + 1:]
-script(b, "stock entry 26, the power-up without the blocking wait (it never ended in co-op tests): Super Saiyan 2")
-stockseq(A3, "m325_r10_defeat", 27, 30, "\"Gohan has entered Super Saiyan Rage!\", \"NOW TASTE MY TRUE POWER\"")
-script(["CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
-duo_only(["SpawnCharacterEntity 72, 648, 320", "WalkToPosition 72, 564, 376", "SetEntityFacing 72, 2"], "card7", "two players: Hercule comes back the way he left, to Gohan's side (next); alone he stays away")
+assert b == ["PlayMusic 20", "PlayAudio 55", "SetEntityAnimation 0, 9", "FadeToWhite 10", "PushActiveCharMaxEP", "TypeOp 15", "PushActiveCharMaxHP", "TypeOp 13",
+             "PlayAudio 23", "PlayAudio 20", "StopAudio 55", "SetCharacterTransformation 0, 58", "WhiteFadeOut 10", "END"]
+SS2_RISE = (["PlayMusic 20", "PlayAudio 55", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 4, 40"] + dust_ring(22) + ["WaitFrames 40"])       # the first tremor
+SS2_BURST = (["WhiteFlash 6", "SetEntityAnimationNoWait 0, 9", "ScreenShake 0, 10, 40"] + dust_ring(40) +                                        # the second, harder:
+             ["SetEntityFacing 30, 3", "WaitFrames 16", "WalkToPosition 30, 506, 428", "SetEntityFacing 30, 3", "WaitFrames 14",                  # Cell turns round and gives ground
+              "StopAudio 55", "SetEntityFacing 0, 0", "WaitFrames 24",                                                                           # a held silence, his head down
+              "FadeToWhite 20", "PushActiveCharMaxEP", "TypeOp 15", "PushActiveCharMaxHP", "TypeOp 13", "PlayAudio 23", "PlayAudio 20",
+              "SetCharacterTransformation 0, 58", "SetEntityFacing 0, 2", "ScreenShake 0, 20, 60", "WaitFrames 24", "WhiteFadeOut 30", "WaitFrames 36",
+              "WhiteFlash 3", "WaitFrames 12", "WhiteFlash 3", f"SpawnDustCloud 0, {GX + 14}, {GY + 2}", "WaitFrames 7", "WhiteFlash 3", "WaitFrames 19",  # light flickers on him
+              "WaitFrames 30"])
+script(SS2_RISE + SS2_BURST, "stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)")
+stock_at(A3, "m325_r10_defeat", 27, "\"AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!\"")
+script(body(A3, "m325_r10_defeat", 28)[:-1] + [f"PanCameraToPosition {CAM_TALK}, 2"], "stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box")
+stock_at(A3, "m325_r10_defeat", 29, "\"Gohan has entered Super Saiyan Rage!\"")
+script(["SetEntityAnimationNoWait 30, 5", "PlayAudio 55", "WhiteFlash 4", "ScreenShake 0, 8, 20", "WaitFrames 24", "StopAudio 55"], "Cell powers up, then speaks")
+stock_at(A3, "m325_r10_defeat", 30, "\"You wretched child!!!  NOW TASTE MY TRUE POWER!!!!!!\"")
+script(["SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 3", "CoopCall 15, 0, 0, 0", "CoopCall 6, 5, 0, 0"], "player 2 is Hercule again")
+duo_only(["SpawnCharacterEntity 72, 648, 330", f"WalkToPosition 72, {GX + 40}, {GY - 26}", "ScreenShake 0, 6, 14", "SetEntityAnimation 72, 2",
+          f"WalkToPosition 72, {GX - 12}, {GY}", "SetEntityFacing 72, 2"], "card7",
+         "two players: Hercule comes back the way he left, stumbles at an aftershock, to Gohan's side (next); alone he stays away")
 text(67, "HERCULE: The champ is back!\\x0bLet's finish this together, kid!")
 label("card7")
 title(BOTH)

@@ -36,6 +36,7 @@ These are not staging taste; they are wrong pictures. All three are in the endin
 3. **Player 1's own text box hides him in the rage before Super Saiyan 2.** Gohan stands in the top third of the view
    and his lines open at the top: for "You loved life!...", "I just let you die!" and "I won't watch this ANYMORE!!!!!!"
    the box sits on his body (`head/sheet_head_00.png`, first row). Fixed by the reframing in scene 3.6.
+   **Fixed (`nb-cs3`, 2026-11-06):** scene 3.6, "Built": from "You loved life!..." to the transformation the view is 56 px higher.
 
 A fourth, smaller: in fight 2's end nobody is placed, so the pans that follow are aimed at where Goku and Cell were
 assumed to stand. Filmed after a fight that ended elsewhere: "CELL: This is your replacement, Goku?" shows Hercule alone
@@ -321,6 +322,19 @@ a step that is moved or removed breaks an insertion further down, so change one 
      POWER!!!!!!": power shown, then spoken.
   10. **Two players:** Hercule's walk back as today, but he stumbles at the last tremor (hurt pose 2, 10 frames) before
       "The champ is back!  Let's finish this together, kid!". **Alone:** nothing; the card.
+- **Built (`nb-cs3`, 2026-11-06), beats 2-10, with script steps only (no helper):** the carry is a white cut and three reluctant steps down
+  from the view's top; he sets the head down (dust, a thud), looks at Cell and runs off the top. Cell comes closer in three legs between 16's
+  boxes, steps onto the head and crushes it with his blow pose (6), a flash, the stock sound and dust; the music stops; he turns away, says his
+  line, and walks off past Gohan. The transformation: a first tremor with a dust ring, a flash and a harder one with a wider ring while Cell
+  turns round and backs off a step, a held silence with Gohan's head down, the white (20 frames, the biggest shake), then he stands still while
+  three flashes flicker. Cell powers up (pose 5) before his last line. Two players: Hercule comes in from the top, stumbles at an aftershock
+  (pose 2), "The champ is back!". Alone: the card. Beat 1's extra look and the afterimage dash were not built.
+  **Research corrections (the boxes decide the view):** a box at the bottom covers screen rows 74-136, one at the top 0-62, and a shout
+  (`@`, "ANDROID 16!!!!!!!") or a caption (`@^`) sits in the middle, rows 45-105. No single view clears them all, so the scene uses two: the
+  stock height (Gohan at row 40) while 16 and Cell speak and for the shout and the caption, and 56 px higher (row 96) from "You loved
+  life!..." through the transformation and "AHHH". `FindCharacterEntity 0 / 1` and `FindEntityByType 0 / 1` are how the map shows and removes
+  the head (by the rocks / beside Gohan): its spot (616, 384) is the map's and was kept. A dust ring needs about 22 px of radius to read as one.
+  Filmed alone and with two players (`C:/Users/ryan/AppData/Local/Temp/claude/.../scratchpad/cs3/`); `cell_staging.txt` passes through it.
 - **Draft lines:** none.
 - **Risks:** (a) Gohan may be Super Saiyan 1 (row 5, sprite 59) when this scene makes him player 1 again, if the player
   transformed in fight 3: the hair would go gold to gold. Put him on his base row before the fade lifts (the ring scene's

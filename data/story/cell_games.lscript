@@ -572,38 +572,154 @@ sequence cg_head_scene
         FadeFromWhite 120
         PlayAudio 50
         END
-  stockseq @083ea400 1 14    ; 16 and Hercule, "It would be shameful for a world champion to run away", 16's speech
+  stockseq @083ea400 1 10    ; 16 and Hercule, "It would be shameful for a world champion to run away"
+  script                                 ; stock entry 11: he picks the head up; a white cut to Gohan; the last steps, he sets it down, looks at Cell and runs off the view's top
+        WaitFrames 60
+        SetEntityFacing 72, 1
+        WaitFrames 30
+        WalkToPosition 72, 600, 200
+        SetEntityFacing 72, 1
+        WaitFrames 30
+        FindEntityByType 0
+        FadeToWhite 8
+        SetEntityPositionInstant 72, 616, 332
+        PanCameraToPosition 456, 336, 30
+        WaitFrames 10
+        WhiteFadeOut 8
+        WalkToPosition 72, 616, 346
+        WaitFrames 14
+        WalkToPosition 72, 616, 356
+        WaitFrames 18
+        WalkToPosition 72, 616, 364
+        WaitFrames 10
+        PlaySFX 72, 34
+        FindCharacterEntity 1
+        SpawnDustCloud 72, 616, 390
+        WaitFrames 24
+        SetEntityFacing 72, 2
+        WaitFrames 24
+        WalkToPosition 72, 648, 330
+        DespawnEntity 72
+        WaitFrames 20
+  stock @083ea09e    ; "Gohan."
+  script                                 ; stock entry 13: Gohan turns to the head; Cell starts toward them
+        SetEntityFacing 0, 3
+        WalkToPosition 30, 540, 452
+        SetEntityFacing 30, 3
+  stock @083ea0b4    ; 16's speech
+  script                                 ; Cell, closer
+        WalkToPosition 30, 572, 436
+        SetEntityFacing 30, 3
   text 27 "The birds I watched with Krillin...\x0bprotect them, Gohan."
-  stockseq @083ea400 15 25    ; Cell crushes 16, "I won't watch this ANYMORE!!!!!!"
-  script                                 ; stock entry 26, the power-up without the blocking wait (it never ended in co-op tests): Super Saiyan 2
+  script                                 ; Cell stands over the head
+        WalkToPosition 30, 606, 418
+        SetEntityFacing 30, 1
+  stockseq @083ea400 15 17    ; "This sentimental downpour is killing me!", "Just let it go."
+  script                                 ; stock entry 18: Cell steps onto the head and crushes it (the stock blast's sound and dust); the music stops; he turns away
+        SetEntityFacing 0, 3
+        WaitFrames 30
+        WalkToPosition 30, 614, 398
+        SetEntityFacing 30, 1
+        SetEntityAnimation 30, 6
+        WhiteFlash 4
+        PlayAudio 20
+        ScreenShake 0, 8, 12
+        SpawnDustCloud 30, 616, 384
+        FindEntityByType 1
+        StopMusic
+        WaitFrames 40
+        SetEntityFacing 30, 2
+        WaitFrames 10
+  stock @083ea250    ; "Yet another fighter you could have saved, Gohan."
+  script                                 ; stock entry 20 (Gohan's start): Cell walks off past him first, his back turned
+        WalkToPosition 30, 524, 424
+        SetEntityFacing 30, 2
+        ScreenShake 0, 4, 20
+        SetEntityAnimation 0, 4
+  stock @083ea290    ; "ANDROID 16!!!!!!!"
+  script                                 ; stock entry 22, dust at his feet; the view drops so he stands under his own boxes
+        PanCameraToPosition 456, 280, 2
+        SetEntityFacing 0, 0
+        SetEntityAnimation 0, 6
+        SpawnDustCloud 0, 564, 382
+        SpawnDustCloud 0, 588, 382
+  stockseq @083ea400 23 25    ; "You loved life!...  I just let you die!", "I won't watch this ANYMORE!!!!!!"
+  script                                 ; stock entry 26, Super Saiyan 2: two tremors, Cell gives ground, a silence, the white, and he stands still (the power-up pose never blocks: it never ended in co-op tests)
         PlayMusic 20
         PlayAudio 55
         SetEntityAnimationNoWait 0, 9
-        WaitFrames 60
-        FadeToWhite 10
+        ScreenShake 0, 4, 40
+        SpawnDustCloud 0, 554, 380
+        SpawnDustCloud 0, 598, 380
+        SpawnDustCloud 0, 576, 358
+        SpawnDustCloud 0, 576, 398
+        WaitFrames 40
+        WhiteFlash 6
+        SetEntityAnimationNoWait 0, 9
+        ScreenShake 0, 10, 40
+        SpawnDustCloud 0, 536, 380
+        SpawnDustCloud 0, 616, 380
+        SpawnDustCloud 0, 576, 340
+        SpawnDustCloud 0, 576, 416
+        SetEntityFacing 30, 3
+        WaitFrames 16
+        WalkToPosition 30, 506, 428
+        SetEntityFacing 30, 3
+        WaitFrames 14
+        StopAudio 55
+        SetEntityFacing 0, 0
+        WaitFrames 24
+        FadeToWhite 20
         PushActiveCharMaxEP
         TypeOp 15
         PushActiveCharMaxHP
         TypeOp 13
         PlayAudio 23
         PlayAudio 20
-        StopAudio 55
         SetCharacterTransformation 0, 58
-        WhiteFadeOut 10
-        END
-  stockseq @083ea400 27 30    ; "Gohan has entered Super Saiyan Rage!", "NOW TASTE MY TRUE POWER"
+        SetEntityFacing 0, 2
+        ScreenShake 0, 20, 60
+        WaitFrames 24
+        WhiteFadeOut 30
+        WaitFrames 36
+        WhiteFlash 3
+        WaitFrames 12
+        WhiteFlash 3
+        SpawnDustCloud 0, 590, 378
+        WaitFrames 7
+        WhiteFlash 3
+        WaitFrames 19
+        WaitFrames 30
+  stock @083ea370    ; "AHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!"
+  script                                 ; stock entry 28: the caption's sound; the view rises again, clear of the caption and of Cell's box
+        PlayAudio 27
+        PanCameraToPosition 456, 336, 2
+  stock @083ea388    ; "Gohan has entered Super Saiyan Rage!"
+  script                                 ; Cell powers up, then speaks
+        SetEntityAnimationNoWait 30, 5
+        PlayAudio 55
+        WhiteFlash 4
+        ScreenShake 0, 8, 20
+        WaitFrames 24
+        StopAudio 55
+  stock @083ea3b4    ; "You wretched child!!!  NOW TASTE MY TRUE POWER!!!!!!"
   script                                 ; player 2 is Hercule again
+        SetEntityAnimationNoWait 30, 0
+        SetEntityFacing 30, 3
         CoopCall 15, 0, 0, 0
         CoopCall 6, 5, 0, 0
-  script                                 ; two players: Hercule comes back the way he left, to Gohan's side (next); alone he stays away
+  script                                 ; two players: Hercule comes back the way he left, stumbles at an aftershock, to Gohan's side (next); alone he stays away
         CoopCall 5, 0, 0, 0
         JumpIfFalse HS9
-        SpawnCharacterEntity 72, 648, 320
+        SpawnCharacterEntity 72, 648, 330
+        WalkToPosition 72, 616, 350
+        ScreenShake 0, 6, 14
+        SetEntityAnimation 72, 2
         WalkToPosition 72, 564, 376
         SetEntityFacing 72, 2
         END
       HS9:
-        PushByte 35
+        PushByte 38
         END
   text 67 "HERCULE: The champ is back!\x0bLet's finish this together, kid!"
   fmt 0 "%s"
