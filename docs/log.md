@@ -4,6 +4,17 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **The cinematic helpers (`src/coop/cine.c`, `CoopCall 37`; branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine"):** the moves a
+  cutscene fight needs, each one call from lscript: the afterimage dash, a light or heavy strike (the knock-back in an arc, the
+  landing, lying or on a knee), a melee exchange (beats, clashes, both vanishing and meeting again), a charge (blocking, or held
+  through dialogue), blasts (one, a volley, a held beam, a big blast; blocked or thrown), a beam struggle with a winner, rise /
+  kneel / fall, the looks of howto rule 7 in one call, a camera that follows the cast, a pan to any body. Played inside the
+  game's command modal with the game's own effect objects, poses only from groups a body has, quiet without a body, Start
+  skips. A demo scene on New Planet Vegeta behind test command 50 (`data/story/cine_demo.lscript`), `tools/headless/cine.txt`
+  (632 checks, in `regfull.sh`), `tools/cineposes.py` (what each sprite lacks). New RAM region `cineram` 0x0203E900 (the heap
+  cap moved down 0x100). Facts found on the way: `EntitySetVelocity` / `EntityStopMovement` / `SpawnDustCloud` are one dust
+  effect and move nobody, `LockEntityPose` is the draw priority (`docs/scripts.md` 2.1), the effect object and its six frame
+  sets, the palette blend, the command pop (`docs/engine.md` "Cine").
 - **The lab door's scene keeps 13 through its cut back into the lab (Ryan: his model vanished at the third view):** the scene reloads map 8/60 at entry 16 after the cut outside, which drops actors; `ch4_lab_door` entry 79 spawns him again beside Gero.
 - **F1-F9 for Ryan's one-player tests (`tools/headless/dropins_test.py`, `docs/testing.md`):** Gero's stage, the door generator, the lab, the eggs, the Chamber's door (a fresh run), the tournament's waiting room, Broly's ship with five lights out, the portal, Frieza's ship.
 - **One death for Gero (Ryan):** the first lab cutaway is back to the stock beat (Gero wakes 17 and 18, the controller) with 13 beside him; 13's revenge moved into the stock 16 scene at the lab door, after 17's blast ("scrap heap"): `ch4_lab_door`, run by area 46's item 0 (`tools/mapedit.py` gained `"items": {"N": {"script": REF}}`). `ch4_staging.txt` door blocks, one player and two.

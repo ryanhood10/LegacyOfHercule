@@ -302,8 +302,10 @@ entries moves); `partyram` holds 0x9B0 of 0xB00 bytes at 9 slots, and a 16-slot 
 | 25-27 | the tournament engine, free | |
 | 28-29 | the tournament ui (28 op 1: the unlock board) | tournament |
 | 30 | Grounds (op, b, c): op 0 the waiting room's fighters (on-load), op 1 b -> 1 when sprite b has a record in this build, op 2 -> 1 when the grounds' maps are built (the landing's condition), 3 player 1's name, 4 the courtyard's crowd, 5 an item, 6 sprite b's entities play group c; op 7 player 2 faces b, op 8 sprite b's actors hold group c & 0xFF's last frame (0 idle), facing (c >> 8) - 1 (2026-11-05, `docs/tournament.md` 27) | tournament grounds (`tny_grounds.c`) |
-| 32+ | free (32 the story piece's; 33-34 agency's, unused) | |
+| 32-34 | free (32 the story piece's; 33-34 agency's, unused) | |
 | 35 | Chamber (op, a, b) [-> value]: the Time Chamber's rooms, the gate's six, the drops (`chamber.c`, `data/story/chamber.lscript`) | Time Chamber |
+| 37 | Cine (op, b, c) [-> value]: the cinematic helpers (`cine.c`, `cine.h`'s ops; every op with its arguments and an example in `docs/cutscenes.md` section 5 "Cine"): 0 end, 1 cast, 2 point, 3 / 4 dash, 5 strike, 6 exchange, 7 charge, 8 blast, 9 beam struggle, 10 rise / kneel / fall, 11 / 12 looks, 13 camera follow, 14 pan, 15 jolt, 16 -> has, 17 -> held; 98 / 99 the demo's trigger | every staged fight (2026-11-06, `nb-cine`) |
+| 38+ | free | |
 | 36 | Popo (op, a, b) [-> value]: the Time Chamber's hidden room, Mr. Popo's scenes and fight, the loop, a room's prize (`popo.c`, `data/story/chamber_popo.lscript`, `ch_lever`) | Time Chamber |
 
 Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
@@ -331,6 +333,8 @@ Full argument notes: `docs/scripts.md` 2.2b and the header of `vmcall.c`.
 | 17+ | free | |
 | 48 | CHAMBER (`chamber.c` `chamber_test`, the Time Chamber) | the ops: the table "The Time Chamber" at the top |
 | 49 | POPO (`popo.c` `popo_test`, the Time Chamber's Mr. Popo) | the ops: the table "The Time Chamber" at the top |
+| 50 | CINE (`cine.c` `cine_test`, the cinematic helpers; `tools/headless/cine_gen.py`) | `arg` = a `CoopCall 37` op, `arg2` = b \| c << 16 (two signed 16-bit numbers): the call is made at the next input poll outside a scene, as a script would make it; a query's answer replaces the `cmd_arg` word. `arg` 100 arms the demo scene's trigger (then warp to zone 15 area 3, into x 250-410, y 290-398), 101 wipes the counters, 102 stands an actor (`arg2` = sprite \| dx << 16 \| dy << 24, signed bytes from player 1), 103 marks OBJ VRAM's largest free block, 104 answers 1 while it is that size again. State `.cine` 0x0203E900 (`CineRam`, magic 0xC14E0001; `find` it): +4 the cast (two s16), +8 the point, +0xC busy, +0xD camera follow, +0xE the demo armed, +0xF the last op, +0x10 how it ended (1 played, 2 skipped, 3 a body went, 4 timed out, 5 nothing played, 6 its command never ran), +0x11 a charge is held, +0x18 ops started, +0x1A ended, +0x1C the last op's frames, +0x1E skips, +0x20 effects made, +0x22 left out (OBJ VRAM short), +0x24 shots and beams, +0x26 calls that played nothing |
+| 51+ | free | |
 | 15-16 | allocated to the Cell Games chapter | |
 | 17 | S13 | spawn Super Android 13 72 px right of player 1, with a boss bar |
 | 18 | S13_DRIVE | `arg` low byte = forced special (1 volley, 2 fan, 3 bomber, 4 wave, 5 nova, 6 roar; 0 = his choice), \| 0x100 = his HP := `arg2`, \| 0x200 = toggle the autopilot (`A16_TEST`) |
@@ -426,7 +430,7 @@ places: `krillinsprites.py` asserts the index.
 
 | address | size | what |
 |---|---|---|
-| 0x02000000-0x0203F000 | | the game's heap (capped by `patch_rom.py`) |
+| 0x02000000-0x0203E900 | | the game's heap (capped by `patch_rom.py`: below `cineram` since 2026-11-06) |
 | 0x0203F000 | 0xB00 region | `partyram` (9 slots): `g_party_block` (party, flags at +0x108, 0x1B8), `party_save` store (0x564), `switch` (0x1B8) |
 | 0x0203F8D4 | 0xC | `.party.kr` Android 16 player state (`a16player.c`) |
 | 0x0203F8E0 | 0x34 | `.party.kr` Krillin state (`krillin.c`) |
@@ -449,6 +453,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203F880 | 0x9C | `.party.wv` `waves` (Time Chamber); moves when `.party.kr` grows |
 | 0x0203F91C | 0x2C | `.party.s13` `s13` (Super Android 13: live boss, debug counters, force, state, tuning; `super13.h` `S13Global`); moves when the sections before it grow |
 | 0x0203F948-0x0203FB00 | ~0x1B8 | free in `partyram` |
+| 0x0203E900 | 0x84 of 0x100 | `cineram` (`coop.ld`, NOLOAD; 2026-11-06): `.cine`, the cinematic helpers' state (`cine.c` `CineRam`, magic 0xC14E0001: the cast, the point, the hold control state and its vtable copy, the held charge, the tests' counters; offsets at test command 50). **The heap cap ends here** (`tools/patch_rom.py` `WORD_PATCHES`: 0xF83E words), `__coop_ram_start` too |
 | 0x0203EA00 | 0x200 region | `comboram` (team combos, `tny_combo.h`, NOLOAD): `.combo.meter` 0x0203EA00 (0x80, the meter), `.combo.cap` 0x0203EA80 (0x30, the caption), `.combo.run` 0x0203EAB0 (0x88 of 0x140, the runner: test command 33); then `.combo.rg`, `.combo.pf`, `.combo.ag`, `.combo.ch`, `.combo.st` (0xC, the tournament scenes' staging counts for tests, `tny_engine.c`, 2026-11-05: 0x1C0 of 0x200 used); the heap cap ends here since 2026-10-31; offsets at test command 32 |
 | 0x0203EC00 | 0x228 of 0x240 | `.tny.eng` the tournament engine (`tny_engine.c` `TnyEng`, NOLOAD, magic 0x7E6E0003): phase +4, kind +6, result +7, picks +12, the fight's frames +0x16, opponents +0x2C, challengers +0x57 (count +0x59), bracket +0x6C (72 bytes: seats +0x70, 32 of them; winners +0x90; p1_seat / p2_seat +0xB0; `docs/tournament.md` 26), pop-ups queued / shown +0xEC (the queue: `.tny.eq`), the tests' wait bytes +0xFC / +0xFD, the winners' celebration +0x115 (its frame, 0xFF none) / +0x116 (started for this fight's end; `docs/tournament.md` 28, in the old padding), the held poses +0x11C, the announcer +0x14C, presentation stage +0x150, final form +0x153, the curtain +0x154, the announcer's walk +0x155 (1 on, 2 off; frames +0x156, target +0x158 / +0x15A), the last ring reload's frames +0x157, the last warp's spot +0x15C / +0x15E, walks off / on done +0x160 / +0x161, test mark x +0x162, walks started +0x164 (2026-11-01, `docs/tournament.md` 24.4 / 24.5), the record as last read +0x168 (`extra` +0x38: bit 0 Super Buu's final form beaten), the line +0x1B4 (speaker +0x1B7, text +0x1B8); then `.tny.ui`, `.tny.mv`, `.tny.gr`, `.tny.hp`, `.tny.talk`, `.tny.cap`, `.tny.cp`, `.tny.eq` (0x10, the pop-up queue), `.tny.us` (0x10, the bracket's first seats as last drawn) (`coop.map`): 0x3F8 of `tourneyram`'s 0x400 used, **8 bytes left** (`comboram` has 0x80) |
 | 0x0203FB00 | 0x29C used, 0x2C0 max | `coop2` (`CoopExtra`, `coop.h`): about 0x24 bytes left, avoid adding fields |
@@ -458,7 +463,7 @@ places: `krillinsprites.py` asserts the index.
 | 0x0203FF00 | 2 + 2 | `g_p2_remote`, `g_p1_remote` pad words |
 | 0x0203FF04 | 0xE4 | `coop` (`CoopState`): `p2` +4, `p2_slot` +0x80, `exp_awards` +0xD8 |
 
-All of it, 0x0203EA00-0x02040000 (`coop.ld` `__coop_ram_start` / `__coop_ram_end`), is zeroed before a soft reset
+All of it, 0x0203E900-0x02040000 (`coop.ld` `__coop_ram_start` / `__coop_ram_end`), is zeroed before a soft reset
 (`input.c` `soft_reset`, `docs/coop-design.md` "Session logic"), as a power cycle leaves it.
 
 Save chip (8 KiB EEPROM, `party_save.c`): the header 0x0-0xF, three save slots of `SAVE_STRIDE` (0x10-0x54F with 9

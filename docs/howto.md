@@ -46,10 +46,20 @@ per-scene edits; a Map Test party has everyone in it, so check party flags by pe
 6. **Test every lineup** with a generator: `tools/headless/ch4_staging_gen.py` is the pattern; look at the frames.
 
 7. **Look at whoever is talking (Ryan, 2026-11-05):** when a line starts, the others on screen turn to its speaker (players too, by char 0 / player 2's entity in C; actors by sprite when guarded); the speaker faces whom he speaks to. A crowd may keep facing the ring.
+   One call does it: `CoopCall 37, 11, SPEAKER, TO` in the script entry before the line (`docs/cutscenes.md` section 5 "Cine"; body codes there).
 8. **One small move per beat:** a step toward whom you address, a pose (victory, taunt, ki pose, a hop), a shake or a flash at the big moments; never a long hold of nothing.
 9. **Never cost the player:** no new wait before control returns, everything A can skip still skips, no per-frame heavy work, nothing new on fight frames (`perf_budget`).
 
 Facing: 0 down, 1 up, 2 left, 3 right. A `stop` line counts as an entry for absolute indexes. Two actors showing one sprite: a step finds the first, so move and despawn the first before addressing the second (`z8_dino_defeat`).
+
+## Stage a fight in a scene (the cinematic helpers, 2026-11-06)
+
+Reference: `data/story/cine_demo.lscript` (every move once), the table in `docs/cutscenes.md` section 5 "Cine".
+
+1. Spawn the actors (guarded as ever), set the cast: `CoopCall 37, 1, A, B` (sprite ids; 0 / -1 the players; -10 - slot whoever plays a party member).
+2. One call a move: dash `4`, strike `5`, exchange `6`, charge `7`, blast `8`, beam struggle `9`, rise / kneel / fall `10`. Each blocks like a walk and needs no pose-group check: a body without a group shows the next best (`python -I tools/cineposes.py ROM` says what a sprite lacks).
+3. A body left lying is held until `CoopCall 37, 10, who, 0` (rise) or `CoopCall 37, 0, 0, 0` at the scene's end; players free themselves.
+4. Film it (`docs/testing.md` "Cinematic helpers": test command 50 runs any op on any pair of bodies without a script) and look at the frames enlarged.
 
 ## Call C from a script (CoopCall)
 

@@ -140,7 +140,9 @@ All co-op RAM lives in pinned regions at the top of EWRAM (`src/coop/coop.ld`), 
 heap. The heap (`Arena_Init`, `0x0801EFA4`) hands out `[0x02000808, 0x02000808 + 4 * cap)`; the stock
 cap `0xFDFE` words runs to `0x02040000` and overwrote co-op state on entity-heavy maps (player 2
 respawning every frame, garbage input). `tools/patch_rom.py` (`WORD_PATCHES`, file offset `0x1F20C`)
-sets the cap to **`0xF9FE`**, so the heap ends at `0x0203F000`. The regions above it:
+sets the cap to **`0xF9FE`**, so the heap ends at `0x0203F000` (since then lowered three times for new regions: `tourneyram`
+0x0203EC00, `comboram` 0x0203EA00 and, 2026-11-06, `cineram` 0x0203E900 for the cinematic helpers: the cap is `0xF83E` words now;
+`docs/ids.md` "Memory" has the current layout). The regions above it:
 
 | address | region / section | contents |
 |---|---|---|

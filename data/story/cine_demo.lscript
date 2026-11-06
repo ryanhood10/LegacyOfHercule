@@ -1,0 +1,104 @@
+; The cinematic helpers' demo (docs/cutscenes.md section 5 "Cine"; src/coop/cine.c): every move of CoopCall 37 once, on
+; New Planet Vegeta's basin (zone 15 area 3; data/maps/broly_arena.json holds the trigger). Not in the story: the
+; trigger exists only when test command 50 (arg 100) armed it before the map loaded (cine_demo_cond), and the scene
+; disarms it. Vegeta (137) against Android 17 (9), then Broly (159, when the build has him) against everyone; the
+; players stand below and take a blast and a blow (alone, player 2's parts do nothing). Its lines are test lines.
+; Film: tools/headless/cine_demo.txt.
+
+script cine_demo_cond
+    CoopCall 37, 99, 0, 0
+end
+
+sequence cine_demo
+  [0] script
+        CoopCall 37, 98, 0, 0
+        SetEntityPositionInstant 0, 314, 398
+        SetEntityFacing 0, 1
+        CoopCall 9, 1, 346, 398
+        SpawnCharacterEntity 137, 258, 348
+        SetEntityFacing 137, 3
+        SpawnCharacterEntity 9, 402, 348
+        SetEntityFacing 9, 2
+        PanCameraToPosition 210, 268, 4
+        WaitFrames 30
+        CoopCall 37, 1, 137, 9          ; the cast: Vegeta on 17
+        CoopCall 37, 11, 9, 137         ; everyone looks at 17, he looks at Vegeta
+        END
+  [1] text 28 "#17: Back for more, Vegeta?"
+  [2] script
+        CoopCall 37, 11, 137, 9         ; the others turn to Vegeta
+        CoopCall 37, 7, 0, 1            ; he powers up while he speaks
+        END
+  [3] text 106 "#VEGETA: This time I finish it."
+  [4] script
+        CoopCall 37, 7, -1, 0           ; the held charge ends in its burst
+        WaitFrames 10
+        CoopCall 37, 4, 0, 0            ; he is beside 17
+        CoopCall 37, 5, 0, 0            ; a punch
+        CoopCall 37, 5, 2, 0            ; a kick
+        CoopCall 37, 6, 170, 0          ; they trade blows and break apart
+        WaitFrames 20
+        CoopCall 37, 1, 9, 137          ; 17's turn
+        CoopCall 37, 8, 17, 5           ; a volley; Vegeta blocks
+        CoopCall 37, 1, 137, 9
+        CoopCall 37, 4, 5, 0            ; behind him
+        CoopCall 37, 5, 1, 64           ; a heavy blow: 17 flies and lies
+        WaitFrames 30
+        CoopCall 37, 10, 1, 0           ; 17 gets up
+        CoopCall 37, 9, 150, 1          ; the beam struggle; Vegeta's wins
+        WaitFrames 40
+        CoopCall 30, 1, 159, 0
+        JumpIfFalse nobroly
+        PushByte 5
+        END
+      nobroly:
+        PushByte 6
+        END
+  [5] script
+        SpawnCharacterEntity 159, 330, 300
+        CoopCall 37, 1, 159, 137
+        CoopCall 37, 3, 330, 330        ; Broly is suddenly there
+        CoopCall 37, 12, 159, -3        ; everyone looks at him
+        CoopCall 37, 7, 80, 2           ; his power
+        CoopCall 37, 5, 5, 60           ; a heavy blow: Vegeta ends on a knee
+        CoopCall 37, 1, 159, 0
+        CoopCall 37, 8, 35, 0           ; a big blast throws player 1
+        CoopCall 37, 1, -1, 159
+        CoopCall 37, 4, 0, 0            ; player 2 goes for him
+        CoopCall 37, 5, 2, 0
+        CoopCall 37, 1, 159, -1
+        CoopCall 37, 5, 5, 40           ; and is put on a knee
+        WaitFrames 30
+        CoopCall 37, 1, 0, -1
+        CoopCall 37, 10, 0, 0           ; the players get up
+        CoopCall 37, 10, 1, 0
+        CoopCall 37, 1, 137, 159
+        CoopCall 37, 10, 0, 0           ; Vegeta gets up
+        CoopCall 37, 11, 159, 137
+        END
+  [6] script
+        BeginCommandBatch               ; a move in a batch plays with the batch's walks
+        WalkToPosition 0, 314, 398
+        CoopCall 37, 1, 137, 9
+        CoopCall 37, 4, 1, 0
+        CommitCommandBatch
+        CoopCall 37, 14, 0, 4           ; the camera back on player 1
+        CoopCall 37, 0, 0, 0            ; everything of ours ends
+        END
+  [7] text 0 "@^The demo is over."
+  [8] script
+        CoopCall 22, 2, 137, 0
+        JumpIfFalse a
+        DespawnEntity 137
+      a:
+        CoopCall 22, 2, 9, 0
+        JumpIfFalse b
+        DespawnEntity 9
+      b:
+        CoopCall 22, 2, 159, 0
+        JumpIfFalse c
+        DespawnEntity 159
+      c:
+        END
+  stop 0x0
+end

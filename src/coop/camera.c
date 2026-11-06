@@ -10,6 +10,7 @@ ROM_FN(int, Camera_Apply, (void *world, s32 *pos), 0x080062E9);        // clamps
 ROM_FN(void, World_SetView, (void *world, s32 *pos), 0x08006079);      // sets view origin + 240x160 cull rect
 #define WORLD_CELL (*(s32 **)0x083ED658)                                // -> world object (0x03001090)
 
+static void aim(s32 cx, s32 cy);
 void camera_follow_hook(u8 *follow) {
     Entity *target = *(Entity **)(follow + 4);
     s32 r[4];
@@ -22,6 +23,12 @@ void camera_follow_hook(u8 *follow) {
         cx = (cx + (q[0] + q[2]) / 2) / 2;
         cy = (cy + (q[1] + q[3]) / 2) / 2;
     }
+    aim(cx, cy);
+}
+// One step of the follow toward a centre (px): the cinematic helpers aim it at their cast while a move plays (cine.c;
+// nothing else scrolls the view inside the command modal)
+void camera_aim(s32 cx, s32 cy) { aim(cx, cy); }
+static void aim(s32 cx, s32 cy) {
     s32 *world = WORLD_CELL;
     s32 curx = world[1], cury = world[2];   // view position in px << 10
     s32 pos[2];
