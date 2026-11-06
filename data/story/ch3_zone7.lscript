@@ -44,7 +44,35 @@ sequence ch3_z7_battle
       L1:
         SpawnCharacterEntity 165, 528, 384
         SetEntityFacing 165, 2
-  stockseq @083d40c8 0 38                ; Goku's virus, Yamcha takes him home, 19: "I will finish Vegeta now"
+  stockseq @083d40c8 0 23                ; Goku's virus, he falls; 19: "Ah yes...  Perfect!"
+  [25] script                            ; stock 24, and 19's hand over the fallen Goku: the drain (the cutscene pass, 2026-11-06)
+        SetEntityFacing 13, 2
+        SetEntityAnimation 12, 8
+        PlayDamageEffect 61
+        WhiteFlash 3
+        END
+  stockseq @083d40c8 25 27               ; "Let's move in!", 20: "You will stay where you are."
+  [29] script                            ; stock 28, the entrance: a boot from nowhere (the stock flew Vegeta to a mark): he is beside 19 and kicks him 60 px off Goku; he steps over Kakarot to his mark, his back to the machine
+        WaitFrames 20
+        CoopCall 37, 1, 0, 12                 ; the view stays on the fight: he comes into it out of nowhere
+        CoopCall 37, 4, 1, 0
+        CoopCall 37, 5, 3, 60
+        WaitFrames 20
+        WalkToPosition 0, 424, 416
+        WaitFrames 10
+        SetEntityFacing 0, 3
+        SetActiveEntity 0
+        PanCameraToPosition 352, 288, 3
+        END
+  stockseq @083d40c8 29 29               ; "Nobody kills Kakarot while I'm around..."
+  [31] script                            ; stock 30; 19 gets up and walks back to his mark
+        SetEntityFacing 0, 1
+        CoopCall 37, 1, 0, 12
+        CoopCall 37, 10, 1, 0
+        WalkToPosition 12, 480, 408
+        SetEntityFacing 12, 2
+        END
+  stockseq @083d40c8 31 38               ; Yamcha takes Goku home, 19: "I will finish Vegeta now"
   text 169 "!ANDROID 13: Not by yourself, you don't.\x0bI've been itchin' for a real fight all day."
   script                                 ; 13 walks up beside 19, to the spot his boss twin takes (TWIN_OFFSET right of 19), so the swap does not show
         WalkToPosition 165, 504, 408

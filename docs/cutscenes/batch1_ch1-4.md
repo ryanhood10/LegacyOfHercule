@@ -504,6 +504,17 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
   play the CHARGE without the form. In real play the player walks into this area from its edge; the test warp puts
   him beside Goku: film it once from the area's entrance.
 - **Size L.** The Short: beat 3 to beat 6, about 35 seconds.
+- **Built 2026-11-06 (`nb-cs1`, with Cine): beats 3 (in part), 4 and 6; 1 and 2 left as the stock plays them** (its opening is the
+  liveliest stock choreography of the batch: kept). The scene's trigger is the whole map, so in play the players stand at the area's
+  entry (468, 556), below the view, through Goku's fight (the research film's Vegeta "30 px from Goku" was the test warp). 19 raises
+  his hand over the fallen Goku (his attack 8, Goku flinches red, a flash): the drain. The entrance: Vegeta is beside 19 out of nowhere
+  (Cine dash, the view staying on the fight) and kicks him 60 px (heavy); he steps over Kakarot to the stock mark with his back to the
+  machine; the stock box; 19 gets up and walks back to his mark before "One of you needs to take Kakarot home". Not built: Piccolo and
+  Tien starting down with 20 dashing into their path; player 2 (Hercule) stays at the entry until the fight, as before (he cannot be
+  walked by a script, and a Cine dash is not his way to move). **The debut is its own commit** (Ryan's decision): before the last line
+  a charge (level 2) and he stands gold: **an actor (140) on his spot while player 1's body waits out of view**, so nothing of his
+  state changes (a real transformation in the scene left the form's meter running after it was undone: tried and dropped); a flash at
+  the fight's start puts him back, in base form as the stock starts it. Skipped when he walks in transformed already.
 
 ### 3.6 19's end, 13 leaves, 20 flees: rework (M)
 

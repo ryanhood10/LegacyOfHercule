@@ -26,12 +26,23 @@ preset +76
 maptest 7
 frames 200
 poke8 0x0203F000 2
+poke8 FLAGS+0x3A 3
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0xf07
-poke32 0x0203FD54 0x1a001a8
+poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 30 110
+mash 24 110
+shot c3_V_drain
+mash 3 110
+key 1 6
+frames 44
+shot c3_V_kick
+frames 24
+shot c3_V_thrown
+frames 100
+shot c3_V_mark
+mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
@@ -72,12 +83,23 @@ preset +76
 maptest 7
 frames 200
 poke8 0x0203F000 5
+poke8 FLAGS+0x3A 3
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0xf07
-poke32 0x0203FD54 0x1a001a8
+poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 30 110
+mash 24 110
+shot c3_H_drain
+mash 3 110
+key 1 6
+frames 44
+shot c3_H_kick
+frames 24
+shot c3_H_thrown
+frames 100
+shot c3_H_mark
+mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R72
@@ -119,12 +141,23 @@ maptest 7
 frames 200
 poke8 0x0203F000 2
 poke8 0x0203FF84 5
+poke8 FLAGS+0x3A 3
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0xf07
-poke32 0x0203FD54 0x1a001a8
+poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 30 110
+mash 24 110
+shot c3_VH_drain
+mash 3 110
+key 1 6
+frames 44
+shot c3_VH_kick
+frames 24
+shot c3_VH_thrown
+frames 100
+shot c3_VH_mark
+mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
@@ -166,12 +199,23 @@ maptest 7
 frames 200
 poke8 0x0203F000 5
 poke8 0x0203FF84 2
+poke8 FLAGS+0x3A 3
 deref TBL 0x0800959C
 poke32 0x0203FD0C 0xf07
-poke32 0x0203FD54 0x1a001a8
+poke32 0x0203FD54 0x22c01d4
 poke32 0x0203FD08 5
 frames 300
-mash 30 110
+mash 24 110
+shot c3_HV_drain
+mash 3 110
+key 1 6
+frames 44
+shot c3_HV_kick
+frames 24
+shot c3_HV_thrown
+frames 100
+shot c3_HV_mark
+mash 2 110
 deref R72 TBL+0x104
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R72
