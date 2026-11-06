@@ -778,13 +778,13 @@ python tools/headless/staging_run.py tools/headless/cine.txt ROM build/<dir>/hl/
 python tools/headless/st_test.py tools/headless/cine_demo.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl/cine --cols 8
 ```
 
-- **`cine.txt`** (in `regfull.sh`; 632 checks, about three minutes): on New Planet Vegeta's basin (zone 15 area 3), every
+- **`cine.txt`** (in `regfull.sh`; 636 checks, about three minutes): on New Planet Vegeta's basin (zone 15 area 3), every
   blocking op for seven pairs of sprites (Vegeta 137 and Android 17 both ways, Cooler's 64 x 64 body 34, King Cold 74 with
   five groups and no hit-stun, Piccolo's one-group NPC 73 with a bird 63), then a missing B, a missing A, an id past the
   sprite index, the point as the target, player 1 and player 2 as either party (two players, and one: player 2's moves play
   nothing), a party-slot code, the players on each other, a transformed player 1 (Goku on his Super Saiyan row), Start
   skipping an exchange, a struggle and a beam, the looks (player 1's facing byte), the camera's follow, a pan, a jolt, the
-  held charge, and the demo scene in both modes. After each op: the last op and how it ended (`CineRam` +0xF / +0x10), ops
+  held charge (and the charge beside a transformation, level + 4: nobody held, no hum of its own), and the demo scene in both modes. After each op: the last op and how it ended (`CineRam` +0xF / +0x10), ops
   started = ended (+0x18); after each block: nobody held (op 17), no hum left (test command 46), OBJ VRAM's largest free
   block back to its mark (`arg` 103 / 104), the `ents` lists' vtables sane (`staging_run.py`): a body animated on a group
   it lacks would corrupt the heap and show there. A player knocked down outside a scene is back in his idle state

@@ -19,16 +19,18 @@ sequence ch3_z7_cutaway
         WaitFrames 60
         PlayAudio 50
   stockseq @083d37bc 1 8                 ; 20: "We will fight here", the tracking device, "Super Saiyan?"
-  [9] script                             ; stock 9, the transformation: Goku's power is shown first (the cutscene pass, 2026-11-06: Cine's charge under the stock's sprite swap; the stock played a sound and swapped); the watchers shout
+  [9] script                             ; stock 9, the transformation: the stock's own power-up (his animation 9 at its pace, the hum 55, the burst sound 23, the swap to 61) with Cine's charge held alongside it (rings, flickers, the rumble growing; Ryan, 2026-11-06: "add that back in alongside the explosions"), the gold in a flash; the watchers shout
         SetEntityFacing 12, 2
         SetEntityFacing 60, 0
         WaitFrames 60
         CoopCall 37, 1, 60, 12
-        CoopCall 37, 7, 50, 2
-        CoopCall 37, 0, 0, 0
+        CoopCall 37, 7, 0, 6
+        PlayAudio 55
+        SetEntityAnimation 60, 9
+        CoopCall 37, 7, -1, 0
+        PlayAudio 23
         DespawnEntity 60
         SpawnCharacterEntity 61, 432, 408
-        PlayAudio 55
         WhiteFlash 6
         CoopCall 22, 2, 121, 0
         JumpIfFalse w1

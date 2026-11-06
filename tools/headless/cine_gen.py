@@ -335,6 +335,13 @@ def main():
     s.cine(CHARGE, -1, 0, 20)
     s.expect(r"[0-9a-f]{8}: [0-9a-f]{4}00[0-9a-f]{2}", "peek CN+0x10 1")
     s.answer(HELD, 0, 1)
+    s.cine(CHARGE, 0, 6, 90)                        # beside his own animation (level 2 + 4, the transformations' power-up):
+    s.expect(r"[0-9a-f]{8}: [0-9a-f]{4}01[0-9a-f]{2}", "peek CN+0x10 1")
+    s.answer(HELD, 0, 1)                            # he is not held (only 17, lying)
+    s.cmd(46, 0, 0, 3)
+    s.expect(r"[0-9a-f]{8}: 00000000", f"peek {ARG:#x} 1")   # and no hum of its own
+    s.cine(CHARGE, -1, 0, 20)                       # the silent burst
+    s.expect(r"[0-9a-f]{8}: [0-9a-f]{4}00[0-9a-f]{2}", "peek CN+0x10 1")
     s.cine(CHARGE, 0, 1, 20)
     s.cine(END, 0, 0, 20)                           # everything ends
     s.clean()

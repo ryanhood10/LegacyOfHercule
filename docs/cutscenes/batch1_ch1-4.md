@@ -527,6 +527,10 @@ the only thing worth a step is Vegeta turning his back on "#VEGETA: Hmph.  Stay 
 - **Risks:** the stock swaps sprite 60 for 61 by despawn and spawn: the CHARGE goes on 60 before the swap.
 - **Built 2026-11-06 (`nb-cs1`):** stock entry 9 restated: Cine's charge (level 2) on Goku's 60, the swap to 61 in a flash, the watchers' shout
   poses (Tien, Gohan, Krillin; guarded). Not built: 19 and 20 stepping back.
+- **The transformation itself back (Ryan, 2026-11-06: "you removed the normal sprite animation of them transforming super sayain (normal
+  pace), add that back in alongside the explosions"; branch `nb-ssjfix`):** the stock's own steps again (the hum 55, `SetEntityAnimation 60, 9`
+  at its own pace, about 140 frames, the burst sound 23, the swap to 61) with Cine's charge held alongside (`CoopCall 37, 7, 0, 6`: rings,
+  smoke, white flickers, a growing rumble; no pose of its own), its burst on the swap. The stock hum loops on as it did.
 
 ### 3.5 Goku falls, Vegeta arrives: SHOWCASE (L)
 

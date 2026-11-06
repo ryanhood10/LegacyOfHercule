@@ -54,11 +54,12 @@ for p1, p2 in ((GOHAN, None), (PICCOLO, HERCULE)):
 s.begin("cutaway", VEGETA, None)
 s.warp(7, 1, 200, 310, 200)
 s.press(16, 100)
-for i in range(3):                  # Goku's power before the gold (the cutscene pass, 2026-11-06): Cine's charge on sprite 60, then 61 stands
+for i in range(3):                  # Goku's power before the gold: his stock power-up (animation 9 on sprite 60) with Cine's charge held alongside (nb-ssjfix), then 61 stands
     s.out("key 1 6", "frames 50")
     s.shot(f"c3_cut_power{i}a")
     s.out("frames 50")
     s.shot(f"c3_cut_power{i}b")
+s.out("frames 160")                 # (the stock power-up runs its own length, about 140 frames)
 s.actors(s61=1, s60=0)
 s.out("ents")
 s.shot("c3_cut")

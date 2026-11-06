@@ -3122,6 +3122,30 @@ frames 4
 echo EXPECT [0-9a-f]{8}: 00000001
 peek 0x203fd0c 1
 poke32 0x203fd0c 0x7
+poke32 0x203fd54 0x60000
+poke32 0x203fd08 50
+frames 90
+echo EXPECT [0-9a-f]{8}: [0-9a-f]{4}01[0-9a-f]{2}
+peek CN+0x10 1
+poke32 0x203fd0c 0x11
+poke32 0x203fd54 0x0
+poke32 0x203fd08 50
+frames 4
+echo EXPECT [0-9a-f]{8}: 00000001
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x0
+poke32 0x203fd54 0x0
+poke32 0x203fd08 46
+frames 3
+echo EXPECT [0-9a-f]{8}: 00000000
+peek 0x203fd0c 1
+poke32 0x203fd0c 0x7
+poke32 0x203fd54 0xffff
+poke32 0x203fd08 50
+frames 20
+echo EXPECT [0-9a-f]{8}: [0-9a-f]{4}00[0-9a-f]{2}
+peek CN+0x10 1
+poke32 0x203fd0c 0x7
 poke32 0x203fd54 0x10000
 poke32 0x203fd08 50
 frames 20

@@ -99,6 +99,7 @@ frames 50
 shot c3_cut_power2a
 frames 50
 shot c3_cut_power2b
+frames 160
 deref R61 TBL+0xd8
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R61
