@@ -68,9 +68,9 @@ frames 120
 shot gr05_pad_saved
 key 1 10
 frames 60
-# 4. talk to the announcer (the stock stand-in without art-buu's sprite 230): three pages
+# 4. talk to the announcer (the stock stand-in without art-buu's sprite 230): three pages; he stands at (280, 344)
 poke32 0x0203FD0C 0x0B0F
-poke32 0x0203FD54 0x014A00E8
+poke32 0x0203FD54 0x01760118
 poke32 0x0203FD08 5
 frames 300
 key 0x40 6

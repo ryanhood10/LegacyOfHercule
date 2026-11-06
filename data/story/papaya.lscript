@@ -31,16 +31,27 @@ end
 
 ; ---- the plaza (15 / 11) ---------------------------------------------------------------------------------
 
-; the first visit (flag 441 clear): the announcer's welcome on the beach
+; the first visit (flag 441 clear): the announcer's welcome on the beach. Staged (docs/tournament.md 27): he stands where
+; the camera shows him (beside the flight sign, up and right of the landing) and the players turn to him; he raises his
+; microphone for the welcome (CoopCall 30 op 8: his pose group 4 held, a no-op without his sprite 230), lowers it and
+; turns up the street for the directions, then faces the beach again. No frame is added.
 sequence tny_arrival
   script
         SetStoryFlag 441
         PlayAudio 62
+        SetEntityFacing 0, 3
+        CoopCall 30, 7, 3, 0
   text 0 "@^Papaya Island"
+  script
+        CoopCall 30, 8, 230, 0x104
   text 0 "ANNOUNCER: Welcome, welcome!  You've arrived at\x0bthe World Martial Arts Tournament!"
   text 0 "ANNOUNCER: All fighters welcome!  Rookies and legends,\x0bheroes and villains...  everyone gets a shot!"
   text 0 "ANNOUNCER: And who knows?  Maybe one of you can\x0btake the title from our reigning champion...\x0bthe great HERCULE!"
+  script
+        CoopCall 30, 8, 230, 0x200
   text 0 "ANNOUNCER: Fighters sign in with the director.\x0bUp the street, through the gate, past the infirmary:\x0bthe fighters' waiting room!"
+  script
+        CoopCall 30, 8, 230, 0x100
 end
 
 sequence tny_announcer_talk

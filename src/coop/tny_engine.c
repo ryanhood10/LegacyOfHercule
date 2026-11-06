@@ -528,6 +528,10 @@ const TBracket *tny_bracket(void) {
 
 // ---- lines in a text box ---------------------------------------------------------------------------------
 static const u8 say_wait[] __attribute__((aligned(4))) = { 1, 0, 0, 0x00, 0x14, 0x02, 0x45, 0x11 };   // WaitFrames 20
+// the same, then CoopCall 23, 2, 0, 0: the announcer's line is staged as it opens (stage_ann: docs/tournament.md 27)
+static const u8 say_wait_ann[] __attribute__((aligned(4))) = {
+    1, 0, 0, 0x00, 0x14, 0x02, 0x45, 0x00, 23, 0x00, 2, 0x00, 0, 0x00, 0, 0x02, 59, 0x11,
+};
 static char *catu(char *o, const char *s, int upper) {   // upper: in capitals (the announcer calls names so)
     char *end = eng.say_entry.text + sizeof eng.say_entry.text - 1;
     while (s && *s && o < end) { char ch = *s++; *o++ = upper && ch >= 'a' && ch <= 'z' ? (char)(ch - 32) : ch; }
@@ -543,17 +547,18 @@ static char *say_open(int speaker) {
     eng.say_entry.head[3] = (u8)speaker;
     return cat(eng.say_entry.text, speaker ? "ANNOUNCER: " : "@^");
 }
-static void say_go(void) {
-    eng.say_seq[0] = say_wait;
+static void say_run(const void *wait) {
+    eng.say_seq[0] = wait;
     eng.say_seq[1] = &eng.say_entry;
     eng.say_seq[2] = 0;
     coop_run_sequence(eng.say_action, eng.say_seq);
     eng.say_hold = 8;
 }
-static void say(const char *a, const char *b, const char *c, const char *d, const char *e) {
+static void say_go(void) { say_run(say_wait_ann); }   // the announcer's line (ann_prep, the calls built in place)
+static void say(const char *a, const char *b, const char *c, const char *d, const char *e) {   // narration
     char *o = say_open(0);
     o = cat(o, a); o = cat(o, b); o = cat(o, c); o = cat(o, d); cat(o, e);
-    say_go();
+    say_run(say_wait);
 }
 // The announcer's line: plain parts and NAMES (upper case) alternate, starting with plain text
 static int ann_speaker(void);
@@ -1125,9 +1130,17 @@ static int frames_of(const Entity *e, const u32 *grp) {
     }
     return n;
 }
+const u32 *tny_pose_group(const Entity *e, int group, int *last) {
+    const u32 *grp = e ? grp_of(e, group) : 0;
+    *last = grp ? frames_of(e, grp) - 1 : 0;
+    return grp;
+}
 // The lying table's entry for e's body (tny_lie, generated: bodies whose group 12 is no lying pose), or 0
 extern const TnyLie tny_lie[] __attribute__((weak));
 #define POSE_LIE_TABLE 0xFF                  // pose_g: the group comes from tny_lie
+#define PG_WIN         0x80                  // pose_g flags (never on POSE_LIE_TABLE): a standing pose, it may turn
+#define PG_TALK        0x40                  //   held for one line (a speaker's, the announcer's microphone)
+#define PG_GROUP       0x3F
 static const TnyLie *lie_entry(const Entity *e) {
     if (!tny_lie) return 0;
     for (const TnyLie *l = tny_lie; l->sprite; l++)
@@ -1186,14 +1199,14 @@ static void pose_hold(Entity *e, int win) {
     if (g < 0 || !(g == POSE_LIE_TABLE ? lg : grp_of(e, g))) return;
     int k = eng.npose++;
     eng.pose_e[k] = e;
-    eng.pose_g[k] = (u8)g;
+    eng.pose_g[k] = (u8)(g == POSE_LIE_TABLE ? g : g | (win ? PG_WIN : 0));
     eng.pose_f[k] = (u8)f;
 }
 static void poses_apply(int still) {
     for (int k = 0; k < eng.npose; k++) {
         Entity *e = eng.pose_e[k];
         const u32 *grp = !e || !in_list(e) ? 0
-                       : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : grp_of(e, eng.pose_g[k]);
+                       : eng.pose_g[k] == POSE_LIE_TABLE ? lie_grp(e, lie_entry(e)) : grp_of(e, eng.pose_g[k] & PG_GROUP);
         if (!grp) continue;
         E32(e, 0x4C) = (u32)grp;
         E16(e, 0x14) = eng.pose_f[k];
@@ -1223,6 +1236,158 @@ static void poses_release(void) {
         eng.pose_e[k] = 0;
     }
     eng.npose = 0;
+}
+
+// ---- staging the ring's lines (docs/tournament.md 27; Ryan's scene rules, docs/howto.md "Stage a scene") ---------------
+// Every line on the ring is staged as it opens, at no cost in frames (the hooks run inside the scene, between two boxes):
+// the others on the floor turn to the speaker, the speaker turns to whom he speaks to and strikes one pose for his line
+// (his shout's last frame, the victory pose; else the fidget, else the ki pose: only a group his body has, grp_of), and
+// lets it go when the next line starts. A body lying stays as it lies; a body posing (the winner) keeps his pose and only
+// turns. The announcer's own lines (say_wait_ann: CoopCall 23, 2) raise his microphone and turn him to whom he names; for
+// his calls the fighters stay squared up, facing each other. The facings and the held frames are drawn while the line
+// freezes the world (the dialogue modal draws the entity list without updating it, section 14).
+static Entity *floor_p2(void);
+static int pose_at(const Entity *e) {
+    for (int k = 0; k < eng.npose; k++) if (eng.pose_e[k] == e) return k;
+    return -1;
+}
+static int face_to(const Entity *e, const Entity *t) {
+    int dx = (t->x - e->x) >> 8, dy = (t->y - e->y) >> 8;
+    int ax = dx < 0 ? -dx : dx, ay = dy < 0 ? -dy : dy;
+    if (ax * 2 >= ay) return dx < 0 ? 2 : 3;        // about level: a side facing (partners one above the other look up / down)
+    return dy < 0 ? 1 : 0;
+}
+// e turns to facing f; a posing body keeps its pose in the new facing (only when that facing's frames are drawable), a
+// body lying does not turn
+static void turn(Entity *e, int f) {
+    if (!e || !in_list(e) || e->facing == f) return;
+    int k = pose_at(e);
+    if (k < 0) { e->facing = (u8)f; return; }
+    u8 g = eng.pose_g[k];
+    if (g == POSE_LIE_TABLE || !(g & PG_WIN)) return;
+    u8 was = e->facing;
+    e->facing = (u8)f;
+    const u32 *grp = grp_of(e, g & PG_GROUP);
+    if (!grp) { e->facing = was; return; }
+    int n = frames_of(e, grp);
+    if ((g & PG_GROUP) == 4 || eng.pose_f[k] >= n) eng.pose_f[k] = (u8)(n - 1);   // the shout's pose is its last frame
+}
+// One line's pose, held until the next line starts (talk_poses_release): `tab` the groups to try, first that the body has
+static void talk_pose(Entity *e, const s8 (*tab)[2], int ntab) {
+    if (!e || !in_list(e) || pose_at(e) >= 0 || eng.npose >= 4) return;
+    for (int i = 0; i < ntab; i++) {
+        const u32 *grp = grp_of(e, tab[i][0]);
+        if (!grp) continue;
+        int k = eng.npose++;
+        eng.pose_e[k] = e;
+        eng.pose_g[k] = (u8)(tab[i][0] | PG_WIN | PG_TALK);
+        eng.pose_f[k] = (u8)(tab[i][1] < 0 ? frames_of(e, grp) - 1 : tab[i][1]);
+        return;
+    }
+}
+static void talk_poses_release(void) {
+    int n = 0;
+    for (int k = 0; k < eng.npose; k++) {
+        Entity *e = eng.pose_e[k];
+        if (eng.pose_g[k] != POSE_LIE_TABLE && (eng.pose_g[k] & PG_TALK)) {
+            if (e && in_list(e)) Entity_SetAnimation(e, 0);   // idle, group 0: every body has it
+            continue;
+        }
+        eng.pose_e[n] = e; eng.pose_g[n] = eng.pose_g[k]; eng.pose_f[n] = eng.pose_f[k]; n++;
+    }
+    eng.npose = (u8)n;
+}
+// A talk's seat (tny_talk.c: side << 4 | index; side 0 the opening side) -> the body on the floor
+static Entity *seat_ent(int seat) {
+    int side = seat >> 4, i = seat & 15;
+    Entity *e;
+    if (eng.phase == P_DUEL) e = side ? g_PlayerObject : coop.p2;       // the co-op final: player 1 answers player 2
+    else if (side) e = i ? floor_p2() : g_PlayerObject;
+    else e = i < eng.nopp && i < MAX_OPP ? eng.opp[i] : 0;
+    return e && in_list(e) ? e : 0;
+}
+// Everyone the camera may show on the floor: the players, the opponents, the announcer (at most 9)
+static int floor_ents(Entity **out) {
+    int n = 0;
+    Entity *p1 = g_PlayerObject, *p2 = eng.phase == P_DUEL ? coop.p2 : floor_p2();
+    if (p1 && in_list(p1)) out[n++] = p1;
+    if (p2 && p2 != p1 && in_list(p2)) out[n++] = p2;
+    for (int i = 0; i < eng.nopp && i < MAX_OPP; i++) if (eng.opp[i] && in_list(eng.opp[i])) out[n++] = eng.opp[i];
+    if (eng.ann && in_list(eng.ann)) out[n++] = eng.ann;
+    return n;
+}
+// What the staging did since test command 38 arg 5 wiped it (tools/headless/tny_scenes.txt; `find ST 0x47415453`)
+#define STG_MAGIC   0x47415453u             // "STAG"
+static struct { u32 magic; u8 lines, anns, hop, low; } stg COMBO_SECTION("st");
+_Static_assert(sizeof(stg) == 8, ".combo.st is 8 bytes (docs/ids.md)");
+static void stg_count(u8 *c) { if (stg.magic == STG_MAGIC && *c < 255) (*c)++; }
+#define BOX_CLEAR_Y 100                     // a speaker's feet above this screen row: the box at the top would hide him
+static const s8 speak_pose[][2] = { { 4, -1 }, { 14, 0 }, { 5, 0 } };   // the shout's last frame, the fidget, the ki pose
+static const s8 mic_pose[][2] = { { 4, -1 } };                           // the announcer's raised microphone (sprite 230)
+// Returns 1 when the speaker stands in the view's upper part: his box goes to the bottom (the fighters' lines open at the
+// top, where it hid a speaker standing on the players' upper row: docs/tournament.md 27)
+int tny_stage_line(int who, int to) {
+    if (eng.magic != ENG_MAGIC || !tny_ring_active()) return 0;
+    talk_poses_release();
+    Entity *sp = seat_ent(who), *at = seat_ent(to), *all[MAX_OPP + 3];
+    if (!sp) return 0;
+    int n = floor_ents(all);
+    for (int i = 0; i < n; i++) if (all[i] != sp) turn(all[i], face_to(all[i], sp));
+    if (at && at != sp) turn(sp, face_to(sp, at));
+    talk_pose(sp, speak_pose, 3);
+    stg_count(&stg.lines);
+    int low = (sp->y >> 8) - CAMERA_CELL[8] < BOX_CLEAR_Y;
+    if (low) stg_count(&stg.low);
+    return low;
+}
+// The talk is over: the fighters face each other again for the call, the announcer the crowd
+static void squared(void) {
+    talk_poses_release();
+    if (eng.phase == P_DUEL) { turn(g_PlayerObject, 3); turn(coop.p2, 2); }
+    else {
+        turn(g_PlayerObject, 3);
+        turn(floor_p2(), 3);
+        for (int i = 0; i < eng.nopp && i < MAX_OPP; i++) if (eng.opp_in[i] == 1) turn(eng.opp[i], 2);
+    }
+    turn(eng.ann, 0);
+}
+// The announcer's line opens (say_wait_ann): his microphone up, turned to whom he names: the winner of a fight, the
+// champions at the trophy, the entrance when a challenger appears (the players look there too); a call goes to the crowd
+static Entity *winner_ent(void) {
+    if (eng.result == R_WON) return g_PlayerObject;
+    for (int i = 0; i < eng.nopp && i < MAX_OPP; i++)
+        if (eng.opp[i] && in_list(eng.opp[i]) && eng.opp[i]->hp > 0) return eng.opp[i];
+    return 0;
+}
+static void stage_ann(void) {
+    Entity *a = eng.ann, *t = 0;
+    if (eng.magic != ENG_MAGIC || !tny_ring_active() || !a || !in_list(a) || eng.ann_walk) return;
+    talk_poses_release();
+    int f = 0;
+    if (eng.phase == P_MATCH_END) t = winner_ent();
+    else if (eng.phase == P_PRIZE) t = g_PlayerObject;
+    else if (eng.phase == P_CHALLENGE) {
+        f = 3;
+        turn(g_PlayerObject, 3);
+        turn(coop.p2 && !coop_solo() ? coop.p2 : 0, 3);
+    }
+    turn(a, t ? face_to(a, t) : f);
+    stg_count(&stg.anns);
+    if (a->sprite_record == Character_GetSpriteRecord(ann_sprite()) && ann_sprite() == TS_ANNOUNCER) talk_pose(a, mic_pose, 1);
+}
+// The trophy's line: the champions hop twice for joy while it opens (they stand on TNY_RING_P1_Y: step_trophy), player 2
+// a few frames after player 1; nothing when a pose is not held (no body there)
+#define HOP_T       16                      // frames a hop
+static void trophy_hop(void) {
+    if (eng.timer < 0xFFFF) eng.timer++;
+    Entity *w[2] = { g_PlayerObject, coop.p2 && !coop_solo() ? coop.p2 : 0 };
+    for (int k = 0; k < 2; k++) {
+        int t = (int)eng.timer - 6 * k, h = t > 0 && t < 2 * HOP_T ? (t % HOP_T) * (HOP_T - t % HOP_T) / 10 : 0;   // 6 px
+        if (w[k] && in_list(w[k]) && pose_at(w[k]) >= 0) {
+            w[k]->y = (TNY_RING_P1_Y - h) << 8;
+            if (stg.magic == STG_MAGIC && h > stg.hop) stg.hop = (u8)h;
+        }
+    }
 }
 
 // The walk-in: the fighters from their sides of the platform to their marks (the command modal: nothing else
@@ -1368,6 +1533,7 @@ static void step_intro(void) {
         if (talk(TALK_BEFORE)) return;               // the fighters' lines (the seat): the call waits for them
     }
     if (eng.pres == 1) {
+        squared();                                   // after the fighters' lines: face to face for the call
         say_go();
         eng.pres = 2;
         return;
@@ -2049,7 +2215,7 @@ static void step_duel(void) {
         eng.pres = 1;
         if (talk(TALK_BEFORE)) return;
     }
-    if (eng.pres == 1) { say_go(); eng.pres = 2; return; }
+    if (eng.pres == 1) { squared(); say_go(); eng.pres = 2; return; }
     if (eng.pres == 2) { coop2.call_state = 1; eng.pres = 4; return; }   // 4: the duel runs (the frame tick)
     if (eng.pres == 3) {
         eng.pres = 0;
@@ -2207,6 +2373,7 @@ static void step_trophy(void) {
     o = cat(o, tier_name[eng.tier]);
     cat(o, eng.division == DIV_RUMBLE ? " Royal Rumble!" : eng.division == DIV_2V2 ? " tournament (2 v 2)!" : " tournament!");
     say_go();
+    eng.timer = 0;                                   // the champions' hops (trophy_hop) count from here
     eng.phase = P_PRIZE;
 }
 
@@ -2261,6 +2428,8 @@ static int pick_challengers(int t) {
 // second one with no player KO); then the hidden fight, if one is still locked
 static void step_prize(void) {
     int t = tny_tourney_index(eng.tier, eng.division);
+    Entity *w[2] = { g_PlayerObject, coop.p2 && !coop_solo() ? coop.p2 : 0 };
+    for (int k = 0; k < 2; k++) if (w[k] && in_list(w[k]) && pose_at(w[k]) >= 0) w[k]->y = TNY_RING_P1_Y << 8;   // a hop cut short by A
     poses_release();                                 // the trophy pose gives way to the prize's pick-up
     static const u8 capsule[3] = { ITEM_STR3, ITEM_PWR3, ITEM_END3 };
     rec_load();
@@ -2330,7 +2499,9 @@ static int popup_step(void) {
 }
 
 static void run_step(void) {
-    // the poses held for the last line stay until the curtain closes (scene_clear) or the prize's pick-up
+    // the poses held for the last line stay until the curtain closes (scene_clear) or the prize's pick-up; a pose held for
+    // one line (a speaker's, the announcer's microphone) ends with it
+    talk_poses_release();
     switch (eng.phase) {
     case P_IDLE:
         if (eng.dark) curtain_open();                // back where the director was: the curtain opens
@@ -2478,7 +2649,10 @@ void tny_engine_frame(void) {
         g_InputSystem->pressed &= (u16)~KEY_A;
         coop.input2.pressed &= (u16)~KEY_A;
     }
-    if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
+    if (eng.npose) {                                 // the end's poses hold while the announcer speaks
+        if (eng.phase == P_PRIZE && scene_running()) trophy_hop();   // the champions (posed) hop while the trophy's line opens
+        poses_apply(!scene_running());
+    }
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
@@ -2515,6 +2689,7 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
     state_check();
     if (fn != 23) return 0;
     if (a == 1) { *push = eng.phase != P_IDLE; return 1; }
+    if (a == 2) { stage_ann(); return 0; }          // the announcer's line opens (say_wait_ann): nothing pushed
     if (eng.phase != P_IDLE) { *push = 1; return 1; }
     if (!g_PlayerObject) { *push = 0; return 1; }
     eng.preset = 0;
@@ -2544,6 +2719,7 @@ static void test_checks(u32 arg, u32 arg2) {
     u32 r = 0;
     if (arg == 2) { if (p1) eng.mark_x = (s16)(p1->x >> 8); return; }
     if (arg == 4) { eng.ann_starts = 0; return; }
+    if (arg == 5) { stg.magic = STG_MAGIC; stg.lines = stg.anns = stg.hop = stg.low = 0; return; }   // the staging's counts (27)
     if (arg != 0) return;
     switch (arg2 >> 16) {
     case 0: r = eng.restage_t && eng.restage_t <= n ? eng.restage_t : 0; break;

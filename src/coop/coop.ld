@@ -100,6 +100,7 @@ SECTIONS
         KEEP(*(.combo.ag))     /* agency.c: player 2's agency (<= 0x40) */
         KEEP(*(.combo.ch))     /* chamber.c: the Time Chamber's state (<= 0x30) */
         KEEP(*(.combo.po))     /* popo.c: the hidden room and Mr. Popo (<= 0x30) */
+        KEEP(*(.combo.st))     /* tny_engine.c: the ring's staging counts for the tests (8; docs/tournament.md 27) */
     } > comboram
 
     .bss (NOLOAD) : {

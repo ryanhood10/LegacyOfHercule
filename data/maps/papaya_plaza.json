@@ -1,5 +1,5 @@
 {
- "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is West City's light-blue cloud marker on the paving just above the beach with the stock flight sign on it (the world-map landing arrives on the beach below it). The announcer (art-buu's sprite 230, a stock stand-in without it) and three fans; the first visit's welcome (flag 441).",
+ "_": "Papaya Island's plaza by the sea (the tournament grounds, docs/tournament.md 'The grounds'): Buu's Fury's zone 7 area 1 without the plane (variation 0x0824AE74 there) imported whole, tiles converted to LoG2's palette, its own collision with the grass behind the brick walls closed. The Capsule Corp pad (Buu's art: the same pad LoG2 draws, e.g. zone 7 area 9) is the save / switch-characters pad; the flight spot is West City's light-blue cloud marker on the paving just above the beach with the stock flight sign on it (the world-map landing arrives on the beach below it). The announcer (art-buu's sprite 230, a stock stand-in without it; at (280, 344) beside the flight sign since 2026-11-05, where the camera shows him to the players arriving on the beach: docs/tournament.md 27) and three fans; the first visit's welcome (flag 441).",
  "name": "papaya_plaza",
  "zone": 15,
  "area": 11,
@@ -184,8 +184,8 @@
   {
    "kind": "npc",
    "sprite": 230,
-   "x": 232,
-   "y": 300,
+   "x": 280,
+   "y": 344,
    "facing": 0,
    "talk": "seq:tny_announcer_talk",
    "condition": "script:tny_has_announcer",
@@ -194,8 +194,8 @@
   {
    "kind": "npc",
    "sprite": 99,
-   "x": 232,
-   "y": 300,
+   "x": 280,
+   "y": 344,
    "facing": 0,
    "talk": "seq:tny_announcer_talk",
    "condition": "script:tny_no_announcer",
