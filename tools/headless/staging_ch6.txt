@@ -886,7 +886,15 @@ mashmap 11 6 30
 frames 200
 poke32 0x0203FD08 7
 frames 20
-mash 110 60
+mash 74 60
+shot c6_P_fall
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 8 60
+shot c6_P_blow
+mash 33 60
 frames 45
 shot c6_P_tri0
 frames 45
@@ -913,6 +921,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 9 area 1\b
 map
 ents
@@ -941,7 +954,15 @@ mashmap 11 6 30
 frames 200
 poke32 0x0203FD08 7
 frames 20
-mash 110 60
+mash 74 60
+shot c6_PH_fall
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 8 60
+shot c6_PH_blow
+mash 33 60
 frames 45
 shot c6_PH_tri0
 frames 45
@@ -968,6 +989,11 @@ stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
+find CN 0xC14E0001
+echo EXPECT [0-9a-f]{8}: 04[0-9a-f]{6} [0-9a-f]{6}01
+peek CN+0x0C 2
+echo EXPECT [0-9a-f]{8}: ([0-9a-f]{4})\1
+peek CN+0x18 1
 echo EXPECT map zone 9 area 1\b
 map
 ents

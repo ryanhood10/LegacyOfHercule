@@ -108,9 +108,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 | state | scenes |
 |---|---|
-| built | 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built | 6.8 (a), (b) (`nb-cs4`), 7.2 (the first blow: `nb-cs4`), 7.6 (the misses: `nb-cs4`; Krillin's throw left hand-rolled), 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (Cooler's charge: `nb-cs4`), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
 | built in part | - |
-| not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
+| not built | 5.1, 5.7, 6.1, 6.6, 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
 
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
 
@@ -492,8 +492,20 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.8 Cell arrives, 17 is absorbed, Tien's stand, Goku's rescue (showcase, L)
 
-- **(c) built 2026-11-06 (`nb-cs2`); (a) and (b) are not built** (the stock arrival, Piccolo's fall, 16's punches and 17's absorption
-  play as before). Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
+- **(a) and (b) built 2026-11-06 (`nb-cs4`)** (stock entries 7, 31, 39 and 44 restated in place, so the stock indexes hold): the fade
+  also stands player 2 on the field at (256, 192), up by the cliff beside Piccolo (`CoopCall 9`; he stood off screen); before Cell is
+  seen the ground trembles (the rumble, `ScreenShake 0, 6, 40`) and 16 turns south first, then 17 and 18, then Piccolo; everyone looks
+  at Cell as he walks in; 18 takes a step back from him at "And 18!  Poetry in motion!". Piccolo's attack: a short charge, a volley of
+  three that bursts on Cell (`CoopCall 37, 8, 1, 3`), Cell turns, is at his side in a blink and one heavy blow throws him 32 px (the
+  view's edge is near) into the stock lying pose 33; everyone looks at him and player 2's Hercule drops to a knee and stays down
+  (Krillin only looks). 16 walks up as before and strikes twice and once heavy (`CoopCall 37, 5`: Cell thrown 64 px, the stock red
+  flash, he lies there through "16 squashed the bug!"). While the camera is up on Tien, Cell gets up and is behind 17 in a blink at
+  the bottom of the view (the stock walked him there in plain view); the absorption and the reveal are the stock's. Goku's
+  Instant-Transmission pick-ups take player 2 too (a blink beside him, `CoopCall 31, 3`), before Piccolo. Not built: Krillin's start
+  toward Piccolo, the rising shake under the tail (the stock's own shake and purple flashes stay). `staging_ch6` "island half" shoots
+  the fall and the blow and checks every move ended (`cine_last(4)`); flags and party after it equal the build before (one and two
+  players).
+- **(c) built 2026-11-06 (`nb-cs2`).** Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
   jolt (`CoopCall 37, 15`), the hit blink on Cell, four dust clouds in a square round him, and Cell falls flat (`CoopCall 37, 10`
   pose 2); three, 24, 18 and 12 frames apart. Cell gets up for "What do you think you're doing?"; after the Lookout cutaway and "You
   fool." he takes a step and two more flatten him; 18 and 16 fly off while four more land 14 frames apart; then the gaps grow and

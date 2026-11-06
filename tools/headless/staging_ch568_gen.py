@@ -146,7 +146,8 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE), (PICCOLO, KRILLIN)):
     s.shot(f"c6_{n}_break1")
     s.out("mashmap 11 5 60", "frames 400", "ents")
     s.on_map(11, 5)
-# The island's end (a16_island_half): 16 stops at half health, Cell arrives, 17 is absorbed, Tien's Tri-Beam from above (Tien 121 up at
+# The island's end (a16_island_half): 16 stops at half health, Cell arrives (the ground shakes first; player 2 on the field beside Piccolo),
+# Piccolo's three blasts and Cell's blow that lays him out, 16's three blows that throw Cell, Cell behind 17 in a blink, 17 is absorbed, Tien's Tri-Beam from above (Tien 121 up at
 # (396, 148), Semi-Perfect Cell 29 hammered flat), Goku's rescue by Instant Transmission, the Lookout. Win both stages at once.
 for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     n = lineup_name(p1, p2)
@@ -156,7 +157,13 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     s.win(120)
     s.out("mashmap 11 5 60", "frames 300", "mashmap 11 6 30", "frames 200")
     s.win(20)
-    s.press(110, 60)                                # to Tien's "NO!!!!!!!!"
+    s.press(74, 60)                                 # (6.8 a) Piccolo's three blasts, Cell's blow: Piccolo lies, player 2 beside him on the field
+    s.shot(f"c6_{n}_fall")
+    s.actors(s28=1)
+    s.out("ents")
+    s.press(8, 60)                                  # (6.8 b) 16's three blows: Cell thrown and lying
+    s.shot(f"c6_{n}_blow")
+    s.press(33, 60)                                 # to Tien's "NO!!!!!!!!"
     for i in range(4):
         s.out("frames 45")
         s.shot(f"c6_{n}_tri{i}")
@@ -166,6 +173,7 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     s.shot(f"c6_{n}_tri4")
     s.out("ents", "mashmap 9 1 200")
     s.end_scene()
+    s.cine_last(4)                                  # Goku's last blink (beside Piccolo) played; every move of the scene ended
     s.on_map(9, 1)
 s.write("staging_ch6.txt")
 
