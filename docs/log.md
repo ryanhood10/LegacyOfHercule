@@ -15,6 +15,8 @@ Newest first. One entry per landed piece or decision; details live in the linked
   cap moved down 0x100). Facts found on the way: `EntitySetVelocity` / `EntityStopMovement` / `SpawnDustCloud` are one dust
   effect and move nobody, `LockEntityPose` is the draw priority (`docs/scripts.md` 2.1), the effect object and its six frame
   sets, the palette blend, the command pop (`docs/engine.md` "Cine").
+  Full regression on the final build: 96 blocks, clean (`perf_budget` run by itself with the perf runner: 94 checks; `pickup.txt`'s
+  hard-coded heap address moved with the heap cap, 02026fac -> 02026eac).
 - **The lab door's scene keeps 13 through its cut back into the lab (Ryan: his model vanished at the third view):** the scene reloads map 8/60 at entry 16 after the cut outside, which drops actors; `ch4_lab_door` entry 79 spawns him again beside Gero.
 - **F1-F9 for Ryan's one-player tests (`tools/headless/dropins_test.py`, `docs/testing.md`):** Gero's stage, the door generator, the lab, the eggs, the Chamber's door (a fresh run), the tournament's waiting room, Broly's ship with five lights out, the portal, Frieza's ship.
 - **One death for Gero (Ryan):** the first lab cutaway is back to the stock beat (Gero wakes 17 and 18, the controller) with 13 beside him; 13's revenge moved into the stock 16 scene at the lab door, after 17's blast ("scrap heap"): `ch4_lab_door`, run by area 46's item 0 (`tools/mapedit.py` gained `"items": {"N": {"script": REF}}`). `ch4_staging.txt` door blocks, one player and two.
