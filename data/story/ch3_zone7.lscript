@@ -150,6 +150,7 @@ sequence ch3_z7_defeat
         CoopCall 37, 1, 0, 12
         CoopCall 37, 8, 3, 0
   stock @083d4174                        ; 19 explodes, EXP, the music
+  stock @083d42e0                        ; Vegeta's stock "Silly robot.  You really thought you had a chance against me?..." moved up to here, next to what it is about (it came after 13 had come and gone); the words are the stock's
   script                                 ; 13 gets up (he may be the body that fell first, lying) and comes at Vegeta, wherever the fight left the two; everyone looks at him
         SetEntityAnimation 165, 0
         CoopCall 37, 12, 165, 165
@@ -180,7 +181,7 @@ sequence ch3_z7_defeat
         FlyToPosition 165, 640, 96
         DespawnEntity 165
         WaitFrames 30
-  stockseq @083d4834 1 14                ; Vegeta's "Silly robot", 20 flees, Vegeta follows, Piccolo takes over
+  stockseq @083d4834 2 14                ; 20 flees, Vegeta follows, Piccolo takes over
 end
 
 ; ---- zone 2 area 1 (map 7): the three-year skip: after Gohan's and Piccolo's new moves, Hercule's Ki Blast (Ryan, 2026-11-02) ----
