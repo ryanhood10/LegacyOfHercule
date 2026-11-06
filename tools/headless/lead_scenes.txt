@@ -3,7 +3,7 @@
 # Krillin actor beside the player), and the scenes that need their lead as player 1 (the fade hands it over): the
 # Lookout's first visit and the island (Piccolo, 01), Gingertown (Piccolo, 01), Semi-Perfect Cell (Vegeta, 02). Actor
 # records are read from the sprite table (*0x0800959C + (id - 7) * 4). From a debug-menu savestate (--out its folder).
-echo == the forest spirit alone as Krillin: Gohan's actor walks up (1), Krillin's none (0)
+echo == the forest spirit alone as Krillin: no Gohan actor (Ryan, 2026-11-05: a party member nobody plays is not in the scene) (0), Krillin's none (0)
 p2 off
 preset +4 +360
 maptest 7
@@ -21,21 +21,21 @@ entrec 0x082E94B4
 shot ls_spirit
 mash 8 90
 frames 120
-echo == the fight: Gohan's actor by the edge (1)
+echo == the fight: no Gohan actor (0)
 entrec GO
 shot ls_fight
 poke32 0x0203FD08 7
 frames 300
 mash 3 90
 frames 60
-echo == after the spirit: Gohan's actor beside him in the clearing (1)
+echo == after the spirit: no Gohan actor (0)
 entrec GO
 shot ls_after
 mash 12 90
 frames 200
 echo == he ran on ahead (0)
 entrec GO
-echo == the lab basement alone as Krillin: Trunks' actor (1), no Krillin actor (0)
+echo == the lab basement alone as Krillin: no Trunks actor (0), no Krillin actor (0)
 load menu.ss
 p2 off
 preset +136 +466
@@ -56,7 +56,7 @@ entrec TR
 entrec 0x082E94B4
 shot ls_basement
 map
-echo == the larva: Trunks' actor (1), Krillin's (0)
+echo == the larva: no Trunks actor (0), Krillin's (0)
 poke32 0x0203FD0C 0x3E08
 poke32 0x0203FD54 0x00F00080
 poke32 0x0203FD08 5
@@ -64,7 +64,7 @@ frames 300
 entrec TR
 entrec 0x082E94B4
 shot ls_larva
-echo == the larva as Trunks: Trunks only player 1 himself (1: his body is sprite 128 too), Krillin's actor (1)
+echo == the larva as Trunks: Trunks only player 1 himself (1: his body is sprite 128 too), no Krillin actor (0)
 load menu.ss
 p2 off
 preset +136 +466

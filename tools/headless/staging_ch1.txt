@@ -15,7 +15,7 @@ deref R53 TBL+0xb8
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R53
 deref R76 TBL+0x114
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 mash 2 110
 shot c1_G_talk
@@ -30,7 +30,7 @@ deref R53 TBL+0xb8
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R53
 deref R76 TBL+0x114
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 echo EXPECT map zone 2 area 8\b
 map
@@ -46,7 +46,7 @@ deref R53 TBL+0xb8
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R53
 deref R76 TBL+0x114
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 stepz 0x03001FDC 150
 frames 30
@@ -74,7 +74,7 @@ poke32 0x0203FD54 0xdc0060
 poke32 0x0203FD08 5
 frames 100
 deref R53 TBL+0xb8
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R53
 deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -89,7 +89,7 @@ echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 shot c1_K_fight
 deref R53 TBL+0xb8
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R53
 deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -105,7 +105,7 @@ echo EXPECT map zone 2 area 3\b
 map
 ents
 deref R53 TBL+0xb8
-echo EXPECT entrec [0-9a-f]+: 1$
+echo EXPECT entrec [0-9a-f]+: 0$
 entrec R53
 deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
@@ -167,9 +167,6 @@ shot c1_GK_after
 echo EXPECT map zone 2 area 3\b
 map
 ents
-deref R53 TBL+0xb8
-echo EXPECT entrec [0-9a-f]+: 1$
-entrec R53
 deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
@@ -244,6 +241,212 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 echo EXPECT map zone 2 area 3\b
+map
+ents
+echo === landing G
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F000 0
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x403
+poke32 0x0203FD54 0x7800c8
+poke32 0x0203FD08 5
+frames 280
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+shot c1_G_land
+mash 70 110
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 60 110
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+shot c1_G_landed
+echo === landing K
+load menu.ss
+p2 off
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F000 6
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x403
+poke32 0x0203FD54 0x7800c8
+poke32 0x0203FD08 5
+frames 280
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+shot c1_K_land
+mash 70 110
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 60 110
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+shot c1_K_landed
+echo === landing KG
+load menu.ss
+p2 0
+preset +4 +360
+maptest 52
+frames 200
+poke8 0x0203F000 6
+poke8 0x0203FF84 0
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x403
+poke32 0x0203FD54 0x7800c8
+poke32 0x0203FD08 5
+frames 280
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+shot c1_KG_land
+mash 70 110
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+mash 60 110
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+shot c1_KG_landed
+echo === arrival G
+load menu.ss
+p2 off
+preset +4 +360 +21 +22
+maptest 54
+frames 200
+poke8 0x0203F000 0
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x603
+poke32 0x0203FD54 0x1c801a0
+poke32 0x0203FD08 5
+frames 500
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+keys 0x20
+frames 200
+keys 0
+key 0x01 4
+frames 300
+shot c1_G_arr0
+key 1 6
+frames 140
+shot c1_G_arr1
+key 1 6
+frames 140
+shot c1_G_arr2
+key 1 6
+frames 140
+shot c1_G_arr3
+key 1 6
+frames 140
+shot c1_G_arr4
+key 1 6
+frames 140
+shot c1_G_arr5
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 1\b
+map
+ents
+echo === arrival K
+load menu.ss
+p2 off
+preset +4 +360 +21 +22
+maptest 54
+frames 200
+poke8 0x0203F000 6
+poke8 FLAGS+0x3A 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x603
+poke32 0x0203FD54 0x1c801a0
+poke32 0x0203FD08 5
+frames 500
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+keys 0x20
+frames 200
+keys 0
+key 0x01 4
+frames 300
+shot c1_K_arr0
+key 1 6
+frames 140
+shot c1_K_arr1
+key 1 6
+frames 140
+shot c1_K_arr2
+key 1 6
+frames 140
+shot c1_K_arr3
+key 1 6
+frames 140
+shot c1_K_arr4
+key 1 6
+frames 140
+shot c1_K_arr5
+deref R55 TBL+0xc0
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R55
+deref R76 TBL+0x114
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R76
+stepz 0x03001FDC 200
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 2 area 1\b
 map
 ents
 echo === visit alone
