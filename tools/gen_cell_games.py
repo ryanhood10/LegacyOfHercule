@@ -482,14 +482,42 @@ script(["SetEntityFollow 137, 76", "WalkToPosition 76, 524, 440", "WaitFrames 8"
 stockseq(A3, "m325_r11_defeat", 33, 38, "\"Leave that Android alone right now!\", the sound, \"He's back!!!!\"")
 b = body(A3, "m325_r11_defeat", 39)
 k = b.index("SpawnCharacterEntity 30, 428, 328")
-b = b[:k + 1] + ["SpawnCharacterEntity 162, 468, 328", "WalkToPosition 162, 468, 400"] + b[k + 1:]
+# Cell's return has an arrival (docs/cutscenes/batch3 3.8): dust and a tremor where he will be, he is spawned inside it; lightning as he walks out
+b = (b[:k] + ["SpawnDustCloud 0, 428, 322", "SpawnDustCloud 0, 440, 314", "SpawnDustCloud 0, 418, 332", "ScreenShake 0, 6, 30", "WaitFrames 12"] + b[k:k + 1] +
+     ["SpawnCharacterEntity 162, 468, 328", "WalkToPosition 162, 468, 400"] + b[k + 1:])
+assert b[-1] == "END" and b[-2] == "WalkToPosition 30, 428, 408"
+b = b[:-1] + ["WhiteFlash 3", "WaitFrames 9", "WhiteFlash 3"] + b[-1:]
 k = b.index("SetEntityAnimation 121, 4")
 b = b[:k] + guard72(["SetEntityFollow 72, 132", "SetEntityAnimation 72, 4"], "a") + b[k:]
 script(b, "stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest")
 emit(f"  stock @{A3['m325_r11_defeat']['entries'][40]['head'].split('@')[1].split()[0]}    ; \"Surprised to see me?\"")
 text(40, "When I exploded, two pieces of my core survived...\\x0b...and each one grew back perfect!")
 text(40, "SECOND CELL: Twice the perfection!")
-stockseq(A3, "m325_r11_defeat", 41, 50, "Vegeta, \"part of my design\", Trunks falls, Vegeta's attack")
+stockseq(A3, "m325_r11_defeat", 41, 48, "Vegeta, \"part of my design\", Yamcha takes Trunks, \"Trunks!  My son!...  He will pay!!!!\"")
+# Vegeta's charge (docs/cutscenes/batch3 3.8). The stock was one blast from him, three at him while he stood, and Gohan strolling up after
+# the shots, so "Why do you protect Vegeta?" answered nothing. Now he powers up, empties two bursts of four into both Cells, the smoke
+# clears on them untouched, one blast throws him down (his hurt pose in a glide, then lying: 137's 2 and 3, as zone 12 lays him), Cell
+# raises his hand to finish him, and Gohan is in the way first: the shot bursts at his guard (it is fired at the ground before him: a
+# blast that hit the player's body would be a real hit). Two players: Hercule's actor runs for the far edge at the first burst.
+b = body(A3, "m325_r11_defeat", 49)
+assert b[:3] == ["WalkToPosition 137, 376, 416", "SetEntityFacing 137, 3", "SetEntityFacing 30, 2"]
+burst = ["BeginCommandBatch", "NPCFireKiBlastAtEntity 137, 30, 100", "NPCFireKiBlastAtEntity 137, 162, 100", "NPCFireKiBlastAtEntity 137, 30, 100",
+         "NPCFireKiBlastAtEntity 137, 162, 100", "CommitCommandBatch"]
+script(["PlayAudio 55", "WhiteFlash 6", "ScreenShake 0, 8, 20", "SetEntityAnimation 137, 4", "StopAudio 55"] + b[:3] + ["SetEntityFacing 162, 2"] +
+       burst[:1] + guard72(["WalkToPosition 72, 592, 500"], "r") + burst[1:] +
+       ["SpawnDustCloud 30, 424, 400", "SpawnDustCloud 162, 466, 392", "ScreenShake 0, 6, 20"] + burst +
+       ["SpawnDustCloud 30, 434, 408", "SpawnDustCloud 162, 474, 400", "SpawnDustCloud 30, 448, 394", "ScreenShake 0, 6, 20", "WaitFrames 44",       # the smoke; both stand as they were
+        "BeginCommandBatch", "NPCFireKiBlastAtEntity 30, 137, 120", "CommitCommandBatch",
+        "WhiteFlash 3", "ScreenShake 0, 8, 10", "PlayDamageEffect 137", "PlaySFX 137, 35",
+        "BeginCommandBatch", "SetEntityAnimation 137, 2", "GlideToPosition 137, 340, 422, 2500", "CommitCommandBatch",
+        "SetEntityAnimationNoWait 137, 3", "SpawnDustCloud 137, 336, 426", "WaitFrames 20",
+        "SetEntityAnimationNoWait 30, 5", "WaitFrames 12",                                                                                           # his hand comes up
+        "WalkToPosition 0, 376, 418", "SetEntityFacing 0, 3",                                                                                        # Gohan, between them
+        "BeginCommandBatch", "NPCFireKiBlast 30, 398, 414, 120", "CommitCommandBatch",
+        "PlayDamageEffect 0", "PlaySFX 0, 34", "SpawnDustCloud 0, 392, 416", "ScreenShake 0, 6, 10", "SetEntityAnimationNoWait 30, 0", "SetEntityFacing 30, 2",
+        "WaitFrames 20"],
+       "stock entry 49: Vegeta's volley at both Cells does nothing; Cell's one blast throws him down; Gohan steps between them and takes the next")
+stock_at(A3, "m325_r11_defeat", 50, "\"Why do you protect Vegeta?  I'll never understand you Saiyans.\"")
 b = body(A3, "m325_r11_defeat", 51)
 k = b.index("DespawnEntity 30")
 b = b[:k + 1] + ["DespawnEntity 162", "CoopCall 22, 2, 11, 0", "JumpIfFalse A18", "DespawnEntity 11", "A18:"] + b[k + 1:]   # 18, lying since Cell spat her out

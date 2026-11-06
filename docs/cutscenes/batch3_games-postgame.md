@@ -449,6 +449,13 @@ a step that is moved or removed breaks an insertion further down, so change one 
      between them; `cine: blast single` Cell at him; the damage effect on char 0, 8 px back, `cine: kneel`.
   9. "Why do you protect Vegeta?..." now answers what was shown. The stock fade.
   10. Two players: Hercule's actor runs for the far edge at beat 6 and is off the view by beat 7.
+- **Built (`nb-cs3`, 2026-11-06), beats 1, 3, 5-10 with script steps (no helper):** dust and a tremor where Cell appears, two flashes as he
+  has walked out; Vegeta powers up (a flash, a shake, the aura's sound, his hop), walks in as stock, fires two bursts of four at both Cells with
+  dust on them and a shake after each; a 44-frame hold on the smoke, both as they were; Cell's one blast throws him back (137's hurt pose 2 in a
+  glide to (340, 422), then lying, 3: the poses zone 12 uses on him); Cell raises his hand (pose 5); Gohan walks between them and the next
+  blast bursts at his guard (fired at the ground 22 px before him, with his damage flash: a blast that reached the player's body would be a
+  real hit); "Why do you protect Vegeta?" now answers what was shown. Two players: Hercule's actor runs for the far edge at the first burst.
+  Not built: the afterimage dashes, Gohan's kneel, the knock-back on Trunks (the stock lays him down where he stands).
 - **Risks:** Vegeta's actor 137 needs a lying group for beat 7 (zone 12 lays "Vegeta's body" on the field in `ch7_cell`:
   use the same sprite and group as there). Char 0 is sprite 58: hurt frames come from 59 (a few frames of the wrong
   hair), acceptable for a flinch and a kneel; check the kneel's frame is drawable. Eight blasts with dust on a field of

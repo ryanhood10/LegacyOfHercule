@@ -1076,6 +1076,11 @@ sequence cg_fight7_end
         SetEntityFacing 137, 3
   stockseq @083eb704 33 38    ; "Leave that Android alone right now!", the sound, "He's back!!!!"
   script                                 ; stock entry 39 with the second Perfect Cell (sprite 162, a copy of record 30); Hercule's actor jumps with the rest
+        SpawnDustCloud 0, 428, 322
+        SpawnDustCloud 0, 440, 314
+        SpawnDustCloud 0, 418, 332
+        ScreenShake 0, 6, 30
+        WaitFrames 12
         SpawnCharacterEntity 30, 428, 328
         SpawnCharacterEntity 162, 468, 328
         WalkToPosition 162, 468, 400
@@ -1108,11 +1113,77 @@ sequence cg_fight7_end
         CommitCommandBatch
         SetActiveEntity 30
         WalkToPosition 30, 428, 408
+        WhiteFlash 3
+        WaitFrames 9
+        WhiteFlash 3
         END
   stock @083ead70    ; "Surprised to see me?"
   text 40 "When I exploded, two pieces of my core survived...\x0b...and each one grew back perfect!"
   text 40 "SECOND CELL: Twice the perfection!"
-  stockseq @083eb704 41 50    ; Vegeta, "part of my design", Trunks falls, Vegeta's attack
+  stockseq @083eb704 41 48    ; Vegeta, "part of my design", Yamcha takes Trunks, "Trunks!  My son!...  He will pay!!!!"
+  script                                 ; stock entry 49: Vegeta's volley at both Cells does nothing; Cell's one blast throws him down; Gohan steps between them and takes the next
+        PlayAudio 55
+        WhiteFlash 6
+        ScreenShake 0, 8, 20
+        SetEntityAnimation 137, 4
+        StopAudio 55
+        WalkToPosition 137, 376, 416
+        SetEntityFacing 137, 3
+        SetEntityFacing 30, 2
+        SetEntityFacing 162, 2
+        BeginCommandBatch
+        CoopCall 22, 2, 72, 0
+        JumpIfFalse G72r
+        WalkToPosition 72, 592, 500
+      G72r:
+        NPCFireKiBlastAtEntity 137, 30, 100
+        NPCFireKiBlastAtEntity 137, 162, 100
+        NPCFireKiBlastAtEntity 137, 30, 100
+        NPCFireKiBlastAtEntity 137, 162, 100
+        CommitCommandBatch
+        SpawnDustCloud 30, 424, 400
+        SpawnDustCloud 162, 466, 392
+        ScreenShake 0, 6, 20
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 137, 30, 100
+        NPCFireKiBlastAtEntity 137, 162, 100
+        NPCFireKiBlastAtEntity 137, 30, 100
+        NPCFireKiBlastAtEntity 137, 162, 100
+        CommitCommandBatch
+        SpawnDustCloud 30, 434, 408
+        SpawnDustCloud 162, 474, 400
+        SpawnDustCloud 30, 448, 394
+        ScreenShake 0, 6, 20
+        WaitFrames 44
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 30, 137, 120
+        CommitCommandBatch
+        WhiteFlash 3
+        ScreenShake 0, 8, 10
+        PlayDamageEffect 137
+        PlaySFX 137, 35
+        BeginCommandBatch
+        SetEntityAnimation 137, 2
+        GlideToPosition 137, 340, 422, 2500
+        CommitCommandBatch
+        SetEntityAnimationNoWait 137, 3
+        SpawnDustCloud 137, 336, 426
+        WaitFrames 20
+        SetEntityAnimationNoWait 30, 5
+        WaitFrames 12
+        WalkToPosition 0, 376, 418
+        SetEntityFacing 0, 3
+        BeginCommandBatch
+        NPCFireKiBlast 30, 398, 414, 120
+        CommitCommandBatch
+        PlayDamageEffect 0
+        PlaySFX 0, 34
+        SpawnDustCloud 0, 392, 416
+        ScreenShake 0, 6, 10
+        SetEntityAnimationNoWait 30, 0
+        SetEntityFacing 30, 2
+        WaitFrames 20
+  stock @083eb1c6    ; "Why do you protect Vegeta?  I'll never understand you Saiyans."
   script                                 ; stock entry 51: both Cells cleared, record 12 brings the pair; Hercule's actor at Gohan's side
         FadeOut 120
         PlayMusic 33
