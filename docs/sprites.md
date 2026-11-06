@@ -390,7 +390,7 @@ of the face's line along that axis; the waist sits at 70 % of the body's length 
 
 | part (16-space colours) | Android 13 |
 |---|---|
-| hair (16's orange mohawk) at or above the forehead line, at most 3.6 px deep | trucker cap: yellow crown, black outline, black band over the forehead, red dot in front views, a 2 px black peak over the face in side views; mohawk above the cap cut off |
+| hair (16's orange mohawk) at or above the forehead line | cleared; the trucker cap is drawn over the skull (below): a yellow dome as wide as the head, black band and outline, red dot in front views, a 3 px yellow peak on a black underside in side views |
 | hair below the cap | white hair (sides and back); in front views hair inside the face's span (16's fringe) becomes forehead skin, two columns of white hair stay at each side for five rows |
 | face skin | pale skin (one step lighter than 16's) |
 | other skin (hands) | brown gloves |
@@ -399,7 +399,18 @@ of the face's line along that axis; the waist sits at 70 % of the body's length 
 | armour below the waist; 17's blue trousers | blue jeans |
 | back views (facing up) | the face pixels become hair: white hair under the cap |
 
-The head gets a black outline (transparent pixels next to cap, face or hair), which 16's head lacks.
+**The cap (2026-11-06, Ryan: "improve his trucker hat"; `docs/art-audit.md`).** It was 16's mohawk cut 3.6 px deep and
+painted from the dull end of its ramp: a ragged brown tray narrower than the head, missing on tilted and lying heads.
+`dress13` now draws it: in the frame's own axes (up = body centroid to hair centroid, so a tilted or lying head gets it
+too) a dome from the forehead line up 4.6 px, as wide as the head at the brow (`hw * (1 - (d / 4.6) ^ 2.2) ^ (1 / 2.2)`),
+over transparent and hair pixels only (a fist raised in front of it stays), the band row and the rim black, the inside
+the portrait's yellows (LoG2 36 / 38 / 120: `a13_colours` `cap`), the column inside the right rim a shade darker, the
+Red Ribbon dot on the row two above the band in front and side views, and in upright side views a peak: three yellow
+pixels past the band toward the face with black under them. A "13" does not fit a 12 px head; the portrait (169) has
+it beside the same dot. In back views only skin inside the head's width becomes hair (an arm raised beside the head was
+painted white with it: the white boxes in the back-view kicks).
+
+The head gets a black outline (transparent pixels next to face or hair), which 16's head lacks.
 The record keeps 17's header and group layout (13 groups: 0-3, 5-8 and 12 filled), so Android 19's AI
 set 29 and the melee set 21 find every group they play, and group 3 (stand, stagger, fall, lie) is
 there for the both-down rule. 82 frames, all LZ-compressed (`buu2log2.compress`).
