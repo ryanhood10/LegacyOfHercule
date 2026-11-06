@@ -2631,8 +2631,10 @@ void tny_engine_frame(void) {
         g_InputSystem->pressed &= (u16)~KEY_A;
         coop.input2.pressed &= (u16)~KEY_A;
     }
-    if (eng.phase == P_PRIZE && scene_running()) trophy_hop();   // the champions hop while the trophy's line opens
-    if (eng.npose) poses_apply(!scene_running());   // the end's poses hold while the announcer speaks
+    if (eng.npose) {                                 // the end's poses hold while the announcer speaks
+        if (eng.phase == P_PRIZE && scene_running()) trophy_hop();   // the champions (posed) hop while the trophy's line opens
+        poses_apply(!scene_running());
+    }
     eng.t_busy = eng.phase != P_IDLE || scene_running() || eng.qn || eng.pending || eng.say_hold || eng.dark;
     // a step when the moment is safe: no scene, player 1 free, nothing queued
     if (eng.pending || !safe) return;
