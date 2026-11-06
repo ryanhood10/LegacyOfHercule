@@ -55,6 +55,10 @@ for p1, p2 in ((VEGETA, TRUNKS), (TRUNKS, VEGETA), (VEGETA, None), (TRUNKS, None
     s.press(3, 100)
     s.actors(s132="[01]" if TRUNKS in (p1, p2) else 0, s56="[01]" if GOHAN in (p1, p2) else 0, s103="[01]" if PICCOLO in (p1, p2) else 0, s76=0)
     s.shot(f"cb_{n}_rim")
+    s.press(2, 100)
+    s.out("frames 150")
+    s.shot(f"cb_{n}_power")       # the camera has gone east to Broly: his power-up
+    s.out("ents")
     s.end_scene()
     s.shot(f"cb_{n}_fight")
     s.actors(s159=1, s170=1)      # the bosses

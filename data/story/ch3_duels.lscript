@@ -240,15 +240,31 @@ sequence ch6_lookout
         SetCharacterTransformation 3, 134
         WarpToMapWithEntities 15, 2, 1, 280, 320
         SpawnCharacterEntity 134, 344, 320
-        SetEntityFacing 0, 3
+        SetEntityFacing 0, 2             ; Vegeta has his back to his son; Trunks looks about the white room
         SetEntityFacing 134, 2
         FadeFromWhite 60
+        SetEntityFacing 134, 1
+        WaitFrames 24
+        SetEntityFacing 134, 0
+        WaitFrames 24
+        SetEntityFacing 134, 2
         PlayAudio 50
   text 99 "TRUNKS: Well, father, let's get settled in.  We have a whole year in here."
+  script                                 ; Vegeta's answer is his power (shown, then spoken): a flare, and he turns
+        CoopCall 37, 1, 0, 134
+        CoopCall 37, 7, 40, 1
+        SetEntityFacing 0, 3
   text 106 "VEGETA: Settled in?  Don't be ridiculous.\x0bWe spar.  Right now, boy!"
   text 99 "TRUNKS: Right now?  ...Fine.  Don't expect me to go easy on you."
-  script
+  script                                 ; Trunks powers up too; a held look. Two players: his actor makes way for player 2 and the duel is
+        CoopCall 37, 1, 134, 0           ; theirs. One player: the actor stays and the spar is played (ch6_chamber_end's entry 1): Vegeta
+        CoopCall 37, 7, 40, 1            ; no longer tells an empty room to get up
+        SetEntityFacing 134, 2
+        WaitFrames 30
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
         DespawnEntity 134
+      L1:
         PlayMusic 35
         CoopCall 1, 3, 12, seq:ch6_chamber_end
         SetPlayerVisible 1
@@ -256,7 +272,7 @@ end
 
 ; the winner's pad plays Piccolo next, the loser's Hercule (the pads swapped if Trunks won)
 sequence ch6_chamber_end
-  script                                 ; [0] two players dueled: on to 2; alone: the flash at 1
+  script                                 ; [0] two players dueled: on to 2; alone: the spar at 1
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
         PushByte 2
@@ -264,15 +280,19 @@ sequence ch6_chamber_end
       L1:
         PushByte 1
         END
-  script                                 ; [1] alone (no duel): the fight happens in a flash
-        WhiteFlash 20
-        PlayAudio 20
-        ScreenShake 0, 20, 50
-        WaitFrames 30
-        WhiteFlash 20
-        PlayAudio 21
-        WaitFrames 50
-  script                                 ; [2] next entry: 3 if Vegeta won, 4 if Trunks did
+  script                                 ; [1] alone (no duel): the spar between Vegeta and Trunks' actor (it was two flashes over Vegeta alone):
+        SetPlayerVisible 0               ; an exchange too fast to follow, they break; Trunks is behind him in a blink, Vegeta catches it,
+        CoopCall 37, 1, 0, 134           ; Trunks answers, and one blow from his father throws him across the floor
+        CoopCall 37, 6, 110, 0
+        CoopCall 37, 1, 134, 0
+        CoopCall 37, 4, 5, 0
+        CoopCall 37, 1, 0, 134
+        CoopCall 37, 5, 0, 0
+        CoopCall 37, 1, 134, 0
+        CoopCall 37, 5, 0, 0
+        CoopCall 37, 1, 0, 134
+        CoopCall 37, 5, 1, 64
+  script                                 ; [2] next entry: 3 if Vegeta won, 5 if Trunks did
         WaitFrames 40
         PlayAudio 50
         CoopCall 3, 0, 0, 0
@@ -282,15 +302,35 @@ sequence ch6_chamber_end
         PushByte 3
         END
       L1:
-        PushByte 4
+        PushByte 5
         END
-  text 106 "VEGETA: Hmph.  That is how a prince fights.\x0bNow get up.  We have a year of training ahead of us." -> 5
-  text 99 "TRUNKS: I won, father...\x0bNow let's train.  Cell won't wait for us." -> 5
-  script
+  script                                 ; [3] Vegeta won: Trunks is down (his player's body on a knee; alone his actor lies where it fell)
+        CoopCall 37, 1, -13, -12
+        CoopCall 37, 10, 0, 1
+        CoopCall 37, 11, -12, -13
+  text 106 "VEGETA: Hmph.  That is how a prince fights.\x0bNow get up.  We have a year of training ahead of us." -> 7
+  script                                 ; [5] Trunks won: Vegeta on a knee
+        CoopCall 37, 1, -12, -13
+        CoopCall 37, 10, 0, 1
+        CoopCall 37, 11, -13, -12
+  text 99 "TRUNKS: I won, father...\x0bNow let's train.  Cell won't wait for us." -> 7
+  script                                 ; [7] the loser gets up; Trunks' actor (alone) rises and goes
+        CoopCall 37, 1, -13, -3
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 1, -12, -3
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 1, 134, -3
+        CoopCall 37, 10, 0, 0
+        WaitFrames 20
+        CoopCall 37, 0, 0, 0
         CoopCall 2, 0, 0, 0
         SetCharacterTransformation 2, 137
         SetCharacterTransformation 3, 128
         FadeOut 120
+        CoopCall 22, 2, 134, 0
+        JumpIfFalse D1
+        DespawnEntity 134
+      D1:
         WaitFrames 60
         ClearCharacterFlag_Bit1 0
         ClearCharacterFlag_Bit1 2

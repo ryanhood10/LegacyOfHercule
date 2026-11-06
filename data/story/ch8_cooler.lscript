@@ -7,9 +7,18 @@
 ; Speakers: 0 narration (the Namekian has no portrait), 1 the active character, 44 Cooler.
 
 sequence ch8_cooler
-  script                                 ; stock entry 0: Goku -> 4, Trunks -> 7, else 1
-        PanCameraToPosition 100, 176, 2
-        WaitFrames 60
+  script                                 ; stock entry 0: Goku -> 4, Trunks -> 7, else 1. The players walk up into the view (they were left
+        SetPlayerVisible 0               ; below it for the whole opening) and face him 34 px off; Cooler has his back to them and turns
+        SetEntityFacing 34, 1
+        WalkToPosition 0, 200, 298
+        SetEntityFacing 0, 1
+        CoopCall 9, 1, 226, 302
+        PanCameraToPosition 100, 214, 2
+        WaitFrames 20
+        SetEntityFacing 34, 3
+        WaitFrames 12
+        SetEntityFacing 34, 0
+        WaitFrames 20
         PushActiveCharIndex
         PushByte 4
         CmpEq
@@ -49,5 +58,137 @@ sequence ch8_cooler
   text 1 "A Namekian...  serving Frieza's family?!"
   script                                 ; [15] his actor makes way for the twin
         DespawnEntity 166
-  stock @083d2a98                        ; [16] the fight (Cooler, and his servant in co-op)
+  script                                 ; [16] stock 083d2a98, the fight (Cooler, and his servant in co-op); the HUD back
+        DespawnCharacterAndRecordPosition 34, 1
+        SetPlayerVisible 1
+        DrawBossHealthBar 34
+        SetActiveEntity 0
+end
+
+; Cooler's end (record 1's defeat script, stock 083fb3c8): the camera goes to him first, so his death is seen wherever the fight
+; left the players (it played off screen); the stock script's own pan to the door and SetActiveEntity 0 hand the camera back
+script ch8_cooler_death
+    PushEntityPosition 34
+    PushVarint 65536
+    Div
+    PushByte 120
+    Sub
+    PushEntityPosition 34
+    PushEntityPosition 34
+    PushVarint 65536
+    Div
+    PushVarint 65536
+    Mul
+    Sub
+    PushByte 96
+    Sub
+    PushByte 6
+    Step PanCameraToPosition
+    WhiteFlash 5
+    BeginCommandBatch
+    ScreenShake 0, 20, 30
+    PlaySFX 34, 31
+    PlayDamageEffect 34
+    PushMulti 34, 10, 10
+    Negate
+    EntitySetVelocity
+    PlaySFX 34, 20
+    PushMulti 34, 8
+    Negate
+    EntitySetVelocity 10
+    PlaySFX 34, 21
+    PushMulti 34, 4
+    Negate
+    EntitySetVelocity 16
+    CommitCommandBatch
+    WaitFrames 20
+    BeginCommandBatch
+    ScreenShake 0, 20, 30
+    PlaySFX 34, 31
+    PlayDamageEffect 34
+    SetEntityAnimation 34, 2
+    PushMulti 34, 16, 16
+    Negate
+    EntitySetVelocity
+    PlaySFX 34, 21
+    PushMulti 34, 20, 8
+    Negate
+    EntitySetVelocity
+    PlaySFX 34, 20
+    PushMulti 34, 12
+    Negate
+    PushByte 4
+    Negate
+    EntitySetVelocity
+    CommitCommandBatch
+    WaitFrames 20
+    BeginCommandBatch
+    ScreenShake 0, 20, 40
+    PlaySFX 34, 31
+    PlayDamageEffect 34
+    SetEntityAnimation 34, 2
+    PushMulti 34, 10
+    Negate
+    PushByte 16
+    Negate
+    EntitySetVelocity
+    PlaySFX 34, 20
+    EntitySetVelocity 34, 10, 16
+    PlaySFX 34, 21
+    PushMulti 34, 16
+    Negate
+    EntitySetVelocity 8
+    CommitCommandBatch
+    WaitFrames 20
+    BeginCommandBatch
+    ScreenShake 0, 20, 20
+    PlayDamageEffect 34
+    SetEntityAnimation 34, 2
+    PlaySFX 34, 31
+    PushMulti 34, 12
+    Negate
+    EntitySetVelocity 24
+    PlaySFX 34, 20
+    PushMulti 34, 0, 24
+    Negate
+    EntitySetVelocity
+    CommitCommandBatch
+    WaitFrames 20
+    BeginCommandBatch
+    ScreenShake 0, 20, 80
+    PlayDamageEffect 34
+    SetEntityAnimation 34, 2
+    PlaySFX 34, 21
+    EntitySetVelocity 34, 0, 0
+    EntitySetVelocity 34, 16, 16
+    PushMulti 34, 16
+    Negate
+    PushByte 16
+    Negate
+    EntitySetVelocity
+    PushMulti 34, 16, 16
+    Negate
+    EntitySetVelocity
+    PushMulti 34, 16
+    Negate
+    EntitySetVelocity 16
+    CommitCommandBatch
+    SpawnMapEntity 0
+    DespawnEntity 34
+    WaitFrames 80
+    FindPlayerEntity
+    AddEXP 600000
+    PlayMusic 11
+    WaitFrames 80
+    SetStoryFlag 301
+    SetCollisionRect 200, 128, 240, 152
+    SetCollisionRect 184, 488, 256, 512
+    PanCameraToPosition 100, 48, 3
+    WaitFrames 60
+    PlayAudio 47
+    FindEntityByType 0
+    PlayAudio 12
+    WaitFrames 60
+    SetActiveEntity 0
+    END
 end

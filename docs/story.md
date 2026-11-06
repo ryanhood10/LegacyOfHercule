@@ -261,6 +261,8 @@ the plea; the kiss stays Krillin's.
   for befriending and treating Piccolo well: +3 levels and a full HP / EP refill (Ryan's note said
   "level + EXP"; the amount is ours), then the fusion plays as written. Piccolo and the boosted
   Hercule go to Gingertown together.
+  **Staged 2026-11-06 (`docs/cutscenes/batch2_ch5-9.md` 5.5 / 5.6):** the whole fusion plays on the Lookout (Kami glides into
+  Piccolo, the burst throws Hercule on his back, Mr. Popo watches from the stair head); no line changed.
 
 ## 4e. Gingertown to the island (Ryan, 2026-10-18)
 
@@ -312,6 +314,10 @@ the plea; the kiss stays Krillin's.
   first to the spot his twin takes. Vegeta's body lies right of Cell from the kick until he gets up. **Krillin now flies in in one-player
   games too** and stays beside Vegeta through the fight, so his rush and one-hit KO are the same story alone. Draft line, alone only, Claude's:
   KRILLIN: "...Yeah. You're right. I'll get Vegeta out of the line of fire. Give him one for me!"
+- **Cutscene pass (2026-11-06, `docs/cutscenes/batch2_ch5-9.md` 7.2, 7.4, 7.6):** Vegeta's power-up pushes Cell back; the absorption,
+  Perfect Cell's silent reveal, the kick that does not move him and the blow that throws Vegeta are staged; **the Final Flash was
+  added between the kick and Cell's lesson (Claude's, for Ryan's review, one commit: Cell stands through it, the story is
+  unchanged)**; Trunks is on a knee under Cell for "How gracious of you!".
 - **After Perfect Cell:** the default pair is Trunks + Krillin; Vegeta stays selectable (his
   barriers are needed to progress), Piccolo and Hercule too; the pad lets players change.
 

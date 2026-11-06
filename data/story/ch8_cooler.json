@@ -5,7 +5,8 @@
     {
       "map": {"zone": 6, "area": 61},
       "_": "Cooler's fight: the three stock openings meet at the co-op check",
-      "triggers": {"0": {"payload": "seq:ch8_cooler"}}
+      "triggers": {"0": {"payload": "seq:ch8_cooler"}},
+      "records": {"1": {"action": "script:ch8_cooler_death"}}
     }
   ]
 }

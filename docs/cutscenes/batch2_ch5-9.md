@@ -104,6 +104,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 | B.5 | **Broly's end, the planet** | `broly_end` 0-7 | **showcase** (with B.3) | M |
 | B.6 | the debrief | `broly_home_out`, map 165 | touch up | S |
 
+### Development status (2026-11-06, branch `nb-cs2`; each built scene has a "Built" note under its heading)
+
+| state | scenes |
+|---|---|
+| built | 5.5, 5.6, 5.8 (+ the escape as light, for review), 6.4 (smaller than the shot list), 6.5, 6.7, 6.8 (c), 7.4 (+ the Final Flash, for review), W.3 (but Cooler's charge), B.3 (+ Vegeta's knee, for review), B.4, B.5 |
+| built in part | 7.2 (the power-up; not the first blow), 7.6 (the knee, Cell's turns and exit; not the two misses) |
+| not built | 5.1, 5.7, 6.1, 6.6, 6.8 (a) and (b), 7.1, 7.3, 7.5, W.2, W.4, W.5, 9.1, 9.2, 9.4, 9.5, B.1, B.6 |
+
 ## 2. Chapter 5: the Lookout, the fusion, Gingertown
 
 ### 5.1 The Lookout, first visit: Kami defers (touch up, S)
@@ -147,6 +155,9 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 5.5 Kami draws out Hercule's potential (touch up, S; build with 5.6)
 
+- **Built 2026-11-06 (`nb-cs2`, with 5.6).** Piccolo turns to watch Hercule come; a hum, a rising tremble, a white pulse and dust at
+  his feet before the stock flash; a punch each way after the caption. No hop (the actor has no jump pose worth it).
+
 - **Where:** `ch5_fusion` entries 36-46 (ours). **Today:** Hercule's actor (72) walks in from the right rim to
   Kami, four lines, `WhiteFlash 20` and the level sound, the caption "@^Hercule has achieved Level %d!", he throws a
   punch (animation 6), his line, Piccolo's "Hmph.  Don't let it go to your head.", he walks aside.
@@ -162,6 +173,22 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Risks:** none beyond 72's groups (full set). **Size S.**
 
 ### 5.6 The fusion (showcase, M)
+
+- **Built 2026-11-06 (`nb-cs2`), script steps only (the cine helpers were not merged yet: CHARGE, FALL / RISE and DASH are
+  hand-rolled here).** The whole scene stays on the Lookout: the blank map 1/6 is not used (the stock `DespawnEntity 0` /
+  `UploadSpritePalette` there only hid the player on the white map; the level and the form are plain party writes). Mr. Popo steps
+  toward Kami for "No, Kami!", goes to the stair head and turns back; Hercule gives them room; Piccolo steps up; a held look; the
+  rumble, a rising shake, two white pulses, pale green light while Kami glides down into him (`GlideToPosition 73, 192, 118, 50`:
+  the last argument is a speed in 1/100 px a frame, measured: 300 crossed 22 px in under 10 frames), the flash that takes Kami, a white;
+  out of it Piccolo stands on Kami's spot in the start pose, a ring of dust, the Lookout shakes, Hercule is thrown on his back, Popo
+  steps away; quiet; the stock caption under him; the three lines in the bottom box (they were `@`); he turns to the rim, walks, flies
+  off; Hercule runs to the rim, looks after him and back at Popo; the stock white and the world map. The camera is held with
+  `PanCameraToPosition 72, 46` (the view follows player 1 otherwise) and handed back with `SetActiveEntity 0` under the last white.
+- **Facts found:** the Lookout top's floor is the blue disc only: about x 92-247, y 82-176 (centre (170, 128)); the stock mark
+  (240, 152) and a walk to (268, 116) both stand on air (no wall stops an actor there). `ScreenShake`, `FlashScreenColor`,
+  `SpawnDustCloud`, `EntityWaitFrames` and `GlideToPosition` are entity commands: in a batch each body's queue runs beside the
+  others', so a shake on one queue, waits and flashes on a second and a glide on a third make one timed beat; `WhiteFlash` and the
+  fades are modal and cannot be batched. `SetEntityAnimation 0, 4` (the start pose) takes about 64 frames.
 
 - **Where:** `ch5_fusion` entries 47-59 (stock 36-48 with our ending), reached from map 283's trigger; it plays on
   the Lookout's top (zone 9 area 4: Kami's record at (192, 96), Mr. Popo's at (144, 96)) and then on the blank
@@ -243,6 +270,24 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   of a sprite); the twin stands by `TWIN_OFFSET`, so the first Cell must end on his record's spot. **Size M.**
 
 ### 5.8 Cell's Kamehameha, the arm, Cell's story, the escape (showcase, L)
+
+- **Built 2026-11-06 (`nb-cs2`, cine helpers); 5.7 (the meeting, the town blown away) is not built.** Player 2 has a mark (324, 250)
+  and looks at Cell. Cell is in a charge with blue light before "Kaaaaaaaaa..." (`CoopCall 37, 7, 40, 0`). The beam is cine's
+  (`CoopCall 37, 8, 2, 60`: the stock batch of twelve contact-waits is gone): it holds on Piccolo with bursts and shakes and
+  pushes him back a few pixels (not the 40 px of the shot list: the op moves him a pixel at a time and stops at the hits);
+  player 2 throws himself down first and gets up when the talk starts. The arm (stock pose 22), a jolt, and Cell walks over to
+  stand beside him (his marks are relative to player 1: `PushEntityPosition 0`). **The story is paced:** Cell walks off as the
+  questions start, stops and turns to the camera for "Very well, my name is Cell.", is back at Piccolo's side after "You're
+  wrong!", walks away and looks at the sky for "I suppose I can answer this last one.", comes back for the last of it. The
+  regrowth (stock 26) lands on a white jolt with the ki sound and Cell slides back; Piccolo powers up (30 frames) and is face to
+  face with him in a blink for "Maybe I'll take yours."; a held look; Krillin and Trunks fly in and everyone turns to them. Vegeta
+  lands at (200, 214), left of where Piccolo now stands (the stock spot was on top of him). Every line kept; the sequence has
+  five more script entries (entry 0's targets 1 / 3 are before them).
+- **Cell's escape as a blinding light (its own commit, for Ryan's review; decided for him while away):** the burst sound, a fast
+  white, everyone in the start pose, Cell gone under it, his flight heard trailing off as it clears. No word added. The stock
+  flew him out between Trunks and Krillin.
+- Tested in `staging_ch5` ("gingertown": alone, with Hercule, as Hercule with Piccolo): Cell stands for the beam, nobody of the
+  scene is left after it, Trunks is player 1 and Krillin player 2's.
 
 - **Where:** `ch5_gingertown_end`, map 287 record 0's defeat sequence (entries 3-61 are stock `083e24a0`). Film
   `gin_PH` (sheets 1-2).
@@ -328,6 +373,18 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.4 The Time Chamber duel, Vegeta and Trunks (rework, M)
 
+- **Built 2026-11-06 (`nb-cs2`, cine helpers), smaller than the shot list.** In `data/story/ch3_duels.lscript` only the chamber part
+  changed: the tail of `ch6_lookout` (from the fade into the chamber) and `ch6_chamber_end` up to its fade out. Vegeta stands with
+  his back to his son; Trunks looks about the white room; his line; **Vegeta's answer is a power-up** (a 40-frame charge) and then
+  he turns: "Settled in?  Don't be ridiculous. ..."; Trunks' line, his own power-up, a held look. **Two players:** the actor makes
+  way and the duel starts as before. **One player (the repair):** the actor stays and the spar is played: an exchange of about
+  two seconds (`CoopCall 37, 6, 110, 0`), they break, Trunks is behind his father in a blink, Vegeta catches it, Trunks answers,
+  and one heavy blow throws Trunks 64 px; he lies there for "Now get up." and gets up after it. After a real duel the loser's
+  body (the player who plays that character, `-12` / `-13`) is on a knee for the winner's line and rises after it.
+- **Not built:** the base-form walk-in and the change into Super Saiyans inside the scene (the duel's rules want both
+  transformations set before `CoopCall 1`: left as the stock order), the opening clash before control with two players, marks
+  behind a fade at the duel's end (the two stand where the last blow left them, often on top of each other).
+
 - **Where:** `ch6_lookout` entries 18-22 and `ch6_chamber_end` (`data/story/ch3_duels.lscript`), zone 15 area 2.
   Films `tc_T2` (two players, the duel ended by a real blow), `tc_T` (alone).
 - **Today:** fade in: both already Super Saiyans, standing 64 px apart on the white floor. Three lines. Two
@@ -366,6 +423,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.5 Kame House: the androids land, Piccolo's deal (touch up, S)
 
+- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (player 2's own move waits for the cine helpers' player-2 bodies).** The HUD is hidden
+  from the first line. 16 walks up to (592, 448), the ground shakes and dust rises at his feet before "Not here...?"; 17 turns to him
+  and steps away for "Whoa, take it easy, 16."; Piccolo steps toward 16 with the offer; after the island's pan 16 looks at the
+  island, then at Piccolo, "Agreed."; **16 flies off first**, then 17's line, Piccolo's aside, and 17 and 18 leave together.
+- **Fixed (the research's finding):** the flight pad's stock script (trigger 4) stood Krillin's actor beside Tien whoever played
+  him; it is `a16_kame_flight` now and leaves the actor out when Krillin is played (`CoopCall 22, 4, 6`). Tested in `staging_ch6`
+  ("kame": Tien alone with a played Krillin, both otherwise).
+
 - **Where:** `a16_kame_house`, map 293 (zone 11 area 1) trigger 3. Films `kh_PH`, `kh_K`.
 - **Today:** 17's "Hi!  Can Goku come out and play?" from off screen; the three fly in below the house; 16 scans
   (three turns, stock); the lines; Piccolo walks down; the camera pans to the far beach and back for "You and
@@ -401,6 +466,16 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 6.7 "This island is breaking apart!" (rework, S)
 
+- **Built 2026-11-06 (`nb-cs2`).** Behind a 20-frame fade 16 (the boss, sprite 160) stands at (264, 164), player 1 at (304, 168), player 2
+  at (328, 172) (`CoopCall 9`), the camera at (152, 100) with 17 and 18 on their cliff in the same view; dust bursts across the grass
+  during the two rumbles, 18 looks down at them, 16 looks up at her and back, 17 steps to the cliff's edge, Piccolo steps up for his
+  line. The HUD is hidden as before. Tested in `staging_ch6` ("island break", three lineups).
+- **Research corrected:** "nothing breaking" was half wrong. `PlayAudioBlocking a, b` is not a sound of b frames: decompiled
+  (`0x0800A5BE`) it starts sound 43 (the rumble) and runs a modal camera shake of **b frames at strength a**; the stock scene
+  already shook for 180, 120 and 90 frames, over a tree. The scene keeps those lengths (as `PlayAudio 43` + a batched
+  `ScreenShake` so the dust and turns run beside it): no new wait. A `SetEntityPositionInstant` on the live boss at 75 % holds.
+  A bottom box of three lines covers the view's lowest 72 px: marks' feet stay at camera y + 84 or higher.
+
 - **Where:** `a16_island_break`, map 296 record 1's defeat (16 at 75 %). Film `isl_PH` (sheet 1).
 - **Today:** the camera stays on player 1 wherever the fight left him (in the film: half behind a tree at the
   shore); 18's, 17's and Piccolo's lines play **with no speaker in view and nothing breaking**; two seconds of
@@ -416,6 +491,21 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   **Size S.**
 
 ### 6.8 Cell arrives, 17 is absorbed, Tien's stand, Goku's rescue (showcase, L)
+
+- **(c) built 2026-11-06 (`nb-cs2`); (a) and (b) are not built** (the stock arrival, Piccolo's fall, 16's punches and 17's absorption
+  play as before). Tien flies up to (396, 148) over Cell and the Tri-Beam is light from above: his ki pose (5), the boom, a white
+  jolt (`CoopCall 37, 15`), the hit blink on Cell, four dust clouds in a square round him, and Cell falls flat (`CoopCall 37, 10`
+  pose 2); three, 24, 18 and 12 frames apart. Cell gets up for "What do you think you're doing?"; after the Lookout cutaway and "You
+  fool." he takes a step and two more flatten him; 18 and 16 fly off while four more land 14 frames apart; then the gaps grow and
+  Tien sinks 8 px lower with each; "Can't... do... this... much... longer..."; a last flash and he drops out of the air (glide, fall,
+  the stock lying pose). Cell rises and walks to the body. Goku appears between them (the stock blink), and the pick-ups are
+  Instant Transmission: a dash to Tien (a flash, Tien gone), a dash to Piccolo's side (a flash, the player gone, as stock, last);
+  on "Be seeing you!" Cell fires and the blast crosses the place Goku stood. Every stock line kept; entry count unchanged (the
+  stock indexes hold).
+- **What the cutaway does:** `SetMapRestoreFlag` / `LoadMapWithEntities` / `RestoreMap` brought everyone back as they were (Tien up
+  at his mark, Cell standing, Piccolo lying). Cell does not fire back at Tien any more (the stock's three blasts): he is pinned
+  until Tien is spent, as in the anime; the outcome is the same. Filmed alone, with Hercule and with Krillin; `staging_ch6`
+  "island half" (two lineups; about four minutes each).
 
 - **Where:** `a16_island_half` (map 298, 11/6, record 0's defeat): entries 0-7 ours, then the stock sequence
   `083e6078` from its entry 1 (90 stock entries; 97 in the merged sequence), with a cutaway to the Lookout (9/4) and the end on 9/1. Film
@@ -513,6 +603,14 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 7.2 Vegeta and Semi-Perfect Cell (rework, M)
 
+- **Built in part 2026-11-06 (`nb-cs2`).** Built: after "What is this?" a 100-frame charge on Vegeta (`CoopCall 37, 7, 100, 2`: rings,
+  flickers, a growing shake, the burst), the stock change at its peak (skipped when he arrived as a Super Saiyan: the charge
+  plays either way), a jolt, and Cell is **pushed** back to the stock mark (216, 272) in his hit-stun instead of walking there.
+- **Not built: the first blow (beat 4).** Built and taken out: after the charge and the change, a dash of player 1 (`CoopCall 37, 4`)
+  made the camera leave its panned spot (one frame far below, then about two seconds of drifting back to centre on him); the
+  same dash in 7.4 (no charge or change before it) holds the view. Told to the coordinator; not diagnosed. Beat 1's folded
+  arms: no such pose.
+
 - **Where:** `ch7_semi_perfect`, map 302 (zone 12 area 4) trigger 0. Films `z12_VT`, `z12_V`.
 - **Today:** Vegeta (and Trunks beside him) below Cell; nine lines; "Tell me...  Are you ready now to witness a
   power that has not been seen for thousands of years?" is answered by the stock change (animation 35) and Cell
@@ -554,6 +652,30 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   **Size S.**
 
 ### 7.4 Cell absorbs 18; Perfect Cell; the kick; Vegeta falls (showcase, L)
+
+- **Built 2026-11-06 (`nb-cs2`, with the cine helpers, `CoopCall 37`).** *Area 5:* Cell waits below as Vegeta lands at (204, 272) and
+  walks up into the clearing; 16 steps in front of 18, she steps back to the cliff; Cell is at 16's side in a blink (dash) and one
+  heavy strike throws him against the right-hand tree (the stock red flash on the blow), where he stays down; 18 turns to run, two
+  steps, and Cell is in front of her; she backs onto the stock mark and the tail takes her as before (the stock poses 27 / 29 / 25),
+  under a slow rising shake, Vegeta one step forward. Then the change: the stock morph (animation 9, started with
+  `SetEntityAnimationNoWait` so the timeline is ours) under purple and white pulses and three rings of dust, Vegeta pushed back
+  16 px (`GlideToPosition 0`: a glide moves a player without turning him); **a full white, the music and the rumble cut**; out of it
+  Perfect Cell with his back to us for a second and a half of silence, a look over the shoulder, he turns, a held look; the music
+  again and the stock flights. *Area 6:* Cell stands with his back to Vegeta, who lands lower right (300, 284); the first line in
+  the bottom box (it was `@`, on both bodies); Vegeta is beside him in a blink, the kick (the stock animation 8, the hit blink on
+  Cell, a jolt) and **Cell does not move**; a hold; Cell turns his head; Vegeta slides back into the start pose for "That kick!";
+  Cell walks two steps for "Now, do you understand..."; then the blow: a dash and a heavy strike that throws Vegeta to (296, 262),
+  where the stock lays his body after the fade.
+- **The Final Flash (its own commit, for Ryan's review; decided for him while away):** after "That kick!" Vegeta springs back
+  to (330, 266), a 70-frame charge (rings, flickers), a yellow flash, the beam held 60 frames on Cell, who blocks with an arm
+  out (`CoopCall 37, 8, 18, 60`; the beam is the game's blue Kamehameha: cine has no beam colour); a white; when it clears Cell
+  stands where he stood among dust, and Vegeta drops to a knee, spent (ours, with the beat: say if he should stay on his feet).
+  Then Cell's two steps, his line, the blow. No line added; the outcome is unchanged. About 5 s.
+- **One lineup** (filmed as Vegeta alone, Vegeta + Trunks, Trunks + Vegeta: the same scene). The sequence grew by one entry
+  (indexes 26-37 are 27-38). About 1.5 s longer than the stock in area 5 (the silence), none before control.
+- **Facts found:** `SetEntityAnimation 29, 9` is the whole morph into Perfect Cell and holds his new body for about a second after
+  it; `StopMusic` takes no argument and `PlayMusic n` starts the tune again; the clearing of area 5 is about x 130-210, y 170-250
+  between the trees; with `EntityWaitTouchPlayer` gone nothing in the scene waits on a contact.
 
 - **Where:** `ch7_semi_perfect_end` entries 21-26 (stock 20-22): entry 21 is one script that flies Cell and Vegeta
   out of area 4, warps with entities to area 5 (map 303: 16's actor at (176, 184), 18's at (152, 200)), plays
@@ -630,6 +752,17 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### 7.6 Krillin's one hit, "pump up your muscles", the tournament (rework, M)
 
+- **Built in part 2026-11-06 (`nb-cs2`).** Built: after "...You can finish me if you want.  I've failed." Trunks drops to a knee
+  (`CoopCall 37, 10, 0, 1`; the ascended body's kneeling frames are his base-form art, so it reads as the power let go) and Cell
+  walks over to stand above him for "How gracious of you!"; Trunks gets up for "For your information, he's training to defeat
+  you!"; Cell turns away (left, then his back) before "No contest?  No contest!  Ahhh!!!  A tournament!" and back to him for
+  the rules; after "Bring me Goku!" he is gone upward in a blink (a dash without afterimage), then the stock flight out.
+- **Not built: the two misses (beat 2) and STRIKE-H for Krillin's throw (beat 1).** The misses were built and taken out: with Cell
+  standing just below Trunks (a dash to 22 px under him) a second picture of Vegeta's lying body was drawn over Trunks' head for
+  as long as Cell stood there (filmed; with and without the dash's afterimage, with and without a punch on Trunks). Cause not
+  found (OBJ tiles of the lying actor 137?); told to the coordinator. A raw `SetEntityAnimation 0, 6` on the ascended Trunks
+  was not the cause.
+
 - **Where:** `ch7_perfect_end`, map 304 record 1's defeat. Films `z12b_VT`, `z12b_V`.
 - **Today:** marks behind a fade; "KRILLIN: He's wide open!  Now's my chance!  Hyaaaah!", his rush, Cell's arm, a
   flash and a shake, Krillin thrown past Trunks and down (staged 2026-11-05: it reads). Then Cell's lesson on speed
@@ -683,6 +816,18 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 - **Risks:** Cooler's sprite 34: 0 1 2 5-8 12. **Size S.**
 
 ### W.3 Cooler's fight: the opening and his end (rework, S)
+
+- **Built 2026-11-06 (`nb-cs2`), but for beat 3 (Cooler's CHARGE waits for the cine helpers).** The HUD is hidden for the opening
+  (`SetPlayerVisible 0`, back at the fight's entry). Player 1 walks up to (200, 298), 34 px under Cooler, player 2 is placed beside him
+  (`CoopCall 9`), the camera at (100, 214): Cooler above a bottom box and the players just clear of it; a top box (the player's
+  lines) covers Cooler and leaves the players. Cooler starts with his back turned and turns round as they arrive. The three
+  openings and the servant's walk are unchanged. **His end:** record 1's defeat is now `ch8_cooler_death`, the stock script
+  with a pan to wherever he fell first (`PushEntityPosition 34`), so the jolts and explosions are seen; the stock pan to the door and
+  `SetActiveEntity 0` hand the camera back.
+- **Not done (found, left):** with two players the body of whichever of the two fell first stays lying on the map after the
+  explosion, as before this change (the both-down rule's downed body is never removed here; the same in the build before this
+  branch). Beat 5's "the servant's body goes in the last flash" needs `enemies.c`, not the script: the fallen one may be Cooler
+  himself with the servant dying in his place.
 
 - **Where:** `ch8_cooler`, map 172 (zone 6 area 61) trigger 0; the defeat is the stock script of record 1. Films
   `co2_PH`, `co2_G`.
@@ -813,6 +958,21 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### B.3 The rim: the betrayal, Broly (showcase, M)
 
+- **Built 2026-11-06 (`nb-cs2`, cine helpers).** The basin is empty while Paragus speaks (Broly waits out of view at (520, 404)).
+  On "Broly!" Paragus turns east, the ground shudders twice, dust at the players' feet, everyone looks east and the camera pans
+  56 px to him: his back to them, a 90-frame charge (`CoopCall 37, 7, 90, 2`: the ki pose, white flickers, rings, the burst) with
+  pale green light, the lead pushed back 8 px; silence; he turns his head, then round; "BROLY: ...Ka...  ka...  rot..." in a bottom
+  box (speaker 0 without `@^`), nothing over him. The lines of who is played as before. Before "BROLY: KAKAROOOOT!!" (bottom box) a
+  white flash and the ground heaves; then he is in front of them in a blink (dash to (400, 414), the spot the fight opens from)
+  and his fist goes into the ground at their feet (a heavy strike at a point: ring, flash, boom) with dust and the lead thrown
+  back a step; Paragus walks to his twin's spot through it. The sequence grew by one entry (the fight is entry 18).
+- **Vegeta's knee (its own commit, for Ryan's review; decided for him while away):** after his step back he drops to one knee
+  for "The Legendary Super Saiyan...  It can't be..." (`CoopCall 37, 10, 0, 1` on `-12`, the player who plays him, and on his actor
+  137: the cast nobody fills plays nothing) and gets up on his own before the roar (after Trunks' shout when Trunks is played).
+- **Marks:** player 1 (326, 414), player 2 (284, 400), Paragus (384, 380), Vegeta's actor when nobody plays him (352, 400).
+  Filmed: Vegeta + Trunks, Gohan alone (Vegeta's actor), Piccolo + Vegeta. `staging_broly` (nine lineups) unchanged but for a
+  shot of the power-up.
+
 - **Where:** `broly_rim`, zone 15 area 3 (through `data/maps/broly_arena.json`), once (flag 403; the retry goes
   straight to the fight). Films `rim_VT`, `rim_G`.
 - **Today:** the players walk to their marks; **Broly strolls in** from the top right to his spot while Paragus
@@ -855,6 +1015,11 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
 
 ### B.4 Broly's rage (showcase with B.3, S)
 
+- **Built 2026-11-06 (`nb-cs2`).** The camera goes to Broly (`CoopCall 37, 14, 159, 8`: the fight may have left him off screen: the
+  old captions then played over nothing), he looks at his father's body and the players look at him (op 11), "Pa...  ra...  gus...?" in
+  a bottom box, a held look, a 70-frame charge with green light, "RRRAAAAAAAAAGH!!", a jolt, the camera back, the caption. About
+  3.5 s of moves. The fight goes on after it (the staging test wins it afterwards).
+
 - **Where:** `broly_rage` (queued by `enemies.c` when Paragus falls first). Film `rim_VT` (test command 9).
 - **Today:** a flash and a shake; two captions over him; a flash and a shake; "@^Broly's power explodes!  He is
   stronger and faster than ever!" tells what happened.
@@ -869,6 +1034,16 @@ build/ref/log2-coop.gba` (it reads the built ROM, so a dump shows our edits and 
   seconds, address only sprite 159 and the players, nothing on fight frames (`perf_budget`). **Size S.**
 
 ### B.5 Broly's end, the planet (showcase with B.3, M)
+
+- **Built 2026-11-06 (`nb-cs2`).** Marks behind a 20-frame fade (Broly (400, 404), the players as at the rim, Paragus' body beside
+  his son, the camera on them); "KAKAROOOOOOT!!" in a bottom box; a charge with green light and dust in two lines across the ground,
+  a second burst that drives him to a knee; Vegeta's line (or player 1's); then player 2 is gone in a blink to the south edge,
+  player 1 flies off the bottom of the view while Broly rises into a last charge, a flash, shakes, and the white takes him standing
+  in it (the white no longer fades back to the basin before the cut). In the ship the white clears, and a second flash and a
+  hard shake open "The ship escapes the exploding planet...".
+- **Cine finding (told to the coordinator):** a **held** charge (`CoopCall 37, 7, 0, 2`) on Broly's body here (sprite 159, the boss
+  after his defeat fired) followed by any blocking script step never returned (the scene hung with him charging); the blocking
+  charge is used instead. Not diagnosed.
 
 - **Where:** `broly_end` entries 0-7. Film `rim_VT`.
 - **Today:** "@^BROLY: KAKAROOOOOOT!!", hit effects and four shakes on him, Vegeta's line (or player 1's), two more

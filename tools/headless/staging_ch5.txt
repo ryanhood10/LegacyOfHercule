@@ -198,6 +198,7 @@ ents
 echo === fusion T
 load menu.ss
 p2 off
+preset +129 +131
 maptest 7
 frames 200
 poke8 0x0203F000 3
@@ -208,6 +209,36 @@ poke32 0x0203FD08 5
 frames 100
 mash 56 80
 shot c5_T_kami
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
+ents
+mash 16 80
+frames 80
+shot c5_T_fuse0
+frames 80
+shot c5_T_fuse1
+frames 80
+shot c5_T_fuse2
+frames 80
+shot c5_T_fuse3
+frames 80
+shot c5_T_fuse4
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
 ents
 stepz 0x03001FDC 300
 frames 30
@@ -219,6 +250,7 @@ ents
 echo === fusion G
 load menu.ss
 p2 off
+preset +129 +131
 maptest 7
 frames 200
 poke8 0x0203F000 0
@@ -229,6 +261,36 @@ poke32 0x0203FD08 5
 frames 100
 mash 56 80
 shot c5_G_kami
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
+ents
+mash 16 80
+frames 80
+shot c5_G_fuse0
+frames 80
+shot c5_G_fuse1
+frames 80
+shot c5_G_fuse2
+frames 80
+shot c5_G_fuse3
+frames 80
+shot c5_G_fuse4
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
 ents
 stepz 0x03001FDC 300
 frames 30
@@ -240,6 +302,7 @@ ents
 echo === fusion TG
 load menu.ss
 p2 0
+preset +129 +131
 maptest 7
 frames 200
 poke8 0x0203F000 3
@@ -251,6 +314,36 @@ poke32 0x0203FD08 5
 frames 100
 mash 56 80
 shot c5_TG_kami
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
+ents
+mash 16 80
+frames 80
+shot c5_TG_fuse0
+frames 80
+shot c5_TG_fuse1
+frames 80
+shot c5_TG_fuse2
+frames 80
+shot c5_TG_fuse3
+frames 80
+shot c5_TG_fuse4
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
 ents
 stepz 0x03001FDC 300
 frames 30
@@ -262,6 +355,7 @@ ents
 echo === fusion GT
 load menu.ss
 p2 0
+preset +129 +131
 maptest 7
 frames 200
 poke8 0x0203F000 0
@@ -273,12 +367,207 @@ poke32 0x0203FD08 5
 frames 100
 mash 56 80
 shot c5_GT_kami
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
+ents
+mash 16 80
+frames 80
+shot c5_GT_fuse0
+frames 80
+shot c5_GT_fuse1
+frames 80
+shot c5_GT_fuse2
+frames 80
+shot c5_GT_fuse3
+frames 80
+shot c5_GT_fuse4
+deref R73 TBL+0x108
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R73
+deref R72 TBL+0x104
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R72
+deref R93 TBL+0x158
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R93
 ents
 stepz 0x03001FDC 300
 frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 echo EXPECT map zone 6 area 99\b
+map
+ents
+echo === gingertown P
+load menu.ss
+p2 off
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_P_beam0
+frames 50
+shot c5_P_beam1
+frames 50
+shot c5_P_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_P_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+echo === gingertown PH
+load menu.ss
+p2 0
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_PH_beam0
+frames 50
+shot c5_PH_beam1
+frames 50
+shot c5_PH_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_PH_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 06
+peek8 0x0203FF84 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+echo === gingertown HP
+load menu.ss
+p2 0
+preset +129 +131 +132
+maptest 7
+frames 200
+poke8 0x0203F000 5
+poke8 0x0203FF84 1
+deref TBL 0x0800959C
+poke32 0x0203FD0C 0x110a
+poke32 0x0203FD54 0x12c0118
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+echo EXPECT map zone 10 area 20\b
+map
+ents
+poke32 0x0203FD08 7
+frames 120
+mash 8 60
+frames 50
+shot c5_HP_beam0
+frames 50
+shot c5_HP_beam1
+frames 50
+shot c5_HP_beam2
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R28
+ents
+mash 40 60
+shot c5_HP_story
+ents
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R28 TBL+0x54
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R28
+deref R137 TBL+0x208
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R137
+deref R121 TBL+0x1c8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R121
+echo EXPECT 0203f000: 03
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 06
+peek8 0x0203FF84 1
+echo EXPECT map zone 10 area 20\b
 map
 ents
 echo ALIVE

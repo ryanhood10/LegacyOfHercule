@@ -31,15 +31,22 @@ sequence ch7_semi_perfect
         WalkToPosition 0, 184, 300
         SetEntityFacing 0, 3
   [10] stockseq @083e6620 8 9            ; "a power not seen for thousands of years", "What is this?"
-  [12] script                            ; stock entry 10 (its index moved): transform unless already; Cell gives ground
+  [12] script                            ; stock entry 10 (its index moved). The power-up is the scene (it was the bare change and Cell walking
+        CoopCall 37, 1, 0, 29            ; back two steps): a long charge with rings and dust, the change at its peak unless he came as a Super
+        CoopCall 37, 7, 100, 2           ; Saiyan already, and Cell is pushed back to his mark in the hit-stun, not walking
         PushActiveCharIsTransformed
         JumpIfFalse L1
-        PushByte 13
-        END
+        Jump L2
       L1:
         SetEntityAnimation 0, 35
-        WalkToPosition 29, 216, 272
+      L2:
+        CoopCall 37, 15, 24, 0
+        SetEntityAnimationNoWait 29, 2
+        GlideToPosition 29, 216, 272, 100
+        WaitFrames 16
+        SetEntityAnimation 29, 0
         SetEntityFacing 29, 2
+        SetEntityFacing 0, 3
   [13] stock @083e65f4                   ; "It's your end!"
   [14] script                            ; co-op: the split (next 15), else the fight (20)
         CoopCall 5, 0, 0, 0
@@ -103,17 +110,169 @@ sequence ch7_semi_perfect_end
   [16] script                            ; Trunks steps up
         WalkToPosition 132, 152, 320
         SetEntityFacing 132, 1
-  [17] stockseq @083e6f30 13 21          ; "He's trying to deceive you!", the deal, 18 absorbed, Perfect Cell, the kick
-  [26] script                            ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
-        BeginCommandBatch                ; for the pad that played Vegeta (the pads trade players)
-        SetEntityAnimation 30, 6
-        EntityWaitTouchPlayer 0
-        PlaySFX 0, 34
-        PlayDamageEffect 0
-        SetEntityAnimation 0, 3
+  [17] stockseq @083e6f30 13 16          ; "He's trying to deceive you!", the deal, "Quiet boy."
+  [21] script                            ; stock entry 17, restaged (batch 2, 7.4): the absorption in area 5, Perfect Cell, the flight to area 6
+        BeginCommandBatch
+        PlaySFX 29, 26
+        PushMulti 29, 368, 48
+        Negate
+        FlyToPosition
+        PushMulti 0, 328, 32
+        Negate
+        FlyToPosition
+        CommitCommandBatch
+        FadeOut 180
+        WarpToMapWithEntities 12, 5, 1, 144, 408
+        SetEntityPositionInstant 29, 168, 300    ; Cell comes up into the clearing from below, past where Vegeta lands
+        FlyToPosition 0, 204, 272
+        SetEntityFacing 0, 1
+        PanCameraToPosition 40, 120, 3
+        WalkToPosition 29, 164, 244
+        SetEntityFacing 29, 1
+        BeginCommandBatch                ; 16 steps between Cell and 18 (he has no line); 18 a step back
+        WalkToPosition 8, 160, 220
+        WalkToPosition 11, 156, 190
+        CommitCommandBatch
+        SetEntityFacing 8, 0
+        SetEntityFacing 11, 0
+        WaitFrames 20
+        CoopCall 37, 1, 29, 8            ; Cell is at 16's side in a blink and one blow throws him against the tree
+        CoopCall 37, 4, 1, 0
+        BeginCommandBatch
+        CoopCall 37, 5, 1, 40
+        EntityWaitFrames 11, 12
+        FlashScreenColor 11, 255, 0, 0, 20
+        CommitCommandBatch
+        SetEntityAnimation 8, 3          ; he stays down (the stock pose; it also frees his command queue for the flashes below)
+        WaitFrames 20
+        WalkToPosition 11, 142, 192      ; 18 turns to run: two steps; Cell is in front of her
+        CoopCall 37, 1, 29, 11
+        CoopCall 37, 4, 1, 20
+        WaitFrames 10
+        WalkToPosition 11, 152, 200      ; she backs away
+        SetEntityFacing 11, 2
+        WalkToPosition 29, 140, 192      ; the stock marks of the tail: Cell 12 px left of her, 8 up
+        SetEntityFacing 29, 0
+        PlayMusic 33
+        SetEntityAnimation 29, 27
+        SetEntityAnimation 11, 29
+        LockEntityPose 11, 41
+        PlayAudio 0
+        BeginCommandBatch                ; (stock WaitFrames 60) a slow rising shake; Vegeta takes a step forward and stops himself
+        ScreenShake 8, 3, 30
+        ScreenShake 8, 6, 30
+        EntityWaitFrames 0, 20
+        WalkToPosition 0, 204, 262
+        CommitCommandBatch
+        SetEntityAnimation 29, 25
+        FadeToWhite 20
+        SetEntityAnimation 29, 27
+        DespawnEntity 11
+        StopAudio 0
+        WhiteFadeOut 20
+        SetEntityAnimation 29, 28
+        SetEntityFacing 29, 0
+        PlayAudio 43
+        CoopCall 37, 15, 100, 0          ; the stock shake, not blocking, so Vegeta's queue is free: he is pushed back
+        SetEntityAnimationNoWait 29, 9   ; the stock change plays on while the light and the dust build; the white comes as it ends
+        BeginCommandBatch
+        FlashScreenColor 8, 180, 60, 220, 10
+        SpawnDustCloud 8, 124, 200
+        SpawnDustCloud 8, 158, 200
+        FlashScreenColor 8, 255, 255, 255, 6
+        EntityWaitFrames 8, 14
+        FlashScreenColor 8, 180, 60, 220, 10
+        SpawnDustCloud 8, 110, 208
+        SpawnDustCloud 8, 172, 208
+        SpawnDustCloud 8, 140, 222
+        FlashScreenColor 8, 255, 255, 255, 6
+        EntityWaitFrames 8, 14
+        FlashScreenColor 8, 180, 60, 220, 10
+        SpawnDustCloud 8, 100, 216
+        SpawnDustCloud 8, 184, 218
+        SpawnDustCloud 8, 140, 238
+        EntityWaitFrames 0, 30
+        GlideToPosition 0, 204, 278, 40
+        CommitCommandBatch
+        FadeToWhite 10                   ; a full white for the swap, held; then silence
+        BeginCommandBatch
+        DespawnEntity 29
+        SpawnCharacterEntity 30, 136, 184
+        CommitCommandBatch
+        SetEntityFacing 30, 1
+        StopAudio 43
+        StopMusic
+        WaitFrames 20
+        WhiteFadeOut 60
+        WaitFrames 90                    ; Perfect Cell with his back to us. Not a word (the script has none)
+        SetEntityFacing 30, 3
+        WaitFrames 30
+        SetEntityFacing 30, 0
+        WaitFrames 40                    ; a held look at Vegeta
+        PlayMusic 33
+        PlayAudio 26
+        PushMulti 30, 144, 64
+        Negate
+        FlyToPosition
+        PlayAudio 26
+        PushMulti 0, 144, 64
+        Negate
+        FlyToPosition
+        WarpToMapWithEntities 12, 6, 1, 248, 544
+        SetEntityPositionInstant 30, 248, 264
+        SetEntityFacing 30, 1            ; Cell with his back to Vegeta
+        FlyToPosition 0, 300, 284
+        SetEntityFacing 0, 2
+        PanCameraToPosition 136, 204, 2
+        WaitFrames 120
+        PlayAudio 50
+  [22] text 4 "#So this is your new body?  Pathetic, Cell.  You've wasted my time. "      ; the stock line in the bottom box (it was "@": on both of them)
+  [23] script                            ; stock entry 19: the kick. He is in front of Cell in a blink; it lands square and Cell does not move
+        CoopCall 37, 1, 0, 30
+        CoopCall 37, 4, 2, 26
+        SetEntityFacing 0, 2
+        CoopCall 37, 15, 10, 1
+        BeginCommandBatch
+        SetEntityAnimation 0, 8
+        PlaySFX 30, 35
+        PlayDamageEffect 30
         CommitCommandBatch
         WaitFrames 40
+        SetEntityFacing 30, 3            ; Cell turns his head
+        WaitFrames 30
+        GlideToPosition 0, 292, 266, 100 ; Vegeta drops back
+        SetEntityAnimation 0, 4
+  [24] stock @083e6d60                   ; "#That kick!  I put all my energy into it! "
+  [25] script                            ; THE FINAL FLASH (for Ryan's review: a beat the game does not have; this commit alone adds it).
+        CoopCall 37, 1, 0, 30            ; Vegeta springs back, gathers everything (the charge, yellow light) and fires; the light
+        CoopCall 37, 3, 330, 266         ; swallows Cell; when it clears he stands where he stood (the story needs him whole). No line.
+        CoopCall 37, 7, 70, 2
+        FlashScreenColor 30, 255, 230, 90, 10
+        CoopCall 37, 8, 18, 60
+        FadeToWhite 8
+        SetEntityPositionInstant 30, 248, 264
+        SetEntityFacing 30, 3
+        CoopCall 37, 15, 50, 0
+        WhiteFadeOut 40
+        BeginCommandBatch
+        SpawnDustCloud 30, 232, 270
+        SpawnDustCloud 30, 264, 272
+        SpawnDustCloud 30, 248, 248
+        CommitCommandBatch
+        WaitFrames 50
+        CoopCall 37, 10, 0, 1            ; Vegeta drops to a knee, spent
+        WaitFrames 30
+        WalkToPosition 30, 262, 264      ; then Cell walks two slow steps toward him
+        SetEntityFacing 30, 3
+        WaitFrames 10
+  [26] stock @083e6d90                   ; "#Now, do you understand what I mean by "perfection"? ..."
+  [27] script                            ; stock entry 22: Vegeta down, Trunks player 1; in co-op Krillin
+        CoopCall 37, 1, 30, 0            ; for the pad that played Vegeta (the pads trade players). The blow (it was Cell's arm moving
+        CoopCall 37, 4, 0, 0             ; and Vegeta lying at his feet): Cell is beside him and one strike throws him to where the stock
+        CoopCall 37, 5, 1, 28            ; lays his body, (296, 262)
+        WaitFrames 40
         FadeOut 120
+        CoopCall 37, 0, 0, 0             ; the held body is player 1's: let go before he becomes Trunks
         FindCharacterEntity 1
         ClearCollisionRect 256, 272, 264, 280
         SetActiveCharacter 3
@@ -137,40 +296,40 @@ sequence ch7_semi_perfect_end
         WalkToPosition 0, 248, 320
         PanCameraToPosition 136, 192, 2
         WaitFrames 120
-  [27] stock @083e6e60                   ; Trunks: "as long as there is breath in my body, I WILL FIGHT!"
-  [28] script                            ; Krillin flies in, to the spot player 2's entity will take
+  [28] stock @083e6e60                   ; Trunks: "as long as there is breath in my body, I WILL FIGHT!"
+  [29] script                            ; Krillin flies in, to the spot player 2's entity will take
         WaitFrames 20
         SpawnCharacterEntity 76, 200, 380
         PlayAudio 26
         FlyToPosition 76, 236, 320
         SetEntityFacing 76, 1
-  [29] text 73 "KRILLIN: Trunks!  I got here as fast as I could!\x0bOh man...  Vegeta?!  Cell did that to him?"
-  [30] text 1 "@TRUNKS: Krillin, stay back!  He's too strong!"
-  [31] script                            ; co-op: he stays and fights (next 32), alone he goes to Vegeta (34)
+  [30] text 73 "KRILLIN: Trunks!  I got here as fast as I could!\x0bOh man...  Vegeta?!  Cell did that to him?"
+  [31] text 1 "@TRUNKS: Krillin, stay back!  He's too strong!"
+  [32] script                            ; co-op: he stays and fights (next 32), alone he goes to Vegeta (34)
         CoopCall 5, 0, 0, 0
         JumpIfFalse L1
-        PushByte 32
+        PushByte 33
         END
       L1:
-        PushByte 34
+        PushByte 35
         END
-  [32] text 73 "KRILLIN: No way.  Two of us have a better shot than one!"
-  [33] script                            ; player 2 takes over on the spot when player 1 is free
+  [33] text 73 "KRILLIN: No way.  Two of us have a better shot than one!"
+  [34] script                            ; player 2 takes over on the spot when player 1 is free
         DespawnEntity 76
-        PushByte 36
+        PushByte 37
         END
-  [34] text 73 "KRILLIN: ...Yeah.  You're right.\x0bI'll get Vegeta out of the line of fire.  Give him one for me!"       ; (draft) alone
-  [35] script
+  [35] text 73 "KRILLIN: ...Yeah.  You're right.\x0bI'll get Vegeta out of the line of fire.  Give him one for me!"       ; (draft) alone
+  [36] script
         WalkToPosition 76, 288, 280
         SetEntityFacing 76, 1
-  [36] script                            ; stock entry 24 (its index moved): transform unless already
+  [37] script                            ; stock entry 24 (its index moved): transform unless already
         PushActiveCharIsTransformed
         JumpIfFalse L1
-        PushByte 37
+        PushByte 38
         END
       L1:
         SetEntityAnimation 0, 35
-  [37] stock @083e6f16                   ; the fight: Perfect Cell (stat 78, then 79)
+  [38] stock @083e6f16                   ; the fight: Perfect Cell (stat 78, then 79)
 end
 
 ; ---- zone 12 area 6: Perfect Cell laughs it off; Krillin's rush and one-hit KO first (in both modes) ------
@@ -214,7 +373,42 @@ sequence ch7_perfect_end
         WaitFrames 40
   [4] text 40 "CELL: Hmph.  Was that supposed to be an attack?"
   [5] text 73 "KRILLIN: Ugh...  One hit...  He took me out with one hit..."
-  stockseq @083e77b0 1 13                ; "pump up your muscles", the tournament in ten days, Cell leaves
+  [6] script                             ; Cell looks from Krillin back to Trunks. (The shot list's two misses are not built: with Cell
+        SetEntityFacing 30, 2            ; standing just below Trunks here a second lying-Vegeta picture was drawn over Trunks: not understood)
+        WaitFrames 16
+        SetEntityFacing 30, 0
+        WaitFrames 10
+  [7] stockseq @083e77b0 1 2             ; "All you've done is pump up your muscles. ...", "Of course! ... You can finish me if you want.  I've failed."
+  [9] script                             ; Trunks lets the power go and drops to a knee; Cell walks over to stand above him
+        CoopCall 37, 1, 0, 30
+        CoopCall 37, 10, 0, 1
+        WalkToPosition 30, 248, 298
+        SetEntityFacing 30, 0
+  [10] stock @083e7274                   ; "How gracious of you!   *sigh*  What shall I do with you? ..."
+  [11] script                            ; Trunks gets up for his answer
+        CoopCall 37, 1, 0, 30
+        CoopCall 37, 10, 0, 0
+        SetEntityFacing 0, 1
+  [12] stock @083e7320                   ; "For your information, he's training to defeat you! ... No contest!"
+  [13] script                            ; Cell turns away from him: the idea comes
+        SetEntityFacing 30, 2
+        WaitFrames 20
+        SetEntityFacing 30, 1
+        WaitFrames 20
+  [14] stockseq @083e77b0 5 6            ; "No contest?  No contest!  Ahhh!!!  A tournament!", "What do you mean?"
+  [16] script                            ; and back to Trunks
+        SetEntityFacing 30, 0
+  [17] stockseq @083e77b0 7 11           ; the tournament in ten days ... "It will just be very entertaining for me."
+  [22] script                            ; stock entry 12: he is gone upward in a blink, then his flight out
+        CoopCall 37, 2, 248, 248
+        CoopCall 37, 1, 30, -2
+        CoopCall 37, 4, 19, 16
+        PlayAudio 26
+        FlyToPosition 30, 160, 40
+        DespawnEntity 30
+        CoopCall 37, 0, 0, 0
+        WaitFrames 60
+  [23] stock @083e76ac                   ; "I should return to Capsule Corporation and tell the others."
   script                                 ; stock entry 14, with Krillin on his feet and Vegeta up from where he fell; then Trunks + Krillin
         SetEntityAnimation 76, 0         ; by default with Vegeta, Piccolo and Hercule selectable too
         SetEntityFacing 76, 1

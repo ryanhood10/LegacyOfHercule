@@ -726,6 +726,23 @@ entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the 
   leaves row 0 and an empty entry: the scene never starts).
 - Real party at Krillin's visit: flags byte 0 on slots 1-8 (`flags_of`), `p2 off`, then `p2 0`: player 2's entity is born only when Krillin joins.
 
+## Cutscenes of chapters 5 to 9 and Broly (headless, 2026-11-06, branch `nb-cs2`; `docs/cutscenes/batch2_ch5-9.md`)
+
+The staging generators grew a block per changed scene (run alone by cutting the block out of the script: `sed -n '/^echo === NAME/,$p'`):
+`staging_ch5` "fusion" (now with `+129 +131`: Kami stands; Kami 73 gone and Popo 93 there after it) and "gingertown" (alone, with
+Hercule, as Hercule: Cell stands for the beam, nobody left after, Trunks player 1 / Krillin player 2's); `staging_ch6` "chamber"
+(alone: Trunks' actor 134 on the floor during Vegeta's line and gone after; two players: the duel runs), "kame" (the flight pad:
+Tien alone when Krillin is played), "island break" (player 1 on his mark (304, 168), then area 5), "island half" (Tien 121 and Cell
+29 during the Tri-Beam, the Lookout after; about four minutes a lineup); `staging_ch8` (player 1 at (200, 298) under Cooler);
+`staging_broly` (a shot of the power-up). `cell_staging` and `staging_broly` pass unchanged otherwise.
+
+- **Films** (how each scene was looked at; not committed): `build/film/gen.py NAME [old]` writes a script per lineup that warps in,
+  shoots every 10 to 15 frames and ends with a `STATE` block (party block, flags, player 2's slot, the map, `ents`); `sheet.py`
+  tiles the changed frames; `cmpstate.py NEW OLD` compares the `STATE` blocks of the new ROM and a ROM built before the change,
+  word by word (HP / EP and the HUD meter differ by the fight's luck; flags, rows, who plays and the map must not).
+- **Traps met:** an idle player dies fast in zone 12 and on the island: win at once after `stepz`; a press count before a shot
+  drifts when a scene gets longer (retune it by looking at the shot); `mashmap 9 1` needs about 80 presses for the island's end.
+
 ## Cinematic helpers (headless, 2026-11-06, branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine")
 
 `src/coop/cine.c` (`CoopCall 37`) is driven two ways: from lscript, and by **test command 50** (`docs/ids.md`): `arg` = the op,

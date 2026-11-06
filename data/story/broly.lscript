@@ -297,33 +297,33 @@ end
 ; Krillin) have no actors; a line of one nobody plays is skipped, or said by player 1 (speaker 250) where the scene needs it. Kept for the
 ; plot: Vegeta at the rim when nobody plays him (Paragus' betrayal and Broly are his). CoopCall 22 op 4: 1 = played.
 sequence broly_rim
-  [0] script                             ; seen before (flag 403): straight to the fight (the last entry, 17)
+  [0] script                             ; seen before (flag 403): straight to the fight (the last entry, 18)
         StackTestStoryFlag 403
         JumpIfFalse L1
-        PushByte 17
+        PushByte 18
         END
       L1:
         PushByte 1
         END
-  [1] script  ; Paragus comes round the rim from above; Vegeta's actor runs up from the left when nobody plays him (kept: the scene is his)
-        SetPlayerVisible 0
+  [1] script  ; Paragus comes round the rim from above; Vegeta's actor runs up from the left when nobody plays him (kept: the scene is his).
+        SetPlayerVisible 0               ; The basin is empty: Broly waits out of view to the east (he strolled in beside them before)
         PlayMusic 39
-        WalkToPosition 0, 312, 414
+        SetEntityPositionInstant 159, 520, 404
+        SetEntityFacing 159, 3
+        WalkToPosition 0, 326, 414
         SetEntityFacing 0, 3
-        CoopCall 9, 1, 280, 414
+        CoopCall 9, 1, 284, 400
         PanCameraToPosition 212, 330, 2
-        WalkToPosition 159, 400, 414
-        SetEntityFacing 159, 2
         SpawnCharacterEntity 170, 360, 310
         CoopCall 22, 1, 2, 0
         JumpIfFalse N9
-        SpawnCharacterEntity 137, 150, 414
+        SpawnCharacterEntity 137, 190, 426
       N9:
         BeginCommandBatch
-        WalkToPosition 170, 360, 400
+        WalkToPosition 170, 384, 380
         CoopCall 22, 2, 137, 0
         JumpIfFalse W1
-        WalkToPosition 137, 248, 414
+        WalkToPosition 137, 352, 400
       W1:
         CommitCommandBatch
         SetEntityFacing 170, 2
@@ -335,12 +335,45 @@ sequence broly_rim
   [2] text 4 "VEGETA: Paragus!  What is this?  Where are my people?"
   [3] text 120 "PARAGUS: Your people?  There are none, Prince.  There is no kingdom.\x0bThis planet is a graveyard...  and it is about to become yours."
   [4] text 120 "PARAGUS: Your father sentenced my son to death as an infant because his power dwarfed yours.\x0bWe survived.  Now meet him.  Broly!"
-  [5] script
-        PlayAudio 50
+  [5] script  ; power before the body: Paragus turns to the basin; the ground shudders, dust at their feet; everyone looks east and the
+        SetEntityFacing 170, 3           ; camera goes there: Broly, his back to them. He powers up (green light with the white), the
+        PlayAudio 43                     ; players are pushed back; silence; he turns his head, then round
+        BeginCommandBatch
+        ScreenShake 0, 6, 40
+        ScreenShake 0, 12, 40
+        EntityWaitFrames 170, 30
+        SpawnDustCloud 170, 318, 420
+        SpawnDustCloud 170, 344, 408
+        CommitCommandBatch
+        StopAudio 43
+        SetEntityPositionInstant 159, 456, 404
+        CoopCall 37, 2, 456, 404
+        CoopCall 37, 12, -2, -3
+        PanCameraToPosition 268, 330, 1
+        CoopCall 37, 1, 159, -3
+        BeginCommandBatch
+        CoopCall 37, 7, 90, 2
+        EntityWaitFrames 170, 24
+        FlashScreenColor 170, 150, 255, 170, 8
+        EntityWaitFrames 170, 16
+        FlashScreenColor 170, 150, 255, 170, 8
+        EntityWaitFrames 170, 12
+        FlashScreenColor 170, 150, 255, 170, 8
+        SpawnDustCloud 170, 432, 412
+        SpawnDustCloud 170, 480, 412
+        SpawnDustCloud 170, 456, 424
+        EntityWaitFrames 0, 70
+        GlideToPosition 0, 318, 414, 80
+        CommitCommandBatch
+        SetEntityAnimation 159, 0
+        SetEntityFacing 159, 3
+        WaitFrames 30
+        SetEntityFacing 159, 0
+        WaitFrames 24
         SetEntityFacing 159, 2
-        WhiteFlash 5
-        ScreenShake 0, 20, 30
-  [6] text 0 "@^BROLY: ...Ka...  ka...  rot..."
+        WaitFrames 10
+        PlayAudio 50
+  [6] text 0 "BROLY: ...Ka...  ka...  rot..."          ; the stock words in a bottom box (the centred caption half covered him)
   [7] script
         CoopCall 22, 4, 0, 0
         JumpIfFalse skip
@@ -362,16 +395,20 @@ sequence broly_rim
   [11] script  ; Vegeta backs away a step
         CoopCall 22, 2, 137, 0
         JumpIfFalse V1
-        WalkToPosition 137, 232, 414
+        WalkToPosition 137, 338, 400
         SetEntityFacing 137, 3
       V1:
         PushActiveCharIndex
         PushByte 2
         CmpEq
         JumpIfFalse V2
-        WalkToPosition 0, 296, 414
+        WalkToPosition 0, 306, 414
         SetEntityFacing 0, 3
       V2:
+        CoopCall 37, 1, -12, 159         ; (for Ryan's review, its own commit) the film's beat on the game's lines: at Broly's power the
+        CoopCall 37, 10, 0, 1            ; prince goes down on one knee: his player's body when he is played, his actor otherwise (a
+        CoopCall 37, 1, 137, 159         ; cast nobody fills plays nothing)
+        CoopCall 37, 10, 0, 1
   [12] text 4 "VEGETA: The Legendary Super Saiyan...  It can't be..."
   [13] script
         CoopCall 22, 4, 3, 0
@@ -382,14 +419,37 @@ sequence broly_rim
         PushByte 15
         END
   [14] text 5 "TRUNKS: Father, snap out of it!  We have to fight!"
-  [15] text 0 "@^BROLY: KAKAROOOOT!!"
-  [16] script  ; Vegeta's actor steps back out of it; Paragus goes to his son's side, to the spot his boss twin takes (TWIN_OFFSET right of Broly)
-        SetStoryFlag 403
+  [15] script  ; Vegeta gets up on his own (after Trunks' shout when Trunks is played). The roar: a flash and the ground heaves before it
+        CoopCall 37, 1, -12, 159
+        CoopCall 37, 10, 0, 0
+        CoopCall 37, 1, 137, 159
+        CoopCall 37, 10, 0, 0
+        WaitFrames 10
+        WhiteFlash 8
+        ScreenShake 0, 24, 40
+  [16] text 0 "BROLY: KAKAROOOOT!!"
+  [17] script  ; he is in front of them in a blink and his fist goes into the ground at their feet: dust, the players thrown back a step. He does
+        SetStoryFlag 403                 ; not touch them: the fight is theirs. Paragus goes to his son's side through the dust, to the spot
+        CoopCall 37, 2, 372, 416         ; his boss twin takes (TWIN_OFFSET right of Broly); Vegeta's actor steps out
+        CoopCall 37, 1, 159, -2
+        CoopCall 37, 3, 400, 414
+        BeginCommandBatch
+        CoopCall 37, 5, 1, 0
+        EntityWaitFrames 170, 14
+        SpawnDustCloud 170, 360, 420
+        SpawnDustCloud 170, 376, 404
+        SpawnDustCloud 170, 384, 426
+        EntityWaitFrames 0, 14
+        GlideToPosition 0, 298, 414, 150
+        CommitCommandBatch
+        SetEntityAnimation 159, 0
+        SetEntityFacing 159, 2
+        PanCameraToPosition 212, 330, 4
         BeginCommandBatch
         WalkToPosition 170, 424, 414
         CoopCall 22, 2, 137, 0
         JumpIfFalse W1
-        WalkToPosition 137, 150, 414
+        WalkToPosition 137, 190, 426
       W1:
         CommitCommandBatch
         DespawnEntity 170
@@ -397,8 +457,9 @@ sequence broly_rim
         JumpIfFalse D1
         DespawnEntity 137
       D1:
-  [17] script
+  [18] script
         PlayMusic 30
+        CoopCall 37, 0, 0, 0
         CoopCall 9, 0, seq:broly_rage, 0
         DespawnCharacterAndRecordPosition 159, 2
         SetPlayerVisible 1
@@ -408,15 +469,32 @@ end
 
 ; Paragus fell while Broly stands (bosses.c BOSS_RAGE; queued by enemies.c)
 sequence broly_rage
-  script
+  script                                 ; he stops and looks at his father's body (the players look at him)
         WhiteFlash 5
-        ScreenShake 0, 20, 40
+        ScreenShake 0, 20, 20
         PlayAudio 50
-  text 0 "@^BROLY: Pa...  ra...  gus...?"
-  text 0 "@^BROLY: RRRAAAAAAAAAGH!!"
+        CoopCall 37, 14, 159, 8          ; the camera goes to him (the fight may have left him far from the players)
+        CoopCall 37, 11, 159, 170
+        WaitFrames 20
+  text 0 "BROLY: Pa...  ra...  gus...?"                 ; bottom boxes (the centred captions sat on him)
+  script                                 ; a held look, then the power doubles: a charge harder than at the rim, green light
+        WaitFrames 30
+        CoopCall 37, 1, 159, -3
+        BeginCommandBatch
+        CoopCall 37, 7, 70, 2
+        EntityWaitFrames 0, 20
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 16
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 12
+        FlashScreenColor 0, 150, 255, 170, 8
+        CommitCommandBatch
+  text 0 "BROLY: RRRAAAAAAAAAGH!!"
   script
-        WhiteFlash 5
-        ScreenShake 0, 20, 60
+        CoopCall 37, 15, 40, 2
+        CoopCall 37, 0, 0, 0
+        CoopCall 37, 14, 0, 8            ; and back to player 1
+        SetActiveEntity 0
   text 0 "@^Broly's power explodes!  He is stronger and faster than ever!"
 end
 
@@ -429,18 +507,40 @@ sequence broly_end
         SetStoryFlag 402
         SetPlayerVisible 0
         WaitFrames 40
-  text 0 "@^BROLY: KAKAROOOOOOT!!"
-  script
+        FadeOut 20                       ; marks behind a short fade (the fight left everyone anywhere): Broly in the middle of the view,
+        CoopCall 37, 0, 0, 0             ; the players below him
+        SetEntityPositionInstant 159, 400, 404
+        SetEntityFacing 159, 2
+        SetEntityPositionInstant 0, 326, 414
+        SetEntityFacing 0, 3
+        CoopCall 9, 1, 290, 402
+        CoopCall 22, 2, 170, 0           ; his father's body beside him
+        JumpIfFalse P1
+        SetEntityPositionInstant 170, 438, 424
+      P1:
+        PanCameraToPosition 240, 326, 10
+        FadeFromWhite 20
+  text 0 "BROLY: KAKAROOOOOOT!!"                        ; a bottom box
+  script                                 ; his own power tears him apart: a charge with green light and dust in lines across the ground
+        CoopCall 37, 1, 159, -3          ; (the cracks), a second burst, and it drives him to a knee
         WhiteFlash 5
+        PlayAudio 31
         BeginCommandBatch
-        ScreenShake 0, 20, 30
-        PlaySFX 159, 31
-        PlayDamageEffect 159
+        CoopCall 37, 7, 50, 2
+        SpawnDustCloud 0, 352, 432
+        SpawnDustCloud 0, 392, 438
+        SpawnDustCloud 0, 432, 432
+        EntityWaitFrames 0, 20
+        FlashScreenColor 0, 150, 255, 170, 8
+        EntityWaitFrames 0, 10
+        SpawnDustCloud 0, 370, 386
+        SpawnDustCloud 0, 414, 380
+        SpawnDustCloud 0, 452, 390
+        FlashScreenColor 0, 150, 255, 170, 8
         CommitCommandBatch
-        WaitFrames 20
-        WhiteFlash 5
-        ScreenShake 0, 20, 40
-        PlaySFX 159, 20
+        PlayAudio 20
+        CoopCall 37, 15, 40, 2
+        CoopCall 37, 10, 0, 1
         WaitFrames 20
   [3] script
         CoopCall 22, 4, 2, 0
@@ -464,26 +564,34 @@ sequence broly_end
   [6] fmt 250 "%s: His power is tearing the whole planet apart!  Everyone, back to the ship!"
         PushActiveCharNameUpper
         END
-  [7] script  ; back aboard: the ride home (Ryan), the players only
+  [7] script  ; the players turn and go (player 2 in a blink, player 1 flies off the view's south edge) while the ground heaves; Broly
+        CoopCall 37, 15, 80, 1           ; rises into a last charge and the white takes him. Back aboard: the ride home (Ryan), the players only
+        PlayAudio 21
+        CoopCall 37, 1, -1, -3
+        CoopCall 37, 3, 300, 474
+        CoopCall 37, 1, 159, -3
+        PlayAudio 26
         BeginCommandBatch
-        ScreenShake 0, 20, 80
-        PlaySFX 159, 21
+        CoopCall 37, 7, 50, 2
+        FlyToPosition 0, 326, 520
         CommitCommandBatch
-        WaitFrames 20
         WhiteFlash 5
-        ScreenShake 0, 20, 80
-        PlaySFX 159, 31
+        ScreenShake 0, 20, 60
+        PlayAudio 31
         PlayAudioBlocking 10, 20
         FadeToWhite 10
-        WhiteFadeOut 20
-        WaitFrames 60
+        CoopCall 37, 0, 0, 0
+        WaitFrames 40
         WarpToMapWithEntities 15, 9, 1, 96, 192
         CoopCall 9, 1, 128, 196
+        SetActiveEntity 0
         SetEntityFacing 0, 0
         SetPlayerVisible 1
+        WhiteFadeOut 20
         WaitFrames 30
         PlayAudio 26
-        ScreenShake 0, 12, 200
+        WhiteFlash 20                    ; the planet goes behind them
+        ScreenShake 0, 16, 200
         WaitFrames 60
   [8] text 0 "@^The ship escapes the exploding planet and heads home..."
   [9] script

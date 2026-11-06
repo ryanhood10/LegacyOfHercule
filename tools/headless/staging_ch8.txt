@@ -11,6 +11,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_G_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -42,6 +46,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_O_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -73,6 +81,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_T_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -105,6 +117,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_GH_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -137,6 +153,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_OV_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -169,6 +189,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_TP_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -201,6 +225,10 @@ poke32 0x0203FD0C 0x3d06
 poke32 0x0203FD54 0x19000c8
 poke32 0x0203FD08 5
 frames 260
+mash 1 100
+shot c8_PH_open
+echo EXPECT map zone 6 area 61 var 1 player 200,298
+map
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000

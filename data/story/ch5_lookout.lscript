@@ -52,8 +52,9 @@ end
 
 sequence ch5_fusion
   stockseq @083e0dbc 0 35                ; the cicada skin, the news from Gingertown, "So you finally came to your senses?"
-  script
+  script                                 ; Hercule comes in from the rim; Piccolo watches him come
         SpawnCharacterEntity 72, 296, 176
+        SetEntityFacing 0, 3
         WalkToPosition 72, 216, 136
         SetEntityFacing 72, 2
         SetEntityFacing 73, 3
@@ -61,7 +62,18 @@ sequence ch5_fusion
   text 67 "HERCULE: M-me?  Uh, sure thing, Mr. Kami, sir!"
   text 69 "KAMI: You took Piccolo into your home and stood beside him...\x0bthough you had every reason to fear him.\x0bFew have ever shown him such kindness."
   text 69 "Every living being carries a hidden potential.\x0bAllow me to draw out a little of yours...\x0bas the Grand Elder of Namek once did for Gohan and Krillin."
-  script
+  script                                 ; the power comes up through him (a hum, the floor trembles, light) before the flash
+        PlayAudio 43
+        SetEntityAnimation 72, 4
+        BeginCommandBatch
+        ScreenShake 0, 3, 30
+        ScreenShake 0, 6, 30
+        EntityWaitFrames 72, 30
+        FlashScreenColor 72, 255, 255, 255, 8
+        SpawnDustCloud 72, 206, 140
+        SpawnDustCloud 72, 226, 140
+        CommitCommandBatch
+        StopAudio 43
         WhiteFlash 20
         PlayAudio 27
         StackGetCharLevel 5, 5
@@ -70,22 +82,117 @@ sequence ch5_fusion
         SetCharacterLevel
         SetCharHP 5, 5000
         SetCharEP 5, 5000
+        SetEntityAnimation 72, 0
+        SetEntityFacing 72, 2
         WaitFrames 30
   fmt 0 "@^Hercule has achieved Level %d!"
         StackGetCharLevel 5
-  script                                 ; he tries it out
+  script                                 ; he tries it out: a punch each way
+        SetEntityAnimation 72, 6
+        SetEntityFacing 72, 3
         SetEntityAnimation 72, 6
         SetEntityAnimation 72, 0
         SetEntityFacing 72, 2
   text 67 "HERCULE: Whoa...  I feel like I could lift a truck!\x0bHa ha ha!  Not that I couldn't before, of course!"
   text 90 "PICCOLO: Hmph.  Don't let it go to your head."
   script                                 ; and gives Piccolo and Kami the floor
-        WalkToPosition 72, 240, 152
+        WalkToPosition 72, 224, 144
+        SetEntityFacing 72, 2
+        SetEntityFacing 0, 1
+        SetEntityFacing 73, 0
+  stock @083e0a74                        ; "Our union will make you more powerful, Piccolo..."
+  script                                 ; Mr. Popo starts toward Kami; they look at him
+        WalkToPosition 93, 156, 96
+        SetEntityFacing 93, 3
+        SetEntityFacing 0, 2
+  stock @083e0ae8                        ; "MR. POPO: No, Kami!  No!"
+  script                                 ; stock entry 38: Kami turns to him
+        SetEntityFacing 73, 2
+        SetEntityFacing 0, 1
+  stock @083e0b14                        ; "There is nothing to worry about, Popo.  Piccolo has changed. ..."
+  stock @083e0be4                        ; "Goodbye, Kami.  I'll miss you.  Please be careful."
+  script                                 ; Popo goes as far as the stair head and turns back to watch; Hercule gives them room; Piccolo steps up to Kami. A held, quiet look
+        PanCameraToPosition 72, 46, 10   ; the view holds still from here (the camera would follow Piccolo up and off)
+        WalkToPosition 93, 132, 112
+        SetEntityFacing 93, 3
+        WalkToPosition 72, 228, 132
         SetEntityFacing 72, 2
         SetEntityFacing 73, 0
-  stockseq @083e0dbc 36 47               ; "Our union will make you more powerful", Popo's goodbye, the Namek
+        WaitFrames 20
+        WalkToPosition 0, 192, 120
+        SetEntityFacing 0, 1
+        WaitFrames 40
+  script                                 ; the light builds and Kami goes into him (a glide: Kami's sprite has one pose group)
+        PlayAudio 43
+        BeginCommandBatch
+        ScreenShake 0, 4, 60
+        ScreenShake 0, 10, 70
+        EntityWaitFrames 73, 40
+        FlashScreenColor 73, 255, 255, 255, 6
+        EntityWaitFrames 73, 20
+        FlashScreenColor 73, 255, 255, 255, 6
+        EntityWaitFrames 73, 10
+        GlideToPosition 73, 192, 118, 50
+        EntityWaitFrames 93, 88          ; pale green light as he goes in
+        FlashScreenColor 93, 200, 255, 200, 8
+        EntityWaitFrames 93, 10
+        FlashScreenColor 93, 200, 255, 200, 8
+        CommitCommandBatch
+        WhiteFlash 10
+        DespawnEntity 73
+        FadeToWhite 20
+        StackGetCharLevel 1, 1           ; the stock bookkeeping, under the white
+        PushByte 1
+        Add
+        SetCharacterLevel
+        SetEntityPositionInstant 0, 192, 96
+        SetEntityFacing 0, 0
+        PanCameraToPosition 72, 54, 10   ; a little lower: the caption's box will sit under him
+        WhiteFadeOut 40
+        BeginCommandBatch                ; the Namek's power shakes the Lookout: dust in a ring, Hercule thrown on his back, Popo a step away
+        ScreenShake 0, 20, 14
+        SetEntityAnimation 0, 4
+        SpawnDustCloud 93, 172, 100
+        SpawnDustCloud 93, 212, 100
+        SpawnDustCloud 93, 180, 116
+        SpawnDustCloud 93, 204, 116
+        WalkToPosition 93, 122, 112
+        SetEntityFacing 93, 3
+        ScreenShake 93, 20, 96
+        EntityWaitFrames 72, 8
+        SetEntityAnimation 72, 2
+        GlideToPosition 72, 238, 138, 150
+        SetEntityAnimation 72, 3
+        CommitCommandBatch
+        StopAudio 43
+        SetEntityAnimation 0, 0
+        SetEntityFacing 0, 0
+        WaitFrames 50
+        PlayMusic 34
+        PlayAudio 27
+  stock @083e0c80                        ; "@^Piccolo has achieved Level %d! ..."
+  script                                 ; Hercule picks himself up
+        SetEntityAnimation 72, 0
+        SetEntityFacing 72, 2
+  text 94 "No longer am I Kami or Piccolo... "       ; the stock line in the bottom box (it was "@": the middle box sat on him)
+  script                                 ; he turns to the rim and walks two steps
+        SetEntityFacing 0, 3
+        WalkToPosition 0, 218, 96
+  text 94 "I am the Namek who has long since forgotten his name..."
+  script
+        WaitFrames 20
+  text 94 "I must go."
+  script                                 ; he is gone; Hercule runs to the rim, looks after him, looks back at Mr. Popo
+        PlayAudio 26
+        FlyToPosition 0, 340, 20
+        WalkToPosition 72, 222, 104
+        SetEntityFacing 72, 3
+        WaitFrames 30
+        SetEntityFacing 72, 2
+        WaitFrames 20
   script                                 ; stock entry 48: Piccolo and Hercule fly to Gingertown together
         FadeToWhite 120
+        SetActiveEntity 0                ; the camera back on player 1 (the fusion held it still)
         SetCharacterFlag_Dynamic 1, 2
         SetCharacterFlag_Bit1 1
         SetCharacterFlag_Bit5 1
@@ -138,8 +245,210 @@ sequence ch5_gingertown_end
         SetEntityAnimation 28, 0         ; the one left may be the body that fell first (lying)
         WaitFrames 30
   text 1 "#PICCOLO: It took its other half back into itself..."
-  stockseq @083e24a0 0 56                ; the Kamehameha, the arm trick, Cell's story, Krillin and Trunks, Vegeta
-  script                                 ; stock entry 57: Trunks and Krillin are the pair for the lab
+  [3] script                             ; stock entry 0 with player 2 on a mark too (he stood mid-screen with his back to the camera all scene)
+        PlayAudio 60
+        FindPlayerEntity
+        AddEXP 12000
+        SetPlayerVisible 0
+        FadeOut 60
+        PanCameraToPosition 128, 168, 10
+        SetEntityPositionInstant 28, 208, 224
+        SetEntityPositionInstant 0, 312, 224
+        SetEntityFacing 0, 2
+        SetEntityFacing 28, 3
+        CoopCall 9, 1, 324, 250
+        CoopCall 37, 0, 0, 0
+        FadeFromWhite 60
+        WalkToPosition 0, 280, 224
+        CoopCall 37, 12, 28, 28
+        PlayAudio 50
+  stockseq @083e24a0 1 2                 ; "Now who are you?", "I came here of my own accord."
+  [6] script                             ; Cell is in the wind-up from the first syllable (he stood idle while the box typed it): the charge, blue light
+        CoopCall 37, 1, 28, 0
+        BeginCommandBatch
+        CoopCall 37, 7, 40, 0
+        EntityWaitFrames 0, 14
+        FlashScreenColor 0, 120, 170, 255, 8
+        EntityWaitFrames 0, 8
+        FlashScreenColor 0, 120, 170, 255, 8
+        CommitCommandBatch
+  stockseq @083e24a0 3 6                 ; "Kaaaaaaaaa... Meeeeeeee...", Piccolo starts, "It can't be!", "HAAAAAAAAAAAAAAAAAAAA!!!"
+  [11] script                            ; stock entry 7: the beam. It drives Piccolo back along its line while the hits land (he flashed where he
+        CoopCall 37, 1, -1, -3           ; stood); player 2 throws himself down out of its way. The arm is gone (the stock pose 22), dust; Cell
+        CoopCall 37, 10, 0, 2            ; walks over to stand above him
+        CoopCall 37, 1, 28, 0
+        CoopCall 37, 8, 2, 60
+        SetEntityAnimation 28, 0
+        SetEntityFacing 0, 0
+        SetEntityAnimation 0, 2
+        PlayDamageEffect 0
+        SetEntityAnimationNoWait 0, 22
+        CoopCall 37, 15, 12, 0
+        WaitFrames 30
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 60
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 34
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 8 10                ; "I got you now.", "I have no choice but to surrender.", "You finally realize the futility..."
+  [15] script                            ; stock entry 11 (Piccolo faces him); Cell begins to pace: the interrogation is staged (it was a minute of
+        SetEntityFacing 0, 2             ; text with nobody moving); player 2 picks himself up
+        SetEntityAnimation 0, 0
+        CoopCall 37, 1, -1, -3
+        CoopCall 37, 10, 0, 0
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 58
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 12 14               ; "What do you mean?", "...Perfection!", "Tell me, who are you?"
+  [19] script                            ; he stops and turns to the camera
+        SetEntityFacing 28, 0
+        WaitFrames 12
+  stockseq @083e24a0 15 16               ; "Very well, my name is Cell. ...", "You're wrong!  We destroyed Dr. Gero's lab..."
+  [22] script                            ; that stings: he is back at Piccolo's side
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 34
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 17 18               ; "Luckily, the computer was hidden...", "Wait!  One more question..."
+  [25] script                            ; he turns his back on Piccolo, walks off a few steps and looks at the sky
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 70
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 1
+  stockseq @083e24a0 19 20               ; "I suppose I can answer this last one. ...", "But what for?"
+  [28] script                            ; and comes back for the last of it
+        SetEntityFacing 28, 3
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 40
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step WalkToPosition
+        SetEntityFacing 28, 3
+  stockseq @083e24a0 21 23               ; "...I need Androids 17 and 18...", the arm pose again, "Yes, I'm ready.  You've said more than enough!"
+  [32] script                            ; stock entry 24: the regrowth on a flash, the ground jolts, and Cell recoils
+        WaitFrames 40
+        PlayAudio 13
+        CoopCall 37, 15, 14, 2
+        SetEntityAnimation 0, 26
+        PushByte 28
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushByte 52
+        Sub
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        PushVarint 150
+        Step GlideToPosition
+        WaitFrames 30
+  stockseq @083e24a0 25 26               ; "You tricked me!!!", "That's right. ... Don't think I won't pay you back for taking my arm."
+  [35] script                            ; stock entry 27: he powers up and is face to face with Cell in a blink
+        SetEntityFacing 0, 2
+        CoopCall 37, 1, 0, 28
+        CoopCall 37, 7, 30, 1
+        CoopCall 37, 4, 0, 18
+        WaitFrames 10
+  stock @083e1e66                        ; "Maybe I'll take yours."
+  [37] script                            ; a held look; then stock entry 29: Krillin and Trunks fly in, and everyone looks
+        WaitFrames 30
+        SpawnCharacterEntity 76, 256, 376
+        SpawnCharacterEntity 128, 280, 376
+        FlyToPosition 128, 280, 296
+        FlyToPosition 76, 240, 304
+        CoopCall 37, 12, 128, 128
+  stockseq @083e24a0 30 41               ; the talk with Krillin and Trunks; "You all must feel honored. ... I'll absorb you later!"
+  [50] script                            ; stock entry 42, CELL'S ESCAPE AS A BLINDING LIGHT (for Ryan's review, its own commit): the anime's Solar
+        PlayAudio 23                     ; Flare shown as light, no word added. The stock flew him out between Trunks and Krillin. Everyone
+        FadeToWhite 8                    ; starts; when the white clears he is gone and his flight is heard trailing off. Then Vegeta (stock)
+        SetEntityAnimationNoWait 0, 4
+        SetEntityAnimationNoWait 76, 4
+        SetEntityAnimationNoWait 128, 4
+        WaitFrames 30
+        DespawnEntity 28
+        PlayAudio 26
+        WhiteFadeOut 40
+        SetEntityAnimationNoWait 0, 0
+        SetEntityAnimationNoWait 76, 0
+        SetEntityAnimationNoWait 128, 0
+        WaitFrames 60
+        SpawnCharacterEntity 137, 104, 176
+        FlyToPosition 137, 200, 214
+        WaitFrames 30
+        SetEntityFollow 137, 0
+  stockseq @083e24a0 43 56               ; Vegeta, Tien, "You can call me... Piccolo.", the plan
+  [65] script                            ; stock entry 57: Trunks and Krillin are the pair for the lab
         FadeOut 90                       ; basement (ch6_basement); Hercule flies on with Piccolo
         PlayMusic 5
         DespawnEntity 128

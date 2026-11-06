@@ -26,6 +26,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_VT_rim
+mash 2 100
+frames 150
+shot cb_VT_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -119,6 +123,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_TV_rim
+mash 2 100
+frames 150
+shot cb_TV_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -211,6 +219,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_V_rim
+mash 2 100
+frames 150
+shot cb_V_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -302,6 +314,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_T_rim
+mash 2 100
+frames 150
+shot cb_T_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -393,6 +409,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_G_rim
+mash 2 100
+frames 150
+shot cb_G_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -484,6 +504,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_K_rim
+mash 2 100
+frames 150
+shot cb_K_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -575,6 +599,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_P_rim
+mash 2 100
+frames 150
+shot cb_P_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -667,6 +695,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_GK_rim
+mash 2 100
+frames 150
+shot cb_GK_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
@@ -760,6 +792,10 @@ deref R76 TBL+0x114
 echo EXPECT entrec [0-9a-f]+: 0$
 entrec R76
 shot cb_PV_rim
+mash 2 100
+frames 150
+shot cb_PV_power
+ents
 stepz 0x03001FDC 150
 frames 30
 echo EXPECT 03001fdc: 00000000
