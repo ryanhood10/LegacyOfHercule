@@ -111,8 +111,9 @@ typedef struct CgBeamRam {
     u8 step;
     u8 spirit;               // a body shown as a spirit: 0 none, 1 flickering (two frames in four), 2 whole, 3 hidden
     u8 spirit_id;            // its sprite id
-    u8 _pad;
+    u8 seen;                 // CoopCall 16 on 5 / 6: CG_SEEN once the summit's scene has played in full since power-on (a retry plays its short form)
 } CgBeamRam;
+#define CG_SEEN 0x5A         // partyram is not cleared at boot: one value in 256 counts
 _Static_assert(sizeof(CgBeamRam) == 0x40, "CgBeamRam: .party.bv holds 0x40");
 static CgBeamRam cgb __attribute__((section(".party.bv")));
 #define cg_beam_vt cgb.vt
@@ -155,6 +156,8 @@ static void cg_beam_capped(Beam *b) {
 }
 
 int cg_beam(int id, int on, int c) {
+    if (on == 5) { cgb.seen = c ? CG_SEEN : 0; return 0; }   // the summit's scene (arctic_summit.lscript): seen in full / forget
+    if (on == 6) return cgb.seen == CG_SEEN;                 // -> 1 on a retry in the same session (pushed by vmcall.c)
     if (on == 3) {                           // the clash goes to x = c px at id px a frame (0 = 1; 99 = at once)
         cgb.clash_to = (s16)c;
         cgb.step = (u8)(id == 99 ? 0 : id);
@@ -253,5 +256,6 @@ void cg_set_solo(int mode) {
     if (mode < 0 || mode > 2) mode = 0;
     cg_state.magic = CG_MAGIC;
     cg_state.solo = (u8)mode;
+    if (mode) cgb.seen = 0;                  // the Games: a later visit to the summit is a first one again
     if (mode && coop.p2) EntityList_Remove(g_SceneTable[1], coop.p2, 0);   // its destroy clears coop.p2
 }

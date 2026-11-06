@@ -98,9 +98,17 @@ for p1, p2, s56 in ((KRILLIN, SS2, 0), (SS2, KRILLIN, 0), (HERCULE, SS2, 0), (GO
     s.out("echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372", "map")
     if p2 is not None:
         s.out("deref P2E 0x0203FF08", f"echo EXPECT [0-9a-f]+: {350 << 8:08x} {372 << 8:08x}", "peek P2E+0x158 2")
-    s.end_scene(120)
+    s.out("echo EXPECT stepz 03001fdc: zero", f"stepz {SCENE} 120")     # the scene ends (not a peek after it: the fight starts at once and a hit blips the flag)
     s.shot(f"ca_{n}_fight")
     s.on_map(15, 8)
+    s.actors(s180=1, s165=0, s9=0, s11=0)       # the boss; 13, 17 and 18 are gone
+    if (p1, p2) in ((KRILLIN, SS2), (HERCULE, None)):
+        # a retry in the same session (a loss, a reload at the ridge pad) plays the short form (docs/cutscenes/batch3 6.2): he stands transformed at once
+        s.warp(15, 8, 336, 430, 200)
+        s.actors(s180=1, s165=0, s9=0, s11=0)
+        s.shot(f"ca_{n}_retry")
+        s.out("echo EXPECT stepz 03001fdc: zero", f"stepz {SCENE} 12")       # his last line and the players' lines only
+        s.on_map(15, 8)
     s.win(240)
     s.out("frames 200")
     s.end_scene()

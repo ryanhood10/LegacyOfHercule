@@ -47,11 +47,43 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_KS_fight
+echo EXPECT map zone 15 area 8\b
+map
+ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+poke32 0x0203FD0C 0x80f
+poke32 0x0203FD54 0x1ae0150
+poke32 0x0203FD08 5
+frames 200
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+shot ca_KS_retry
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 12
 echo EXPECT map zone 15 area 8\b
 map
 ents
@@ -114,14 +146,24 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_SK_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -181,14 +223,24 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_HS_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -248,14 +300,24 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_GS_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -311,11 +373,43 @@ frames 60
 shot ca_H_watch
 echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
 map
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_H_fight
+echo EXPECT map zone 15 area 8\b
+map
+ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+poke32 0x0203FD0C 0x80f
+poke32 0x0203FD54 0x1ae0150
+poke32 0x0203FD08 5
+frames 200
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
+shot ca_H_retry
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 12
 echo EXPECT map zone 15 area 8\b
 map
 ents
@@ -374,14 +468,24 @@ frames 60
 shot ca_S_watch
 echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
 map
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_S_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -437,14 +541,24 @@ frames 60
 shot ca_V_watch
 echo EXPECT map zone 15 area 8 var [0-9]+ player 324,372
 map
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_V_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -504,14 +618,24 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_HV_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200
@@ -571,14 +695,24 @@ map
 deref P2E 0x0203FF08
 echo EXPECT [0-9a-f]+: 00015e00 00017400
 peek P2E+0x158 2
+echo EXPECT stepz 03001fdc: zero
 stepz 0x03001FDC 120
-frames 30
-echo EXPECT 03001fdc: 00000000
-peek 0x03001FDC 1
 shot ca_VG_fight
 echo EXPECT map zone 15 area 8\b
 map
 ents
+deref R180 TBL+0x2b4
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R180
+deref R165 TBL+0x278
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R165
+deref R9 TBL+0x8
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R9
+deref R11 TBL+0x10
+echo EXPECT entrec [0-9a-f]+: 0$
+entrec R11
 poke32 0x0203FD08 7
 frames 240
 frames 200

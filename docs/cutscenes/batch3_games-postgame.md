@@ -816,6 +816,18 @@ Stock, about 50 s (filmed). **Leave.**
   (`CoopCall 9`), both facing the three, and the pan down before the players' lines is gone. Seen: with the stock camera a text box at
   the bottom covers screen rows 74-136, so the players show whole between boxes and by their feet under one; nothing on this view clears
   both the three and the players during a box. Test: `staging_arctic.txt` (player 1 at 324, 372 and player 2 at 350, 372 mid-scene, nine lineups).
+- **Built (`nb-cs3`, 2026-11-06), beats 2-7, 9, 10 and the short form, with script steps (no helper):** 17 goes in first (two blows with their
+  sounds and no flash on 13), 13's one answer throws him back (his hurt pose in a glide, dust), 18's blast lands and 13 walks out of its dust and
+  cracks his knuckles (pose 5); 17 comes forward again, 18 steps up on the other side; they go in together, 13 throws 17 down (a flash, a shake,
+  the knock-down 12) and knocks 18 back; he stands over 17, a pulse, 17 is dragged into him and gone, 13 doubles over (pose 2) and straightens;
+  18 fires three as he walks at her, backs off, two more, he reaches her, the same pulse and drag; the three surges each blow a wider ring of
+  snow, the second pushes Tien, Yamcha and both players back (glides; player 2 by `CoopCall 9`); after "I am complete!" Tien and Yamcha fire
+  three each, dust on him, he turns his head and one blast between them throws both to the rim, where they lie through the fight and stand again
+  when he is gone (`summit_13_end`); player 1 steps toward him for his line (Hercule: a step back). Not built: beat 8's crouch and roar (the
+  boss draws those groups by its own frame code, not by an animation index a script can name), the caption at the bottom (`@` without `^` is a
+  shout box in the middle too). **The short form:** `CoopCall 16, 0, 6` is 1 once the full scene has played since power-on: the players walk in,
+  a white cut to Super 13 standing with Tien and Yamcha down at the rim, his music, "Look at me.  Even Cell would tremble!", the players' lines,
+  the fight (about 8 s to control instead of 55).
 - **Draft lines:** none.
 - **Time:** about +12 s on 35. **This scene replays in full after every loss and every reload at the ridge pad** (Ryan
   kept that, 4i). Build with it a short form for a retry in the same session (a RAM bit, not a flag: he stands

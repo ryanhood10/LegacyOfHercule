@@ -40,7 +40,7 @@ end
 
 ; ---- the scene ---------------------------------------------------------------------------------------
 sequence summit_scene
-  script                                 ; 13 against 17 and 18 at the centre of the clearing
+  script                                 ; the players walk into the view; a retry's short form; else 13 against 17 and 18, a fight already under way
         SetPlayerVisible 1
         ; the players come into the picture (docs/cutscenes/batch3 0, 6.2 beat 1): they stood below the view for the whole scene. Player 1
         ; walks up to the view's bottom edge, player 2 beside him (by C: never a sprite step on a player), both facing the three
@@ -48,99 +48,189 @@ sequence summit_scene
         SetEntityFacing 0, 1
         CoopCall 9, 1, 350, 372
         PanCameraToPosition 228, 220, 3        ; the pan names the view's top-left corner
+        ; a retry (a loss, a reload at the ridge pad) in the same session plays the short form: he stands transformed, his last line, the
+        ; players' lines. A bit in RAM, not a flag (CoopCall 16 on 5 / 6, cellgames.c): a save made at the pad must not know
+        CoopCall 16, 0, 6, 0
+        JumpIfFalse FULL
+        FadeToWhite 12
+        DespawnEntity 9
+        DespawnEntity 11
+        DespawnEntity 165
+        SpawnCharacterEntity 180, 348, 300
+        SetEntityFacing 180, 0
+        SetEntityPositionInstant 121, 530, 380
+        SetEntityPositionInstant 156, 530, 430
+        SetEntityAnimationNoWait 121, 3
+        SetEntityAnimationNoWait 156, 3
+        PlayMusic 30
+        WhiteFadeOut 30
+        ScreenShake 0, 12, 40
+        WaitFrames 40
+        PushByte 15
+        END
+      FULL:
+        CoopCall 16, 0, 5, 1
         ; the others run in from the rim to the view's edges (Ryan, 2026-11-05: no stagnant characters; only actors move, by their own sprites)
         BeginCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Pa
+        JumpIfFalse a103
         WalkToPosition 103, 240, 250
-      Pa:
+      a103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Ga
+        JumpIfFalse a56
         WalkToPosition 56, 258, 280
-      Ga:
+      a56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Ka
+        JumpIfFalse a76
         WalkToPosition 76, 240, 300
-      Ka:
+      a76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Ha
+        JumpIfFalse a72
         WalkToPosition 72, 232, 330
-      Ha:
+      a72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Va
+        JumpIfFalse a137
         WalkToPosition 137, 456, 250
-      Va:
+      a137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Ta
+        JumpIfFalse a132
         WalkToPosition 132, 438, 280
-      Ta:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Na
+      a132:
         WalkToPosition 121, 456, 300
-      Na:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Ya
         WalkToPosition 156, 440, 328
-      Ya:
         CommitCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Paf
+        JumpIfFalse af103
         SetEntityFacing 103, 3
-      Paf:
+      af103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Gaf
+        JumpIfFalse af56
         SetEntityFacing 56, 3
-      Gaf:
+      af56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Kaf
+        JumpIfFalse af76
         SetEntityFacing 76, 3
-      Kaf:
+      af76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Haf
+        JumpIfFalse af72
         SetEntityFacing 72, 3
-      Haf:
+      af72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Vaf
+        JumpIfFalse af137
         SetEntityFacing 137, 2
-      Vaf:
+      af137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Taf
+        JumpIfFalse af132
         SetEntityFacing 132, 2
-      Taf:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Naf
+      af132:
         SetEntityFacing 121, 2
-      Naf:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Yaf
         SetEntityFacing 156, 2
-      Yaf:
-        BeginCommandBatch
+        ; a fight already under way: 17's two blows land and do nothing (no flash on 13), 13's one answer throws him back; 18's blast, and
+        ; 13 walks out of its dust
+        WalkToPosition 9, 322, 306
+        SetEntityFacing 165, 2
         SetEntityAnimation 9, 6
-        NPCFireKiBlastAtEntity 11, 165, 100
-        CommitCommandBatch
-        PlayDamageEffect 165
+        PlaySFX 165, 34
+        SetEntityAnimation 9, 7
+        PlaySFX 165, 35
         SetEntityAnimation 165, 6
         PlayDamageEffect 9
-        WaitFrames 30
+        PlaySFX 9, 36
+        BeginCommandBatch
+        SetEntityAnimation 9, 3
+        GlideToPosition 9, 288, 322, 2500
+        CommitCommandBatch
+        SpawnDustCloud 9, 284, 326
+        SetEntityFacing 9, 3
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 11, 165, 100
+        CommitCommandBatch
+        SpawnDustCloud 165, 344, 296
+        SpawnDustCloud 165, 354, 304
+        WaitFrames 24
+        WalkToPosition 165, 348, 312
+        SetEntityFacing 165, 0
+        SetEntityAnimation 165, 5              ; he cracks his knuckles
   text 169 "ANDROID 13: Ha!  The Dragon Balls brought your brother back...\x0band you came along too.  Just for me!"
+  script                                 ; 17 comes forward again
+        WalkToPosition 9, 306, 318
+        SetEntityFacing 9, 3
   text 28 "ANDROID 17: Sis, get out of here!"
+  script                                 ; 18 steps up: both sides of him
+        WalkToPosition 11, 390, 314
+        SetEntityFacing 11, 2
   text 29 "ANDROID 18: Not a chance.  We finish him together!"
-  script                                 ; 13 absorbs 17
-        WalkToPosition 165, 316, 316
-        WhiteFlash 20
+  script                                 ; they go in together; 13 throws 17 down, knocks 18 back, and absorbs 17
+        ; they go in together; 13 takes both blows, throws 17 down and knocks 18 back
+        BeginCommandBatch
+        WalkToPosition 9, 326, 310
+        WalkToPosition 11, 372, 308
+        CommitCommandBatch
+        BeginCommandBatch
+        SetEntityAnimation 9, 6
+        SetEntityAnimation 11, 6
+        CommitCommandBatch
+        PlaySFX 165, 34
+        PlaySFX 165, 35
+        SetEntityFacing 165, 2
+        SetEntityAnimation 165, 6
+        WhiteFlash 3
+        ScreenShake 0, 8, 10
+        PlayDamageEffect 9
+        PlaySFX 9, 36
+        BeginCommandBatch
+        SetEntityAnimation 9, 3
+        GlideToPosition 9, 290, 324, 3000
+        CommitCommandBatch
+        SetEntityAnimationNoWait 9, 12         ; down (his fight set's knock-down)
+        SpawnDustCloud 9, 288, 328
+        SetEntityFacing 165, 3
+        SetEntityAnimation 165, 7
+        PlayDamageEffect 11
+        PlaySFX 11, 35
+        BeginCommandBatch
+        SetEntityAnimation 11, 3
+        GlideToPosition 11, 414, 318, 2500
+        CommitCommandBatch
+        SetEntityFacing 11, 2
+        SpawnDustCloud 11, 418, 322
+        ; 13 absorbs 17: he stands over him, a pulse, 17 is dragged the last steps into him
+        WalkToPosition 165, 314, 320
+        SetEntityFacing 165, 2
+        WaitFrames 12
+        WhiteFlash 6
         PlayAudio 61
+        GlideToPosition 9, 310, 322, 700
         DespawnEntity 9
         ScreenShake 0, 10, 30
-        WaitFrames 40
+        SetEntityAnimation 165, 2              ; it doubles him over for a moment
+        WaitFrames 10
+        SetEntityFacing 165, 3
+        WaitFrames 24
   text 169 "ANDROID 13: This is for the Doc.\x0bYour power is mine!"
-  script                                 ; then 18; the transformation (Ryan: more epic): the camera closes in, three surges
-        WalkToPosition 165, 384, 316
-        WhiteFlash 20
+  script                                 ; 18's volley as he walks through it; he absorbs her; the transformation's three surges
+        ; 18 does not wait her turn: she fires as he walks at her through it, backs off still firing; he reaches her
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 11, 165, 100
+        NPCFireKiBlastAtEntity 11, 165, 100
+        NPCFireKiBlastAtEntity 11, 165, 100
+        WalkToPosition 165, 370, 318
+        CommitCommandBatch
+        SpawnDustCloud 165, 366, 314
+        WalkToPosition 11, 438, 318
+        SetEntityFacing 11, 2
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 11, 165, 100
+        NPCFireKiBlastAtEntity 11, 165, 100
+        WalkToPosition 165, 416, 318
+        CommitCommandBatch
+        WhiteFlash 6
         PlayAudio 61
+        GlideToPosition 11, 422, 318, 700
         DespawnEntity 11
         ScreenShake 0, 10, 30
-        WaitFrames 40
+        SetEntityAnimation 165, 2
+        WaitFrames 20
         WalkToPosition 165, 348, 300
         SetEntityFacing 165, 0
         CoopCall 22, 2, 76, 0                  ; Krillin starts forward at the sight of 18 going
@@ -148,90 +238,95 @@ sequence summit_scene
         WalkToPosition 76, 268, 306
       Ks:
         PanCameraToPosition 228, 230, 2        ; 13 at the centre of the view
-        WaitFrames 30
+        WaitFrames 20
+        ; the change (Ryan: more epic): three surges, each blowing the snow out further; the second pushes Tien, Yamcha and the players back
         PlayAudio 55
         WhiteFlash 10
         ScreenShake 0, 6, 20
-        WaitFrames 40
+        SpawnDustCloud 165, 326, 302
+        SpawnDustCloud 165, 370, 302
+        SpawnDustCloud 165, 348, 284
+        SpawnDustCloud 165, 348, 316
+        WaitFrames 36
         PlayAudio 55
         WhiteFlash 20
         ScreenShake 0, 12, 30
-        WaitFrames 30
+        SpawnDustCloud 165, 308, 302
+        SpawnDustCloud 165, 388, 302
+        SpawnDustCloud 165, 348, 266
+        SpawnDustCloud 165, 348, 334
+        BeginCommandBatch
+        GlideToPosition 121, 470, 300, 1500
+        GlideToPosition 156, 454, 328, 1500
+        GlideToPosition 0, 324, 378, 1500
+        CommitCommandBatch
+        SetEntityFacing 0, 1
+        CoopCall 9, 1, 350, 378
+        WaitFrames 20
         PlayAudio 55
         WhiteFlash 30
         ScreenShake 0, 18, 40
+        SpawnDustCloud 165, 290, 302
+        SpawnDustCloud 165, 406, 302
+        SpawnDustCloud 165, 348, 248
+        SpawnDustCloud 165, 348, 352
+        SetEntityAnimationNoWait 165, 2        ; it doubles him over
         WaitFrames 20
   text 169 "ANDROID 13: Yes...  YES!  I can feel their power!"
   script                                 ; the mountain shakes
         PlayAudio 20
         ScreenShake 0, 20, 120
-        ; and all of them fall back
+        ; and the party's watchers fall back
         BeginCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Pb
+        JumpIfFalse b103
         WalkToPosition 103, 224, 250
-      Pb:
+      b103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Gb
+        JumpIfFalse b56
         WalkToPosition 56, 242, 280
-      Gb:
+      b56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Kb
+        JumpIfFalse b76
         WalkToPosition 76, 224, 300
-      Kb:
+      b76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Hb
+        JumpIfFalse b72
         WalkToPosition 72, 216, 344
-      Hb:
+      b72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Vb
+        JumpIfFalse b137
         WalkToPosition 137, 472, 250
-      Vb:
+      b137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Tb
+        JumpIfFalse b132
         WalkToPosition 132, 454, 280
-      Tb:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Nb
-        WalkToPosition 121, 472, 300
-      Nb:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Yb
-        WalkToPosition 156, 456, 328
-      Yb:
+      b132:
         CommitCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Pbf
+        JumpIfFalse bf103
         SetEntityFacing 103, 3
-      Pbf:
+      bf103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Gbf
+        JumpIfFalse bf56
         SetEntityFacing 56, 3
-      Gbf:
+      bf56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Kbf
+        JumpIfFalse bf76
         SetEntityFacing 76, 3
-      Kbf:
+      bf76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Hbf
+        JumpIfFalse bf72
         SetEntityFacing 72, 3
-      Hbf:
+      bf72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Vbf
+        JumpIfFalse bf137
         SetEntityFacing 137, 2
-      Vbf:
+      bf137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Tbf
+        JumpIfFalse bf132
         SetEntityFacing 132, 2
-      Tbf:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Nbf
-        SetEntityFacing 121, 2
-      Nbf:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Ybf
-        SetEntityFacing 156, 2
-      Ybf:
+      bf132:
         WaitFrames 30
   text 0 "@^The whole mountain is shaking..."
   script                                 ; the reveal: a long white-out, Super 13, the biggest shake, his music
@@ -247,121 +342,156 @@ sequence summit_scene
         ScreenShake 0, 30, 90
         WaitFrames 40
   text 122 "SUPER 13: Now...  I am complete!"
+  script                                 ; Tien and Yamcha's blasts do nothing; his one blast throws them to the rim
+        ; proof, between story actors only: Tien and Yamcha fire everything; he has not moved; one blast between them puts both down at the rim,
+        ; where they lie through the fight
+        BeginCommandBatch
+        NPCFireKiBlastAtEntity 121, 180, 100
+        NPCFireKiBlastAtEntity 156, 180, 100
+        NPCFireKiBlastAtEntity 121, 180, 100
+        NPCFireKiBlastAtEntity 156, 180, 100
+        NPCFireKiBlastAtEntity 121, 180, 100
+        NPCFireKiBlastAtEntity 156, 180, 100
+        CommitCommandBatch
+        SpawnDustCloud 180, 352, 284
+        SpawnDustCloud 180, 366, 296
+        SpawnDustCloud 180, 356, 306
+        WaitFrames 36
+        SetEntityFacing 180, 3
+        WaitFrames 24
+        BeginCommandBatch
+        NPCFireKiBlast 180, 462, 318, 100
+        CommitCommandBatch
+        WhiteFlash 4
+        PlayAudio 20
+        ScreenShake 0, 10, 16
+        SpawnDustCloud 121, 462, 318
+        BeginCommandBatch
+        GlideToPosition 121, 530, 380, 2500
+        GlideToPosition 156, 530, 430, 2500
+        CommitCommandBatch
+        SetEntityAnimationNoWait 121, 3
+        SetEntityAnimationNoWait 156, 3
+        SpawnDustCloud 121, 526, 384
+        SpawnDustCloud 156, 526, 434
+        WaitFrames 24
+        SetEntityFacing 180, 0
   text 122 "SUPER 13: Look at me.  Even Cell would tremble!"
-  script                                 ; who speaks for the players: some characters have their own line (they are in the view already: no pan down)
+  script                                 ; [16] the players' lines (they are in the view already: no pan down)
+        ; who speaks for the players: some characters have their own line; player 1 takes a step toward him (Hercule: a step back)
         PushActiveCharIndex
         PushByte 2
         CmpEq
         JumpIfFalse L1
-        PushByte 14
+        WalkToPosition 0, 324, 366
+        SetEntityFacing 0, 1
+        PushByte 17
         END
       L1:
         PushActiveCharIndex
         PushByte 5
         CmpEq
         JumpIfFalse L2
-        PushByte 15
+        WalkToPosition 0, 324, 386
+        SetEntityFacing 0, 1
+        PushByte 18
         END
       L2:
         PushActiveCharIndex
         PushByte 6
         CmpEq
         JumpIfFalse L3
-        PushByte 16
+        WalkToPosition 0, 324, 366
+        SetEntityFacing 0, 1
+        PushByte 19
         END
       L3:
         PushActiveCharIndex
         PushByte 1
         CmpEq
         JumpIfFalse L4
-        PushByte 17
-        END
-      L4:
-        PushByte 18
-        END
-  text 106 "VEGETA: Hmph.  Another tin can to scrap." -> 19
-  text 67 "HERCULE: Uh...  is it too late to go home?" -> 19
-  text 73 "KRILLIN: 18...  You'll pay for this!" -> 19
-  text 90 "PICCOLO: Careful.  He's stronger than Cell was." -> 19
-  text 1 "We have to stop this!"
-  script                                 ; [19] player 2 answers when there is one; alone, straight to the fight
-        CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
+        WalkToPosition 0, 324, 366
+        SetEntityFacing 0, 1
         PushByte 20
         END
-      L1:
+      L4:
+        WalkToPosition 0, 324, 366
+        SetEntityFacing 0, 1
         PushByte 21
+        END
+  text 106 "VEGETA: Hmph.  Another tin can to scrap." -> 22
+  text 67 "HERCULE: Uh...  is it too late to go home?" -> 22
+  text 73 "KRILLIN: 18...  You'll pay for this!" -> 22
+  text 90 "PICCOLO: Careful.  He's stronger than Cell was." -> 22
+  text 1 "We have to stop this!"
+  script                                 ; [22] player 2 answers when there is one; alone, straight to the fight
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse L1
+        PushByte 23
+        END
+      L1:
+        PushByte 24
         END
   fmt 0 "%s: Let's take him down together!"
         CoopCall 14, 2, 0, 0
         END
-  script                                 ; the fight: the boss record (stat 145, sprite 180); the others clear the field to the rim's edge
+  script                                 ; the fight: the boss record (stat 145, sprite 180); the party's watchers clear the field (Tien and Yamcha lie at the rim)
         BeginCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Pc
+        JumpIfFalse c103
         WalkToPosition 103, 190, 280
-      Pc:
+      c103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Gc
+        JumpIfFalse c56
         WalkToPosition 56, 190, 330
-      Gc:
+      c56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Kc
+        JumpIfFalse c76
         WalkToPosition 76, 190, 380
-      Kc:
+      c76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Hc
+        JumpIfFalse c72
         WalkToPosition 72, 170, 430
-      Hc:
+      c72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Vc
+        JumpIfFalse c137
         WalkToPosition 137, 530, 280
-      Vc:
+      c137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Tc
+        JumpIfFalse c132
         WalkToPosition 132, 530, 330
-      Tc:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Nc
-        WalkToPosition 121, 530, 380
-      Nc:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Yc
-        WalkToPosition 156, 530, 430
-      Yc:
+      c132:
         CommitCommandBatch
         CoopCall 22, 2, 103, 0
-        JumpIfFalse Pcf
+        JumpIfFalse cf103
         SetEntityFacing 103, 3
-      Pcf:
+      cf103:
         CoopCall 22, 2, 56, 0
-        JumpIfFalse Gcf
+        JumpIfFalse cf56
         SetEntityFacing 56, 3
-      Gcf:
+      cf56:
         CoopCall 22, 2, 76, 0
-        JumpIfFalse Kcf
+        JumpIfFalse cf76
         SetEntityFacing 76, 3
-      Kcf:
+      cf76:
         CoopCall 22, 2, 72, 0
-        JumpIfFalse Hcf
+        JumpIfFalse cf72
         SetEntityFacing 72, 3
-      Hcf:
+      cf72:
         CoopCall 22, 2, 137, 0
-        JumpIfFalse Vcf
+        JumpIfFalse cf137
         SetEntityFacing 137, 2
-      Vcf:
+      cf137:
         CoopCall 22, 2, 132, 0
-        JumpIfFalse Tcf
+        JumpIfFalse cf132
         SetEntityFacing 132, 2
-      Tcf:
-        CoopCall 22, 2, 121, 0
-        JumpIfFalse Ncf
-        SetEntityFacing 121, 2
-      Ncf:
-        CoopCall 22, 2, 156, 0
-        JumpIfFalse Ycf
-        SetEntityFacing 156, 2
-      Ycf:
+      cf132:
+        ; his power flares and pushes the players back to fighting distance (they stood 70 px from him for the scene)
+        WhiteFlash 3
+        ScreenShake 0, 8, 14
+        GlideToPosition 0, 324, 414, 2500
+        SetEntityFacing 0, 1
+        CoopCall 9, 1, 350, 414
         DespawnEntity 180
         TriggerMapEvent 11
         DrawBossHealthBar 180
@@ -380,6 +510,16 @@ sequence summit_13_end
         WaitFrames 60
         FadeToWhite 30
         WaitFrames 30
+        CoopCall 22, 2, 121, 0                 ; Tien and Yamcha, thrown to the rim in the scene, are on their feet when the white lifts
+        JumpIfFalse T1
+        SetEntityAnimationNoWait 121, 0
+        SetEntityFacing 121, 2
+      T1:
+        CoopCall 22, 2, 156, 0
+        JumpIfFalse Y1
+        SetEntityAnimationNoWait 156, 0
+        SetEntityFacing 156, 2
+      Y1:
         WhiteFadeOut 60
         CoopCall 22, 4, 2, 0                   ; Vegeta's line only when someone plays him (next 1), else 2
         JumpIfFalse V1

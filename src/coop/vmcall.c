@@ -186,7 +186,7 @@ void vm_coop_call(s32 *st) {
     case 7: coop2.pad_swap ^= 1; break;   // input.c swaps the pads while player 2's pad is present
     case 8: vm_push(st, (coop.p2 || p2_present()) ? (s32)coop.p2_slot : -1); break;
     case 15: cg_set_solo(a); break;       // the Cell Games' solo fights (cellgames.c)
-    case 16: cg_beam(a, b, c); break;
+    case 16: { s32 v = cg_beam(a, b, c); if (b == 6) vm_push(st, v); break; }
     case 18: if (a) cg_choice_arm(); else vm_push(st, cg_choice_take()); break;   // yes / no (cellgames.c)
     case 13: wave_start((const void *)a, b); break;
     case 14:
