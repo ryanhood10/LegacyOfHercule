@@ -429,10 +429,19 @@ sequence ch5_gingertown_end
         FlyToPosition 76, 240, 304
         CoopCall 37, 12, 128, 128
   stockseq @083e24a0 30 41               ; the talk with Krillin and Trunks; "You all must feel honored. ... I'll absorb you later!"
-  [50] script                            ; stock entry 42: Cell flies off; Vegeta flies in (to a spot left of where Piccolo stands now)
-        PlayAudio 26
-        FlyToPosition 28, 344, 380
+  [50] script                            ; stock entry 42, CELL'S ESCAPE AS A BLINDING LIGHT (for Ryan's review, its own commit): the anime's Solar
+        PlayAudio 23                     ; Flare shown as light, no word added. The stock flew him out between Trunks and Krillin. Everyone
+        FadeToWhite 8                    ; starts; when the white clears he is gone and his flight is heard trailing off. Then Vegeta (stock)
+        SetEntityAnimationNoWait 0, 4
+        SetEntityAnimationNoWait 76, 4
+        SetEntityAnimationNoWait 128, 4
+        WaitFrames 30
         DespawnEntity 28
+        PlayAudio 26
+        WhiteFadeOut 40
+        SetEntityAnimationNoWait 0, 0
+        SetEntityAnimationNoWait 76, 0
+        SetEntityAnimationNoWait 128, 0
         WaitFrames 60
         SpawnCharacterEntity 137, 104, 176
         FlyToPosition 137, 200, 214
