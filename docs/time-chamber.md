@@ -2,7 +2,8 @@
 
 **Status: phases 1-6 and the loop built (section 12: what stands, the numbers measured, how to add a room); Ryan's first play
 answered on branch `nb-chamber2` (section 13: the door home asks, no save pad, plaques ON then OFF, the lever's way to the gate,
-every reward in a box, the red carpet, the gate's wall and portal, the opening scene, side rooms, the training's end). Where 13
+every reward in a box, the red carpet, the gate's wall and portal, the opening scene, side rooms, the training's end; his
+second round in 13.6: two questions mid-run, Broly's north room, Frieza's three rooms). Where 13
 and an older section differ, 13 holds.** Ryan reads part 1
 first (what the player sees), part 2 for what the stock game really has, parts 3-6 for the content, part 7 for the
 technical notes, then the phases, the risks and the decisions (section 10). Facts carry their source; anything not
@@ -1119,3 +1120,47 @@ portal: player 1 at (1028, 346), Up; the hidden room's scene starts after the po
 - The carpet's look over the whole map, the portal's two-frame turn and the wall at the top are seen in headless shots only.
 - The rooms' views stand only the lead and the partner (Tao without his crew).
 - A player 2 alone walking into the portal does nothing (player 1's position fires it, as the stock doors).
+
+### 13.6 Ryan's second round (2026-11-06)
+
+He played 13 (merged into `main` at `5cb4ec0`): "f5- everything is perfect. i would just add another message on the leaving the time
+chamber question saying 'are you sure? you will lose all progress' -- i want progress to reset if they leave mid-run. they have to
+conquer all 6 bosses AND Popo in one run." "f7- ... theres also supposed to be a room up north, theres a door for it. the side rooms
+are good though." "f9- friezas is cool too. it would honestly make more sense if you used the new room as the initial fighting room
+and the room we already have as the 2nd room. BUT, we still need another room north of that that has no doors and matches the ships
+vibe. a control room would be cool".
+
+- **The door home, mid-run** (a light out, Popo not beaten): two questions, each a box of its own after its beat: "Leave the Time
+  Chamber? (A: Yes B: No)", and on yes his words, "Are you sure? / You will lose all progress. / (A: Yes B: No)". B (or no) on
+  either: a step back, still inside, nothing lost. An A held from the first does not answer the second (CoopCall 18 arms it anew).
+  Both yes: the run resets as in 13.1 (the six lights, 510, 530; first wins, finds and Popo's rounds kept), the Lookout. With
+  nothing done (no light out): the first question only. After Popo (the training complete): none. The whole six and Popo are one
+  run. (chamber.c `CH_EXIT_ROUTE`: a = 0 the first route, a = 1 after a yes; `B_ASKED` 0x10 in ChState +0x31.)
+- **Broly's ship, north**: the round room's top doorway (blocked by the map, opened by the lever like the side ones: `ways` now
+  holds three) leads up into a lounge (15/31, 240 x 176, 55 slots): composed from the round room's own Buu's Fury neighbours, 6/7's
+  walls and floor without its cold box, its left opening shut by its right rim mirrored, the round room's bottom doorway stamped
+  into its bottom rim (the way down), the round room's table in the middle. Two stone jars; facing the table "Bowls and cups on the
+  table, and a capsule among them..." and a +3 Strength Capsule, once (flag 535); later "The table is bare now."
+- **Frieza's ship, three rooms**: the door from the open area now enters **his throne room** (15/21, Buu's 8/27: the pillars, the
+  round pad, the dome at the back as his hover pod; its bottom wall cut for 8/19's corridor; 431 slots), where the fight is: the
+  plaque on the back wall left of the pod (purple, lit), Frieza (and King Cold with two players) standing either side in front of the
+  pod and walking down onto the pad, the door's beam across the corridor, Mecha Frieza at 40 % alone, the lever and its cut-away as
+  before. The doorway right of the pod (8/19's top doorway stamped into the back wall) opens with the lever: **the crystal room**
+  (15/29, Buu's 8/19 whole, the old fight room; its right opening shut; 420 slots): two jars; facing the crystal's dais "The crystal
+  hums. Something glints at its foot..." and a +3 Power Capsule (flag 533); later "The crystal hums quietly.". Its top doorway leads
+  to **the control room** (15/30, Buu's 8/34 inside Babidi's ship with 8/20's right wall over its side opening and 8/20's console in
+  the middle: no other door, the ship's purple walls and blue floor; 146 slots): two jars; facing the console "The ship's controls. A
+  pouch is wedged under the panel..." and a Senzu Bean (flag 534); later "The ship's controls blink. Nothing else here."
+- **Without `roms/buu.gba`** (`BUU=0`): Frieza's room is still `chamber_frieza_plain.json` on area 21 (Capsule Ship 3 in purple,
+  one room, no doorway) and the Saiyan ship's `_plain` has none either; areas 27-31 are not built. The rooms' `plain` rows are
+  unchanged.
+- **Numbers**: areas 29 (the crystal room, `chamber_frieza_crystal.json`, in place of the throne room's file), 30 (the control
+  room, `chamber_frieza_control.json`), 31 (the lounge, `chamber_saiyan_lounge.json`); finds 531-535 by area 27-31 (the bed, the
+  cold box, the crystal, the console, the table); `CH_FINDS` 5; `ch_find` 22 entries. Frieza's row: marks (176, 200) / (232, 200),
+  seal (184, 312)-(216, 320), line 300, stands (168, 132) / (248, 132), the opening's views (24, 8) and (88, 72) (alone centred on him),
+  the way on (248, 56)-(280, 104). The opening's view of his ship is now the throne room.
+- **Tests**: `chamber_gate` asks twice mid-run (B on the first, a held A, the second with its bit, B on it, then both yes and out)
+  and once with nothing done (B, then A out); `chamber_rooms` enters the new Frieza room, checks the lounge's doorway and the way on
+  shut before the lever, then each side room's find and look, the control room through the crystal room (`side_room`'s `next`).
+- **Full regression** (`regfull.sh build/t`, the branch's final build, 2026-11-06): 95 blocks, no FAIL, TIMEOUT or CRASH
+  (`chamber_gate` 118 checks, `chamber_rooms` 443, `chamber_run` 77). On a `BUU=0` build: `chamber_rooms_plain` 376, `chamber_run_plain` 73.
