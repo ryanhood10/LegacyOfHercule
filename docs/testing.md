@@ -15,6 +15,7 @@ inspection goes through the GDB stub.
 | Frame time and OAM probe | lag, frame budget, OBJ count, what vanished and why, which function eats the frame: alone vs with player 2, on any map |
 | Story chapters, headless | any story chapter or scene: scripted input, Map Test with flag presets, screenshots, RAM peeks |
 | Scene staging | who stands, walks and talks in our added scenes for every lineup (one player, two, any selectable character): `staging_*.txt` |
+| Cinematic helpers | `CoopCall 37`'s moves (dash, strikes, exchange, charge, blasts, beam struggle, poses, looks): every op for many bodies, self-checking; filming a move or the demo scene and looking at it |
 | Tournament moves | the opponents' kits, the move library, Rumble mode (test commands 26 / 27) |
 | Tournament fight fixes | knock-back per punch, the fall at HP 0, a Rumble finished by real hits, Energy Steal, the playables' lead |
 | Tournament flow films | a whole tournament filmed shot by shot with the engine's phase: transitions, pops, the curtain |
@@ -699,6 +700,43 @@ entry 7, poke player 1 (and 2's slot), warp into the trigger (a Map Test of the 
 - Slot 8 for a test: `poke16 0x0203F0EC..F2` HP / EP, `poke8 0x0203F0F4 28` the row, flags `0x7F` at `0x0203F100` (as `ssj2_join` leaves him; only poking the flags
   leaves row 0 and an empty entry: the scene never starts).
 - Real party at Krillin's visit: flags byte 0 on slots 1-8 (`flags_of`), `p2 off`, then `p2 0`: player 2's entity is born only when Krillin joins.
+
+## Cinematic helpers (headless, 2026-11-06, branch `nb-cine`; `docs/cutscenes.md` section 5 "Cine")
+
+`src/coop/cine.c` (`CoopCall 37`) is driven two ways: from lscript, and by **test command 50** (`docs/ids.md`): `arg` = the op,
+`arg2` = b | c << 16, called at the next input poll outside a scene exactly as a script's call (the op plays inside the command
+modal, nested in that poll, so `frames N` after the poke runs it). `arg` 102 stands an actor of a sprite at an offset from
+player 1, so any pair of bodies can be put on any map without a script.
+
+```
+python tools/headless/cine_gen.py            # writes cine.txt and cine_demo.txt
+python tools/headless/staging_run.py tools/headless/cine.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+python tools/headless/st_test.py tools/headless/cine_demo.txt ROM build/<dir>/hl/menu.ss --out build/<dir>/hl/cine --cols 8
+```
+
+- **`cine.txt`** (in `regfull.sh`; 632 checks, about three minutes): on New Planet Vegeta's basin (zone 15 area 3), every
+  blocking op for seven pairs of sprites (Vegeta 137 and Android 17 both ways, Cooler's 64 x 64 body 34, King Cold 74 with
+  five groups and no hit-stun, Piccolo's one-group NPC 73 with a bird 63), then a missing B, a missing A, an id past the
+  sprite index, the point as the target, player 1 and player 2 as either party (two players, and one: player 2's moves play
+  nothing), a party-slot code, the players on each other, a transformed player 1 (Goku on his Super Saiyan row), Start
+  skipping an exchange, a struggle and a beam, the looks (player 1's facing byte), the camera's follow, a pan, a jolt, the
+  held charge, and the demo scene in both modes. After each op: the last op and how it ended (`CineRam` +0xF / +0x10), ops
+  started = ended (+0x18); after each block: nobody held (op 17), no hum left (test command 46), OBJ VRAM's largest free
+  block back to its mark (`arg` 103 / 104), the `ents` lists' vtables sane (`staging_run.py`): a body animated on a group
+  it lacks would corrupt the heap and show there. A player knocked down outside a scene is back in his idle state
+  (0x08025A84 at his control state) 40 frames later.
+- **`cine_demo.txt`** films the demo scene (`data/story/cine_demo.lscript`: Vegeta against 17, then Broly against
+  everyone, players included, every op once), a shot every 6 frames; `st_test.py` tiles them into `cine_demo.png`. The
+  demo is not in the story: its dialogue trigger on the basin has the condition `CoopCall 37, 99`, true only after test
+  command 50 `arg` 100, and the scene disarms it.
+- **Looking at one move:** poke the cast and an op, then `frames 2` / `shot` in a loop; crop and enlarge the shots round the
+  bodies (a 240 x 160 sheet is too small to judge a strike: at 3x a punch, the star and the white frame read clearly).
+- **Skips in a test:** player 1's Start outside a scene also opens the pause menu once the op is over, so `cine.txt` skips
+  with player 2's pad (`p2 8`); in a real scene player 1's Start skips (checked on the demo: four moves skipped, the same
+  end positions, the scene's end reached).
+- **A skipped move's cost:** the rest of its timeline runs in one frame without poses or effects (a 300-frame exchange:
+  no lagged frame); before the poses were cached a skip froze the game for some 40 frames, which is why `act_frame`
+  writes a pose only when it changes.
 
 ## Time Chamber (headless, 2026-11-05, branch `nb-chamber`; `docs/time-chamber.md` 12)
 
