@@ -20,6 +20,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
   with `asidewatch` through the whole `cell_staging.txt` (every Games lineup) and `staging_arctic.txt` on both builds: before, the two Cells
   went for most lines of fight 7's end and, with two players, two Cell Juniors in view for a line of their scene; after, nothing in view is
   ever set aside (only the cliff's watchers while the camera is down on the field). The summit sets nothing aside in either build.
+  Full regression clean on `nb-vis` (101 blocks, `ST_HEADLESS=` a runner built from this branch's `st_headless.c`, private play ROM).
 - **Ryan's Super Saiyan notes on the cutscene pass (branch `nb-ssjfix`; one commit a scene).** (1) The transformations play the body's
   own stock power-up again at its own pace, with the cutscene pass's effects alongside instead of in place of it: Cine's held charge has
   a mode beside the body's animation (`CoopCall 37, 7, 0, level + 4`: rings, smoke, flickers, a growing rumble, no pose, no hold, no
