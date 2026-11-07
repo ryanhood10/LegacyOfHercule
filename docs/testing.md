@@ -124,7 +124,7 @@ ST_HEADLESS=/root/st_perf python tools/headless/perf_probe.py table build/<dir>/
 python tools/headless/perf_probe.py hot TRACE build/<dir>/log2-coop.gba --top 25    # a `ptrace` rolled up by function
 ```
 
-`perf_budget.py` builds its own runner (`/root/st_perf`, from `st_headless.c`, when older than the source); the `perf`
+`perf_budget.py`'s forced evictions (West City's arrival, test command 45): 4 KB held, the pack makes the room and nobody on screen goes (since 2026-11-06); 8 KB held (`forced_full`), the pack cannot, some of the crowd goes one at a time and the players stay. `perf_budget.py` builds its own runner (`/root/st_perf`, from `st_headless.c`, when older than the source); the `perf`
 commands are not in a `/root/st_headless` built before them. From Git Bash set `MSYS_NO_PATHCONV=1` before
 `ST_HEADLESS=/root/...`, or the path gets rewritten. The spots are `tools/headless/perf_spots.txt` (runner scripts with
 `{P2}` for `p2 0` / `p2 off`).

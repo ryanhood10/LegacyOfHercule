@@ -334,10 +334,11 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   frames after it, at once, so moved blocks uploaded while the screen is drawn show a band of wrong tiles for one frame: the pack
   uploads in the VBlank. A decoration (holder vtable `0x08025974`, its other pieces `0x08024EE4`) answers slot 6 `0x08006528` (only
   at round 15) and slot 3 `0x080071FA` "in the view" (+0x18..+0x24 its box against the camera's); the holder frees its sheet's block
-  at +0x0E. The hook's round 15 now: player 1's block low, the decorations if none is in the view, the pack (only when the free
-  space and the bodies' blocks between the fixed blocks hold the box: the box's room is taken first, the bodies reallocated largest
-  first, the room given back; a body that finds no block is set aside as the eviction would have, without slot 7), then one body at
-  a time as before, packed again after each. `obj_room` +8 `decor`, +9 `moved` count it.
+  at +0x0E. The hook's round 15 now: player 1's block low, the decorations if none is in the view, on-screen bodies one at a time
+  (as before) only while a pack could not make the room (`packed_room`: the free and the bodies' blocks between the fixed blocks),
+  then the pack once (it waits for a VBlank: the box's room is taken first, the bodies reallocated largest first, the room given
+  back; a body that finds no block is set aside as the eviction would have, without slot 7), then one at a time again if the pack
+  could not place every body. `obj_room` +8 `decor`, +9 `moved` count it.
 
 ## Dropped items and touch boxes (decompiled 2026-11-01 for player 2's pickups)
 

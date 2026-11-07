@@ -102,24 +102,30 @@ def arrival(rom, state, outdir, room):
         check(taken == 0, f"West City's arrival {mode}: on-screen bodies taken {taken}")
 
 
-def forced(rom, state, outdir, room):
-    # Test command 45 holds 4 KB at the free run's low end: the box does not fit. Some of the crowd goes, the players stay
-    body = ["p2 0\n", ARRIVAL, "poke32 0x0203FD0C 4096\n", "poke32 0x0203FD08 45\n", "frames 2\n",
+def forced(rom, state, outdir, room, hold=4096, name="forced"):
+    # Test command 45 holds `hold` bytes at the free run's low end: the box does not fit as it is. With 4 KB the eviction's own
+    # rounds (what is off screen) and the pack of the bodies' blocks (objroom.c, 2026-11-06) make its room: nobody on screen goes.
+    # With 8 KB packing cannot do it: some of the crowd goes, one at a time, the players stay
+    body = ["p2 0\n", ARRIVAL, f"poke32 0x0203FD0C {hold}\n", "poke32 0x0203FD08 45\n", "frames 2\n",
             "findent PL 0x08025604\n", "findent PTWO 0x0203FE00\n", "peek 0x03001124\n",
-            "perfstart\n", "frames 180\n", "perfstop forced\n",
-            f"peek {room:#x} 2\n", "ents\n", "shot wc_forced\n"]
+            "perfstart\n", "frames 180\n", f"perfstop {name}\n",
+            f"peek {room:#x} 3\n", "ents\n", f"shot wc_{name}\n"]
     for _ in range(24):
         body += ["key 1 8\n", "frames 60\n"]
     body += ["frames 120\n", "echo after\n", "peek 0x03001124\n", "poke32 0x0203FD0C 0\n", "poke32 0x0203FD08 45\n", "frames 2\n", "map\n"]
-    out = P.run_spot("forced", body, "coop", rom, state, outdir)
-    ln, r = perf_line(out, "forced")
+    out = P.run_spot(name, body, "coop", rom, state, outdir)
+    ln, r = perf_line(out, name)
     print(ln)
-    m = re.search(r"^0*%x: (\w{8}) (\w{8})" % room, out, re.M)
+    m = re.search(r"^0*%x: (\w{8}) (\w{8}) (\w{8})" % room, out, re.M)
     word = int(m.group(1), 16) if m else 0
     taken, rnd, calls = word >> 24, (word >> 16) & 0xFF, int(m.group(2), 16) if m else 0
-    check(calls >= 1 and rnd >= 15, f"forced eviction ran to its last round (round {rnd}, {calls} calls)")
-    check(1 <= taken <= 12, f"forced eviction: {taken} on-screen bodies taken, not the whole crowd")
-    listed = re.findall(r"vt (\w{8})", out[out.index("perf forced"):out.index("\nafter")] if "\nafter" in out else "")
+    moved = (int(m.group(3), 16) >> 8) & 0xFF if m else 0
+    check(calls >= 1 and rnd >= 15, f"{name} eviction ran to its last round (round {rnd}, {calls} calls)")
+    if hold <= 4096:
+        check(taken == 0, f"{name} eviction: {taken} on-screen bodies taken (the pack makes the room: {moved} bodies moved)")
+    else:
+        check(1 <= taken <= 12, f"{name} eviction: {taken} on-screen bodies taken, not the whole crowd ({moved} bodies moved)")
+    listed = re.findall(r"vt (\w{8})", out[out.index("perf " + name):out.index("\nafter")] if "\nafter" in out else "")
     check("08025604" in listed and "0203fe00" in listed, "forced eviction: both players stay listed through the box")
     check("08025974" in listed or "08024ee4" not in listed, "forced eviction: no decoration left without its sheet (it would show the box's tiles)")
     after = re.search(r"^after\s*\n03001124: (\w{8})", out, re.M)
@@ -153,6 +159,7 @@ if __name__ == "__main__":
     spots_budget(rom_path, state_path, out_dir)
     arrival(rom_path, state_path, out_dir, room_addr)
     forced(rom_path, state_path, out_dir, room_addr)
+    forced(rom_path, state_path, out_dir, room_addr, 8192, "forced_full")
     sign(rom_path, state_path, out_dir)
     print(f"== expect: {checks} checks, {fails} failed")
     sys.exit(1 if fails else 0)

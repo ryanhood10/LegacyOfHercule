@@ -246,11 +246,15 @@ static void round15(EntityList *l, int need) {
     Entity *p1 = g_PlayerObject, *p2 = coop.p2, *e;
     if (p1 && listed(l, p1)) obj_entity_low(p1);   // no one sees a body move: its old block joins what is free beside it
     if (!room_for(l, need)) decor_off_view(l, p1, p2);   // nothing seen goes first
-    repack(l, need);
-    while (!room_for(l, need) && (e = next_body(l, p1, p2)) != 0) {
+    // bodies go only until a pack would make the room (one pack: each waits for the VBlank), then the pack
+    while (!room_for(l, need) && packed_room(l) < need && (e = next_body(l, p1, p2)) != 0) {
         Entity_Suspend(l, e);
         obj_room.taken++;
-        repack(l, need);
+    }
+    repack(l, need);
+    while (!room_for(l, need) && (e = next_body(l, p1, p2)) != 0) {   // a pack that could not place every body
+        Entity_Suspend(l, e);
+        obj_room.taken++;
     }
     // What is not a body: the decorations, together. The first holds the sheet's one block (its slot 7 frees it), the
     // others draw from it with nothing of their own to give back: one left behind would show whatever moves in there.
