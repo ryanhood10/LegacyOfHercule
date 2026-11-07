@@ -475,6 +475,9 @@ a step that is moved or removed breaks an insertion further down, so change one 
   afterimage dash to Vegeta's side (op 4 on player 1, side 2, 18 px), Cell's blast on his guard (op 8 kind 0 + 16), and Gohan down on a knee (op 10)
   until "I will!", where he rises (op 10 rise in entry 64). Seen with the real Super Saiyan 2 Gohan (sprite 58): the kneel draws. Not built: the
   knock-back on Trunks.
+- **The Cells vanished (Ryan, 2026-11-06, fixed on `nb-vis`):** from Cell's return to the fade every text box with a portrait took the second
+  Cell (often both) off the list while it was open: two 64 x 64 bodies and nine fighters left no 0x3800-byte piece of OBJ VRAM. The eviction
+  now packs the bodies' blocks first (`docs/engine.md` "OBJ VRAM and the text box"); `cell_staging.txt` checks both Cells at 30 presses.
 - **Risks:** Vegeta's actor 137 needs a lying group for beat 7 (zone 12 lays "Vegeta's body" on the field in `ch7_cell`:
   use the same sprite and group as there). Char 0 is sprite 58: hurt frames come from 59 (a few frames of the wrong
   hair), acceptable for a flinch and a kneel; check the kneel's frame is drawable. Eight blasts with dust on a field of

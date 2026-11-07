@@ -246,7 +246,7 @@ them in place yet (the tests are headless): a scene writer who hears a wrong one
 (check groups in `docs/sprites.md`; test `ents` vtables with `staging_run.py`); a sprite-addressed step on a sprite
 nobody shows is a null write; a reload of a map mid-scene drops actors (spawn them again); `stop` counts as an entry
 and a trigger's last stop must be `stop 0x0`; stock indexes are absolute (added entries go after the end); in C
-`"\x0bD"` eats the letter; a text box on a full map can take bodies off the list while it is open; timing changes
+`"\x0bD"` eats the letter; a text box on a full map can take bodies off the list while it is open (since 2026-11-06 only when packing the bodies' OBJ VRAM blocks cannot make its room: `docs/engine.md` "OBJ VRAM and the text box"; check a crowded scene with `cell_staging_gen.py`'s `cells_stay` pattern); timing changes
 shift tests that sit near a hit (step through the pick-up box).
 
 ## 6. How the work is split

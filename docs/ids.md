@@ -43,7 +43,7 @@ Each piece takes numbers only from its own row. `ewram`, `partyram` and `coop2` 
 | tny (`pp2-tny`, `log2-pp2-tny`) | - | - | 40 used, 41 free | `.tny.cp` 0x10 of at most 0x20 (`tny_engine.c`); `UiState.vs` in `.tny.ui`'s padding (+141) |
 | agency (`pp2-agency`, `log2-pp2-agency`) | 478-479 (not used) | 33-34 (not used) | 42-43 (not used) | `.combo.ag` 0x30 of 0x40 (`agency.c` `AgState`, `player.c`'s regroup) |
 | regen (`pp2-regen`, `log2-pp2-regen`) | - | - | 44 (used) | `.combo.rg` grows to at most 0x10 (**0xC used**: the resting and ki timers) |
-| perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 (45 used, 46 free) | `.combo.pf` at most 0x10 (8 used: `obj_room`, `src/coop/objroom.h`; after `.combo.rg`, so read its address from `coop.sym`) |
+| perf (`pp2-perf`, `log2-pp2-perf`) | - | - | 45-46 (45 used, 46 free) | `.combo.pf` at most 0x10 (10 used since 2026-11-06, +8 `decor`, +9 `moved`: `obj_room`, `src/coop/objroom.h`; after `.combo.rg`, so read its address from `coop.sym`) |
 
 ## Allocations for the tournament build (2026-10-25, `src/coop/tourney.h`)
 

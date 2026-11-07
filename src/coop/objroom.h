@@ -7,6 +7,8 @@ typedef struct ObjRoomState {   // .combo.pf, at most 0x10 bytes (docs/ids.md)
     u8 round;                   // +2: the last eviction's last round
     u8 taken;                   // +3: on-screen bodies its round 15 took (the crowd's vanishing, 0 when none)
     u32 calls;                  // +4: evictions so far (a text box or an effect that did not fit)
+    u8 decor;                   // +8: the last eviction set the map's decorations aside while none was in the view (1)
+    u8 moved;                   // +9: bodies the last eviction gave a new block to join the free run (compact)
 } ObjRoomState;
 extern ObjRoomState obj_room;
 

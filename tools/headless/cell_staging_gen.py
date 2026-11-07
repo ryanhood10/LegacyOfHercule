@@ -107,6 +107,23 @@ def herc(n):
     expect(f"entrec [0-9a-f]+: {n}$", "entrec R72")
 
 
+def cells_stay(tag):
+    """Cell's return (docs/cutscenes/batch3 3.8): from "Surprised to see me?" to the fade both Perfect Cells (30 and the second, 162)
+    stand on the entity list and are drawn at every press, whether a text box is open or not, nothing with a sprite is set aside
+    (the box's eviction took the second Cell for every portrait box until objroom.c's repack, 2026-11-06), and OBJ VRAM's blocks agree
+    with their users (every body its own block, every OBJ of the frame from a used block: the repack's moves). Thirty presses inside
+    the stretch both stand (about presses 90 to 135 of the scene at 100 frames apart)."""
+    out("mash 78 100")
+    for i in range(30):
+        out("key 1 6", "frames 60")
+        expect(r"bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$", "bodies cells")
+        expect("drawn 30: on the list 1, drawn 1", "drawn 30")
+        expect("drawn 162: on the list 1, drawn 1", "drawn 162")
+        expect("vramcheck ok", "vramcheck")
+        out("frames 30")
+    out(f"shot cs_{tag}_cells")
+
+
 def win(stat, who):
     out("poke32 0x0203F9B0 0xCE11CA3E", f"poke8 0x0203F9B5 {stat}", "poke8 0x0203F9B6 0", "stepz 0x0203F9B5 150")
     expect(f"0203f9b7: {who}", "peek8 0x0203F9B7 1")
@@ -157,6 +174,7 @@ def games(tag, p2):
     # Android 18 lies where Cell spat her out until the two Cells' fade (she walked off by herself; 3.7): there after the bomb's lines, gone at fight 8
     out("deref TBL 0x0800959C", f"deref R11 TBL+{(11 - 7) * 4:#x}", "mash 14 100", f"shot cs_{tag}_18")
     expect("entrec [0-9a-f]+: 1$", "entrec R11")
+    cells_stay(tag)
     scene_done(f"{tag}_f8", 200)      # fight 8 (fight 7's end is the Games' longest scene: about 145 presses since 2026-11-06)
     expect("entrec [0-9a-f]+: 0$", "entrec R11")
     if coop:

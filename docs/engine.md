@@ -326,6 +326,18 @@ How the combos use these: `docs/tournament.md` 25.2-25.4. Facings everywhere bel
   decorations together (the first holds the sheet's block, the rest draw from it: one left behind shows the box's tiles); the
   players last. It also gives up at round 64 instead of hanging. `obj_room` (`.combo.pf`) keeps the last eviction's round, the bodies
   taken and the count. **`coop.hud2.size` is now the panel's "allocated" flag: tile 0 is a real place for it.**
+- **Bodies packed instead of taken (2026-11-06, the Cells after fight 7, `nb-vis`).** A body's slot 7 (`0x0800678C`) frees its block
+  (+0x0C := 0xFFFF), slot 8 (`0x080078CC`) allocates +0x0E bytes into +0x0C and clears +0x20; nothing else holds the block (its draw,
+  slot 4 `0x08007772`, decompresses the frame into the body's own buffer when +0x20 differs, its upload, slot 5 `0x0800784C`, DMAs that
+  to tile +0x0C). So a body can change blocks at any time by slots 7 then 8: the stock does it to every body it set aside when a box
+  closes. `EntityList_Upload` (`0x08006AA6`) copies the OAM shadow (the array at 0x030022BC, 128 x 8 bytes) to OAM first and the queued
+  frames after it, at once, so moved blocks uploaded while the screen is drawn show a band of wrong tiles for one frame: the pack
+  uploads in the VBlank. A decoration (holder vtable `0x08025974`, its other pieces `0x08024EE4`) answers slot 6 `0x08006528` (only
+  at round 15) and slot 3 `0x080071FA` "in the view" (+0x18..+0x24 its box against the camera's); the holder frees its sheet's block
+  at +0x0E. The hook's round 15 now: player 1's block low, the decorations if none is in the view, the pack (only when the free
+  space and the bodies' blocks between the fixed blocks hold the box: the box's room is taken first, the bodies reallocated largest
+  first, the room given back; a body that finds no block is set aside as the eviction would have, without slot 7), then one body at
+  a time as before, packed again after each. `obj_room` +8 `decor`, +9 `moved` count it.
 
 ## Dropped items and touch boxes (decompiled 2026-11-01 for player 2's pickups)
 

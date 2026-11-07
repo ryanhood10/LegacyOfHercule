@@ -1337,7 +1337,7 @@ Junior each (stat 26 at 432, 359, 63 px below the fighter at 432, 296), J3 and J
 8; at the beam struggle Goku's spirit (one entity on sprite 176), the clash's x (`cgb` at `.party.bv` + 0x38, 0x0203FAD8 in the current build: two s16,
 now / target) 440 at the start, pushed toward Gohan after Cell's line, 384 at the end, and no spirit left (+0x3D = 0). Fight 7's end is given 200
 presses (it is the Games' longest scene, about 145 at 100 frames apart; `cell_games.txt` and `cell_games_1p.txt` 190). A scene's end is read from `stepz`'s own line, not from a peek after it (while an idle fighter is being hit the word reads 1 for a moment). **Jumping straight to a scene**
-(for a film or a drop-in; not in the committed tests). On the desert: `preset +191 +421 +193`, `maptest 325`, `frames 200`, `poke8 0x0203F000 SLOT`
+(for a film or a drop-in; not in the committed tests). On the desert: `preset +191 +421 +193`, **plus `+192 +194` for every scene after fight 3** (fights 2 and 3 set them: without them Gohan's actor 56 and 16's actor 8 stay on the cliff, out of view, and take OBJ VRAM the later scenes need; F8 lacked them until 2026-11-06), `maptest 325`, `frames 200`, `poke8 0x0203F000 SLOT`
 (player 1), `poke8 0x0203FF84 5` (player 2 Hercule; `p2 off` alone), a test warp to zone 14 area 3 at (368, 440) (`cmd_arg` 0x030E), test command
 15 with the solo mode, `findent CELL 0x0203fb04` and `poke32 CELL+0x188 0` (fight 2's Cell, always on the map, must not be won too; not for fight 2's
 own end), test command 1 with the scene's record, then the queued win (`poke32 0x0203F9B0 0xCE11CA3E`, `poke8 0x0203F9B5 QUEUE`, `poke8 0x0203F9B6 0`,
@@ -1354,6 +1354,17 @@ The ring and fight 1's end are reached the real way (`cell_games.txt`'s first li
 `maptest 261`, poke who plays, a test warp to zone 15 area 8 at (336, 464), Up on both pads. The finale: the same preset `+382`, `maptest 7`, a test
 warp to zone 9 area 1 at (760, 448). The wishes, Hercule's stomach and the explosion: `preset +195 +191`, `maptest 261`, the same warp, Up, A. The
 talk show and the epilogue: the finale's preset `+483`, the warp, Up, then A four times (the question, yes, yes).
+
+**Cell's return, the Cells kept (2026-11-06, `nb-vis`, `docs/engine.md` "OBJ VRAM and the text box"):** in every Games lineup `cells_stay`
+presses 30 times through Cell's return (from about press 92 of fight 7's end) and checks at each: `bodies cells` (both Perfect Cells, 30 and 162, on
+the list, nothing with a sprite on the aside pile), `drawn 30` / `drawn 162` (on the list 1, drawn 1: an OBJ of the frame at its tile) and
+`vramcheck ok`. On the build before the fix it fails with two players (the second Cell aside for every portrait box). These need a runner built
+from the current `st_headless.c` (`/root/st_headless` from before 2026-11-06 lacks `bodies`, `drawn`, `vramcheck`, `asidewatch`: rebuild it, or
+`ST_HEADLESS=` a private one). Runner commands for vanishing bodies: `bodies [TAG]` one line, every entity's sprite id and x,y on the list and on
+the aside pile; `drawn SPRITE`; `vramcheck` (OBJ VRAM's blocks tile it end to end, every body holds a used block of its own size, every OBJ of
+the frame's OAM shadow draws from a used block; an empty entity list, a fade or a modal screen, is skipped); `asidewatch on` prints the aside
+pile's bodies whenever they change ("aside fN: id@x,yv": v = in the view, a body seen to vanish). How the bug was filmed: a shot, `bodies`,
+`vram` and `vramcheck` every 10 frames through the scene, frame by frame around the box that evicted.
 
 `tools/headless/cell_staging_gen.py` writes `cell_staging.txt`, self-checking: zone 12 for Vegeta alone, Trunks alone, Vegeta + Trunks and Trunks + Vegeta (in by the real pad of area 15), the Games for alone and player 2 as Hercule, Krillin or Vegeta at the ring (since 2026-11-05 also sprite 72 at the start of fights 3, J1, 7 and 8: none alone, player 2's Hercule with two players); every scene pressed through until `0x03001FDC` clears, so a hung walk fails the next EXPECT. Run it with `st_expect.py` into a log, then `python tools/headless/cell_staging_gen.py check LOG`: every vtable in the `ents` lists must be sane (a sprite without the group an animation needs corrupts the heap and the runner keeps going). About ten minutes. In a solo-2 scene only player 2's A advances the text, and `load` forgets the runner's `p2`: write `p2 0` after it. An actor sprite's groups: `*0x0800959C + (id - 7) * 4` is the record, +2 the group count, +0x4C the four pointers per group.
 

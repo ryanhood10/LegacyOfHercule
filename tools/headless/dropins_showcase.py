@@ -104,8 +104,10 @@ STATES = {
     # B.3 (staging_ch9_gen.py "rim"): the rim's trigger is y 400-472; Vegeta alone on the plain between the ship and the basin
     "f7": (begin(VEGETA, 7, "+400 +401 +378 +377") + warp(15, 3, 320, 492), UP),
     # 3.6 (docs/testing.md "Cell saga staging", the table's row): Trunks player 1 (the scene makes Gohan player 1), alone, record 13,
+    # with 192 and 194 as the real Games have set them by then (fights 2 and 3: Gohan's and 16's watchers on the cliff gone; without
+    # them both stood off the view and took OBJ VRAM the Cells' scene needs, 2026-11-06),
     # fight 2's Cell kept out of the win, the win queued; saved at the scene's first frame once the win has fired
-    "f8": (begin(TRUNKS, 325, "+191 +421 +193") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n"
+    "f8": (begin(TRUNKS, 325, "+191 +421 +193 +192 +194") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n"
            + "findent CELL 0x0203fb04\npoke32 CELL+0x188 0\n" + f"poke32 {ARG} 13\npoke32 {CMD} 1\nframes 30\n" + CELL_Q.format(q=142)
            + f"waitnz {SCENE} 900\n", ""),
     # 6.2 (staging_ch9_gen.py "summit", docs/testing.md "Cell saga staging"): Hercule alone at the summit's foot (the map's spawn), the

@@ -766,6 +766,338 @@ mash 14 100
 shot cs_alone_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
+mash 78 100
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+shot cs_alone_cells
 stepz 0x03001FDC 200
 frames 120
 echo EXPECT stepz 03001fdc: zero
@@ -977,6 +1309,338 @@ mash 14 100
 shot cs_H_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
+mash 78 100
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+shot cs_H_cells
 stepz 0x03001FDC 200
 frames 120
 echo EXPECT stepz 03001fdc: zero
@@ -1190,6 +1854,338 @@ mash 14 100
 shot cs_K_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
+mash 78 100
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+shot cs_K_cells
 stepz 0x03001FDC 200
 frames 120
 echo EXPECT stepz 03001fdc: zero
@@ -1403,6 +2399,338 @@ mash 14 100
 shot cs_Ve_18
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R11
+mash 78 100
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+key 1 6
+frames 60
+echo EXPECT bodies cells f\d+ sc1 list(?=[^|]* 30@)(?=[^|]* 162@)[^|]*\| aside( -)*$
+bodies cells
+echo EXPECT drawn 30: on the list 1, drawn 1
+drawn 30
+echo EXPECT drawn 162: on the list 1, drawn 1
+drawn 162
+echo EXPECT vramcheck ok
+vramcheck
+frames 30
+shot cs_Ve_cells
 stepz 0x03001FDC 200
 frames 120
 echo EXPECT stepz 03001fdc: zero

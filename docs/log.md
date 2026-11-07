@@ -4,6 +4,19 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-06
 
+- **The Cells no longer vanish after fight 7 (Ryan, playing alone from F8: "his character model and his twins would be invisible, or
+  just one"; branch `nb-vis`).** Cause: OBJ VRAM. With Cell back beside his second (two 64 x 64 bodies, 0x1000 each) and nine fighters
+  on the field, a text box with a portrait (0x3800 bytes in one piece) did not fit: alone 15104 bytes were free but in pieces (largest
+  11008), with two players 14080 in all (and from F8, whose preset lacked flags 192 and 194, Gohan's actor 56 and 16's actor 8 stood
+  on the cliff out of view as well). The eviction's round 15 then took the on-screen body whose block made the longest free run,
+  always a Cell, often both, for every Cell line. The second Cell is the story's (sprite 162, both modes): no co-op twin is involved.
+  Fix (`src/coop/objroom.c`, `docs/engine.md` "OBJ VRAM and the text box"): before an on-screen body goes, the map's decorations go
+  when none is in the view, then the bodies are packed again (each gives its block back and takes a new one through its own class's
+  slots 7 and 8, as the stock does to every set-aside body when a box closes; the box's room held first so best fit packs around it;
+  the upload done in the VBlank, after a frame-by-frame film showed a band of wrong tiles for one frame when it was done mid-screen).
+  F8's preset fixed (`dropins_showcase.py`, `docs/testing.md`). Tests: `cell_staging.txt` checks both Cells on the list and drawn,
+  nothing set aside and OBJ VRAM's blocks against their users at 30 presses of Cell's return in every Games lineup (fails on the build
+  before with two players); new runner commands `bodies`, `vramcheck`, `drawn`, `asidewatch` (`docs/testing.md`).
 - **Ryan's Super Saiyan notes on the cutscene pass (branch `nb-ssjfix`; one commit a scene).** (1) The transformations play the body's
   own stock power-up again at its own pace, with the cutscene pass's effects alongside instead of in place of it: Cine's held charge has
   a mode beside the body's animation (`CoopCall 37, 7, 0, level + 4`: rings, smoke, flickers, a growing rumble, no pose, no hold, no

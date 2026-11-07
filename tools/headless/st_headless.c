@@ -24,6 +24,14 @@
 //   pose SPRITE GROUP FACING FRAME [N]   hold every entity showing sprite id SPRITE in that group, facing and frame
 //                          for N frames (3), re-poked each frame (+0x4C a group built in coop2.boss_rec, +0x10, +0x12 the timer)
 //   entmove SPRITE DX DY   every entity showing sprite id SPRITE stands DX, DY pixels from player 1 (negative: -48)
+//   drawn SPRITE           "drawn SPRITE: on the list N, drawn M": the entities showing that sprite id, and how many of them
+//                          an OBJ of the frame's OAM shadow draws (at the entity's tile)
+//   asidewatch on|off      after every frame, print the bodies on the aside pile when they change ("aside fN: id@x,y[v]",
+//                          v = in the view: a body seen to vanish while a text box is open)
+//   vramcheck              OBJ VRAM's blocks tile it end to end, every body on the list holds its own used block of its size,
+//                          every OBJ in the frame's OAM shadow draws from a used block ("vramcheck ok|FAIL: N bodies, M objs")
+//   bodies [TAG]           one line: the sprite id and x,y of every entity on the list and on its aside pile
+//                          (+0x40C: what a text box's eviction set aside until the box closes); '-' = no sprite record
 //   entrec RECORD          count the entities on that sprite record (+0x48; an actor's sprite id -> record:
 //                          the table at *0x0800959C, entry id - 7)
 //   map                    print the current map (zone, area, variation) and player 1's position
@@ -113,12 +121,37 @@ static void w8(unsigned a, unsigned v) { core->busWrite8(core, a, v); }
 static void w16(unsigned a, unsigned v) { core->busWrite16(core, a, v); }
 static void w32(unsigned a, unsigned v) { core->busWrite32(core, a, v); }
 
+// `asidewatch on`: after every frame, the bodies (entities on a sprite record) on the entity list's aside pile (+0x40C: what a
+// text box's eviction set aside), printed when they change: "aside fN: id@x,y[v] ..." (v = in the camera's view: a body seen
+// to vanish) and "aside fN: none" when the pile is empty of bodies again
+static int aside_watch;
+static unsigned aside_sig;
+static void aside_frame(void) {
+    unsigned tbl = r32(0x0800959C), pile = 0x03001120 + 0x40C, cnt = r32(pile), sig = 0, cam = r32(0x081DA974);
+    char buf[512];
+    int len = 0;
+    buf[0] = 0;
+    for (unsigned i = 0; i < cnt && i < 128; i++) {
+        unsigned e = r32(pile + 4 + 4 * i), rec = e ? r32(e + 0x48) : 0;
+        int sid = -1;
+        for (int k = 0; k < 300 && rec; k++) if (r32(tbl + 4 * k) == rec) { sid = k + 7; break; }
+        if (sid < 0) continue;
+        int x = (int)r32(e + 0x158) >> 8, y = (int)r32(e + 0x15C) >> 8;
+        int v = x >= (int)r32(cam + 12) && x < (int)r32(cam + 20) && y >= (int)r32(cam + 16) && y < (int)r32(cam + 24) + 32;
+        sig = sig * 31 + (unsigned)sid * 7 + (unsigned)v + e;
+        if (len < 480) len += snprintf(buf + len, sizeof buf - len, " %d@%d,%d%s", sid, x, y, v ? "v" : "");
+    }
+    if (sig != aside_sig) printf("aside f%lu:%s\n", frame_no, len ? buf : " none");
+    aside_sig = sig;
+}
+
 static void run_frames(int n) {
     for (int i = 0; i < n; i++) {
         if (p2_on) w16(0x0203FF00, 0x8000 | (p2_word & 0x3FF));
         core->runFrame(core);
         frame_no++;
         perf_frame_end();
+        if (aside_watch) aside_frame();
     }
 }
 
@@ -525,6 +558,78 @@ int main(int argc, char **argv) {
                 w32(e + 0x158, r32(p1 + 0x158) + ((int)num(tok[2]) << 8));
                 w32(e + 0x15C, r32(p1 + 0x15C) + ((int)num(tok[3]) << 8));
             }
+        }
+        else if (!strcmp(c, "drawn")) {     // drawn SPRITE: "drawn SPRITE: on the list N, drawn M" (M: an OBJ of the frame's OAM shadow at its tile)
+            unsigned sid = num(tok[1]), rec = r32(r32(0x0800959C) + 4 * (sid - 7)), cnt = r32(0x03001124), on = 0, dr = 0;
+            for (unsigned i = 0; i < cnt && i < 128; i++) {
+                unsigned e = r32(0x03001128 + 4 * i);
+                if (!e || r32(e + 0x48) != rec) continue;
+                on++;
+                for (unsigned o = 0; o < 128; o++) {
+                    unsigned a0 = r16(0x030022BC + 8 * o), a2 = r16(0x030022BC + 8 * o + 4);
+                    if ((a0 & 0x300) != 0x200 && (a2 & 0x3FF) == (r16(e + 0xC) & 0x3FF)) { dr++; break; }
+                }
+            }
+            printf("drawn %u: on the list %u, drawn %u\n", sid, on, dr);
+        }
+        else if (!strcmp(c, "asidewatch")) { aside_watch = n > 1 && !strcmp(tok[1], "on"); aside_sig = 0; }
+        else if (!strcmp(c, "vramcheck")) {   // OBJ VRAM's allocator and its users agree (objroom.c's repack, docs/testing.md)
+            // the blocks tile OBJ VRAM end to end; every body (the stock release 0x0800678D) on the list holds a used block
+            // of its own size at its tile, no two the same; every OBJ of the frame's OAM shadow draws from a used block
+            unsigned list = r32(0x083B5348 + 8), id = r8(list), bad = 0, units = 0, bodies = 0, objs = 0, g;
+            unsigned tiles[128];
+            if (id != 0xFF) for (g = 0; r8(list + 0x694 + id * 10 + 7) != 0xFF && g < 256; g++) id = r8(list + 0x694 + id * 10 + 7);
+            else id = r8(list + 0xC00);                  // nothing free: any block, then back to the first
+            if (r8(list) == 0xFF) for (g = 0; r8(list + 0x694 + id * 10 + 7) != 0xFF && g < 256; g++) id = r8(list + 0x694 + id * 10 + 7);
+            unsigned first = id;
+            for (g = 0; id != 0xFF && g < 256; g++, id = r8(list + 0x694 + id * 10 + 6)) {
+                unsigned rec = list + 0x694 + id * 10;
+                if (r16(rec + 2) != units) { printf("vramcheck: block %u at %u, expected %u\n", id, r16(rec + 2), units); bad++; }
+                units = r16(rec + 2) + r16(rec + 4);
+            }
+            if (units != 512) { printf("vramcheck: blocks end at %u units, not 512\n", units); bad++; }
+            unsigned cnt = r32(0x03001124);
+            for (unsigned i = 0; i < cnt && i < 128; i++) {
+                unsigned e = r32(0x03001128 + 4 * i), vt = r32(e);
+                if (vt + r32(vt + 28) != 0x0800678D) continue;
+                unsigned tile = r16(e + 0xC), rec = list + 0x694 + r8(list + 0xC00 + (tile >> 1)) * 10;
+                if (tile == 0xFFFF || !r8(rec) || r16(rec + 2) * 2 != tile || r16(rec + 4) * 64 != r16(e + 0xE)) {
+                    printf("vramcheck: ent %u tile %u size %u: no block of its own\n", i, tile, r16(e + 0xE)); bad++;
+                }
+                for (unsigned k = 0; k < bodies && k < 128; k++) if (tiles[k] == tile) { printf("vramcheck: ent %u shares tile %u\n", i, tile); bad++; }
+                if (bodies < 128) tiles[bodies] = tile;
+                bodies++;
+            }
+            unsigned shadow = 0x030022BC;                // the OAM the frame drew, 128 x 8 bytes (hardware OAM is a frame behind)
+            for (unsigned o = 0; o < 128 && cnt; o++) {      // an empty list (a fade, a modal screen) drew no shadow
+                unsigned a0 = r16(shadow + 8 * o), a2 = r16(shadow + 8 * o + 4), tile = a2 & 0x3FF;
+                if ((a0 & 0x300) == 0x200) continue;       // hidden
+                objs++;
+                unsigned used = 0;                         // the block holding that tile: walk by address
+                for (g = 0, id = first; id != 0xFF && g < 256; g++, id = r8(list + 0x694 + id * 10 + 6)) {
+                    unsigned rec = list + 0x694 + id * 10;
+                    if (r16(rec + 2) * 2 <= tile && tile < (r16(rec + 2) + r16(rec + 4)) * 2) { used = r8(rec) ? 1 : 2; break; }
+                }
+                if (used != 1) { printf("vramcheck: obj %u tile %u in %s\n", o, tile, used ? "a free block" : "no block"); bad++; }
+            }
+            printf("vramcheck %s: %u bodies, %u objs\n", bad ? "FAIL" : "ok", bodies, objs);
+        }
+        else if (!strcmp(c, "bodies")) {    // bodies [TAG]: one line, the sprite ids on the list and on its aside pile (+0x40C:
+            // what a text box's eviction set aside until it closes), each as id@x,y; '-' for an entity on no sprite record
+            unsigned tbl = r32(0x0800959C);
+            printf("bodies %s f%lu sc%u list", n > 1 ? tok[1] : "-", frame_no, r8(0x03001FDC));
+            for (int pile = 0; pile < 2; pile++) {
+                unsigned base = pile ? 0x03001120 + 0x40C : 0x03001124, cnt = r32(base);
+                if (pile) printf(" | aside");
+                for (unsigned i = 0; i < cnt && i < 128; i++) {
+                    unsigned e = r32(base + 4 + 4 * i), rec = e ? r32(e + 0x48) : 0;
+                    int sid = -1;
+                    for (int k = 0; k < 300 && rec; k++) if (r32(tbl + 4 * k) == rec) { sid = k + 7; break; }
+                    if (sid < 0) printf(" -");
+                    else printf(" %d@%d,%d", sid, (int)r32(e + 0x158) >> 8, (int)r32(e + 0x15C) >> 8);
+                }
+            }
+            printf("\n");
         }
         else if (!strcmp(c, "entrec")) {    // entrec RECORD: how many entities use that sprite record (+0x48)
             unsigned rec = num(tok[1]), cnt = r32(0x03001124), n = 0;
