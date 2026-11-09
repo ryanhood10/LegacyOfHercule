@@ -124,11 +124,31 @@ sequence ch3_space_end
         WaitFrames 40
         CoopCall 37, 1, 0, 137
       gather:
+        CoopCall 37, 4, 0, 96            ; he springs back: the Big Bang has room to fly
         CoopCall 37, 7, 0, 2             ; he gathers it, held through his line; the blast goes as the box closes
   text 1 "#VEGETA: FINAL FLASH!"
   script
         CoopCall 37, 7, -1, 0
-        CoopCall 37, 8, 2, 70
+        CoopCall 5, 0, 0, 0              ; alone the blast is aimed at the spot where the clone lies: a move on the body itself would stand it up
+        JumpIfFalse spot
+        Jump fire
+      spot:
+        PushByte 37
+        PushByte 2
+        PushEntityPosition 137
+        PushVarint 65536
+        Div
+        PushEntityPosition 137
+        PushEntityPosition 137
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step CoopCall
+        CoopCall 37, 1, 0, -2
+      fire:
+        CoopCall 37, 8, 3, 0             ; his Big Bang (the game's own big blue ball: Ryan, 2026-11-08, not a Kamehameha)
         FadeToWhite 8                         ; the white of the explosion, and when it clears nothing is left of the clone
         CoopCall 37, 0, 0, 0
         CoopCall 5, 0, 0, 0
