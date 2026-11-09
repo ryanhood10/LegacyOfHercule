@@ -892,7 +892,16 @@ deref R28 TBL+0x54
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R28
 ents
-mash 8 60
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R175 TBL+0x2a0
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R175
+poke32 0x0203FD08 7
+frames 200
+mash 6 60
 shot c6_P_blow
 mash 33 60
 frames 45
@@ -960,7 +969,16 @@ deref R28 TBL+0x54
 echo EXPECT entrec [0-9a-f]+: 1$
 entrec R28
 ents
-mash 8 60
+stepz 0x03001FDC 250
+frames 30
+echo EXPECT 03001fdc: 00000000
+peek 0x03001FDC 1
+deref R175 TBL+0x2a0
+echo EXPECT entrec [0-9a-f]+: 1$
+entrec R175
+poke32 0x0203FD08 7
+frames 200
+mash 6 60
 shot c6_PH_blow
 mash 33 60
 frames 45

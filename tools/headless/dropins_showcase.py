@@ -132,7 +132,8 @@ STORY = dict(STATES,
     f3=(begin(PICCOLO, 7, "+136 +140 +141 +142 +143 +144 +145") + warp(11, 4, 352, 224, 100) + f"stepz {SCENE} 150\nframes 30\npoke32 {CMD} 7\nframes 120\n"
         + f"mashmap 11 5 60\nframes 300\nmashmap 11 6 30\nframes 200\npoke32 {CMD} 7\n", ""),
     # Games 3.3 (docs/testing.md "Cell saga staging", the table's row): Goku alone, record 0 stands, fight 2's win queued
-    f4=(begin(4, 325, "+191 +421 +193") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n" + CELL_Q.format(q=23)
+    # (the ring's scene is skipped, its work is poked in: Goku the story's lead for speaker 1 (flags 464-467 = slot + 1, 468 Gohan's Super Saiyan given), Gohan on teen row 2: Super Saiyan on B)
+    f4=(begin(4, 325, "+191 +421 +193") + "poke8 FLAGS+0x3A 0x15\npoke8 0x0203F014 2\n" + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n" + CELL_Q.format(q=23)
         + f"waitnz {SCENE} 900\n", ""),
     # Games 3.7-3.9: through 16's head for the real Super Saiyan 2 body, fight 7's win queued: the bomb, Goku's goodbye, Cell's return, Vegeta's charge
     f5=(HEAD + SCENE_DONE + CELL_Q.format(q=25) + f"waitnz {SCENE} 900\n", ""),

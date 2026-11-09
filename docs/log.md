@@ -4,6 +4,7 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-08
 
+- **Ryan's notes on the second set (`data/story/ch3_duels`, `ch5_lookout`, `a16_island`, `gen_cell_games.py`).** Space: the clone's lines after it turns gold use Super Saiyan Vegeta's portrait (107); Vegeta knocks it down out of its form, "FINAL FLASH!", a white, gone; he stays gold through his last line. Gingertown's end cut by lines and pages (none reworded); Piccolo's power-ups are his real form (row 7, sprite 104), kept until a fade or a blow (`flag 8`). The island: after "I cannot let that happen" the players fight Cell (stat 125, a copy of 60, to half, `BOSS_NO_TWIN`), alone as 16 with Piccolo down, two players as Piccolo and 16 (`a16_fight_join` / `a16_fight_leave`, CoopCall 11, 1 and 12, 2; test `island_cell.txt`), then 16's blows; 17 is held in Cell's tail with a pulse before the white. "I give up": alone Hercule says "You got this kid!" and runs. `SetEntityAnimation 33` on a fresh actor never returns: lie an actor with Cine's op 10.
 - **A second set of showcase keys (Ryan: keep the last two fixed, the other keys for the other scenes).** `dropins_showcase.py --story`: F1-F7 are
   space (3.2), Gingertown's end (5.8), the island (6.8), "I give up", the bomb, the beam struggle, Broly's end; F8 and F9 the same. Every key
   filmed (`--film`), no bad vtable. In `build/play`, the first set in `build/play/first-set/`.

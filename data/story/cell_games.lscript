@@ -422,7 +422,19 @@ sequence cg_fight2_end
         WalkToPosition 72, 392, 444
         SetEntityFacing 72, 3
         SetEntityAnimation 72, 8
+  script
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse HL1
+        PushByte 21
+        END
+      HL1:
+        PushByte 23
+        END
   text 67 "HERCULE: Well...  since the kid insists...\x0bstand back, boy, and watch a professional!"
+  script
+        PushByte 24
+        END
+  text 67 "HERCULE: You got this kid!"
   stock @083e9362    ; "Wonderful.  Let's get started!"
   script                                 ; stock entry 20: alone, Hercule backs off and runs before the fade; Gohan player 1, player 2 is Hercule
         CoopCall 5, 0, 0, 0

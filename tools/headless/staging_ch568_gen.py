@@ -173,7 +173,10 @@ for p1, p2 in ((PICCOLO, None), (PICCOLO, HERCULE)):
     s.shot(f"c6_{n}_fall")
     s.actors(s28=1)
     s.out("ents")
-    s.press(8, 60)                                  # (6.8 b) 16's three blows: Cell thrown and lying
+    s.end_scene(250)                                # (2026-11-08) the players fight Cell as 16 and Piccolo (island_cell.txt): the scene ends at the fight, the win takes it on
+    s.actors(s175=1)
+    s.win(200)
+    s.press(6, 60)                                  # (6.8 b) 16's three blows: Cell thrown and lying
     s.shot(f"c6_{n}_blow")
     s.press(33, 60)                                 # to Tien's "NO!!!!!!!!"
     for i in range(4):

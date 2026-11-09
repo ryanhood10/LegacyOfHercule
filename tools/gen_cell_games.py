@@ -260,7 +260,14 @@ script(["SetActiveEntity 56",                              # the camera follows 
         f"PanCameraToPosition {FLOOR}, 3",
         f"WalkToPosition 72, {FX - 4}, {FY + 22}", f"WalkToPosition 72, 392, {FY + 4}", "SetEntityFacing 72, 3", "SetEntityAnimation 72, 8"],
        "Gohan lands between them, facing Cell; Hercule comes out from behind Goku to Gohan's shoulder")
+# Alone Gohan fights by himself and Hercule runs (Ryan, 2026-11-08: "you got this kid" because he runs away); with two players he fights beside him, the line as it was
+script(["CoopCall 5, 0, 0, 0", "JumpIfFalse HL1", "PushByte {herc2}", "END", "HL1:", "PushByte {herc1}", "END"])
+label("herc2")
 text(67, "HERCULE: Well...  since the kid insists...\\x0bstand back, boy, and watch a professional!")
+script(["PushByte {hdone}", "END"])
+label("herc1")
+text(67, "HERCULE: You got this kid!")
+label("hdone")
 emit(f"  stock @{A3['m325_r0_defeat']['entries'][19]['head'].split('@')[1].split()[0]}    ; \"Wonderful.  Let's get started!\"")
 b = body(A3, "m325_r0_defeat", 20)
 b = ["CoopCall 5, 0, 0, 0", "JumpIfFalse AL1", "Jump AL2", "AL1:", "SetEntityFacing 72, 2", "WaitFrames 10", f"WalkToPosition 72, 292, {FY + 20}", "AL2:"] + b   # alone: he clears off before the fade

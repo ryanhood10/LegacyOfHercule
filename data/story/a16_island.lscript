@@ -428,7 +428,7 @@ sequence a16_island_cell_end
         BeginCommandBatch
         ScreenShake 9, 3, 50
         FlashScreenColor 9, 180, 60, 220, 12
-        GlideToPosition 9, 328, 206, 100
+        GlideToPosition 9, 329, 186, 100
         EntityWaitFrames 28, 22
         FlashScreenColor 28, 180, 60, 220, 12
         CommitCommandBatch
