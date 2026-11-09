@@ -1,5 +1,6 @@
 r"""F1-F9 for Ryan's YouTube Shorts: each state stands just before one of the new cinematic scenes, to play alone and record.
-usage: python -I tools/headless/dropins_showcase.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR [--film] [--only f1,f4]
+usage: python -I tools/headless/dropins_showcase.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR [--story] [--film] [--only f1,f4]
+  --story    the second set: F1-F7 the other showcases (STORY below); F8 and F9 the same
   PLAY_ROM   the play ROM (`make`); DEBUG_ROM the same source with DEBUG_MENU=1, MENU_SS its debug-menu state
   OUTDIR     gets legacy-of-hercule.gba (a copy of PLAY_ROM), coop.sym and legacy-of-hercule.ss1-.ss9
   --film     afterwards load each state on the copied ROM, answer the question, do Ryan's action, press A once a second
@@ -23,6 +24,9 @@ args = sys.argv[1:]
 film = "--film" in args
 if film:
     args.remove("--film")
+story = "--story" in args
+if story:
+    args.remove("--story")
 only = None
 if "--only" in args:
     i = args.index("--only")
@@ -82,6 +86,10 @@ SS2 = ("poke16 0x0203F0EC 300\npoke16 0x0203F0EE 300\npoke16 0x0203F0F0 100\npok
 # post-game party), his abilities 3, 4, 23, 2 too: until 2026-11-06 the list was left to the map-visit bits, which made it 0, 0, 0, 64
 # and crashed the game on its fourth ability (docs/party-8-slots.md "The map-visit bank")
 UP = "keys 0x40\nframes 90\nkeys 0\n"
+HEAD = (begin(TRUNKS, 325, "+191 +421 +193 +192 +194") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n"
+        + "findent CELL 0x0203fb04\npoke32 CELL+0x188 0\n" + f"poke32 {ARG} 13\npoke32 {CMD} 1\nframes 30\n" + CELL_Q.format(q=142)
+        + f"waitnz {SCENE} 900\n")
+SCENE_DONE = f"stepz {SCENE} 250\nframes 120\nstepz {SCENE} 150\nframes 120\n"      # twice: a level-up's box clears the word for a moment
 
 # key: (made on the debug ROM, Ryan's one action for the film after the question, what to watch)
 STATES = {
@@ -107,13 +115,34 @@ STATES = {
     # with 192 and 194 as the real Games have set them by then (fights 2 and 3: Gohan's and 16's watchers on the cliff gone; without
     # them both stood off the view and took OBJ VRAM the Cells' scene needs, 2026-11-06),
     # fight 2's Cell kept out of the win, the win queued; saved at the scene's first frame once the win has fired
-    "f8": (begin(TRUNKS, 325, "+191 +421 +193 +192 +194") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n"
-           + "findent CELL 0x0203fb04\npoke32 CELL+0x188 0\n" + f"poke32 {ARG} 13\npoke32 {CMD} 1\nframes 30\n" + CELL_Q.format(q=142)
-           + f"waitnz {SCENE} 900\n", ""),
+    "f8": (HEAD, ""),
     # 6.2 (staging_ch9_gen.py "summit", docs/testing.md "Cell saga staging"): Hercule alone at the summit's foot (the map's spawn), the
     # trigger above y 440; the post-game party with Super Saiyan 2 Gohan
     "f9": (begin(HERCULE, 261, "+195 +191 +480 +381") + SS2 + warp(15, 8, 336, 464), UP),
 }
+# --story (Ryan, 2026-11-08): F8 and F9, the last two fixed, stay; F1-F7 are the researchers' other showcases, in story order. A fight in
+# front of a scene is won by the state (test command 7 runs at the first frame after the save, as F4; a queued Games win as F8)
+STORY = dict(STATES,
+    # 3.2 (staging_ch23_gen.py "space"): the whole map; Vegeta alone, nobody else selectable, as Amenbo's "Meanwhile..." leaves them
+    f1=(begin(VEGETA, 7) + "poke8 FLAGS+0x3A 3\n" + "".join(f"poke8 {0x0203F020 + i * 0x1C:#x} 0\n" for i in (0, 1, 3, 4, 5, 6, 8))
+        + fade_in(6, 50, 248, 560), ""),
+    # 5.8 (staging_ch568_gen.py "gingertown"): Piccolo alone, 5.7 pressed through, the fight won: Cell's Kamehameha, the arm, the escape
+    f2=(begin(PICCOLO, 7, "+129 +131 +132") + warp(10, 17, 280, 300, 100) + f"stepz {SCENE} 150\nframes 60\npoke32 {CMD} 7\n", ""),
+    # 6.8 (staging_ch568_gen.py "island half"): Piccolo alone, both of 16's stages won: Cell arrives, 17 absorbed, Tien's stand, Goku's rescue
+    f3=(begin(PICCOLO, 7, "+136 +140 +141 +142 +143 +144 +145") + warp(11, 4, 352, 224, 100) + f"stepz {SCENE} 150\nframes 30\npoke32 {CMD} 7\nframes 120\n"
+        + f"mashmap 11 5 60\nframes 300\nmashmap 11 6 30\nframes 200\npoke32 {CMD} 7\n", ""),
+    # Games 3.3 (docs/testing.md "Cell saga staging", the table's row): Goku alone, record 0 stands, fight 2's win queued
+    f4=(begin(4, 325, "+191 +421 +193") + warp(14, 3, 368, 440) + f"poke32 {ARG} 1\npoke32 {CMD} 15\nframes 30\n" + CELL_Q.format(q=23)
+        + f"waitnz {SCENE} 900\n", ""),
+    # Games 3.7-3.9: through 16's head for the real Super Saiyan 2 body, fight 7's win queued: the bomb, Goku's goodbye, Cell's return, Vegeta's charge
+    f5=(HEAD + SCENE_DONE + CELL_Q.format(q=25) + f"waitnz {SCENE} 900\n", ""),
+    # Games 3.10-3.12: on through fight 7's end (the Games' longest scene), fight 8's win queued: the beam struggle, the aftermath
+    f6=(HEAD + SCENE_DONE + CELL_Q.format(q=25) + f"waitnz {SCENE} 900\n" + SCENE_DONE + CELL_Q.format(q=26) + f"waitnz {SCENE} 900\n", ""),
+    # B.5 (staging_ch9_gen.py "rim"): Vegeta alone, the rim pressed through, the fight won: Broly's end, the planet
+    f7=(begin(VEGETA, 7, "+400 +401 +378 +377") + warp(15, 3, 312, 460, 150) + f"waitnz {SCENE} 900\nstepz {SCENE} 150\nframes 30\npoke32 {CMD} 7\n", ""),
+)
+if story:
+    STATES = STORY
 keys = [k for k in STATES if only is None or k in only]
 
 shutil.copy(menu, os.path.join(work, "menu.ss"))
@@ -167,7 +196,7 @@ if film:
     # as Ryan would: the question answered (A, then A on "One player."), his action, then A once a second; a shot every 60 frames
     fdir = os.path.join(out, "film")
     os.makedirs(fdir, exist_ok=True)
-    SHOTS = dict(f1=220, f6=150)        # the longest scenes
+    SHOTS = dict(f1=120, f3=180, f5=300, f6=160) if story else dict(f1=220, f6=150)        # the longest scenes
     for n in keys:
         t = f"load {wsl(os.path.join(out, f'{BASE}.ss{n[1:]}'))}\np2 off\nframes 2\nmap\n"
         act = STATES[n][1]

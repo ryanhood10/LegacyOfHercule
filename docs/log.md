@@ -2,6 +2,12 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-08
+
+- **A second set of showcase keys (Ryan: keep the last two fixed, the other keys for the other scenes).** `dropins_showcase.py --story`: F1-F7 are
+  space (3.2), Gingertown's end (5.8), the island (6.8), "I give up", the bomb, the beam struggle, Broly's end; F8 and F9 the same. Every key
+  filmed (`--film`), no bad vtable. In `build/play`, the first set in `build/play/first-set/`.
+
 ## 2026-11-06
 
 - **The Cells no longer vanish after fight 7 (Ryan, playing alone from F8: "his character model and his twins would be invisible, or
