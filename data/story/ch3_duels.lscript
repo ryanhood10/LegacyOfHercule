@@ -66,7 +66,7 @@ sequence ch3_space
         CoopCall 37, 11, 140, 0
         WhiteFlash 20
         WaitFrames 40
-  text 106 "CLONE: A copy?  Look again, Prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
+  text 107 "CLONE: A copy?  Look again, Prince.\x0bOnly one of us leaves here alive.  I'm done living in your shadow!"
   script
         CoopCall 37, 1, 140, 0
         CoopCall 37, 4, 0, 0                  ; it is on him
@@ -108,26 +108,40 @@ end
 
 ; the duel is over: the winner is Vegeta (player 1's entity; the pads swapped if player 2 won)
 sequence ch3_space_end
-  script                                 ; [0] two players dueled: on to 2; alone: the fight at 1
+  script                                 ; the fight's end (Ryan, 2026-11-08): he knocks the clone down, out of its form (flag 8: base, black hair); alone the fight
+        SetPlayerVisible 0               ; is shown first (no duel), with two players the duel has just been played and the clone is player 2's body
         CoopCall 5, 0, 0, 0
-        JumpIfFalse L1
-        PushByte 2
-        END
-      L1:
-        PushByte 1
-        END
-  script                                 ; [1] alone (no duel): the fight is shown (the stock: two blind flashes): a flurry, and his blow ends it
-        SetPlayerVisible 0
+        JumpIfFalse one
+        CoopCall 37, 1, 0, -1
+        CoopCall 37, 5, 9, 60
+        WaitFrames 40
+        Jump gather
+      one:
         CoopCall 37, 1, 0, 140
         CoopCall 37, 6, 60, 1
         WaitFrames 10
-        WhiteFlash 8
+        CoopCall 37, 5, 9, 60
+        WaitFrames 40
+        CoopCall 37, 1, 0, 137
+      gather:
+        CoopCall 37, 7, 0, 2             ; he gathers it, held through his line; the blast goes as the box closes
+  text 1 "#VEGETA: FINAL FLASH!"
+  script
+        CoopCall 37, 7, -1, 0
+        CoopCall 37, 8, 2, 70
+        FadeToWhite 8                         ; the white of the explosion, and when it clears nothing is left of the clone
         CoopCall 37, 0, 0, 0
-        CoopCall 22, 2, 140, 0
-        JumpIfFalse gone
-        DespawnEntity 140
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse actor
+        CoopCall 2, 0, 0, 0              ; the clone's slot is given back first (duel_clear needs his body), then the body waits out the scene
+        CoopCall 31, 3, 0, 0
+        Jump gone
+      actor:
+        DespawnEntity 137
       gone:
         PlayAudio 21
+        CoopCall 37, 15, 50, 0
+        WhiteFadeOut 40
         WaitFrames 20
         SetPlayerVisible 1
   script
@@ -139,9 +153,9 @@ sequence ch3_space_end
   stock @083d21bc                        ; "I have to get back to Earth..."
   script
         CoopCall 2, 0, 0, 0
-        SetCharacterTransformation 2, 137
         SetStoryFlag 77
         FadeOut 60
+        SetCharacterTransformation 2, 137     ; in the dark, not as the fade starts (Ryan, 2026-11-08: he stays gold through his last line)
         WaitFrames 60
         WarpToMapWithEntities 6, 22, 1, 240, 288
         WalkToPosition 0, 240, 312

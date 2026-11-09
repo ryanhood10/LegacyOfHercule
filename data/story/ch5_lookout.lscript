@@ -429,8 +429,8 @@ sequence ch5_gingertown_end
         Sub
         Step WalkToPosition
         SetEntityFacing 28, 3
-  stockseq @083e24a0 8 10                ; "I got you now.", "I have no choice but to surrender.", "You finally realize the futility..."
-  [15] script                            ; stock entry 11 (Piccolo faces him); Cell begins to pace: the interrogation is staged (it was a minute of
+  stockseq @083e24a0 8 9                 ; "I got you now.", "I have no choice but to surrender." (Ryan, 2026-11-08: "way too long and wordy": lines and pages cut, none reworded) "You finally realize the futility..."
+  script                                 ; stock entry 11 (Piccolo faces him); Cell begins to pace: the interrogation is staged (it was a minute of
         SetEntityFacing 0, 2             ; text with nobody moving); player 2 picks himself up
         SetEntityAnimation 0, 0
         CoopCall 37, 1, -1, -3
@@ -450,29 +450,13 @@ sequence ch5_gingertown_end
         Sub
         Step WalkToPosition
         SetEntityFacing 28, 3
-  stockseq @083e24a0 12 14               ; "What do you mean?", "...Perfection!", "Tell me, who are you?"
-  [19] script                            ; he stops and turns to the camera
+  stockseq @083e24a0 14 14               ; "Tell me, who are you?"
+  script                                 ; he stops and turns to the camera
         SetEntityFacing 28, 0
         WaitFrames 12
-  stockseq @083e24a0 15 16               ; "Very well, my name is Cell. ...", "You're wrong!  We destroyed Dr. Gero's lab..."
-  [22] script                            ; that stings: he is back at Piccolo's side
-        PushByte 28
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushByte 34
-        Sub
-        PushEntityPosition 0
-        PushEntityPosition 0
-        PushVarint 65536
-        Div
-        PushVarint 65536
-        Mul
-        Sub
-        Step WalkToPosition
-        SetEntityFacing 28, 3
-  stockseq @083e24a0 17 18               ; "Luckily, the computer was hidden...", "Wait!  One more question..."
-  [25] script                            ; he turns his back on Piccolo, walks off a few steps and looks at the sky
+  text 38 "#Very well, my name is Cell.\x0bI am an Android created by the great Dr. Gero.\x0bIn his efforts to create a supreme fighting organism, Dr. Gero devised a means by which he could fuse the cells of the world's greatest fighters into one, and then cultivate that cell into a single entity."
+  stockseq @083e24a0 18 18               ; "Wait!  One more question..."
+  script                                 ; he turns his back on Piccolo, walks off a few steps and looks at the sky
         PushByte 28
         PushEntityPosition 0
         PushVarint 65536
@@ -488,8 +472,8 @@ sequence ch5_gingertown_end
         Sub
         Step WalkToPosition
         SetEntityFacing 28, 1
-  stockseq @083e24a0 19 20               ; "I suppose I can answer this last one. ...", "But what for?"
-  [28] script                            ; and comes back for the last of it
+  text 38 "#I am looking for a very specific source of energy.  I require the energy of Androids 17 and 18.\x0bAnd now, once I absorb these Androids I will become the most powerful being who has ever lived!\x0bOf course, it could be just the DNA of Frieza and Vegeta coursing through my body, causing me to thirst for more power.  Now, are we done talking?"
+  script                                 ; and comes back for the last of it
         SetEntityFacing 28, 3
         PushByte 28
         PushEntityPosition 0
@@ -506,8 +490,8 @@ sequence ch5_gingertown_end
         Sub
         Step WalkToPosition
         SetEntityFacing 28, 3
-  stockseq @083e24a0 21 23               ; "...I need Androids 17 and 18...", the arm pose again, "Yes, I'm ready.  You've said more than enough!"
-  [32] script                            ; stock entry 24: the regrowth on a flash, the ground jolts, and Cell recoils
+  stockseq @083e24a0 22 23               ; the arm pose again, "Yes, I'm ready.  You've said more than enough!"
+  script                                 ; stock entry 24: the regrowth on a flash, the ground jolts, and Cell recoils
         WaitFrames 40
         PlayAudio 13
         CoopCall 37, 15, 14, 2
@@ -529,22 +513,28 @@ sequence ch5_gingertown_end
         Step GlideToPosition
         WaitFrames 30
   stockseq @083e24a0 25 26               ; "You tricked me!!!", "That's right. ... Don't think I won't pay you back for taking my arm."
-  [35] script                            ; stock entry 27: he powers up and is face to face with Cell in a blink
-        SetEntityFacing 0, 2
+  script                                 ; stock entry 27: he goes Super (his own form, row 7: the stock transformation with the charge beside it) and stays so through
+        SetEntityFacing 0, 2             ; the blink and the rest of the scene (Ryan, 2026-11-08: "when he attacked he wasnt super anymore"); back to base behind the last fade
         CoopCall 37, 1, 0, 28
-        CoopCall 37, 7, 30, 1
+        CoopCall 37, 7, 0, 5
+        SetEntityAnimation 0, 35
+        CoopCall 37, 7, -1, 0
+        SetCharacterTransformation 1, 104
+        WhiteFlash 12
         CoopCall 37, 4, 0, 18
         WaitFrames 10
   stock @083e1e66                        ; "Maybe I'll take yours."
-  [37] script                            ; a held look; then stock entry 29: Krillin and Trunks fly in, and everyone looks
+  script                                 ; a held look; then stock entry 29: Krillin and Trunks fly in, and everyone looks
         WaitFrames 30
         SpawnCharacterEntity 76, 256, 376
         SpawnCharacterEntity 128, 280, 376
         FlyToPosition 128, 280, 296
         FlyToPosition 76, 240, 304
         CoopCall 37, 12, 128, 128
-  stockseq @083e24a0 30 41               ; the talk with Krillin and Trunks; "You all must feel honored. ... I'll absorb you later!"
-  [50] script                            ; stock entry 42, CELL'S ESCAPE AS A BLINDING LIGHT (for Ryan's review, its own commit): the anime's Solar
+  stockseq @083e24a0 30 30               ; "We're not too late!"
+  stockseq @083e24a0 38 38
+  stockseq @083e24a0 40 41               ; "You're outnumbered...", "You all must feel honored. ... I'll absorb you later!"
+  script                                 ; stock entry 42, CELL'S ESCAPE AS A BLINDING LIGHT (for Ryan's review, its own commit): the anime's Solar
         PlayAudio 23                     ; Flare shown as light, no word added. The stock flew him out between Trunks and Krillin. Everyone
         FadeToWhite 8                    ; starts; when the white clears he is gone and his flight is heard trailing off. Then Vegeta (stock)
         SetEntityAnimationNoWait 0, 4
@@ -562,10 +552,13 @@ sequence ch5_gingertown_end
         FlyToPosition 137, 200, 214
         WaitFrames 30
         SetEntityFollow 137, 0
-  stockseq @083e24a0 43 56               ; Vegeta, Tien, "You can call me... Piccolo.", the plan
-  [65] script                            ; stock entry 57: Trunks and Krillin are the pair for the lab
+  stockseq @083e24a0 43 46               ; Vegeta: "...fused with Kami???"
+  stockseq @083e24a0 52 53               ; the plan
+  stockseq @083e24a0 55 56
+  script                                 ; stock entry 57: Trunks and Krillin are the pair for the lab
         FadeOut 90                       ; basement (ch6_basement); Hercule flies on with Piccolo
         PlayMusic 5
+        SetCharacterTransformation 1, 103
         DespawnEntity 128
         SetEntityPositionInstant 0, 280, 296
         SetCharacterFlag_Bit1 3
@@ -577,7 +570,6 @@ sequence ch5_gingertown_end
         CoopCall 6, 6, 0, 0
         DespawnEntity 137
         DespawnEntity 76
-        DespawnEntity 121
         SetActiveEntity 0
         FadeFromWhite 90
         SetPlayerVisible 1
