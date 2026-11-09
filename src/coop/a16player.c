@@ -46,14 +46,9 @@ static void shake(int frames, int strength) {
 // ---- the party lock ------------------------------------------------------------------------------
 static u16 pct(u32 v, u32 p) { v = v * p / 100; return (u16)(v > 0xFFFF ? 0xFFFF : v); }
 
-void a16_join(void) {
+// 16's entry in his slot: Krillin's level with stronger numbers, his four moves
+static void a16_fill(void) {
     PartyState *p = g_Party;
-    for (int s = 0; s < PARTY_SLOTS; s++) {
-        if (s == KRILLIN_SLOT || s == A16_SLOT) continue;
-        if (p->chars[s].flags & 2) flag_set_hook(p, A16_FLAG_SAVED + s);
-        else flag_clear_hook(p, A16_FLAG_SAVED + s);
-        p->chars[s].flags &= ~2u;
-    }
     const CharacterEntry *k = &p->chars[KRILLIN_SLOT];
     CharacterEntry *a = &p->chars[A16_SLOT];
     memset(a, 0, sizeof *a);
@@ -67,6 +62,17 @@ void a16_join(void) {
     a->flags = A16_FLAGS;
     static const u8 abilities[4] = { ROCKET_ABILITY, 19, 0, 2 };   // Rocket Punch, Afterimage Rush, Big Bang, Ki Blast
     for (int i = 0; i < 4; i++) a->ability_list[i] = abilities[i];
+}
+
+void a16_join(void) {
+    PartyState *p = g_Party;
+    for (int s = 0; s < PARTY_SLOTS; s++) {
+        if (s == KRILLIN_SLOT || s == A16_SLOT) continue;
+        if (p->chars[s].flags & 2) flag_set_hook(p, A16_FLAG_SAVED + s);
+        else flag_clear_hook(p, A16_FLAG_SAVED + s);
+        p->chars[s].flags &= ~2u;
+    }
+    a16_fill();
     p->chars[KRILLIN_SLOT].flags |= 3;
     flag_set_hook(p, A16_FLAG_ACTIVE);
 }
@@ -105,6 +111,24 @@ void a16_gone(void) {
     if (!flag_test_hook(p, A16_FLAG_ACTIVE) || p->chars[A16_SLOT].display_row != A16_ROW) return;   // never joined / a duel's
     p->chars[A16_SLOT].flags = 0;
     if (coop.p2 && coop.p2_slot == A16_SLOT) p2_bind_slot(HERCULE_SLOT);
+}
+
+// The island's fight with Cell (data/story/a16_island.*, Ryan 2026-11-08): 16 for that one fight, in his slot (the time chamber's duel has given it
+// back by then), no party lock and no chapter flag. With two players player 2 is 16 and his slot is kept in duel_saved_slot, which no duel uses here.
+void a16_fight_join(void) {
+    a16_fill();
+    if (coop.p2 || p2_present()) {
+        coop2.duel_saved_slot = coop.p2_slot;
+        if (coop.p2) p2_bind_slot(A16_SLOT); else coop.p2_slot = A16_SLOT;
+    }
+}
+
+void a16_fight_leave(void) {
+    if (coop.p2_slot == A16_SLOT) {
+        int back = coop2.duel_saved_slot;
+        if (coop.p2) p2_bind_slot(back); else coop.p2_slot = (u8)back;
+    }
+    memset(&g_Party->chars[A16_SLOT], 0, sizeof(CharacterEntry));
 }
 
 // COOP_CMD_A16_PARTY (fork tests): the chapter's party without its scene: 16 joins, Krillin becomes player 1

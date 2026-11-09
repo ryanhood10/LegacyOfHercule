@@ -50,6 +50,12 @@ static const ExtraStat gero_stats[] = {
 };
 #define GERO_STAT_COUNT (sizeof gero_stats / sizeof gero_stats[0])
 
+// 125: the island's Cell (data/story/a16_island.*): a copy of Gingertown's (stat 60), fought by 16 and Piccolo before 16's blows
+static const ExtraStat island_stats[] = {
+    { 60, -1, 0, -1, 0, 0, 0, 0 },
+};
+#define ISLAND_STAT_COUNT (sizeof island_stats / sizeof island_stats[0])
+
 // 140-144: the Cell Games (data/story/cell_games.*)
 static const ExtraStat cell_stats[] = {
     // 140 the second Perfect Cell of the final fight: a copy of the stock final stage (stat 25)
@@ -65,6 +71,7 @@ static const BossRule rules[] = {
     // sprite, and a twin was left standing through it and after, at HP 0 and past hurting, some ways still attacking (2026-11-02)
     { 6,  0, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     { 117, 50, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },  // one mother dinosaur, to half her health
+    { ISLAND_STAT_BASE, 50, BOSS_NO_TWIN, 0, 0, 100, 0, 0 },  // the island's Cell, to half his health, stays standing for 16's blows
     { 118, 0, BOSS_NO_TWIN, 0, 0, 0, 0, 0 },
     // Androids 17 and 18 pair with each other's model (the road: Piccolo + Vegeta vs 17 + 18)
 #ifdef BOSS_RULE_TEST
@@ -141,6 +148,8 @@ int resolve_stat(int stat_index, EnemyStat *out) {
     const ExtraStat *x;
     if (stat_index >= GERO_STAT_BASE && (u32)(stat_index - GERO_STAT_BASE) < GERO_STAT_COUNT)
         x = &gero_stats[stat_index - GERO_STAT_BASE];
+    else if (stat_index >= ISLAND_STAT_BASE && (u32)(stat_index - ISLAND_STAT_BASE) < ISLAND_STAT_COUNT)
+        x = &island_stats[stat_index - ISLAND_STAT_BASE];
     else if (stat_index >= CELL_STAT_BASE && (u32)(stat_index - CELL_STAT_BASE) < CELL_STAT_COUNT)
         x = &cell_stats[stat_index - CELL_STAT_BASE];
     else if (i >= 0 && (u32)i < extra_stat_count)

@@ -109,6 +109,7 @@ typedef struct BossRule {
 #define DOJO_FINALE_HP_PCT 250
 #define DOJO_FINALE_ATK_ADD 16
 #define DOJO_SPEED_PCT 115
+#define ISLAND_STAT_BASE 125     // the island's Cell (data/story/a16_island.*; 126-139 unused)
 #define GERO_STAT_BASE 120
 #define BUNKER19_STAT 120   // the bunker's Android 19 spare body A (the record), BOSS_PAIR with B
 #define BUNKER19B_STAT 121  // spare body B (the pair's twin)

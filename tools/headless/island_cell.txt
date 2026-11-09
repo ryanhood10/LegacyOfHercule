@@ -1,0 +1,161 @@
+# The island's fight with Cell (data/story/a16_island.lscript, Ryan 2026-11-08): 16 and Piccolo fight Cell, then 16's blows, 17's absorption, the Lookout.
+# Alone: player 1 is 16 (slot 7), Piccolo lies (an actor, 103). Two players: player 1 Piccolo, player 2 16 (sprite 175); afterwards he is who he was.
+# Scene ends when the fight starts (stepz), test command 7 wins it, the scene runs on to the Lookout; 16's slot is empty again; a corrupted heap fails the vtable check of the caller.
+echo === alone
+load menu.ss
+p2 off
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke32 0x0203FD0C 0x040B
+poke32 0x0203FD54 0x00E00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+poke32 0x0203FD08 7
+frames 120
+mashmap 11 5 60
+frames 300
+mashmap 11 6 30
+frames 200
+poke32 0x0203FD08 7
+frames 60
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+frames 60
+shot isl_alone_fight
+echo EXPECT 0203f000: 07
+peek8 0x0203F000 1
+echo EXPECT 0203f0d8: 19
+peek8 0x0203F0D8 1
+echo EXPECT map zone 11 area 6 
+map
+ents
+poke32 0x0203FD08 7
+frames 200
+shot isl_alone_blows
+frames 200
+shot isl_alone_after
+mash 20 60
+shot isl_alone_mid
+ents
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203f0d8: 00
+peek8 0x0203F0D8 1
+echo EXPECT map zone 9 area 1 
+map
+ents
+echo === H
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 5
+poke32 0x0203FD0C 0x040B
+poke32 0x0203FD54 0x00E00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+poke32 0x0203FD08 7
+frames 120
+mashmap 11 5 60
+frames 300
+mashmap 11 6 30
+frames 200
+poke32 0x0203FD08 7
+frames 60
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+frames 60
+shot isl_H_fight
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 07
+peek8 0x0203FF84 1
+echo EXPECT 0203f0d8: 19
+peek8 0x0203F0D8 1
+echo EXPECT map zone 11 area 6 
+map
+ents
+poke32 0x0203FD08 7
+frames 200
+shot isl_H_blows
+frames 200
+shot isl_H_after
+mash 20 60
+shot isl_H_mid
+ents
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 05
+peek8 0x0203FF84 1
+echo EXPECT 0203f0d8: 00
+peek8 0x0203F0D8 1
+echo EXPECT map zone 9 area 1 
+map
+ents
+echo === K
+load menu.ss
+p2 0
+preset +136 +140 +141 +142 +143 +144 +145
+maptest 7
+frames 200
+poke8 0x0203F000 1
+poke8 0x0203FF84 6
+poke32 0x0203FD0C 0x040B
+poke32 0x0203FD54 0x00E00160
+poke32 0x0203FD08 5
+frames 100
+stepz 0x03001FDC 150
+frames 30
+poke32 0x0203FD08 7
+frames 120
+mashmap 11 5 60
+frames 300
+mashmap 11 6 30
+frames 200
+poke32 0x0203FD08 7
+frames 60
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+frames 60
+shot isl_K_fight
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 07
+peek8 0x0203FF84 1
+echo EXPECT 0203f0d8: 19
+peek8 0x0203F0D8 1
+echo EXPECT map zone 11 area 6 
+map
+ents
+poke32 0x0203FD08 7
+frames 200
+shot isl_K_blows
+frames 200
+shot isl_K_after
+mash 20 60
+shot isl_K_mid
+ents
+echo EXPECT stepz 03001fdc: zero
+stepz 0x03001FDC 250
+echo EXPECT 0203f000: 01
+peek8 0x0203F000 1
+echo EXPECT 0203ff84: 06
+peek8 0x0203FF84 1
+echo EXPECT 0203f0d8: 00
+peek8 0x0203F0D8 1
+echo EXPECT map zone 9 area 1 
+map
+ents
+echo ALIVE

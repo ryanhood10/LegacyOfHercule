@@ -55,4 +55,6 @@
 void a16_join(void);     // CoopCall 11
 void a16_leave(void);    // CoopCall 12 (0): the chapter's end: the lock lifts, 16 stays selectable
 void a16_gone(void);     // CoopCall 12, 1: the Cell Games: 16 leaves the party for good
+void a16_fight_join(void);   // CoopCall 11, 1: the island: 16 for one fight, no lock (player 2's body with two players)
+void a16_fight_leave(void);  // CoopCall 12, 2: the fight's over: the slot empty again, player 2 back on who he was
 void a16_frame(void);    // every frame (input.c): an older save's 16 gets his four moves and the lower numbers

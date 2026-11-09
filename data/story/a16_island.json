@@ -40,7 +40,8 @@
         "5": {"sprite": 8}
       },
       "add_records": [
-        {"kind": "actor", "sprite": 8, "x": 288, "y": 232, "facing": 0, "condition": "never"}
+        {"kind": "actor", "sprite": 8, "x": 288, "y": 232, "facing": 0, "condition": "never"},
+        {"kind": "enemy", "sprite": 28, "stat": 125, "x": 340, "y": 216, "facing": 2, "condition": "never", "action": "seq:a16_island_cell_end"}
       ]
     }
   ]

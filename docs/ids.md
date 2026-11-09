@@ -149,7 +149,8 @@ sprite 72) for Roshi's gym.
 | 119 | the mother dinosaur's babies (`bosses.c`: a stat 94's numbers on stat 54's class and AI set) | 54 | zone 8 area 50 |
 | 120 / 121 | the bunker's two Android 19s (`gero_stats[]`) | 5 | Gero's computer |
 | 122-124 | reserved for Gero's computer, unused | | |
-| 125-139 | allocated to the Lookout session, unused | | |
+| 125 | the island's Cell, fought by 16 and Piccolo before 16's blows (`island_stats[]`, a rule: to half his health, `BOSS_NO_TWIN`) | 60 | zone 11 area 6 |
+| 126-139 | allocated to the Lookout session, unused | | |
 | 140 | the second Perfect Cell of the final fight (copy of stat 25) | 25 | Cell Games |
 | 141-144 | reserved for the Cell Games, unused | | |
 | 145+ | see the allocations above | | |

@@ -299,15 +299,19 @@ sequence a16_island_half
         SetEntityFacing 9, 0            ; at his side in a blink and one heavy blow throws him 32 px into the stock lying pose. Player 2:
         PlayMusic 35                    ; Hercule cowers on a knee (he stays down until Goku comes); everyone looks at Piccolo
         SetEntityFacing 11, 2
-        CoopCall 37, 1, 0, 28
-        CoopCall 37, 7, 30, 0
+        CoopCall 37, 1, 0, 28            ; (Ryan, 2026-11-08: "when he attacked he wasnt super anymore") he goes Super first, the stock transformation with the charge
+        CoopCall 37, 7, 0, 4             ; beside it, and fires as his own form (row 7, sprite 104); Cell's blow knocks him out of it (flag 8)
+        SetEntityAnimation 0, 35
+        CoopCall 37, 7, -1, 0
+        SetCharacterTransformation 1, 104
+        WhiteFlash 12
         CoopCall 37, 8, 1, 3
         WaitFrames 40
         SetEntityFacing 28, 2
         WaitFrames 30
         CoopCall 37, 1, 28, 0
         CoopCall 37, 4, 0, 0
-        CoopCall 37, 5, 1, 32
+        CoopCall 37, 5, 9, 32
         SetEntityAnimation 0, 33
         CoopCall 37, 12, 0, 28
         CoopCall 37, 16, -15, 0
@@ -316,6 +320,80 @@ sequence a16_island_half
         CoopCall 37, 10, 0, 1
       H1:
   stockseq @083e6078 32 38              ; "I could absorb you if I wanted..." ... "I will kill Cell. ... I cannot let that happen."
+  script                                ; (Ryan, 2026-11-08) the players fight Cell here, before 16's blows: as 16 and Piccolo with two players (player 2 is 16), alone as
+        PlayAudio 60                    ; 16 with Piccolo left lying; behind a short fade. Cell goes from the actor to the boss record (stat 125, to half his health)
+        FadeOut 30
+        CoopCall 37, 0, 0, 0
+        CoopCall 11, 1, 0, 0            ; 16 for this fight (a16_fight_join)
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse alone
+        SetEntityAnimation 0, 0
+        CoopCall 9, 1, 300, 176
+        Jump ready
+      alone:
+        PushVarint 103
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushEntityPosition 0
+        PushEntityPosition 0
+        PushVarint 65536
+        Div
+        PushVarint 65536
+        Mul
+        Sub
+        Step SpawnCharacterEntity
+        CoopCall 37, 1, 103, -3          ; the actor lies by Cine's pose (held; SetEntityAnimation 33 never returned on a fresh actor)
+        CoopCall 37, 10, 0, 2
+        SetEntityAnimationNoWait 0, 0    ; the switch waits for the lying pose to end: he is stood up behind the fade first
+        SetActiveCharacter 7
+        SetEntityPositionInstant 0, 300, 176
+      ready:
+        DespawnEntity 8
+        SetEntityPositionInstant 28, 340, 216
+        SetEntityFacing 28, 2
+        SetEntityFacing 0, 3
+        DespawnCharacterAndRecordPosition 28, 7
+        DrawBossHealthBarRange 28, 50, 100
+        PlayMusic 35
+        FadeFromWhite 30
+        SetPlayerVisible 1
+        SetActiveEntity 0
+end
+
+; map 298 record 7 defeat (Cell at half health, 2026-11-08): back to the scene: the fighters on their marks behind a fade, then 16's blows and the rest
+sequence a16_island_cell_end
+  script
+        PlayAudio 60
+        SetPlayerVisible 0
+        FindPlayerEntity
+        FadeOut 30
+        CoopCall 37, 0, 0, 0
+        CoopCall 5, 0, 0, 0
+        JumpIfFalse one
+        Jump down
+      one:
+        DespawnEntity 103
+        SetActiveCharacter 1
+      down:
+        CoopCall 12, 2, 0, 0            ; 16's slot given back; player 2 on who he was
+        SetEntityPositionInstant 0, 240, 216
+        SetEntityFacing 0, 3
+        SetEntityAnimation 0, 33
+        CoopCall 9, 1, 256, 192
+        CoopCall 37, 16, -15, 0
+        JumpIfFalse noh
+        CoopCall 37, 1, -15, 28
+        CoopCall 37, 10, 0, 1
+      noh:
+        SpawnCharacterEntity 8, 300, 176
+        SetEntityFacing 8, 3
+        SetEntityPositionInstant 28, 340, 216
+        SetEntityFacing 28, 2
+        SetEntityAnimation 28, 0
+        PanCameraToPosition 208, 112, 10
+        PlayMusic 28
+        FadeFromWhite 30
   script                                ; stock entry 39, restaged (6.8 b): 16 walks up (he does not hurry), two blows and a heavy one; Cell is
         SetEntityFacing 28, 1           ; thrown 64 px and lies there, the stock red flash on him
         WalkToPosition 8, 296, 208
@@ -343,7 +421,18 @@ sequence a16_island_half
         CoopCall 37, 3, 316, 217
         SetEntityAnimation 28, 0
         SetEntityFacing 28, 1
-  stockseq @083e6078 45 58              ; "He's behind you!" ... 17 absorbed ... "NO!!!!!!!!"
+  stockseq @083e6078 45 49              ; "He's behind you!", "You should have listened...", the tail's bell comes up over him
+  script                                ; (Ryan, 2026-11-08: "it doesnt look like hes actually absorbing him") 17 is caught in the bell: the stock pose of 18's absorption (ch7) drawn
+        SetEntityAnimation 9, 29        ; over Cell, a purple pulse on him, the ground shaking, and he is dragged in toward the tail before the white takes him
+        LockEntityPose 9, 41
+        BeginCommandBatch
+        ScreenShake 9, 3, 50
+        FlashScreenColor 9, 180, 60, 220, 12
+        GlideToPosition 9, 328, 206, 100
+        EntityWaitFrames 28, 22
+        FlashScreenColor 28, 180, 60, 220, 12
+        CommitCommandBatch
+  stockseq @083e6078 50 58              ; "NO!!!!!!!!" ... the stock white, 17 gone, Semi-Perfect Cell
   script                                ; stock entry 59, restaged (batch 2, 6.8 c). Tien's stand is the Tri-Beam from above: he flies up over
         PanCameraToPosition 236, 104, 3 ; Cell and each blast is light, a boom, a square of dust and Cell hammered flat (the stock threw
         PlayAudio 26                    ; four small ki blasts level across the grass). Three, faster each time

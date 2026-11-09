@@ -206,8 +206,8 @@ void vm_coop_call(s32 *st) {
         else if (a == 1 && coop.p2) { coop.p2->x = b << 8; coop.p2->y = c << 8; coop.p2->facing = 1; }
         break;
     case 10: party_keep(st, a); break;
-    case 11: a16_join(); break;
-    case 12: if (a == 1) a16_gone(); else a16_leave(); break;
+    case 11: if (a == 1) a16_fight_join(); else a16_join(); break;
+    case 12: if (a == 1) a16_gone(); else if (a == 2) a16_fight_leave(); else a16_leave(); break;
 #if PARTY_SLOTS > SSJ2_SLOT
     case 20: ssj2_join(); break;
 #endif
