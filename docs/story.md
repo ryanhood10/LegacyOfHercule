@@ -483,7 +483,7 @@ sparring match names the winner's character instead), and both players are back 
     Numbers in section 0.
   - *Models:* Broly appears only as the Legendary Super Saiyan (sprite 159, from Buu's Fury), already
     waiting in the basin; no base-form Broly. Paragus is Vegeta's Saiyan-armor set (sprites 137-140)
-    made old with grey hair and a grey goatee (sprite 170, `tools/brolysprites.py`), with a matching
+    dressed as the movie's Paragus since 2026-11-13 (black hair, a moustache, the white chest as his cape, a green skirt, bare limbs; it was Vegeta made old, grey with a goatee) (sprite 170, `tools/brolysprites.py`), with a matching
     edit of Vegeta's dialogue portrait (portrait 120).
   - *End:* after both fall, a huge explosion, a debrief in the backyard with Bulma, fade to black,
     and the party is exactly as before the trip (selectable bits, player 1 and player 2; flags

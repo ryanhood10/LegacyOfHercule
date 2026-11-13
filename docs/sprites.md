@@ -446,10 +446,12 @@ groups, 213 unique frames) aged per frame. Vegeta's skin shows only on his face 
 suit), so the hair is the black left after removing the eyes (black with face skin on both sides
 within 4 px, across or up and down), taken as the 4-connected black components that touch the face
 (8-way), or in back views the component holding the topmost black pixel (the ground shadow under the
-boots touches no skin). Hair edges stay black, the inside becomes mid grey, a darker band sits on the
-forehead line, Vegeta's grey highlights (13) inside the hair go light grey. A grey goatee: the chin's
-lowest face rows at the centre in front views, at the chin's front edge in side views (the side the
-stored frame faces, h-flip aware), only when the head is upright (hair centroid above the face's).
+boots touches no skin). **Since 2026-11-13 he is dressed as the movie's Paragus, not aged:** the hair stays black with
+Vegeta's sheen; a black moustache on the face row above the chin's (five wide in front views, its ends a row lower; at
+the face's front edge in side views); `dress`: the white chest plate is his cape, three rows under its gold the green
+skirt, the rest of the blue suit bare tan limbs, the boots purple. (Before: hair edges black, the inside mid grey, a
+grey goatee at the chin's centre in front views, at the chin's front edge in side views (the side the
+stored frame faces, h-flip aware), only when the head is upright (hair centroid above the face's).)
 Group 9 (the Super Saiyan transform's flames) stays as it is; Paragus never plays it. The header is
 137's, so the melee boss AI set 21 finds groups 0-2 and 5-8, and group 3 serves the both-down rule.
 
@@ -650,7 +652,7 @@ Seen in play (headless and fork): walk in four facings, the A combo, the Kameham
 the ki pose (Burst, Ki Blast), hurt frames from 59.
 ## Super Android 13 (id 180, portrait 122; `tools/super13sprites.py`, 2026-10-19)
 
-The post-game boss (`docs/story.md` 4i): blue skin, white hair, huge muscles, red-brown trousers, much
+The post-game boss (`docs/story.md` 4i): royal blue skin and orange hair as the movie's (since 2026-11-13; it was pale blue with white hair), huge muscles, red-brown trousers, much
 larger than a normal fighter. Neither ROM has him (`docs/sprites.md` "Buu's Fury": no Super 13), so the
 body is **Legendary Super Saiyan Broly from Buu's Fury (Buu record 28)**: a 64 px tall muscle giant (a LoG2
 fighter is about 32 px; Perfect Cell 30 about 40), frames 32x64 / 64x64, with a full fight set and the

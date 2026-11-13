@@ -2,6 +2,27 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-13
+
+- **A tournament crash found by the regression after the recolours, an old bug of ours: a kit ended a beam the game had already
+  freed** (`tny_n32`'s real fights: `CRASH`, a jump to 0x1CF51CF0). The stock beam ends itself (off the entity list, freed) while
+  `TKit.beam` still pointed at it; `kit_update -> finish -> beam_end -> Beam_End` then removed and destroyed freed memory. Until this
+  build the block still held the dead beam (a silent double free); the recoloured frames compress to other sizes, the arena laid out
+  differently, and pixels lay there. `tny_moves.c`: `beam_live` (the beam is on the entity list with a beam vtable) before `Beam_End`,
+  and each `kit_update` drops a pointer the game no longer has. Found with `breakpc` at EntityList_Remove's destroy call (0x08006934)
+  and the stack at the hit (`docs/testing.md` "Finding a hang or a memory stomp headless").
+
+- **Super 13's and Paragus' bodies match their drawn faces (Ryan: Super 13 "could have a bit more orange"; Paragus "wears a white cape in the
+  anime").** `super13sprites.py`: the skin ramp is the movie's royal blue (77 / 72 / 215, forearms too), the hair orange (32 / 33 / 34: the
+  yellow strands, their skin-ramp shading and, in `hair_rest`, the flecks and silver strands the rules missed), a small warm patch wholly
+  inside the skin is an eye (blank yellow), a swing's arc stays white (`ARC_WHITE`). `brolysprites.py`: Paragus is no longer Vegeta made
+  old: black hair, a black moustache (no goatee), and `dress`: the white chest plate stands for the cape, three rows under its gold are the
+  green armour's skirt (upright frames), the rest of the blue suit bare tan limbs, purple boots. A draped cape is not drawn (he did not
+  ask for it). **A trap found on the way:** stopping a background `xargs` regression (TaskStop) kills the shell, not `xargs.exe`: it kept
+  launching tests against a ROM being rebuilt, and WSL kept the old image mapped, so a state made on the debug ROM crashed on the play ROM
+  ("Jumped to invalid address"). After stopping a regression: `taskkill //F //IM xargs.exe`, `pkill -f st_headless` in WSL, then the cache
+  drop (`docs/testing.md` "Full regression").
+
 ## 2026-11-12
 
 - **Three portraits drawn, not repainted (Ryan: "complaints about andriod 13's portrait being teins recycled, and same for super andriod 13 ...

@@ -915,9 +915,20 @@ static void kit_beam_update(Beam *b, int run) {
     ((void (*)(Beam *, int))BEAM_UPDATE)(b, run);
     if (b->state == 1 && b->len > BEAM_THIN_LEN) { b->len = BEAM_THIN_LEN; b->impact = 1; }
 }
+// Is the kit's beam still the game's object? The stock beam ends itself (it leaves the entity list and is freed) and k->beam went on
+// pointing at it: Beam_End on freed memory called a destroy through whatever lay there since (pixels: a jump to 0x1CF51CF0 in
+// tny_n32's real fights, 2026-11-13; before that build the block happened to hold the dead beam still, a double free nobody saw).
+static int beam_live(const TKit *k) {
+    const Entity *b = (const Entity *)k->beam;
+    if (!b) return 0;
+    const EntityList *l = g_EntityList;
+    for (int i = 0; i < l->count; i++)
+        if (l->items[i] == b) return b->vtable == (const u32 *)BEAM_VTABLE || b->vtable == k->beam_vt;
+    return 0;
+}
 static void beam_end(TKit *k) {
     if (!k->beam) return;
-    Beam_End(k->beam);
+    if (beam_live(k)) Beam_End(k->beam);
     k->beam = 0;
 }
 static void beam_fire(TKit *k, const TMove *m) {
@@ -1715,6 +1726,7 @@ static void kit_update(Entity *e) {
     TKit *k = (TKit *)e->vtable;
     const u32 *base = k->base;
     void (*base_update)(Entity *) = (void (*)(Entity *))((u32)base + base[2]);
+    if (k->beam && !beam_live(k)) k->beam = 0;      // the game ended it by itself: nothing of ours reads it again
     if (k->native) {
         if (e->hp <= 0 && k->cur) { beam_end(k); k->cur = 0; }
         base_update(e);                             // natives (Android 16, Super 13) aim at players and end themselves

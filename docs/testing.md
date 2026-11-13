@@ -94,6 +94,10 @@ works on a copy) and compare the party blocks.
 
 ## Full regression (headless, `tools/headless/regfull.sh`)
 
+**Stopping a parallel run (2026-11-13):** stopping the background shell does not stop `xargs.exe`: it goes on launching tests, and a ROM
+rebuilt meanwhile is seen stale in WSL (a state made on one ROM then jumps to an invalid address on the other). Kill it all first:
+`taskkill //F //IM xargs.exe`, then `wsl -d Ubuntu -u root -- pkill -f st_headless`, then the cache drop, then rebuild `menu.ss`.
+
 Every chapter and tournament script on a `DEBUG_MENU=1` build, co-op as written plus `arctic_summit`, `postgame` and
 `ch9_gero` again with player 2 off, then the prologue on the play ROM (`build/log2-coop.gba`, or `PLAY=<rom>`
 for a private one, e.g. `make BUILD=build/<dir>/play` then `PLAY=build/<dir>/play/log2-coop.gba bash ...`). About

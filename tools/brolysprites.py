@@ -6,12 +6,15 @@ until 2026-10-21; it is map art now, tools/shipart.py.)
 usage: brolysprites.py roms/log2.gba build/gen/broly_sprites_data.c [--preview-dir build/x]   (--buu is accepted and ignored)
 
 Paragus (record paragus_record, sprite id 170 by default): Vegeta's playable set in Saiyan armour
-(sprite 137, all 21 groups) with every frame aged:
+(sprite 137, all 21 groups) with every frame dressed as the Broly movie dresses him (since 2026-11-13; Ryan: "i like the mustache
+you gave paragus, but he wears a white cape in the anime". Until then he was Vegeta made old: grey hair, a grey goatee, the blue suit):
   * the hair (Vegeta's black flame, told apart per frame: black pixels above the shoulders that are not
-    the eyes, i.e. not between face-skin pixels in the face's rows) becomes grey: a black outline where
-    it meets anything else, mid grey inside, light grey for Vegeta's grey hair highlights;
-  * a grey goatee on the chin: the lowest face-skin rows at the chin's centre in front views, at the
-    chin's front edge in side views (the side the stored frame faces); none in back views.
+    the eyes, i.e. not between face-skin pixels in the face's rows) stays black, its sheen kept;
+  * a black moustache: the face-skin row above the chin's, five wide in front views with its ends a row lower, at the face's front
+    edge in side views (the side the stored frame faces); none in back views;
+  * the white chest plate with its gold stands for his white cape; under it three rows of the blue suit are the green armour's skirt
+    (in upright frames); the rest of the blue suit is bare tan arms and legs; the boots are purple (white pieces low on an upright
+    body; the gloves stay white in every pose).
 The record keeps 137's header and group layout, so the melee boss AI set 21 finds every group it plays
 (0, 1, 2, 5-8) and group 3 (knock-down) serves the both-down rule.
 
@@ -57,6 +60,55 @@ def neighbours4(y, x):
 
 
 # ---- Paragus' sprite --------------------------------------------------------------------------------
+LIMBS = {79: 17, 80: 18, 81: 21}                 # the blue suit -> bare tan arms and legs
+SKIRT = {79: 49, 80: 50, 81: 167}                # ... and, under the chest, the green armour's skirt
+BOOTS = {2: 223, 9: 223, 10: 223, 11: 95, 12: 95, 13: 229}
+
+
+def dress(px, out, w, h, hair, face, upright):
+    """The movie's clothes on Vegeta's body, in place: the white chest plate is the cape, three rows under its gold the green skirt, the
+    rest of the suit bare limbs, the boots purple."""
+    gold = [y for y in range(h) for x in range(w) if px[y][x] in (41, 42)]
+    body = [y for y in range(h) for x in range(w) if px[y][x]]
+    skirt = None
+    if upright and body:
+        top = max(gold) + 1 if gold else min(body) + (max(body) - min(body)) * 55 // 100
+        skirt = range(top, top + 3)
+    for y in range(h):
+        for x in range(w):
+            v = out[y][x]
+            if v in LIMBS:
+                out[y][x] = (SKIRT if skirt is not None and y in skirt else LIMBS)[v]
+    if not upright or not body:
+        return
+    # white pieces: the largest is the chest; the others low on the body, outside the face and the hair, are the boots
+    white = [[px[y][x] in BOOTS and (y, x) not in hair for x in range(w)] for y in range(h)]
+    fy = {y for y, _ in face}
+    low = min(body) + (max(body) - min(body)) * 0.72
+    seen, comps = set(), []
+    for y in range(h):
+        for x in range(w):
+            if white[y][x] and (y, x) not in seen:
+                comp, stack = [], [(y, x)]
+                seen.add((y, x))
+                while stack:
+                    cy, cx = stack.pop()
+                    comp.append((cy, cx))
+                    for ny, nx in neighbours4(cy, cx):
+                        if 0 <= ny < h and 0 <= nx < w and white[ny][nx] and (ny, nx) not in seen:
+                            seen.add((ny, nx))
+                            stack.append((ny, nx))
+                comps.append(comp)
+    if not comps:
+        return
+    big = max(comps, key=len)
+    for comp in comps:
+        if comp is big or len(comp) < 3 or all(y in fy for y, _ in comp) or sum(y for y, _ in comp) / len(comp) < low:
+            continue
+        for y, x in comp:
+            out[y][x] = BOOTS[px[y][x]]
+
+
 def age_frame(px, w, h, facing):
     """facing in stored pixel space: 'front', 'back', 'left', 'right'. Returns a new pixel grid."""
     out = [row[:] for row in px]
@@ -114,37 +166,22 @@ def age_frame(px, w, h, facing):
         for x in range(w):
             if px[y][x] == HAIR_HI and sum((ny, nx) in hair for ny, nx in neighbours4(y, x)) >= 2:
                 hair.add((y, x))
-    grey_lo, grey_mid, grey_hi = near((90, 90, 98)), near((128, 128, 136)), near((180, 180, 188))
     upright = bool(face) and bool(hair) and (sum(y for y, _ in hair) / len(hair)) < (sum(y for y, _ in face) / len(face))
-    for y, x in hair:
-        v = px[y][x]
-        if v == HAIR_HI:
-            out[y][x] = grey_hi
-            continue
-        edge = False
-        for ny, nx in neighbours4(y, x):
-            if not (0 <= ny < h and 0 <= nx < w) or (ny, nx) not in hair:
-                edge = True
-                break
-        out[y][x] = BLACK if edge else grey_mid
-    # a darker band right above the face so the forehead line stays readable
-    for y, x in hair:
-        if out[y][x] == grey_mid and y + 1 < h and px[y + 1][x] in SKIN:
-            out[y][x] = grey_lo
-    # goatee
+    # the moustache
     if face and facing != "back" and upright:
         chin = fy1
         xs = [x for y, x in face if y == chin]
         if facing == "front":
             cx = (min(xs) + max(xs)) // 2 if xs else w // 2
-            spots = [(chin, cx - 1), (chin, cx), (chin, cx + 1), (chin - 1, cx), (chin + 1, cx)]
+            spots = [(chin - 1, cx - 2), (chin - 1, cx - 1), (chin - 1, cx), (chin - 1, cx + 1), (chin - 1, cx + 2), (chin, cx - 2), (chin, cx + 2)]
         else:
             front = min(xs) if facing == "left" else max(xs)
             step = 1 if facing == "left" else -1
-            spots = [(chin, front), (chin, front + step), (chin - 1, front), (chin + 1, front + step)]
+            spots = [(chin - 1, front), (chin - 1, front + step), (chin - 1, front + 2 * step), (chin, front + step)]
         for y, x in spots:
-            if 0 <= y < h and 0 <= x < w and (px[y][x] in SKIN or (y == chin + 1 and px[y][x] != 0)):
-                out[y][x] = grey_mid if y <= chin else grey_lo
+            if 0 <= y < h and 0 <= x < w and px[y][x] in SKIN:
+                out[y][x] = BLACK
+    dress(px, out, w, h, hair, face, upright or not face)
     return out
 
 

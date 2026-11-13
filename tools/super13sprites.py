@@ -8,9 +8,11 @@ usage: super13sprites.py roms/log2.gba build/gen/super13_sprites_data.c --buu ro
 The body (docs/sprites.md "Super Android 13"): Legendary Super Saiyan Broly from Buu's Fury (Buu record
 28), a 64 px tall muscle giant twice a normal LoG2 fighter's height, converted to LoG2's record format
 with tools/buu2log2.py's converter and recoloured per body part, per frame, from geometry:
-  * skin -> Super 13's blue skin ramp;
-  * yellow components above the skin's centroid (the hair) -> white hair; below it (the trousers)
-    -> red-brown trousers;
+  * skin -> Super 13's blue skin ramp: the movie's royal blue (77 / 72 / 215), as the drawn portrait's, since 2026-11-13 (Ryan: the
+    body was pale blue with white hair, the face royal blue with orange hair);
+  * yellow components above the skin's centroid (the hair) -> orange hair, and with them the rest of the hair (its skin-ramp shading,
+    its silver and lit flecks: hair_rest); a small one wholly inside the skin is an eye: blank yellow; below the centroid (the
+    trousers) -> red-brown trousers;
   * the largest red component (the sash) -> a charcoal belt; red below the trousers (boot soles) -> black;
   * silver and gem pixels (necklace, arm cuffs) above the trousers -> skin (bare chest and forearms);
     below them (the boots) -> black boots;
@@ -97,12 +99,12 @@ def near(rgb, avoid=(0,)):
 
 def ramps():
     """Buu index -> LoG2 index per body part (LoG2 OBJ palette 0x081DA6C8 indices)."""
-    skin = {67: 184, 66: 186, 200: 186, 201: 189, 203: 187, 202: 76, 18: 187, 205: 193, 16: 192}
-    hair = {30: 2, 29: 2, 2: 2, 28: 9, 5: 9, 110: 10, 109: 11, 4: 12}
+    skin = {67: 77, 66: 77, 200: 77, 201: 72, 202: 72, 203: 215, 18: 215, 205: 215, 16: 211}
+    hair = {30: 32, 29: 32, 2: 32, 28: 32, 5: 33, 110: 33, 109: 34, 4: 34}
     pants = {30: 117, 29: 117, 2: 117, 28: 110, 5: 110, 110: 111, 109: 112, 4: 112}
     belt = {105: 14, 104: 15, 34: 14, 31: 1, 32: 15, 33: 15}
     sole = {k: 1 for k in B_RED}
-    cuff = {28: 189, 5: 189, 110: 187, 109: 187, 4: 193, 30: 186, 29: 186, 2: 184, 120: 184, 119: 186, 118: 189, 117: 187, 87: 187, 97: 187, 164: 187, 178: 187, 162: 187, 183: 187, 132: 187}
+    cuff = {28: 72, 5: 72, 110: 215, 109: 215, 4: 211, 30: 77, 29: 77, 2: 77, 120: 77, 119: 77, 118: 72, 117: 215, 87: 215, 97: 215, 164: 215, 178: 215, 162: 215, 183: 215, 132: 215}
     boot = {120: 12, 119: 13, 118: 14, 117: 15, 87: 15, 97: 15, 164: 15, 178: 15, 162: 15, 183: 15, 132: 15}
     return skin, hair, pants, belt, sole, cuff, boot
 
@@ -128,6 +130,52 @@ def comps(px, w, h, cols):
                             stack.append((ny, nx))
             out.append(comp)
     return out
+
+
+ARC_WHITE = {30: 2, 29: 2, 2: 2, 28: 9, 5: 9, 110: 10, 109: 11, 4: 12}      # a swing's arc touching the trousers: white
+HAIR_C = (32, 33, 34)
+EYE_C = 46
+
+
+def is_eye(comp, px, w, h):
+    """A small warm patch wholly inside the skin: an eye, not a lock of hair."""
+    if len(comp) > 6:
+        return False
+    cs = set(comp)
+    for y, x in comp:
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = y + dy, x + dx
+            if (ny, nx) not in cs and (not (0 <= ny < h and 0 <= nx < w) or px[ny][nx] not in B_SKIN):
+                return False
+    return True
+
+
+def hair_rest(px, o, w, h):
+    """The hair's pieces the rules above miss (warm flecks with no yellow, its silver strands, which came out cream, grey or the
+    skin's blue): a warm fleck touching the hair is hair; then everything that is not skin in the hair's box takes the orange by how
+    light it is. Black stays the line."""
+    grow = True
+    while grow:
+        grow = False
+        for y in range(h):
+            for x in range(w):
+                if px[y][x] in B_WARM and o[y][x] not in HAIR_C and o[y][x] != EYE_C:
+                    if any(0 <= y + dy < h and 0 <= x + dx < w and o[y + dy][x + dx] in HAIR_C and px[y + dy][x + dx] in B_WARM
+                           for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+                        o[y][x] = HAIR_C[0]
+                        grow = True
+    hp = [(y, x) for y in range(h) for x in range(w) if o[y][x] in HAIR_C and px[y][x] in B_WARM]
+    if not hp:
+        return
+    y0, x0, x1 = min(y for y, _ in hp), min(x for _, x in hp), max(x for _, x in hp)
+    y1 = min(max(y for y, _ in hp), y0 + 12)
+    for y in range(max(0, y0 - 2), y1 + 1):
+        for x in range(max(0, x0 - 2), min(w, x1 + 3)):
+            v = o[y][x]
+            if not px[y][x] or px[y][x] in B_SKIN or v in HAIR_C or v == 1:
+                continue
+            lum = sum(PAL[v]) / 3
+            o[y][x] = HAIR_C[0] if lum >= 150 else HAIR_C[1] if lum >= 90 else HAIR_C[2]
 
 
 def cy(comp):
@@ -156,7 +204,7 @@ def dress13(px, w, h, table, death=False):
             continue                                        # white light, sparks: unchanged
         c = cy(comp)
         if c < skin_y:
-            part = hair
+            part = {k: EYE_C for k in hair} if is_eye(comp, px, w, h) else hair
             hair_px.update(comp)
         elif death and belt_y is not None and c < belt_y:
             continue                                        # light bursting out of the torso
@@ -173,15 +221,15 @@ def dress13(px, w, h, table, death=False):
                     out[y][x] = pants[px[y][x]]
                     pants_px.append((y, x))
                 else:
-                    out[y][x] = hair[px[y][x]]
+                    out[y][x] = ARC_WHITE[px[y][x]]
             continue
         else:
             part = cuff                                     # the gold necklace and arm cuffs
         for y, x in comp:
             out[y][x] = part.get(px[y][x], cuff[118])
     # Broly's hair is shaded with the skin ramp: skin pixels mostly surrounded by hair are hair (grown
-    # from the yellow strands three times, 5x5 window), shaded grey
-    shade = {67: 9, 66: 9, 200: 10, 201: 10, 203: 11, 18: 11, 202: 12, 205: 13, 16: 13}
+    # from the yellow strands three times, 5x5 window), shaded in the hair's orange
+    shade = {67: 32, 66: 32, 200: 32, 201: 33, 203: 33, 18: 33, 202: 34, 205: 34, 16: 34}
     rest = set(sk)
     for _ in range(3):
         grown = [(y, x) for y, x in rest
@@ -192,7 +240,7 @@ def dress13(px, w, h, table, death=False):
             out[p[0]][p[1]] = shade[px[p[0]][p[1]]]
     for y, x in [p for p in rest if px[p[0]][p[1]] in (202, 205, 16)]:    # the hair's dark outline
         if sum((y + dy, x + dx) in hair_px for dy in (-1, 0, 1) for dx in (-1, 0, 1)) >= 3:
-            out[y][x] = 14
+            out[y][x] = 35
     pants_y = cy(pants_px) if pants_px else None
     for k, comp in enumerate(reds):
         # the sash, front and back; in the side views its knot sits at the hip 8 rows over the tails' middle (it
@@ -212,6 +260,8 @@ def dress13(px, w, h, table, death=False):
         part = boot if pants_y is not None and cy(comp) > pants_y + 2 else cuff
         for y, x in comp:
             out[y][x] = part[px[y][x]]
+    if not death:
+        hair_rest(px, out, w, h)
     return out
 
 
