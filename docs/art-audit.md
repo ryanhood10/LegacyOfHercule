@@ -124,7 +124,7 @@ failures), and `art_poses.py` passes there for 72, 157, 160, 163 (LoG2's own Pop
   flying frames in Buu's Fury (anims 0-21 checked): the pose would be his dash lean, built.
 - **Android 13: shout (4) and hurt (11).** His record keeps 17's 13-group layout for the boss AI; a taunt (the smirk,
   thumb at his chest) would be drawn on his idle. The player body 240 has both (borrowed).
-- **Super 13's portrait 122** is still Android 16's face in blue, the fault Ryan named on 169. Tried on the new base
+- **(Done 2026-11-12: 122, 169 and Paragus' 120 are drawn, `tools/drawnportraits.py`.)** Super 13's portrait 122 was still Android 16's face in blue, the fault Ryan named on 169. Tried on the new base
   (Tien's 95, blue, red eyes) three ways: the bald skull reaches the frame's top, so drawn spikes read as a crown, and
   16's mohawk cut out and mirrored does not sit on the other head. Not committed. It needs hair drawn by hand over a
   face moved down, or a look at the result by Ryan first (he may want the two faces to match, or not).

@@ -2,6 +2,16 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-12
+
+- **Three portraits drawn, not repainted (Ryan: "complaints about andriod 13's portrait being teins recycled, and same for super andriod 13 ...
+  we would also need one for paragus", "in akira toriyama's style ... anime accurate").** `tools/drawnportraits.py`: Android 13 (169), Super
+  Android 13 (122) and Paragus (120) drawn shape by shape from the way the movies draw them (13 three-quarter under the cap, dark mesh back, the
+  black patch reading 13, the long bill; Super 13 close on the face, royal blue, the split brow, blank yellow eyes, gritted teeth; Paragus
+  three-quarter, black hair, the moustache, his left eye scarred shut, the white scarf), in the stock manner (black line, flat colour, one
+  shade, the stock gradient and frame). `ppportraits.py` `a13`, `brolysprites.py` and `super13sprites.py` `build_portrait` now return them
+  (the repaints are gone). Not changed: the bodies (Super 13's sprite is pale blue with white hair, Paragus' has grey hair and a goatee).
+
 ## 2026-11-08
 
 - **Ryan's notes on the second set (`data/story/ch3_duels`, `ch5_lookout`, `a16_island`, `gen_cell_games.py`).** Space: the clone's lines after it turns gold use Super Saiyan Vegeta's portrait (107); Vegeta knocks it down out of its form, "FINAL FLASH!", a white, gone; he stays gold through his last line. Gingertown's end cut by lines and pages (none reworded); Piccolo's power-ups are his real form (row 7, sprite 104), kept until a fade or a blow (`flag 8`). The island: after "I cannot let that happen" the players fight Cell (stat 125, a copy of 60, to half, `BOSS_NO_TWIN`), alone as 16 with Piccolo down, two players as Piccolo and 16 (`a16_fight_join` / `a16_fight_leave`, CoopCall 11, 1 and 12, 2; test `island_cell.txt`), then 16's blows; 17 is held in Cell's tail with a pulse before the white. "I give up": alone Hercule says "You got this kid!" and runs. `SetEntityAnimation 33` on a fresh actor never returns: lie an actor with Cine's op 10.

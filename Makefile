@@ -179,7 +179,7 @@ $(BUILD)/obj/tny_portraits_data.o: $(BUILD)/gen/tny_portraits_data.c src/coop/ro
 	@mkdir -p $(BUILD)/obj
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
-$(BUILD)/gen/pp_portraits_data.c: tools/ppportraits.py tools/dinosprites.py tools/oldherculeportrait.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/gen/pp_portraits_data.c: tools/ppportraits.py tools/drawnportraits.py tools/dinosprites.py tools/oldherculeportrait.py tools/buu2log2.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/gen/portraits.stamp $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	@mkdir -p $(BUILD)/gen
 	$(PYTHON) tools/ppportraits.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) $(PP_PORTRAITS)
 
@@ -222,7 +222,7 @@ $(BUILD)/obj/boss_models_data.o: $(BUILD)/gen/boss_models_data.c src/coop/rom.h
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # Paragus (sprite + dialogue portrait) and the Saiyan ship for the Broly chapter (never committed); preview beside them
-$(BUILD)/gen/broly_sprites_data.c: tools/brolysprites.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/gen/broly_sprites_data.c: tools/brolysprites.py tools/drawnportraits.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	$(PYTHON) tools/brolysprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
 
 $(BUILD)/obj/broly_sprites_data.o: $(BUILD)/gen/broly_sprites_data.c src/coop/rom.h
@@ -264,7 +264,7 @@ $(BUILD)/obj/ssj2_sprites_data.o: $(BUILD)/gen/ssj2_sprites_data.c src/coop/rom.
 	$(CC) $(CFLAGS) -Isrc/coop -c $< -o $@
 
 # Super Android 13 (sprite, ki orbs, dialogue portrait) for the post-game (never committed); preview beside it
-$(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/gen/super13_sprites_data.c: tools/super13sprites.py tools/drawnportraits.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	$(PYTHON) tools/super13sprites.py $(ROM) $@ --buu $(if $(filter 1,$(BUU)),$(BUU_ROM),none) --preview-dir $(BUILD)
 
 $(BUILD)/obj/super13_sprites_data.o: $(BUILD)/gen/super13_sprites_data.c src/coop/rom.h

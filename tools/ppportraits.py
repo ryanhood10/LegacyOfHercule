@@ -3,11 +3,7 @@
 (data/story/ch4_eggs.lscript). Each one is a stock 64x64 portrait of the body the sprite was made from, repainted the
 way that sprite was (so face and body agree):
 
-  a13     Tien's portrait (Portrait_Table 95: a bald three-quarter face, heavy brow, a smirk) since 2026-11-06 (Ryan:
-          the first one, Android 16's 26 under a cap, "looks too much like 16"): a yellow trucker cap over the skull
-          (foam front panel with a black "13" and the Red Ribbon dot, a mesh back, a button, the peak down over the
-          brow), long white hair out of the back of it down both sides, pale blue eyes, the strap and its mirror a
-          sleeveless yellow vest, the androids' red background (17's 28, 18's 29)
+  a13     drawn, not a repaint (tools/drawnportraits.py, 2026-11-12): the movie's three-quarter face under the trucker cap
   celljr  Perfect Cell's portrait (40; Cell Jr. is a small Perfect Cell): the green crest blue with dark-blue
           spots, the whites and greys blue-tinted, the gold jaw and purple marks kept, an orange background
   namek   Piccolo's portrait (94, no turban; the Namekian Warrior's sprite is Piccolo's capeless set recoloured,
@@ -40,6 +36,7 @@ import mapchunks as m  # noqa: E402
 import sprites as S  # noqa: E402
 from buu2log2 import compress  # noqa: E402
 from oldherculeportrait import build as buu_portrait, LOG_TABLE, LOG_HERCULE, B  # noqa: E402
+import drawnportraits as drawn  # noqa: E402
 
 W = 64
 IN = range(3, W - 3)                       # inside LoG2's 3 px grey frame
@@ -87,145 +84,10 @@ def remap(pic, table, where=None):
 
 
 # ---- Android 13 -----------------------------------------------------------------------------------------------
-# Tien's portrait (95) is the base since 2026-11-06 (Ryan: the old one, Android 16's 26 under a cap, "looks too much
-# like 16"; neither ROM has an Android 13 or a Super 13 face: every entry of both portrait tables was drawn and looked
-# at, docs/art-audit.md): a bald three-quarter face with the heavy brow and the smirk, so the cap sits on a skull with
-# no hair to hide and his third eye is under the front panel. Rows / columns below are that picture's.
-A13_BG = {76: 25, 75: 252, 74: 31}                  # the androids' red (17's 28, 18's 29)
-A13_SKIN = {114, 115, 116, 117, 113, 111, 112, 21, 241}
-DIGITS = {"1": ["..##.", ".###.", "####.", "..##.", "..##.", "..##.", "..##.", "#####"],
-          "3": ["#####.", "....##", "....##", ".####.", "....##", "....##", "....##", "#####."]}
-
-
+# Drawn since 2026-11-12 (tools/drawnportraits.py): the movie's face under his trucker cap. Until then it was Tien's portrait (95)
+# repainted (a cap, white hair), before that Android 16's (26): Ryan had "complaints about andriod 13's portrait being teins recycled".
 def a13(log):
-    pic = stock(log, 95)
-    bg = flood(pic, set(A13_BG), top_seeds() + [(y, 3) for y in range(40, 53)])
-    remap(pic, A13_BG, bg)
-
-    def put(y, x, c):
-        if y in IN and x in IN:
-            pic[y * W + x] = c
-
-    def get(y, x):
-        return pic[y * W + x]
-
-    light, mid, shade, deep = near((255, 222, 90)), near((255, 189, 41)), near((222, 156, 49)), near((156, 106, 41))
-    line, black = 113, 1
-    white, w1, w2, wline = 2, near((222, 222, 222)), near((197, 197, 197)), near((115, 115, 115))
-
-    # -- the trucker cap: a foam front panel and a mesh back over the skull, the peak toward where he looks
-    def band(x):                                          # the crown's lower edge (the head is turned)
-        return 14.6 - 0.075 * (x - 17)
-
-    cx, cy, rx, ry = 35.5, 14.0, 19.0, 11.5
-
-    def crown(y, x):
-        return y <= band(x) and abs((x - cx) / rx) ** 2.4 + abs((y - cy) / ry) ** 2.4 <= 1.0
-
-    bx, by, brx, bry = 23.5, 15.2, 16.0, 3.6             # the peak: a flat ellipse hung on the band, left of centre
-
-    def peak(y, x):
-        return y > band(x) - 1 and ((x - bx) / brx) ** 2 + ((y - by) / bry) ** 2 <= 1.0 and x <= 39
-
-    for y in IN:                                          # what the crown leaves of the skull above the band: gone
-        for x in IN:
-            if y < band(x) and not crown(y, x) and (y, x) not in bg:
-                put(y, x, A13_BG[76] if y < 14 else A13_BG[75])
-                bg.add((y, x))
-
-    # -- the long white hair out of the back of the cap: behind the ear down onto the shoulder, and past the far cheek
-    def lock(rows, inner, outer, tips):
-        """White hair on the background between the head's edge and `outer(y)` (a column), strands shaded, the last
-        `tips` rows cut into points (`tips` = 4)."""
-        rows = list(rows)
-        for y in rows:
-            lo, hi = sorted((inner(y), outer(y)))
-            left = outer(y) < inner(y)
-            for x in range(lo, hi + 1):
-                if (y, x) not in bg:
-                    continue
-                if y - (rows[-1] - tips) > (1, 3, 4, 2)[x % 4]:
-                    continue                              # the ends: points of 1-4 rows
-                far = x == (lo if left else hi)
-                t = (hi - x if left else x - lo) / max(1, hi - lo)
-                c = white if t < 0.7 else w1
-                if (x + y // 5) % 3 == 0:
-                    c = w1 if c == white else w2          # strands
-                put(y, x, wline if far else c)
-        for y in rows:                                    # an outline wherever the hair meets the background
-            for x in IN:
-                if get(y, x) in (white, w1, w2) and (y, x) in bg and any(
-                        (y + dy, x + dx) in bg and get(y + dy, x + dx) in A13_BG.values()
-                        for dy, dx in ((0, 1), (0, -1))):
-                    put(y, x, wline)
-
-    lock(range(11, 51), lambda y: 44, lambda y: 55 + (1 if y >= 16 else 0) + (1 if y >= 22 else 0)
-         + (1 if y >= 30 else 0), 4)
-    lock(range(15, 45), lambda y: 22, lambda y: 15 - (1 if y >= 20 else 0) - (1 if y >= 27 else 0)
-         - (1 if y >= 34 else 0), 4)
-
-    seam = 42                                             # the front panel ends, the mesh starts
-    for y in IN:                                          # what the crown leaves of the skull above the band: gone
-        for x in IN:
-            if y < band(x) and not crown(y, x) and (y, x) not in bg and x < 44:
-                put(y, x, A13_BG[76] if y < 14 else A13_BG[75])
-    for y in IN:
-        for x in IN:
-            if not crown(y, x):
-                continue
-            t, u = (x - cx) / rx, (y - (cy - ry)) / ry
-            if x >= seam:                                 # mesh: a two-tone weave, darker toward the back
-                c = (shade if (x + y) % 2 else mid) if t < 0.72 else (deep if (x + y) % 2 else shade)
-            else:
-                c = light if (t < -0.25 and u < 0.75) or u < 0.22 else mid
-                if u > 0.9:
-                    c = shade                             # the band's shadow line
-            put(y, x, c)
-    for y in IN:
-        for x in IN:
-            if crown(y, x) and any(not crown(y + dy, x + dx) for dy, dx in ((0, 1), (0, -1), (-1, 0), (1, 0))):
-                put(y, x, line)
-            elif crown(y, x) and x == seam:
-                put(y, x, shade if y % 2 else line)       # the seam
-    put(3, 34, line)                                      # the button
-    put(3, 35, line)
-    # "13" on the front panel, black, two pixels thick so it reads at 1x
-    x0, y0 = 22, 5
-    for ch in "13":
-        g = DIGITS[ch]
-        for r, row in enumerate(g):
-            for q, bit in enumerate(row):
-                if bit == "#":
-                    put(y0 + r, x0 + q, black)
-        x0 += len(g[0]) + 1
-    red = near((230, 16, 32))                             # the Red Ribbon dot his sprite's cap wears, beside the number
-    for dy, dx in ((0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)):
-        put(9 + dy, 38 + dx, red)
-    for y in IN:                                          # the peak, lit on top, a dark rim, its shadow on the brow
-        for x in IN:
-            if not peak(y, x):
-                continue
-            rim = not peak(y + 1, x) or not peak(y, x - 1) or not peak(y, x + 1)
-            t = (x - bx) / brx
-            put(y, x, line if rim else (light if y <= by - 1 and t < 0.2 else mid if t < 0.55 else shade))
-    for x in IN:
-        ys = [y for y in IN if peak(y, x)]
-        if ys and get(max(ys) + 1, x) in (114, 115):
-            put(max(ys) + 1, x, 116)
-            if get(max(ys) + 2, x) == 114:
-                put(max(ys) + 2, x, 115)
-    # -- an android's pale eyes, a sleeveless yellow vest over the bare chest (Tien's strap, and its other side)
-    for y in range(19, 24):
-        for x in range(20, 43):
-            if get(y, x) in (12, 14, 13, 10):
-                put(y, x, near((74, 156, 255)))
-    remap(pic, {49: mid, 50: deep})
-    for y in range(48, 61):
-        hi = int(round(22 - (y - 48) * 1.25))
-        for x in range(hi - 8, hi + 1):
-            if x in IN and get(y, x) in A13_SKIN:
-                put(y, x, line if x in (hi - 8, hi) else light if x < hi - 5 else mid if x < hi - 1 else shade)
-    return bytes(pic)
+    return bytes(drawn.a13(log))
 
 
 # ---- Cell Jr. -------------------------------------------------------------------------------------------------

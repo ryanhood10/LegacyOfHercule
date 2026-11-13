@@ -312,29 +312,9 @@ P_OUTLINE = 113
 
 
 def build_portrait(rom):
-    pt = struct.unpack_from("<I", rom, PORTRAIT_TABLE - S.ROM_BASE + 4 * A16_PORTRAIT)[0]
-    raw = list(m.unpack(rom, pt))[:4096]
-    W = 64
-    px = [raw[y * W:(y + 1) * W] for y in range(W)]
-    out = [row[:] for row in px]
-    hair = {(y, x) for y in range(W) for x in range(W) if px[y][x] in P_HAIR and y < 34}
-    for y in range(W):
-        for x in range(W):
-            c = px[y][x]
-            if (y, x) in hair:
-                out[y][x] = P_HAIR[c]
-            elif c in P_EARRING:
-                out[y][x] = P_SKIN[P_EARRING[c]]
-            elif c in P_SKIN and not (y < 4 or x < 3 or x > 60):
-                out[y][x] = P_SKIN[c]
-            elif c in P_ARMOUR:
-                out[y][x] = P_ARMOUR[c]
-            elif c in P_EYE:
-                out[y][x] = P_EYE[c]
-            elif c == P_OUTLINE:
-                by_hair = any((y + dy, x + dx) in hair for dy in (-1, 0, 1) for dx in (-1, 0, 1))
-                out[y][x] = 14 if by_hair else 211
-    return bytes(v for row in out for v in row)
+    """Drawn since 2026-11-12 (tools/drawnportraits.py): the movie's Super 13. Until then Android 16's portrait (26) made blue."""
+    import drawnportraits
+    return bytes(drawnportraits.s13(rom))
 
 
 # ---- output -----------------------------------------------------------------------------------------

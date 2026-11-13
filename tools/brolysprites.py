@@ -189,37 +189,9 @@ def build_paragus(sp):
 
 # ---- Paragus' portrait ------------------------------------------------------------------------------
 def build_portrait(rom):
-    pt = struct.unpack_from("<I", rom, PORTRAIT_TABLE - S.ROM_BASE + 4 * VEGETA_PORTRAIT)[0]
-    raw = list(m.unpack(rom, pt))[:4096]
-    W = 64
-    px = [raw[y * W:(y + 1) * W] for y in range(W)]
-    out = [row[:] for row in px]
-
-    def in_face(y, x):   # the eyes, brows and the face's own black lines (read off the portrait)
-        return (29 <= y <= 38 and 14 <= x <= 43) or (y >= 44 and x < 44) or y >= 50
-    hair = {(y, x) for y in range(3, 50) for x in range(3, 61) if px[y][x] in (BLACK, 211) and not in_face(y, x)}
-    dark, mid, light = near((80, 80, 88)), near((128, 128, 136)), near((176, 176, 184))
-    for y, x in hair:
-        edge = any((ny, nx) not in hair for ny, nx in neighbours4(y, x))
-        if edge:
-            out[y][x] = BLACK
-            continue
-        deep = all((y + dy, x + dx) in hair for dy in (-2, 0, 2) for dx in (-2, 0, 2))
-        out[y][x] = light if px[y][x] == 211 else (mid if deep else dark)
-    # moustache over the upper lip and a pointed chin beard (grey, darker rim)
-    beard = set()
-    for y in (42, 43):
-        for x in range(23, 35):
-            beard.add((y, x))
-    for y in range(46, 51):
-        half = 6 - (y - 46)
-        for x in range(30 - half, 31 + half):
-            beard.add((y, x))
-    for y, x in beard:
-        if px[y][x] in SKIN or px[y][x] == 113:
-            rim = any((ny, nx) not in beard for ny, nx in neighbours4(y, x))
-            out[y][x] = dark if rim else mid
-    return bytes(v for row in out for v in row)
+    """Drawn since 2026-11-12 (tools/drawnportraits.py): the movie's Paragus. Until then Vegeta's portrait (106) with grey hair and a beard."""
+    import drawnportraits
+    return bytes(drawnportraits.paragus(rom))
 
 
 # ---- output -----------------------------------------------------------------------------------------
