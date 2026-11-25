@@ -92,15 +92,25 @@ def attr(sp):
 
 
 def powerup_frames(sp):
-    """Group 9 for herc_record: four (xo, yo, w, h, attr, px) frames, the same for every facing."""
-    base = frame(sp, HERCULE, *POSE)
-    ssj = gold(base)
-    images = [base,
-              ring(base, AURA_DIM, 2),
-              ring(ssj, AURA_IN),
-              ring(ring(ring(ssj, AURA_HOT), AURA_IN), AURA_OUT, 2)]
+    """Group 9 for herc_record: its (xo, yo, w, h, attr, px) frames, the same for every facing."""
+    images = powerup(sp)[0]
     a = attr(sp)
     return [(BOX[0], BOX[1], BOX[2], BOX[3], a, img) for img in images]
+
+
+def powerup(sp):
+    """(images, seq): the power-up's frames and which shows at each 4-frame tick (src/coop/ssj.c ssj_transform_update). With Ryan's
+    sheets in roms/ssjh, tools/ssjpowerup.py's longer one; else the four code-drawn frames by the stock rule."""
+    import ssjpowerup
+    got = ssjpowerup.powerup(sp)
+    if got:
+        return got
+    base = frame(sp, HERCULE, *POSE)
+    ssj = gold(base)
+    return ([base,
+             ring(base, AURA_DIM, 2),
+             ring(ssj, AURA_IN),
+             ring(ring(ring(ssj, AURA_HOT), AURA_IN), AURA_OUT, 2)], ssjpowerup.STOCK_SEQ)
 
 
 def detransform_frames(sp):

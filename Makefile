@@ -231,7 +231,7 @@ $(BUILD)/obj/broly_sprites_data.o: $(BUILD)/gen/broly_sprites_data.c src/coop/ro
 
 # Hercule's record 72 with the Kamehameha pose (group 18) for the Cell Games beam struggle (never committed);
 # preview beside it (Goku and Gohan's beam frames above Hercule's)
-$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py tools/spriteclone.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags $(if $(filter 1,$(BUU)),$(BUU_ROM))
+$(BUILD)/gen/hercule_sprites_data.c: tools/herculesprites.py tools/ssjhercule.py tools/ssjpowerup.py $(wildcard roms/ssjh/*.png) tools/spriteclone.py tools/a16sprites.py tools/buu2log2.py tools/buu_sprites.py tools/sprites.py tools/mapchunks.py $(ROM) $(BUILD)/.spriteflags $(if $(filter 1,$(BUU)),$(BUU_ROM))
 	$(PYTHON) tools/herculesprites.py $(ROM) $@ --buu $(HERC_BUU) --preview-dir $(BUILD)
 
 $(BUILD)/obj/hercule_sprites_data.o: $(BUILD)/gen/hercule_sprites_data.c src/coop/rom.h

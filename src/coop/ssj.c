@@ -114,6 +114,20 @@ void ssj_transform_done(void *state, Entity *e) {
     apply(e, 1);
 }
 
+// transform state 0x23, vtable slot 1 (stock 0x080155E4: the party meter +8, then 0x08011D4A: the counter at +0x12 up, the frame
+// at +0x14 = 0, 1 for 16 frames each, then 2 / 3 every 16; at 160 the state ends). Hercule's power-up has more frames than four
+// (tools/ssjpowerup.py, 2026-11-25): while the state runs on his record, the frame is herc_powerup_seq's for the 4-frame tick.
+// Everyone else's, and a build without his sheets (the table is then the stock rule's), play as the stock does.
+ROM_FN(void, TransformState_Update, (void *state, Entity *e), 0x080155E5);
+extern const u8 herc_record[];
+extern const u8 herc_powerup_seq[40];
+void ssj_transform_update(void *state, Entity *e) {
+    TransformState_Update(state, e);
+    u16 n = *(u16 *)((u8 *)e + 0x12);
+    if (n < 160 && e->sprite_record == (void *)herc_record)
+        *(u16 *)((u8 *)e + 0x14) = herc_powerup_seq[n >> 2];
+}
+
 // detransform state 0x24, vtable slot 5 (stock 0x080157AE)
 void ssj_detransform_done(void *state, Entity *e) {
     (void)state;

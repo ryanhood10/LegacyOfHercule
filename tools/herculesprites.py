@@ -452,6 +452,9 @@ def write_c(path, sp, group18, gun=None):
                          f"{{{', '.join(f'0x{b:02x}' for b in blob)}}};")
         ents.append(f"{{{xo}, {yo}, {w}, {h}, 0x{attr:08x}u, {blobs[data]}}}")
     lines.append(f"static const HcDesc herc_g9[{len(ents)}] = {{{', '.join(ents)}}};")
+    seq = SSJ.powerup(sp)[1]
+    assert max(seq) < len(ents)
+    lines.append(f"const u8 herc_powerup_seq[{len(seq)}] = {{{', '.join(map(str, seq))}}};   // frame per 4-frame tick (ssj.c)")
     # ability 18's HUD icons (ready, cooling): the Transformation icon in Hercule's colours (ssjhercule.py)
     for i, ic in enumerate(SSJ.icons(rom)):
         lines.append(f"const u8 herc_ssj_icon_{i}[0x200] __attribute__((aligned(4))) = "

@@ -2,6 +2,27 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-25
+
+- **Super Saiyan Hercule's power-up is longer and has a drawn aura (Ryan: "fill in the gap with pixellab and wire it up").** It was
+  four code-drawn frames (his victory pose, an outline, two rings). Now twelve, played over the same 160 frames: he braces and
+  shakes, yells, a white burst, the afro turns gold in it, fists up in flames that grow, then stands in the aura. The bodies are
+  his own stock frames (72: group 2 frame 2, group 4 frames 2 / 3, the victory pose, the idle); the flames and the burst are from two
+  sheets his PixelLab account drew from his sprite (`roms/ssjh/aura.png`, `burst.png`: ignored by git, never commit them; without
+  them the four old frames play by the stock rule). `tools/ssjpowerup.py` halves a 64 x 64 cell to the 32 x 32 box, maps it onto the
+  OBJ palette and keeps only the bright yellow (and the burst's white) behind the stock body; `ssjhercule.powerup` returns the frames
+  and `herc_powerup_seq` (the frame at each 4-frame tick), and `ssj_transform_update` (`ssj.c`, vtable `0x08025D9C` slot 1 over the
+  stock `0x080155E5`) plays it while the state runs on `herc_record`. Everyone else's transform is the stock's. **Why not PixelLab's
+  bodies:** drawn at twice the size and halved they are four pixels shorter and softer than the game's Hercule (tried, both sheets;
+  the second, from a reference enlarged x2, kept his proportions). **PixelLab:** Ryan's account is the free trial: the image tool
+  with reference images works (a 64 x 64 output is a 4 x 4 grid of 16 for 10 generations; 5 free a day, 20 stored), the animate
+  tools are paid. Checked: `ssj_hercule.txt` 57 of 57, the transform filmed in the engine (`build/ssjh/film.txt`), the full regression.
+  `python -I tools/ssjpowerup.py roms/log2.gba OUT.gif` shows it as played.
+- **The Buu campaign is dropped (Ryan: "it would take too much time and we have another project to do").** The game ends with the
+  Cell saga and its post-game; the no-reveal rule stays as it is (his answer: "Leave as is"). Still to adjust: Dende's question about
+  starting Buu's Fury after the finale (`tools/gen_postgame.py`), the README's "later phase". `docs/making-of.md` is the outline for
+  his video and the audit of 2026-11-24.
+
 ## 2026-11-24
 
 - **The three portraits are digitized from stills Ryan picked (he judged the drawn ones not close enough: "pick portraits from the anime

@@ -54,6 +54,7 @@ VTABLE_HOOKS = [
     (0x08025604, 9, "player_msg_hook"),     # player message handler: duel hits (duel.c)
     (0x08025604, 16, "p1_take_damage_hook"),# player 1 take-damage: a duel's final blow leaves 1 HP
     # Super Saiyan transformations for the entity's own party slot, not only the active one (src/coop/ssj.c)
+    (0x08025D9C, 1, "ssj_transform_update"), # transform (anim 0x23) update: Hercule's longer power-up: stock 0x080155E5
     (0x08025D9C, 5, "ssj_transform_done"),   # transform (anim 0x23, ability 12) done: stock 0x0801563D
     (0x08025CE0, 5, "ssj_transform_done"),   # transform (anim 0x25, ability 11) done: the same function
     (0x080256AC, 5, "ssj_detransform_done"), # detransform (anim 0x24) done: stock 0x080157AF

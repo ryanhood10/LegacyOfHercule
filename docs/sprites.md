@@ -104,6 +104,16 @@ tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercul
 
 A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
 
+**The longer power-up (2026-11-25, `tools/ssjpowerup.py`).** With Ryan's two PixelLab sheets in `roms/ssjh/` (`aura.png`,
+`burst.png`; ignored by git) group 9 has twelve frames instead of four: his stock brace (group 2 frame 2, and one pixel lower:
+the shake), his yell (group 4 frames 2 / 3), the yell in a white burst, the same with the gold afro, the gold victory pose in three
+sizes of flame, the gold idle in two auras. Only the sheets' bright yellow and the burst's white are used, halved to the game's
+size, behind the stock bodies. The stock state shows frames 0, 1, then 2 / 3: `ssj_transform_update` (`ssj.c`) sets the frame
+from `herc_powerup_seq` (40 entries, one per 4 frames; `herculesprites.py` emits it beside `herc_g9`) while the state runs on
+`herc_record`. Without the sheets the table is the stock rule's and the four frames above play. To change the timing or a
+pose: `ssjpowerup.py` `powerup` (`play`: frame, ticks; they must add up to 40). `python -I tools/ssjpowerup.py roms/log2.gba
+OUT.gif` shows it as played.
+
 **The poses `herc_record` adds, in gold (2026-11-06, `docs/art-audit.md`).** The clone is made from the stock record 72, so
 it had neither the Kamehameha pose (group 18: a transformed Hercule sent into a beam scene had no group there, the
 heap-damage trap) nor the flight's side view. `spriteclone.py` now takes both from `herculesprites.py` (`build`,

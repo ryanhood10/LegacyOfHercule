@@ -63,6 +63,7 @@ Every number in this page was counted from the repo on 2026-11-24 at commit `46d
 - Super Saiyan Hercule: the game's sprite tables were relocated so new bodies could be added, then his body was
   cloned and recoloured, with a transformation that follows the stock rules (drain, turning back at zero energy).
 - His Kamehameha pose was built from his own punch stance and Goku's beam arms.
+- The power-up itself: first four code-drawn frames, then (2026-11-25) twelve, his own poses over flames drawn by PixelLab from his sprite.
 
 **Show:** Super Saiyan Hercule transforming; the pose sheet. **Docs:** `docs/hercule.md`, `docs/sprites.md`. **Files:** `ssj.c`, `hercule.c`, `tools/spriteclone.py`, `tools/herculesprites.py`.
 
