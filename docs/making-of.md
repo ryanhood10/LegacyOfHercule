@@ -182,7 +182,7 @@ Every number in this page was counted from the repo on 2026-11-24 at commit `46d
 
 ### 17. What is left
 
-- The Buu saga as chapters inside this ROM (researched, not planned), where Hercule is finally revealed as the hero.
+- The Buu saga was researched as chapters inside this ROM, and dropped on 2026-11-25 (Ryan: too much time, another project next). The game ends with the Cell saga and its post-game.
 - The open items in Part 2.
 
 ---
@@ -233,7 +233,7 @@ cutscene toolkit and the re-staged scenes, the three portraits.
 
 ### 2.5 Not built
 
-- The Buu campaign (decided as chapters inside this ROM; facts in `docs/story-buu-rom.md`; no plan yet).
+- The Buu campaign: dropped 2026-11-25 (Ryan). The research stays in `docs/story-buu-rom.md`.
 - The Time Chamber's trophy hall and panel.
 - A real draped cape on Paragus' body (his white chest stands in for it).
 - The combos' longer step tables.
