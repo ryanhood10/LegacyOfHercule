@@ -1,6 +1,7 @@
 r"""F1-F9 for Ryan's YouTube Shorts: each state stands just before one of the new cinematic scenes, to play alone and record.
 usage: python -I tools/headless/dropins_showcase.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR [--story | --video] [--film] [--only f1,f4]
-  --video    the feature videos' set (VIDEO below): F1 Super Saiyan Hercule against Cell Jr. in the tournament ring; only its keys are written
+  --video    the feature videos' set (VIDEO below): F1 Super Saiyan Hercule against Cell Jr. in the tournament ring, F2 the Super 13
+             summit as Android 16; only its keys are written
   --story    the second set: F1-F7 the other showcases (STORY below); F8 and F9 the same
   PLAY_ROM   the play ROM (`make`); DEBUG_ROM the same source with DEBUG_MENU=1, MENU_SS its debug-menu state
   OUTDIR     gets legacy-of-hercule.gba (a copy of PLAY_ROM), coop.sym and legacy-of-hercule.ss1-.ss9
@@ -158,8 +159,11 @@ VIDEO = dict(
         + f"poke32 {ARG} 42\npoke32 {ARG2} 0x7E000016\npoke32 {CMD} 21\nframes 10\n"
         + "poke8 0x0203F0B2 18\npoke8 0x0203F0A1 2\npoke8 0x0203F0AC 0x78\npoke32 PARTY+8 0\n"
         + f"poke32 {ARG} 0x300\npoke32 {ARG2} 0xFFFF\npoke32 {CMD} 25\nframes 10\n", ""),
+    # F2: the Super 13 summit (as --story's F9) played as Android 16, alone: test command 11 puts him in slot 7 (Rocket Punch, Afterimage
+    # Rush, Big Bang, Ki Blast on L), then player 1 is that slot. A showcase, not the story's lineup: 16 is gone by the post-game.
+    f2=(begin(HERCULE, 261, "+195 +191 +480 +381") + f"poke32 {CMD} 11\nframes 60\npoke8 0x0203F000 7\n" + SS2 + warp(15, 8, 336, 464), UP),
 )
-NOASK = set(VIDEO) if video else set()
+NOASK = {"f1"} if video else set()
 if story:
     STATES = STORY
 if video:
