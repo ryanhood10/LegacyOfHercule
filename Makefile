@@ -108,7 +108,7 @@ TNY_BUU_IDS := 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 2
 TNY_PORTRAITS ?= 140=10 141=16 142=126 143=160 144=119 145=116 146=83 147=113 148=24 149=92 150=85 151=127                  152=130 153=129 154=81 155=65 156=139 157=68 158=71 159=73 160=151 161=142 162=57 163=59 164=61                  165=148 166=42 167=47 168=112
 # the perfecting pass's portraits for the fighters that had none (tools/ppportraits.py, docs/tournament.md 24.2):
 # "<portrait id>=<recipe>", ids 169-172, and 173 the mother dinosaur (data/story/ch4_eggs.lscript; docs/ids.md); Evil Buu's needs roms/buu.gba (LoG2's Hercule without it)
-PP_PORTRAITS ?= 169=a13 170=celljr 171=namek 172=evilbuu 173=dino
+PP_PORTRAITS ?= 169=a13 170=celljr 171=namek 172=evilbuu 173=dino 174=ssjherc
 OBJS += $(BUILD)/obj/pp_portraits_data.o
 EXTRA_SPRITES += $(KING_COLD_SPRITE)=tny_cold_record $(ROSHI_SPRITE)=tny_roshi_record $(CHICHI_SPRITE)=tny_chichi_record $(VIDEL_SPRITE)=tny_videl_record $(CHIAOTZU_SPRITE)=tny_chiaotzu_record
 # Mr. Popo, the Time Chamber's hidden room (tools/popoart.py, TNY_ART: Buu's Fury r.183, LoG2's sprite 93 without roms/buu.gba;

@@ -17,6 +17,7 @@ extern const TalkTvt tny_talk_tvt[];
 int  tny_talk_pre(const u8 *opp, int nopp, const u8 *mine, int nmine);
 // The winner's line after the end pose (1 = it runs)
 int  tny_talk_win(int id);
+int  tny_live_portrait(int id);   // a played story fighter's portrait in the form he is in now, else the roster's
 // A scene with lines (the Time Chamber's rooms): `first` (a dialogue entry whose next is 1; 0 = the short wait), up to 4 lines
 // with their portraits, `last` (an entry whose next is 6, lscript `-> 6`; 0 = none). 1 = it runs. Start does not skip it.
 int tny_talk_scene(const void *first, const u8 *faces, const char *const *lines, int n, const void *last);

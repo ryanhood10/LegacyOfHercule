@@ -1,0 +1,82 @@
+# Super Saiyan Hercule in the tournament ring (docs/log.md 2026-11-25; docs/testing.md "Super Saiyan Hercule"): player 1 as Hercule
+# alone, a Champion 1 v 1 whose first opponent is Cell Jr. (test commands 24, 21 with 0x7E000016, 25), ability 18 poked into his
+# third slot. A. he transforms in the ring after a punch combo (row 22). B. Ryan's freeze: his ki runs out as he wins. The bodies'
+# states stop running at a fight's end, so the turn back's animation never ended and the tournament waited for player 1 for ever.
+# Now the form ends at once there (ssj.c ssj_class_update, ssj_settle): row 21 again, and the next round's fight starts.
+#   python tools/headless/st_expect.py tools/headless/ssj_ring.txt build/<dir>/log2-coop.gba build/<dir>/hl/menu.ss --out build/<dir>/hl --cols 6
+p2 off
+maptest 13
+frames 300
+poke8 PARTY 5
+frames 10
+poke32 0x0203FD0C 0x0F0F
+poke32 0x0203FD54 0x013200A8
+poke32 0x0203FD08 5
+frames 300
+poke32 0x0203FD0C 0x1F
+poke32 0x0203FD54 3
+poke32 0x0203FD08 24
+frames 10
+poke32 0x0203FD0C 42
+poke32 0x0203FD54 0x7E000016
+poke32 0x0203FD08 21
+frames 10
+poke8 0x0203F0B2 18
+poke8 0x0203F0A1 2
+poke8 0x0203F0AC 0x78
+poke32 PARTY+8 0
+poke32 0x0203FD0C 0x300
+poke32 0x0203FD54 0xFFFF
+poke32 0x0203FD08 25
+frames 10
+stepz 0x0203ECFC 80
+frames 60
+find mv 0x4D4F5645
+deref k0 mv+8
+deref e0 k0+0x138
+poke16 0x0203F098 9000
+echo == A. a punch combo, then B: the power-up runs its 160 frames and he is Super Saiyan Hercule (row 22 = 0x16)
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 10
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 34
+poke32 0x0203FD0C 0x03000000
+poke32 0x0203FD54 3000
+poke32 0x0203FD08 27
+poke32 e0+0x158 0x30000
+frames 2
+key 2 4
+frames 200
+echo EXPECT 0203f0a0: 16
+peek8 0x0203F0A0
+shot sr_0_gold
+echo == B. 1 EP left, Cell Jr. at 20 HP, punched out: the form ends as the fight does, the end's lines play, round 2 starts
+poke32 e0+0x158 0x11800
+poke32 e0+0x188 20
+poke16 0x0203F09C 1
+frames 2
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 12
+poke32 0x0203FD0C 0x06100001
+poke32 0x0203FD08 27
+frames 120
+shot sr_1_won
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0
+frames 30
+stepz 0x0203ECFC 120
+shot sr_2_round2
+echo EXPECT 0203f0a0: 15
+peek8 0x0203F0A0

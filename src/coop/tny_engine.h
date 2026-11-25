@@ -45,6 +45,7 @@ const BossRule *tny_boss_rule(int stat_index);
 
 int  tny_ring_active(void);                                     // a tournament runs and the players are in the ring
 int  tny_fight_on(void);                                        // ... and a fight runs (no walk-in, line or end pose)
+void ssj_settle(Entity *e);                                 // ssj.c: a player out of a transformation's animation (a fight has ended)
 int  tny_rumble_live(void);                                     // a Rumble round: 1 its fight runs, 2 its end's pause
 int  tny_ko_check(int k, s32 dmg);                              // duel.c / player.c: player k (0 / 1) takes a
                                                                 // lethal hit in a tournament fight: 1 = he stays

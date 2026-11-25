@@ -40,10 +40,10 @@ import drawnportraits as drawn  # noqa: E402
 
 W = 64
 IN = range(3, W - 3)                       # inside LoG2's 3 px grey frame
-SOURCE = {"a13": 95, "celljr": 40, "namek": 94, "evilbuu": ("buu", 127), "dino": 96}
+SOURCE = {"a13": 95, "celljr": 40, "namek": 94, "evilbuu": ("buu", 127), "dino": 96, "ssjherc": 67}
 NAMES = {"a13": "Android 13", "celljr": "Cell Jr.", "namek": "Namekian Warrior", "evilbuu": "Evil Buu",
-         "dino": "Mother Dinosaur"}
-SPRITE = {"a13": 165, "celljr": 31, "namek": 166, "evilbuu": 203, "dino": 245}   # their bodies (tourney_data.c, Makefile)
+         "dino": "Mother Dinosaur", "ssjherc": "Super Saiyan Hercule"}
+SPRITE = {"a13": 165, "celljr": 31, "namek": 166, "evilbuu": 203, "dino": 245, "ssjherc": 157}   # their bodies (tourney_data.c, Makefile)
 PAL = None
 
 
@@ -92,6 +92,10 @@ def a13(log):
 
 # ---- Cell Jr. -------------------------------------------------------------------------------------------------
 def celljr(log):
+    import portraitstills
+    still = portraitstills.portrait(log, "celljr")        # Ryan's picture of him (roms/stills/celljr.png), when it is there
+    if still:
+        return bytes(still)
     pic = stock(log, 40)
     bg = flood(pic, {31, 30, 252, 25}, top_seeds() + [(y, x) for y in range(40, 50) for x in (3, W - 4)])
     remap(pic, {31: near((255, 180, 41)), 30: near((255, 213, 65)), 252: near((255, 148, 24)),
@@ -152,10 +156,81 @@ def dino(log):
     return bytes(pic)
 
 
+# ---- Super Saiyan Hercule --------------------------------------------------------------------------------------
+# Ryan, 2026-11-25: "when i won the fight i was still super sayain but my portrait was normal"; then, of the tries that left black
+# at the afro's sides and in the sideburns: "ALL of his hair should be golden except his mustache", "his sideburns need to be golden
+# too". Hercule's own portrait (67) with the hair gold. Every line of the face is the same flat black as the hair, so the hair is
+# told apart by place, from the portrait's own runs of black (it is fixed art; measured, not guessed: the first tries were):
+#   * the afro: all the black above row 20; in rows 20-23 up to x 18 and from x 46; below, the lobes outside the ears (x <= 15 to
+#     row 36, x >= 48 to row 38, less the ear lobes' own outlines);
+#   * the sideburns: the strips between the ears and the cheeks, x 15-21 and x 42-47 from row 23 / 24 down to row 39 where the
+#     jaw begins (less the left ear's bottom line);
+#   * the eyebrows: the black of rows 20-23 over the eyes, in the rim's brown as the stock Super Saiyan Goku's (65).
+# The eyes and the moustache (from x 23 to x 41 below row 31) stay black; the ear lobes' bottom lines go brown. The afro is his sprite 157's gold with
+# a lighter crown, a shaded band along the hairline and curls of shade, a brown rim for the black one, on Super Saiyan Goku's purple
+# background for Hercule's yellow (gold hair on yellow would not read).
+HAIR = (37, 36, 120, 23)                   # gold, light, shade (his sprite 157's golds), the rim (portrait 65's brown)
+BACK = {45: 233, 44: 233, 46: 92, 36: 92, 43: 92}
+
+
+def _afro(y, x):
+    if y < 20:
+        return True
+    if y <= 23:
+        return x <= 18 or x >= 46
+    if x <= 15:
+        return y <= 36
+    if x >= 48:
+        return y <= 38 and not (y in (35, 36) and x <= 50)
+    return False
+
+
+def _sideburn(y, x):
+    if 24 <= y <= 39 and 15 <= x <= 21:
+        return not (y in (37, 38) and x <= 18)
+    return 23 <= y <= 39 and 42 <= x <= 47
+
+
+def _brow(y, x):
+    return (20 <= y <= 22 and (20 <= x <= 26 or 38 <= x <= 44)) or (y == 23 and (25 <= x <= 27 or 37 <= x <= 39))
+
+
+def ssjherc(log):
+    import portraitstills
+    still = portraitstills.portrait(log, "ssjherc")       # Ryan's still of him (roms/stills/ssjherc.png), when it is there
+    if still:
+        return bytes(still)
+    pic = stock(log, 67)
+    black = [(y, x) for y in IN for x in IN if pic[y * W + x] == 1]
+    hair = {q for q in black if _afro(*q)}
+    assert len(hair) > 900, "portrait 67's afro not found"
+    back = flood(pic, set(BACK), [(y, x) for y in IN for x in IN if pic[y * W + x] in BACK and (y < 6 or x < 6 or x > W - 7)])
+    for (y, x) in back:
+        pic[y * W + x] = BACK[pic[y * W + x]]
+    for (y, x) in black:
+        if (y, x) in hair:
+            continue
+        if _brow(y, x):
+            pic[y * W + x] = HAIR[3]
+        elif (y in (37, 38) and 15 <= x <= 18) or (y in (35, 36) and 48 <= x <= 50):
+            pic[y * W + x] = HAIR[3]          # the ear lobes' bottom lines: brown, so no black stands beside the gold
+        elif _sideburn(y, x):
+            # thin: the gold, shaded on the side away from the face
+            away = (y, x - 1) if x < 32 else (y, x + 1)
+            pic[y * W + x] = HAIR[2] if away not in black else HAIR[0]
+    for (y, x) in hair:
+        inner = all((y + dy, x + dx) in hair or not (y + dy in IN and x + dx in IN) for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        below = sum((y + k, x) in hair for k in range(1, 5))
+        curl = (x * 5 + y * 3) % 17 == 0 or (x * 5 + y * 3 + 5) % 17 == 0 and y % 2
+        pic[y * W + x] = (HAIR[3] if not inner else HAIR[2] if below < 3 or curl else
+                          HAIR[1] if y < 8 + abs(x - 32) // 5 else HAIR[0])
+    return bytes(pic)
+
+
 def make(kind, log, buu):
     if kind == "evilbuu":
         return evilbuu(log, buu)
-    return {"a13": a13, "celljr": celljr, "namek": namek, "dino": dino}[kind](log)
+    return {"a13": a13, "celljr": celljr, "namek": namek, "dino": dino, "ssjherc": ssjherc}[kind](log)
 
 
 # ---- the comparison sheet ---------------------------------------------------------------------------------------

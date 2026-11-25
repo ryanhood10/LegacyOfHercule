@@ -39,6 +39,7 @@ NEW_ROW = 22
 ROW_COUNT = 22
 KRILLIN_SPRITE = 161     # Krillin's playable record (tools/krillinsprites.py; 76 is his NPC set)
 KRILLIN_ROW = 23
+SSJ_HERCULE_PORTRAIT = 174   # gold-haired Hercule (tools/ppportraits.py ssjherc, Makefile PP_PORTRAITS)
 KRILLIN_PORTRAIT = 73    # Portrait_Table: his dialogue portrait (switch screen / dialogue, OBJ palette)
 KRILLIN_STATUS_PORTRAIT = 119   # status-screen portrait, appended by tools/krillinsprites.py (portrait_module)
 A16_ROW = 25             # Android 16 as a player (party slot 7 in the "Gero's computer" chapter)
@@ -101,11 +102,33 @@ def encode_literal(data):
     return struct.pack("<II", 1, len(data)) + stream
 
 
-def recolour(px, w, h):
+HALO = {36, 37, 44}                        # the ring over his head in the dead pose (group 17)
+FALL_GROUP = 3                             # the death state's group (0x0800E130: record + 0x7C; frame = counter / 16, 64 frames)
+# The fall, frame by frame (Ryan, 2026-11-25: "if he gets killed/faints from here, his hair should slowly return black and his eyes
+# turn back to normal immediately as he falls down to the fainted position"; "He cant be super sayain AND knocked out"): the hair
+# (and the moustache with it) gold, dark gold, brown, black, as the turn back's (ssjhercule.FADE); the eyes his own from the first.
+FALL_FADE = [(120, 46), (20, 120), (23, 20), None]
+
+
+def recolour(px, w, h, eyes=True, fade=()):
+    """recolour_gold with the fall's stages: fade = (hair, light) for those two golds, None for the frame as it is (black-haired);
+    eyes False leaves his eyes as they are."""
+    if fade is None:
+        return [row[:] for row in px]
+    out = recolour_gold(px, w, h, eyes)
+    if fade:
+        swap = {HAIR_GOLD: fade[0], HAIR_LIGHT: fade[1]}
+        out = [[swap.get(v, v) if v != px[y][x] else v for x, v in enumerate(row)] for y, row in enumerate(out)]
+    return out
+
+
+def recolour_gold(px, w, h, eyes=True):
     """The afro is the big connected blob of black (index 1) in the upper part of the frame: its
-    interior pixels (not touching transparency) turn gold and its brown highlights yellow; eyes,
-    moustache and outlines stay black because they are small components or edge pixels."""
+    interior pixels (not touching transparency) turn gold and its brown highlights yellow; outlines
+    stay black because they are edge pixels. Then the face (face_gold): the moustache and the sideburns
+    gold, the eyes blue."""
     out = [row[:] for row in px]
+    afro = set()
     limit = max(10, int(h * 0.5))
     seen = [[False] * w for _ in range(h)]
     for sy in range(min(limit, h)):
@@ -123,6 +146,13 @@ def recolour(px, w, h):
                         seen[ny][nx] = True
                         stack.append((ny, nx))
             if len(comp) < 30:
+                # the black inside the dead pose's halo is the afro's top, cut off from it by the ring: gold too
+                if any(0 <= y + dy < h and 0 <= x + dx < w and px[y + dy][x + dx] in HALO
+                       for y, x in comp for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1))) and len(comp) >= 6:
+                    for y, x in comp:
+                        if not any(not (0 <= y + dy < h and 0 <= x + dx < w) or px[y + dy][x + dx] == 0
+                                   for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1))):
+                            out[y][x] = HAIR_GOLD
                 continue
             top = min(y for y, _ in comp)
             if top > limit // 2:
@@ -134,12 +164,104 @@ def recolour(px, w, h):
                     out[y][x] = HAIR_GOLD
             # brown highlights adjacent to the blob become yellow
             blob = set(comp)
+            afro |= blob
             for y, x in list(blob):
                 for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                     ny, nx = y + dy, x + dx
                     if 0 <= ny < h and 0 <= nx < w and px[ny][nx] in HIGHLIGHTS and ny < limit:
                         out[ny][nx] = HAIR_LIGHT
+    if not afro:
+        # lying or tumbling: the afro is not in the frame's upper half. The biggest solid piece of black anywhere, if it is big
+        # enough to be it (2026-11-25: Super Saiyan Hercule lay down black-haired)
+        seen2, best = set(), []
+        for sy in range(h):
+            for sx in range(w):
+                if px[sy][sx] != BLACK or (sy, sx) in seen2:
+                    continue
+                comp, stack = [], [(sy, sx)]
+                seen2.add((sy, sx))
+                while stack:
+                    y, x = stack.pop()
+                    comp.append((y, x))
+                    for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                        ny, nx = y + dy, x + dx
+                        if 0 <= ny < h and 0 <= nx < w and px[ny][nx] == BLACK and (ny, nx) not in seen2:
+                            seen2.add((ny, nx))
+                            stack.append((ny, nx))
+                if len(comp) > len(best):
+                    best = comp
+        if len(best) >= 40:
+            for y, x in best:
+                if not any(not (0 <= y + dy < h and 0 <= x + dx < w) or px[y + dy][x + dx] == 0
+                           for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1))):
+                    out[y][x] = HAIR_GOLD
+        return out
+    face_gold(px, out, w, h, afro, eyes)
     return out
+
+
+SKIN = {16, 17, 18, 19, 20, 21}            # Hercule's skin ramp on sprite 72
+EYE_WHITE, LID = {2, 11}, {11, 14}         # his eye: a white (or pale grey) pixel beside the black pupil, under a grey lid
+FACE_BELOW = 7                             # the face may hang this far under the afro found (its search stops half-way down the frame)
+EYE_BLUE = 76
+
+
+def face_gold(px, out, w, h, afro, eyes=True):
+    """Super Saiyan Hercule's face (Ryan, 2026-11-25, from the anime still he picked: "his mustache and sideburns all turn golden, and
+    his eyes turn blue"). The sideburns are part of the afro's black and are gold with it. The rest of his face's black is small
+    pieces of their own inside the head (not the afro's, at most 12 pixels, beside skin, no lower than seven rows under the afro found): a
+    pixel beside the eye's white is the pupil: blue; a piece over the grey lids is a brow: it stays; the others are the moustache:
+    the light gold (its arms run on into the gi's lapel lines and stay with them). A frame whose afro was not found (lying: the
+    old limit) or without such pieces (the back view) is left as it was."""
+    if not afro:
+        return
+    top, bottom = min(y for y, _ in afro), max(y for y, _ in afro)
+    left, right = min(x for _, x in afro), max(x for _, x in afro)
+    # the afro's black below where its search stopped (a head held low: the sideburns' ends): part of it, and gold inside
+    afro = set(afro)
+    stack = list(afro)
+    while stack:
+        cy, cx = stack.pop()
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = cy + dy, cx + dx
+            if (0 <= ny < h and 0 <= nx < w and ny <= bottom + FACE_BELOW and left <= nx <= right and px[ny][nx] == BLACK
+                    and (ny, nx) not in afro):
+                afro.add((ny, nx))
+                stack.append((ny, nx))
+                if not any(not (0 <= ny + ey < h and 0 <= nx + ex < w) or px[ny + ey][nx + ex] == 0
+                           for ey, ex in ((-1, 0), (1, 0), (0, -1), (0, 1))) and out[ny][nx] == BLACK and ny > bottom:
+                    out[ny][nx] = HAIR_GOLD
+    seen, comps = set(), []
+    for y in range(top, min(h, bottom + FACE_BELOW + 1)):
+        for x in range(left, right + 1):
+            if px[y][x] != BLACK or (y, x) in afro or (y, x) in seen:
+                continue
+            comp, stack = [], [(y, x)]
+            seen.add((y, x))
+            while stack:
+                cy, cx = stack.pop()
+                comp.append((cy, cx))
+                for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    ny, nx = cy + dy, cx + dx
+                    if 0 <= ny < h and 0 <= nx < w and px[ny][nx] == BLACK and (ny, nx) not in afro and (ny, nx) not in seen:
+                        seen.add((ny, nx))
+                        stack.append((ny, nx))
+            beside = any(0 <= cy + dy < h and 0 <= cx + dx < w and px[cy + dy][cx + dx] in SKIN
+                         for cy, cx in comp for dy in (-1, 0, 1) for dx in (-1, 0, 1))
+            inside = all(top <= cy <= bottom + FACE_BELOW and left <= cx <= right for cy, cx in comp)
+            if len(comp) <= 12 and beside and inside:
+                comps.append(comp)
+    for comp in comps:
+        pupils = [(cy, cx) for cy, cx in comp if any(0 <= cx + dx < w and px[cy][cx + dx] in EYE_WHITE for dx in (-1, 1))]
+        if pupils:
+            low = max(cy for cy, _ in pupils)
+            for cy, cx in comp:                # the moustache hangs from the pupils in the front view: the piece's rows under them
+                out[cy][cx] = (EYE_BLUE if eyes else out[cy][cx]) if (cy, cx) in pupils else HAIR_LIGHT if cy > low else out[cy][cx]
+        elif any(cy + 1 < h and px[cy + 1][cx] in LID for cy, cx in comp):
+            continue                           # a brow, over the eye's lid: stays
+        else:
+            for cy, cx in comp:
+                out[cy][cx] = HAIR_LIGHT
 
 
 def frame_bytes(px, w, h):
@@ -180,7 +302,7 @@ def main():
 
     arrays = {}   # descriptor array addr -> list of (xo, yo, w, h, attr, blob bytes)
     assert len(groups) == rom[rec - S.ROM_BASE + 2], "record group count"
-    for g in groups:
+    for gi, g in enumerate(groups):
         for p in g:
             if not p or p in arrays:
                 continue
@@ -192,7 +314,7 @@ def main():
                     frames.append((xo, yo, w, h, attr, None))
                     continue
                 _, _, px = f
-                npx = recolour(px, w, h)
+                npx = recolour(px, w, h, False, FALL_FADE[min(fi, 3)]) if gi == FALL_GROUP else recolour(px, w, h)
                 frames.append((xo, yo, w, h, attr, encode_literal(frame_bytes(npx, w, h))))
             arrays[p] = frames
     # verify the encoder against the decoder on every frame
@@ -334,6 +456,7 @@ def main():
     new = bytearray(rows[SRC_ROW * 20:SRC_ROW * 20 + 20])
     new[0] |= 1            # transformed form
     new[1] = row_sprite
+    new[2] = SSJ_HERCULE_PORTRAIT   # his dialogue / switch-screen portrait while transformed
     # the stock Super Saiyans' behaviour class (rows 5, 11, 16, 17, 20: 0x030021EC, vtable 0x08024C58): combat
     # bytes +10, walk 1.75 / dash 3.0, 1 EP every 20 frames, back to the base form at 0 EP, the aura's hum
     # (docs/engine.md "Super Saiyan transformation")

@@ -18,6 +18,50 @@ Newest first. One entry per landed piece or decision; details live in the linked
   with reference images works (a 64 x 64 output is a 4 x 4 grid of 16 for 10 generations; 5 free a day, 20 stored), the animate
   tools are paid. Checked: `ssj_hercule.txt` 57 of 57, the transform filmed in the engine (`build/ssjh/film.txt`), the full regression.
   `python -I tools/ssjpowerup.py roms/log2.gba OUT.gif` shows it as played.
+- **Super Saiyan Hercule has his own portrait, 174 (Ryan, after his first play of the key: "when i won the fight i was still super
+  sayain but my portrait was normal").** It is his own pick digitized: a still of Super Saiyan Hercule from the anime
+  (`roms/stills/ssjherc.png`, ignored by git) through `tools/portraitstills.py` (`CROP` / `SAT` `ssjherc`), as the other three. Without
+  the file `ppportraits.py` `ssjherc` recolours his portrait 67: all the hair gold, the eyebrows brown, on Super Saiyan Goku's purple.
+  That recolour took three tries and Ryan's patience ("ALL of his hair should be golden except his mustache", "theres still black hair
+  in the sideburns"): I had placed the hair by counting columns in a printed map and miscounted; the fix was to print every run of
+  black with its coordinates and assign each (the function's comment), and to let a program check that only the eyes and the
+  moustache are black. **Lesson: measure fixed art with code, do not count characters by eye.**
+  Row 22's byte 2 is 174 (`spriteclone.py`), so the switch screen and speaker 1 / 250 show it while he is transformed, and the
+  tournament's talk and champion screen ask `tny_live_portrait` (`tny_talk.c`: a story fighter a player is playing shows his
+  current row's portrait, `ssj_slot_portrait`), which also gives the stock Super Saiyans their gold portraits there. Not done: the
+  bracket's small face (drawn from the base sprite) and his status-screen portrait. Filmed: `build/ssjh/win.txt`.
+- **Super Saiyan Hercule's sprite: gold moustache and sideburns, blue eyes (Ryan, from that still: "his mustache and sideburns all
+  turn golden, and his eyes turn blue").** `spriteclone.py` `face_gold`, run by `recolour` on every frame of 157 and on the
+  power-up's and the turn-back's gold frames: the sideburns were already gold with the afro (the same piece of black); the small
+  pieces of black inside the head are told apart by what is beside them (a pixel beside the eye's white is the pupil: blue 76; a
+  piece over the grey lids is a brow: stays; the rest is the moustache: the light gold). The moustache's arms run on into the gi's
+  lapel lines and stay black with them. Also fixed there: **he lay down and tumbled black-haired** (the afro's search stopped
+  half-way down the frame): with no afro found, the biggest solid piece of black in the frame is it.
+  Two rounds of Ryan's eye on it after that: two poses kept a black moustache (the fists-up pose and a punch: the head sits lower
+  than the afro's search reaches, so the afro's black is followed down and the face may hang seven rows under it), and the dead
+  pose's halo had a black circle (the afro's top, cut off by the ring: gold now).
+- **A Super Saiyan Hercule who is knocked out turns back as he falls (Ryan: "his hair should slowly return black and his eyes turn
+  back to normal immediately as he falls down to the fainted position. NOT flying position"; "He cant be super sayain AND knocked
+  out").** The death state shows group 3 (`0x0800E130`: record + 0x7C), frame = counter / 16 for 64 frames. `ssj_record`'s group 3
+  is drawn as that fade (`spriteclone.py` `FALL_FADE`): gold, dark gold, brown, black, the eyes his own in all four; the form itself
+  already turned back at the death state's enter (`ssj_death_enter`). The tumble (group 20, the flying one) stays gold. Filmed:
+  `build/ssjh/death.txt` (down by test command 10, the fade, lying black-haired, up again as Hercule).
+- **Cell Jr.'s portrait (170) is Ryan's picture of him (his question: "it looks more like regular cell thats been repainted. was
+  there not a cell jr portrait in the game before?").** There was none: the stock game's 119 portraits have the three Cells (38, 39,
+  40) and no Cell Jr., who never speaks in it; ours was Perfect Cell's 40 recoloured blue (the perfecting pass, `docs/tournament.md`
+  24.2), made without asking him, which he would rather I had. He pasted a picture (a cut-out, `roms/stills/celljr.png`) and it goes
+  through `tools/portraitstills.py` as the others: a new `BACK` table gives a cut-out or a white-backed picture a background colour
+  (the stock Cells' red). The recipe and the rule (ask before repainting a stock portrait for someone) are in `docs/howto.md` "Add a
+  dialogue or status portrait".
+- **A freeze in the ring: a Super Saiyan whose ki runs out as he wins (Ryan: "after i defeated cell jr as a super sayain hercule the
+  game froze").** Not the new portrait. At a fight's end the bodies' states stop running (the end's poses, the lines), but the Super
+  Saiyans' class update still drains ki: at 0 it starts the turn back's animation, which then never ends, and the tournament waits
+  for player 1 to be free for ever. It was there for every Super Saiyan since the tournament was built; Hercule's 45 s of ki made it
+  likely. Found by trying ways the fight can end (the punch, the Gun, the Ki Blast, mid power-up: all fine) until 1 EP at the last
+  punch reproduced it. Fix (`ssj.c`): in the ring outside a fight the form ends at once instead of by the animation
+  (`ssj_class_update`), and `ssj_settle` takes a player out of a transformation's animation as the result is known and before the
+  poses (`tny_engine.c`). Test: `tools/headless/ssj_ring.txt` (in `regfull.sh`): he transforms in the ring, wins on his last EP,
+  is Hercule again, round 2 starts.
 - **The video drop-in: Super Saiyan Hercule against Cell Jr. in the ring (`dropins_showcase.py --video`, F1).** Hercule alone, a
   Champion 1 v 1 whose first opponent is Cell Jr. (test commands 24, 21 with `0x7E000016`, 25), saved as the ring loads; ability 18
   in his third slot and selected, flags 0x78; no "How many players?" (it would come up in the fight). Filmed on the play ROM

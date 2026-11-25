@@ -95,6 +95,20 @@ from several sprites), `tools/buu2log2.py` (convert from Buu's Fury).
 
 ## Add a dialogue or status portrait
 
+**From a picture Ryan picks (his way since 2026-11-24: "pick portraits from the anime and digitize them"; never repaint a stock
+portrait for a character without asking him first: Cell Jr.'s was Perfect Cell's repainted, and he would rather have chosen).**
+1. He pastes or names the picture; save it as `roms/stills/<name>.png` (ignored by git, as the ROMs are: never commit it; keep the
+   alpha channel of a cut-out). Claude does not copy art off websites itself.
+2. `tools/portraitstills.py`: add `<name>` to `CROP` (a square on the face, in the picture's own pixels; try two or three and look)
+   and `SAT`; for a cut-out or a picture on plain white add `BACK` (the background colour: the stock portraits of that family
+   show which, e.g. the Cells' red).
+3. The portrait's generator returns `portraitstills.portrait(rom, "<name>")` when it is there and its old drawing or recolour
+   when not, so a build without the pictures still works (`ppportraits.py` `celljr` / `ssjherc`, `drawnportraits.py`).
+4. Show him the x6 picture beside the old one before building it in.
+The six so far: Android 13 169, Super 13 122, Paragus 120, Super Saiyan Hercule 174, Cell Jr. 170 (`docs/ids.md` "Portraits").
+
+**The table.**
+
 Portraits go through `tools/krillinsprites.py`'s `portrait_module` table. Another generator passes
 its own with `--extra-portrait ID=SYMBOL` (add it to the Makefile's `EXTRA_PORTRAITS`; a change there regenerates the table through
 `$(BUILD)/gen/portraits.stamp`, while a stale table shows a garbage portrait). Take the id from

@@ -21,6 +21,7 @@
 // join and move together, winner[r][m] is the winning team's first seat, and the banner names both.
 // Rumble board: the round's faces with their names, the fallen ones greying one after another.
 #include "tny_ui.h"
+#include "tny_talk.h"
 
 #define ROW_Y0 32
 #define ROW_DY 28
@@ -1102,7 +1103,7 @@ static void champ_open(Ui *u) {
         bm_fill(x - 1, CH_BOX_Y - 1, 66, 66, C_NAVY);
         bm_frame(x - 2, CH_BOX_Y - 2, 68, 68, C_GOLD);
         ui_text(u, x + 32, CH_BOX_Y + 66, 1, C_WHITE, ui_short_name(f->name, 76, sb, sizeof sb));
-        c->tile[i] = ui_portrait_load(f->portrait);
+        c->tile[i] = ui_portrait_load(tny_live_portrait(c->ids[i]));
         if (c->tile[i] == 0xFFFF) c->body[i] = ui_face(f->sprite, x + 32, 160 + 32);
     }
     for (int i = 0; i < CH_FLAKES; i++) { c->fx[i] = 0xFF; c->fy[i] = (u8)(18 + i * 61 % 108); }

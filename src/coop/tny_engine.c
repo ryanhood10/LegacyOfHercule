@@ -1503,6 +1503,8 @@ static Entity *floor_p2(void);
 static void cel_start(void) {
     if (eng.cel_on || eng.result == R_NONE) return;
     eng.cel_on = 1;
+    ssj_settle(g_PlayerObject);
+    if (coop.p2) ssj_settle(coop.p2);
     revive_fight_over();                             // a body down: up before the poses (his pad closes the line)
     int n = eng.npose;
     if (eng.result == R_WON) { pose_hold(g_PlayerObject, 1); pose_hold(floor_p2(), 1); }
@@ -1734,6 +1736,8 @@ static void fight_frame(void) {
         eng.phase = P_MATCH_END;
         eng.timer = 0;
         eng.cel_on = 0;
+        ssj_settle(g_PlayerObject);                  // nobody stays inside a transformation's animation: the states stop here
+        if (coop.p2) ssj_settle(coop.p2);
         bars_out();
         ann_enter();                                 // back on during the end's pause (24.4)
     }

@@ -147,7 +147,7 @@ Bojack's crew (104-109) and Janemba (81), no android but 18.
 | 122 | Super Android 13 (Android 16's 26 in blue) | **16's face**: section 4 |
 | 126, 127, 140-168 | Buu's Fury portraits on LoG2's frame | fine: Buu's Fury's own drawings; a little heavier in line than LoG2's |
 | 169 | Android 13 | **redone** (section 3): Tien's three-quarter face, a yellow trucker cap with "13" and the Red Ribbon dot, long white hair, a yellow vest, the androids' red background |
-| 170, 171 | Cell Jr., the Namekian Warrior (recolours of the body's own stock portrait) | fine |
+| 170, 171 | Cell Jr. (since 2026-11-25 Ryan's picture of him digitized, `tools/portraitstills.py`; it was Perfect Cell's 40 repainted), the Namekian Warrior (a recolour of the body's own stock portrait) | fine |
 | 172 | Evil Buu (Buu's Fury's Super Buu in grey) | fine |
 | 173 | the mother dinosaur (King Triceratops' 96 recoloured) | fine; the same row banding as her sprite, less visible on a face |
 

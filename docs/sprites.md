@@ -104,6 +104,12 @@ tools/ssjhercule.py roms/log2.gba out.png`, also written as `$(BUILD)/ssj_hercul
 
 A test build with `SSJ_SPRITE=158` / `159` (row 22 on a Buu's Fury record) has no group 21 there: do not turn back in it.
 
+**His face (2026-11-25, `spriteclone.py` `face_gold`).** As the anime's Super Saiyan Hercule: the moustache and the sideburns gold,
+the eyes blue, on every frame of 157 and on the gold frames of the power-up and the turn back. How the pieces are told apart, and
+what stays black (the brows, the moustache's arms where they run into the lapel lines), is in the function's comment. Tumbling frames are gold-haired since the same day (they were black: the afro's search covered the frame's upper half only).
+Group 3, the fall of a knock-out, is the turn back instead (`FALL_FADE`: gold, dark gold, brown, black over its four frames,
+his own eyes): he cannot be a Super Saiyan and knocked out, so he lies black-haired.
+
 **The longer power-up (2026-11-25, `tools/ssjpowerup.py`).** With Ryan's two PixelLab sheets in `roms/ssjh/` (`aura.png`,
 `burst.png`; ignored by git) group 9 has twelve frames instead of four: his stock brace (group 2 frame 2, and one pixel lower:
 the shake), his yell (group 4 frames 2 / 3), the yell in a white burst, the same with the gold afro, the gold victory pose in three

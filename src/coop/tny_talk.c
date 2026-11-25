@@ -61,11 +61,23 @@ static const char *voice(int id, int k) {
 }
 static int same(int table_id, int id, int loose) { return table_id == id || (loose && table_id == canon(id)); }
 
+// A story fighter one of the players is playing shows the portrait of the form he is in now (ssj.c): a Super Saiyan's gold hair.
+int ssj_slot_portrait(int slot);
+int tny_live_portrait(int id) {
+    if (id < 0 || id >= TF_COUNT) return 0;
+    int slot = tny_fighters[id].story_slot;
+    if (slot != 0xFF && (slot == g_Party->active_slot || (coop.p2 && slot == coop.p2_slot))) {
+        int p = ssj_slot_portrait(slot);
+        if (p) return p;
+    }
+    return tny_fighters[id].portrait;
+}
+
 static void add(int seat, int id, const char *line) {
     if (!line || talk.n >= TALK_MAX) return;
     TalkEnt *e = &talk.ent[talk.n];
     e->head[2] = MODE_FORMAT;
-    e->head[3] = id >= 0 && id < TF_COUNT ? tny_fighters[id].portrait : 0;
+    e->head[3] = tny_live_portrait(id);
     e->fmt = line;
     e->script[0] = OP_END;
     ENT_WHO(e) = (u8)seat;

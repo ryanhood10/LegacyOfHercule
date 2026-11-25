@@ -14,6 +14,7 @@
 // regen.c's now, and the other forms' classes run on the entity's own slot (form_update below).
 #include "coop.h"
 #include "krillin.h"
+#include "tny_engine.h"
 
 #define ANIM_DETRANSFORM 0x24
 #define DRAIN_STEP 0xCCD            // stock: 16.16 accumulator, 1 EP per overflow (every 20 frames)
@@ -114,6 +115,27 @@ void ssj_transform_done(void *state, Entity *e) {
     apply(e, 1);
 }
 
+// A fight in the ring has ended (tny_engine.c, as the result is known and again before the end's poses): a player caught inside a
+// transformation's animation is taken out of it, as the states stop running there. Turning back: the form ends now. Powering up:
+// back to standing, untransformed (the power-up's leave stops its hum).
+#define STATE_DETRANSFORM 0x03002180u
+#define STATE_TRANSFORM_A 0x03002184u
+#define STATE_TRANSFORM_B 0x03002188u
+void ssj_settle(Entity *e) {
+    if (!e) return;
+    u32 st = (u32)e->ctrl_state;
+    if (st == STATE_DETRANSFORM) apply(e, 0);
+    else if (st == STATE_TRANSFORM_A || st == STATE_TRANSFORM_B) Entity_SetAnimation(e, ANIM_IDLE);
+}
+
+// The dialogue portrait of the form a party slot is in now (his display row's byte 2: Goku 63, Super Saiyan Goku 65, Hercule 67,
+// Super Saiyan Hercule 174), for the tournament's talk and champion screen, which otherwise show the roster's base portrait
+// (Ryan, 2026-11-25: "when i won the fight i was still super sayain but my portrait was normal").
+int ssj_slot_portrait(int slot) {
+    if (slot < 0 || slot >= PARTY_SLOTS) return 0;
+    return row_of(slot)[2];
+}
+
 // transform state 0x23, vtable slot 1 (stock 0x080155E4: the party meter +8, then 0x08011D4A: the counter at +0x12 up, the frame
 // at +0x14 = 0, 1 for 16 frames each, then 2 / 3 every 16; at 160 the state ends). Hercule's power-up has more frames than four
 // (tools/ssjpowerup.py, 2026-11-25): while the state runs on his record, the frame is herc_powerup_seq's for the 4-frame tick.
@@ -198,7 +220,13 @@ void ssj_class_update(void *cls, Entity *e) {
         } else {
             c->ep = 0;
         }
-        if (c->ep == 0 && c->hp != 0) Entity_SetAnimation(e, ANIM_DETRANSFORM);
+        if (c->ep == 0 && c->hp != 0) {
+            // In the ring between fights (the end's poses, the lines) the bodies' states do not run: the turn back's animation
+            // would never end and the tournament waits for player 1 to be free for ever (Ryan's freeze, 2026-11-25: he beat Cell
+            // Jr. as Super Saiyan Hercule with his ki about to run out). There the form ends at once.
+            if (tny_ring_active() && !tny_fight_on()) apply(e, 0);
+            else Entity_SetAnimation(e, ANIM_DETRANSFORM);
+        }
     }
     *acc &= 0xFFFF;
 }
