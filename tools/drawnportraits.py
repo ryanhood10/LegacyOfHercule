@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mapchunks as m  # noqa: E402
 import sprites as S  # noqa: E402
 from PIL import Image, ImageDraw  # noqa: E402
+import portraitstills  # noqa: E402
 
 LOG_TABLE, B = 0x083EC9D4, 0x08000000      # Portrait_Table (oldherculeportrait.py)
 W = 64
@@ -131,6 +132,13 @@ def png(pics, path, k=4, cols=None):
 
 
 def a13(rom):
+    still = portraitstills.portrait(rom, "a13")       # Ryan's still of him, when it is there (roms/stills)
+    if still:
+        return still
+    return a13_drawn(rom)
+
+
+def a13_drawn(rom):
     """Android 13 as the movie draws him, three-quarter: the trucker cap low over his eyes (a dark mesh back, the mustard front with its black
 patch, here reading 13, the long black bill), wispy white hair blown back, the long jaw and the smirk, the olive vest."""
     global _ROM
@@ -218,6 +226,13 @@ patch, here reading 13, the long black bill), wispy white hair blown back, the l
 
 
 def s13(rom):
+    still = portraitstills.portrait(rom, "s13")       # Ryan's still of him, when it is there (roms/stills)
+    if still:
+        return still
+    return s13_drawn(rom)
+
+
+def s13_drawn(rom):
     """Super Android 13 as the movie draws him, close on the face: royal blue skin, the furrowed brow under the orange flame of hair, slanted
 blank yellow eyes in a dark mask, gritted teeth, the ear rings."""
     global _ROM
@@ -285,6 +300,13 @@ blank yellow eyes in a dark mask, gritted teeth, the ear rings."""
 
 
 def paragus(rom):
+    still = portraitstills.portrait(rom, "paragus")       # Ryan's still of him, when it is there (roms/stills)
+    if still:
+        return still
+    return paragus_drawn(rom)
+
+
+def paragus_drawn(rom):
     """Paragus as the Broly movie draws him, three-quarter: black upswept hair with the peak on the brow, heavy brows, his left eye scarred shut,
 the big moustache, the white scarf over his armour."""
     global _ROM

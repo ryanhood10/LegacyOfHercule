@@ -2,6 +2,14 @@
 
 Newest first. One entry per landed piece or decision; details live in the linked docs.
 
+## 2026-11-24
+
+- **The three portraits are digitized from stills Ryan picked (he judged the drawn ones not close enough: "pick portraits from the anime
+  and digitize them").** `tools/portraitstills.py`: `roms/stills/a13.png`, `s13.png`, `paragus.png` (his files, ignored by git like the
+  ROMs: never commit them) cropped on the face, shrunk to 58 x 58 inside the stock frame, mapped onto the OBJ palette (a coloured pixel
+  never onto a grey; no smoothing: a median filter erased the eyes). `drawnportraits.py` `a13` / `s13` / `paragus` return the still's
+  portrait when the file is there and the drawing (`*_drawn`) when not, so a checkout without the stills still builds.
+
 ## 2026-11-13
 
 - **A tournament crash found by the regression after the recolours, an old bug of ours: a kit ended a beam the game had already
