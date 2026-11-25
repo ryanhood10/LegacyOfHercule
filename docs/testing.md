@@ -907,6 +907,7 @@ machine `chamber_rooms` (eleven cases, 356 checks) ran in about a minute.
 - **The lever:** player 1 at (136, 96), Up, A. `waitmap 15 18` (the cut-away), the light still shown 120 frames later, out 70
   frames after that; with five lights out the beams 6, 7, 8 go 90, 115, 140 frames after the light. About 130 frames more and
   the room is back.
+- **The video set** (`dropins_showcase.py ... --video`, 2026-11-25): F1 Super Saiyan Hercule against Cell Jr. in the ring; only its keys are written, and it does not ask how many players (`docs/log.md` 2026-11-25).
 - **Transformed:** `poke32 0x0300208C 1` (a Map Test leaves the switch 0), the ability index 2 and `poke32 PARTY+8 0`, then B
   (player 2: `p2 2`).
 - **The measures** (`chamber_perf.txt`, not in regfull, about 20 minutes): `perf` lines per tier and records standing,

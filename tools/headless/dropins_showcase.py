@@ -1,5 +1,6 @@
 r"""F1-F9 for Ryan's YouTube Shorts: each state stands just before one of the new cinematic scenes, to play alone and record.
-usage: python -I tools/headless/dropins_showcase.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR [--story] [--film] [--only f1,f4]
+usage: python -I tools/headless/dropins_showcase.py PLAY_ROM DEBUG_ROM MENU_SS OUTDIR [--story | --video] [--film] [--only f1,f4]
+  --video    the feature videos' set (VIDEO below): F1 Super Saiyan Hercule against Cell Jr. in the tournament ring; only its keys are written
   --story    the second set: F1-F7 the other showcases (STORY below); F8 and F9 the same
   PLAY_ROM   the play ROM (`make`); DEBUG_ROM the same source with DEBUG_MENU=1, MENU_SS its debug-menu state
   OUTDIR     gets legacy-of-hercule.gba (a copy of PLAY_ROM), coop.sym and legacy-of-hercule.ss1-.ss9
@@ -27,6 +28,9 @@ if film:
 story = "--story" in args
 if story:
     args.remove("--story")
+video = "--video" in args
+if video:
+    args.remove("--video")
 only = None
 if "--only" in args:
     i = args.index("--only")
@@ -142,8 +146,24 @@ STORY = dict(STATES,
     # B.5 (staging_ch9_gen.py "rim"): Vegeta alone, the rim pressed through, the fight won: Broly's end, the planet
     f7=(begin(VEGETA, 7, "+400 +401 +378 +377") + warp(15, 3, 312, 460, 150) + f"waitnz {SCENE} 900\nstepz {SCENE} 150\nframes 30\npoke32 {CMD} 7\n", ""),
 )
+# --video (Ryan, 2026-11-25: one-player feature videos). F1: Hercule alone, a Champion 1 v 1 whose first opponent is Cell Jr. (TF 22;
+# test commands 24, 21, 25 as tny_engine.txt), saved as the ring loads: the announcer, then the fight. Super Hercule (ability 18) is in
+# his third slot and selected, with every move's bit (flags 0x78): the game itself keeps it locked (ssj.c SSJ_HERCULE_UNLOCK 0), and a
+# savestate is not a save, so hercule_lock does not take it back. B transforms; a hit interrupts it (the stock rule, Ryan: "Keep it
+# interruptible"): after a punch combo's knock-back Cell Jr. leaves about 2.7 s free one time in two (measured, six combos).
+# No "How many players?" on load (NOASK): it would come up in the fight.
+VIDEO = dict(
+    f1=("p2 off\nmaptest 13\nframes 300\npoke8 0x0203F000 5\nframes 10\n" + warp(15, 15, 168, 306)
+        + f"poke32 {ARG} 0x1F\npoke32 {ARG2} 3\npoke32 {CMD} 24\nframes 10\n"
+        + f"poke32 {ARG} 42\npoke32 {ARG2} 0x7E000016\npoke32 {CMD} 21\nframes 10\n"
+        + "poke8 0x0203F0B2 18\npoke8 0x0203F0A1 2\npoke8 0x0203F0AC 0x78\npoke32 PARTY+8 0\n"
+        + f"poke32 {ARG} 0x300\npoke32 {ARG2} 0xFFFF\npoke32 {CMD} 25\nframes 10\n", ""),
+)
+NOASK = set(VIDEO) if video else set()
 if story:
     STATES = STORY
+if video:
+    STATES = VIDEO
 keys = [k for k in STATES if only is None or k in only]
 
 shutil.copy(menu, os.path.join(work, "menu.ss"))
@@ -183,7 +203,8 @@ def players_addr():
 PLAYERS = players_addr()
 for n in keys:
     fill(n)
-    run(n + "_ask", play, f"load {W(n + '.ss')}\npoke32 0x{PLAYERS:08X} 0x91A7E250\npoke32 0x{PLAYERS + 4:08X} 0\nssave {W(n + '.ss')}\n")
+    if n not in NOASK:
+        run(n + "_ask", play, f"load {W(n + '.ss')}\npoke32 0x{PLAYERS:08X} 0x91A7E250\npoke32 0x{PLAYERS + 4:08X} 0\nssave {W(n + '.ss')}\n")
 for n in keys:
     path = os.path.join(out, f"{BASE}.ss{n[1:]}")
     shutil.copy(os.path.join(work, n + ".ss"), path)

@@ -18,6 +18,19 @@ Newest first. One entry per landed piece or decision; details live in the linked
   with reference images works (a 64 x 64 output is a 4 x 4 grid of 16 for 10 generations; 5 free a day, 20 stored), the animate
   tools are paid. Checked: `ssj_hercule.txt` 57 of 57, the transform filmed in the engine (`build/ssjh/film.txt`), the full regression.
   `python -I tools/ssjpowerup.py roms/log2.gba OUT.gif` shows it as played.
+- **The video drop-in: Super Saiyan Hercule against Cell Jr. in the ring (`dropins_showcase.py --video`, F1).** Hercule alone, a
+  Champion 1 v 1 whose first opponent is Cell Jr. (test commands 24, 21 with `0x7E000016`, 25), saved as the ring loads; ability 18
+  in his third slot and selected, flags 0x78; no "How many players?" (it would come up in the fight). Filmed on the play ROM
+  (`build/ssjh/vfilm.txt`): the bracket, "Play with me!", the fight, a transformation that completes (row 22). Facts found:
+  **(1) Super Saiyan Hercule is locked off in the game** (`ssj.c` `SSJ_HERCULE_UNLOCK 0`, the no-reveal rule waiting for the Buu
+  phase, which is dropped): nobody can get it in a real save; where he gets it is Ryan's to decide. **(2) A hit interrupts a
+  power-up** (the stock rule; Ryan: "Keep it interruptible"). Against Cell Jr. (stat 26's stock AI shoots whatever the kit does;
+  test command 27 op 3 stops only the kit's specials) an idle Hercule is hit every 1 to 3 s: in 100 s only two gaps of 160 frames.
+  After a punch combo's knock-back the next hit came after 55, 45, over 300, 80, 280 and over 300 frames: one try in two. B during
+  a punch is ignored. **(3) The Flash does not daze a kit fighter.** **(4) Hercule has no Kamehameha as a player** (the pose is the
+  Cell Games scene's): his moves are the Flash, the Ki Blast, the Gun and, in a tournament, Megaton Punch. **(5)** A tournament
+  finished from a forced pool still writes the global record (only the story notices are held back): said in the key's notes.
+  Combo damage on Cell Jr. (3040 HP): about 250 as Hercule, 350 gold.
 - **The Buu campaign is dropped (Ryan: "it would take too much time and we have another project to do").** The game ends with the
   Cell saga and its post-game; the no-reveal rule stays as it is (his answer: "Leave as is"). Still to adjust: Dende's question about
   starting Buu's Fury after the finale (`tools/gen_postgame.py`), the README's "later phase". `docs/making-of.md` is the outline for
