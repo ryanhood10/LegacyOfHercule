@@ -202,14 +202,14 @@ specials in C (the Super 13 kind).
 | fighter | Buu record | role | kit | cost |
 |---|---|---|---|---|
 | Goku (Buu saga) | 105 base, 108 SSJ, 110 SSJ3 | O, **B** (a second Goku skin: "Goku (Other World)", 113 with the halo) | **SSJ at 60 %, SSJ3 at 25 %** (the three records as one fighter), Kamehameha, Instant Transmission, Dragon Fist (rush) | moderate |
-| Majin Vegeta | 274 / 275 (SSJ, M on the brow) | O, **B** | Big Bang, Final Flash (beam), **Final Explosion** (a nova at 10 % that costs his life: he loses, you take heavy damage) | moderate |
+| Majin Vegeta | 272 (SSJ Vegeta of the Buu saga; 274 / 275 are Vegito, fixed 2026-11-26) | O, **B** | Big Bang, Final Flash (beam), **Final Explosion** (a nova at 10 % that costs his life: he loses, you take heavy damage) | moderate |
 | Mystic Gohan | 100 | O, **B** | Masenko, Kamehameha; no transform (already at full power), high stats | moderate |
 | Great Saiyaman | 101 | O, **B** | justice poses (the Taunt), Masenko; a joke fighter with Gohan's numbers | moderate |
 | Gohan with the Z Sword (?) | 106 (partial set) | O only | sword reach (Sword Blast) | cheap |
 | Goten (SSJ) | 114 (113 base; 92 was a guess, 4e) | O, **B** | Kamekameha (short beam), rush; small, fast | moderate |
 | Kid Trunks (SSJ) | 260 (259 base; 93 was a guess, 4e) | O, **B** | Big Tree Cannon (ball), Galick-style beam; small, fast | moderate |
 | Gotenks | 116 base, 119 SSJ, 120 SSJ3 (4e: 277 is a red-haired kid) | **C** (Champion 2v2: the fusion alone against your team) | **Super Ghost Kamikaze Attack** (three homing ghosts: the rocket class), Galactic Donut (a ring that stuns), SSJ3 at 40 % | moderate; ghosts big-ish |
-| Vegito | 92 (SSJ; 93 has the same frames; 273 is a Vegeta, 4e) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
+| Vegito | 274 (SSJ; 275 has the same frames; 92 / 93 are Gogeta, fixed 2026-11-26; 273 is a Vegeta, 4e) | **C** (Legend 1v1) | Final Kamehameha (beam), Spirit Sword (long melee), Big Bang Kamehameha | moderate |
 | Uub | 263 | **C** (Champion Rumble, won as Hercule: "the champion's student") | ki volley, rush; Kid Buu's numbers in a boy | moderate |
 | Hercule (Buu saga) | 128 (= old Hercule's body, row 24 today) | O (Legend "the champion") | his four moves; a comic headliner | cheap |
 | Piccolo (Buu saga) | 212 (cape), 214 / 215 (?) | O | Special Beam Cannon, Hellzone Grenade (volley that converges) | cheap |
@@ -265,7 +265,7 @@ Test: `tools/headless/tny_artbuu.txt` (`docs/testing.md` "Tournament art").
 Our calls, made while building:
 - **Records checked by eye; several first guesses were wrong.** Each candidate was drawn at 3-6x (idle and attack
   frames) and matched against Buu's own portraits: Kibito is 148 (32 is a grey caped Buu: Evil Buu), Pikkon 214 (132 /
-  179 / 62 are a small capped soldier), Goten SSJ 114 (92 / 93 are Super Saiyan Vegito: orange undershirt, blue gi;
+  179 / 62 are a small capped soldier), Goten SSJ 114 (92 / 93 are Super Saiyan Gogeta: orange-trimmed vest, white trousers;
   102 / 104 are Gohan in the Saiyaman tunic), Kid Trunks SSJ 260 (259 base, the only lavender-haired kid), Gotenks
   116 (277 is a red-haired kid; 117 / 118 are Gotenks NPC sets), Super Buu with Gotenks absorbed 41 (the vest; 42 / 43
   both wear Gohan's gi top), the announcer 8 (blond, sunglasses, suit; 207 is the Ox-King and 216 Pintar). The ids in

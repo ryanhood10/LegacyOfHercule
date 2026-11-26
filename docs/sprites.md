@@ -232,7 +232,7 @@ The previews draw the hurt box in red on group 0 and use each record's own group
 **Corrections (2026-10-25, each drawn at 3-6x and matched to Buu's own portraits):** 8 is the World Tournament
 announcer (blond, sunglasses, suit); 207 is the Ox-King and 216 Pintar (not the announcer and Spopovich); 32 is
 Evil Buu (grey, caped, a partial set); 62 / 132 / 179 a small capped soldier; 148 Kibito (NPC set), 149 Supreme Kai;
-92 / 93 Super Saiyan Vegito (identical frames); 102 / 104 Gohan in the Saiyaman tunic (base / SSJ), 103 SSJ Gohan in
+92 / 93 Super Saiyan Gogeta (identical frames; read as Vegito until 2026-11-26), 274 / 275 Super Saiyan Vegito, 272 Super Saiyan Vegeta (Buu saga); 102 / 104 Gohan in the Saiyaman tunic (base / SSJ), 103 SSJ Gohan in
 school clothes, 97 Gohan in school clothes; 113 / 114 Goten (base / SSJ), 259 / 260 Kid Trunks (base / SSJ); 116
 Gotenks (full set), 117 / 118 Gotenks NPC sets, 277 a red-haired kid; 41 Super Buu with Gotenks absorbed (the vest),
 42 / 43 with Gohan absorbed; 214 / 215 Pikkon (two palettes); 242 Spopovich, 293 Yamu (partial sets), 290 Yakon,

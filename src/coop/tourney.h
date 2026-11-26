@@ -59,17 +59,17 @@
 #define TS_SUPER_BUU_G      206     // Buu r.41 (Gotenks absorbed: the vest)
 #define TS_SUPER_BUU_GH     207     // Buu r.43 (Gohan absorbed)
 #define TS_JANEMBA          208     // Buu r.144
-#define TS_GOTEN            209     // Buu r.114 (SSJ; r.92 is Vegito)
+#define TS_GOTEN            209     // Buu r.114 (SSJ; r.92 is Gogeta)
 #define TS_KID_TRUNKS       210     // Buu r.260 (SSJ)
 #define TS_GOTENKS          211     // Buu r.116 (r.277 is a red-haired kid)
 #define TS_GOTENKS_SSJ      212     // Buu r.119
 #define TS_GOTENKS_SSJ3     213     // Buu r.120
-#define TS_VEGITO           214     // Buu r.92 (SSJ; r.93 is the same frames)
+#define TS_VEGITO           214     // Buu r.274 (SSJ; r.275 is the same frames; r.92 / 93 are Gogeta)
 #define TS_UUB              215     // Buu r.263
 #define TS_BGOKU            216     // Buu r.105 (base)
 #define TS_BGOKU_SSJ        217     // Buu r.108
 #define TS_BGOKU_SSJ3       218     // Buu r.110
-#define TS_MAJIN_VEGETA     219     // Buu r.274
+#define TS_MAJIN_VEGETA     219     // Buu r.272 (SSJ Vegeta of the Buu saga)
 #define TS_MYSTIC_GOHAN     220     // Buu r.100
 #define TS_SAIYAMAN         221     // Buu r.101
 #define TS_BPICCOLO         222     // Buu r.212
