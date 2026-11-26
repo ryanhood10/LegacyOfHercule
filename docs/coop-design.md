@@ -775,7 +775,7 @@ vtable, control state, projectile class, hit messages and poise, in a module of 
   `s13_spawn` (own stat row `s13_stat`, no co-op twin). TriggerMapEvent (opcode 84) spawns a condition-1
   record for a scripted boss; `DrawBossHealthBarRange 180, 0, 100` draws his bar (one bar, plain range).
 - His **defeat action fires the moment his HP hits 0** (the boss death class), while he explodes for
-  `S13_DEATH_FRAMES` (96) frames: pose group 12 (light bursting out of him) under explosions, then a big blast
+  `S13_DEATH_FRAMES` (96) frames: pose group 12 (light bursting out of him) under explosions, then (since 2026-11-25: `S13_FINALE_FRAMES`, three spreading rings; the camera on him; the story's end scene held back until he is gone, as a scene stops the world) a big blast
   with debris and a strong shake, then an empty pose. The entity stays (scripts addressing sprite 180 still
   find him; `DespawnEntity 180` is safe), invisible and inert. A defeat script waits with
   `CoopCall 17, 1, 0, 0` (pushes his state: 0 none, 1 fighting, 2 exploding, **3 gone**) or about 2 s of

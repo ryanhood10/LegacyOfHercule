@@ -85,6 +85,10 @@ typedef struct Proj {
     u32 vt[24];
 } Proj;
 
+#define ACTION_RUN_DIALOG  0x080106B3u     // EnemyAction_RunDialog {func, sequence} (vmcall.c)
+void coop_run_sequence(u32 *action, const void *seq);   // vmcall.c
+static const u32 s13_no_action[2] = { ENEMY_ACTION_NONE, 0 };
+
 typedef struct CtrlObj { u32 *vtable; } CtrlObj;
 
 typedef struct S13 {
@@ -101,6 +105,8 @@ typedef struct S13 {
     Entity *target;
     Proj *held[2];        // bombers growing over his head
     Proj *live[S13_LIVE];
+    const u32 *end_action;   // the record's action (the story's end scene), held back until his explosion is over
+    u32 act[2];              // ... and the live action object it is queued with then (coop_run_sequence)
 } S13;
 
 static Entity *real_player(int i) {   // a downed player (revive.c) is no target
@@ -673,17 +679,37 @@ static void dying(S13 *a) {
         if ((t % 24) == 1) shake(24, 50 + t / 2);
         return;
     }
-    // the big blast
-    spawn_boom(x, y);
-    spawn_boom(x - 22, y - 12);
-    spawn_boom(x + 22, y - 12);
-    spawn_boom(x - 16, y + 16);
-    spawn_boom(x + 16, y + 16);
-    debris(x, y);
-    shake(40, 100);
+    // the big blast (Ryan, 2026-11-25: "there was no big explosioin"): his body goes in the first burst, then three rings of
+    // explosions spread from where he stood, each with its own jolt, and the last is the biggest shake
+    t -= S13_DEATH_FRAMES;
+    if (t == 0) {
+        spawn_boom(x, y);
+        spawn_boom(x - 22, y - 12);
+        spawn_boom(x + 22, y - 12);
+        spawn_boom(x - 16, y + 16);
+        spawn_boom(x + 16, y + 16);
+        debris(x, y);
+        shake(30, 100);
+        sfx(SFX_BOOM);
+        set_frames(a, S13_G_BLANK, 0);
+    }
+    if (t < S13_FINALE_FRAMES) {
+        static const s8 ring[6][2] = { { 0, -10 }, { 9, -5 }, { 9, 5 }, { 0, 10 }, { -9, 5 }, { -9, -5 } };   // a hexagon, x 1/10
+        if (t > 0 && t % S13_RING_EVERY == 0) {
+            int r = 3 * (t / S13_RING_EVERY) + 1;                   // 40, 70, 100 px across the three rings (r tenths x 10)
+            for (int i = 0; i < 6; i++) spawn_boom(x + ring[i][0] * r, y + ring[i][1] * r * 3 / 4);
+            debris(x, y);
+            shake(30, 100);
+            sfx(SFX_BOOM + (t / S13_RING_EVERY & 1));
+        }
+        return;
+    }
+    shake(50, 100);
     sfx(SFX_BOOM);
-    set_frames(a, S13_G_BLANK, 0);
     a->gone = 1;
+    // now the story's end scene (see s13_spawn): a scene stops the world, so started at HP 0 it froze this explosion after its
+    // first bursts (Ryan, 2026-11-25: "after i killed super 13 there was no big explosioin")
+    if (a->end_action && a->end_action[0] == ACTION_RUN_DIALOG) coop_run_sequence(a->act, (const void *)a->end_action[1]);
     s13.state = 3;
     s13.gone_frame = g_FrameCounter;
     flight_hold(0);
@@ -792,6 +818,13 @@ static void s13_destroy(Entity *e, int free_it, u32 x, u32 y) {
     Enemy_Destroy(e, free_it, x, y);
 }
 
+// While he explodes the camera goes to him (camera.c): the players are still free, and he may stand off the view
+int s13_camera(s32 *cx, s32 *cy) {
+    if (s13.magic != S13_MAGIC || !s13.boss || s13.state != 2 || tny_ring_active()) return 0;
+    his_centre(s13.boss, cx, cy);
+    return 1;
+}
+
 static void s13_globals(void) {
     if (s13.magic != S13_MAGIC) {
         memset(&s13, 0, sizeof s13);
@@ -816,6 +849,10 @@ Entity *s13_spawn(const EnemyRecord *rec) {
     memcpy(r, rec, 0x1C + 4 * (u32)rec->behaviour_count);
     Entity *e = Enemy_Create(block, r, stat);
     if (!e) { Arena_Free(block); return 0; }
+    // his defeat's scene waits for his explosion: the stock fires a record's action the moment HP reaches 0
+    a->end_action = (const u32 *)e->action;
+    if (a->end_action && a->end_action[0] == ACTION_RUN_DIALOG) { r->action = (void *)s13_no_action; e->action = (void *)s13_no_action; }
+    else a->end_action = 0;
     a->e = e;
     u32 base = (u32)a->vt;
     const u32 *orig = (const u32 *)ENEMY_VTABLE;

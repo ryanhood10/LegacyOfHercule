@@ -4,6 +4,22 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-25
 
+- **Super 13's explosion never played (Ryan, after the F2 key: "after i killed super 13 there was no big explosioin. the transition
+  AFTER the fight was terrible").** The stock fires a record's action the moment HP reaches 0, the action was the summit's end
+  scene, and a scene stops the world: `dying` (`super13.c`) froze after its first bursts, usually off the view since the camera
+  follows the player, and the script's white came down over a Super 13 still standing. It had been so since the summit was
+  built; the tests only checked flag 382. Now `s13_spawn` holds the record's action back (the entity's and the record copy's are
+  the no-action object) and `dying` queues it (`coop_run_sequence`) when he is gone; while he explodes the follow camera goes to
+  him (`s13_camera`, `camera.c`); the blast is bigger (after the 96 frames of bursts his body goes and three rings of six
+  explosions spread out over `S13_FINALE_FRAMES` 48, a jolt each); the end script (`arctic_summit.lscript` `summit_13_end`) keeps
+  the camera where he stood, brings the white up slowly, holds, lifts it on the empty snow, waits a beat and pans back to the
+  player before the line and the journal. **How it was found:** the queued test win (`0x0203F9B0`) does not run his death at all
+  (he stands through the scene): to see an ending as a player gets it, set the boss's HP to 1 (`s13` + 4 is his entity, HP at
+  +0x188) and land a real hit (`build/ssjh/kr3.txt`: 16's Rocket Punch).
+- **The video set's F2: the Super 13 summit as Android 16** (`dropins_showcase.py --video`): test command 11 puts him in slot 7,
+  then player 1 is that slot. The scene plays with him ("We have to stop this!" is his, speaker 250). A showcase: 16 is gone by the
+  post-game. Standing still he lasts about 25 s; Super 13 has `S13_SOLO_HP_PCT` of 14,000 alone.
+
 - **Super Saiyan Hercule's power-up is longer and has a drawn aura (Ryan: "fill in the gap with pixellab and wire it up").** It was
   four code-drawn frames (his victory pose, an outline, two rings). Now twelve, played over the same 160 frames: he braces and
   shakes, yells, a white burst, the afro turns gold in it, fists up in flames that grow, then stands in the aura. The bodies are

@@ -11,6 +11,7 @@ ROM_FN(void, World_SetView, (void *world, s32 *pos), 0x08006079);      // sets v
 #define WORLD_CELL (*(s32 **)0x083ED658)                                // -> world object (0x03001090)
 
 static void aim(s32 cx, s32 cy);
+int s13_camera(s32 *cx, s32 *cy);
 void camera_follow_hook(u8 *follow) {
     Entity *target = *(Entity **)(follow + 4);
     s32 r[4];
@@ -23,6 +24,7 @@ void camera_follow_hook(u8 *follow) {
         cx = (cx + (q[0] + q[2]) / 2) / 2;
         cy = (cy + (q[1] + q[3]) / 2) / 2;
     }
+    if (target == g_PlayerObject) s13_camera(&cx, &cy);   // Super 13 exploding: the view goes to him (super13.c)
     aim(cx, cy);
 }
 // One step of the follow toward a centre (px): the cinematic helpers aim it at their cast while a move plays (cine.c;

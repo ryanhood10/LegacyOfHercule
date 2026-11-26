@@ -86,6 +86,8 @@
 
 // The death: light bursts out of him (pose group 12), explosions all over, then one big blast and he is gone
 #define S13_DEATH_FRAMES  96
+#define S13_FINALE_FRAMES 48      // then the big blast: his body goes, three rings of explosions spread out
+#define S13_RING_EVERY    12      // (the summit's end script waits for all of it: data/story/arctic_summit.lscript)
 #define S13_LIVE          28      // live projectiles tracked
 
 // Pose groups of sprite 180 (tools/super13sprites.py)

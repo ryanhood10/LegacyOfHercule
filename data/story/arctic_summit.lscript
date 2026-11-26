@@ -441,16 +441,21 @@ end
 
 sequence summit_13_end
   script                                 ; Super 13 explodes, and 17 and 18 with him (his own 96-frame explosion first)
-        WaitFrames 100
+        ; Ryan, 2026-11-25 ("there was no big explosioin. the transition AFTER the fight was terrible"): the camera stayed on the
+        ; player and this scene started the moment his HP reached 0, which stops the world: his explosion froze after its first
+        ; bursts, off the screen, and the white came down at once. Now the scene starts when his explosion is over (super13.c
+        ; s13_spawn holds this action back; dying: 96 frames of bursts, then 48 of spreading rings, the camera on him: camera.c),
+        ; the camera stays where he stood, the white comes up slowly, holds, and lifts on the empty snow; a quiet beat, then back
+        ; to the player.
+        CoopCall 37, 14, 180, 8
+        WaitFrames 30
         FindPlayerEntity
         SetPlayerVisible 1
-        WhiteFlash 30
         PlayAudio 21
         ScreenShake 0, 30, 90
         PlayAudio 20
-        WaitFrames 60
-        FadeToWhite 30
-        WaitFrames 30
+        FadeToWhite 50
+        WaitFrames 50
         CoopCall 22, 2, 121, 0                 ; Tien and Yamcha, thrown to the rim in the scene, are on their feet when the white lifts
         JumpIfFalse T1
         SetEntityAnimationNoWait 121, 0
@@ -461,8 +466,11 @@ sequence summit_13_end
         SetEntityAnimationNoWait 156, 0
         SetEntityFacing 156, 2
       Y1:
-        WhiteFadeOut 60
-        CoopCall 22, 4, 2, 0                   ; Vegeta's line only when someone plays him (next 1), else 2
+        WhiteFadeOut 90
+        WaitFrames 70
+        CoopCall 37, 14, 0, 3
+        WaitFrames 20
+        CoopCall 22, 4, 2, 0                 ; Vegeta's line only when someone plays him (next 1), else 2
         JumpIfFalse V1
         PushByte 1
         END
