@@ -8,6 +8,110 @@ Every number in this page was counted from the repo on 2026-11-24 at commit `46d
 
 ---
 
+## Part 0. The video plan (2026-11-26)
+
+Part 1 below is the whole history in order, 17 chapters: too much for one video. This is the cut for one long video,
+about 18 minutes, told as "a 2003 game, one person directing an AI, 41 days". Each segment has what to say, what is on
+screen, and where that footage comes from. Finished Shorts are in `F:\DBZYoutube\FirstRun\exports`, raw runs in
+`F:\DBZYoutube\FirstRun`. "Capture" means it does not exist yet.
+
+Numbers to quote (2026-11-26): 41 days (Oct 16 to Nov 26), 694 commits, about 25,000 lines of C and 25,000 of Python
+tools (counted Nov 24), 24 story scripts, 33 new maps, 104 automatic tests, 9 party slots where the game had 6.
+
+### 0:00 Cold open (45 s)
+- **Say:** "This is a Game Boy Advance game from 2003. One player. Hercule was never playable. Forty-one days later it
+  looks like this, and I didn't write a line of the code."
+- **Show:** the twelve-frame power-up (`hercule_super_saiyan_short_FINAL`), Super 13's explosion
+  (`super13_unleashed_short_FINAL`), then two players on one screen (an early `run0x`). Hard cut to the title.
+
+### 0:45 What it is now (75 s)
+- **Say:** the feature list fast: two-player co-op, Hercule as a hero with a Super Saiyan form, new bosses (Android 16,
+  13, Super 13, Broly, Cooler), a World Tournament, the Time Chamber mode, a post-game. Then the numbers.
+- **Show:** a montage, 3-4 seconds per Short: Royal Rumble, Budokai tournament, Time Chamber, Mr. Popo, Legendary Super
+  Saiyan, Vegeta vs the clone, Vegeta vs Android 13.
+- **Say last:** nothing from the original game is shared; it is a patch you put on your own copy.
+
+### 2:00 Act 1: getting inside a game with no source code (2 min)
+- **Say:** there is no source code, only the cartridge's machine code. A decompiler (Ghidra) turns it back into
+  something readable, and functions get names one at a time: this one reads the buttons, this one is the player's dash.
+- **The idea that makes it work:** the cartridge has empty space at the end. New code goes there, and the game's own
+  tables are rewired to call it. Every feature in the video is new code living in that space.
+- **Show:** capture a Ghidra window beside `src/coop/rom.h`; a simple drawing of the ROM as a bar with the new block at
+  `0x08800000` (can be generated).
+
+### 4:00 Act 2: player 2 (2 min)
+- **Say:** the game assumed one player everywhere, and every assumption was a bug: enemies only chased player 1, the
+  camera followed one person, EXP went to one person, player 2 could not pick things up or use doors.
+- **Bug story:** the first crash was player 2 dashing. The player's list of functions had 48 entries and too few had
+  been copied.
+- **Say:** your brother plays over Parsec; the things tests could not catch came from those sessions (pickups, resting
+  heals, exits).
+- **Show:** the earliest two-player run (`run01`-`run05`); capture a Parsec session if you have one.
+
+### 6:00 Act 3: Hercule becomes a hero (2.5 min)
+- **Say:** the rule was "canon plus Hercule": the real story stays, Hercule is in it.
+- **The art problem, in three steps:** (1) Super Saiyan Hercule's first power-up was four frames drawn by code: a
+  recolour and rings. (2) Then twelve frames: his own poses over flames made in PixelLab from his sprite. (3) His own
+  portrait from a still you picked, with the gold moustache and blue eyes carried onto the sprite.
+- **Also good:** his Kamehameha pose was assembled from his punch stance and Goku's beam arms.
+- **Show:** the four-frame version next to the twelve-frame one, the pose sheet, the portrait (sheets can be generated).
+
+### 8:30 Act 4: new story and new bodies (2 min)
+- **Say:** scenes in the game are a tiny programming language. A tool turns them into text and back, so story is edited
+  like a script. Your dictated lines go in word for word. Scenes change depending on who you play and on one or two
+  players.
+- **New bodies:** characters the game never had are borrowed from the sequel, *Buu's Fury*, by decoding its sprite
+  format and translating it.
+- **Bug story (from today):** the tournament's "Majin Vegeta" was wearing Vegito's body, and "Vegito" was wearing
+  Gogeta's. Two fusions that look alike in a 32-pixel sprite.
+- **Show:** a `.lscript` file beside its scene (Piccolo and Kami, or Vegeta and the clone); the Buu's Fury sheet.
+
+### 10:30 Act 5: the big additions (2 min)
+- **Tournament:** brackets (1 v 1, 2 v 2, Royal Rumble, a 32-fighter Legend bracket), character select, unlocks, team
+  combos written from a document you edit, an announcer that never pauses the fight.
+- **Time Chamber:** a huge open area, six rooms, a gate, Mr. Popo as the hidden boss, harder each loop.
+- **Show:** the tournament, Rumble, Chamber and Popo Shorts; capture character select with everyone unlocked (key F3).
+
+### 12:30 Act 6: testing a game without playing it (1.5 min)
+- **Say:** you cannot play every scene after every change, so the emulator was turned into a robot: a text file
+  presses buttons, checks memory and takes screenshots. 104 tests, six at a time, after every change.
+- **Bug story:** a beam was freed while still in use, and the game jumped to a nonsense address (`0x1CF51CF0`).
+  Savestates break on every rebuild, which is why the F-key drop-ins exist.
+- **Show:** capture the terminal running the regression to "104 passed"; a tiled screenshot sheet from one test.
+
+### 14:00 Act 7: cutscenes that move (1.5 min)
+- **Say:** your rule: never stagnant, every lineup has bodies, fits the story, smooth not overdone. 95 scenes were
+  filmed and compared with how the anime staged them, then a fight toolkit was built (afterimage dashes, hit-stop,
+  beam struggles) and about 50 scenes re-staged.
+- **Show:** one scene before and after. Capture: the old version from an old ROM in `build/play/backup/`, the new one
+  from the play ROM.
+
+### 15:30 Act 8: what working with an AI was really like (2 min)
+- **Say:** you decided, one decision at a time, from the player's side; Claude grounded answers in facts dug out of the
+  game. Rules were written down and kept (never commit game data, dictated lines stay, never touch your emulator).
+  The repo is its own memory: an index, a registry of every number used, a dated log.
+- **Be honest about the misses:** portraits took three tries (a smoothing filter erased the eyes); the Vegito / Gogeta
+  mix-up; the AI also gets confidently wrong, which is why every change is tested. What only you could do: play it,
+  judge the art, pick the stills, decide the story.
+- **Show:** capture a session in the Claude app; scroll `CLAUDE.md`, `docs/ids.md`, `docs/log.md`.
+
+### 17:30 Outro (45 s)
+- **Say:** it ends with the Cell saga and its post-game; the Buu saga was planned and dropped to move on. What is next
+  for the channel. Follow.
+- **Show:** two players walking off; the Eldrin end card.
+
+### To capture before editing
+1. Ghidra window beside `rom.h`.
+2. A Parsec session with your brother (or an old recording of one).
+3. Character select with the full roster (F3).
+4. The regression running in a terminal.
+5. One cutscene from an old backup ROM and the same one now.
+6. A Claude session on screen.
+7. Generated stills: ROM bar drawing, Super Saiyan Hercule four vs twelve frames, pose sheet, Buu's Fury sheet, a test
+   screenshot sheet, a map render.
+
+---
+
 ## Part 1. The outline (video chapters)
 
 ### 0. The pitch (30 seconds)
