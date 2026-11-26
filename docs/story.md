@@ -721,8 +721,12 @@ epilogue, then the title screen; the talk-show bonus ending).
   characters say they have to stop this; the rest of the party watches from the sideline, so open
   dialogue still works (lines written per speaker or with the player's name; the duplicate-NPC rule
   keeps the two players' characters off the sideline).
-- **After 13 (Ryan):** back to Dende's Lookout (built 2026-10-20: after "Journal Updated!" the summit fades and warps
-  below Dende, whose finale then plays by itself through an arrival trigger, `pg_finale_cond`). The players' characters say they are happy to finally
+- **After 13 (Ryan):** back to Dende's Lookout. Since 2026-11-25 (Ryan: "it shouldnt transport me to kamis lookout. the cutscene
+  should have everyone celebrating, and then the player says 'we should get back to Kamis lookout' and thats it!") the summit
+  scene ends with everyone celebrating (Tien and Yamcha come over, each throws up his victory pose with a hop), Vegeta's line when
+  he is played, player 1's "We should get back to Kami's Lookout.", "Journal Updated!", and the players stay on the summit; its
+  world-map sign (dark during the fight) takes them on, the Lookout's star is back on the world map (382), and arriving below Dende
+  (or talking to him) plays the finale (`pg_finale_cond`). (2026-10-20 to 11-25 the scene faded and warped below Dende.) The players' characters say they are happy to finally
   have time to relax with no enemies to fight. Dende's last line: "Talk to me if you want to discuss
   our times of peace!"
 - **Dende's prompt (Ryan), from then on whenever he is talked to:** "Enter Peace Times and start

@@ -83,6 +83,7 @@ WEAK void tny_talk_test(u32 cmd, u32 arg, u32 arg2) { (void)cmd; (void)arg; (voi
 
 WEAK int  tny_play_row(int id) { (void)id; return 0; }
 WEAK const u32 *tny_lie_pose(const Entity *e, int *frame) { (void)e; *frame = 0; return 0; }
+WEAK const u32 *tny_win_group(const Entity *e, int *frame) { (void)e; *frame = 0; return 0; }
 WEAK void tny_play_entry(int id, CharacterEntry *out, const CharacterEntry *lead) { (void)id; (void)out; (void)lead; }
 
 // The dispatchers the game calls (vmcall.c, enemies.c, input.c): fixed here, so pieces never touch those files.

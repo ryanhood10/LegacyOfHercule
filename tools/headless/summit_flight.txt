@@ -6,7 +6,7 @@
 #    (Hercule) each stand on the flight spot (rect (201, 401)-(268, 476) round the sign) and press A: still on the summit
 #    (15 / 8), Super 13 still fighting (S13 + 0x15 = 1), and player 1's A a swing (his control state not the idle one,
 #    0x03001F64: a box that would take the press holds the swing back). The fight won (the boss win queued as the Cell
-#    Games test does it), the end scene takes everyone to the Lookout (9 / 1), 382 set.
+#    Games test does it), the end scene leaves everyone on the summit (no warp since 2026-11-25), 382 set, and A on the sign flies.
 # B: the same hold and its release on one map: the arctic landing (15 / 1, flight rect (89, 217)-(168, 296)), Super 13 by
 #    test command 17 beside player 1: A on the sign does nothing; his HP to 0, the explosion, state 3: A on the sign flies
 #    to the world map (6 / 99).
@@ -86,41 +86,29 @@ map
 echo EXPECT \w+: 01
 peek8 S13+0x15
 shot sf_04_p2_still_here
-echo == the fight won (the boss win queued as the Cell Games test does it), the end scene: to the Lookout
+echo == the fight won (the boss win queued as the Cell Games test does it), the end scene: the players stay on the summit
 poke32 0x0203F9B0 0xCE11CA3E
 poke8 0x0203F9B5 146
 poke8 0x0203F9B6 0
 stepz 0x0203F9B5 60
 shot sf_05_won
-p2 1
-key 1 6
-p2 0
-frames 100
-p2 1
-key 1 6
-p2 0
-frames 100
-p2 1
-key 1 6
-p2 0
-frames 100
-p2 1
-key 1 6
-p2 0
-frames 100
-p2 1
-key 1 6
-p2 0
-frames 100
-p2 1
-key 1 6
-p2 0
-frames 300
-echo EXPECT map zone 9 area 1
+frames 200
+stepz 0x03001FDC 150
+frames 60
+echo EXPECT map zone 15 area 8
 map
 echo == 382 set: FLAGS+47 bit 6
 echo EXPECT \w+: [4-7c-f][0-9a-f]
 peek8 FLAGS+47
+echo == the sign flies again: player 1 on the flight spot, A
+findent PL 0x08025604
+poke32 PL+0x158 0xEA00
+poke32 PL+0x15C 0x1B800
+frames 20
+key 1 6
+frames 200
+echo EXPECT map zone 6 area 99
+map
 echo === B: the arctic landing, Super 13 by test command 17: the flight spot waits, then works once he has exploded
 load menu.ss
 p2 0

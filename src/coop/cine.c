@@ -132,7 +132,7 @@ _Static_assert(sizeof(CineRam) <= 0x100, "cineram is 0x100 bytes (coop.ld)");
 static CineRam ram __attribute__((section(".cine"), used));
 
 enum { END_NONE, END_PLAYED, END_SKIPPED, END_LOST, END_TIMEOUT, END_QUIET, END_STUCK };
-enum { P_IDLE, P_HURT, P_FALL, P_PUNCH, P_KICK, P_KI, P_BEAM, P_CHARGE, P_DASH, P_LIE, P_KNEEL, P_COUNT };
+enum { P_IDLE, P_HURT, P_FALL, P_PUNCH, P_KICK, P_KI, P_BEAM, P_CHARGE, P_DASH, P_LIE, P_KNEEL, P_CHEER, P_COUNT };
 
 typedef struct CProj {
     u32 *vtable; s32 sort; u8 prio, _p0[3]; u16 tile, size; const Desc *loaded;
@@ -312,7 +312,7 @@ static const s8 kinds[P_COUNT][4] = {
     [P_IDLE] = { 0, -1, -1, -1 },  [P_HURT] = { 2, 11, 0, -1 },  [P_FALL] = { 3, 2, 0, -1 },
     [P_PUNCH] = { 7, 6, 8, 0 },    [P_KICK] = { 8, 6, 7, 0 },    [P_KI] = { 5, 6, 7, 0 },
     [P_BEAM] = { 18, 5, 0, -1 },   [P_CHARGE] = { 5, 0, -1, -1 }, [P_DASH] = { 13, 1, 0, -1 },
-    [P_LIE] = { 12, 3, 2, 0 },     [P_KNEEL] = { 3, 2, 0, -1 },
+    [P_LIE] = { 12, 3, 2, 0 },     [P_KNEEL] = { 3, 2, 0, -1 },  [P_CHEER] = { 4, 14, 5, 0 },
 };
 static const u32 *kind_group(const Entity *e, int kind) {
     if (kind >= P_COUNT) kind = P_IDLE;
@@ -339,6 +339,11 @@ static void pose_kind(Entity *e, int kind, int f) {
         int lf = 0;
         const u32 *lg = tny_lie_pose(e, &lf);
         if (lg) { put_pose(e, lg, lf); return; }
+    }
+    if (kind == P_CHEER) {                          // the tournament's victory pose (its table, built ones too), else 4 / 14 / 5
+        int cf = 0;
+        const u32 *cg = tny_win_group(e, &cf);
+        if (cg) { put_pose(e, cg, cf); return; }
     }
     const u32 *g = kind_group(e, kind);
     if (kind == P_KNEEL) f = g == group_of(e, 3) ? 1 : 7;      // the fall's second frame (down on a knee), else the hit-stun's last
@@ -1537,7 +1542,8 @@ static void op_struggle(Run *r) {
     if (k > 44 && !l->kt && k > 25 + KN_FLY + KN_SLIDE + 12 && (!beam_live(r, wi) || k > 90)) finish(r, END_PLAYED);
 }
 
-// ---- rise, kneel, fall (the run's A is the body named) ----------------------------------------------------------------------
+// ---- rise, kneel, fall, cheer (the run's A is the body named) ---------------------------------------------------------------
+#define CHEER_HOP 16                                // the cheer's hop: frames up and down (6 px: the tournament's trophy hop)
 static void op_pose(Run *r) {
     Entity *e = A->e;
     int t = r->t;
@@ -1551,6 +1557,10 @@ static void op_pose(Run *r) {
         if (t == len + 1) pose(A, P_IDLE, 0, 0, 0);
         A->endpose = P_IDLE;
         if (t >= len + 4) finish(r, END_PLAYED);
+    } else if (r->p[1] == 3) {                      // the cheer: his victory pose facing us, one hop, held
+        if (t == 0) { e->facing = 0; pose(A, P_CHEER, 0, 0, 0); move(A, A->x, A->y, CHEER_HOP, 6); }
+        A->endpose = P_CHEER;
+        if (t >= CHEER_HOP + 2) finish(r, END_PLAYED);
     } else if (r->p[1] == 1) {                      // down on a knee
         if (t == 0) pose(A, P_FALL, 0, 0, 0);
         if (t == 5) { pose(A, P_KNEEL, 0, 0, 0); A->endpose = P_KNEEL; }
@@ -1857,7 +1867,7 @@ int cine_call(s32 op, s32 b, s32 c, s32 *push) {
         break;
     case CINE_POSE:
         e = body_of(ram.cast[b ? 1 : 0]);
-        if (!e || c < 0 || c > 2) break;
+        if (!e || c < 0 || c > 3) break;
         if (c == 0 && !held(e)) break;              // nothing to rise from
         if (c == 0) {
             const u32 *g3 = group_of(e, 3);

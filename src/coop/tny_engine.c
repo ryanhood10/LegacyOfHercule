@@ -1239,6 +1239,13 @@ static int win_pose(const Entity *e, int *frame) {
     return -1;
 }
 
+// A body's victory pose for a scene (cine.c's cheer, CoopCall 37 op 10 pose 3): the group arrays to show (the record's or a
+// built one) and its frame; 0 when the body has none
+const u32 *tny_win_group(const Entity *e, int *frame) {
+    int g = win_pose(e, frame);
+    return g < 0 ? 0 : pose_grp(e, (u8)g);
+}
+
 static int pose_at(const Entity *e);
 // Hold e in a pose for the line: lying (the loser) or the victory pose (the winner, facing the crowd). The loser lies
 // in a side facing (the down / up facings of the lying groups are front views of a body half sitting up); the

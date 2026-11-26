@@ -95,9 +95,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit SK
 load menu.ss
 p2 0
@@ -172,9 +174,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit HS
 load menu.ss
 p2 0
@@ -249,9 +253,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit GS
 load menu.ss
 p2 0
@@ -326,9 +332,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit H
 load menu.ss
 p2 off
@@ -421,9 +429,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit S
 load menu.ss
 p2 off
@@ -494,9 +504,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit V
 load menu.ss
 p2 off
@@ -567,9 +579,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit HV
 load menu.ss
 p2 0
@@ -644,9 +658,11 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo === summit VG
 load menu.ss
 p2 0
@@ -721,7 +737,9 @@ frames 30
 echo EXPECT 03001fdc: 00000000
 peek 0x03001FDC 1
 frames 200
-echo EXPECT map zone 9 area 1\b
+echo EXPECT map zone 15 area 8\b
 map
 ents
+echo EXPECT \w+: [4-7c-f][0-9a-f]
+peek8 FLAGS+47
 echo ALIVE

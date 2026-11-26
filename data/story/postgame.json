@@ -14,16 +14,11 @@
           "talk": "seq:pg_dende"
         }
       },
-      "_": "Dende (record 4) runs the post-game; arriving below him from the summit plays the finale by itself",
+      "_": "Dende (record 4) runs the post-game; walking up to him with Super 13 beaten plays the finale by itself (the rect spans the walkway: the players come from the world-map landing (768, 832) since 2026-11-25, no longer warped in below him)",
       "add_triggers": [
         {
           "kind": "dialogue",
-          "rect": [
-            736,
-            432,
-            784,
-            472
-          ],
+          "rect": [560, 424, 980, 476],
           "payload": "seq:pg_dende",
           "condition": "script:pg_finale_cond"
         }

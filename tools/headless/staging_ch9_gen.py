@@ -117,5 +117,8 @@ for p1, p2, s56 in ((KRILLIN, SS2, 0), (SS2, KRILLIN, 0), (HERCULE, SS2, 0), (GO
     s.out("frames 200")
     s.end_scene()
     s.out("frames 200")
-    s.on_map(9, 1)
+    # no warp since 2026-11-25 (Ryan: "DONT teleport the player to kamis lookout!"): the celebration, the line, and the players
+    # stay on the summit with Super 13 beaten (382)
+    s.on_map(15, 8)
+    s.out(r"echo EXPECT \w+: [4-7c-f][0-9a-f]", "peek8 FLAGS+47")
 s.write("staging_arctic.txt")

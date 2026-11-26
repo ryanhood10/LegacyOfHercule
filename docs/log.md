@@ -4,6 +4,21 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-25
 
+- **After Super 13 the players stay on the summit (Ryan: "after i defeat him, it shouldnt transport me to kamis lookout. the
+  cutscene should have everyone celebrating, and then the player says 'we should get back to Kamis lookout' and thats it! DONT
+  teleport the player to kamis lookout! theres a world map in the arena that should become active AFTER you defeat super
+  andriod").** `summit_13_end` (`arctic_summit.lscript`): after the white lifts the camera comes back to the players, Tien and Yamcha
+  dash over from the rim, and each body in turn throws up his victory pose with a hop and holds it (a new cine pose, `CoopCall 37,
+  10, who, 3`, the cheer: `tny_win_group`, the tournament's win poses, built ones too), a jolt; Vegeta's line when he is played;
+  player 1's `fmt 250 "%s: We should get back to Kami's Lookout."` (his words; the capitals, the apostrophe and the full stop
+  mine); "Journal Updated!"; Super 13's body is despawned and that is all. The summit's sign was dark only while he fought
+  (`flight_hold`): it flies to the world map again, and the Lookout's star is back there with 382. **The finale's arrival
+  trigger** (`postgame.json`, below Dende) was 48 px wide, made for the warp that landed inside it: walking up from the
+  world-map landing (768, 832) a player passed it at x 731. It spans the walkway now, (560, 424)-(980, 476); talking to Dende
+  plays the finale too. Tests: `summit_flight.txt` (the players stay, 382, the sign flies), `staging_arctic.txt` (regenerated:
+  15 / 8 and 382 for every lineup). Filmed: `build/ssjh/kr4.txt` (the win as 16, the celebration, the line, the sign),
+  `kr5.txt` (the Lookout: walking up from the landing plays the finale).
+
 - **Super 13's explosion never played (Ryan, after the F2 key: "after i killed super 13 there was no big explosioin. the transition
   AFTER the fight was terrible").** The stock fires a record's action the moment HP reaches 0, the action was the summit's end
   scene, and a scene stops the world: `dying` (`super13.c`) froze after its first bursts, usually off the view since the camera
