@@ -4,6 +4,14 @@ Newest first. One entry per landed piece or decision; details live in the linked
 
 ## 2026-11-25
 
+- **The video set's F3: the tournament with the whole roster (Ryan: "lets do the tournament rumble one next").** The waiting room
+  just above the director, every tier open (`dropins_showcase.py --video`); test command 24 gets a new bit, `TFORCE_UNLOCKED` (4):
+  every beat-to-unlock fighter and challenger is playable (`tny_unlocked`) and `rec_save` writes nothing, so the record on his
+  own save (EEPROM 0x1E00, which the key reads, not the state) never takes the showcase's unlocks or its wins. The force is set
+  before the flags: while it is on the engine announces no new tiers (four pop-ups otherwise). Filmed by pad presses
+  (`build/ssjh/r6.txt`, `r7.txt`): the director, Legend, Royal Rumble, 8 fighters, the select's four tabs full and in colour, the
+  Rumble's rounds (the announcer, packs of three fighting each other and Piccolo).
+
 - **After Super 13 the players stay on the summit (Ryan: "after i defeat him, it shouldnt transport me to kamis lookout. the
   cutscene should have everyone celebrating, and then the player says 'we should get back to Kamis lookout' and thats it! DONT
   teleport the player to kamis lookout! theres a world map in the arena that should become active AFTER you defeat super

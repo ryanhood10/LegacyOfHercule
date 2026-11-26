@@ -179,6 +179,9 @@ static const char *tny_queue[4] TNY_SECTION("eq") __attribute__((used));   // th
 
 #define TFORCE_POOL_FLAGS 1      // ignore the fighters' story flags (pool_flag)
 #define TFORCE_STANDIN    2      // a fighter whose art is not in this build fights with a stock stand-in body
+#define TFORCE_UNLOCKED   4      // every beat-to-unlock fighter and challenger playable, and the record never written (a video
+                                 // drop-in on Ryan's own save: dropins_showcase.py --video F3)
+static int forced(int bit) { return eng.magic == ENG_MAGIC && (eng.force_flags & bit); }
 #define STANDIN_SPRITE    121    // Tien's body (AI set 98)
 
 // ---- opponents' numbers (stats 160-219) ------------------------------------------------------------------
@@ -361,6 +364,7 @@ static void rec_load(void) {
     }
 }
 static void rec_save(void) {
+    if (forced(TFORCE_UNLOCKED)) return;             // the showcase's unlocks are not his: his save's record stays as it was
     eng.rec.magic = TREC_MAGIC;
     eng.rec.version = TREC_VERSION;
     eng.rec.checksum = Save_Checksum(&eng.rec, sizeof eng.rec - 4);
@@ -512,6 +516,7 @@ int tny_unlocked(int id) {
         return in_party(f->story_slot);
     }
     if (!(f->role & (TR_BEAT | TR_CHALLENGER))) return 0;
+    if (forced(TFORCE_UNLOCKED)) return 1;
     state_check();
     rec_load();
     return rec_bit(id);
@@ -2850,7 +2855,8 @@ int tny_engine_call(int fn, s32 a, s32 b, s32 c, s32 *push) {
 //   22 FORCE      arg 0: every opponent in the fight takes a lethal blow from player 1 (a won fight); 1: the fight is
 //                 lost; 2: the running duel ends, arg2 = the winner (1 / 2)
 //   23 RECORD     arg 0: wipe the record; 1 / 2: set / clear fighter arg2's unlock bit; 3: reread it into eng.rec
-//   24 FORCE_POOL arg = tiers forced open (bits 0-4), arg2 = TFORCE_* (1 ignore story flags, 2 stand-in bodies)
+//   24 FORCE_POOL arg = tiers forced open (bits 0-4), arg2 = TFORCE_* (1 ignore story flags, 2 stand-in bodies, 4 everyone
+//      unlocked and the record never written)
 //   25 START      a tournament without the screens: arg = division | full << 4 (2: 32 fighters, a 2 v 2's) | tier << 8, arg2 = pick 1 | pick 2 << 8
 //                 (0xFF = his own character); from wherever player 1 stands (that is also the way back)
 //   38 CHECKS     the perfecting pass's checks (docs/ids.md). arg 0: a check, arg2 = kind << 16 | n; the answer
